@@ -1,7 +1,7 @@
 import { Conversation } from "@/types";
 import { IconPlus } from "@tabler/icons-react";
 import { FC } from "react";
-import { Conversations } from "../Conversations";
+import { Conversations } from "./Conversations";
 import { SidebarSettings } from "./SidebarSettings";
 
 interface Props {
