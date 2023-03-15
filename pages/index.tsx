@@ -119,8 +119,10 @@ export default function Home() {
   };
 
   const handleNewConversation = () => {
+    const lastConversation = conversations[conversations.length - 1];
+
     const newConversation: Conversation = {
-      id: conversations.length + 1,
+      id: lastConversation ? lastConversation.id + 1 : 1,
       name: "",
       messages: []
     };
