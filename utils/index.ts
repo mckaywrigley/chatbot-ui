@@ -16,7 +16,7 @@ export const OpenAIStream = async (model: OpenAIModel, messages: Message[]) => {
       messages: [
         {
           role: "system",
-          content: `You are a helpful, friendly, assistant.`
+          content: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully.`
         },
         ...messages
       ],
