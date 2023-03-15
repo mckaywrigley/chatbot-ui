@@ -10,6 +10,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -20,6 +21,7 @@ export default function Home() {
 
       setSelectedConversation(updatedConversation);
       setLoading(true);
+      setDisabled(true);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -106,6 +108,8 @@ export default function Home() {
       setConversations(updatedConversations);
 
       localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+      setDisabled(false);
     }
   };
 
@@ -142,8 +146,15 @@ export default function Home() {
     setConversations(updatedConversations);
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
-    if (selectedConversation && selectedConversation.id === conversation.id) {
-      setSelectedConversation(undefined);
+    if (updatedConversations.length > 0) {
+      setSelectedConversation(updatedConversations[0]);
+      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[0]));
+    } else {
+      setSelectedConversation({
+        id: 1,
+        name: "",
+        messages: []
+      });
       localStorage.removeItem("selectedConversation");
     }
   };
@@ -193,6 +204,7 @@ export default function Home() {
       {selectedConversation && (
         <div className={`flex h-screen text-white ${lightMode}`}>
           <Sidebar
+            loading={disabled}
             conversations={conversations}
             lightMode={lightMode}
             selectedConversation={selectedConversation}

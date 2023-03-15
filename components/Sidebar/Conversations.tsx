@@ -3,20 +3,22 @@ import { IconMessage, IconTrash } from "@tabler/icons-react";
 import { FC } from "react";
 
 interface Props {
+  loading: boolean;
   conversations: Conversation[];
   selectedConversation: Conversation;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
 }
 
-export const Conversations: FC<Props> = ({ conversations, selectedConversation, onSelectConversation, onDeleteConversation }) => {
+export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, onSelectConversation, onDeleteConversation }) => {
   return (
     <div className="flex flex-col space-y-2">
       {conversations.map((conversation, index) => (
-        <div
+        <button
           key={index}
-          className={`flex items-center justify-start w-[240px] h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
+          className={`flex items-center justify-start w-[240px] h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
           onClick={() => onSelectConversation(conversation)}
+          disabled={loading}
         >
           <IconMessage
             className="mr-2 min-w-[20px]"
@@ -32,7 +34,7 @@ export const Conversations: FC<Props> = ({ conversations, selectedConversation, 
               onDeleteConversation(conversation);
             }}
           />
-        </div>
+        </button>
       ))}
     </div>
   );

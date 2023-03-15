@@ -5,6 +5,7 @@ import { Conversations } from "./Conversations";
 import { SidebarSettings } from "./SidebarSettings";
 
 interface Props {
+  loading: boolean;
   conversations: Conversation[];
   lightMode: "light" | "dark";
   selectedConversation: Conversation;
@@ -14,7 +15,7 @@ interface Props {
   onDeleteConversation: (conversation: Conversation) => void;
 }
 
-export const Sidebar: FC<Props> = ({ conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation }) => {
+export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation }) => {
   return (
     <div className="flex flex-col bg-[#202123] min-w-[260px]">
       <div className="flex items-center justify-center h-[60px]">
@@ -32,6 +33,7 @@ export const Sidebar: FC<Props> = ({ conversations, lightMode, selectedConversat
 
       <div className="flex-1 mx-auto pb-2 overflow-auto">
         <Conversations
+          loading={loading}
           conversations={conversations}
           selectedConversation={selectedConversation}
           onSelectConversation={onSelectConversation}
