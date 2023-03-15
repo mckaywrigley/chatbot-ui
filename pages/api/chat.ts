@@ -1,4 +1,4 @@
-import { Message } from "@/types";
+import { Message, OpenAIModel } from "@/types";
 import { OpenAIStream } from "@/utils";
 
 export const config = {
@@ -7,7 +7,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { messages } = (await req.json()) as {
+    const { model, messages } = (await req.json()) as {
+      model: OpenAIModel;
       messages: Message[];
     };
 
@@ -24,7 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
       messagesToSend.push(message);
     }
 
-    const stream = await OpenAIStream(messagesToSend);
+    const stream = await OpenAIStream(model, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

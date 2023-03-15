@@ -1,7 +1,7 @@
 import { Message, OpenAIModel } from "@/types";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
 
-export const OpenAIStream = async (messages: Message[]) => {
+export const OpenAIStream = async (model: OpenAIModel, messages: Message[]) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -12,7 +12,7 @@ export const OpenAIStream = async (messages: Message[]) => {
     },
     method: "POST",
     body: JSON.stringify({
-      model: OpenAIModel.DAVINCI_TURBO,
+      model,
       messages: [
         {
           role: "system",

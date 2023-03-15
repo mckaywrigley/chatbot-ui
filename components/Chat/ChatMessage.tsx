@@ -7,12 +7,14 @@ interface Props {
 
 export const ChatMessage: FC<Props> = ({ message }) => {
   return (
-    <div className={`flex flex-col ${message.role === "assistant" ? "items-start" : "items-end"}`}>
-      <div
-        className={`flex items-center ${message.role === "assistant" ? "bg-neutral-200 text-neutral-900" : "bg-blue-500 text-white"} rounded-2xl px-3 py-2 max-w-[67%] whitespace-pre-wrap`}
-        style={{ overflowWrap: "anywhere" }}
-      >
-        {message.content}
+    <div
+      className={`flex justify-center px-[120px] py-[30px] whitespace-pre-wrap] ${message.role === "assistant" ? "dark:bg-[#434654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none" : "dark:bg-[#343541] dark:text-white text-neutral-900"}`}
+      style={{ overflowWrap: "anywhere" }}
+    >
+      <div className="w-[650px] flex">
+        <div className="mr-4 font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
+
+        <div className="whitespace-pre-wrap">{message.content}</div>
       </div>
     </div>
   );

@@ -1,19 +1,14 @@
 import { Chat } from "@/components/Chat/Chat";
-import { Footer } from "@/components/Layout/Footer";
-import { Navbar } from "@/components/Layout/Navbar";
-import { Message } from "@/types";
+import { Sidebar } from "@/components/Sidebar/Sidebar";
+import { Message, OpenAIModel } from "@/types";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
+  const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
 
   const handleSend = async (message: Message) => {
     const updatedMessages = [...messages, message];
@@ -27,6 +22,7 @@ export default function Home() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        model,
         messages: updatedMessages
       })
     });
@@ -76,18 +72,7 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    setMessages([
-      {
-        role: "assistant",
-        content: `Hi there! I'm Chatbot UI, an AI assistant. I can help you with things like answering questions, providing information, and helping with tasks. How can I help you?`
-      }
-    ]);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -107,20 +92,21 @@ export default function Home() {
         />
       </Head>
 
-      <div className="flex flex-col h-screen">
-        <Navbar />
+      <div className={`flex h-screen text-white ${lightMode}`}>
+        <Sidebar
+          lightMode={lightMode}
+          onToggleLightMode={setLightMode}
+        />
 
-        <div className="flex-1 overflow-auto sm:px-10 pb-4 sm:pb-10">
-          <div className="max-w-[800px] mx-auto mt-4 sm:mt-12">
-            <Chat
-              messages={messages}
-              loading={loading}
-              onSend={handleSend}
-            />
-            <div ref={messagesEndRef} />
-          </div>
+        <div className="flex flex-col w-full h-full dark:bg-[#343541]">
+          <Chat
+            model={model}
+            messages={messages}
+            loading={loading}
+            onSend={handleSend}
+            onSelect={setModel}
+          />
         </div>
-        <Footer />
       </div>
     </>
   );

@@ -1,5 +1,5 @@
 import { Message } from "@/types";
-import { IconArrowUp } from "@tabler/icons-react";
+import { IconSend } from "@tabler/icons-react";
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface Props {
@@ -46,20 +46,24 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
 
   return (
     <div className="relative">
-      <textarea
-        ref={textareaRef}
-        className="min-h-[44px] rounded-lg pl-4 pr-12 py-2 w-full focus:outline-none focus:ring-1 focus:ring-neutral-300 border-2 border-neutral-200"
-        style={{ resize: "none" }}
-        placeholder="Type a message..."
-        value={content}
-        rows={1}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-
-      <button onClick={() => handleSend()}>
-        <IconArrowUp className="absolute right-2 bottom-3 h-8 w-8 hover:cursor-pointer rounded-full p-1 bg-blue-500 text-white hover:opacity-80" />
-      </button>
+      <div className="absolute bottom-[-120px] w-full">
+        <textarea
+          ref={textareaRef}
+          className="rounded-lg pl-4 pr-8 py-3 w-full focus:outline-none max-h-[280px] dark:bg-[#40414F] dark:border-opacity-50 dark:border-neutral-800 dark:text-neutral-100 border border-neutral-300 shadow text-neutral-900"
+          style={{ resize: "none", bottom: `${textareaRef?.current?.scrollHeight}px` }}
+          placeholder="Type a message..."
+          value={content}
+          rows={1}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
+        <button
+          className="absolute right-2 bottom-[14px] text-neutral-400 p-2 hover:dark:bg-neutral-800 hover:bg-neutral-400 hover:text-white rounded-md"
+          onClick={handleSend}
+        >
+          <IconSend size={18} />
+        </button>
+      </div>
     </div>
   );
 };
