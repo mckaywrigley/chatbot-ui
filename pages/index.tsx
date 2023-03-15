@@ -44,11 +44,14 @@ export default function Home() {
     const decoder = new TextDecoder();
     let done = false;
     let isFirst = true;
+    let text = "";
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
+
+      text += chunkValue;
 
       if (isFirst) {
         isFirst = false;
@@ -70,9 +73,29 @@ export default function Home() {
         });
       }
     }
+
+    localStorage.setItem("messageHistory", JSON.stringify([...updatedMessages, { role: "assistant", content: text }]));
   };
 
-  useEffect(() => {}, []);
+  const handleLightMode = (mode: "dark" | "light") => {
+    setLightMode(mode);
+    localStorage.setItem("theme", mode);
+  };
+
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+
+    if (theme) {
+      setLightMode(theme as "dark" | "light");
+    }
+
+    const messageHistory = localStorage.getItem("messageHistory");
+    console.log(messageHistory);
+
+    if (messageHistory) {
+      setMessages(JSON.parse(messageHistory));
+    }
+  }, []);
 
   return (
     <>
@@ -95,7 +118,7 @@ export default function Home() {
       <div className={`flex h-screen text-white ${lightMode}`}>
         <Sidebar
           lightMode={lightMode}
-          onToggleLightMode={setLightMode}
+          onToggleLightMode={handleLightMode}
         />
 
         <div className="flex flex-col w-full h-full dark:bg-[#343541]">
