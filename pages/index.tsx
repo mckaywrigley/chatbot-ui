@@ -189,6 +189,7 @@ export default function Home() {
           href="/favicon.ico"
         />
       </Head>
+
       {selectedConversation && (
         <div className={`flex h-screen text-white ${lightMode}`}>
           <Sidebar
