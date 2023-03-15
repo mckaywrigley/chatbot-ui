@@ -26,7 +26,7 @@ Modify the chat interface in `components/Chat`.
 
 Modify the sidebar interface in `components/Sidebar`.
 
-Tweak the system prompt in `utils/index.ts`.
+Modify the system prompt in `utils/index.ts`.
 
 ## Deploy
 
