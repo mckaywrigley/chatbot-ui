@@ -1,80 +1,112 @@
 import { Chat } from "@/components/Chat/Chat";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { Message, OpenAIModel } from "@/types";
+import { Conversation, Message, OpenAIModel } from "@/types";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
 
   const handleSend = async (message: Message) => {
-    const updatedMessages = [...messages, message];
+    if (selectedConversation) {
+      let updatedConversation: Conversation = {
+        ...selectedConversation,
+        messages: [...selectedConversation.messages, message]
+      };
 
-    setMessages(updatedMessages);
-    setLoading(true);
+      setSelectedConversation(updatedConversation);
+      setLoading(true);
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model,
-        messages: updatedMessages
-      })
-    });
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model,
+          messages: updatedConversation.messages
+        })
+      });
 
-    if (!response.ok) {
-      setLoading(false);
-      throw new Error(response.statusText);
-    }
-
-    const data = response.body;
-
-    if (!data) {
-      return;
-    }
-
-    setLoading(false);
-
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let isFirst = true;
-    let text = "";
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-
-      text += chunkValue;
-
-      if (isFirst) {
-        isFirst = false;
-        setMessages((messages) => [
-          ...messages,
-          {
-            role: "assistant",
-            content: chunkValue
-          }
-        ]);
-      } else {
-        setMessages((messages) => {
-          const lastMessage = messages[messages.length - 1];
-          const updatedMessage = {
-            ...lastMessage,
-            content: lastMessage.content + chunkValue
-          };
-          return [...messages.slice(0, -1), updatedMessage];
-        });
+      if (!response.ok) {
+        setLoading(false);
+        throw new Error(response.statusText);
       }
-    }
 
-    localStorage.setItem("messageHistory", JSON.stringify([...updatedMessages, { role: "assistant", content: text }]));
+      const data = response.body;
+
+      if (!data) {
+        return;
+      }
+
+      setLoading(false);
+
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let isFirst = true;
+      let text = "";
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+
+        text += chunkValue;
+
+        if (isFirst) {
+          isFirst = false;
+          const updatedMessages: Message[] = [...updatedConversation.messages, { role: "assistant", content: chunkValue }];
+
+          updatedConversation = {
+            ...updatedConversation,
+            messages: updatedMessages
+          };
+
+          setSelectedConversation(updatedConversation);
+        } else {
+          const updatedMessages: Message[] = updatedConversation.messages.map((message, index) => {
+            if (index === updatedConversation.messages.length - 1) {
+              return {
+                ...message,
+                content: text
+              };
+            }
+
+            return message;
+          });
+
+          updatedConversation = {
+            ...updatedConversation,
+            messages: updatedMessages
+          };
+
+          setSelectedConversation(updatedConversation);
+        }
+      }
+
+      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+
+      const updatedConversations: Conversation[] = conversations.map((conversation) => {
+        if (conversation.id === selectedConversation.id) {
+          return updatedConversation;
+        }
+
+        return conversation;
+      });
+
+      if (updatedConversations.length === 0) {
+        updatedConversations.push(updatedConversation);
+      }
+
+      setConversations(updatedConversations);
+
+      localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+    }
   };
 
   const handleLightMode = (mode: "dark" | "light") => {
@@ -82,18 +114,61 @@ export default function Home() {
     localStorage.setItem("theme", mode);
   };
 
+  const handleNewConversation = () => {
+    const newConversation: Conversation = {
+      id: conversations.length + 1,
+      name: "",
+      messages: []
+    };
+
+    const updatedConversations = [...conversations, newConversation];
+    setConversations(updatedConversations);
+    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+    setSelectedConversation(newConversation);
+    localStorage.setItem("selectedConversation", JSON.stringify(newConversation));
+
+    setModel(OpenAIModel.GPT_3_5);
+    setLoading(false);
+  };
+
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    localStorage.setItem("selectedConversation", JSON.stringify(conversation));
+  };
+
+  const handleDeleteConversation = (conversation: Conversation) => {
+    const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
+    setConversations(updatedConversations);
+    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+    if (selectedConversation && selectedConversation.id === conversation.id) {
+      setSelectedConversation(undefined);
+      localStorage.removeItem("selectedConversation");
+    }
+  };
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
-
     if (theme) {
       setLightMode(theme as "dark" | "light");
     }
 
-    const messageHistory = localStorage.getItem("messageHistory");
-    console.log(messageHistory);
+    const conversationHistory = localStorage.getItem("conversationHistory");
 
-    if (messageHistory) {
-      setMessages(JSON.parse(messageHistory));
+    if (conversationHistory) {
+      setConversations(JSON.parse(conversationHistory));
+    }
+
+    const selectedConversation = localStorage.getItem("selectedConversation");
+    if (selectedConversation) {
+      setSelectedConversation(JSON.parse(selectedConversation));
+    } else {
+      setSelectedConversation({
+        id: 1,
+        name: "",
+        messages: []
+      });
     }
   }, []);
 
@@ -114,23 +189,29 @@ export default function Home() {
           href="/favicon.ico"
         />
       </Head>
-
-      <div className={`flex h-screen text-white ${lightMode}`}>
-        <Sidebar
-          lightMode={lightMode}
-          onToggleLightMode={handleLightMode}
-        />
-
-        <div className="flex flex-col w-full h-full dark:bg-[#343541]">
-          <Chat
-            model={model}
-            messages={messages}
-            loading={loading}
-            onSend={handleSend}
-            onSelect={setModel}
+      {selectedConversation && (
+        <div className={`flex h-screen text-white ${lightMode}`}>
+          <Sidebar
+            conversations={conversations}
+            lightMode={lightMode}
+            selectedConversation={selectedConversation}
+            onToggleLightMode={handleLightMode}
+            onNewConversation={handleNewConversation}
+            onSelectConversation={handleSelectConversation}
+            onDeleteConversation={handleDeleteConversation}
           />
+
+          <div className="flex flex-col w-full h-full dark:bg-[#343541]">
+            <Chat
+              model={model}
+              messages={selectedConversation.messages}
+              loading={loading}
+              onSend={handleSend}
+              onSelect={setModel}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
