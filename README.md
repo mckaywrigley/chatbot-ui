@@ -1,12 +1,10 @@
 # Chatbot UI Pro
 
-An advanced chatbot kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS.
+Chatbot UI Pro is an advanced chatbot kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS.
 
 It aims to mimic ChatGPT's interface and functionality.
 
 All conversations are stored locally on your device.
-
-See a [demo]().
 
 ![Chatbot UI Pro](./public/screenshot.png)
 
@@ -16,11 +14,13 @@ Chatbot UI Pro will be updated over time.
 
 Expect frequent improvements.
 
-## Features
+Next up:
 
-Chatbot UI Pro provides a ChatGPT-like interface that you can use to start building your own chatbot apps powered by OpenAI.
+- Mobile view
+- Markdown formatting
+- Conversation naming
 
-It has everything you need to hit the ground running.
+## Modifications
 
 Modify the chat interface in `components/Chat`.
 
