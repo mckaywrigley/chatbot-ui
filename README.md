@@ -6,7 +6,7 @@ It aims to mimic ChatGPT's interface and functionality.
 
 All conversations are stored locally on your device.
 
-See a [demo]().
+See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
 
 ![Chatbot UI Pro](./public/screenshot.png)
 
