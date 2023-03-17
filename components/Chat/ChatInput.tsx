@@ -8,6 +8,7 @@ interface Props {
 
 export const ChatInput: FC<Props> = ({ onSend }) => {
   const [content, setContent] = useState<string>();
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -31,7 +32,7 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -54,6 +55,8 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
           placeholder="Type a message..."
           value={content}
           rows={1}
+          onCompositionStart={() => setIsTyping(true)}
+          onCompositionEnd={() => setIsTyping(false)}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
