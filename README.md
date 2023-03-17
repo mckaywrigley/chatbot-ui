@@ -1,3 +1,7 @@
+Todo
+- modify this readme file to reflect new scope
+- create roadmap phases
+
 # Chatbot UI Pro
 
 Chatbot UI Pro is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI](https://github.com/mckaywrigley/chatbot-ui) using Next.js, TypeScript, and Tailwind CSS.
