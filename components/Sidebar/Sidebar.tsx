@@ -20,9 +20,9 @@ interface Props {
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation }) => {
   return (
     <div className="flex flex-col bg-[#202123] min-w-[260px] max-w-[260px]">
-      <div className="flex items-center h-[60px] pl-2">
+      <div className="flex items-center h-[60px] px-2">
         <button
-          className="flex items-center w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
+          className="flex items-center flex-grow h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
           onClick={onNewConversation}
         >
           <IconPlus
@@ -33,7 +33,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         </button>
 
         <IconArrowBarLeft
-          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400"
+          className="ml-1 p-1 sm:hidden visable text-neutral-300 cursor-pointer hover:text-neutral-400"
           size={38}
           onClick={onToggleSidebar}
         />
