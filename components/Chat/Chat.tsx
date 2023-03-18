@@ -44,12 +44,11 @@ export const Chat: FC<Props> = ({ model, messages, loading, lightMode, onSend, o
             <div className="text-center py-3 dark:bg-[#444654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">Model: {OpenAIModelNames[model]}</div>
 
             {messages.map((message, index) => (
-              <div key={index}>
-                <ChatMessage
-                  message={message}
-                  lightMode={lightMode}
-                />
-              </div>
+              <ChatMessage
+                key={index}
+                message={message}
+                lightMode={lightMode}
+              />
             ))}
             {loading && <ChatLoader />}
             <div ref={messagesEndRef} />
