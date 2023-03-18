@@ -57,7 +57,7 @@ export const Chat: FC<Props> = ({ model, messages, loading, lightMode, onSend, o
         )}
       </div>
 
-      <div className="h-[140px] w-[300px] sm:w-[400px] md:w-[500px] lg:w-[700px] xl:w-[800px] mx-auto">
+      <div className="h-[80px] sm:h-[140px] w-[340px] sm:w-[400px] md:w-[500px] lg:w-[700px] xl:w-[800px] mx-auto">
         <ChatInput onSend={onSend} />
       </div>
     </div>
