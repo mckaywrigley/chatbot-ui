@@ -1,0 +1,25 @@
+# Ignore node_modules
+node_modules
+
+# Ignore .git and .gitignore
+.git
+.gitignore
+
+# Ignore .env files
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignore Next.js build output
+.next
+
+# Ignore logs
+*.log
+
+# Ignore operating system files
+.DS_Store
+Thumbs.db
+
+# Ignore README.md file
+README.md

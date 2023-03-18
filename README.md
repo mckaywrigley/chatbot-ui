@@ -80,7 +80,18 @@ OPENAI_API_KEY=<YOUR_KEY>
 npm run dev
 ```
 
-**5. Use It**
+**5. Running the app with Docker Compose**
+
+You can also run the app using Docker Compose. Make sure you have Docker and Docker Compose installed on your machine. If you don't have them installed, you can download Docker from the official website: https://www.docker.com/products/docker-desktop
+
+Open a terminal in the project directory and run (assuming you already have a .env.local in the root directory):
+
+```bash
+docker-compose -f docker-compose/docker-compose.yml up --build
+```
+This command will build the Docker image and run a container using the image. Your Next.js app should now be running inside a Docker container, and you can access it at `http://localhost:3000`.
+
+**6. Use It**
 
 You should be able to start chatting.
 
