@@ -25,8 +25,8 @@ Expect frequent improvements.
 
 **Recent updates:**
 
-- [x] Added markdown support (3/17/23)
-- [x] Added code syntax highlighting (3/18/23)
+- [x] Markdown support (3/17/23)
+- [x] Code syntax highlighting (3/18/23)
 
 ## Modifications
 
@@ -86,4 +86,4 @@ If you have any questions, feel free to reach out to me on [Twitter](https://twi
 
 ## Contributors
 
-@PeterTakahashi: Added input support for Japanese users (3/17/23)
+[@PeterTakahashi](https://github.com/PeterTakahashi): Added input support for Japanese users (3/17/23)
