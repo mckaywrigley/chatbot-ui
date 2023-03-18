@@ -1,85 +1,103 @@
 import { Conversation } from "@/types";
-import { IconCheck, IconMessage, IconPencil, IconTrash, IconX } from "@tabler/icons-react";
-import { FC, KeyboardEvent, useEffect, useState } from "react";
+import {
+  IconCheck,
+  IconMessage,
+  IconPencilMinus,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
+import { FC, useEffect, useRef } from "react";
 
 interface Props {
+  editing: number;
   loading: boolean;
   conversations: Conversation[];
+  newConversationName: string;
   selectedConversation: Conversation;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onRenameConversation: (conversation: Conversation, name: string) => void;
+  //
+  onConfirmRenameConversation: (
+    conversation: Conversation,
+    newName: string
+  ) => void;
+  onBeginRenameConversation: (conversation: Conversation) => void;
+  onCancelRenameConversation: (conversation: Conversation) => void;
+  onSetNewConversationName: (newName: string) => void;
 }
 
-export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, onSelectConversation, onDeleteConversation, onRenameConversation }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(false);
-  const [renameValue, setRenameValue] = useState("");
-
-  const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleRename(selectedConversation);
-    }
-  };
-
-  const handleRename = (conversation: Conversation) => {
-    onRenameConversation(conversation, renameValue);
-    setRenameValue("");
-    setIsRenaming(false);
-  };
+export const Conversations: FC<Props> = ({
+  editing,
+  loading,
+  conversations,
+  newConversationName,
+  selectedConversation,
+  onSelectConversation,
+  onDeleteConversation,
+  onConfirmRenameConversation,
+  onBeginRenameConversation,
+  onCancelRenameConversation,
+  onSetNewConversationName,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isRenaming) {
-      setIsDeleting(false);
-    } else if (isDeleting) {
-      setIsRenaming(false);
+    if (editing !== -1) {
+      const input = document.getElementById(
+        `input-${editing}`
+      ) as HTMLInputElement;
+      if (input) {
+        input.focus();
+      }
     }
-  }, [isRenaming, isDeleting]);
+  }, [editing]);
 
   return (
-    <div className="flex flex-col space-y-2 w-full px-2">
+    <div className="flex flex-col space-y-2">
       {conversations.map((conversation, index) => (
         <button
           key={index}
-          className={`flex items-center justify-start min-h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
+          className={`flex items-center justify-start w-[240px] h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${
+            loading ? "disabled:cursor-not-allowed" : ""
+          } ${
+            selectedConversation.id === conversation.id ? "bg-slate-600" : ""
+          }`}
           onClick={() => onSelectConversation(conversation)}
           disabled={loading}
         >
-          <IconMessage
-            className="mr-2 min-w-[20px]"
-            size={18}
-          />
+          <IconMessage className="mr-2 min-w-[20px]" size={18} />
+          <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1 text-left w-full">
+            {editing == conversation.id ? (
+              <input
+                className="bg-transparent outline-none"
+                id={`input-${conversation.id}`}
+                ref={inputRef}
+                onBlur={(e) =>
+                  onConfirmRenameConversation(conversation, newConversationName)
+                }
+                onChange={(e) => onSetNewConversationName(e.target.value)}
+                value={newConversationName}
+              ></input>
+            ) : conversation.name ? (
+              conversation.name
+            ) : conversation.messages[0] ? (
+              conversation.messages[0].content
+            ) : (
+              "Empty conversation"
+            )}
+          </div>
 
-          {isRenaming && selectedConversation.id === conversation.id ? (
-            <input
-              className="flex-1 bg-transparent border-b border-neutral-400 focus:border-neutral-100 text-left overflow-hidden overflow-ellipsis pr-1 outline-none text-white"
-              type="text"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onKeyDown={handleEnterDown}
-              autoFocus
-            />
-          ) : (
-            <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1 flex-1 text-left">{conversation.name}</div>
-          )}
-
-          {(isDeleting || isRenaming) && selectedConversation.id === conversation.id && (
-            <div className="flex w-[40px]">
+          {editing == conversation.id ? (
+            <>
               <IconCheck
                 className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
                 size={18}
                 onClick={(e) => {
                   e.stopPropagation();
-
-                  if (isDeleting) {
-                    onDeleteConversation(conversation);
-                  } else if (isRenaming) {
-                    handleRename(conversation);
-                  }
-
-                  setIsDeleting(false);
-                  setIsRenaming(false);
+                  onConfirmRenameConversation(
+                    conversation,
+                    newConversationName
+                  );
                 }}
               />
 
@@ -88,34 +106,30 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
                 size={18}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsDeleting(false);
-                  setIsRenaming(false);
+                  onCancelRenameConversation(conversation);
                 }}
               />
-            </div>
-          )}
-
-          {selectedConversation.id === conversation.id && !isDeleting && !isRenaming && (
-            <div className="flex w-[40px]">
-              <IconPencil
-                className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
+            </>
+          ) : (
+            <>
+              <IconPencilMinus
+                className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
                 size={18}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsRenaming(true);
-                  setRenameValue(selectedConversation.name);
+                  onBeginRenameConversation(conversation);
                 }}
               />
 
               <IconTrash
-                className=" min-w-[20px] text-neutral-400 hover:text-neutral-100"
+                className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
                 size={18}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsDeleting(true);
+                  onDeleteConversation(conversation);
                 }}
               />
-            </div>
+            </>
           )}
         </button>
       ))}
