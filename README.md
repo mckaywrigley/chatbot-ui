@@ -19,7 +19,6 @@ Expect frequent improvements.
 **Next up:**
 
 - [ ] Mobile view
-- [ ] Conversation naming
 - [ ] Saving via data export
 - [ ] Folders
 
@@ -28,6 +27,7 @@ Expect frequent improvements.
 - [x] Markdown support (3/17/23)
 - [x] Code syntax highlighting (3/18/23)
 - [x] Toggle sidebar (3/18/23)
+- [x] Conversation naming (3/18/23)
 
 ## Modifications
 
