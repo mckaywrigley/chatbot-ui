@@ -1,6 +1,7 @@
 import { Chat } from "@/components/Chat/Chat";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { Conversation, Message, OpenAIModel } from "@/types";
+import { IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,7 @@ export default function Home() {
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -118,12 +120,33 @@ export default function Home() {
     localStorage.setItem("theme", mode);
   };
 
+  const handleRenameConversation = (conversation: Conversation, name: string) => {
+    const updatedConversation = {
+      ...conversation,
+      name
+    };
+
+    const updatedConversations = conversations.map((c) => {
+      if (c.id === updatedConversation.id) {
+        return updatedConversation;
+      }
+
+      return c;
+    });
+
+    setConversations(updatedConversations);
+    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+    setSelectedConversation(updatedConversation);
+    localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+  };
+
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: "",
+      name: "New conversation",
       messages: []
     };
 
@@ -205,26 +228,35 @@ export default function Home() {
 
       {selectedConversation && (
         <div className={`flex h-screen text-white ${lightMode}`}>
-          <Sidebar
-            loading={disabled}
-            conversations={conversations}
-            lightMode={lightMode}
-            selectedConversation={selectedConversation}
-            onToggleLightMode={handleLightMode}
-            onNewConversation={handleNewConversation}
-            onSelectConversation={handleSelectConversation}
-            onDeleteConversation={handleDeleteConversation}
-          />
-
-          <div className="flex flex-col w-full h-full dark:bg-[#343541]">
-            <Chat
-              model={model}
-              messages={selectedConversation.messages}
-              loading={loading}
-              onSend={handleSend}
-              onSelect={setModel}
+          {showSidebar ? (
+            <Sidebar
+              loading={disabled}
+              conversations={conversations}
+              lightMode={lightMode}
+              selectedConversation={selectedConversation}
+              onToggleLightMode={handleLightMode}
+              onNewConversation={handleNewConversation}
+              onSelectConversation={handleSelectConversation}
+              onDeleteConversation={handleDeleteConversation}
+              onToggleSidebar={() => setShowSidebar(!showSidebar)}
+              onRenameConversation={handleRenameConversation}
             />
-          </div>
+          ) : (
+            <IconArrowBarRight
+              className="absolute top-1 left-4 text-black dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300"
+              size={32}
+              onClick={() => setShowSidebar(!showSidebar)}
+            />
+          )}
+
+          <Chat
+            model={model}
+            messages={selectedConversation.messages}
+            loading={loading}
+            lightMode={lightMode}
+            onSend={handleSend}
+            onSelect={setModel}
+          />
         </div>
       )}
     </>
