@@ -16,11 +16,16 @@ Chatbot UI Pro will be updated over time.
 
 Expect frequent improvements.
 
-Next up:
+**Next up:**
 
-- Mobile view
-- Markdown formatting
-- Conversation naming
+- [ ] Mobile view
+- [ ] Conversation naming
+- [ ] Saving via data export
+- [ ] Folders
+
+**Recent updates:**
+
+- [x] Added markdown support
 
 ## Modifications
 
