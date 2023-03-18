@@ -1,6 +1,7 @@
 import { Message } from "@/types";
 import { FC } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CodeBlock } from "../Markdown/CodeBlock";
 
 interface Props {
@@ -19,6 +20,7 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
 
         <div className="prose dark:prose-invert mt-[-2px]">
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || "");

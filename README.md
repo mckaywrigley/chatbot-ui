@@ -30,6 +30,7 @@ Expect frequent improvements.
 - [x] Code syntax highlighting (3/18/23)
 - [x] Toggle sidebar (3/18/23)
 - [x] Conversation naming (3/18/23)
+- [x] Github flavored markdown (3/18/23)
 
 ## Modifications
 
