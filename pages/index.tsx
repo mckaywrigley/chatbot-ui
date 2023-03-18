@@ -1,6 +1,7 @@
 import { Chat } from "@/components/Chat/Chat";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { Conversation, Message, OpenAIModel } from "@/types";
+import { IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,7 @@ export default function Home() {
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -205,16 +207,24 @@ export default function Home() {
 
       {selectedConversation && (
         <div className={`flex h-screen text-white ${lightMode}`}>
-          <Sidebar
-            loading={disabled}
-            conversations={conversations}
-            lightMode={lightMode}
-            selectedConversation={selectedConversation}
-            onToggleLightMode={handleLightMode}
-            onNewConversation={handleNewConversation}
-            onSelectConversation={handleSelectConversation}
-            onDeleteConversation={handleDeleteConversation}
-          />
+          {showSidebar ? (
+            <Sidebar
+              loading={disabled}
+              conversations={conversations}
+              lightMode={lightMode}
+              selectedConversation={selectedConversation}
+              onToggleLightMode={handleLightMode}
+              onNewConversation={handleNewConversation}
+              onSelectConversation={handleSelectConversation}
+              onDeleteConversation={handleDeleteConversation}
+              onToggleSidebar={() => setShowSidebar(!showSidebar)}
+            />
+          ) : (
+            <IconArrowBarRight
+              className="absolute top-4 left-4 text-black dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300"
+              onClick={() => setShowSidebar(!showSidebar)}
+            />
+          )}
 
           <div className="flex flex-col w-full h-full dark:bg-[#343541]">
             <Chat
