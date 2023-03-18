@@ -68,7 +68,6 @@ export default function Home() {
 
           updatedConversation = {
             ...updatedConversation,
-            name: message.content,
             messages: updatedMessages
           };
 
@@ -122,12 +121,14 @@ export default function Home() {
   };
 
   const handleRenameConversation = (conversation: Conversation, name: string) => {
+    const updatedConversation = {
+      ...conversation,
+      name
+    };
+
     const updatedConversations = conversations.map((c) => {
-      if (c.id === conversation.id) {
-        return {
-          ...c,
-          name
-        };
+      if (c.id === updatedConversation.id) {
+        return updatedConversation;
       }
 
       return c;
@@ -136,11 +137,8 @@ export default function Home() {
     setConversations(updatedConversations);
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
-    setSelectedConversation({
-      ...conversation,
-      name
-    });
-    localStorage.setItem("selectedConversation", JSON.stringify(selectedConversation));
+    setSelectedConversation(updatedConversation);
+    localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
   };
 
   const handleNewConversation = () => {
