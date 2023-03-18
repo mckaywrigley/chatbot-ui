@@ -40,7 +40,7 @@ export const Chat: FC<Props> = ({ model, messages, loading, onSend, onSelect }) 
       ) : (
         <>
           <div className="flex-1 overflow-auto">
-            <div className="text-center py-3 dark:bg-[#434654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">Model: {OpenAIModelNames[model]}</div>
+            <div className="text-center py-3 dark:bg-[#444654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">Model: {OpenAIModelNames[model]}</div>
 
             {messages.map((message, index) => (
               <div key={index}>

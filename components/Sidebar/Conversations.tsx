@@ -11,7 +11,6 @@ interface Props {
 }
 
 export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, onSelectConversation, onDeleteConversation }) => {
-  console.log(conversations);
   return (
     <div className="flex flex-col space-y-2">
       {conversations.map((conversation, index) => (
