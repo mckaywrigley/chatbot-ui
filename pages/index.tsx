@@ -68,6 +68,7 @@ export default function Home() {
 
           updatedConversation = {
             ...updatedConversation,
+            name: message.content,
             messages: updatedMessages
           };
 
@@ -120,12 +121,34 @@ export default function Home() {
     localStorage.setItem("theme", mode);
   };
 
+  const handleRenameConversation = (conversation: Conversation, name: string) => {
+    const updatedConversations = conversations.map((c) => {
+      if (c.id === conversation.id) {
+        return {
+          ...c,
+          name
+        };
+      }
+
+      return c;
+    });
+
+    setConversations(updatedConversations);
+    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+    setSelectedConversation({
+      ...conversation,
+      name
+    });
+    localStorage.setItem("selectedConversation", JSON.stringify(selectedConversation));
+  };
+
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: "",
+      name: "New conversation",
       messages: []
     };
 
@@ -218,6 +241,7 @@ export default function Home() {
               onSelectConversation={handleSelectConversation}
               onDeleteConversation={handleDeleteConversation}
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
+              onRenameConversation={handleRenameConversation}
             />
           ) : (
             <IconArrowBarRight
@@ -226,16 +250,14 @@ export default function Home() {
             />
           )}
 
-          <div className="flex flex-col w-full h-full dark:bg-[#343541]">
-            <Chat
-              model={model}
-              messages={selectedConversation.messages}
-              loading={loading}
-              lightMode={lightMode}
-              onSend={handleSend}
-              onSelect={setModel}
-            />
-          </div>
+          <Chat
+            model={model}
+            messages={selectedConversation.messages}
+            loading={loading}
+            lightMode={lightMode}
+            onSend={handleSend}
+            onSelect={setModel}
+          />
         </div>
       )}
     </>

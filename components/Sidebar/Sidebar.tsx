@@ -14,14 +14,15 @@ interface Props {
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
   onToggleSidebar: () => void;
+  onRenameConversation: (conversation: Conversation, name: string) => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar }) => {
+export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation }) => {
   return (
     <div className="flex flex-col bg-[#202123] min-w-[260px]">
-      <div className="flex items-center h-[60px] pl-4">
+      <div className="flex items-center h-[60px] pl-2">
         <button
-          className="flex items-center w-[190px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
+          className="flex items-center w-[220px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
           onClick={onNewConversation}
         >
           <IconPlus
@@ -32,18 +33,19 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         </button>
 
         <IconArrowBarLeft
-          className="ml-auto mr-4 text-neutral-300 cursor-pointer hover:text-neutral-400"
+          className="ml-1 mr-2 text-neutral-300 cursor-pointer hover:text-neutral-400"
           onClick={onToggleSidebar}
         />
       </div>
 
-      <div className="flex-1 mx-auto pb-2 overflow-auto">
+      <div className="flex flex-1 justify-center pb-2 overflow-y-auto">
         <Conversations
           loading={loading}
           conversations={conversations}
           selectedConversation={selectedConversation}
           onSelectConversation={onSelectConversation}
           onDeleteConversation={onDeleteConversation}
+          onRenameConversation={onRenameConversation}
         />
       </div>
 
