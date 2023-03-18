@@ -3,4 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
 }
 
+//test comment
+
 module.exports = nextConfig
