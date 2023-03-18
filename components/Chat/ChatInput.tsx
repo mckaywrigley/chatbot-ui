@@ -3,10 +3,11 @@ import { IconSend } from "@tabler/icons-react";
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface Props {
+  messageIsStreaming: boolean,
   onSend: (message: Message) => void;
 }
 
-export const ChatInput: FC<Props> = ({ onSend }) => {
+export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -23,6 +24,10 @@ export const ChatInput: FC<Props> = ({ onSend }) => {
   };
 
   const handleSend = () => {
+    if (messageIsStreaming) {
+      return;
+    }
+
     if (!content) {
       alert("Please enter a message");
       return;
