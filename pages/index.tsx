@@ -245,8 +245,8 @@ export default function Home() {
             />
           ) : (
             <IconArrowBarRight
-              className="absolute top-2 left-4 text-black dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300"
-              size={38}
+              className="absolute top-1 left-4 text-black dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300"
+              size={32}
               onClick={() => setShowSidebar(!showSidebar)}
             />
           )}
