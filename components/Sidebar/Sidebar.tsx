@@ -19,7 +19,7 @@ interface Props {
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation }) => {
   return (
-    <div className="flex flex-col bg-[#202123] min-w-[260px]">
+    <div className="flex flex-col bg-[#202123] w-[260px]">
       <div className="flex items-center h-[60px] pl-2">
         <button
           className="flex items-center w-[220px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
@@ -38,7 +38,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         />
       </div>
 
-      <div className="flex flex-1 justify-center pb-2 overflow-y-auto">
+      <div className="flex flex-1 justify-center overflow-auto">
         <Conversations
           loading={loading}
           conversations={conversations}

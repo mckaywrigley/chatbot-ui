@@ -11,7 +11,7 @@ interface Props {
 export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
   return (
     <div
-      className={`flex justify-center py-[30px] whitespace-pre-wrap ${message.role === "assistant" ? "dark:bg-[#444654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none" : "dark:bg-[#343541] dark:text-white text-neutral-900"}`}
+      className={`flex justify-center py-[30px] ${message.role === "assistant" ? "dark:bg-[#444654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none" : "dark:bg-[#343541] dark:text-white text-neutral-900"}`}
       style={{ overflowWrap: "anywhere" }}
     >
       <div className="w-full px-4 sm:px-0 sm:w-2/3 md:w-1/2 flex">

@@ -27,7 +27,7 @@ export const Chat: FC<Props> = ({ model, messages, loading, lightMode, onSend, o
 
   return (
     <div className="h-full w-full flex flex-col dark:bg-[#343541]">
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-auto">
         {messages.length === 0 ? (
           <>
             <div className="flex justify-center pt-8 overflow-auto">
