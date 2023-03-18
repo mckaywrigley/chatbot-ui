@@ -11,7 +11,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
-  const [messageIsStreaming, setmessageIsStreaming] = useState<boolean>(false);
+  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const handleSend = async (message: Message) => {
@@ -23,7 +23,7 @@ export default function Home() {
 
       setSelectedConversation(updatedConversation);
       setLoading(true);
-      setmessageIsStreaming(true);
+      setMessageIsStreaming(true);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -111,7 +111,7 @@ export default function Home() {
 
       localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
-      setmessageIsStreaming(false);
+      setMessageIsStreaming(false);
     }
   };
 
