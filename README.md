@@ -26,7 +26,7 @@ Expect frequent improvements.
 **Recent updates:**
 
 - [x] Added markdown support (3/17/23)
-- [x] Add code syntax highlighting (3/18/23)
+- [x] Added code syntax highlighting (3/18/23)
 
 ## Modifications
 
