@@ -25,7 +25,8 @@ Expect frequent improvements.
 
 **Recent updates:**
 
-- [x] Added markdown support
+- [x] Added markdown support (3/17/23)
+- [x] Add code syntax highlighting (3/18/23)
 
 ## Modifications
 
@@ -82,3 +83,7 @@ You should be able to start chatting.
 ## Contact
 
 If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+
+## Contributors
+
+@PeterTakahashi: Added input support for Japanese users (3/17/23)

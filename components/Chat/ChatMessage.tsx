@@ -1,6 +1,7 @@
 import { Message } from "@/types";
 import { FC } from "react";
 import ReactMarkdown from "react-markdown";
+import { CodeBlock } from "../Markdown/CodeBlock";
 
 interface Props {
   message: Message;
@@ -16,7 +17,30 @@ export const ChatMessage: FC<Props> = ({ message }) => {
         <div className="mr-4 font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
 
         <div className="prose dark:prose-invert">
-          <ReactMarkdown>{message.content}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || "");
+                return !inline && match ? (
+                  <CodeBlock
+                    key={Math.random()}
+                    language={match[1]}
+                    value={String(children).replace(/\n$/, "")}
+                    {...props}
+                  />
+                ) : (
+                  <code
+                    className={className}
+                    {...props}
+                  >
+                    {children}
+                  </code>
+                );
+              }
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
         </div>
       </div>
     </div>
