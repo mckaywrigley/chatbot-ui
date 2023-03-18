@@ -231,6 +231,7 @@ export default function Home() {
               model={model}
               messages={selectedConversation.messages}
               loading={loading}
+              lightMode={lightMode}
               onSend={handleSend}
               onSelect={setModel}
             />

@@ -5,9 +5,10 @@ import { CodeBlock } from "../Markdown/CodeBlock";
 
 interface Props {
   message: Message;
+  lightMode: "light" | "dark";
 }
 
-export const ChatMessage: FC<Props> = ({ message }) => {
+export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
   return (
     <div
       className={`flex justify-center px-[120px] py-[30px] whitespace-pre-wrap] ${message.role === "assistant" ? "dark:bg-[#444654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none" : "dark:bg-[#343541] dark:text-white text-neutral-900"}`}
@@ -26,6 +27,7 @@ export const ChatMessage: FC<Props> = ({ message }) => {
                     key={Math.random()}
                     language={match[1]}
                     value={String(children).replace(/\n$/, "")}
+                    lightMode={lightMode}
                     {...props}
                   />
                 ) : (

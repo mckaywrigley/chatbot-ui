@@ -9,11 +9,12 @@ interface Props {
   model: OpenAIModel;
   messages: Message[];
   loading: boolean;
+  lightMode: "light" | "dark";
   onSend: (message: Message) => void;
   onSelect: (model: OpenAIModel) => void;
 }
 
-export const Chat: FC<Props> = ({ model, messages, loading, onSend, onSelect }) => {
+export const Chat: FC<Props> = ({ model, messages, loading, lightMode, onSend, onSelect }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -44,7 +45,10 @@ export const Chat: FC<Props> = ({ model, messages, loading, onSend, onSelect }) 
 
             {messages.map((message, index) => (
               <div key={index}>
-                <ChatMessage message={message} />
+                <ChatMessage
+                  message={message}
+                  lightMode={lightMode}
+                />
               </div>
             ))}
             {loading && <ChatLoader />}
