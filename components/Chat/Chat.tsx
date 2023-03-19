@@ -57,7 +57,7 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
         )}
       </div>
 
-      <div className="absolute sm:relative bottom-0 left-0 right-0 h-[100px] w-[340px] sm:w-[400px] md:w-[500px] lg:w-[700px] xl:w-[800px] mx-auto">
+      <div className="h-[100px] w-[340px] sm:w-[400px] md:w-[500px] lg:w-[700px] xl:w-[800px] mx-auto">
         <ChatInput
           messageIsStreaming={messageIsStreaming}
           onSend={onSend}
