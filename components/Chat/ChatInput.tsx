@@ -13,6 +13,8 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const chatBoxMaxHeight = 400; //chat box max height in pixels
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length > 4000) {
@@ -45,8 +47,21 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
 
   useEffect(() => {
     if (textareaRef && textareaRef.current) {
+      let chatBoxHeight = textareaRef.current.scrollHeight;
+      if (chatBoxHeight > chatBoxMaxHeight) {
+        textareaRef.current.style.overflowY = "auto";
+      } else {
+        textareaRef.current.style.overflowY = "hidden";
+      }
+
       textareaRef.current.style.height = "inherit";
-      textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
+
+      // Reset textarea height if there is no content
+      if (content) {
+        textareaRef.current.style.height = `${chatBoxHeight}px`;
+      } else {
+        textareaRef.current.style.height = "auto";
+      }
     }
   }, [content]);
 
@@ -59,8 +74,8 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
           style={{
             resize: "none",
             bottom: `${textareaRef?.current?.scrollHeight}px`,
-            maxHeight: "400px",
-            overflow: "auto"
+            maxHeight: `${chatBoxMaxHeight}px`,
+            overflow: "hidden",
           }}
           placeholder="Type a message..."
           value={content}
