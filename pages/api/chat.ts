@@ -31,7 +31,10 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(stream);
   } catch (error: any) {
     console.error(error);
-    return new Response(error);
+    return new Response(
+      error +
+        `. Set OpenAI API Key: click menu (top left) > OpenAI API Key > Done.`
+    );
   }
 };
 
