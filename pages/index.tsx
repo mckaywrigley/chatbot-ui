@@ -248,7 +248,6 @@ export default function Home() {
           <div className="sm:hidden w-full fixed top-0">
             <Navbar
               selectedConversation={selectedConversation}
-              onToggleSidebar={() => setShowSidebar(!showSidebar)}
               onNewConversation={handleNewConversation}
             />
           </div>
