@@ -54,6 +54,14 @@ Host your own live version of Chatbot UI with Vercel.
 
 Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
 
+
+**Docker**
+
+```shell
+docker build -t chatgpt-ui .
+docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
+```
+
 ## Running Locally
 
 **1. Clone Repo**
