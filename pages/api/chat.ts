@@ -7,9 +7,10 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages } = (await req.json()) as {
+    const { model, messages, key } = (await req.json()) as {
       model: OpenAIModel;
       messages: Message[];
+      key: string;
     };
 
     const charLimit = 12000;
@@ -25,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
       messagesToSend.push(message);
     }
 
-    const stream = await OpenAIStream(model, messagesToSend);
+    const stream = await OpenAIStream(model, key, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

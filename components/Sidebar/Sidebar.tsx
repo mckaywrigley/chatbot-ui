@@ -9,15 +9,17 @@ interface Props {
   conversations: Conversation[];
   lightMode: "light" | "dark";
   selectedConversation: Conversation;
+  apiKey: string;
   onNewConversation: () => void;
   onToggleLightMode: (mode: "light" | "dark") => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
   onToggleSidebar: () => void;
   onRenameConversation: (conversation: Conversation, name: string) => void;
+  onApiKeyChange: (apiKey: string) => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation }) => {
+export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation, onApiKeyChange }) => {
   return (
     <div className="flex flex-col bg-[#202123] min-w-[260px] max-w-[260px]">
       <div className="flex items-center h-[60px] pl-2">
@@ -52,7 +54,9 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
 
       <SidebarSettings
         lightMode={lightMode}
+        apiKey={apiKey}
         onToggleLightMode={onToggleLightMode}
+        onApiKeyChange={onApiKeyChange}
       />
     </div>
   );

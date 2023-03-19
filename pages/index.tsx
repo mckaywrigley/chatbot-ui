@@ -13,6 +13,7 @@ export default function Home() {
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [apiKey, setApiKey] = useState<string>("");
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -32,7 +33,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           model,
-          messages: updatedConversation.messages
+          messages: updatedConversation.messages,
+          key: apiKey
         })
       });
 
@@ -184,10 +186,20 @@ export default function Home() {
     }
   };
 
+  const handleApiKeyChange = (apiKey: string) => {
+    setApiKey(apiKey);
+    localStorage.setItem("apiKey", apiKey);
+  };
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
       setLightMode(theme as "dark" | "light");
+    }
+
+    const apiKey = localStorage.getItem("apiKey");
+    if (apiKey) {
+      setApiKey(apiKey);
     }
 
     const conversationHistory = localStorage.getItem("conversationHistory");
@@ -234,12 +246,14 @@ export default function Home() {
               conversations={conversations}
               lightMode={lightMode}
               selectedConversation={selectedConversation}
+              apiKey={apiKey}
               onToggleLightMode={handleLightMode}
               onNewConversation={handleNewConversation}
               onSelectConversation={handleSelectConversation}
               onDeleteConversation={handleDeleteConversation}
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
               onRenameConversation={handleRenameConversation}
+              onApiKeyChange={handleApiKeyChange}
             />
           ) : (
             <IconArrowBarRight
