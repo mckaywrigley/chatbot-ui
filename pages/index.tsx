@@ -175,8 +175,8 @@ export default function Home() {
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
     if (updatedConversations.length > 0) {
-      setSelectedConversation(updatedConversations[0]);
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[0]));
+      setSelectedConversation(updatedConversations[updatedConversations.length - 1]);
+      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[updatedConversations.length - 1]));
     } else {
       setSelectedConversation({
         id: 1,

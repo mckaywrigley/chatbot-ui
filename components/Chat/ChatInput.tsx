@@ -83,6 +83,7 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
+
         <button
           className="absolute right-2 bottom-[14px] text-neutral-400 p-2 hover:dark:bg-neutral-800 hover:bg-neutral-400 hover:text-white rounded-md"
           onClick={handleSend}
