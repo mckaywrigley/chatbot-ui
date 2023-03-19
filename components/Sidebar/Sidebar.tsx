@@ -21,7 +21,7 @@ interface Props {
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation, onApiKeyChange }) => {
   return (
-    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] h-full z-10`}>
+    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] max-h-[calc(100%_-_48px)] sm:max-h-full z-10`}>
       <div className="flex items-center h-[60px] sm:pl-2 px-2">
         <button
           className="flex items-center w-full sm:w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
