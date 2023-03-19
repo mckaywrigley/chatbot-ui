@@ -28,7 +28,7 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
 
   return (
     <div className="h-full w-full flex flex-col dark:bg-[#343541]">
-      <div className="sm:flex-1 overflow-auto max-h-[calc(100%_-_100px)]">
+      <div className="sm:flex-1 overflow-auto h-[calc(100%_-_100px)]">
         {messages.length === 0 ? (
           <>
             <div className="flex justify-center pt-8">
