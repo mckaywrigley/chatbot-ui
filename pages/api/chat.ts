@@ -2,7 +2,7 @@ import { Message, OpenAIModel } from "@/types";
 import { OpenAIStream } from "@/utils";
 
 export const config = {
-  runtime: "edge",
+  runtime: "edge"
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -23,18 +23,15 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       }
       charCount += message.content.length;
-      messagesToSend = [message, ...messagesToSend];
+      messagesToSend = [message, ...messagesToSend]
     }
 
     const stream = await OpenAIStream(model, key, messagesToSend);
 
     return new Response(stream);
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
-    return new Response(
-      error +
-        `. Set OpenAI API Key: click menu (top left) > OpenAI API Key > Done.`
-    );
+    return new Response("Error", { status: 500 });
   }
 };
 
