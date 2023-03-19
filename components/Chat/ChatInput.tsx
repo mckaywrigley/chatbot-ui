@@ -32,8 +32,13 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
       alert("Please enter a message");
       return;
     }
+
     onSend({ role: "user", content });
     setContent("");
+
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.blur();
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
