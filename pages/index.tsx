@@ -283,17 +283,15 @@ export default function Home() {
               />
             )}
 
-            <div className={`${showSidebar ? "hidden sm:flex" : "ml-0"} flex flex-col w-full h-full`}>
-              <Chat
-                messageIsStreaming={messageIsStreaming}
-                model={model}
-                messages={selectedConversation.messages}
-                loading={loading}
-                lightMode={lightMode}
-                onSend={handleSend}
-                onSelect={setModel}
-              />
-            </div>
+            <Chat
+              messageIsStreaming={messageIsStreaming}
+              model={model}
+              messages={selectedConversation.messages}
+              loading={loading}
+              lightMode={lightMode}
+              onSend={handleSend}
+              onSelect={setModel}
+            />
           </div>
         </div>
       )}
