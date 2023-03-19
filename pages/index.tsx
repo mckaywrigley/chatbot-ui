@@ -253,7 +253,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex h-full w-full mt-[48px] sm:mt-0">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <>
                 <Sidebar
