@@ -27,22 +27,22 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
   }, [messages]);
 
   return (
-    <div className="h-full w-full flex flex-col dark:bg-[#343541]">
-      <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-scroll dark:bg-[#343541]">
+      <div>
         {messages.length === 0 ? (
           <>
-            <div className="flex justify-center pt-8 overflow-auto">
+            <div className="flex justify-center pt-8">
               <ModelSelect
                 model={model}
                 onSelect={onSelect}
               />
             </div>
 
-            <div className="flex-1 text-4xl text-center text-neutral-300 pt-[280px]">Chatbot UI Pro</div>
+            <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200 pt-[160px] sm:pt-[280px]">Chatbot UI</div>
           </>
         ) : (
           <>
-            <div className="text-center py-3 dark:bg-[#444654] dark:text-neutral-300 text-neutral-500 text-sm border border-b-neutral-300 dark:border-none">Model: {OpenAIModelNames[model]}</div>
+            <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {OpenAIModelNames[model]}</div>
 
             {messages.map((message, index) => (
               <ChatMessage
@@ -51,18 +51,21 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
                 lightMode={lightMode}
               />
             ))}
+
             {loading && <ChatLoader />}
-            <div ref={messagesEndRef} />
+
+            <div
+              className="bg-white dark:bg-[#343541] h-24 sm:h-32"
+              ref={messagesEndRef}
+            />
           </>
         )}
       </div>
 
-      <div className="h-[100px] w-[340px] sm:w-[400px] md:w-[500px] lg:w-[700px] xl:w-[800px] mx-auto">
-        <ChatInput
-          messageIsStreaming={messageIsStreaming}
-          onSend={onSend}
-        />
-      </div>
+      <ChatInput
+        messageIsStreaming={messageIsStreaming}
+        onSend={onSend}
+      />
     </div>
   );
 };
