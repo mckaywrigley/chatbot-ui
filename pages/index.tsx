@@ -179,7 +179,7 @@ export default function Home() {
     } else {
       setSelectedConversation({
         id: 1,
-        name: "",
+        name: "New conversation",
         messages: []
       });
       localStorage.removeItem("selectedConversation");
@@ -223,10 +223,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Chatbot UI Pro</title>
+        <title>Chatbot UI</title>
         <meta
           name="description"
-          content="An advanced chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+          content="ChatGPT but better."
         />
         <meta
           name="viewport"
