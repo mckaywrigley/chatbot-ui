@@ -15,15 +15,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     const charLimit = 12000;
     let charCount = 0;
-    let messagesToSend = [];
+    let messagesToSend: Message[] = [];
 
-    for (let i = 0; i < messages.length; i++) {
+    for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
       if (charCount + message.content.length > charLimit) {
         break;
       }
       charCount += message.content.length;
-      messagesToSend.push(message);
+      messagesToSend = [message, ...messagesToSend]
     }
 
     const stream = await OpenAIStream(model, key, messagesToSend);
