@@ -19,32 +19,35 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
         <div className="mr-1 sm:mr-2 font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
 
         <div className="prose dark:prose-invert mt-[-2px]">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              code({ node, inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || "");
-                return !inline && match ? (
-                  <CodeBlock
-                    key={Math.random()}
-                    language={match[1]}
-                    value={String(children).replace(/\n$/, "")}
-                    lightMode={lightMode}
-                    {...props}
-                  />
-                ) : (
-                  <code
-                    className={className}
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                );
-              }
-            }}
-          >
-            {message.content}
-          </ReactMarkdown>
+          {message.role === "user" ? (
+            <div className="prose dark:prose-invert whitespace-pre">
+              {message.content}
+            </div>
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({ node, inline, className, children, ...props }) {
+                  const match = /language-(\w+)/.exec(className || "");
+                  return !inline && match ? (
+                    <CodeBlock
+                      key={Math.random()}
+                      language={match[1]}
+                      value={String(children).replace(/\n$/, "")}
+                      lightMode={lightMode}
+                      {...props}
+                    />
+                  ) : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
       </div>
     </div>
