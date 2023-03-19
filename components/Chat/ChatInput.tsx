@@ -41,10 +41,18 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
     }
   };
 
+  const isMobile = () => {
+    const userAgent = typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
+    return mobileRegex.test(userAgent);
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    if (!isTyping) {
+      if (e.key === "Enter" && !e.shiftKey && !isMobile()) {
+        e.preventDefault();
+        handleSend();
+      }
     }
   };
 
