@@ -13,6 +13,7 @@ export default function Home() {
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [apiKey, setApiKey] = useState<string>("");
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -32,7 +33,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           model,
-          messages: updatedConversation.messages
+          messages: updatedConversation.messages,
+          key: apiKey
         })
       });
 
@@ -177,17 +179,27 @@ export default function Home() {
     } else {
       setSelectedConversation({
         id: 1,
-        name: "",
+        name: "New conversation",
         messages: []
       });
       localStorage.removeItem("selectedConversation");
     }
   };
 
+  const handleApiKeyChange = (apiKey: string) => {
+    setApiKey(apiKey);
+    localStorage.setItem("apiKey", apiKey);
+  };
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
       setLightMode(theme as "dark" | "light");
+    }
+
+    const apiKey = localStorage.getItem("apiKey");
+    if (apiKey) {
+      setApiKey(apiKey);
     }
 
     const conversationHistory = localStorage.getItem("conversationHistory");
@@ -211,10 +223,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Chatbot UI Pro</title>
+        <title>Chatbot UI</title>
         <meta
           name="description"
-          content="An advanced chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+          content="ChatGPT but better."
         />
         <meta
           name="viewport"
@@ -234,12 +246,14 @@ export default function Home() {
               conversations={conversations}
               lightMode={lightMode}
               selectedConversation={selectedConversation}
+              apiKey={apiKey}
               onToggleLightMode={handleLightMode}
               onNewConversation={handleNewConversation}
               onSelectConversation={handleSelectConversation}
               onDeleteConversation={handleDeleteConversation}
               onToggleSidebar={() => setShowSidebar(!showSidebar)}
               onRenameConversation={handleRenameConversation}
+              onApiKeyChange={handleApiKeyChange}
             />
           ) : (
             <IconArrowBarRight

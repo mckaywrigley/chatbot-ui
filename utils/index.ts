@@ -1,14 +1,14 @@
 import { Message, OpenAIModel } from "@/types";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
 
-export const OpenAIStream = async (model: OpenAIModel, messages: Message[]) => {
+export const OpenAIStream = async (model: OpenAIModel, key: string, messages: Message[]) => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
     },
     method: "POST",
     body: JSON.stringify({

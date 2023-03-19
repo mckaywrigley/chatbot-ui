@@ -31,6 +31,7 @@ Expect frequent improvements.
 - [x] Toggle sidebar (3/18/23)
 - [x] Conversation naming (3/18/23)
 - [x] Github flavored markdown (3/18/23)
+- [x] Add OpenAI API key in app (3/18/23)
 
 ## Modifications
 
