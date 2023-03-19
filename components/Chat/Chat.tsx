@@ -31,14 +31,14 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
       <div className="flex-1 overflow-auto">
         {messages.length === 0 ? (
           <>
-            <div className="flex justify-center pt-8 overflow-auto">
+            <div className="flex justify-center pt-8">
               <ModelSelect
                 model={model}
                 onSelect={onSelect}
               />
             </div>
 
-            <div className="flex-1 text-4xl text-center text-neutral-300 pt-[160px] sm:pt-[280px]">Chatbot UI</div>
+            <div className="text-4xl text-center text-neutral-300 pt-[160px] sm:pt-[280px]">Chatbot UI</div>
           </>
         ) : (
           <>
