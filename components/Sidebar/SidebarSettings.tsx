@@ -1,4 +1,4 @@
-import { IconMoon, IconSun } from "@tabler/icons-react";
+import { IconMoon, IconSun, IconTrash } from "@tabler/icons-react";
 import { FC } from "react";
 import { SidebarButton } from "./SidebarButton";
 
@@ -9,10 +9,10 @@ interface Props {
 
 export const SidebarSettings: FC<Props> = ({ lightMode, onToggleLightMode }) => {
   return (
-    <div className="flex flex-col items-center border-t border-neutral-500 py-4">
+    <div className="flex flex-col items-center border-t border-neutral-500 p-2 text-sm">
       <SidebarButton
         text={lightMode === "light" ? "Dark mode" : "Light mode"}
-        icon={lightMode === "light" ? <IconMoon /> : <IconSun />}
+        icon={lightMode === "light" ? <IconMoon size={16} /> : <IconSun size={16} />}
         onClick={() => onToggleLightMode(lightMode === "light" ? "dark" : "light")}
       />
     </div>
