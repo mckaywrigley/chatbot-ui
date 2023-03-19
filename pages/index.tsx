@@ -283,7 +283,7 @@ export default function Home() {
               />
             )}
 
-            <div className={`${showSidebar ? "hidden sm:flex" : "ml-0"} flex flex-col w-full h-full max-h-[calc(100%_-_48px)] sm:max-h-full`}>
+            <div className={`${showSidebar ? "hidden sm:flex" : "ml-0"} flex flex-col w-full h-full`}>
               <Chat
                 messageIsStreaming={messageIsStreaming}
                 model={model}
