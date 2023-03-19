@@ -1,6 +1,6 @@
 import { Conversation } from "@/types";
-import { IconArrowBarLeft, IconPlus } from "@tabler/icons-react";
-import { FC } from "react";
+import { IconArrowBarLeft, IconPlus, IconX } from "@tabler/icons-react";
+import { FC, useState } from "react";
 import { Conversations } from "./Conversations";
 import { SidebarSettings } from "./SidebarSettings";
 
@@ -20,6 +20,18 @@ interface Props {
 }
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation, onApiKeyChange }) => {
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+  const filteredConversations = conversations.filter((conversation) =>
+    conversation.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
+
   return (
     <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] z-10`}>
       <div className="flex items-center h-[60px] sm:pl-2 px-2">
@@ -41,10 +53,29 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         />
       </div>
 
+      {conversations && conversations.length > 1 && (
+        <div className="flex items-center h-[60px] sm:pl-2 px-2">
+          <input
+              className="flex-1 bg-[#202123] border border-neutral-600 text-sm rounded-lg px-4 text-white"
+              type="text"
+              placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={onSearchChange}
+          />
+          {searchTerm && (
+              <IconX
+                  className="mr-2 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400"
+                  size={20}
+                  onClick={clearSearch}
+              />
+          )}
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto">
         <Conversations
           loading={loading}
-          conversations={conversations}
+          conversations={filteredConversations}
           selectedConversation={selectedConversation}
           onSelectConversation={onSelectConversation}
           onDeleteConversation={onDeleteConversation}
