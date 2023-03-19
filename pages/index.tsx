@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
