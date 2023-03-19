@@ -149,7 +149,7 @@ export default function Home() {
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: "New conversation",
+      name: `Conversation ${lastConversation ? lastConversation.id + 1 : 1}`,
       messages: []
     };
 
@@ -219,7 +219,7 @@ export default function Home() {
     } else {
       setSelectedConversation({
         id: 1,
-        name: "",
+        name: "New conversation",
         messages: []
       });
     }
