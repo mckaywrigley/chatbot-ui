@@ -23,6 +23,7 @@ Expect frequent improvements.
 - [ ] Mobile view
 - [ ] Saving via data export
 - [ ] Folders
+- [ ] Change default prompt
 
 **Recent updates:**
 

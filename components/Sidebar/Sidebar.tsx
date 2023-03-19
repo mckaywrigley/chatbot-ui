@@ -21,10 +21,10 @@ interface Props {
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation, onApiKeyChange }) => {
   return (
-    <div className="flex flex-col bg-[#202123] min-w-[260px] max-w-[260px]">
-      <div className="flex items-center h-[60px] pl-2">
+    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] z-10`}>
+      <div className="flex items-center h-[60px] sm:pl-2 px-2">
         <button
-          className="flex items-center w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
+          className="flex items-center w-full sm:w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
           onClick={onNewConversation}
         >
           <IconPlus
@@ -35,13 +35,13 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         </button>
 
         <IconArrowBarLeft
-          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400"
+          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400 hidden sm:flex"
           size={38}
           onClick={onToggleSidebar}
         />
       </div>
 
-      <div className="flex flex-1 justify-center overflow-auto">
+      <div className="flex-1 overflow-auto">
         <Conversations
           loading={loading}
           conversations={conversations}
