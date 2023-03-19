@@ -41,7 +41,7 @@ export default function Home() {
 
       if (!response.ok) {
         setLoading(false);
-        throw new Error(response.statusText);
+        return;
       }
 
       const data = response.body;
