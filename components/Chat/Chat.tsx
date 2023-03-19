@@ -38,7 +38,7 @@ export const Chat: FC<Props> = ({ model, messages, messageIsStreaming, loading, 
               />
             </div>
 
-            <div className="flex-1 text-4xl text-center text-neutral-300 pt-[280px]">Chatbot UI Pro</div>
+            <div className="flex-1 text-4xl text-center text-neutral-300 pt-[160px] sm:pt-[280px]">Chatbot UI</div>
           </>
         ) : (
           <>
