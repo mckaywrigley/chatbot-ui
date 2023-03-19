@@ -52,15 +52,13 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
 
   return (
     <div className="relative">
-      <div className="absolute bottom-[-70px] sm:bottom-[-120px] w-full">
+      <div className="absolute bottom-[-80px] w-full">
         <textarea
           ref={textareaRef}
           className="rounded-lg pl-4 pr-8 py-3 w-full focus:outline-none max-h-[280px] dark:bg-[#40414F] dark:border-opacity-50 dark:border-neutral-800 dark:text-neutral-100 border border-neutral-300 shadow text-neutral-900"
           style={{
             resize: "none",
             bottom: `${textareaRef?.current?.scrollHeight}px`,
-            height: "auto",
-            minHeight: "100px",
             maxHeight: "400px",
             overflow: "auto"
           }}
