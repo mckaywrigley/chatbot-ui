@@ -18,24 +18,24 @@ Chatbot UI will be updated over time.
 
 Expect frequent improvements.
 
-**Coming this week:**
+**Next up:**
 
 - [ ] Saving via data export
 - [ ] Folders
 - [ ] Custom model settings
-- [ ] GPT-4 support for those with access
 - [ ] Prompt templates
 - [ ] Regenerate responses
 
-**Last week updates:**
+**Recent updates:**
 
-- [x] Markdown support (3/17/23)
+- [x] GPT-4 support (access required) (3/20/23)
+- [x] Search conversations (3/19/23)
 - [x] Code syntax highlighting (3/18/23)
 - [x] Toggle sidebar (3/18/23)
 - [x] Conversation naming (3/18/23)
 - [x] Github flavored markdown (3/18/23)
 - [x] Add OpenAI API key in app (3/18/23)
-- [x] Search conversations (3/19/23)
+- [x] Markdown support (3/17/23)
 
 ## Modifications
 
