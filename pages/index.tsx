@@ -237,8 +237,6 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
-    setLoading(true);
-
     const response = await fetch("/api/models", {
       method: "POST",
       headers: {
@@ -250,7 +248,6 @@ export default function Home() {
     });
 
     if (!response.ok) {
-      setLoading(false);
       setModelError(true);
       return;
     }
@@ -258,13 +255,11 @@ export default function Home() {
     const data = await response.json();
 
     if (!data) {
-      setLoading(false);
       setModelError(true);
       return;
     }
 
     setModels(data);
-    setLoading(false);
   };
 
   useEffect(() => {
