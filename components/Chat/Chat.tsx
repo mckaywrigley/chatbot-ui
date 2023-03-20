@@ -7,6 +7,7 @@ import { ModelSelect } from "./ModelSelect";
 
 interface Props {
   model: OpenAIModel;
+  models: OpenAIModel[];
   messages: Message[];
   messageIsStreaming: boolean;
   loading: boolean;

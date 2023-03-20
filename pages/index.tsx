@@ -11,6 +11,7 @@ export default function Home() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
+  const [models, setModels] = useState<OpenAIModel[]>([]);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
@@ -192,6 +193,24 @@ export default function Home() {
     localStorage.setItem("apiKey", apiKey);
   };
 
+  const fetchModels = async () => {
+    const response = await fetch("/api/models", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        key: apiKey
+      })
+    });
+    const data = await response.json();
+
+    if (data) {
+      console.log(data);
+      setModels(data);
+    }
+  };
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
@@ -223,6 +242,8 @@ export default function Home() {
         messages: []
       });
     }
+
+    fetchModels();
   }, []);
 
   return (
@@ -285,6 +306,7 @@ export default function Home() {
             <Chat
               messageIsStreaming={messageIsStreaming}
               model={model}
+              models={models}
               messages={selectedConversation.messages}
               loading={loading}
               lightMode={lightMode}
