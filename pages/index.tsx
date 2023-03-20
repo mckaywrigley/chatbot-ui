@@ -12,7 +12,6 @@ export default function Home() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
   const [models, setModels] = useState<OpenAIModel[]>([]);
-  const [models, setModels] = useState<OpenAIModel[]>([]);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
@@ -37,7 +36,6 @@ export default function Home() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: updatedConversation.model,
           model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey
@@ -176,35 +174,12 @@ export default function Home() {
     localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
   };
 
-  const handleChangeModel = (conversation: Conversation, model: OpenAIModel) => {
-    const updatedConversation = {
-      ...conversation,
-      model
-    };
-
-    const updatedConversations = conversations.map((c) => {
-      if (c.id === updatedConversation.id) {
-        return updatedConversation;
-      }
-
-      return c;
-    });
-
-    setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
-
-    setSelectedConversation(updatedConversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
-  };
-
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
       name: `Conversation ${lastConversation ? lastConversation.id + 1 : 1}`,
-      messages: [],
-      model: OpenAIModels[OpenAIModelID.GPT_3_5]
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5]
     };
@@ -238,8 +213,6 @@ export default function Home() {
         name: "New conversation",
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5]
-        messages: [],
-        model: OpenAIModels[OpenAIModelID.GPT_3_5]
       });
       localStorage.removeItem("selectedConversation");
     }
@@ -271,27 +244,6 @@ export default function Home() {
     setLoading(false);
   };
 
-  const fetchModels = async () => {
-    setLoading(true);
-
-    const response = await fetch("/api/models", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        key: apiKey
-      })
-    });
-    const data = await response.json();
-
-    if (data) {
-      setModels(data);
-    }
-
-    setLoading(false);
-  };
-
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
@@ -312,16 +264,10 @@ export default function Home() {
       const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
       const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
       setConversations(cleanedConversationHistory);
-      const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
-      setConversations(cleanedConversationHistory);
     }
 
     const selectedConversation = localStorage.getItem("selectedConversation");
     if (selectedConversation) {
-      const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
-      const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
-      setSelectedConversation(cleanedSelectedConversation);
       const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
       const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
       setSelectedConversation(cleanedSelectedConversation);
@@ -331,14 +277,10 @@ export default function Home() {
         name: "New conversation",
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5]
-        messages: [],
-        model: OpenAIModels[OpenAIModelID.GPT_3_5]
       });
     }
 
     fetchModels(apiKey);
-
-    fetchModels();
   }, []);
 
   return (
@@ -399,14 +341,12 @@ export default function Home() {
 
             <Chat
               conversation={selectedConversation}
-              conversation={selectedConversation}
               messageIsStreaming={messageIsStreaming}
               error={error}
               models={models}
               loading={loading}
               lightMode={lightMode}
               onSend={handleSend}
-              onModelChange={handleChangeModel}
               onModelChange={handleChangeModel}
             />
           </div>
