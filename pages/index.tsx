@@ -16,19 +16,32 @@ export default function Home() {
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [apiKey, setApiKey] = useState<string>("");
-  const [error, setError] = useState<boolean>(false);
+  const [messageError, setMessageError] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<boolean>(false);
 
-  const handleSend = async (message: Message) => {
+  const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
-      let updatedConversation: Conversation = {
-        ...selectedConversation,
-        messages: [...selectedConversation.messages, message]
-      };
+      let updatedConversation: Conversation;
+
+      if (isResend) {
+        const updatedMessages = [...selectedConversation.messages];
+        updatedMessages.pop();
+
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...updatedMessages, message]
+        };
+      } else {
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, message]
+        };
+      }
 
       setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
-      setError(false);
+      setMessageError(false);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -45,7 +58,7 @@ export default function Home() {
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setError(true);
+        setMessageError(true);
         return;
       }
 
@@ -54,7 +67,7 @@ export default function Home() {
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setError(true);
+        setMessageError(true);
 
         return;
       }
@@ -224,6 +237,7 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
+    setModelError(false);
     setLoading(true);
 
     const response = await fetch("/api/models", {
@@ -235,12 +249,22 @@ export default function Home() {
         key
       })
     });
-    const data = await response.json();
 
-    if (data) {
-      setModels(data);
+    if (!response.ok) {
+      setLoading(false);
+      setModelError(true);
+      return;
     }
 
+    const data = await response.json();
+
+    if (!data) {
+      setLoading(false);
+      setModelError(true);
+      return;
+    }
+
+    setModels(data);
     setLoading(false);
   };
 
@@ -342,7 +366,8 @@ export default function Home() {
             <Chat
               conversation={selectedConversation}
               messageIsStreaming={messageIsStreaming}
-              error={error}
+              modelError={modelError}
+              messageError={messageError}
               models={models}
               loading={loading}
               lightMode={lightMode}
