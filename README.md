@@ -24,10 +24,11 @@ Expect frequent improvements.
 - [ ] Folders
 - [ ] Custom model settings
 - [ ] Prompt templates
-- [ ] Regenerate responses
+- [ ] Regenerate & edit responses
 
 **Recent updates:**
 
+- [x] Error handling (3/20/23)
 - [x] GPT-4 support (access required) (3/20/23)
 - [x] Search conversations (3/19/23)
 - [x] Code syntax highlighting (3/18/23)
