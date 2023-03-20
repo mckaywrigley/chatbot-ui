@@ -1,5 +1,5 @@
 import { Message, OpenAIModel } from "@/types";
-import { OpenAIStream } from "@/utils";
+import { OpenAIStream } from "@/utils/server";
 
 export const config = {
   runtime: "edge"
@@ -23,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       }
       charCount += message.content.length;
-      messagesToSend = [message, ...messagesToSend]
+      messagesToSend = [message, ...messagesToSend];
     }
 
     const stream = await OpenAIStream(model, key, messagesToSend);

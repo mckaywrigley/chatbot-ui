@@ -12,7 +12,7 @@ export const OpenAIStream = async (model: OpenAIModel, key: string, messages: Me
     },
     method: "POST",
     body: JSON.stringify({
-      model,
+      model: model.id,
       messages: [
         {
           role: "system",
