@@ -18,14 +18,16 @@ Chatbot UI will be updated over time.
 
 Expect frequent improvements.
 
-**Next up:**
+**Coming this week:**
 
-- [ ] Mobile view
 - [ ] Saving via data export
 - [ ] Folders
-- [ ] Change default prompt
+- [ ] Custom model settings
+- [ ] GPT-4 support for those with access
+- [ ] Prompt templates
+- [ ] Regenerate responses
 
-**Recent updates:**
+**Last week updates:**
 
 - [x] Markdown support (3/17/23)
 - [x] Code syntax highlighting (3/18/23)
@@ -33,6 +35,7 @@ Expect frequent improvements.
 - [x] Conversation naming (3/18/23)
 - [x] Github flavored markdown (3/18/23)
 - [x] Add OpenAI API key in app (3/18/23)
+- [x] Search conversations (3/19/23)
 
 ## Modifications
 
@@ -53,7 +56,6 @@ Host your own live version of Chatbot UI with Vercel.
 **Replit**
 
 Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
-
 
 **Docker**
 
