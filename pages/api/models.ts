@@ -1,4 +1,4 @@
-import { OpenAIModel, OpenAIModelNames } from "@/types";
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
 
 export const config = {
   runtime: "edge"
@@ -23,13 +23,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const json = await response.json();
 
-    const models = json.data
+    const models: OpenAIModel[] = json.data
       .map((model: any) => {
-        for (const [key, value] of Object.entries(OpenAIModel)) {
+        for (const [key, value] of Object.entries(OpenAIModelID)) {
           if (value === model.id) {
             return {
               id: model.id,
-              name: OpenAIModelNames[value]
+              name: OpenAIModels[value].name
             };
           }
         }

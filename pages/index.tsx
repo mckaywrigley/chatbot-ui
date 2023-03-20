@@ -1,7 +1,8 @@
 import { Chat } from "@/components/Chat/Chat";
 import { Navbar } from "@/components/Mobile/Navbar";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { Conversation, Message, OpenAIModel } from "@/types";
+import { Conversation, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
+import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -10,7 +11,6 @@ export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
   const [models, setModels] = useState<OpenAIModel[]>([]);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
@@ -34,7 +34,7 @@ export default function Home() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model,
+          model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey
         })
@@ -48,6 +48,8 @@ export default function Home() {
       const data = response.body;
 
       if (!data) {
+        setLoading(false);
+        setMessageIsStreaming(false);
         return;
       }
 
@@ -145,13 +147,35 @@ export default function Home() {
     localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
   };
 
+  const handleChangeModel = (conversation: Conversation, model: OpenAIModel) => {
+    const updatedConversation = {
+      ...conversation,
+      model
+    };
+
+    const updatedConversations = conversations.map((c) => {
+      if (c.id === updatedConversation.id) {
+        return updatedConversation;
+      }
+
+      return c;
+    });
+
+    setConversations(updatedConversations);
+    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+    setSelectedConversation(updatedConversation);
+    localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+  };
+
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
       name: `Conversation ${lastConversation ? lastConversation.id + 1 : 1}`,
-      messages: []
+      messages: [],
+      model: OpenAIModels[OpenAIModelID.GPT_3_5]
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -161,7 +185,6 @@ export default function Home() {
     setSelectedConversation(newConversation);
     localStorage.setItem("selectedConversation", JSON.stringify(newConversation));
 
-    setModel(OpenAIModel.GPT_3_5);
     setLoading(false);
   };
 
@@ -182,7 +205,8 @@ export default function Home() {
       setSelectedConversation({
         id: 1,
         name: "New conversation",
-        messages: []
+        messages: [],
+        model: OpenAIModels[OpenAIModelID.GPT_3_5]
       });
       localStorage.removeItem("selectedConversation");
     }
@@ -194,6 +218,8 @@ export default function Home() {
   };
 
   const fetchModels = async () => {
+    setLoading(true);
+
     const response = await fetch("/api/models", {
       method: "POST",
       headers: {
@@ -206,9 +232,10 @@ export default function Home() {
     const data = await response.json();
 
     if (data) {
-      console.log(data);
       setModels(data);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -227,19 +254,23 @@ export default function Home() {
     }
 
     const conversationHistory = localStorage.getItem("conversationHistory");
-
     if (conversationHistory) {
-      setConversations(JSON.parse(conversationHistory));
+      const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
+      const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
+      setConversations(cleanedConversationHistory);
     }
 
     const selectedConversation = localStorage.getItem("selectedConversation");
     if (selectedConversation) {
-      setSelectedConversation(JSON.parse(selectedConversation));
+      const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
+      const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
+      setSelectedConversation(cleanedSelectedConversation);
     } else {
       setSelectedConversation({
         id: 1,
         name: "New conversation",
-        messages: []
+        messages: [],
+        model: OpenAIModels[OpenAIModelID.GPT_3_5]
       });
     }
 
@@ -263,7 +294,6 @@ export default function Home() {
           href="/favicon.ico"
         />
       </Head>
-
       {selectedConversation && (
         <div className={`flex flex-col h-screen w-screen text-white ${lightMode}`}>
           <div className="sm:hidden w-full fixed top-0">
@@ -304,14 +334,13 @@ export default function Home() {
             )}
 
             <Chat
+              conversation={selectedConversation}
               messageIsStreaming={messageIsStreaming}
-              model={model}
               models={models}
-              messages={selectedConversation.messages}
               loading={loading}
               lightMode={lightMode}
               onSend={handleSend}
-              onSelect={setModel}
+              onModelChange={handleChangeModel}
             />
           </div>
         </div>
