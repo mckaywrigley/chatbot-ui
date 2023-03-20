@@ -217,7 +217,7 @@ export default function Home() {
     localStorage.setItem("apiKey", apiKey);
   };
 
-  const fetchModels = async () => {
+  const fetchModels = async (key: string) => {
     setLoading(true);
 
     const response = await fetch("/api/models", {
@@ -226,7 +226,7 @@ export default function Home() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        key: apiKey
+        key
       })
     });
     const data = await response.json();
@@ -244,7 +244,7 @@ export default function Home() {
       setLightMode(theme as "dark" | "light");
     }
 
-    const apiKey = localStorage.getItem("apiKey");
+    const apiKey = localStorage.getItem("apiKey") || "";
     if (apiKey) {
       setApiKey(apiKey);
     }
@@ -274,7 +274,7 @@ export default function Home() {
       });
     }
 
-    fetchModels();
+    fetchModels(apiKey);
   }, []);
 
   return (
