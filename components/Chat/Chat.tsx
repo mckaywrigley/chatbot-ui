@@ -1,4 +1,6 @@
+import models from "@/pages/api/models";
 import { Conversation, Message, OpenAIModel } from "@/types";
+import error from "next/error";
 import { FC, useEffect, useRef } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatLoader } from "./ChatLoader";
@@ -6,6 +8,8 @@ import { ChatMessage } from "./ChatMessage";
 import { ModelSelect } from "./ModelSelect";
 
 interface Props {
+  conversation: Conversation;
+  models: OpenAIModel[];
   conversation: Conversation;
   models: OpenAIModel[];
   messageIsStreaming: boolean;
@@ -26,10 +30,12 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, erro
   useEffect(() => {
     scrollToBottom();
   }, [conversation.messages]);
+  }, [conversation.messages]);
 
   return (
     <div className="flex-1 overflow-scroll dark:bg-[#343541]">
       <div>
+        {conversation.messages.length === 0 ? (
         {conversation.messages.length === 0 ? (
           <>
             <div className="flex justify-center pt-8">
@@ -37,15 +43,21 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, erro
                 model={conversation.model}
                 models={models}
                 onModelChange={(model) => onModelChange(conversation, model)}
+                model={conversation.model}
+                models={models}
+                onModelChange={(model) => onModelChange(conversation, model)}
               />
             </div>
 
+            <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200 pt-[160px] sm:pt-[280px]">{loading ? "Loading..." : "Chatbot UI"}</div>
             <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200 pt-[160px] sm:pt-[280px]">{loading ? "Loading..." : "Chatbot UI"}</div>
           </>
         ) : (
           <>
             <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {conversation.model.name}</div>
+            <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {conversation.model.name}</div>
 
+            {conversation.messages.map((message, index) => (
             {conversation.messages.map((message, index) => (
               <ChatMessage
                 key={index}
