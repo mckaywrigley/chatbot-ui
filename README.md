@@ -24,7 +24,7 @@ Expect frequent improvements.
 - [ ] Folders
 - [ ] Custom model settings
 - [ ] Prompt templates
-- [ ] Regenerate responses
+- [ ] Regenerate & edit responses
 
 **Recent updates:**
 
