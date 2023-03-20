@@ -33,7 +33,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
   }, [searchTerm, conversations]);
 
   return (
-    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] z-10`}>
+    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] z-10 sm:relative sm:top-0 absolute top-12 bottom-0`}>
       <div className="flex items-center h-[60px] sm:pl-2 px-2">
         <button
           className="flex items-center w-full sm:w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
