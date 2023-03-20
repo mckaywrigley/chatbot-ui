@@ -237,7 +237,6 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
-    setModelError(false);
     setLoading(true);
 
     const response = await fetch("/api/models", {
