@@ -9,13 +9,14 @@ interface Props {
   conversation: Conversation;
   models: OpenAIModel[];
   messageIsStreaming: boolean;
+  error: boolean;
   loading: boolean;
   lightMode: "light" | "dark";
   onSend: (message: Message) => void;
   onModelChange: (conversation: Conversation, model: OpenAIModel) => void;
 }
 
-export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, loading, lightMode, onSend, onModelChange }) => {
+export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, error, loading, lightMode, onSend, onModelChange }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -63,10 +64,14 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, load
         )}
       </div>
 
-      <ChatInput
-        messageIsStreaming={messageIsStreaming}
-        onSend={onSend}
-      />
+      {error ? (
+        <div className="text-center text-red-500">Error</div>
+      ) : (
+        <ChatInput
+          messageIsStreaming={messageIsStreaming}
+          onSend={onSend}
+        />
+      )}
     </div>
   );
 };

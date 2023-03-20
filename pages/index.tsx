@@ -16,6 +16,7 @@ export default function Home() {
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [apiKey, setApiKey] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
 
   const handleSend = async (message: Message) => {
     if (selectedConversation) {
@@ -27,6 +28,7 @@ export default function Home() {
       setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
+      setError(false);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -42,6 +44,8 @@ export default function Home() {
 
       if (!response.ok) {
         setLoading(false);
+        setMessageIsStreaming(false);
+        setError(true);
         return;
       }
 
@@ -50,6 +54,8 @@ export default function Home() {
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
+        setError(true);
+
         return;
       }
 
@@ -336,6 +342,7 @@ export default function Home() {
             <Chat
               conversation={selectedConversation}
               messageIsStreaming={messageIsStreaming}
+              error={error}
               models={models}
               loading={loading}
               lightMode={lightMode}
