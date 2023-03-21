@@ -18,7 +18,17 @@ interface Props {
   onModelChange: (conversation: Conversation, model: OpenAIModel) => void;
 }
 
-export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onModelChange }) => {
+export const Chat: FC<Props> = ({
+  conversation,
+  models,
+  messageIsStreaming,
+  modelError,
+  messageError,
+  loading,
+  lightMode,
+  onSend,
+  onModelChange,
+}) => {
   const [currentMessage, setCurrentMessage] = useState<Message>();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,8 +46,13 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
       {modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-center text-red-500">Error fetching models.</div>
-          <div className="text-center text-red-500">Make sure your OpenAI API key is set in the bottom left of the sidebar or in a .env.local file and refresh.</div>
-          <div className="text-center text-red-500">If you completed this step, OpenAI may be experiencing issues.</div>
+          <div className="text-center text-red-500">
+            Make sure your OpenAI API key is set in the bottom left of the
+            sidebar or in a .env.local file and refresh.
+          </div>
+          <div className="text-center text-red-500">
+            If you completed this step, OpenAI may be experiencing issues.
+          </div>
         </div>
       ) : (
         <>
@@ -48,15 +63,21 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
                   <ModelSelect
                     model={conversation.model}
                     models={models}
-                    onModelChange={(model) => onModelChange(conversation, model)}
+                    onModelChange={(model) =>
+                      onModelChange(conversation, model)
+                    }
                   />
                 </div>
 
-                <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200 pt-[160px] sm:pt-[280px]">{models.length === 0 ? "Loading..." : "Chatbot UI"}</div>
+                <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200 pt-[160px] sm:pt-[280px]">
+                  {models.length === 0 ? "Loading..." : "Chatbot UI"}
+                </div>
               </>
             ) : (
               <>
-                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {conversation.model.name}</div>
+                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">
+                  Model: {conversation.model.name}
+                </div>
 
                 {conversation.messages.map((message, index) => (
                   <ChatMessage
@@ -91,6 +112,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
                 setCurrentMessage(message);
                 onSend(message, false);
               }}
+              model={conversation.model}
             />
           )}
         </>
