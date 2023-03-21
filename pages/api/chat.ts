@@ -1,12 +1,12 @@
-// @ts-expect-error
-import wasm from "../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module";
-import tiktokenModel from "@dqbd/tiktoken/encoders/cl100k_base.json";
-import { init, Tiktoken } from "@dqbd/tiktoken/lite/init";
 import { Message, OpenAIModel, OpenAIModelID } from "@/types";
 import { OpenAIStream } from "@/utils/server";
+import tiktokenModel from "@dqbd/tiktoken/encoders/cl100k_base.json";
+import { init, Tiktoken } from "@dqbd/tiktoken/lite/init";
+// @ts-expect-error
+import wasm from "../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module";
 
 export const config = {
-  runtime: "edge",
+  runtime: "edge"
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -17,15 +17,10 @@ const handler = async (req: Request): Promise<Response> => {
       key: string;
     };
 
-    // Initialize the encoder
     await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str
-    );
+    const encoding = new Tiktoken(tiktokenModel.bpe_ranks, tiktokenModel.special_tokens, tiktokenModel.pat_str);
 
-    const tokenLimit = model.id === OpenAIModelID.GPT_4 ? 8000 : 4000;
+    const tokenLimit = model.id === OpenAIModelID.GPT_4 ? 6000 : 3000;
     let tokenCount = 0;
     let messagesToSend: Message[] = [];
 
