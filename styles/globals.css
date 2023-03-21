@@ -2,35 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NEW SCROLL BAR*/
-/* Hide the scrollbar track */
 ::-webkit-scrollbar-track {
-    background-color: transparent;
+  background-color: transparent;
 }
 
-/* Define the scrollbar thumb */
 ::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
+  background-color: #ccc;
+  border-radius: 10px;
 }
 
-/* Define the scrollbar thumb on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #aaa;
+  background-color: #aaa;
 }
 
-/* Define the scrollbar track on hover */
 ::-webkit-scrollbar-track:hover {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
 
-/* Define the scrollbar corner */
 ::-webkit-scrollbar-corner {
-    background-color: transparent;
+  background-color: transparent;
 }
 
-/* Define the scrollbar width and height */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
