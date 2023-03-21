@@ -1,13 +1,14 @@
-import { Message } from "@/types";
+import { Message, OpenAIModel, OpenAIModelID } from "@/types";
 import { IconSend } from "@tabler/icons-react";
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 interface Props {
   messageIsStreaming: boolean;
   onSend: (message: Message) => void;
+  model: OpenAIModel;
 }
 
-export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
+export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -15,8 +16,10 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    if (value.length > 4000) {
-      alert("Message limit is 4000 characters");
+    const maxLength = model.id === OpenAIModelID.GPT_3_5 ? 12000 : 24000;
+
+    if (value.length > maxLength) {
+      alert(`Message limit is ${maxLength} characters`);
       return;
     }
 
@@ -42,8 +45,10 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
   };
 
   const isMobile = () => {
-    const userAgent = typeof window.navigator === "undefined" ? "" : navigator.userAgent;
-    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
+    const userAgent =
+      typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    const mobileRegex =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
     return mobileRegex.test(userAgent);
   };
 
@@ -72,7 +77,7 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming }) => {
           resize: "none",
           bottom: `${textareaRef?.current?.scrollHeight}px`,
           maxHeight: "400px",
-          overflow: "auto"
+          overflow: "auto",
         }}
         placeholder="Type a message..."
         value={content}

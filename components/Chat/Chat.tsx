@@ -91,6 +91,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
                 setCurrentMessage(message);
                 onSend(message, false);
               }}
+              model={conversation.model}
             />
           )}
         </>
