@@ -39,7 +39,7 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
     onSend({ role: "user", content });
     setContent("");
 
-    if (textareaRef && textareaRef.current) {
+    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
     }
   };
