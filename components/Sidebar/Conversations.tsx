@@ -38,7 +38,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
   }, [isRenaming, isDeleting]);
 
   return (
-    <div className="flex flex-col space-y-2 w-full px-2">
+    <div className="flex flex-col-reverse gap-2 w-full px-2">
       {conversations.map((conversation, index) => (
         <button
           key={index}
