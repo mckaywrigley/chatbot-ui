@@ -21,13 +21,6 @@ export default function Home() {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
 
-  // Close sidebar when a conversation is selected/created on mobile
-  useEffect(() => {
-    if (window.innerWidth < 640) {
-      setShowSidebar(false);
-    }
-  }, [selectedConversation])
-
   const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
@@ -247,6 +240,26 @@ export default function Home() {
     setConversations(all);
   };
 
+  const handleClearConversations = () => {
+    setConversations([]);
+    localStorage.removeItem("conversationHistory");
+
+    setSelectedConversation({
+      id: 1,
+      name: "New conversation",
+      messages: [],
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      prompt: DEFAULT_SYSTEM_PROMPT
+    });
+    localStorage.removeItem("selectedConversation");
+  };
+
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      setShowSidebar(false);
+    }
+  }, [selectedConversation]);
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
@@ -329,6 +342,7 @@ export default function Home() {
                   onToggleSidebar={() => setShowSidebar(!showSidebar)}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
+                  onClearConversations={handleClearConversations}
                 />
 
                 <IconArrowBarLeft
