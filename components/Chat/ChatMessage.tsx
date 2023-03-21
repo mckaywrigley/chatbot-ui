@@ -20,7 +20,7 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
 
         <div className="prose dark:prose-invert mt-[-2px]">
           {message.role === "user" ? (
-            <div className="prose dark:prose-invert whitespace-pre">
+            <div className="prose dark:prose-invert whitespace-pre-wrap">
               {message.content}
             </div>
           ) : (
