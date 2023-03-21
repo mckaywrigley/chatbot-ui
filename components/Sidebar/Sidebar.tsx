@@ -1,4 +1,4 @@
-import { Conversation } from "@/types";
+import { Conversation, KeyValuePair } from "@/types";
 import { IconArrowBarLeft, IconPlus } from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
 import { Conversations } from "./Conversations";
@@ -16,11 +16,11 @@ interface Props {
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
   onToggleSidebar: () => void;
-  onRenameConversation: (conversation: Conversation, name: string) => void;
+  onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
   onApiKeyChange: (apiKey: string) => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onRenameConversation, onApiKeyChange }) => {
+export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>(conversations);
 
@@ -74,7 +74,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
             setSearchTerm("");
           }}
           onRenameConversation={(conversation, name) => {
-            onRenameConversation(conversation, name);
+            onUpdateConversation(conversation, { key: "name", value: name });
             setSearchTerm("");
           }}
         />
