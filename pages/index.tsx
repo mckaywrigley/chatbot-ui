@@ -247,6 +247,11 @@ export default function Home() {
     setConversations(all);
   };
 
+  const handleClearConversations = () => {
+    setConversations([])
+    localStorage.removeItem('conversationHistory')
+  }
+
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme) {
@@ -329,6 +334,7 @@ export default function Home() {
                   onToggleSidebar={() => setShowSidebar(!showSidebar)}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
+                  onClearConversations={handleClearConversations}
                 />
 
                 <IconArrowBarLeft

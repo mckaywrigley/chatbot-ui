@@ -18,9 +18,10 @@ interface Props {
   onToggleSidebar: () => void;
   onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
   onApiKeyChange: (apiKey: string) => void;
+  onClearConversations: () => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange }) => {
+export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>(conversations);
 
@@ -85,6 +86,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         apiKey={apiKey}
         onToggleLightMode={onToggleLightMode}
         onApiKeyChange={onApiKeyChange}
+        onClearConversations={onClearConversations}
       />
     </div>
   );

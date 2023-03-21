@@ -1,4 +1,4 @@
-import { IconMoon, IconSun } from "@tabler/icons-react";
+import { IconMoon, IconSun, IconTrash } from "@tabler/icons-react";
 import { FC } from "react";
 import { Key } from "./Key";
 import { SidebarButton } from "./SidebarButton";
@@ -8,11 +8,17 @@ interface Props {
   apiKey: string;
   onToggleLightMode: (mode: "light" | "dark") => void;
   onApiKeyChange: (apiKey: string) => void;
+  onClearConversations: () => void;
 }
 
-export const SidebarSettings: FC<Props> = ({ lightMode, apiKey, onToggleLightMode, onApiKeyChange }) => {
+export const SidebarSettings: FC<Props> = ({ lightMode, apiKey, onToggleLightMode, onApiKeyChange, onClearConversations }) => {
   return (
     <div className="flex flex-col items-center border-t border-neutral-500 px-2 py-4 text-sm space-y-2">
+      <SidebarButton
+        text="Clear Converstaions"
+        icon={<IconTrash size={16}/>}
+        onClick={() => onClearConversations()}
+      />
       <SidebarButton
         text={lightMode === "light" ? "Dark mode" : "Light mode"}
         icon={lightMode === "light" ? <IconMoon size={16} /> : <IconSun size={16} />}
