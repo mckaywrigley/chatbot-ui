@@ -21,6 +21,13 @@ export default function Home() {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
 
+  // Close sidebar when a conversation is selected/created on mobile
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      setShowSidebar(false);
+    }
+  }, [selectedConversation])
+
   const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
