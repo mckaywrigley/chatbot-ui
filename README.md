@@ -20,14 +20,15 @@ Expect frequent improvements.
 
 **Next up:**
 
+- [ ] More custom model settings
+- [ ] Regenerate & edit responses
 - [ ] Saving via data export
 - [ ] Folders
-- [ ] Custom model settings
 - [ ] Prompt templates
-- [ ] Regenerate & edit responses
 
 **Recent updates:**
 
+- [x] Custom system prompt (3/21/23)
 - [x] Error handling (3/20/23)
 - [x] GPT-4 support (access required) (3/20/23)
 - [x] Search conversations (3/19/23)
@@ -52,7 +53,7 @@ Modify the system prompt in `utils/index.ts`.
 
 Host your own live version of Chatbot UI with Vercel.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui&envDescription=Your%20OpenAI%20API%20Key.%20Chat%20will%20not%20work%20if%20you%20don't%20provide%20it.)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
 
 **Replit**
 

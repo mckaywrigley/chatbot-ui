@@ -1,10 +1,7 @@
 import { Message, OpenAIModel } from "@/types";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
 
-export const OpenAIStream = async (model: OpenAIModel, key: string, messages: Message[]) => {
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-
+export const OpenAIStream = async (model: OpenAIModel, systemPrompt: string, key: string, messages: Message[]) => {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +13,7 @@ export const OpenAIStream = async (model: OpenAIModel, key: string, messages: Me
       messages: [
         {
           role: "system",
-          content: `You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown format.`
+          content: systemPrompt
         },
         ...messages
       ],
@@ -29,6 +26,9 @@ export const OpenAIStream = async (model: OpenAIModel, key: string, messages: Me
   if (res.status !== 200) {
     throw new Error("OpenAI API returned an error");
   }
+
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
 
   const stream = new ReadableStream({
     async start(controller) {

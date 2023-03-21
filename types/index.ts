@@ -31,6 +31,19 @@ export interface Conversation {
   name: string;
   messages: Message[];
   model: OpenAIModel;
+  prompt: string;
+}
+
+export interface ChatBody {
+  model: OpenAIModel;
+  messages: Message[];
+  key: string;
+  prompt: string;
+}
+
+export interface KeyValuePair {
+  key: string;
+  value: any;
 }
 
 // keep track of local storage schema

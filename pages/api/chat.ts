@@ -1,4 +1,5 @@
-import { Message, OpenAIModel, OpenAIModelID } from "@/types";
+import { ChatBody, Message, OpenAIModelID } from "@/types";
+import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { OpenAIStream } from "@/utils/server";
 import tiktokenModel from "@dqbd/tiktoken/encoders/cl100k_base.json";
 import { init, Tiktoken } from "@dqbd/tiktoken/lite/init";
@@ -11,11 +12,7 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key } = (await req.json()) as {
-      model: OpenAIModel;
-      messages: Message[];
-      key: string;
-    };
+    const { model, messages, key, prompt } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(tiktokenModel.bpe_ranks, tiktokenModel.special_tokens, tiktokenModel.pat_str);
@@ -37,7 +34,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, key, messagesToSend);
+    let promptToSend = prompt;
+    if (!promptToSend) {
+      promptToSend = DEFAULT_SYSTEM_PROMPT;
+    }
+
+    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

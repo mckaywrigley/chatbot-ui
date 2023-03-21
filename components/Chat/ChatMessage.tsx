@@ -20,9 +20,7 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
 
         <div className="prose dark:prose-invert mt-[-2px]">
           {message.role === "user" ? (
-            <div className="prose dark:prose-invert whitespace-pre-wrap">
-              {message.content}
-            </div>
+            <div className="prose dark:prose-invert whitespace-pre-wrap">{message.content}</div>
           ) : (
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -38,11 +36,23 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
                       {...props}
                     />
                   ) : (
-                    <code className={className} {...props}>
+                    <code
+                      className={className}
+                      {...props}
+                    >
                       {children}
                     </code>
                   );
                 },
+                table({ children }) {
+                  return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;
+                },
+                th({ children }) {
+                  return <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">{children}</th>;
+                },
+                td({ children }) {
+                  return <td className="border border-black dark:border-white break-words py-1 px-3">{children}</td>;
+                }
               }}
             >
               {message.content}
