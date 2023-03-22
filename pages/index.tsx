@@ -8,7 +8,7 @@ import { saveConversation, saveConversations, updateConversation } from "@/utils
 import { exportConversations, importConversations } from "@/utils/app/data";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -21,6 +21,7 @@ export default function Home() {
   const [apiKey, setApiKey] = useState<string>("");
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
+  const stopConversationRef = useRef<boolean>(false);
 
   const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
@@ -53,11 +54,13 @@ export default function Home() {
         prompt: updatedConversation.prompt
       };
 
+      const controller = new AbortController()
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
+        signal: controller.signal,
         body: JSON.stringify(chatBody)
       });
 
@@ -87,6 +90,11 @@ export default function Home() {
       let text = "";
 
       while (!done) {
+        if (stopConversationRef.current === true) {
+          controller.abort();
+          done = true;
+          break;
+        }
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
@@ -385,6 +393,7 @@ export default function Home() {
               lightMode={lightMode}
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
+              stopConversationRef={stopConversationRef}
             />
           </div>
         </div>

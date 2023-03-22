@@ -1,14 +1,15 @@
 import { Message, OpenAIModel, OpenAIModelID } from "@/types";
-import { IconSend } from "@tabler/icons-react";
-import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { IconHandStop, IconSend } from "@tabler/icons-react";
+import { FC, KeyboardEvent, MutableRefObject, useEffect, useRef, useState } from "react";
 
 interface Props {
   messageIsStreaming: boolean;
   onSend: (message: Message) => void;
   model: OpenAIModel;
+  stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
+export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model, stopConversationRef }) => {
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -67,6 +68,13 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
     }
   }, [content]);
 
+  function handleStopConversation() {
+    stopConversationRef.current = true;
+    setTimeout(() => {
+      stopConversationRef.current = false;
+    }, 1000);
+  }
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent dark:bg-[#444654] md:dark:bg-gradient-to-t from-[#343541] via-[#343541] to-[#343541]/0 bg-white md:dark:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
       <div className="stretch mx-2 md:mt-[52px] mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl">
@@ -98,6 +106,17 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
               className="opacity-60"
             />
           </button>
+          {messageIsStreaming ? (
+            <button
+              className="absolute right-12 focus:outline-none text-neutral-800 hover:text-neutral-900 dark:text-neutral-100 dark:hover:text-neutral-200 dark:bg-opacity-50 hover:bg-neutral-200 p-1 rounded-sm"
+              onClick={handleStopConversation}
+            >
+              <IconHandStop
+                size={16}
+                className="opacity-60"
+              />
+            </button>
+          ) : null}
         </div>
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-xs text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
