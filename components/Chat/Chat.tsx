@@ -1,5 +1,5 @@
 import { Conversation, KeyValuePair, Message, OpenAIModel } from "@/types";
-import { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
+import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatLoader } from "./ChatLoader";
 import { ChatMessage } from "./ChatMessage";
@@ -17,7 +17,7 @@ interface Props {
   lightMode: "light" | "dark";
   onSend: (message: Message, isResend: boolean) => void;
   onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
-  stopConversationRef: MutableRefObject<boolean>
+  stopConversationRef: MutableRefObject<boolean>;
 }
 
 export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, stopConversationRef }) => {
@@ -34,7 +34,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
   }, [conversation.messages]);
 
   return (
-    <div className="relative flex-1 overflow-none dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
       {modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-center text-red-500">Error fetching models.</div>

@@ -8,7 +8,7 @@ import { saveConversation, saveConversations, updateConversation } from "@/utils
 import { exportConversations, importConversations } from "@/utils/app/data";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -54,7 +54,7 @@ export default function Home() {
         prompt: updatedConversation.prompt
       };
 
-      const controller = new AbortController()
+      const controller = new AbortController();
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
