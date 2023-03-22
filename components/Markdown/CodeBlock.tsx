@@ -9,20 +9,20 @@ interface Props {
 }
 
 export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
-  const [buttonText, setButtonText] = useState("Copy");
+  const [buttonText, setButtonText] = useState("Copy code");
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(value).then(() => {
       setButtonText("Copied!");
 
       setTimeout(() => {
-        setButtonText("Copy");
+        setButtonText("Copy code");
       }, 2000);
     });
   };
 
   return (
-    <div className="relative text-[16px]">
+    <div className="relative text-[16px] pt-2">
       <SyntaxHighlighter
         language={language}
         style={lightMode === "light" ? oneLight : oneDark}
@@ -31,7 +31,7 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
       </SyntaxHighlighter>
 
       <button
-        className="absolute top-2 right-2 text-white bg-blue-600 py-1 px-2 rounded focus:outline-none hover:bg-blue-700 text-sm"
+        className="absolute top-[-8px] right-[0px] text-white bg-none py-0.5 px-2 rounded focus:outline-none hover:bg-blue-700 text-xs"
         onClick={copyToClipboard}
       >
         {buttonText}
