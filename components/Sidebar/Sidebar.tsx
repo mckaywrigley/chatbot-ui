@@ -29,7 +29,11 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
 
   useEffect(() => {
     if (searchTerm) {
-      setFilteredConversations(conversations.filter((conversation) => conversation.name.toLowerCase().includes(searchTerm.toLowerCase())));
+      setFilteredConversations(conversations.filter((conversation) => {
+        const searchable = conversation.name.toLocaleLowerCase() + ' ' + conversation.messages.map((message) => message.content).join(" ");
+        return searchable.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      ));
     } else {
       setFilteredConversations(conversations);
     }
