@@ -14,7 +14,7 @@ interface Props {
 
 export const SidebarSettings: FC<Props> = ({ lightMode, apiKey, onToggleLightMode, onApiKeyChange, onClearConversations }) => {
   return (
-    <div className="flex flex-col items-center border-t border-neutral-500 px-2 py-4 text-sm space-y-2">
+    <div className="flex flex-col pt-1 items-center border-t border-white/20 text-sm space-y-1">
       <ClearConversations onClearConversations={onClearConversations} />
 
       <SidebarButton

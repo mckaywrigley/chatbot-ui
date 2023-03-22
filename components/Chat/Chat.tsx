@@ -33,7 +33,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
   }, [conversation.messages]);
 
   return (
-    <div className="flex-1 overflow-scroll dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-none dark:bg-[#343541]">
       {modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-center text-red-500">Error fetching models.</div>
@@ -42,11 +42,11 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
         </div>
       ) : (
         <>
-          <div>
+          <div className="overflow-scroll max-h-full">
             {conversation.messages.length === 0 ? (
               <>
                 <div className="flex flex-col mx-auto pt-12 space-y-10 w-[350px] sm:w-[600px]">
-                  <div className="text-4xl text-center text-neutral-600 dark:text-neutral-200">{models.length === 0 ? "Loading..." : "Chatbot UI"}</div>
+                  <div className="text-4xl font-semibold text-center text-gray-800 dark:text-gray-100">{models.length === 0 ? "Loading..." : "Chatbot UI"}</div>
 
                   {models.length > 0 && (
                     <div className="flex flex-col h-full space-y-4 border p-4 rounded border-neutral-500">
@@ -79,7 +79,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
                 {loading && <ChatLoader />}
 
                 <div
-                  className="bg-white dark:bg-[#343541] h-24 sm:h-32"
+                  className="bg-white dark:bg-[#343541] h-[113px] sm:h-[162px]"
                   ref={messagesEndRef}
                 />
               </>

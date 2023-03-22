@@ -12,11 +12,11 @@ interface Props {
 export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
   return (
     <div
-      className={`flex justify-center py-[20px] sm:py-[30px] ${message.role === "assistant" ? "dark:bg-[#444654] dark:text-neutral-100 bg-neutral-100 text-neutral-900 border border-neutral-300 dark:border-none" : "dark:bg-[#343541] dark:text-white text-neutral-900"}`}
+      className={`group ${message.role === "assistant" ? "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-gray-50 dark:bg-[#444654]" : "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 "}`}
       style={{ overflowWrap: "anywhere" }}
     >
-      <div className="w-full sm:w-4/5 md:w-3/5 lg:w-[600px] xl:w-[800px] flex px-4">
-        <div className="mr-1 sm:mr-2 font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
+      <div className="text-base gap-4 md:gap-6 md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0 m-auto">
+        <div className="font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
 
         <div className="prose dark:prose-invert mt-[-2px]">
           {message.role === "user" ? (

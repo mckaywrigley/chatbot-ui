@@ -38,17 +38,17 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
   }, [isRenaming, isDeleting]);
 
   return (
-    <div className="flex flex-col-reverse gap-2 w-full px-2">
+    <div className="flex flex-col-reverse gap-1 w-full pt-2">
       {conversations.map((conversation, index) => (
         <button
           key={index}
-          className={`flex items-center justify-start min-h-[40px] px-2 text-sm rounded-lg hover:bg-neutral-700 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation.id ? "bg-slate-600" : ""}`}
+          className={`flex gap-3 items-center p-3 text-sm rounded-lg hover:bg-[#343541]/90 transition-colors duration-200 cursor-pointer ${loading ? "disabled:cursor-not-allowed" : ""} ${selectedConversation.id === conversation.id ? "bg-[#343541]/90" : ""}`}
           onClick={() => onSelectConversation(conversation)}
           disabled={loading}
         >
           <IconMessage
-            className="mr-2 min-w-[20px]"
-            size={18}
+            className=""
+            size={16}
           />
 
           {isRenaming && selectedConversation.id === conversation.id ? (
@@ -65,10 +65,10 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
           )}
 
           {(isDeleting || isRenaming) && selectedConversation.id === conversation.id && (
-            <div className="flex w-[40px]">
+            <div className="flex gap-1 -ml-2">
               <IconCheck
-                className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-                size={18}
+                className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
+                size={16}
                 onClick={(e) => {
                   e.stopPropagation();
 
@@ -84,8 +84,8 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
               />
 
               <IconX
-                className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-                size={18}
+                className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
+                size={16}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsDeleting(false);
@@ -96,7 +96,7 @@ export const Conversations: FC<Props> = ({ loading, conversations, selectedConve
           )}
 
           {selectedConversation.id === conversation.id && !isDeleting && !isRenaming && (
-            <div className="flex w-[40px]">
+            <div className="flex gap-1 -ml-2">
               <IconPencil
                 className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
                 size={18}
