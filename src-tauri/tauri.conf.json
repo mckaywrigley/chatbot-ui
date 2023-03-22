@@ -14,7 +14,7 @@
       "all": true,
       "http": {
         "all": true,
-        "scope": ["tauri://localhost/api/models"]
+        "scope": ["https://**"]
       }
     },
     "bundle": {
