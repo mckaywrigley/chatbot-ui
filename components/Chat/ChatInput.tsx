@@ -68,10 +68,12 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
   }, [content]);
 
   return (
-    <div className="fixed sm:absolute bottom-4 sm:bottom-8 w-full sm:w-1/2 px-2 left-0 sm:left-[280px] lg:left-[200px] right-0 ml-auto mr-auto">
+    <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent dark:bg-[#444654] md:dark:bg-gradient-to-t from-[#343541] via-[#343541] to-[#343541]/0 bg-white md:dark:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
+      <div className="stretch mx-2 md:mt-[52px] mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+          <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-[#40414F] rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
       <textarea
         ref={textareaRef}
-        className="rounded-lg pl-4 pr-8 py-3 w-full focus:outline-none dark:bg-[#40414F] dark:border-opacity-50 dark:border-neutral-800 dark:text-neutral-100 border border-neutral-300 shadow text-neutral-900"
+        className="text-base m-0 w-full resize-none outline-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
         style={{
           resize: "none",
           bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -88,11 +90,14 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model }) => {
       />
 
       <button
-        className="absolute right-5 bottom-[18px] focus:outline-none text-neutral-800 hover:text-neutral-900 dark:text-neutral-100 dark:hover:text-neutral-200 dark:bg-opacity-50 hover:bg-neutral-200 p-1 rounded-sm"
+        className="absolute right-5 focus:outline-none text-neutral-800 hover:text-neutral-900 dark:text-neutral-100 dark:hover:text-neutral-200 dark:bg-opacity-50 hover:bg-neutral-200 p-1 rounded-sm"
         onClick={handleSend}
       >
-        <IconSend size={18} />
+        <IconSend size={16} className="opacity-60"/>
       </button>
+      </div>
+      </div>
+      <div className="px-3 pt-2 pb-3 text-center text-xs text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6"><a href="https://github.com/mckaywrigley/chatbot-ui" target="_blank" rel="noreferrer" className="underline">ChatBot UI</a>. Chatbot UI is an advanced chatbot kit for OpenAI&apos;s chat models aiming to mimic ChatGPT&apos;s interface and functionality.</div>
     </div>
   );
 };

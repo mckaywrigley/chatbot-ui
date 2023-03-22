@@ -24,11 +24,11 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
   };
 
   return isChanging ? (
-    <div className="flex hover:bg-[#343541] py-2 px-2 rounded-md cursor-pointer w-full items-center">
+    <div className="flex transition-colors duration:200 hover:bg-gray-500/10 py-3 px-3 rounded-md cursor-pointer w-full items-center">
       <IconKey size={16} />
 
       <input
-        className="ml-2 flex-1 bg-transparent border-b border-neutral-400 focus:border-neutral-100 text-left overflow-hidden overflow-ellipsis pr-1 outline-none text-white"
+        className="ml-2 flex-1 h-[20px] bg-transparent border-b border-neutral-400 focus:border-neutral-100 text-left overflow-hidden overflow-ellipsis pr-1 outline-none text-white"
         type="password"
         value={newKey}
         onChange={(e) => setNewKey(e.target.value)}

@@ -34,17 +34,17 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
   }, [searchTerm, conversations]);
 
   return (
-    <div className={`flex flex-col bg-[#202123] min-w-full sm:min-w-[260px] sm:max-w-[260px] z-10 sm:relative sm:top-0 absolute top-12 bottom-0`}>
-      <div className="flex items-center h-[60px] sm:pl-2 px-2">
+    <div className={`h-full flex flex-col flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-10 sm:relative sm:top-0 absolute top-12 bottom-0`}>
+      <div className="flex items-center">
         <button
-          className="flex items-center w-full sm:w-[200px] h-[40px] rounded-lg bg-[#202123] border border-neutral-600 text-sm hover:bg-neutral-700"
+          className="flex gap-3 p-3 items-center w-full sm:w-[200px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
           onClick={() => {
             onNewConversation();
             setSearchTerm("");
           }}
         >
           <IconPlus
-            className="ml-4 mr-3"
+            className=""
             size={16}
           />
           New chat
@@ -52,7 +52,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
 
         <IconArrowBarLeft
           className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400 hidden sm:flex"
-          size={38}
+          size={32}
           onClick={onToggleSidebar}
         />
       </div>
@@ -64,7 +64,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         />
       )}
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-grow overflow-auto">
         <Conversations
           loading={loading}
           conversations={filteredConversations}
