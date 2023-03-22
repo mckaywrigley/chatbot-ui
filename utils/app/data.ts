@@ -19,4 +19,5 @@ export const exportConversations = () => {
 
 export const importConversations = (conversations: Conversation[]) => {
   localStorage.setItem("conversationHistory", JSON.stringify(conversations));
+  localStorage.setItem("selectedConversation", JSON.stringify(conversations[conversations.length - 1]));
 };
