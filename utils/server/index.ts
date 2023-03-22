@@ -24,7 +24,8 @@ export const OpenAIStream = async (model: OpenAIModel, systemPrompt: string, key
   });
 
   if (res.status !== 200) {
-    throw new Error("OpenAI API returned an error");
+    const statusText = res.statusText; 
+    throw new Error(`OpenAI API returned an error: ${statusText}`);
   }
 
   const encoder = new TextEncoder();
