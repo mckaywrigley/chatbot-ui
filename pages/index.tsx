@@ -170,6 +170,7 @@ export default function Home() {
     }
 
     setModels(data);
+    setModelError(false);
   };
 
   const handleLightMode = (mode: "dark" | "light") => {
@@ -270,6 +271,10 @@ export default function Home() {
       setShowSidebar(false);
     }
   }, [selectedConversation]);
+
+  useEffect(() => {
+    fetchModels(apiKey);
+  }, [apiKey]);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
