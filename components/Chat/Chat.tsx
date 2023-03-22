@@ -80,7 +80,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
                 {loading && <ChatLoader />}
 
                 <div
-                  className="bg-white dark:bg-[#343541] h-[113px] sm:h-[162px]"
+                  className="bg-white dark:bg-[#343541] h-[162px]"
                   ref={messagesEndRef}
                 />
               </>
