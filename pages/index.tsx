@@ -72,7 +72,7 @@ export default function Home() {
       }
 
       const data = response.body;
-      
+
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);

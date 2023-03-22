@@ -1,8 +1,6 @@
 import { Message, OpenAIModel, OpenAIModelID } from "@/types";
 import { IconSend, IconHandStop} from "@tabler/icons-react";
-import {
-  FC, KeyboardEvent, MutableRefObject, useEffect, useRef, useState
-} from 'react';
+import { FC, KeyboardEvent, MutableRefObject, useEffect, useRef, useState } from 'react';
 
 interface Props {
   messageIsStreaming: boolean;
