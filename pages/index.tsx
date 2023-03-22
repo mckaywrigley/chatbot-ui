@@ -318,7 +318,7 @@ export default function Home() {
         />
       </Head>
       {selectedConversation && (
-        <div className={`flex flex-col h-screen w-screen text-white ${lightMode}`}>
+        <div className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
           <div className="sm:hidden w-full fixed top-0">
             <Navbar
               selectedConversation={selectedConversation}
@@ -352,7 +352,7 @@ export default function Home() {
               </>
             ) : (
               <IconArrowBarRight
-                className="fixed top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
+                className="fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
                 onClick={() => setShowSidebar(!showSidebar)}
               />
             )}
