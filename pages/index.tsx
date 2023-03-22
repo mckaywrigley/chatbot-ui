@@ -155,6 +155,7 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
+    console.log(key);
     const response = await fetch("/api/models", {
       method: "POST",
       headers: {
@@ -169,6 +170,8 @@ export default function Home() {
       setModelError(true);
       return;
     }
+
+    console.log(response.json());
 
     const data = await response.json();
 
@@ -189,6 +192,7 @@ export default function Home() {
   const handleApiKeyChange = (apiKey: string) => {
     setApiKey(apiKey);
     localStorage.setItem("apiKey", apiKey);
+    fetchModels(apiKey);
   };
 
   const handleExportConversations = () => {
@@ -279,10 +283,6 @@ export default function Home() {
       setShowSidebar(false);
     }
   }, [selectedConversation]);
-
-  useEffect(() => {
-    fetchModels(apiKey);
-  }, [apiKey]);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");

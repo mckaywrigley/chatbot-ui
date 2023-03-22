@@ -9,6 +9,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { key } = (await req.json()) as {
       key: string;
     };
+    console.log("key", key);
 
     const response = await fetch("https://api.openai.com/v1/models", {
       headers: {
@@ -23,6 +24,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     const json = await response.json();
 
+    console.log("json", json);
+
     const models: OpenAIModel[] = json.data
       .map((model: any) => {
         for (const [key, value] of Object.entries(OpenAIModelID)) {
@@ -35,6 +38,8 @@ const handler = async (req: Request): Promise<Response> => {
         }
       })
       .filter(Boolean);
+
+    console.log("models", models);
 
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {

@@ -1,9 +1,9 @@
 {
   "build": {
-    "beforeBuildCommand": "npm run build && npm run export",
+    "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:3000",
-    "distDir": "../out"
+    "distDir": "../dist"
   },
   "package": {
     "productName": "Chatbot UI",
@@ -14,7 +14,7 @@
       "all": true,
       "http": {
         "all": true,
-        "scope": ["https://**"]
+        "scope": ["tauri://localhost/api/models"]
       }
     },
     "bundle": {
@@ -26,7 +26,7 @@
       },
       "externalBin": [],
       "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "identifier": "chabotui",
+      "identifier": "com.mckaywrigley.chatbotui",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -50,6 +50,7 @@
     "updater": {
       "active": false
     },
+    "macOSPrivateApi": true,
     "windows": [
       {
         "fullscreen": false,
