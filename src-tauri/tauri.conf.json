@@ -11,7 +11,7 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
+      "all": true,
       "http": {
         "all": true,
         "scope": ["https://**"]
