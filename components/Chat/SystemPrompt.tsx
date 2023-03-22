@@ -53,7 +53,7 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
           resize: "none",
           bottom: `${textareaRef?.current?.scrollHeight}px`,
           maxHeight: "300px",
-          overflow: "auto"
+          overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400 ? "auto" : "hidden"}`
         }}
         placeholder="Enter a prompt"
         value={value}
