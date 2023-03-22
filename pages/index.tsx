@@ -5,6 +5,7 @@ import { ChatBody, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModel
 import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
+import { exportConversations, importConversations } from "@/utils/app/data";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -181,6 +182,16 @@ export default function Home() {
     localStorage.setItem("apiKey", apiKey);
   };
 
+  const handleExportConversations = () => {
+    exportConversations();
+  };
+
+  const handleImportConversations = (conversations: Conversation[]) => {
+    importConversations(conversations);
+    setConversations(conversations);
+    setSelectedConversation(conversations[conversations.length - 1]);
+  };
+
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
     saveConversation(conversation);
@@ -343,6 +354,8 @@ export default function Home() {
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
+                  onExportConversations={handleExportConversations}
+                  onImportConversations={handleImportConversations}
                 />
 
                 <IconArrowBarLeft
