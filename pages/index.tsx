@@ -54,11 +54,13 @@ export default function Home() {
         prompt: updatedConversation.prompt
       };
 
+      const controller = new AbortController()
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
+        signal: controller.signal,
         body: JSON.stringify(chatBody)
       });
 
@@ -70,7 +72,7 @@ export default function Home() {
       }
 
       const data = response.body;
-
+      
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
@@ -87,7 +89,12 @@ export default function Home() {
       let isFirst = true;
       let text = "";
 
-      while (!done && stopConversationRef.current === false) {
+      while (!done) {
+        if (stopConversationRef.current === true) {
+          controller.abort();
+          done = true;
+          break;
+        }
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
