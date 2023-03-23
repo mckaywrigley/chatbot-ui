@@ -1,47 +1,83 @@
 import { Chat } from "@/components/Chat/Chat";
+import { Navbar } from "@/components/Mobile/Navbar";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { Conversation, Message, OpenAIModel } from "@/types";
+import { ChatBody, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
+import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
+import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
+import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
+import { exportConversations, importConversations } from "@/utils/app/data";
+import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [model, setModel] = useState<OpenAIModel>(OpenAIModel.GPT_3_5);
+  const [models, setModels] = useState<OpenAIModel[]>([]);
   const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
-  const [disabled, setDisabled] = useState<boolean>(false);
+  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [messageError, setMessageError] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<boolean>(false);
+  const stopConversationRef = useRef<boolean>(false);
 
-  const handleSend = async (message: Message) => {
+  const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
-      let updatedConversation: Conversation = {
-        ...selectedConversation,
-        messages: [...selectedConversation.messages, message]
-      };
+      let updatedConversation: Conversation;
+
+      if (isResend) {
+        const updatedMessages = [...selectedConversation.messages];
+        updatedMessages.pop();
+
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...updatedMessages, message]
+        };
+      } else {
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, message]
+        };
+      }
 
       setSelectedConversation(updatedConversation);
       setLoading(true);
-      setDisabled(true);
+      setMessageIsStreaming(true);
+      setMessageError(false);
 
+      const chatBody: ChatBody = {
+        model: updatedConversation.model,
+        messages: updatedConversation.messages,
+        key: apiKey,
+        prompt: updatedConversation.prompt
+      };
+
+      const controller = new AbortController();
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model,
-          messages: updatedConversation.messages
-        })
+        signal: controller.signal,
+        body: JSON.stringify(chatBody)
       });
 
       if (!response.ok) {
         setLoading(false);
-        throw new Error(response.statusText);
+        setMessageIsStreaming(false);
+        setMessageError(true);
+        return;
       }
 
       const data = response.body;
 
       if (!data) {
+        setLoading(false);
+        setMessageIsStreaming(false);
+        setMessageError(true);
+
         return;
       }
 
@@ -54,6 +90,11 @@ export default function Home() {
       let text = "";
 
       while (!done) {
+        if (stopConversationRef.current === true) {
+          controller.abort();
+          done = true;
+          break;
+        }
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
@@ -91,7 +132,7 @@ export default function Home() {
         }
       }
 
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+      saveConversation(updatedConversation);
 
       const updatedConversations: Conversation[] = conversations.map((conversation) => {
         if (conversation.id === selectedConversation.id) {
@@ -107,10 +148,37 @@ export default function Home() {
 
       setConversations(updatedConversations);
 
-      localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+      saveConversations(updatedConversations);
 
-      setDisabled(false);
+      setMessageIsStreaming(false);
     }
+  };
+
+  const fetchModels = async (key: string) => {
+    const response = await fetch("/api/models", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        key
+      })
+    });
+
+    if (!response.ok) {
+      setModelError(true);
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!data) {
+      setModelError(true);
+      return;
+    }
+
+    setModels(data);
+    setModelError(false);
   };
 
   const handleLightMode = (mode: "dark" | "light") => {
@@ -118,48 +186,103 @@ export default function Home() {
     localStorage.setItem("theme", mode);
   };
 
+  const handleApiKeyChange = (apiKey: string) => {
+    setApiKey(apiKey);
+    localStorage.setItem("apiKey", apiKey);
+  };
+
+  const handleExportConversations = () => {
+    exportConversations();
+  };
+
+  const handleImportConversations = (conversations: Conversation[]) => {
+    importConversations(conversations);
+    setConversations(conversations);
+    setSelectedConversation(conversations[conversations.length - 1]);
+  };
+
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    saveConversation(conversation);
+  };
+
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: "",
-      messages: []
+      name: `Conversation ${lastConversation ? lastConversation.id + 1 : 1}`,
+      messages: [],
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      prompt: DEFAULT_SYSTEM_PROMPT
     };
 
     const updatedConversations = [...conversations, newConversation];
-    setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
     setSelectedConversation(newConversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(newConversation));
+    setConversations(updatedConversations);
 
-    setModel(OpenAIModel.GPT_3_5);
+    saveConversation(newConversation);
+    saveConversations(updatedConversations);
+
     setLoading(false);
-  };
-
-  const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    localStorage.setItem("selectedConversation", JSON.stringify(conversation));
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
     setConversations(updatedConversations);
-    localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+    saveConversations(updatedConversations);
 
     if (updatedConversations.length > 0) {
-      setSelectedConversation(updatedConversations[0]);
-      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[0]));
+      setSelectedConversation(updatedConversations[updatedConversations.length - 1]);
+      saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
       setSelectedConversation({
         id: 1,
-        name: "",
-        messages: []
+        name: "New conversation",
+        messages: [],
+        model: OpenAIModels[OpenAIModelID.GPT_3_5],
+        prompt: DEFAULT_SYSTEM_PROMPT
       });
       localStorage.removeItem("selectedConversation");
     }
   };
+
+  const handleUpdateConversation = (conversation: Conversation, data: KeyValuePair) => {
+    const updatedConversation = {
+      ...conversation,
+      [data.key]: data.value
+    };
+
+    const { single, all } = updateConversation(updatedConversation, conversations);
+
+    setSelectedConversation(single);
+    setConversations(all);
+  };
+
+  const handleClearConversations = () => {
+    setConversations([]);
+    localStorage.removeItem("conversationHistory");
+
+    setSelectedConversation({
+      id: 1,
+      name: "New conversation",
+      messages: [],
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      prompt: DEFAULT_SYSTEM_PROMPT
+    });
+    localStorage.removeItem("selectedConversation");
+  };
+
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      setShowSidebar(false);
+    }
+  }, [selectedConversation]);
+
+  useEffect(() => {
+    fetchModels(apiKey);
+  }, [apiKey]);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -167,31 +290,47 @@ export default function Home() {
       setLightMode(theme as "dark" | "light");
     }
 
-    const conversationHistory = localStorage.getItem("conversationHistory");
+    const apiKey = localStorage.getItem("apiKey") || "";
+    if (apiKey) {
+      setApiKey(apiKey);
+    }
 
+    if (window.innerWidth < 640) {
+      setShowSidebar(false);
+    }
+
+    const conversationHistory = localStorage.getItem("conversationHistory");
     if (conversationHistory) {
-      setConversations(JSON.parse(conversationHistory));
+      const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
+      const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
+      setConversations(cleanedConversationHistory);
     }
 
     const selectedConversation = localStorage.getItem("selectedConversation");
     if (selectedConversation) {
-      setSelectedConversation(JSON.parse(selectedConversation));
+      const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
+      const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
+      setSelectedConversation(cleanedSelectedConversation);
     } else {
       setSelectedConversation({
         id: 1,
-        name: "",
-        messages: []
+        name: "New conversation",
+        messages: [],
+        model: OpenAIModels[OpenAIModelID.GPT_3_5],
+        prompt: DEFAULT_SYSTEM_PROMPT
       });
     }
+
+    fetchModels(apiKey);
   }, []);
 
   return (
     <>
       <Head>
-        <title>Chatbot UI Pro</title>
+        <title>Chatbot UI</title>
         <meta
           name="description"
-          content="An advanced chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+          content="ChatGPT but better."
         />
         <meta
           name="viewport"
@@ -202,27 +341,59 @@ export default function Home() {
           href="/favicon.ico"
         />
       </Head>
-
       {selectedConversation && (
-        <div className={`flex h-screen text-white ${lightMode}`}>
-          <Sidebar
-            loading={disabled}
-            conversations={conversations}
-            lightMode={lightMode}
-            selectedConversation={selectedConversation}
-            onToggleLightMode={handleLightMode}
-            onNewConversation={handleNewConversation}
-            onSelectConversation={handleSelectConversation}
-            onDeleteConversation={handleDeleteConversation}
-          />
+        <div className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
+          <div className="sm:hidden w-full fixed top-0">
+            <Navbar
+              selectedConversation={selectedConversation}
+              onNewConversation={handleNewConversation}
+            />
+          </div>
 
-          <div className="flex flex-col w-full h-full dark:bg-[#343541]">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+            {showSidebar ? (
+              <>
+                <Sidebar
+                  loading={messageIsStreaming}
+                  conversations={conversations}
+                  lightMode={lightMode}
+                  selectedConversation={selectedConversation}
+                  apiKey={apiKey}
+                  onToggleLightMode={handleLightMode}
+                  onNewConversation={handleNewConversation}
+                  onSelectConversation={handleSelectConversation}
+                  onDeleteConversation={handleDeleteConversation}
+                  onToggleSidebar={() => setShowSidebar(!showSidebar)}
+                  onUpdateConversation={handleUpdateConversation}
+                  onApiKeyChange={handleApiKeyChange}
+                  onClearConversations={handleClearConversations}
+                  onExportConversations={handleExportConversations}
+                  onImportConversations={handleImportConversations}
+                />
+
+                <IconArrowBarLeft
+                  className="fixed top-2.5 left-4 sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden"
+                  onClick={() => setShowSidebar(!showSidebar)}
+                />
+              </>
+            ) : (
+              <IconArrowBarRight
+                className="fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
+                onClick={() => setShowSidebar(!showSidebar)}
+              />
+            )}
+
             <Chat
-              model={model}
-              messages={selectedConversation.messages}
+              conversation={selectedConversation}
+              messageIsStreaming={messageIsStreaming}
+              modelError={modelError}
+              messageError={messageError}
+              models={models}
               loading={loading}
+              lightMode={lightMode}
               onSend={handleSend}
-              onSelect={setModel}
+              onUpdateConversation={handleUpdateConversation}
+              stopConversationRef={stopConversationRef}
             />
           </div>
         </div>

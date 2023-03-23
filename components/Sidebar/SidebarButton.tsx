@@ -9,10 +9,10 @@ interface Props {
 export const SidebarButton: FC<Props> = ({ text, icon, onClick }) => {
   return (
     <div
-      className="flex hover:bg-[#343541] py-2 px-4 rounded-md cursor-pointer w-[200px] items-center"
+      className="flex py-3 px-3 gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer w-full items-center"
       onClick={onClick}
     >
-      <div className="mr-3">{icon}</div>
+      <div>{icon}</div>
       <div>{text}</div>
     </div>
   );
