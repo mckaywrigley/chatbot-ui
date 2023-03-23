@@ -65,14 +65,12 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
 
   return (
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
-      {!apiKey && (
+      {!apiKey ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">OpenAI API Key Required</div>
           <div className="text-center text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</div>
         </div>
-      )}
-
-      {modelError ? (
+      ) : modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-center text-red-500">Error fetching models.</div>
           <div className="text-center text-red-500">Make sure your OpenAI API key is set in the bottom left of the sidebar or in a .env.local file and refresh.</div>
