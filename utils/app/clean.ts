@@ -12,7 +12,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: OpenAIModels[OpenAIModelID.GPT_3_5]
+      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5]
     };
   }
 
@@ -20,14 +20,14 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.prompt) {
     updatedConversation = {
       ...updatedConversation,
-      prompt: DEFAULT_SYSTEM_PROMPT
+      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT
     };
   }
 
   if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folderId: 0
+      folderId: updatedConversation.folderId || 0
     };
   }
 
@@ -41,28 +41,19 @@ export const cleanConversationHistory = (history: Conversation[]) => {
 
   let updatedHistory = [...history];
 
-  // check for model on each conversation
-  if (!updatedHistory.every((conversation) => conversation.model)) {
-    updatedHistory = updatedHistory.map((conversation) => ({
-      ...conversation,
-      model: OpenAIModels[OpenAIModelID.GPT_3_5]
-    }));
-  }
+  updatedHistory.forEach((conversation) => {
+    if (!conversation.model) {
+      conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+    }
 
-  // check for system prompt on each conversation
-  if (!updatedHistory.every((conversation) => conversation.prompt)) {
-    updatedHistory = updatedHistory.map((conversation) => ({
-      ...conversation,
-      systemPrompt: DEFAULT_SYSTEM_PROMPT
-    }));
-  }
+    if (!conversation.prompt) {
+      conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+    }
 
-  if (!updatedHistory.every((conversation) => conversation.folderId)) {
-    updatedHistory = updatedHistory.map((conversation) => ({
-      ...conversation,
-      folderId: 0
-    }));
-  }
+    if (!conversation.folderId) {
+      conversation.folderId = 0;
+    }
+  });
 
   return updatedHistory;
 };
