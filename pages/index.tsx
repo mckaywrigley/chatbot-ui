@@ -352,7 +352,7 @@ export default function Home() {
         />
       </Head>
       {selectedConversation && (
-        <div className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
+        <main className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
           <div className="sm:hidden w-full fixed top-0">
             <Navbar
               selectedConversation={selectedConversation}
@@ -360,7 +360,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+          <article className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <>
                 <Sidebar
@@ -405,8 +405,8 @@ export default function Home() {
               onUpdateConversation={handleUpdateConversation}
               stopConversationRef={stopConversationRef}
             />
-          </div>
-        </div>
+          </article>
+        </main>
       )}
     </>
   );
