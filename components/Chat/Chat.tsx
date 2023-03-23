@@ -11,6 +11,7 @@ interface Props {
   conversation: Conversation;
   models: OpenAIModel[];
   apiKey: string;
+  isUsingEnv: boolean;
   messageIsStreaming: boolean;
   modelError: boolean;
   messageError: boolean;
@@ -18,17 +19,17 @@ interface Props {
   lightMode: "light" | "dark";
   onSend: (message: Message, isResend: boolean) => void;
   onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
+  onAcceptEnv: (accept: boolean) => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, stopConversationRef }) => {
+export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, onAcceptEnv, stopConversationRef }) => {
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
 
   const scrollToBottom = () => {
     if (autoScrollEnabled) {
@@ -51,8 +52,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
 
   useEffect(() => {
     scrollToBottom();
-    textareaRef.current?.focus()
-
+    textareaRef.current?.focus();
   }, [conversation.messages]);
 
   useEffect(() => {
@@ -69,10 +69,17 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
 
   return (
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
-      {!apiKey ? (
+      {!apiKey && !isUsingEnv ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">OpenAI API Key Required</div>
           <div className="text-center text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</div>
+          <div className="text-center text-gray-500 dark:text-gray-400">- OR -</div>
+          <button
+            className="flex items-center justify-center mx-auto px-4 py-2 border border-transparent text-xs rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            onClick={() => onAcceptEnv(true)}
+          >
+            click if using a .env.local file
+          </button>
         </div>
       ) : modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">

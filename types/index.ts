@@ -26,12 +26,18 @@ export interface Message {
 
 export type Role = "assistant" | "user";
 
+export interface ChatFolder {
+  id: number;
+  name: string;
+}
+
 export interface Conversation {
   id: number;
   name: string;
   messages: Message[];
   model: OpenAIModel;
   prompt: string;
+  folderId: number;
 }
 
 export interface ChatBody {
@@ -52,4 +58,6 @@ export interface LocalStorage {
   conversationHistory: Conversation[];
   selectedConversation: Conversation;
   theme: "light" | "dark";
+  // added folders (3/23/23)
+  folders: ChatFolder[];
 }

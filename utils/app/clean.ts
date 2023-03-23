@@ -4,6 +4,7 @@ import { DEFAULT_SYSTEM_PROMPT } from "./const";
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
   // added system prompt for each conversation (3/21/23)
+  // added folders (3/23/23)
 
   let updatedConversation = conversation;
 
@@ -23,12 +24,20 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     };
   }
 
+  if (!updatedConversation.folder) {
+    updatedConversation = {
+      ...updatedConversation,
+      folder: 0
+    };
+  }
+
   return updatedConversation;
 };
 
 export const cleanConversationHistory = (history: Conversation[]) => {
   // added model for each conversation (3/20/23)
   // added system prompt for each conversation (3/21/23)
+  // added folders (3/23/23)
 
   let updatedHistory = [...history];
 
@@ -45,6 +54,13 @@ export const cleanConversationHistory = (history: Conversation[]) => {
     updatedHistory = updatedHistory.map((conversation) => ({
       ...conversation,
       systemPrompt: DEFAULT_SYSTEM_PROMPT
+    }));
+  }
+
+  if (!updatedHistory.every((conversation) => conversation.folder)) {
+    updatedHistory = updatedHistory.map((conversation) => ({
+      ...conversation,
+      folder: 0
     }));
   }
 
