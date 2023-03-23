@@ -20,14 +20,16 @@ Expect frequent improvements.
 
 **Next up:**
 
-- [ ] More custom model settings
+- [ ] More custom settings
 - [ ] Regenerate & edit responses
-- [ ] Saving via data export
 - [ ] Folders
 - [ ] Prompt templates
 
 **Recent updates:**
 
+- [x] Search chat content (3/23/23)
+- [x] Stop message generation (3/22/23)
+- [x] Import/Export chats (3/22/23)
 - [x] Custom system prompt (3/21/23)
 - [x] Error handling (3/20/23)
 - [x] GPT-4 support (access required) (3/20/23)
