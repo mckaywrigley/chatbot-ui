@@ -1,4 +1,4 @@
-import { generateRandomString, programmingLanguages } from "@/utils/app/importExport";
+import { generateRandomString, programmingLanguages } from "@/utils/app/codeblock";
 import { IconDownload } from "@tabler/icons-react";
 import { FC, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";

@@ -24,10 +24,10 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     };
   }
 
-  if (!updatedConversation.folder) {
+  if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folder: 0
+      folderId: 0
     };
   }
 
@@ -57,10 +57,10 @@ export const cleanConversationHistory = (history: Conversation[]) => {
     }));
   }
 
-  if (!updatedHistory.every((conversation) => conversation.folder)) {
+  if (!updatedHistory.every((conversation) => conversation.folderId)) {
     updatedHistory = updatedHistory.map((conversation) => ({
       ...conversation,
-      folder: 0
+      folderId: 0
     }));
   }
 
