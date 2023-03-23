@@ -36,7 +36,7 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
   const handleScroll = () => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const bottomTolerance = 50;
+      const bottomTolerance = 30;
 
       if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
         setAutoScrollEnabled(false);
