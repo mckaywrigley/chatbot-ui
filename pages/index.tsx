@@ -81,6 +81,16 @@ export default function Home() {
         return;
       }
 
+      if (updatedConversation.messages.length === 1) {
+        const {content} = message
+        const customName = content.length > 30 ? content.substring(0, 30) + "..." : content;
+
+        updatedConversation = {
+          ...updatedConversation,
+          name: customName
+        };
+      }
+
       setLoading(false);
 
       const reader = data.getReader();
