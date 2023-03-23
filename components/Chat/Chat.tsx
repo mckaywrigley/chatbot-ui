@@ -22,16 +22,45 @@ interface Props {
 
 export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, stopConversationRef }) => {
   const [currentMessage, setCurrentMessage] = useState<Message>();
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    if (autoScrollEnabled) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const bottomTolerance = 50;
+
+      if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
+        setAutoScrollEnabled(false);
+      } else {
+        setAutoScrollEnabled(true);
+      }
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [conversation.messages]);
+
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+
+    if (chatContainer) {
+      chatContainer.addEventListener("scroll", handleScroll);
+
+      return () => {
+        chatContainer.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, []);
 
   return (
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
@@ -43,7 +72,10 @@ export const Chat: FC<Props> = ({ conversation, models, messageIsStreaming, mode
         </div>
       ) : (
         <>
-          <div className="overflow-scroll max-h-full">
+          <div
+            className="overflow-scroll max-h-full"
+            ref={chatContainerRef}
+          >
             {conversation.messages.length === 0 ? (
               <>
                 <div className="flex flex-col mx-auto pt-12 space-y-10 w-[350px] sm:w-[600px]">
