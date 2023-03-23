@@ -28,12 +28,6 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const handleScroll = () => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
@@ -48,8 +42,13 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
   };
 
   useEffect(() => {
+    const scrollToBottom = () => {
+      if (autoScrollEnabled) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
     scrollToBottom();
-  }, [conversation.messages]);
+  }, [conversation.messages, autoScrollEnabled]);
 
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
@@ -64,24 +63,24 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
   }, []);
 
   return (
-    <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
+    <section className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
       {!apiKey && (
-        <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">OpenAI API Key Required</div>
-          <div className="text-center text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</div>
+        <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6 text-center">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">OpenAI API Key Required</h2>
+          <p className="text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</p>
         </div>
       )}
 
       {modelError ? (
-        <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-center text-red-500">Error fetching models.</div>
-          <div className="text-center text-red-500">Make sure your OpenAI API key is set in the bottom left of the sidebar or in a .env.local file and refresh.</div>
-          <div className="text-center text-red-500">If you completed this step, OpenAI may be experiencing issues.</div>
+        <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6 text-center text-red-500">
+          <h3>Error fetching models.</h3>
+          <p>Make sure your OpenAI API key is set in the bottom left of the sidebar or in a .env.local file and refresh.</p>
+          <p>If you completed this step, OpenAI may be experiencing issues.</p>
         </div>
       ) : (
         <>
           <div
-            className="overflow-scroll max-h-full"
+            className="overflow-auto h-full"
             ref={chatContainerRef}
           >
             {conversation.messages.length === 0 ? (
@@ -148,6 +147,6 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, messageIsStreami
           )}
         </>
       )}
-    </div>
+    </section>
   );
 };
