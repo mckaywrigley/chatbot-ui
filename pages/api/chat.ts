@@ -7,7 +7,7 @@ import { init, Tiktoken } from "@dqbd/tiktoken/lite/init";
 import wasm from "../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module";
 
 export const config = {
-  runtime: "edge"
+  runtime: "edge",
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -15,10 +15,22 @@ const handler = async (req: Request): Promise<Response> => {
     const { model, messages, key, prompt } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(tiktokenModel.bpe_ranks, tiktokenModel.special_tokens, tiktokenModel.pat_str);
+    const encoding = new Tiktoken(
+      tiktokenModel.bpe_ranks,
+      tiktokenModel.special_tokens,
+      tiktokenModel.pat_str
+    );
 
     const tokenLimit = model.id === OpenAIModelID.GPT_4 ? 6000 : 3000;
-    let tokenCount = 0;
+
+    let promptToSend = prompt;
+    if (!promptToSend) {
+      promptToSend = DEFAULT_SYSTEM_PROMPT;
+    }
+
+    const prompt_tokens = encoding.encode(promptToSend);
+
+    let tokenCount = prompt_tokens.length;
     let messagesToSend: Message[] = [];
 
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -33,11 +45,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     encoding.free();
-
-    let promptToSend = prompt;
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
-    }
 
     const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
 
