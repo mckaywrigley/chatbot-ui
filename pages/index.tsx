@@ -20,16 +20,16 @@ import { Command } from '@tauri-apps/api/shell';
 import dynamic from 'next/dynamic';
 
 export default function Home() {
-  const [ conversations, setConversations ] = useState<Conversation[]>([]);
-  const [ selectedConversation, setSelectedConversation ] = useState<Conversation>();
-  const [ loading, setLoading ] = useState<boolean>(false);
-  const [ models, setModels ] = useState<OpenAIModel[]>([]);
-  const [ lightMode, setLightMode ] = useState<'dark' | 'light'>('dark');
-  const [ messageIsStreaming, setMessageIsStreaming ] = useState<boolean>(false);
-  const [ showSidebar, setShowSidebar ] = useState<boolean>(true);
-  const [ apiKey, setApiKey ] = useState<string>('');
-  const [ messageError, setMessageError ] = useState<boolean>(false);
-  const [ modelError, setModelError ] = useState<boolean>(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [models, setModels] = useState<OpenAIModel[]>([]);
+  const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
+  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [messageError, setMessageError] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<boolean>(false);
   const stopConversationRef = useRef<boolean>(false);
   const urls = useRef<{ CHAT_URL: string, MODEL_URL: string }>({
     CHAT_URL: '', MODEL_URL: ''
@@ -40,17 +40,17 @@ export default function Home() {
       let updatedConversation: Conversation;
 
       if (isResend) {
-        const updatedMessages = [ ...selectedConversation.messages ];
+        const updatedMessages = [...selectedConversation.messages];
         updatedMessages.pop();
 
         updatedConversation = {
           ...selectedConversation,
-          messages: [ ...updatedMessages, message ]
+          messages: [...updatedMessages, message]
         };
       } else {
         updatedConversation = {
           ...selectedConversation,
-          messages: [ ...selectedConversation.messages, message ]
+          messages: [...selectedConversation.messages, message]
         };
       }
 
@@ -67,10 +67,10 @@ export default function Home() {
       };
 
       const controller = new AbortController();
-      const response = await fetch(urls.current.CHAT_URL, {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         signal: controller.signal,
         body: JSON.stringify(chatBody)
@@ -99,7 +99,7 @@ export default function Home() {
       const decoder = new TextDecoder();
       let done = false;
       let isFirst = true;
-      let text = '';
+      let text = "";
 
       while (!done) {
         if (stopConversationRef.current === true) {
@@ -173,7 +173,7 @@ export default function Home() {
     const response = await fetch(urls.current.MODEL_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         key
@@ -196,9 +196,9 @@ export default function Home() {
     setModelError(false);
   };
 
-  const handleLightMode = (mode: 'dark' | 'light') => {
+  const handleLightMode = (mode: "dark" | "light") => {
     setLightMode(mode);
-    localStorage.setItem('theme', mode);
+    localStorage.setItem("theme", mode);
   };
 
   const handleApiKeyChange = (apiKey: string) => {
@@ -233,7 +233,7 @@ export default function Home() {
       prompt: DEFAULT_SYSTEM_PROMPT
     };
 
-    const updatedConversations = [ ...conversations, newConversation ];
+    const updatedConversations = [...conversations, newConversation];
 
     setSelectedConversation(newConversation);
     setConversations(updatedConversations);
@@ -255,12 +255,12 @@ export default function Home() {
     } else {
       setSelectedConversation({
         id: 1,
-        name: 'New conversation',
+        name: "New conversation",
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT
       });
-      localStorage.removeItem('selectedConversation');
+      localStorage.removeItem("selectedConversation");
     }
   };
 
@@ -270,9 +270,7 @@ export default function Home() {
       [data.key]: data.value
     };
 
-    const {
-      single, all
-    } = updateConversation(updatedConversation, conversations);
+    const { single, all } = updateConversation(updatedConversation, conversations);
 
     setSelectedConversation(single);
     setConversations(all);
@@ -280,31 +278,31 @@ export default function Home() {
 
   const handleClearConversations = () => {
     setConversations([]);
-    localStorage.removeItem('conversationHistory');
+    localStorage.removeItem("conversationHistory");
 
     setSelectedConversation({
       id: 1,
-      name: 'New conversation',
+      name: "New conversation",
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT
     });
-    localStorage.removeItem('selectedConversation');
+    localStorage.removeItem("selectedConversation");
   };
 
   useEffect(() => {
     if (window.innerWidth < 640) {
       setShowSidebar(false);
     }
-  }, [ selectedConversation ]);
+  }, [selectedConversation]);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme) {
-      setLightMode(theme as 'dark' | 'light');
+      setLightMode(theme as "dark" | "light");
     }
 
-    const apiKey = localStorage.getItem('apiKey') || '';
+    const apiKey = localStorage.getItem("apiKey") || "";
     if (apiKey) {
       setApiKey(apiKey);
     }
@@ -313,14 +311,14 @@ export default function Home() {
       setShowSidebar(false);
     }
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
+    const conversationHistory = localStorage.getItem("conversationHistory");
     if (conversationHistory) {
       const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
       const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
       setConversations(cleanedConversationHistory);
     }
 
-    const selectedConversation = localStorage.getItem('selectedConversation');
+    const selectedConversation = localStorage.getItem("selectedConversation");
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
       const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
@@ -328,7 +326,7 @@ export default function Home() {
     } else {
       setSelectedConversation({
         id: 1,
-        name: 'New conversation',
+        name: "New conversation",
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT
@@ -371,28 +369,28 @@ export default function Home() {
       <Head>
         <title>Chatbot UI</title>
         <meta
-          name='description'
-          content='ChatGPT but better.'
+          name="description"
+          content="ChatGPT but better."
         />
         <meta
-          name='viewport'
-          content='width=device-width, initial-scale=1'
+          name="viewport"
+          content="width=device-width, initial-scale=1"
         />
         <link
-          rel='icon'
-          href='/favicon.ico'
+          rel="icon"
+          href="/favicon.ico"
         />
       </Head>
       {selectedConversation && (
         <div className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
-          <div className='sm:hidden w-full fixed top-0'>
+          <div className="sm:hidden w-full fixed top-0">
             <Navbar
               selectedConversation={selectedConversation}
               onNewConversation={handleNewConversation}
             />
           </div>
 
-          <div className='flex h-full w-full pt-[48px] sm:pt-0'>
+          <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <>
                 <Sidebar
@@ -414,13 +412,13 @@ export default function Home() {
                 />
 
                 <IconArrowBarLeft
-                  className='fixed top-2.5 left-4 sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden'
+                  className="fixed top-2.5 left-4 sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden"
                   onClick={() => setShowSidebar(!showSidebar)}
                 />
               </>
             ) : (
               <IconArrowBarRight
-                className='fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8'
+                className="fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
                 onClick={() => setShowSidebar(!showSidebar)}
               />
             )}
