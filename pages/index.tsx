@@ -67,7 +67,7 @@ export default function Home() {
       };
 
       const controller = new AbortController();
-      const response = await fetch("/api/chat", {
+      const response = await fetch(urls.current.CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -342,6 +342,7 @@ export default function Home() {
       : '/api/models';
     urls.current = { CHAT_URL, MODEL_URL };
 
+    console.log({ CHAT_URL, MODEL_URL })
     // Need to start the server in tauri because Vercel API routes don't work
     if ((window as any).__TAURI__) {
       import('@tauri-apps/api/path').then(mod => {
