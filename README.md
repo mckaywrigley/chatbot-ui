@@ -22,11 +22,11 @@ Expect frequent improvements.
 
 - [ ] More custom settings
 - [ ] Regenerate & edit responses
-- [ ] Folders
 - [ ] Prompt templates
 
 **Recent updates:**
 
+- [x] Folders (3/24/23)
 - [x] Search chat content (3/23/23)
 - [x] Stop message generation (3/22/23)
 - [x] Import/Export chats (3/22/23)
