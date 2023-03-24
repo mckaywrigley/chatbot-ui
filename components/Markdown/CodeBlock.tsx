@@ -49,19 +49,22 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
   };
   return (
     <div className="relative text-[16px]">
-      <div className="flex items-center justify-end">
-        <button
-          className="text-white bg-none py-0.5 px-2 rounded focus:outline-none hover:bg-blue-700 text-xs"
-          onClick={copyToClipboard}
-        >
-          {buttonText}
-        </button>
-        <button
-          className="text-white bg-none py-0.5 px-2 rounded focus:outline-none hover:bg-blue-700 text-xs"
-          onClick={downloadAsFile}
-        >
-          <IconDownload size={16} />
-        </button>
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-white">{language}</span>
+        <div className="flex items-center">
+          <button
+            className="text-white bg-none py-0.5 px-2 rounded focus:outline-none hover:bg-blue-700 text-xs"
+            onClick={copyToClipboard}
+          >
+            {buttonText}
+          </button>
+          <button
+            className="text-white bg-none py-0.5 px-2 rounded focus:outline-none hover:bg-blue-700 text-xs"
+            onClick={downloadAsFile}
+          >
+            <IconDownload size={16} />
+          </button>
+        </div>
       </div>
 
       <SyntaxHighlighter
