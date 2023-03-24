@@ -1,4 +1,5 @@
 import { ChatFolder, Conversation } from "@/types";
+import { cleanConversationHistory } from "@/utils/app/clean";
 import { IconFileImport } from "@tabler/icons-react";
 import { FC } from "react";
 
@@ -22,7 +23,7 @@ export const Import: FC<Props> = ({ onImport }) => {
             let json = JSON.parse(e.target?.result as string);
 
             if (!json.folders) {
-              json = { history: json, folders: [] };
+              json = { history: cleanConversationHistory(json), folders: [] };
             }
 
             onImport({ conversations: json.history, folders: json.folders });
