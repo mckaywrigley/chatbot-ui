@@ -215,7 +215,6 @@ export default function Home() {
   };
 
   const handleImportConversations = (data: { conversations: Conversation[]; folders: ChatFolder[] }) => {
-    console.log(data);
     importData(data.conversations, data.folders);
     setConversations(data.conversations);
     setSelectedConversation(data.conversations[data.conversations.length - 1]);
