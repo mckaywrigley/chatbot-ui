@@ -1,4 +1,4 @@
-import { Conversation } from "@/types";
+import { ChatFolder, Conversation } from "@/types";
 import { IconFileExport, IconMoon, IconSun } from "@tabler/icons-react";
 import { FC } from "react";
 import { ClearConversations } from "./ClearConversations";
@@ -13,7 +13,7 @@ interface Props {
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
-  onImportConversations: (conversations: Conversation[]) => void;
+  onImportConversations: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
 }
 
 export const SidebarSettings: FC<Props> = ({ lightMode, apiKey, onToggleLightMode, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {

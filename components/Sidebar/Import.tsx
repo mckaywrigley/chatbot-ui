@@ -1,9 +1,9 @@
-import { Conversation } from "@/types";
+import { ChatFolder, Conversation } from "@/types";
 import { IconFileImport } from "@tabler/icons-react";
 import { FC } from "react";
 
 interface Props {
-  onImport: (conversations: Conversation[]) => void;
+  onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
 }
 
 export const Import: FC<Props> = ({ onImport }) => {
@@ -19,8 +19,13 @@ export const Import: FC<Props> = ({ onImport }) => {
           const file = e.target.files[0];
           const reader = new FileReader();
           reader.onload = (e) => {
-            const conversations: Conversation[] = JSON.parse(e.target?.result as string);
-            onImport(conversations);
+            let json = JSON.parse(e.target?.result as string);
+
+            if (!json.folders) {
+              json = { history: json, folders: [] };
+            }
+
+            onImport({ conversations: json.history, folders: json.folders });
           };
           reader.readAsText(file);
         }}

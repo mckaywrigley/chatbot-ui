@@ -1,11 +1,23 @@
-import { Conversation } from "@/types";
+import { ChatFolder, Conversation } from "@/types";
 
-export const exportConversations = () => {
-  const history = localStorage.getItem("conversationHistory");
+export const exportData = () => {
+  let history = localStorage.getItem("conversationHistory");
+  let folders = localStorage.getItem("folders");
 
-  if (!history) return;
+  if (history) {
+    history = JSON.parse(history);
+  }
 
-  const blob = new Blob([history], { type: "application/json" });
+  if (folders) {
+    folders = JSON.parse(folders);
+  }
+
+  const data = {
+    history,
+    folders
+  };
+
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.download = "chatbot_ui_history.json";
@@ -17,7 +29,8 @@ export const exportConversations = () => {
   URL.revokeObjectURL(url);
 };
 
-export const importConversations = (conversations: Conversation[]) => {
+export const importData = (conversations: Conversation[], folders: ChatFolder[]) => {
   localStorage.setItem("conversationHistory", JSON.stringify(conversations));
   localStorage.setItem("selectedConversation", JSON.stringify(conversations[conversations.length - 1]));
+  localStorage.setItem("folders", JSON.stringify(folders));
 };

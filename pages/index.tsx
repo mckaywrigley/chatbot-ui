@@ -6,7 +6,7 @@ import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
 import { saveFolders } from "@/utils/app/folders";
-import { exportConversations, importConversations } from "@/utils/app/importExport";
+import { exportData, importData } from "@/utils/app/importExport";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
@@ -210,14 +210,16 @@ export default function Home() {
     localStorage.setItem("isUsingEnv", isUsingEnv.toString());
   };
 
-  const handleExportConversations = () => {
-    exportConversations();
+  const handleExportData = () => {
+    exportData();
   };
 
-  const handleImportConversations = (conversations: Conversation[]) => {
-    importConversations(conversations);
-    setConversations(conversations);
-    setSelectedConversation(conversations[conversations.length - 1]);
+  const handleImportConversations = (data: { conversations: Conversation[]; folders: ChatFolder[] }) => {
+    console.log(data);
+    importData(data.conversations, data.folders);
+    setConversations(data.conversations);
+    setSelectedConversation(data.conversations[data.conversations.length - 1]);
+    setFolders(data.folders);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -461,7 +463,7 @@ export default function Home() {
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
-                  onExportConversations={handleExportConversations}
+                  onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
                 />
 

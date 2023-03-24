@@ -25,7 +25,7 @@ interface Props {
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
-  onImportConversations: (conversations: Conversation[]) => void;
+  onImportConversations: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
 }
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, folders, onCreateFolder, onDeleteFolder, onUpdateFolder, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {
