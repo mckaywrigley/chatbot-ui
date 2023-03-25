@@ -536,6 +536,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  console.log("process.env.OPENAI_API_KEY", process.env.OPENAI_API_KEY);
+  
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY
