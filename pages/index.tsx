@@ -32,11 +32,11 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const handleSend = async (message: Message, isResend = false, deleteCount = 0) => {
+  const handleSend = async (message: Message, deleteCount = 0) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
-      if (isResend) {
+      if (deleteCount) {
         const updatedMessages = [...selectedConversation.messages];
         for (let i = 0; i < deleteCount; i++) {
           updatedMessages.pop();

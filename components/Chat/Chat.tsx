@@ -16,7 +16,7 @@ interface Props {
   messageError: boolean;
   loading: boolean;
   lightMode: "light" | "dark";
-  onSend: (message: Message, isResend?: boolean, deleteCount?: number) => void;
+  onSend: (message: Message, deleteCount?: number) => void;
   onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
@@ -66,8 +66,6 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
       };
     }
   }, []);
-
-  console.log("currentMessage", currentMessage);
 
   return (
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
@@ -145,7 +143,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
             }}
             onRegenerate={() => {
               if (currentMessage) {
-                onSend(currentMessage, true, 2);
+                onSend(currentMessage, 2);
               }
             }}
           />
