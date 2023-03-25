@@ -1,5 +1,5 @@
 import { Conversation, KeyValuePair, Message, OpenAIModel } from "@/types";
-import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
+import { FC, MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatLoader } from "./ChatLoader";
 import { ChatMessage } from "./ChatMessage";
@@ -30,16 +30,17 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      textareaRef.current?.focus();
     }
-  };
+  }, [autoScrollEnabled]);
 
   const handleScroll = () => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const bottomTolerance = 30;
+      const bottomTolerance = 5;
 
       if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
         setAutoScrollEnabled(false);
@@ -51,9 +52,8 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
 
   useEffect(() => {
     scrollToBottom();
-    textareaRef.current?.focus();
     setCurrentMessage(conversation.messages[conversation.messages.length - 2]);
-  }, [conversation.messages]);
+  }, [conversation.messages, scrollToBottom]);
 
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
