@@ -24,6 +24,7 @@ export default function Home() {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
   const [isUsingEnv, setIsUsingEnv] = useState<boolean>(false);
+  const [currentMessage, setCurrentMessage] = useState<Message>();
 
   const stopConversationRef = useRef<boolean>(false);
 
@@ -352,6 +353,41 @@ export default function Home() {
     localStorage.removeItem("isUsingEnv");
   };
 
+  const handleEditMessage = (message: Message, messageIndex: number) => {
+    if (selectedConversation) {
+      const updatedMessages = selectedConversation.messages
+        .map((m, i) => {
+          if (i < messageIndex) {
+            return m;
+          }
+        })
+        .filter((m) => m) as Message[];
+
+      const updatedConversation = {
+        ...selectedConversation,
+        messages: updatedMessages
+      };
+
+      const { single, all } = updateConversation(updatedConversation, conversations);
+
+      setSelectedConversation(single);
+      setConversations(all);
+
+      setCurrentMessage(message);
+    }
+  };
+
+  const handleDeleteMessage = (message: Message, messageIndex: number) => {};
+
+  const handleRegenerate = () => {};
+
+  useEffect(() => {
+    if (currentMessage) {
+      handleSend(currentMessage, false);
+      setCurrentMessage(undefined);
+    }
+  }, [currentMessage]);
+
   useEffect(() => {
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -491,6 +527,9 @@ export default function Home() {
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
               onAcceptEnv={handleEnvChange}
+              onEditMessage={handleEditMessage}
+              onDeleteMessage={handleDeleteMessage}
+              onRegenerate={handleRegenerate}
               stopConversationRef={stopConversationRef}
             />
           </article>
