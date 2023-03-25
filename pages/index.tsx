@@ -198,7 +198,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       return;
     }
 
-    setModels(data);
+    // only allow GPT-3.5 models
+    const filteredModels = data.filter((model: OpenAIModel) => model.name.includes("GPT-3.5"));
+
+    setModels(filteredModels);
     setModelError(false);
   };
 

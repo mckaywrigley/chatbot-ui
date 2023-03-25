@@ -34,11 +34,6 @@ export const SidebarSettings: FC<Props> = ({ lightMode, apiKey, onToggleLightMod
         icon={lightMode === "light" ? <IconMoon size={16} /> : <IconSun size={16} />}
         onClick={() => onToggleLightMode(lightMode === "light" ? "dark" : "light")}
       />
-
-      <Key
-        apiKey={apiKey}
-        onApiKeyChange={onApiKeyChange}
-      />
     </div>
   );
 };
