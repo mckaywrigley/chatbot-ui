@@ -11,12 +11,15 @@ import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from "next-i18next";
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
 }
 
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
+  const { t } = useTranslation('chat')
   const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
@@ -282,7 +285,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: `Conversation ${lastConversation ? lastConversation.id + 1 : 1}`,
+      name: `${t('Conversation')} ${lastConversation ? lastConversation.id + 1 : 1}`,
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
@@ -532,10 +535,16 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY
+      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+      ...(await serverSideTranslations(locale ?? 'en', [
+        'common',
+        'chat',
+        'sidebar',
+        'markdown',
+      ])),
     }
   };
 };

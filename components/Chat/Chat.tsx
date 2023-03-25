@@ -1,5 +1,6 @@
 import { Conversation, KeyValuePair, Message, OpenAIModel } from "@/types";
 import { FC, MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { ChatInput } from "./ChatInput";
 import { ChatLoader } from "./ChatLoader";
 import { ChatMessage } from "./ChatMessage";
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKeyIsSet, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, onEditMessage, stopConversationRef }) => {
+  const { t } = useTranslation('chat');
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
@@ -71,14 +73,14 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">OpenAI API Key Required</div>
-          <div className="text-center text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</div>
+          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">{t('OpenAI API Key Required')}</div>
+          <div className="text-center text-gray-500 dark:text-gray-400">{t('Please set your OpenAI API key in the bottom left of the sidebar.')}</div>
         </div>
       ) : modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-center text-red-500">Error fetching models.</div>
-          <div className="text-center text-red-500">Make sure your OpenAI API key is set in the bottom left of the sidebar.</div>
-          <div className="text-center text-red-500">If you completed this step, OpenAI may be experiencing issues.</div>
+          <div className="text-center text-red-500">{t('Error fetching models.')}</div>
+          <div className="text-center text-red-500">{t('Make sure your OpenAI API key is set in the bottom left of the sidebar.')}</div>
+          <div className="text-center text-red-500">{t('If you completed this step, OpenAI may be experiencing issues.')}</div>
         </div>
       ) : (
         <>
@@ -89,7 +91,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
             {conversation.messages.length === 0 ? (
               <>
                 <div className="flex flex-col mx-auto pt-12 space-y-10 w-[350px] sm:w-[600px]">
-                  <div className="text-4xl font-semibold text-center text-gray-800 dark:text-gray-100">{models.length === 0 ? "Loading..." : "Chatbot UI"}</div>
+                  <div className="text-4xl font-semibold text-center text-gray-800 dark:text-gray-100">{models.length === 0 ? t("Loading...") : "Chatbot UI"}</div>
 
                   {models.length > 0 && (
                     <div className="flex flex-col h-full space-y-4 border p-4 rounded border-neutral-500">
@@ -109,7 +111,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
               </>
             ) : (
               <>
-                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {conversation.model.name}</div>
+                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">{t('Model')}: {conversation.model.name}</div>
 
                 {conversation.messages.map((message, index) => (
                   <ChatMessage

@@ -1,6 +1,7 @@
 import { generateRandomString, programmingLanguages } from "@/utils/app/codeblock";
 import { IconCheck, IconClipboard, IconDownload } from "@tabler/icons-react";
 import { FC, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark, oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
+  const { t } = useTranslation('markdown');
   const [isCopied, setIsCopied] = useState<Boolean>(false);
 
   const copyToClipboard = () => {
@@ -29,7 +31,7 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
   const downloadAsFile = () => {
     const fileExtension = programmingLanguages[language] || ".file";
     const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`;
-    const fileName = window.prompt("Enter file name", suggestedFileName);
+    const fileName = window.prompt(t("Enter file name") || '', suggestedFileName);
 
     if (!fileName) {
       // user pressed cancel on prompt
@@ -57,7 +59,7 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
             onClick={copyToClipboard}
           >
             {isCopied ? <IconCheck size={18} className="mr-1.5"/> : <IconClipboard size={18} className="mr-1.5"/>}
-            {isCopied ? "Copied!" : "Copy code"}
+            {isCopied ? t("Copied!") : t("Copy code")}
           </button>
           <button
             className="text-white bg-none py-0.5 pl-2 rounded focus:outline-none text-xs flex items-center"

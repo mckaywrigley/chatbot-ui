@@ -1,6 +1,7 @@
 import { Conversation } from "@/types";
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { FC, useEffect, useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
 
 interface Props {
   conversation: Conversation;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
+  const { t } = useTranslation('chat')
   const [value, setValue] = useState<string>("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -17,7 +19,7 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
     const maxLength = 4000;
 
     if (value.length > maxLength) {
-      alert(`Prompt limit is ${maxLength} characters`);
+      alert(t(`Prompt limit is {{maxLength}} characters`, { maxLength }));
       return;
     }
 
@@ -45,7 +47,7 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
 
   return (
     <div className="flex flex-col">
-      <label className="text-left dark:text-neutral-400 text-neutral-700 mb-2">System Prompt</label>
+      <label className="text-left dark:text-neutral-400 text-neutral-700 mb-2">{t('System Prompt')}</label>
       <textarea
         ref={textareaRef}
         className="w-full rounded-lg px-4 py-2 focus:outline-none dark:bg-[#40414F] dark:border-opacity-50 dark:border-neutral-800 dark:text-neutral-100 border border-neutral-500 shadow text-neutral-900"
@@ -55,8 +57,8 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
           maxHeight: "300px",
           overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400 ? "auto" : "hidden"}`
         }}
-        placeholder="Enter a prompt"
-        value={value}
+        placeholder={t("Enter a prompt") || ''}
+        value={t(value) || ''}
         rows={1}
         onChange={handleChange}
       />
