@@ -8,10 +8,15 @@ import { saveConversation, saveConversations, updateConversation } from "@/utils
 import { saveFolders } from "@/utils/app/folders";
 import { exportData, importData } from "@/utils/app/importExport";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
-export default function Home() {
+interface HomeProps {
+  serverSideApiKeyIsSet: boolean;
+}
+
+const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
@@ -23,7 +28,6 @@ export default function Home() {
   const [apiKey, setApiKey] = useState<string>("");
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
-  const [isUsingEnv, setIsUsingEnv] = useState<boolean>(false);
 
   const stopConversationRef = useRef<boolean>(false);
 
@@ -205,11 +209,6 @@ export default function Home() {
     localStorage.setItem("apiKey", apiKey);
   };
 
-  const handleEnvChange = (isUsingEnv: boolean) => {
-    setIsUsingEnv(isUsingEnv);
-    localStorage.setItem("isUsingEnv", isUsingEnv.toString());
-  };
-
   const handleExportData = () => {
     exportData();
   };
@@ -347,9 +346,6 @@ export default function Home() {
 
     setFolders([]);
     localStorage.removeItem("folders");
-
-    setIsUsingEnv(false);
-    localStorage.removeItem("isUsingEnv");
   };
 
   useEffect(() => {
@@ -374,11 +370,7 @@ export default function Home() {
     if (apiKey) {
       setApiKey(apiKey);
       fetchModels(apiKey);
-    }
-
-    const usingEnv = localStorage.getItem("isUsingEnv");
-    if (usingEnv) {
-      setIsUsingEnv(usingEnv === "true");
+    } else if (serverSideApiKeyIsSet) {
       fetchModels("");
     }
 
@@ -413,7 +405,7 @@ export default function Home() {
         folderId: 0
       });
     }
-  }, []);
+  }, [serverSideApiKeyIsSet]);
 
   return (
     <>
@@ -482,7 +474,7 @@ export default function Home() {
               conversation={selectedConversation}
               messageIsStreaming={messageIsStreaming}
               apiKey={apiKey}
-              isUsingEnv={isUsingEnv}
+              serverSideApiKeyIsSet={serverSideApiKeyIsSet}
               modelError={modelError}
               messageError={messageError}
               models={models}
@@ -490,7 +482,6 @@ export default function Home() {
               lightMode={lightMode}
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
-              onAcceptEnv={handleEnvChange}
               stopConversationRef={stopConversationRef}
             />
           </article>
@@ -498,4 +489,14 @@ export default function Home() {
       )}
     </>
   );
-}
+};
+export default Home;
+
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {
+      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+    },
+  };
+};
