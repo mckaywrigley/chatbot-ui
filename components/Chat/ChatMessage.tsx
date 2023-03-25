@@ -57,7 +57,6 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
       style={{ overflowWrap: "anywhere" }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      onClick={() => setIsHovering(!isHovering)}
     >
       <div className="text-base gap-4 md:gap-6 md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0 m-auto relative">
         <div className="font-bold min-w-[40px]">{message.role === "assistant" ? "AI:" : "You:"}</div>
@@ -105,8 +104,8 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
                 <div className="prose dark:prose-invert whitespace-pre-wrap">{message.content}</div>
               )}
 
-              {isHovering && !isEditing && (
-                <button className="absolute right-[-20px] top-[26px]">
+              {(isHovering || window.innerWidth < 640) && !isEditing && (
+                <button className={`absolute ${window.innerWidth < 640 ? "right-1 bottom-1" : "right-[-20px] top-[26px]"}`}>
                   <IconEdit
                     size={20}
                     className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
