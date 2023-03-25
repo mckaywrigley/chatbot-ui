@@ -139,7 +139,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           >
             <Conversations
               loading={loading}
-              conversations={filteredConversations.filter((conversation) => conversation.folderId === 0)}
+              conversations={filteredConversations.filter((conversation) => conversation.folderId === 0 || !folders[conversation.folderId - 1])}
               selectedConversation={selectedConversation}
               onSelectConversation={onSelectConversation}
               onDeleteConversation={handleDeleteConversation}
