@@ -5,10 +5,7 @@ import { FC } from "react";
 import { SidebarButton } from "./SidebarButton";
 
 interface Props {
-  onImport: (data: {
-    conversations: Conversation[];
-    folders: ChatFolder[];
-  }) => void;
+  onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
 }
 
 export const Import: FC<Props> = ({ onImport }) => {
