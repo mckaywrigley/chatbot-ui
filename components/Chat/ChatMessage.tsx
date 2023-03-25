@@ -84,8 +84,9 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
 
                   <div className="flex mt-10 justify-center space-x-4">
                     <button
-                      className="h-[40px] bg-blue-500 text-white rounded-md px-4 py-1 text-sm font-medium hover:bg-blue-600"
+                      className="h-[40px] bg-blue-500 text-white rounded-md px-4 py-1 text-sm font-medium enabled:hover:bg-blue-600 disabled:opacity-50"
                       onClick={handleEditMessage}
+                      disabled={messageContent.trim().length <= 0}
                     >
                       Save & Submit
                     </button>
