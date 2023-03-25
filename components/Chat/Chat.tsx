@@ -19,10 +19,13 @@ interface Props {
   lightMode: "light" | "dark";
   onSend: (message: Message, isResend: boolean) => void;
   onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
+  onEditMessage: (message: Message, messageIndex: number) => void;
+  onDeleteMessage: (message: Message, messageIndex: number) => void;
+  onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKeyIsSet, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, stopConversationRef }) => {
+export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKeyIsSet, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, onEditMessage, onDeleteMessage, onRegenerate, stopConversationRef }) => {
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
@@ -114,7 +117,10 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
                   <ChatMessage
                     key={index}
                     message={message}
+                    messageIndex={index}
                     lightMode={lightMode}
+                    onEditMessage={onEditMessage}
+                    onDeleteMessage={onDeleteMessage}
                   />
                 ))}
 
@@ -141,11 +147,12 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
+              model={conversation.model}
               onSend={(message) => {
                 setCurrentMessage(message);
                 onSend(message, false);
               }}
-              model={conversation.model}
+              onRegenerate={onRegenerate}
             />
           )}
         </>

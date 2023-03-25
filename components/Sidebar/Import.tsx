@@ -2,6 +2,7 @@ import { ChatFolder, Conversation } from "@/types";
 import { cleanConversationHistory } from "@/utils/app/clean";
 import { IconFileImport } from "@tabler/icons-react";
 import { FC } from "react";
+import { SidebarButton } from "./SidebarButton";
 
 interface Props {
   onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
@@ -9,9 +10,11 @@ interface Props {
 
 export const Import: FC<Props> = ({ onImport }) => {
   return (
-    <div className="flex py-3 px-3 gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer w-full items-center">
+    <>
       <input
-        className="opacity-0 absolute w-[200px] cursor-pointer"
+        id="import-file"
+        className="sr-only"
+        tabIndex={-1}
         type="file"
         accept=".json"
         onChange={(e) => {
@@ -31,10 +34,17 @@ export const Import: FC<Props> = ({ onImport }) => {
           reader.readAsText(file);
         }}
       />
-      <div className="flex items-center gap-3 text-left">
-        <IconFileImport size={16} />
-        <div>Import conversations</div>
-      </div>
-    </div>
+
+      <SidebarButton
+        text="Import conversations"
+        icon={<IconFileImport size={16} />}
+        onClick={() => {
+          const importFile = document.querySelector("#import-file") as HTMLInputElement;
+          if (importFile) {
+            importFile.click();
+          }
+        }}
+      />
+    </>
   );
 };

@@ -28,6 +28,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [apiKey, setApiKey] = useState<string>("");
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
+  const [currentMessage, setCurrentMessage] = useState<Message>();
 
   const stopConversationRef = useRef<boolean>(false);
 
@@ -348,6 +349,41 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     localStorage.removeItem("folders");
   };
 
+  const handleEditMessage = (message: Message, messageIndex: number) => {
+    if (selectedConversation) {
+      const updatedMessages = selectedConversation.messages
+        .map((m, i) => {
+          if (i < messageIndex) {
+            return m;
+          }
+        })
+        .filter((m) => m) as Message[];
+
+      const updatedConversation = {
+        ...selectedConversation,
+        messages: updatedMessages
+      };
+
+      const { single, all } = updateConversation(updatedConversation, conversations);
+
+      setSelectedConversation(single);
+      setConversations(all);
+
+      setCurrentMessage(message);
+    }
+  };
+
+  const handleDeleteMessage = (message: Message, messageIndex: number) => {};
+
+  const handleRegenerate = () => {};
+
+  useEffect(() => {
+    if (currentMessage) {
+      handleSend(currentMessage, false);
+      setCurrentMessage(undefined);
+    }
+  }, [currentMessage]);
+
   useEffect(() => {
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -433,9 +469,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
             />
           </div>
 
-          <article className="flex h-full w-full pt-[48px] sm:pt-0">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
-              <>
+              <div>
                 <Sidebar
                   loading={messageIsStreaming}
                   conversations={conversations}
@@ -459,13 +495,18 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 />
 
                 <IconArrowBarLeft
-                  className="fixed top-2.5 left-4 sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden"
+                  className="z-50 fixed top-5 left-[270px] sm:top-0.5 sm:left-[270px] sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
                   onClick={() => setShowSidebar(!showSidebar)}
                 />
-              </>
+
+                <div
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  className="sm:hidden bg-black opacity-70 z-10 absolute top-0 left-0 h-full w-full"
+                ></div>
+              </div>
             ) : (
               <IconArrowBarRight
-                className="fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
+                className="fixed text-white z-50 top-2.5 left-4 sm:top-0.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
                 onClick={() => setShowSidebar(!showSidebar)}
               />
             )}
@@ -482,9 +523,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               lightMode={lightMode}
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
+              onEditMessage={handleEditMessage}
+              onDeleteMessage={handleDeleteMessage}
+              onRegenerate={handleRegenerate}
               stopConversationRef={stopConversationRef}
             />
-          </article>
+          </div>
         </main>
       )}
     </>
@@ -492,11 +536,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 };
 export default Home;
 
-
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-    },
+      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY
+    }
   };
 };
