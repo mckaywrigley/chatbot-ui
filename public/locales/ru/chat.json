@@ -17,7 +17,7 @@
   "AI": "Бот",
   "You": "Вы",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Убедитесь, что вы ввели API-ключ OpenAI.",
-  "If you completed this step, OpenAI may be experiencing issues.": "Если вы выполнили этот шаг, OpenAI может испытывать проблемы",
+  "If you completed this step, OpenAI may be experiencing issues.": "Если вы выполнили этот шаг, то возможно OpenAI может испытывать проблемы",
   "click if using a .env.local file": "Нажмите, если вы используете файл .env.local",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Лимит сообщения: {{maxLength}} символов. Вы ввели {{valueLength}} символов.",
   "Please enter a message": "Пожалуйста введите сообщение",
