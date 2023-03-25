@@ -479,7 +479,7 @@ export default function Home() {
 
           <article className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
-              <>
+              <div>
                 <Sidebar
                   loading={messageIsStreaming}
                   conversations={conversations}
@@ -503,10 +503,12 @@ export default function Home() {
                 />
 
                 <IconArrowBarLeft
-                  className="fixed top-2.5 left-4 sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden"
+                  className="z-50 fixed top-5 left-[270px] sm:top-1 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8 sm:hidden"
                   onClick={() => setShowSidebar(!showSidebar)}
                 />
-              </>
+                {/* Sidebar Background for closing on click outside of it. */}
+                <div onClick={() => setShowSidebar(!showSidebar)} className="sm:hidden bg-black opacity-70 z-10 absolute top-0 left-0 h-full w-full"></div>
+              </div>
             ) : (
               <IconArrowBarRight
                 className="fixed text-white z-50 top-2.5 left-4 sm:top-1.5 sm:left-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
