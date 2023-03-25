@@ -61,3 +61,9 @@ export interface LocalStorage {
   // added folders (3/23/23)
   folders: ChatFolder[];
 }
+
+export interface ErrorMessage {
+  code: String | null,
+  title: String,
+  messageLines: String[]
+}
