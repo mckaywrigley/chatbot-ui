@@ -25,6 +25,7 @@
     "remark-gfm": "^3.0.1"
   },
   "devDependencies": {
+    "prettier-plugin-tailwindcss": "^0.2.5",
     "prettier": "^2.8.7",
     "@tailwindcss/typography": "^0.5.9",
     "@types/react-syntax-highlighter": "^15.5.6",

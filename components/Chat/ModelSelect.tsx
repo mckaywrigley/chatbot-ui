@@ -12,11 +12,11 @@ export const ModelSelect: FC<Props> = ({ model, models, onModelChange }) => {
   const { t } = useTranslation('chat');
   return (
     <div className="flex flex-col">
-      <label className="text-left mb-2 dark:text-neutral-400 text-neutral-700">
+      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
         {t('Model')}
       </label>
       <select
-        className="w-full p-3 dark:text-white dark:bg-[#343541] border border-neutral-500 rounded-lg appearance-none focus:shadow-outline text-neutral-900 cursor-pointer"
+        className="focus:shadow-outline w-full cursor-pointer appearance-none rounded-lg border border-neutral-500 p-3 text-neutral-900 dark:bg-[#343541] dark:text-white"
         placeholder={t('Select a model') || ''}
         value={model.id}
         onChange={(e) => {

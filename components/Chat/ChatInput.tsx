@@ -102,32 +102,32 @@ export const ChatInput: FC<Props> = ({
   }
 
   return (
-    <div className="absolute bottom-0 left-0 w-full dark:border-white/20 border-transparent dark:bg-[#444654] dark:bg-gradient-to-t from-[#343541] via-[#343541] to-[#343541]/0 bg-white dark:!bg-transparent dark:bg-vert-dark-gradient pt-6 md:pt-2">
-      <div className="stretch mx-2 md:mt-[52px] mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+    <div className="dark:bg-vert-dark-gradient absolute bottom-0 left-0 w-full border-transparent bg-white from-[#343541] via-[#343541] to-[#343541]/0 pt-6 dark:border-white/20 dark:bg-[#444654] dark:!bg-transparent dark:bg-gradient-to-t md:pt-2">
+      <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
         {messageIsStreaming && (
           <button
-            className="absolute -top-2 md:top-0 left-0 right-0 mx-auto dark:bg-[#343541] border w-fit border-gray-500 py-2 px-4 rounded text-black dark:text-white hover:opacity-50"
+            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
             onClick={handleStopConversation}
           >
-            <IconPlayerStop size={16} className="inline-block mb-[2px]" />{' '}
+            <IconPlayerStop size={16} className="mb-[2px] inline-block" />{' '}
             {t('Stop Generating')}
           </button>
         )}
 
         {!messageIsStreaming && messages.length > 0 && (
           <button
-            className="absolute -top-2 md:top-0 left-0 right-0 mx-auto dark:bg-[#343541] border w-fit border-gray-500 py-2 px-4 rounded text-black dark:text-white hover:opacity-50"
+            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
             onClick={onRegenerate}
           >
-            <IconRepeat size={16} className="inline-block mb-[2px]" />{' '}
+            <IconRepeat size={16} className="mb-[2px] inline-block" />{' '}
             {t('Regenerate response')}
           </button>
         )}
 
-        <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-[#40414F] rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
+        <div className="relative flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] md:py-3 md:pl-4">
           <textarea
             ref={textareaRef}
-            className="text-black dark:text-white m-0 w-full resize-none outline-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 pl-2 text-black outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:text-white md:pl-0"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -148,7 +148,7 @@ export const ChatInput: FC<Props> = ({
           />
 
           <button
-            className="absolute right-5 focus:outline-none text-neutral-800 hover:text-neutral-900 dark:text-neutral-100 dark:hover:text-neutral-200 dark:bg-opacity-50 hover:bg-neutral-200 p-1 rounded-sm"
+            className="absolute right-5 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             <IconSend size={16} className="opacity-60" />

@@ -100,7 +100,7 @@ export const Folder: FC<Props> = ({
   return (
     <div>
       <div
-        className={`mb-1 flex gap-3 items-center px-3 py-2 text-sm rounded-lg hover:bg-[#343541]/90 transition-colors duration-200 cursor-pointer`}
+        className={`mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
         onClick={() => setIsOpen(!isOpen)}
         onDrop={(e) => handleDrop(e, currentFolder)}
         onDragOver={allowDrop}
@@ -111,7 +111,7 @@ export const Folder: FC<Props> = ({
 
         {isRenaming ? (
           <input
-            className="flex-1 bg-transparent border-b border-neutral-400 focus:border-neutral-100 text-left overflow-hidden overflow-ellipsis pr-1 outline-none text-white"
+            className="flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-left text-white outline-none focus:border-neutral-100"
             type="text"
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
@@ -119,13 +119,13 @@ export const Folder: FC<Props> = ({
             autoFocus
           />
         ) : (
-          <div className="overflow-hidden whitespace-nowrap overflow-ellipsis pr-1 flex-1 text-left">
+          <div className="flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap pr-1 text-left">
             {currentFolder.name}
           </div>
         )}
 
         {(isDeleting || isRenaming) && (
-          <div className="flex gap-1 -ml-2">
+          <div className="-ml-2 flex gap-1">
             <IconCheck
               className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
               size={16}
@@ -156,7 +156,7 @@ export const Folder: FC<Props> = ({
         )}
 
         {!isDeleting && !isRenaming && (
-          <div className="flex gap-1 ml-2">
+          <div className="ml-2 flex gap-1">
             <IconPencil
               className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
               size={18}
@@ -183,7 +183,7 @@ export const Folder: FC<Props> = ({
         ? conversations.map((conversation, index) => {
             if (conversation.folderId === currentFolder.id) {
               return (
-                <div key={index} className="ml-5 pl-2 border-l gap-2 pt-2">
+                <div key={index} className="ml-5 gap-2 border-l pl-2 pt-2">
                   <ConversationComponent
                     selectedConversation={selectedConversation}
                     conversation={conversation}

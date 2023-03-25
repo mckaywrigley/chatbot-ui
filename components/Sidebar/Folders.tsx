@@ -33,7 +33,7 @@ export const Folders: FC<Props> = ({
   onUpdateConversation,
 }) => {
   return (
-    <div className="flex flex-col gap-1 w-full pt-2">
+    <div className="flex w-full flex-col gap-1 pt-2">
       {folders.map((folder, index) => (
         <Folder
           key={index}

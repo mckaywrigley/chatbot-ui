@@ -62,12 +62,12 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
     URL.revokeObjectURL(url);
   };
   return (
-    <div className="codeblock relative text-[16px] font-sans">
+    <div className="codeblock relative font-sans text-[16px]">
       <div className="flex items-center justify-between py-1.5 px-4">
-        <span className="text-xs text-white lowercase">{language}</span>
+        <span className="text-xs lowercase text-white">{language}</span>
         <div className="flex items-center">
           <button
-            className="text-white bg-none py-0.5 px-2 rounded focus:outline-none text-xs flex items-center"
+            className="flex items-center rounded bg-none py-0.5 px-2 text-xs text-white focus:outline-none"
             onClick={copyToClipboard}
           >
             {isCopied ? (
@@ -78,7 +78,7 @@ export const CodeBlock: FC<Props> = ({ language, value, lightMode }) => {
             {isCopied ? t('Copied!') : t('Copy code')}
           </button>
           <button
-            className="text-white bg-none py-0.5 pl-2 rounded focus:outline-none text-xs flex items-center"
+            className="flex items-center rounded bg-none py-0.5 pl-2 text-xs text-white focus:outline-none"
             onClick={downloadAsFile}
           >
             <IconDownload size={18} />

@@ -31,7 +31,7 @@ export const SidebarSettings: FC<Props> = ({
 }) => {
   const { t } = useTranslation('sidebar');
   return (
-    <div className="flex flex-col pt-1 items-center border-t border-white/20 text-sm space-y-1">
+    <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
       <ClearConversations onClearConversations={onClearConversations} />
 
       <Import onImport={onImportConversations} />

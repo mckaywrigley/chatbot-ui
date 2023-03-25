@@ -23,7 +23,7 @@ export const Conversations: FC<Props> = ({
   onUpdateConversation,
 }) => {
   return (
-    <div className="flex flex-col-reverse gap-1 w-full pt-2">
+    <div className="flex w-full flex-col-reverse gap-1 pt-2">
       {conversations.map((conversation, index) => (
         <ConversationComponent
           key={index}

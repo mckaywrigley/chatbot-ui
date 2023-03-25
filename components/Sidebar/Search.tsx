@@ -21,7 +21,7 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
   return (
     <div className="relative flex items-center">
       <input
-        className="flex-1 w-full pr-10 bg-[#202123] border border-neutral-600 text-sm rounded-md px-4 py-3 text-white"
+        className="w-full flex-1 rounded-md border border-neutral-600 bg-[#202123] px-4 py-3 pr-10 text-sm text-white"
         type="text"
         placeholder={t('Search conversations...') || ''}
         value={searchTerm}
@@ -30,7 +30,7 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
 
       {searchTerm && (
         <IconX
-          className="absolute right-4 text-neutral-300 cursor-pointer hover:text-neutral-400"
+          className="absolute right-4 cursor-pointer text-neutral-300 hover:text-neutral-400"
           size={24}
           onClick={clearSearch}
         />

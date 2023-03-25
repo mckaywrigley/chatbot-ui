@@ -117,11 +117,11 @@ export const Sidebar: FC<Props> = ({
 
   return (
     <aside
-      className={`h-full transition-all flex flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-50 sm:relative sm:top-0 fixed top-0 bottom-0`}
+      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
     >
       <header className="flex items-center">
         <button
-          className="flex gap-3 p-3 items-center w-[190px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
+          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
             setSearchTerm('');
@@ -132,14 +132,14 @@ export const Sidebar: FC<Props> = ({
         </button>
 
         <button
-          className="ml-2 flex gap-3 p-3 items-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
         </button>
 
         <IconArrowBarLeft
-          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400 hidden sm:flex"
+          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
           size={32}
           onClick={onToggleSidebar}
         />
@@ -171,7 +171,7 @@ export const Sidebar: FC<Props> = ({
 
         {conversations.length > 0 ? (
           <div
-            className="pt-2 h-full"
+            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -191,7 +191,7 @@ export const Sidebar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-4 text-white text-center">
+          <div className="mt-4 text-center text-white">
             <div>{t('No conversations.')}</div>
           </div>
         )}
