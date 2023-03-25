@@ -1,6 +1,7 @@
 import { Message, OpenAIModel, OpenAIModelID } from "@/types";
 import { IconPlayerStop, IconRepeat, IconSend } from "@tabler/icons-react";
 import { FC, KeyboardEvent, MutableRefObject, useEffect, useState } from "react";
+import { useTranslation } from "next-i18next";
 
 interface Props {
   messageIsStreaming: boolean;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSend, onRegenerate, stopConversationRef, textareaRef }) => {
+  const { t } = useTranslation('chat');
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -21,7 +23,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
     const maxLength = model.id === OpenAIModelID.GPT_3_5 ? 12000 : 24000;
 
     if (value.length > maxLength) {
-      alert(`Message limit is ${maxLength} characters. You have entered ${value.length} characters.`);
+      alert(t(`Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`, { maxLength, valueLength: value.length }));
       return;
     }
 
@@ -34,7 +36,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
     }
 
     if (!content) {
-      alert("Please enter a message");
+      alert(t("Please enter a message"));
       return;
     }
 
@@ -88,7 +90,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
               size={16}
               className="inline-block mb-[2px]"
             />{" "}
-            Stop Generating
+            {t('Stop Generating')}
           </button>
         )}
 
@@ -115,7 +117,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
               maxHeight: "400px",
               overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400 ? "auto" : "hidden"}`
             }}
-            placeholder="Type a message..."
+            placeholder={t("Type a message...") || ''}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -144,7 +146,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
         >
           ChatBot UI
         </a>
-        . Chatbot UI is an advanced chatbot kit for OpenAI&apos;s chat models aiming to mimic ChatGPT&apos;s interface and functionality.
+        . {t("Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.")}
       </div>
     </div>
   );

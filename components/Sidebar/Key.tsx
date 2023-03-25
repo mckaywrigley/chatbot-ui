@@ -1,5 +1,6 @@
 import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
 import { FC, KeyboardEvent, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { SidebarButton } from "./SidebarButton";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
+  const { t } = useTranslation('sidebar');
   const [isChanging, setIsChanging] = useState(false);
   const [newKey, setNewKey] = useState(apiKey);
 
@@ -58,7 +60,7 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
     </div>
   ) : (
     <SidebarButton
-      text="OpenAI API Key"
+      text={t("OpenAI API Key")}
       icon={<IconKey size={16} />}
       onClick={() => setIsChanging(true)}
     />

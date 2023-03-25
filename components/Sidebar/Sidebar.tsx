@@ -1,6 +1,7 @@
 import { ChatFolder, Conversation, KeyValuePair } from "@/types";
 import { IconArrowBarLeft, IconFolderPlus, IconPlus } from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { Conversations } from "./Conversations";
 import { Folders } from "./Folders";
 import { Search } from "./Search";
@@ -29,6 +30,8 @@ interface Props {
 }
 
 export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, folders, onCreateFolder, onDeleteFolder, onUpdateFolder, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {
+
+  const { t } = useTranslation('sidebar');
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>(conversations);
 
@@ -87,12 +90,12 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           }}
         >
           <IconPlus size={16} />
-          New chat
+          {t('New chat')}
         </button>
 
         <button
           className="ml-2 flex gap-3 p-3 items-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
-          onClick={() => onCreateFolder("New folder")}
+          onClick={() => onCreateFolder(t("New folder"))}
         >
           <IconFolderPlus size={16} />
         </button>
@@ -148,7 +151,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           </div>
         ) : (
           <div className="mt-4 text-white text-center">
-            <div>No conversations.</div>
+            <div>{t('No conversations.')}</div>
           </div>
         )}
       </div>
