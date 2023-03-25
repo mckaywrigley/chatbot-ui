@@ -1,4 +1,5 @@
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
+import { OPENAI_API_HOST } from "@/utils/app/const";
 
 export const config = {
   runtime: "edge"
@@ -10,7 +11,7 @@ const handler = async (req: Request): Promise<Response> => {
       key: string;
     };
 
-    const response = await fetch("https://api.openai.com/v1/models", {
+    const response = await fetch(`${OPENAI_API_HOST}/v1/models`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
