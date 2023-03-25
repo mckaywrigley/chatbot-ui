@@ -10,10 +10,9 @@ interface Props {
   messageIndex: number;
   lightMode: "light" | "dark";
   onEditMessage: (message: Message, messageIndex: number) => void;
-  onDeleteMessage: (message: Message, messageIndex: number) => void;
 }
 
-export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage, onDeleteMessage }) => {
+export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
@@ -106,7 +105,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
               )}
 
               {(isHovering || window.innerWidth < 640) && !isEditing && (
-                <button className={`absolute ${window.innerWidth < 640 ? "right-1 bottom-1" : "right-[-20px] top-[26px]"}`}>
+                <button className={`absolute ${window.innerWidth < 640 ? "right-3 bottom-1" : "right-[-20px] top-[26px]"}`}>
                   <IconEdit
                     size={20}
                     className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"

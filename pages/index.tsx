@@ -32,13 +32,15 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const handleSend = async (message: Message, isResend: boolean) => {
+  const handleSend = async (message: Message, isResend = false, deleteCount = 0) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
       if (isResend) {
         const updatedMessages = [...selectedConversation.messages];
-        updatedMessages.pop();
+        for (let i = 0; i < deleteCount; i++) {
+          updatedMessages.pop();
+        }
 
         updatedConversation = {
           ...selectedConversation,
@@ -373,13 +375,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   };
 
-  const handleDeleteMessage = (message: Message, messageIndex: number) => {};
-
-  const handleRegenerate = () => {};
-
   useEffect(() => {
     if (currentMessage) {
-      handleSend(currentMessage, false);
+      handleSend(currentMessage);
       setCurrentMessage(undefined);
     }
   }, [currentMessage]);
@@ -524,8 +522,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
               onEditMessage={handleEditMessage}
-              onDeleteMessage={handleDeleteMessage}
-              onRegenerate={handleRegenerate}
               stopConversationRef={stopConversationRef}
             />
           </div>
