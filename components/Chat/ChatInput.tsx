@@ -1,17 +1,18 @@
 import { Message, OpenAIModel, OpenAIModelID } from "@/types";
-import { IconPlayerStop, IconSend } from "@tabler/icons-react";
+import { IconPlayerStop, IconRepeat, IconSend } from "@tabler/icons-react";
 import { FC, KeyboardEvent, MutableRefObject, useEffect, useState } from "react";
 
 interface Props {
   messageIsStreaming: boolean;
   model: OpenAIModel;
+  messages: Message[];
   onSend: (message: Message) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
 }
 
-export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model, stopConversationRef, textareaRef }) => {
+export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSend, onRegenerate, stopConversationRef, textareaRef }) => {
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
@@ -90,6 +91,20 @@ export const ChatInput: FC<Props> = ({ onSend, messageIsStreaming, model, stopCo
             Stop Generating
           </button>
         )}
+
+        {!messageIsStreaming && messages.length > 0 && (
+          <button
+            className="absolute -top-2 md:top-0 left-0 right-0 mx-auto dark:bg-[#343541] border w-fit border-gray-500 py-2 px-4 rounded text-black dark:text-white hover:opacity-50"
+            onClick={onRegenerate}
+          >
+            <IconRepeat
+              size={16}
+              className="inline-block mb-[2px]"
+            />{" "}
+            Regenerate response
+          </button>
+        )}
+
         <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-[#40414F] rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
           <textarea
             ref={textareaRef}
