@@ -1,8 +1,8 @@
-import { OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
-import { OPENAI_API_HOST } from "@/utils/app/const";
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types';
+import { OPENAI_API_HOST } from '@/utils/app/const';
 
 export const config = {
-  runtime: "edge"
+  runtime: 'edge',
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -13,22 +13,23 @@ const handler = async (req: Request): Promise<Response> => {
 
     const response = await fetch(`${OPENAI_API_HOST}/v1/models`, {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
-      }
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+      },
     });
 
     if (response.status === 401) {
-      return new Response(
-        response.body,
-        {
-          status: 500,
-          headers: response.headers
-        }
-      );
+      return new Response(response.body, {
+        status: 500,
+        headers: response.headers,
+      });
     } else if (response.status !== 200) {
-      console.error(`OpenAI API returned an error ${response.status}: ${await response.text()}`)
-      throw new Error("OpenAI API returned an error");
+      console.error(
+        `OpenAI API returned an error ${
+          response.status
+        }: ${await response.text()}`,
+      );
+      throw new Error('OpenAI API returned an error');
     }
 
     const json = await response.json();
@@ -39,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
           if (value === model.id) {
             return {
               id: model.id,
-              name: OpenAIModels[value].name
+              name: OpenAIModels[value].name,
             };
           }
         }
@@ -49,7 +50,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {
     console.error(error);
-    return new Response("Error", { status: 500 });
+    return new Response('Error', { status: 500 });
   }
 };
 

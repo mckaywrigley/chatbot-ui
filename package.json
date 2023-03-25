@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
@@ -24,6 +25,7 @@
     "remark-gfm": "^3.0.1"
   },
   "devDependencies": {
+    "prettier": "^2.8.7",
     "@tailwindcss/typography": "^0.5.9",
     "@types/react-syntax-highlighter": "^15.5.6",
     "autoprefixer": "^10.4.14",
