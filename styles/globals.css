@@ -31,3 +31,7 @@
 html {
   background: #202123;
 }
+
+pre:has(div.codeblock) {
+  padding: 0;
+}
