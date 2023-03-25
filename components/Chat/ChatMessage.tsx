@@ -4,8 +4,8 @@ import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeMathjax from "rehype-mathjax";
+import remarkMath from 'remark-math';
+import rehypeMathjax from 'rehype-mathjax'
 import { CodeBlock } from "../Markdown/CodeBlock";
 
 interface Props {
@@ -15,13 +15,8 @@ interface Props {
   onEditMessage: (message: Message, messageIndex: number) => void;
 }
 
-export const ChatMessage: FC<Props> = ({
-  message,
-  messageIndex,
-  lightMode,
-  onEditMessage,
-}) => {
-  const { t } = useTranslation("chat");
+export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage }) => {
+  const { t } = useTranslation('chat');
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
@@ -63,19 +58,13 @@ export const ChatMessage: FC<Props> = ({
 
   return (
     <div
-      className={`group ${
-        message.role === "assistant"
-          ? "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-gray-50 dark:bg-[#444654]"
-          : "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-white dark:bg-[#343541]"
-      }`}
+      className={`group ${message.role === "assistant" ? "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-gray-50 dark:bg-[#444654]" : "text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-white dark:bg-[#343541]"}`}
       style={{ overflowWrap: "anywhere" }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="text-base gap-4 md:gap-6 md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0 m-auto relative">
-        <div className="font-bold min-w-[40px]">
-          {message.role === "assistant" ? t("AI") : t("You")}:
-        </div>
+        <div className="font-bold min-w-[40px]">{message.role === "assistant" ? t("AI") : t("You")}:</div>
 
         <div className="prose dark:prose-invert mt-[-2px] w-full">
           {message.role === "user" ? (
@@ -94,7 +83,7 @@ export const ChatMessage: FC<Props> = ({
                       lineHeight: "inherit",
                       padding: "0",
                       margin: "0",
-                      overflow: "hidden",
+                      overflow: "hidden"
                     }}
                   />
 
@@ -118,19 +107,11 @@ export const ChatMessage: FC<Props> = ({
                   </div>
                 </div>
               ) : (
-                <div className="prose dark:prose-invert whitespace-pre-wrap">
-                  {message.content}
-                </div>
+                <div className="prose dark:prose-invert whitespace-pre-wrap">{message.content}</div>
               )}
 
               {(isHovering || window.innerWidth < 640) && !isEditing && (
-                <button
-                  className={`absolute ${
-                    window.innerWidth < 640
-                      ? "right-3 bottom-1"
-                      : "right-[-20px] top-[26px]"
-                  }`}
-                >
+                <button className={`absolute ${window.innerWidth < 640 ? "right-3 bottom-1" : "right-[-20px] top-[26px]"}`}>
                   <IconEdit
                     size={20}
                     className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
@@ -143,6 +124,7 @@ export const ChatMessage: FC<Props> = ({
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeMathjax]}
+              
               components={{
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || "");
@@ -155,32 +137,23 @@ export const ChatMessage: FC<Props> = ({
                       {...props}
                     />
                   ) : (
-                    <code className={className} {...props}>
+                    <code
+                      className={className}
+                      {...props}
+                    >
                       {children}
                     </code>
                   );
                 },
                 table({ children }) {
-                  return (
-                    <table className="border-collapse border border-black dark:border-white py-1 px-3">
-                      {children}
-                    </table>
-                  );
+                  return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;
                 },
                 th({ children }) {
-                  return (
-                    <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">
-                      {children}
-                    </th>
-                  );
+                  return <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">{children}</th>;
                 },
                 td({ children }) {
-                  return (
-                    <td className="border border-black dark:border-white break-words py-1 px-3">
-                      {children}
-                    </td>
-                  );
-                },
+                  return <td className="border border-black dark:border-white break-words py-1 px-3">{children}</td>;
+                }
               }}
             >
               {message.content}
