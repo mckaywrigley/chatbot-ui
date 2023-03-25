@@ -103,7 +103,7 @@ export const ChatInput: FC<Props> = ({ messageIsStreaming, model, messages, onSe
               size={16}
               className="inline-block mb-[2px]"
             />{" "}
-            Regenerate response
+            {t("Regenerate response")}
           </button>
         )}
 
