@@ -7,9 +7,6 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    fontSize: {
-      sidebar: ['13px', '18px']
-    },
     extend: {},
   },
   plugins: [require('@tailwindcss/typography')],
