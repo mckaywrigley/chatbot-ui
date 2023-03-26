@@ -582,7 +582,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               messageError={messageError}
               models={models}
               loading={loading}
-              lightMode={lightMode}
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
               onEditMessage={handleEditMessage}
