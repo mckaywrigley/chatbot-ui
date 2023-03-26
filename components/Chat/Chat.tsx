@@ -65,51 +65,42 @@ export const Chat: FC<Props> = memo(
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const scrollToBottom = useCallback(() => {
-      if (autoScrollEnabled) {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        textareaRef.current?.focus();
-      }
-    }, [autoScrollEnabled]);
-
-    const handleScroll = () => {
-      if (chatContainerRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContainerRef.current;
-        const bottomTolerance = 5;
-
-        if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
-          setAutoScrollEnabled(false);
-        } else {
-          setAutoScrollEnabled(true);
-        }
-      }
-    };
-
     const handleSettings = () => {
       setShowSettings(!showSettings);
     };
 
     useEffect(() => {
-      scrollToBottom();
+      if (autoScrollEnabled) {
+        messagesEndRef.current?.scrollIntoView(true);
+      }
       setCurrentMessage(
         conversation.messages[conversation.messages.length - 2],
       );
-    }, [conversation.messages, scrollToBottom]);
+    }, [autoScrollEnabled, conversation.messages]);
 
     useEffect(() => {
-      const chatContainer = chatContainerRef.current;
-
-      if (chatContainer) {
-        chatContainer.addEventListener('scroll', handleScroll, {
-          passive: true,
-        });
-
-        return () => {
-          chatContainer.removeEventListener('scroll', handleScroll);
-        };
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setAutoScrollEnabled(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            textareaRef.current?.focus();
+          }
+        },
+        {
+          root: null,
+          threshold: 0,
+        },
+      );
+      const messagesEndElement = messagesEndRef.current;
+      if (messagesEndElement) {
+        observer.observe(messagesEndElement);
       }
-    }, []);
+      return () => {
+        if (messagesEndElement) {
+          observer.unobserve(messagesEndElement);
+        }
+      };
+    }, [messagesEndRef]);
 
     return (
       <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
