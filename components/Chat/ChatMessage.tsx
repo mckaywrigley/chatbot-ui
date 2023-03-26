@@ -83,7 +83,7 @@ export const ChatMessage: FC<Props> = ({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="text-base relative m-auto flex gap-4 p-4 md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+      <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
         <div className="min-w-[40px] font-bold">
           {message.role === 'assistant' ? t('AI') : t('You')}:
         </div>
@@ -111,14 +111,14 @@ export const ChatMessage: FC<Props> = ({
 
                   <div className="mt-10 flex justify-center space-x-4">
                     <button
-                      className="text-sm h-[40px] rounded-md bg-blue-500 px-4 py-1 font-medium text-white enabled:hover:bg-blue-600 disabled:opacity-50"
+                      className="h-[40px] rounded-md bg-blue-500 px-4 py-1 text-sm font-medium text-white enabled:hover:bg-blue-600 disabled:opacity-50"
                       onClick={handleEditMessage}
                       disabled={messageContent.trim().length <= 0}
                     >
                       Save & Submit
                     </button>
                     <button
-                      className="text-sm h-[40px] rounded-md border border-neutral-300 px-4 py-1 font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                      className="h-[40px] rounded-md border border-neutral-300 px-4 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                       onClick={() => {
                         setMessageContent(message.content);
                         setIsEditing(false);

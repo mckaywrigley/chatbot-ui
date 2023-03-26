@@ -2,6 +2,7 @@ import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -25,8 +26,8 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
-  messageError: boolean;
   loading: boolean;
+  prompts: Prompt[];
   onSend: (message: Message, deleteCount?: number) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -43,8 +44,8 @@ export const Chat: FC<Props> = ({
   serverSideApiKeyIsSet,
   messageIsStreaming,
   modelError,
-  messageError,
   loading,
+  prompts,
   onSend,
   onUpdateConversation,
   onEditMessage,
@@ -178,6 +179,7 @@ export const Chat: FC<Props> = ({
             messageIsStreaming={messageIsStreaming}
             messages={conversation.messages}
             model={conversation.model}
+            prompts={prompts}
             onSend={(message) => {
               setCurrentMessage(message);
               onSend(message);

@@ -42,7 +42,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
 
-  const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<ErrorMessage | null>(null);
 
   const [models, setModels] = useState<OpenAIModel[]>([]);
@@ -89,7 +88,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
-      setMessageError(false);
 
       const chatBody: ChatBody = {
         model: updatedConversation.model,
@@ -111,7 +109,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setMessageError(true);
         return;
       }
 
@@ -120,8 +117,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setMessageError(true);
-
         return;
       }
 
@@ -589,7 +584,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       </Head>
       {selectedConversation && (
         <main
-          className={`text-sm flex h-screen w-screen flex-col text-white dark:text-white ${lightMode}`}
+          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
           <div className="fixed top-0 w-full sm:hidden">
             <Navbar
@@ -646,9 +641,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               apiKey={apiKey}
               serverSideApiKeyIsSet={serverSideApiKeyIsSet}
               modelError={modelError}
-              messageError={messageError}
               models={models}
               loading={loading}
+              prompts={prompts}
               onSend={handleSend}
               onUpdateConversation={handleUpdateConversation}
               onEditMessage={handleEditMessage}

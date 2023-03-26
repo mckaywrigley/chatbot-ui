@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/prompt';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 interface Props {
   prompt: Prompt;
@@ -18,6 +18,14 @@ export const PromptModal: FC<Props> = ({
   const [content, setContent] = useState(prompt.content);
 
   const modalRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const handleEnter = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      onUpdatePrompt({ ...prompt, name, content });
+      onClose();
+    }
+  };
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -35,8 +43,14 @@ export const PromptModal: FC<Props> = ({
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (isOpen) {
+      nameInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
-    <div className="relative">
+    <div className="relative" onKeyDown={handleEnter}>
       {isOpen && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -47,48 +61,40 @@ export const PromptModal: FC<Props> = ({
 
             <div
               ref={modalRef}
-              className="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+              className="dark:border-netural-400 inline-block transform overflow-hidden rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
               role="dialog"
             >
-              <div className="mt-3 flex flex-col">
-                <input
-                  className="text-lg font-medium leading-6 text-gray-900"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+              <input
+                ref={nameInputRef}
+                className="w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
 
-                <textarea
-                  className="text-sm mt-2 rounded-md border border-gray-300 p-2 text-gray-500"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              </div>
+              <textarea
+                className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+                style={{ resize: 'none' }}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={5}
+              />
 
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="text-base sm:text-sm mt-3 inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto"
-                  onClick={onClose}
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="text-base sm:text-sm mt-3 inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto"
-                  onClick={() => {
-                    const updatedPrompt = {
-                      ...prompt,
-                      name,
-                      content,
-                    };
+              <button
+                type="button"
+                className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+                onClick={() => {
+                  const updatedPrompt = {
+                    ...prompt,
+                    name,
+                    content,
+                  };
 
-                    onUpdatePrompt(updatedPrompt);
-                    onClose();
-                  }}
-                >
-                  Save
-                </button>
-              </div>
+                  onUpdatePrompt(updatedPrompt);
+                  onClose();
+                }}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

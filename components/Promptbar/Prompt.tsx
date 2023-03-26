@@ -2,7 +2,6 @@ import { Prompt } from '@/types/prompt';
 import {
   IconBulbFilled,
   IconCheck,
-  IconPencil,
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
@@ -48,7 +47,11 @@ export const PromptComponent: FC<Props> = ({
       <button
         className="text-sidebar flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-[14px] transition-colors duration-200 hover:bg-[#343541]/90"
         draggable="true"
-        onClick={() => onSelectPrompt(prompt)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowModal(true);
+          onSelectPrompt(prompt);
+        }}
         onDragStart={(e) => handleDragStart(e, prompt)}
         onMouseEnter={() => onSelectPrompt(prompt)}
         onMouseLeave={() => {
@@ -103,15 +106,6 @@ export const PromptComponent: FC<Props> = ({
 
         {selectedPrompt?.id === prompt.id && !isDeleting && !isRenaming && (
           <div className="-ml-2 flex gap-1">
-            <IconPencil
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={18}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowModal(true);
-              }}
-            />
-
             <IconTrash
               className=" min-w-[20px] text-neutral-400 hover:text-neutral-100"
               size={18}
