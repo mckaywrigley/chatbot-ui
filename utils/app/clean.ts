@@ -1,5 +1,5 @@
-import { Conversation, OpenAIModelID, OpenAIModels } from "@/types";
-import { DEFAULT_SYSTEM_PROMPT } from "./const";
+import { Conversation, OpenAIModelID, OpenAIModels } from '@/types';
+import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -12,7 +12,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5]
+      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
     };
   }
 
@@ -20,14 +20,14 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.prompt) {
     updatedConversation = {
       ...updatedConversation,
-      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT
+      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
     };
   }
 
   if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folderId: updatedConversation.folderId || 0
+      folderId: updatedConversation.folderId || 0,
     };
   }
 
@@ -39,21 +39,28 @@ export const cleanConversationHistory = (history: Conversation[]) => {
   // added system prompt for each conversation (3/21/23)
   // added folders (3/23/23)
 
-  let updatedHistory = [...history];
+  return history.reduce((acc: Conversation[], conversation) => {
+    try {
+      if (!conversation.model) {
+        conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+      }
 
-  updatedHistory.forEach((conversation) => {
-    if (!conversation.model) {
-      conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+      if (!conversation.prompt) {
+        conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+      }
+
+      if (!conversation.folderId) {
+        conversation.folderId = 0;
+      }
+
+      acc.push(conversation);
+      return acc;
+    } catch (error) {
+      console.warn(
+        `error while cleaning conversations' history. Removing culprit`,
+        error,
+      );
     }
-
-    if (!conversation.prompt) {
-      conversation.prompt = DEFAULT_SYSTEM_PROMPT;
-    }
-
-    if (!conversation.folderId) {
-      conversation.folderId = 0;
-    }
-  });
-
-  return updatedHistory;
+    return acc;
+  }, []);
 };
