@@ -39,7 +39,7 @@ interface Props {
   }) => void;
 }
 
-export const Sidebar: FC<Props> = ({
+export const Chatbar: FC<Props> = ({
   loading,
   conversations,
   lightMode,
