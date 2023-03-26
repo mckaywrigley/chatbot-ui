@@ -2,6 +2,7 @@ import { Conversation } from "@/types";
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
+import PromptTemplates from "./PromptTemplates";
 
 interface Props {
   conversation: Conversation;
@@ -62,6 +63,7 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
         rows={1}
         onChange={handleChange}
       />
+      <PromptTemplates onChangePrompt={onChangePrompt} />
     </div>
   );
 };

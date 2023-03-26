@@ -36,6 +36,15 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const stopConversationRef = useRef<boolean>(false);
 
+  // Enabling dark mode support for Headless UI.
+  useEffect(() => {
+    if(lightMode === 'light'){
+      document.body.classList.remove('dark')
+    }else{
+      document.body.classList.add('dark')
+    }
+  }, [lightMode])
+
   const handleSend = async (message: Message, deleteCount = 0) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;

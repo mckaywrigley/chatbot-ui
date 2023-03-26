@@ -63,7 +63,13 @@ export interface LocalStorage {
 }
 
 export interface ErrorMessage {
-  code: String | null,
-  title: String,
-  messageLines: String[]
+  code: String | null;
+  title: String;
+  messageLines: String[];
+}
+
+export interface PromptTemplate {
+  title: string;
+  contributedBy: string;
+  description: string;
 }
