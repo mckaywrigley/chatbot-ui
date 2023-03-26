@@ -38,14 +38,14 @@ export const SidebarSettings: FC<Props> = ({
 
       <SidebarButton
         text={t('Export conversations')}
-        icon={<IconFileExport size={16} />}
+        icon={<IconFileExport size={18} />}
         onClick={() => onExportConversations()}
       />
 
       <SidebarButton
         text={lightMode === 'light' ? t('Dark mode') : t('Light mode')}
         icon={
-          lightMode === 'light' ? <IconMoon size={16} /> : <IconSun size={16} />
+          lightMode === 'light' ? <IconMoon size={18} /> : <IconSun size={18} />
         }
         onClick={() =>
           onToggleLightMode(lightMode === 'light' ? 'dark' : 'light')

@@ -20,6 +20,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { IconSettings } from "@tabler/icons-react";
 
 interface Props {
   conversation: Conversation;
@@ -30,7 +31,6 @@ interface Props {
   modelError: ErrorMessage | null;
   messageError: boolean;
   loading: boolean;
-  lightMode: 'light' | 'dark';
   onSend: (message: Message, deleteCount?: number) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -49,7 +49,6 @@ export const Chat: FC<Props> = ({
   modelError,
   messageError,
   loading,
-  lightMode,
   onSend,
   onUpdateConversation,
   onEditMessage,
@@ -58,6 +57,7 @@ export const Chat: FC<Props> = ({
   const { t } = useTranslation('chat');
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -82,6 +82,10 @@ export const Chat: FC<Props> = ({
         setAutoScrollEnabled(true);
       }
     }
+  };
+
+  const handleSettings = () => {
+    setShowSettings(!showSettings);
   };
 
   useEffect(() => {
@@ -122,12 +126,12 @@ export const Chat: FC<Props> = ({
             {conversation.messages.length === 0 ? (
               <>
                 <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
-                  <div className="text-center text-4xl font-semibold text-gray-800 dark:text-gray-100">
+                  <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? t('Loading...') : 'Chatbot UI'}
                   </div>
 
                   {models.length > 0 && (
-                    <div className="flex h-full flex-col space-y-4 rounded border border-neutral-500 p-4">
+                    <div className="flex h-full flex-col space-y-4 rounded border border-neutral-200 dark:border-neutral-600 p-4">
                       <ModelSelect
                         model={conversation.model}
                         models={models}
@@ -154,16 +158,27 @@ export const Chat: FC<Props> = ({
               </>
             ) : (
               <>
-                <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                  {t('Model')}: {conversation.model.name}
+              <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                {t('Model')}: {conversation.model.name}
+                <IconSettings className="ml-2 cursor-pointer hover:opacity-50" onClick={handleSettings} size={18} />
+              </div>
+              {showSettings && (
+                <div className="flex flex-col mx-auto pt-8 space-y-10 w-[200px] sm:w-[300px]">
+                  <div className="flex flex-col h-full space-y-4 border p-2 rounded border-neutral-500">
+                    <ModelSelect
+                          model={conversation.model}
+                          models={models}
+                          onModelChange={(model) => onUpdateConversation(conversation, { key: "model", value: model })}
+                        />
+                  </div>
                 </div>
+              )}
 
                 {conversation.messages.map((message, index) => (
                   <ChatMessage
                     key={index}
                     message={message}
                     messageIndex={index}
-                    lightMode={lightMode}
                     onEditMessage={onEditMessage}
                   />
                 ))}
