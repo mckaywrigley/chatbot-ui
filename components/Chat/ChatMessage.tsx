@@ -7,6 +7,7 @@ import rehypeMathjax from "rehype-mathjax";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { CodeBlock } from "../Markdown/CodeBlock";
+import { CopyButton } from "./CopyButton";
 
 interface Props {
   message: Message;
@@ -152,6 +153,7 @@ export const ChatMessage: FC<Props> = ({
               )}
             </div>
           ) : (
+            <>
             <ReactMarkdown
               className="prose dark:prose-invert"
               remarkPlugins={[remarkGfm, remarkMath]}
@@ -198,6 +200,14 @@ export const ChatMessage: FC<Props> = ({
             >
               {message.content}
             </ReactMarkdown>
+
+            {(isHovering || window.innerWidth < 640) && (
+              <CopyButton
+                  messagedCopied={messagedCopied}
+                  copyOnClick={copyOnClick}
+                />
+            )}
+</>
           )}
         </div>
       </div>

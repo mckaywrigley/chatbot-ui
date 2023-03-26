@@ -27,8 +27,6 @@
     "remark-math": "^5.1.1"
   },
   "devDependencies": {
-    "prettier-plugin-tailwindcss": "^0.2.5",
-    "prettier": "^2.8.7",
     "@tailwindcss/typography": "^0.5.9",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",
@@ -38,6 +36,8 @@
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "postcss": "^8.4.21",
+    "prettier": "^2.8.7",
+    "prettier-plugin-tailwindcss": "^0.2.5",
     "tailwindcss": "^3.2.7",
     "typescript": "4.9.5"
   }
