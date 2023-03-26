@@ -1,0 +1,192 @@
+{
+  "languages": [
+    {
+      "label": "Väl",
+        "value": ""
+    },
+    {
+      "label": "Arabiska",
+      "value": "Arabiska"
+    },
+    {
+      "label": "Bengali",
+      "value": "Bengali"
+    },
+    {
+      "label": "Kinesiska",
+      "value": "Kinesiska"
+    },
+    {
+      "label": "Tjeckiska",
+      "value": "Tjeckiska"
+    },
+    {
+      "label": "Nederländska",
+      "value": "Nederländska"
+    },
+    {
+      "label": "Engelska",
+      "value": "Engelska"
+    },
+    {
+      "label": "Franska",
+      "value": "Franska"
+    },
+    {
+      "label": "Tyska",
+      "value": "Tyska"
+    },
+    {
+      "label": "Grekiska",
+      "value": "Grekiska"
+    },
+    {
+      "label": "Gujarati",
+      "value": "Gujarati"
+    },
+    {
+      "label": "Hausa",
+      "value": "Hausa"
+    },
+    {
+      "label": "Hindi",
+      "value": "Hindi"
+    },
+    {
+      "label": "Ungerska",
+      "value": "Ungerska"
+    },
+    {
+      "label": "Indonesiska",
+      "value": "Indonesiska"
+    },
+    {
+      "label": "Italienska",
+      "value": "Italienska"
+    },
+    {
+      "label": "Japanska",
+      "value": "Japanska"
+    },
+    {
+      "label": "Javanesiska",
+      "value": "Javanesiska"
+    },
+    {
+      "label": "Kannada",
+      "value": "Kannada"
+    },
+    {
+      "label": "Koreanska",
+      "value": "Koreanska"
+    },
+    {
+      "label": "Malajiska",
+      "value": "Malajiska"
+    },
+    {
+      "label": "Malayalam",
+      "value": "Malayalam"
+    },
+    {
+      "label": "Marathi",
+      "value": "Marathi"
+    },
+    {
+      "label": "Nepalesiska",
+      "value": "Nepalesiska"
+    },
+    {
+      "label": "Oriya",
+      "value": "Oriya"
+    },
+    {
+      "label": "Persiska",
+      "value": "Persiska"
+    },
+    {
+      "label": "Polska",
+      "value": "Polska"
+    },
+    {
+      "label": "Portugisiska",
+      "value": "Portugisiska"
+    },
+    {
+      "label": "Punjabi",
+      "value": "Punjabi"
+    },
+    {
+      "label": "Rumänska",
+      "value": "Rumänska"
+    },
+    {
+      "label": "Ryska",
+      "value": "Ryska"
+    },
+    {
+      "label": "Sinhala",
+      "value": "Sinhala"
+    },
+    {
+      "label": "Slovakiska",
+      "value": "Slovakiska"
+    },
+    {
+      "label": "Somaliska",
+      "value": "Somaliska"
+    },
+    {
+      "label": "Spanska",
+      "value": "Spanska"
+    },
+    {
+      "label": "Swahili",
+      "value": "Swahili"
+    },
+    {
+      "label": "Svenska",
+      "value": "Svenska"
+    },
+    {
+      "label": "Tamil",
+      "value": "Tamil"
+    },
+    {
+      "label": "Telugu",
+      "value": "Telugu"
+    },
+    {
+      "label": "Thailändska",
+      "value": "Thailändska"
+    },
+    {
+      "label": "Turkiska",
+      "value": "Turkiska"
+    },
+    {
+      "label": "Ukrainska",
+      "value": "Ukrainska"
+    },
+    {
+      "label": "Urdu",
+      "value": "Urdu"
+    },
+    {
+      "label": "Vietnamesiska",
+      "value": "Vietnamesiska"
+    },
+    {
+      "label": "Xhosa",
+      "value": "Xhosa"
+    },
+    {
+      "label": "Yoruba",
+      "value": "Yoruba"
+    },
+    {
+      "label": "Zulu",
+      "value": "Zulu"
+    }
+  ]
+}

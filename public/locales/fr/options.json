@@ -1,0 +1,192 @@
+{
+  "languages": [
+    {
+      "label": "Sélectionner la langue",
+      "value": ""
+    },
+    {
+      "label": "Arabe",
+      "value": "Arabe"
+    },
+    {
+      "label": "Bengali",
+      "value": "Bengali"
+    },
+    {
+      "label": "Chinois",
+      "value": "Chinois"
+    },
+    {
+      "label": "Tchèque",
+      "value": "Tchèque"
+    },
+    {
+      "label": "Néerlandais",
+      "value": "Néerlandais"
+    },
+    {
+      "label": "Anglais",
+      "value": "Anglais"
+    },
+    {
+      "label": "Français",
+      "value": "Français"
+    },
+    {
+      "label": "Allemand",
+      "value": "Allemand"
+    },
+    {
+      "label": "Grec",
+      "value": "Grec"
+    },
+    {
+      "label": "Gujarati",
+      "value": "Gujarati"
+    },
+    {
+      "label": "Haoussa",
+      "value": "Haoussa"
+    },
+    {
+      "label": "Hindi",
+      "value": "Hindi"
+    },
+    {
+      "label": "Hongrois",
+      "value": "Hongrois"
+    },
+    {
+      "label": "Indonésien",
+      "value": "Indonésien"
+    },
+    {
+      "label": "Italien",
+      "value": "Italien"
+    },
+    {
+      "label": "Japonais",
+      "value": "Japonais"
+    },
+    {
+      "label": "Javanais",
+      "value": "Javanais"
+    },
+    {
+      "label": "Kannada",
+      "value": "Kannada"
+    },
+    {
+      "label": "Coréen",
+      "value": "Coréen"
+    },
+    {
+      "label": "Malais",
+      "value": "Malais"
+    },
+    {
+      "label": "Malayalam",
+      "value": "Malayalam"
+    },
+    {
+      "label": "Marathi",
+      "value": "Marathi"
+    },
+    {
+      "label": "Népalais",
+      "value": "Népalais"
+    },
+    {
+      "label": "Oriya",
+      "value": "Oriya"
+    },
+    {
+      "label": "Persan",
+      "value": "Persan"
+    },
+    {
+      "label": "Polonais",
+      "value": "Polonais"
+    },
+    {
+      "label": "Portugais",
+      "value": "Portugais"
+    },
+    {
+      "label": "Pendjabi",
+      "value": "Pendjabi"
+    },
+    {
+      "label": "Roumain",
+      "value": "Roumain"
+    },
+    {
+      "label": "Russe",
+      "value": "Russe"
+    },
+    {
+      "label": "Sinhala",
+      "value": "Sinhala"
+    },
+    {
+      "label": "Slovaque",
+      "value": "Slovaque"
+    },
+    {
+      "label": "Somali",
+      "value": "Somali"
+    },
+    {
+      "label": "Espagnol",
+      "value": "Espagnol"
+    },
+    {
+      "label": "Swahili",
+      "value": "Swahili"
+    },
+    {
+      "label": "Suédois",
+      "value": "Suédois"
+    },
+    {
+      "label": "Tamoul",
+      "value": "Tamoul"
+    },
+    {
+      "label": "Télougou",
+      "value": "Télougou"
+    },
+    {
+      "label": "Thaï",
+      "value": "Thaï"
+    },
+    {
+      "label": "Turc",
+      "value": "Turc"
+    },
+    {
+      "label": "Ukrainien",
+      "value": "Ukrainien"
+    },
+    {
+      "label": "Ourdou",
+      "value": "Ourdou"
+    },
+    {
+      "label": "Vietnamien",
+      "value": "Vietnamien"
+    },
+    {
+      "label": "Xhosa",
+      "value": "Xhosa"
+    },
+    {
+      "label": "Yoruba",
+      "value": "Yoruba"
+    },
+    {
+      "label": "Zoulou",
+      "value": "Zoulou"
+    }
+  ]
+}
