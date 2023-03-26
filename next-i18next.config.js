@@ -1,9 +1,7 @@
-const path = require("path");
-
 module.exports = {
   i18n: {
     defaultLocale: "en",
-    locales: ["en", "zh"],
+    locales: ["de", "en", "fr", "ru", "zh", "es", "sv", "pt", "te"],
   },
   localePath:
     typeof window === "undefined"

@@ -18,7 +18,6 @@
   "You": "你",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "请确保您的 OpenAI API 密钥已在侧边栏左下角设置。",
   "If you completed this step, OpenAI may be experiencing issues.": "如果您已完成此步骤，OpenAI 可能遇到了问题。",
-  "click if using a .env.local file": "如果使用 .env.local 文件，请点击",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "消息字数限制为 {{maxLength}} 个字符。您已输入 {{valueLength}} 个字符。",
   "Please enter a message": "请输入一条消息",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI 是一个高级聊天机器人工具包，旨在模仿 OpenAI 聊天模型的 ChatGPT 界面和功能。"

@@ -1,7 +1,7 @@
 import { Chat } from "@/components/Chat/Chat";
 import { Navbar } from "@/components/Mobile/Navbar";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { ChatBody, ChatFolder, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
+import { ChatBody, ChatFolder, Conversation, ErrorMessage, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
 import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
@@ -18,6 +18,7 @@ interface HomeProps {
   serverSideApiKeyIsSet: boolean;
 }
 
+
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const { t } = useTranslation('chat')
   const [folders, setFolders] = useState<ChatFolder[]>([]);
@@ -30,7 +31,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [apiKey, setApiKey] = useState<string>("");
   const [messageError, setMessageError] = useState<boolean>(false);
-  const [modelError, setModelError] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
   const [currentMessage, setCurrentMessage] = useState<Message>();
 
   const stopConversationRef = useRef<boolean>(false);
@@ -179,6 +180,15 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   };
 
   const fetchModels = async (key: string) => {
+    const error = {
+      title: t('Error fetching models.'),
+      code: null,
+      messageLines: [
+        t('Make sure your OpenAI API key is set in the bottom left of the sidebar.'),
+        t('If you completed this step, OpenAI may be experiencing issues.')
+      ]
+    } as ErrorMessage;
+
     const response = await fetch("/api/models", {
       method: "POST",
       headers: {
@@ -190,19 +200,26 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     });
 
     if (!response.ok) {
-      setModelError(true);
+      try {
+        const data = await response.json();
+        Object.assign(error, {
+          code: data.error?.code,
+          messageLines: [data.error?.message]
+        })
+      } catch (e) { }
+      setModelError(error);
       return;
     }
 
     const data = await response.json();
 
     if (!data) {
-      setModelError(true);
+      setModelError(error);
       return;
     }
 
     setModels(data);
-    setModelError(false);
+    setModelError(null);
   };
 
   const handleLightMode = (mode: "dark" | "light") => {
