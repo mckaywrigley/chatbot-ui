@@ -22,6 +22,7 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { IconSettings } from '@tabler/icons-react';
+import { throttle } from '@/utils';
 
 interface Props {
   conversation: Conversation;
@@ -69,14 +70,19 @@ export const Chat: FC<Props> = memo(
       setShowSettings(!showSettings);
     };
 
-    useEffect(() => {
+    const scrollDown = () => {
       if (autoScrollEnabled) {
         messagesEndRef.current?.scrollIntoView(true);
       }
+    };
+    const throttledScrollDown = throttle(scrollDown, 250);
+
+    useEffect(() => {
+      throttledScrollDown();
       setCurrentMessage(
         conversation.messages[conversation.messages.length - 2],
       );
-    }, [autoScrollEnabled, conversation.messages]);
+    }, [conversation.messages, throttledScrollDown]);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -88,7 +94,7 @@ export const Chat: FC<Props> = memo(
         },
         {
           root: null,
-          threshold: 0,
+          threshold: 0.5,
         },
       );
       const messagesEndElement = messagesEndRef.current;
