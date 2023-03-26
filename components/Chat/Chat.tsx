@@ -101,7 +101,9 @@ export const Chat: FC<Props> = memo(
       const chatContainer = chatContainerRef.current;
 
       if (chatContainer) {
-        chatContainer.addEventListener('scroll', handleScroll);
+        chatContainer.addEventListener('scroll', handleScroll, {
+          passive: true,
+        });
 
         return () => {
           chatContainer.removeEventListener('scroll', handleScroll);
