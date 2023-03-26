@@ -4,6 +4,7 @@ import {
   IconFolderPlus,
   IconMessagesOff,
   IconPlus,
+  IconSearch,
 } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -63,6 +64,7 @@ export const Sidebar: FC<Props> = ({
 }) => {
   const { t } = useTranslation('sidebar');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isSearchPage, setIsSearchPage] = useState<boolean>(false);
   const [filteredConversations, setFilteredConversations] =
     useState<Conversation[]>(conversations);
 
@@ -120,34 +122,45 @@ export const Sidebar: FC<Props> = ({
     <aside
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
     >
-      <header className="flex items-center">
-        <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[12px] leading-normal text-white transition-colors duration-200 select-none hover:bg-gray-500/10"
-          onClick={() => {
-            onNewConversation();
-            setSearchTerm('');
-          }}
-        >
-          <IconPlus size={18} />
-          {t('New chat')}
-        </button>
+      {!isSearchPage ? (
+        <header className="flex items-center">
+          <button
+            className="flex w-[140px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[12px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+            onClick={() => {
+              onNewConversation();
+              setSearchTerm('');
+            }}
+          >
+            <IconPlus size={18} />
+            {t('New chat')}
+          </button>
 
-        <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[12px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
-        >
-          <IconFolderPlus size={18} />
-        </button>
+          <button
+            className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[12px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+            onClick={() => onCreateFolder(t('New folder'))}
+          >
+            <IconFolderPlus size={18} />
+          </button>
 
-        <IconArrowBarLeft
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
+          <button
+            className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[12px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+            onClick={() => setIsSearchPage(!isSearchPage)}
+          >
+            <IconSearch size={18} />
+          </button>
+
+          <IconArrowBarLeft
+            className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
+            size={32}
+            onClick={onToggleSidebar}
+          />
+        </header>
+      ) : (
+        <Search
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
+          onCloseSearch={() => setIsSearchPage(!isSearchPage)}
         />
-      </header>
-
-      {conversations.length > 1 && (
-        <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
       )}
 
       <div className="flex-grow overflow-auto">
@@ -172,7 +185,7 @@ export const Sidebar: FC<Props> = ({
 
         {conversations.length > 0 ? (
           <div
-            className="h-full pt-2"
+            className="h-full"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -192,9 +205,11 @@ export const Sidebar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-white text-center opacity-50 select-none">
-            <IconMessagesOff className='mx-auto mb-3'/>
-            <span className='text-[12px] leading-normal'>{t('No conversations.')}</span>
+          <div className="mt-8 select-none text-center text-white opacity-50">
+            <IconMessagesOff className="mx-auto mb-3" />
+            <span className="text-[12px] leading-normal">
+              {t('No conversations.')}
+            </span>
           </div>
         )}
       </div>

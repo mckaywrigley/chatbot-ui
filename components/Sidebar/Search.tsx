@@ -1,13 +1,14 @@
-import { IconX } from '@tabler/icons-react';
+import { IconArrowLeft, IconX } from '@tabler/icons-react';
 import { FC } from 'react';
 import { useTranslation } from 'next-i18next';
 
 interface Props {
   searchTerm: string;
   onSearch: (searchTerm: string) => void;
+  onCloseSearch: () => void;
 }
 
-export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
+export const Search: FC<Props> = ({ searchTerm, onSearch, onCloseSearch }) => {
   const { t } = useTranslation('sidebar');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,10 +19,22 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
     onSearch('');
   };
 
+  const exitFromSearch = () => {
+    onSearch('');
+
+    onCloseSearch();
+  }
+
   return (
-    <div className="relative flex items-center">
+    <div className="flex items-center w-full rounded-md border border-neutral-600 px-3 py-[0.70rem]">
+      <IconArrowLeft
+        className="cursor-pointer mr-3 text-neutral-300 hover:text-neutral-400"
+        size={20}
+        onClick={exitFromSearch}
+      />
+
       <input
-        className="w-full flex-1 rounded-md border border-neutral-600 bg-[#202123] px-4 py-3 pr-10 text-[12px] leading-normal text-white"
+        className="w-full bg-transparent text-[12.5px] text-white outline-0"
         type="text"
         placeholder={t('Search conversations...') || ''}
         value={searchTerm}
@@ -30,7 +43,7 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
 
       {searchTerm && (
         <IconX
-          className="absolute right-4 cursor-pointer text-neutral-300 hover:text-neutral-400"
+          className="cursor-pointer text-neutral-300 hover:text-neutral-400"
           size={18}
           onClick={clearSearch}
         />
