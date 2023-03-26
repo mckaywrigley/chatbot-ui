@@ -42,7 +42,7 @@ export const Import: FC<Props> = ({ onImport }) => {
 
       <SidebarButton
         text={t('Import conversations')}
-        icon={<IconFileImport size={16} />}
+        icon={<IconFileImport size={18} />}
         onClick={() => {
           const importFile = document.querySelector(
             '#import-file',

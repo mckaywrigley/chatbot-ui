@@ -15,22 +15,26 @@ export const ModelSelect: FC<Props> = ({ model, models, onModelChange }) => {
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
         {t('Model')}
       </label>
-      <select
-        className="focus:shadow-outline w-full cursor-pointer appearance-none rounded-lg border border-neutral-500 p-3 text-neutral-900 dark:bg-[#343541] dark:text-white"
-        placeholder={t('Select a model') || ''}
-        value={model.id}
-        onChange={(e) => {
-          onModelChange(
-            models.find((model) => model.id === e.target.value) as OpenAIModel,
-          );
-        }}
-      >
-        {models.map((model) => (
-          <option key={model.id} value={model.id}>
-            {model.name}
-          </option>
-        ))}
-      </select>
+      <div className="w-full rounded-lg border border-neutral-200 pr-2 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
+        <select
+          className="bg-transparent w-full outline-0 p-2"
+          placeholder={t('Select a model') || ''}
+          value={model.id}
+          onChange={(e) => {
+            onModelChange(
+              models.find(
+                (model) => model.id === e.target.value,
+              ) as OpenAIModel,
+            );
+          }}
+        >
+          {models.map((model) => (
+            <option key={model.id} value={model.id}>
+              {model.name}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 };

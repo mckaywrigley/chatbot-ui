@@ -13,14 +13,12 @@ import { CopyButton } from './CopyButton';
 interface Props {
   message: Message;
   messageIndex: number;
-  lightMode: 'light' | 'dark';
   onEditMessage: (message: Message, messageIndex: number) => void;
 }
 
 export const ChatMessage: FC<Props> = ({
   message,
   messageIndex,
-  lightMode,
   onEditMessage,
 }) => {
   const { t } = useTranslation('chat');
@@ -171,12 +169,12 @@ export const ChatMessage: FC<Props> = ({
                 components={{
                   code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
+
                     return !inline && match ? (
                       <CodeBlock
                         key={Math.random()}
                         language={match[1]}
                         value={String(children).replace(/\n$/, '')}
-                        lightMode={lightMode}
                         {...props}
                       />
                     ) : (
