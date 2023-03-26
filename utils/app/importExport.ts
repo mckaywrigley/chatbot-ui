@@ -1,5 +1,12 @@
 import { ChatFolder, Conversation } from '@/types';
 
+function currentDate() {
+  const date = new Date();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+  return `${month}-${day}`;
+}
+
 export const exportData = () => {
   let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
@@ -17,10 +24,12 @@ export const exportData = () => {
     folders,
   };
 
-  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: 'application/json',
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = 'chatbot_ui_history.json';
+  link.download = `chatbot_ui_history_${currentDate()}.json`;
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);
