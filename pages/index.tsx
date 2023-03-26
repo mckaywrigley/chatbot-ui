@@ -458,8 +458,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
+    const lastPrompt = prompts[prompts.length - 1];
+
     const newPrompt: Prompt = {
-      id: prompts.length + 1,
+      id: lastPrompt ? lastPrompt.id + 1 : 1,
       name: `Prompt ${prompts.length + 1}`,
       content: '',
       model: OpenAIModels[OpenAIModelID.GPT_3_5],

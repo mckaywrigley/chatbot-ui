@@ -121,7 +121,6 @@ export const PromptComponent: FC<Props> = ({
       {showModal && (
         <PromptModal
           prompt={prompt}
-          isOpen={showModal}
           onClose={() => setShowModal(false)}
           onUpdatePrompt={onUpdatePrompt}
         />

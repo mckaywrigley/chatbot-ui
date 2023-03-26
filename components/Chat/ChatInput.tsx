@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { VariableModal } from './VariableModal';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -35,11 +36,14 @@ export const ChatInput: FC<Props> = ({
   textareaRef,
 }) => {
   const { t } = useTranslation('chat');
+
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [promptInputValue, setPromptInputValue] = useState('');
+  const [variables, setVariables] = useState<string[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -62,11 +66,6 @@ export const ChatInput: FC<Props> = ({
     }
 
     setContent(value);
-
-    if (value) {
-      setIsTyping(true);
-    }
-
     updatePromptListVisibility(value);
   };
 
@@ -132,14 +131,22 @@ export const ChatInput: FC<Props> = ({
       } else {
         setActivePromptIndex(0);
       }
+    } else if (e.key === 'Enter' && !isMobile() && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const parseVariables = (content: string) => {
+    const regex = /{{(.*?)}}/g;
+    const foundVariables = [];
+    let match;
+
+    while ((match = regex.exec(content)) !== null) {
+      foundVariables.push(match[1]);
     }
 
-    if (!isTyping) {
-      if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
-        e.preventDefault();
-        handleSend();
-      }
-    }
+    return foundVariables;
   };
 
   const updatePromptListVisibility = useCallback((text: string) => {
@@ -152,6 +159,32 @@ export const ChatInput: FC<Props> = ({
       setPromptInputValue('');
     }
   }, []);
+
+  const handlePromptSelect = (promptText: string) => {
+    const parsedVariables = parseVariables(promptText);
+    setVariables(parsedVariables);
+
+    if (parsedVariables.length > 0) {
+      setIsModalVisible(true);
+    } else {
+      setContent((prevContent) => prevContent?.replace(/\/\w*$/, promptText));
+      updatePromptListVisibility(promptText);
+    }
+  };
+
+  const handleSubmit = (updatedVariables: string[]) => {
+    let newContent = content?.replace(/\/\w*$/, variables[0]);
+
+    variables.forEach((variable, index) => {
+      newContent = newContent?.replace(
+        `{{${variable}}}`,
+        updatedVariables[index],
+      );
+    });
+
+    setContent(newContent);
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     if (promptListRef.current) {
@@ -244,14 +277,7 @@ export const ChatInput: FC<Props> = ({
                       : ''
                   } cursor-pointer px-3 py-2 text-sm text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-200`}
                   onClick={() => {
-                    setContent((prevContent) => {
-                      const newContent = prevContent?.replace(
-                        /\/\w*$/,
-                        prompt.content,
-                      );
-                      updatePromptListVisibility(newContent || '');
-                      return newContent;
-                    });
+                    handlePromptSelect(prompt.content);
                   }}
                   onMouseEnter={() => setActivePromptIndex(index)}
                 >
@@ -259,6 +285,14 @@ export const ChatInput: FC<Props> = ({
                 </li>
               ))}
             </ul>
+          )}
+
+          {isModalVisible && (
+            <VariableModal
+              variables={variables}
+              onSubmit={handleSubmit}
+              onClose={() => setIsModalVisible(false)}
+            />
           )}
         </div>
       </div>
