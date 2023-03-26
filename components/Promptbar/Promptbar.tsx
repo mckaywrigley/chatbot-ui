@@ -1,12 +1,19 @@
-import { KeyValuePair, Prompt } from "@/types";
-import { IconArrowBarRight, IconFolderPlus, IconPlus } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Search } from "../Sidebar/Search";
-import { PromptbarSettings } from "./PromptbarSettings";
+import { KeyValuePair } from '@/types/data';
+import { Folder } from '@/types/folder';
+import { Prompt } from '@/types/prompt';
+import {
+  IconArrowBarRight,
+  IconFolderPlus,
+  IconPlus,
+} from '@tabler/icons-react';
+import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Search } from '../Sidebar/Search';
+import { PromptbarSettings } from './PromptbarSettings';
 
 interface Props {
   prompts: Prompt[];
+  folders: Folder[];
   onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt, data: KeyValuePair) => void;
@@ -14,27 +21,35 @@ interface Props {
   onCreatePromptFolder: (name: string) => void;
 }
 
-export const Promptbar: FC<Props> = ({ prompts, onCreatePrompt, onCreatePromptFolder, onUpdatePrompt, onDeletePrompt, onToggleSidebar }) => {
-  const { t } = useTranslation("promptbar");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+export const Promptbar: FC<Props> = ({
+  folders,
+  prompts,
+  onCreatePrompt,
+  onCreatePromptFolder,
+  onUpdatePrompt,
+  onDeletePrompt,
+  onToggleSidebar,
+}) => {
+  const { t } = useTranslation('promptbar');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>(prompts);
 
   const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {
     onUpdatePrompt(prompt, data);
-    setSearchTerm("");
+    setSearchTerm('');
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
     onDeletePrompt(prompt);
-    setSearchTerm("");
+    setSearchTerm('');
   };
 
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
-      const prompt = JSON.parse(e.dataTransfer.getData("prompt"));
-      onUpdatePrompt(prompt, { key: "folderId", value: 0 });
+      const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
+      onUpdatePrompt(prompt, { key: 'folderId', value: 0 });
 
-      e.target.style.background = "none";
+      e.target.style.background = 'none';
     }
   };
 
@@ -43,11 +58,11 @@ export const Promptbar: FC<Props> = ({ prompts, onCreatePrompt, onCreatePromptFo
   };
 
   const highlightDrop = (e: any) => {
-    e.target.style.background = "#343541";
+    e.target.style.background = '#343541';
   };
 
   const removeHighlight = (e: any) => {
-    e.target.style.background = "none";
+    e.target.style.background = 'none';
   };
 
   useEffect(() => {
@@ -56,7 +71,7 @@ export const Promptbar: FC<Props> = ({ prompts, onCreatePrompt, onCreatePromptFo
         prompts.filter((prompt) => {
           const searchable = prompt.name.toLowerCase();
           return searchable.includes(searchTerm.toLowerCase());
-        })
+        }),
       );
     } else {
       setFilteredPrompts(prompts);
@@ -64,42 +79,47 @@ export const Promptbar: FC<Props> = ({ prompts, onCreatePrompt, onCreatePromptFo
   }, [searchTerm, prompts]);
 
   return (
-    <div className={`h-full transition-all flex flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-50 sm:relative sm:top-0 fixed top-0 bottom-0`}>
+    <div
+      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
+    >
       <div className="flex items-center">
         <button
-          className="flex gap-3 p-3 items-center w-[190px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
+          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {}}
         >
           <IconPlus size={16} />
-          {t("New prompt")}
+          {t('New prompt')}
         </button>
 
         <button
-          className="ml-2 flex gap-3 p-3 items-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
-            onCreatePromptFolder(t("New folder"));
-            setSearchTerm("");
+            onCreatePromptFolder(t('New folder'));
+            setSearchTerm('');
           }}
         >
           <IconFolderPlus size={16} />
         </button>
 
         <IconArrowBarRight
-          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400 hidden sm:flex"
+          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
           size={32}
           onClick={onToggleSidebar}
         />
+      </div>
 
-        {prompts.length > 1 && (
-          <Search
-            searchTerm={searchTerm}
-            onSearch={setSearchTerm}
-          />
+      {prompts.length > 1 && (
+        <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
+      )}
+
+      <div className="flex-grow overflow-auto">
+        {folders.length > 0 && (
+          <div className="flex border-b border-white/20 pb-2">Folders</div>
         )}
 
         {prompts.length > 0 ? (
           <div
-            className="pt-2 h-full"
+            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -108,8 +128,8 @@ export const Promptbar: FC<Props> = ({ prompts, onCreatePrompt, onCreatePromptFo
             Prompts.
           </div>
         ) : (
-          <div className="mt-4 text-white text-center">
-            <div>{t("No prompts.")}</div>
+          <div className="mt-4 text-center text-white">
+            <div>{t('No prompts.')}</div>
           </div>
         )}
       </div>

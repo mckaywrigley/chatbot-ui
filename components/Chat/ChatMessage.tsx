@@ -1,4 +1,4 @@
-import { Message } from '@/types';
+import { Message } from '@/types/chat';
 import { IconEdit } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useRef, useState } from 'react';

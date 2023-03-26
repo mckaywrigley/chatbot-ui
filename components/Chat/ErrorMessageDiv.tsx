@@ -1,4 +1,4 @@
-import { ErrorMessage } from '@/types';
+import { ErrorMessage } from '@/types/error';
 import { FC } from 'react';
 
 interface Props {

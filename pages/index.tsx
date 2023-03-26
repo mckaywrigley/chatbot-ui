@@ -2,18 +2,12 @@ import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import { Promptbar } from '@/components/Promptbar/Promptbar';
-import {
-  ChatBody,
-  ChatFolder,
-  Conversation,
-  ErrorMessage,
-  KeyValuePair,
-  Message,
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-  Prompt,
-} from '@/types';
+import { ChatBody, Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { Folder } from '@/types/folder';
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -39,7 +33,7 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const { t } = useTranslation('chat');
-  const [folders, setFolders] = useState<ChatFolder[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>();
@@ -270,7 +264,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const handleImportConversations = (data: {
     conversations: Conversation[];
-    folders: ChatFolder[];
+    folders: Folder[];
   }) => {
     importData(data.conversations, data.folders);
     setConversations(data.conversations);
@@ -286,7 +280,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const handleCreateFolder = (name: string) => {
     const lastFolder = folders[folders.length - 1];
 
-    const newFolder: ChatFolder = {
+    const newFolder: Folder = {
       id: lastFolder ? lastFolder.id + 1 : 1,
       name,
     };
@@ -606,6 +600,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               <div>
                 <Promptbar
                   prompts={prompts}
+                  folders={folders}
                   onToggleSidebar={() => setShowPromptbar(!showPromptbar)}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}

@@ -1,7 +1,7 @@
-import { Conversation } from '@/types';
+import { Conversation } from '@/types/chat';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
+import { FC, useEffect, useRef, useState } from 'react';
 
 interface Props {
   conversation: Conversation;

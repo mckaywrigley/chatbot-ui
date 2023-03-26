@@ -1,4 +1,5 @@
-import { Message, OpenAIModel } from '@/types';
+import { Message } from '@/types/chat';
+import { OpenAIModel } from '@/types/openai';
 import {
   createParser,
   ParsedEvent,

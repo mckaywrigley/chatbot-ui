@@ -1,4 +1,6 @@
-import { ChatFolder, Conversation, KeyValuePair } from '@/types';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { Folder } from '@/types/folder';
 import {
   IconCaretDown,
   IconCaretRight,
@@ -13,7 +15,7 @@ import { ConversationComponent } from './Conversation';
 interface Props {
   searchTerm: string;
   conversations: Conversation[];
-  currentFolder: ChatFolder;
+  currentFolder: Folder;
   onDeleteFolder: (folder: number) => void;
   onUpdateFolder: (folder: number, name: string) => void;
   // conversation props
@@ -27,7 +29,7 @@ interface Props {
   ) => void;
 }
 
-export const Folder: FC<Props> = ({
+export const FolderComponent: FC<Props> = ({
   searchTerm,
   conversations,
   currentFolder,
@@ -58,7 +60,7 @@ export const Folder: FC<Props> = ({
     setIsRenaming(false);
   };
 
-  const handleDrop = (e: any, folder: ChatFolder) => {
+  const handleDrop = (e: any, folder: Folder) => {
     if (e.dataTransfer) {
       setIsOpen(true);
 

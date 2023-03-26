@@ -1,5 +1,5 @@
-import { ChatFolder } from '@/types';
+import { Folder } from '@/types/folder';
 
-export const saveFolders = (folders: ChatFolder[]) => {
+export const saveFolders = (folders: Folder[]) => {
   localStorage.setItem('folders', JSON.stringify(folders));
 };

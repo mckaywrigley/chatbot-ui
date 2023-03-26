@@ -1,4 +1,5 @@
-import { ChatFolder, Conversation } from '@/types';
+import { Conversation } from '@/types/chat';
+import { Folder } from '@/types/folder';
 import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
@@ -16,7 +17,7 @@ interface Props {
   onExportConversations: () => void;
   onImportConversations: (data: {
     conversations: Conversation[];
-    folders: ChatFolder[];
+    folders: Folder[];
   }) => void;
 }
 

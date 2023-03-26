@@ -1,4 +1,5 @@
-import { Conversation, KeyValuePair } from '@/types';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
 import {
   IconCheck,
   IconMessage,

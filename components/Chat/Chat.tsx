@@ -1,10 +1,7 @@
-import {
-  Conversation,
-  ErrorMessage,
-  KeyValuePair,
-  Message,
-  OpenAIModel,
-} from '@/types';
+import { Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { OpenAIModel } from '@/types/openai';
 import { useTranslation } from 'next-i18next';
 import {
   FC,

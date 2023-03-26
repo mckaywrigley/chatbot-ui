@@ -1,4 +1,6 @@
-import { ChatFolder, Conversation, KeyValuePair } from '@/types';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { Folder } from '@/types/folder';
 import {
   IconArrowBarLeft,
   IconFolderPlus,
@@ -17,7 +19,7 @@ interface Props {
   lightMode: 'light' | 'dark';
   selectedConversation: Conversation;
   apiKey: string;
-  folders: ChatFolder[];
+  folders: Folder[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: number) => void;
   onUpdateFolder: (folderId: number, name: string) => void;
@@ -35,7 +37,7 @@ interface Props {
   onExportConversations: () => void;
   onImportConversations: (data: {
     conversations: Conversation[];
-    folders: ChatFolder[];
+    folders: Folder[];
   }) => void;
 }
 
@@ -116,10 +118,10 @@ export const Chatbar: FC<Props> = ({
   }, [searchTerm, conversations]);
 
   return (
-    <aside
+    <div
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
     >
-      <header className="flex items-center">
+      <div className="flex items-center">
         <button
           className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
@@ -143,7 +145,7 @@ export const Chatbar: FC<Props> = ({
           size={32}
           onClick={onToggleSidebar}
         />
-      </header>
+      </div>
 
       {conversations.length > 1 && (
         <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
@@ -206,6 +208,6 @@ export const Chatbar: FC<Props> = ({
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
       />
-    </aside>
+    </div>
   );
 };
