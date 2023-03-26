@@ -1,7 +1,7 @@
 import { Message } from "@/types";
 import { IconEdit } from "@tabler/icons-react";
-import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
+import { FC, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "../Markdown/CodeBlock";
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation("chat");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
@@ -52,14 +52,12 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
   const copyOnClick = () => {
     if (!navigator.clipboard) return;
 
-    navigator.clipboard.writeText(message.content).then(
-      () => {
-        setMessageCopied(true);
-        setTimeout(() => {
-          setMessageCopied(false);
-        }, 2000);
-      }
-    );
+    navigator.clipboard.writeText(message.content).then(() => {
+      setMessageCopied(true);
+      setTimeout(() => {
+        setMessageCopied(false);
+      }, 2000);
+    });
   };
 
   useEffect(() => {
@@ -134,8 +132,9 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
               )}
             </div>
           ) : (
-            <div className="w-full">
+            <>
               <ReactMarkdown
+                className="prose dark:prose-invert whitespace-pre-wrap"
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code({ node, inline, className, children, ...props }) {
@@ -177,7 +176,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
                   copyOnClick={copyOnClick}
                 />
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
