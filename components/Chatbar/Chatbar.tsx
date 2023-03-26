@@ -149,7 +149,11 @@ export const Chatbar: FC<Props> = ({
       </div>
 
       {conversations.length > 1 && (
-        <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
+        <Search
+          placeholder="Search conversations..."
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
+        />
       )}
 
       <div className="flex-grow overflow-auto">

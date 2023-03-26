@@ -635,20 +635,22 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               />
             )}
 
-            <Chat
-              conversation={selectedConversation}
-              messageIsStreaming={messageIsStreaming}
-              apiKey={apiKey}
-              serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-              modelError={modelError}
-              models={models}
-              loading={loading}
-              prompts={prompts}
-              onSend={handleSend}
-              onUpdateConversation={handleUpdateConversation}
-              onEditMessage={handleEditMessage}
-              stopConversationRef={stopConversationRef}
-            />
+            <div className="flex flex-1">
+              <Chat
+                conversation={selectedConversation}
+                messageIsStreaming={messageIsStreaming}
+                apiKey={apiKey}
+                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+                modelError={modelError}
+                models={models}
+                loading={loading}
+                prompts={prompts}
+                onSend={handleSend}
+                onUpdateConversation={handleUpdateConversation}
+                onEditMessage={handleEditMessage}
+                stopConversationRef={stopConversationRef}
+              />
+            </div>
 
             {showPromptbar ? (
               <div>

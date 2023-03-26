@@ -78,8 +78,6 @@ export const Promptbar: FC<Props> = ({
     }
   }, [searchTerm, prompts]);
 
-  console.log('filteredPrompts', filteredPrompts);
-
   return (
     <div
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
@@ -111,7 +109,11 @@ export const Promptbar: FC<Props> = ({
       </div>
 
       {prompts.length > 1 && (
-        <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
+        <Search
+          placeholder="Search prompts..."
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
+        />
       )}
 
       <div className="flex-grow overflow-auto">
