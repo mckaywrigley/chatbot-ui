@@ -1,21 +1,20 @@
-# Chatbot UI
+# ChatifyUI
 
-**Note: Chatbot UI Pro has been renamed to Chatbot UI.**
-
-Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
+Chatify UI is an advanced chatify kit for OpenAI's chat models built on top of [Chatbot UI](https://github.com/mckaywrigley/chatbot-ui) using Next.js, TypeScript, and Tailwind CSS.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
 
-![Chatbot UI](./public/screenshot.png)
+![Chatify UI](./public/screenshot.png)
 
 ## Updates
 
-Chatbot UI will be updated over time.
+Chatify UI will be updated over time.
 
 Expect frequent improvements.
 
 **Next up:**
 
+- [ ] Share your conversation
 - [ ] More model settings
 - [ ] Custom themes
 - [ ] Prompt templates
@@ -51,13 +50,9 @@ Modify the system prompt in `utils/index.ts`.
 
 **Vercel**
 
-Host your own live version of Chatbot UI with Vercel.
+Host your own live version of chatify UI with Vercel.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
-
-**Replit**
-
-Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsyedmuzamilm%2Fchatifyui)
 
 **Docker**
 
@@ -71,7 +66,7 @@ docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
 **1. Clone Repo**
 
 ```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
+git clone https://github.com/syedmuzamilm/chatifyui.git
 ```
 
 **2. Install Dependencies**
@@ -100,4 +95,4 @@ You should be able to start chatting.
 
 ## Contact
 
-If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/syedmuzamilm).
