@@ -21,7 +21,7 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
   return (
     <div className="relative flex items-center">
       <input
-        className="w-full flex-1 rounded-md border border-neutral-600 bg-[#202123] px-4 py-3 pr-10 text-[12px] leading-normal text-white"
+        className="w-full flex-1 rounded-md border border-neutral-600 bg-[#202123] px-4 py-3 pr-10 text-[12px] leading-3 text-white"
         type="text"
         placeholder={t('Search conversations...') || ''}
         value={searchTerm}
