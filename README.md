@@ -47,6 +47,10 @@ Modify the sidebar interface in `components/Sidebar`.
 
 Modify the system prompt in `utils/index.ts`.
 
+Support updating the locale in the `public/locale` .
+
+Support updating the prompts in `public/prompts`.
+
 ## Deploy
 
 **Vercel**
