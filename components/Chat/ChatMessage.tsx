@@ -114,7 +114,7 @@ export const ChatMessage: FC<Props> = ({
                       onClick={handleEditMessage}
                       disabled={messageContent.trim().length <= 0}
                     >
-                      Save & Submit
+                      {t('Save & Submit')}
                     </button>
                     <button
                       className="h-[40px] rounded-md border border-neutral-300 px-4 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
@@ -123,7 +123,7 @@ export const ChatMessage: FC<Props> = ({
                         setIsEditing(false);
                       }}
                     >
-                      Cancel
+                      {t('Cancel')}
                     </button>
                   </div>
                 </div>
