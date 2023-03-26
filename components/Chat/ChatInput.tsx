@@ -164,7 +164,10 @@ export const ChatInput: FC<Props> = ({
     const parsedVariables = parseVariables(promptText);
     setVariables(parsedVariables);
 
+    console.log(parsedVariables);
+
     if (parsedVariables.length > 0) {
+      console.log('show modal');
       setIsModalVisible(true);
     } else {
       setContent((prevContent) => prevContent?.replace(/\/\w*$/, promptText));
@@ -277,6 +280,7 @@ export const ChatInput: FC<Props> = ({
                       : ''
                   } cursor-pointer px-3 py-2 text-sm text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-200`}
                   onClick={() => {
+                    console.log('prompt', prompt);
                     handlePromptSelect(prompt.content);
                   }}
                   onMouseEnter={() => setActivePromptIndex(index)}
