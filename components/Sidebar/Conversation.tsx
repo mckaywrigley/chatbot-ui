@@ -94,32 +94,31 @@ export const ConversationComponent: FC<Props> = ({
       {(isDeleting || isRenaming) &&
         selectedConversation.id === conversation.id && (
           <div className="-ml-2 flex gap-1">
-            <IconCheck
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={16}
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
-
                 if (isDeleting) {
                   onDeleteConversation(conversation);
                 } else if (isRenaming) {
                   handleRename(conversation);
                 }
-
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
-            />
-
-            <IconX
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={16}
+            >
+              <IconCheck size={16} />
+            </button>
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
-            />
+            >
+              <IconX size={16} />
+            </button>
           </div>
         )}
 
@@ -127,24 +126,25 @@ export const ConversationComponent: FC<Props> = ({
         !isDeleting &&
         !isRenaming && (
           <div className="-ml-2 flex gap-1">
-            <IconPencil
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={18}
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRenaming(true);
                 setRenameValue(selectedConversation.name);
               }}
-            />
-
-            <IconTrash
-              className=" min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={18}
+            >
+              <IconPencil size={18} />
+            </button>
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(true);
               }}
-            />
+            >
+              <IconTrash size={18} />
+            </button>
           </div>
         )}
     </button>
