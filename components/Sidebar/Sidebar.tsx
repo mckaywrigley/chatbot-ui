@@ -2,6 +2,7 @@ import { ChatFolder, Conversation, KeyValuePair } from '@/types';
 import {
   IconArrowBarLeft,
   IconFolderPlus,
+  IconMessagesOff,
   IconPlus,
 } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
@@ -121,21 +122,21 @@ export const Sidebar: FC<Props> = ({
     >
       <header className="flex items-center">
         <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sidebar text-white transition-colors duration-200 select-none hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
             setSearchTerm('');
           }}
         >
-          <IconPlus size={16} />
+          <IconPlus size={18} />
           {t('New chat')}
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sidebar text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
-          <IconFolderPlus size={16} />
+          <IconFolderPlus size={18} />
         </button>
 
         <IconArrowBarLeft
@@ -191,8 +192,9 @@ export const Sidebar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-4 text-center text-white">
-            <div>{t('No conversations.')}</div>
+          <div className="mt-8 text-white text-center opacity-50 select-none">
+            <IconMessagesOff className='mx-auto mb-3'/>
+            <span className='text-sidebar'>{t('No conversations.')}</span>
           </div>
         )}
       </div>
