@@ -1,9 +1,10 @@
-import { Conversation, KeyValuePair, Message, OpenAIModel } from "@/types";
+import { Conversation, ErrorMessage, KeyValuePair, Message, OpenAIModel } from "@/types";
 import { FC, MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { ChatInput } from "./ChatInput";
 import { ChatLoader } from "./ChatLoader";
 import { ChatMessage } from "./ChatMessage";
+import { ErrorMessageDiv } from "./ErrorMessageDiv";
 import { ModelSelect } from "./ModelSelect";
 import { SystemPrompt } from "./SystemPrompt";
 
@@ -13,7 +14,7 @@ interface Props {
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
   messageIsStreaming: boolean;
-  modelError: boolean;
+  modelError: ErrorMessage | null;
   messageError: boolean;
   loading: boolean;
   lightMode: "light" | "dark";
@@ -76,13 +77,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
           <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">{t('OpenAI API Key Required')}</div>
           <div className="text-center text-gray-500 dark:text-gray-400">{t('Please set your OpenAI API key in the bottom left of the sidebar.')}</div>
         </div>
-      ) : modelError ? (
-        <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-center text-red-500">{t('Error fetching models.')}</div>
-          <div className="text-center text-red-500">{t('Make sure your OpenAI API key is set in the bottom left of the sidebar.')}</div>
-          <div className="text-center text-red-500">{t('If you completed this step, OpenAI may be experiencing issues.')}</div>
-        </div>
-      ) : (
+      ) : modelError ? <ErrorMessageDiv error={modelError} /> : (
         <>
           <div
             className="overflow-scroll max-h-full"
