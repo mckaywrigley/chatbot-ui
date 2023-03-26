@@ -7,6 +7,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ErrorMessageDiv } from "./ErrorMessageDiv";
 import { ModelSelect } from "./ModelSelect";
 import { SystemPrompt } from "./SystemPrompt";
+import { IconSettings } from "@tabler/icons-react";
 
 interface Props {
   conversation: Conversation;
@@ -28,6 +29,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
   const { t } = useTranslation('chat');
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -51,6 +53,10 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
         setAutoScrollEnabled(true);
       }
     }
+  };
+
+  const onClick = () => {
+    setShowSettings(!showSettings);
   };
 
   useEffect(() => {
@@ -106,15 +112,19 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
               </>
             ) : (
               <>
-              <div className="flex flex-col mx-auto pt-8 space-y-10 w-[200px] sm:w-[300px]">
-                <div className="flex flex-col h-full space-y-4 border p-2 rounded border-neutral-500">
-                  <ModelSelect
-                        model={conversation.model}
-                        models={models}
-                        onModelChange={(model) => onUpdateConversation(conversation, { key: "model", value: model })}
-                      />
+              <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">{t('Model')}: {conversation.model.name}
+              <IconSettings onClick={onClick} size={21}/></div>
+              {showSettings && (
+                <div className="flex flex-col mx-auto pt-8 space-y-10 w-[200px] sm:w-[300px]">
+                  <div className="flex flex-col h-full space-y-4 border p-2 rounded border-neutral-500">
+                    <ModelSelect
+                          model={conversation.model}
+                          models={models}
+                          onModelChange={(model) => onUpdateConversation(conversation, { key: "model", value: model })}
+                        />
+                  </div>
                 </div>
-              </div>
+              )}
 
                 {conversation.messages.map((message, index) => (
                   <ChatMessage
