@@ -76,7 +76,7 @@ export const ChatMessage: FC<Props> = ({
 
   return (
     <div
-      className={`group ${
+      className={`group px-4 ${
         message.role === 'assistant'
           ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
           : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'

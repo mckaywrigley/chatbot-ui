@@ -5,6 +5,7 @@ import {
   Message,
   OpenAIModel,
 } from '@/types';
+import { useTranslation } from 'next-i18next';
 import {
   FC,
   MutableRefObject,
@@ -13,7 +14,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useTranslation } from 'next-i18next';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
