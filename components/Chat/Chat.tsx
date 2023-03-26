@@ -27,7 +27,6 @@ interface Props {
   modelError: ErrorMessage | null;
   messageError: boolean;
   loading: boolean;
-  lightMode: 'light' | 'dark';
   onSend: (message: Message, deleteCount?: number) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -46,7 +45,6 @@ export const Chat: FC<Props> = ({
   modelError,
   messageError,
   loading,
-  lightMode,
   onSend,
   onUpdateConversation,
   onEditMessage,
@@ -160,7 +158,6 @@ export const Chat: FC<Props> = ({
                     key={index}
                     message={message}
                     messageIndex={index}
-                    lightMode={lightMode}
                     onEditMessage={onEditMessage}
                   />
                 ))}
