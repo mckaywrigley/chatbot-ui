@@ -4,9 +4,15 @@ import { PromptComponent } from './Prompt';
 
 interface Props {
   prompts: Prompt[];
+  onUpdatePrompt: (prompt: Prompt) => void;
+  onDeletePrompt: (prompt: Prompt) => void;
 }
 
-export const Prompts: FC<Props> = ({ prompts }) => {
+export const Prompts: FC<Props> = ({
+  prompts,
+  onUpdatePrompt,
+  onDeletePrompt,
+}) => {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt>();
 
   return (
@@ -20,8 +26,8 @@ export const Prompts: FC<Props> = ({ prompts }) => {
             selectedPrompt={selectedPrompt}
             prompt={prompt}
             onSelectPrompt={setSelectedPrompt}
-            onUpdatePrompt={() => {}}
-            onDeletePrompt={() => {}}
+            onUpdatePrompt={onUpdatePrompt}
+            onDeletePrompt={onDeletePrompt}
           />
         ))}
     </div>

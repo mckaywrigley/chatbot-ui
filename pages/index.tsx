@@ -477,15 +477,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     savePrompts(updatedPrompts);
   };
 
-  const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {
-    const updatedPrompt = {
-      ...prompt,
-      [data.key]: data.value,
-    };
-
+  const handleUpdatePrompt = (prompt: Prompt) => {
     const updatedPrompts = prompts.map((p) => {
-      if (p.id === updatedPrompt.id) {
-        return updatedPrompt;
+      if (p.id === prompt.id) {
+        return prompt;
       }
 
       return p;
@@ -594,7 +589,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       </Head>
       {selectedConversation && (
         <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+          className={`text-sm flex h-screen w-screen flex-col text-white dark:text-white ${lightMode}`}
         >
           <div className="fixed top-0 w-full sm:hidden">
             <Navbar

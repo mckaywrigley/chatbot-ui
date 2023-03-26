@@ -1,4 +1,3 @@
-import { KeyValuePair } from '@/types/data';
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
@@ -17,7 +16,7 @@ interface Props {
   folders: Folder[];
   onToggleSidebar: () => void;
   onCreatePrompt: () => void;
-  onUpdatePrompt: (prompt: Prompt, data: KeyValuePair) => void;
+  onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
   onCreatePromptFolder: (name: string) => void;
 }
@@ -35,8 +34,8 @@ export const Promptbar: FC<Props> = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>(prompts);
 
-  const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {
-    onUpdatePrompt(prompt, data);
+  const handleUpdatePrompt = (prompt: Prompt) => {
+    onUpdatePrompt(prompt);
     setSearchTerm('');
   };
 
@@ -48,7 +47,7 @@ export const Promptbar: FC<Props> = ({
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
       const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
-      onUpdatePrompt(prompt, { key: 'folderId', value: 0 });
+      onUpdatePrompt(prompt);
 
       e.target.style.background = 'none';
     }
@@ -87,7 +86,7 @@ export const Promptbar: FC<Props> = ({
     >
       <div className="flex items-center">
         <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-sidebar text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onCreatePrompt();
             setSearchTerm('');
@@ -98,7 +97,7 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="text-sm ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreatePromptFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
@@ -133,6 +132,8 @@ export const Promptbar: FC<Props> = ({
                 (prompt) =>
                   prompt.folderId === 0 || !folders[prompt.folderId - 1],
               )}
+              onUpdatePrompt={handleUpdatePrompt}
+              onDeletePrompt={handleDeletePrompt}
             />
           </div>
         ) : (

@@ -1,4 +1,3 @@
-import { KeyValuePair } from '@/types/data';
 import { Prompt } from '@/types/prompt';
 import {
   IconBulbFilled,
@@ -7,14 +6,14 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { DragEvent, FC, KeyboardEvent, useEffect, useState } from 'react';
+import { DragEvent, FC, useEffect, useState } from 'react';
 import { PromptModal } from './PromptModal';
 
 interface Props {
   selectedPrompt: Prompt | undefined;
   prompt: Prompt;
   onSelectPrompt: (prompt: Prompt | undefined) => void;
-  onUpdatePrompt: (prompt: Prompt, data: KeyValuePair) => void;
+  onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
@@ -30,23 +29,10 @@ export const PromptComponent: FC<Props> = ({
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
 
-  const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' && selectedPrompt?.id === prompt.id) {
-      e.preventDefault();
-      handleRename(selectedPrompt);
-    }
-  };
-
   const handleDragStart = (e: DragEvent<HTMLButtonElement>, prompt: Prompt) => {
     if (e.dataTransfer) {
       e.dataTransfer.setData('prompt', JSON.stringify(prompt));
     }
-  };
-
-  const handleRename = (prompt: Prompt) => {
-    onUpdatePrompt(prompt, { key: 'name', value: renameValue });
-    setRenameValue('');
-    setIsRenaming(false);
   };
 
   useEffect(() => {
@@ -60,12 +46,17 @@ export const PromptComponent: FC<Props> = ({
   return (
     <>
       <button
-        className="hover:bg-[#343541]/90} flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sidebar transition-colors duration-200 hover:bg-[#343541]/90"
         draggable="true"
         onClick={() => onSelectPrompt(prompt)}
         onDragStart={(e) => handleDragStart(e, prompt)}
         onMouseEnter={() => onSelectPrompt(prompt)}
-        onMouseLeave={() => onSelectPrompt(undefined)}
+        onMouseLeave={() => {
+          onSelectPrompt(undefined);
+          setIsDeleting(false);
+          setIsRenaming(false);
+          setRenameValue('');
+        }}
       >
         <IconBulbFilled size={16} />
 
@@ -75,7 +66,6 @@ export const PromptComponent: FC<Props> = ({
             type="text"
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
-            onKeyDown={handleEnterDown}
             autoFocus
           />
         ) : (
@@ -94,12 +84,9 @@ export const PromptComponent: FC<Props> = ({
 
                 if (isDeleting) {
                   onDeletePrompt(prompt);
-                } else if (isRenaming) {
-                  handleRename(prompt);
                 }
 
                 setIsDeleting(false);
-                setIsRenaming(false);
               }}
             />
 
@@ -109,7 +96,6 @@ export const PromptComponent: FC<Props> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
-                setIsRenaming(false);
               }}
             />
           </div>
@@ -123,8 +109,6 @@ export const PromptComponent: FC<Props> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 setShowModal(true);
-                // setIsRenaming(true);
-                // setRenameValue(selectedPrompt.name);
               }}
             />
 
@@ -145,6 +129,7 @@ export const PromptComponent: FC<Props> = ({
           prompt={prompt}
           isOpen={showModal}
           onClose={() => setShowModal(false)}
+          onUpdatePrompt={onUpdatePrompt}
         />
       )}
     </>
