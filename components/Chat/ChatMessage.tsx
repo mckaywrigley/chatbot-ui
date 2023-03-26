@@ -1,10 +1,12 @@
-import { Message } from '@/types';
-import { IconEdit } from '@tabler/icons-react';
-import { FC, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'next-i18next';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { CodeBlock } from '../Markdown/CodeBlock';
+import { Message } from "@/types";
+import { IconEdit } from "@tabler/icons-react";
+import { useTranslation } from "next-i18next";
+import { FC, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeMathjax from "rehype-mathjax";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import { CodeBlock } from "../Markdown/CodeBlock";
 
 interface Props {
   message: Message;
@@ -23,6 +25,7 @@ export const ChatMessage: FC<Props> = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
+  const [messagedCopied, setMessageCopied] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -50,6 +53,17 @@ export const ChatMessage: FC<Props> = ({
       e.preventDefault();
       handleEditMessage();
     }
+  };
+
+  const copyOnClick = () => {
+    if (!navigator.clipboard) return;
+
+    navigator.clipboard.writeText(message.content).then(() => {
+      setMessageCopied(true);
+      setTimeout(() => {
+        setMessageCopied(false);
+      }, 2000);
+    });
   };
 
   useEffect(() => {
@@ -139,7 +153,9 @@ export const ChatMessage: FC<Props> = ({
             </div>
           ) : (
             <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
+              className="prose dark:prose-invert"
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeMathjax]}
               components={{
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '');
