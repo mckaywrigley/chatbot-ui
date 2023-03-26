@@ -1,5 +1,5 @@
-import { Conversation, OpenAIModelID, OpenAIModels } from "@/types";
-import { DEFAULT_SYSTEM_PROMPT } from "./const";
+import { Conversation, OpenAIModelID, OpenAIModels } from '@/types';
+import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -12,7 +12,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5]
+      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
     };
   }
 
@@ -20,14 +20,14 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.prompt) {
     updatedConversation = {
       ...updatedConversation,
-      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT
+      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
     };
   }
 
   if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folderId: updatedConversation.folderId || 0
+      folderId: updatedConversation.folderId || 0,
     };
   }
 
@@ -56,7 +56,10 @@ export const cleanConversationHistory = (history: Conversation[]) => {
       acc.push(conversation);
       return acc;
     } catch (error) {
-      console.warn(`error while cleaning conversations' history. Removing culprit`, error);
+      console.warn(
+        `error while cleaning conversations' history. Removing culprit`,
+        error,
+      );
     }
     return acc;
   }, []);

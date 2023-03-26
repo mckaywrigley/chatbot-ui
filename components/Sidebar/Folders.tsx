@@ -1,6 +1,6 @@
-import { ChatFolder, Conversation, KeyValuePair } from "@/types";
-import { FC } from "react";
-import { Folder } from "./Folder";
+import { ChatFolder, Conversation, KeyValuePair } from '@/types';
+import { FC } from 'react';
+import { Folder } from './Folder';
 
 interface Props {
   searchTerm: string;
@@ -13,7 +13,10 @@ interface Props {
   loading: boolean;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
+  onUpdateConversation: (
+    conversation: Conversation,
+    data: KeyValuePair,
+  ) => void;
 }
 
 export const Folders: FC<Props> = ({
@@ -27,10 +30,10 @@ export const Folders: FC<Props> = ({
   loading,
   onSelectConversation,
   onDeleteConversation,
-  onUpdateConversation
+  onUpdateConversation,
 }) => {
   return (
-    <div className="flex flex-col gap-1 w-full pt-2">
+    <div className="flex w-full flex-col gap-1 pt-2">
       {folders.map((folder, index) => (
         <Folder
           key={index}

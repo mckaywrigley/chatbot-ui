@@ -1,7 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAIのAPIキーが必要です",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "左下のサイドバーでOpenAIのAPIキーを設定してください",
-  "Stop Generating": "作るのをやめる",
+  "Stop Generating": "回答をストップ",
   "Prompt limit is {{maxLength}} characters": "プロンプトの文字数は{{maxLength}}文字までです",
   "System Prompt": "システムのプロンプト",
   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "あなたはOpenAIによってトレーニングされた大規模言語モデルのChatGPTです。ユーザーの指示には注意深く従ってください。マークダウンを使用して応答してください。",
@@ -21,5 +21,5 @@
   "click if using a .env.local file": "もし.env.localファイルを使用している場合はこちらをクリックしてください",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "メッセージの文字数は{{maxLength}}文字までです。あなたは{{valueLength}}文字を入力しました。",
   "Please enter a message": "メッセージを入力してください",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UIは、ChatGPTのインターフェイスと機能を模倣することを目的とした、OpenAIのチャットモデルのための高度なチャットボットキットです。"
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UIは、ChatGPTと同様のインターフェイスと機能を実現するための、チャットボットキットです。"
 }
