@@ -55,7 +55,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
     }
   };
 
-  const onClick = () => {
+  const handleSettings = () => {
     setShowSettings(!showSettings);
   };
 
@@ -113,7 +113,7 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, serverSideApiKey
             ) : (
               <>
               <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">{t('Model')}: {conversation.model.name}
-              <IconSettings onClick={onClick} size={21}/></div>
+              <IconSettings className="ml-2" onClick={handleSettings} size={21}/></div>
               {showSettings && (
                 <div className="flex flex-col mx-auto pt-8 space-y-10 w-[200px] sm:w-[300px]">
                   <div className="flex flex-col h-full space-y-4 border p-2 rounded border-neutral-500">
