@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: chatbot-ui
+  name: Chatify-ui
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: Chatify-ui
+  name: Chatify-ui
 type: Opaque
 data:
   OPENAI_API_KEY: <base64 encoded key>
@@ -15,23 +15,23 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: Chatify-ui
+  name: Chatify-ui
   labels:
-    app: chatbot-ui
+    app: Chatify-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chatbot-ui
+      app: Chatify-ui
   template:
     metadata:
       labels:
-        app: chatbot-ui
+        app: Chatify-ui
     spec:
       containers:
-        - name: chatbot-ui
-          image: <docker user>/chatbot-ui:latest
+        - name: Chatify-ui
+          image: <docker user>/Chatify-ui:latest
           resources: {}
           ports:
             - containerPort: 3000
@@ -39,16 +39,16 @@ spec:
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: chatbot-ui
+                  name: Chatify-ui
                   key: OPENAI_API_KEY
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: Chatify-ui
+  name: Chatify-ui
   labels:
-    app: chatbot-ui
+    app: Chatify-ui
 spec:
   ports:
     - name: http
@@ -56,5 +56,5 @@ spec:
       port: 80
       targetPort: 3000
   selector:
-    app: chatbot-ui
+    app: Chatify-ui
   type: ClusterIP

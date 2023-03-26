@@ -20,7 +20,7 @@ export const exportData = () => {
   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = 'chatbot_ui_history.json';
+  link.download = 'Chatify_ui_history.json';
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);

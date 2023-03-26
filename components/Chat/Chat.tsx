@@ -123,7 +123,7 @@ export const Chat: FC<Props> = ({
               <>
                 <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
                   <div className="text-center text-4xl font-semibold text-gray-800 dark:text-gray-100">
-                    {models.length === 0 ? t('Loading...') : 'Chatbot UI'}
+                    {models.length === 0 ? t('Loading...') : 'Chatify UI'}
                   </div>
 
                   {models.length > 0 && (
