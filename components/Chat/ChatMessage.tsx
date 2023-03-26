@@ -134,7 +134,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
           ) : (
             <>
               <ReactMarkdown
-                className="prose dark:prose-invert whitespace-pre-wrap"
+                className="prose dark:prose-invert"
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code({ node, inline, className, children, ...props }) {
