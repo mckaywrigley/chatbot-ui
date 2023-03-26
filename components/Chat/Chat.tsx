@@ -121,7 +121,7 @@ export const Chat: FC<Props> = ({
             {conversation.messages.length === 0 ? (
               <>
                 <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
-                  <div className="text-center text-4xl font-semibold text-gray-800 dark:text-gray-100">
+                  <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? <Spinner className='mx-auto' size='16px'/> : 'Chatbot UI'}
                   </div>
 
