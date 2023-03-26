@@ -418,10 +418,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Chatbot UI</title>
+        <title>科研泡泡+ChatGPT</title>
         <meta
           name="description"
-          content="ChatGPT but better."
+          content="科研泡泡定制ChatGPT"
         />
         <meta
           name="viewport"

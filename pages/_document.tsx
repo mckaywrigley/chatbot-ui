@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <meta name="apple-mobile-web-app-title" content="Chatbot UI"></meta>
+        <meta name="apple-mobile-web-app-title" content="科研泡泡+ChatGPT"></meta>
       </Head>
       <body>
         <Main />
