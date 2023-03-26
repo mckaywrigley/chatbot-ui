@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "bootstrap": "npm install && npx husky install"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
@@ -27,6 +28,8 @@
     "remark-math": "^5.1.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.5.0",
+    "@commitlint/config-conventional": "^17.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",
@@ -35,6 +38,7 @@
     "autoprefixer": "^10.4.14",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "husky": "^8.0.3",
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.5",
