@@ -126,6 +126,9 @@ export const ChatInput: FC<Props> = ({
           updatePromptListVisibility(newContent || '');
           return newContent;
         });
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowPromptList(false);
       } else {
         setActivePromptIndex(0);
       }
@@ -215,7 +218,7 @@ export const ChatInput: FC<Props> = ({
           />
 
           <button
-            className="absolute right-5 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-5 rounded p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             <IconSend size={16} className="opacity-60" />
@@ -224,12 +227,12 @@ export const ChatInput: FC<Props> = ({
           {showPromptList && (
             <ul
               ref={promptListRef}
-              className="absolute origin-bottom overflow-auto rounded border border-gray-300 bg-white shadow-md dark:border-gray-900/50 dark:bg-[#343541]"
+              className="absolute z-10 w-full rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
               style={{
                 width: 'calc(100% - 48px)',
                 bottom: '100%',
                 marginBottom: '4px',
-                maxHeight: '150px', // Adjust this value as needed
+                maxHeight: '200px',
               }}
             >
               {filteredPrompts.map((prompt, index) => (
@@ -237,9 +240,9 @@ export const ChatInput: FC<Props> = ({
                   key={prompt.id}
                   className={`${
                     index === activePromptIndex
-                      ? 'bg-gray-200 dark:bg-gray-900'
+                      ? 'dark:bg[#202123] bg-gray-200 dark:text-black'
                       : ''
-                  } cursor-pointer px-3 py-2 text-sm text-black hover:bg-gray-200 dark:hover:bg-gray-900`}
+                  } cursor-pointer px-3 py-2 text-sm text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-200`}
                   onClick={() => {
                     setContent((prevContent) => {
                       const newContent = prevContent?.replace(
@@ -250,6 +253,7 @@ export const ChatInput: FC<Props> = ({
                       return newContent;
                     });
                   }}
+                  onMouseEnter={() => setActivePromptIndex(index)}
                 >
                   {prompt.name}
                 </li>
