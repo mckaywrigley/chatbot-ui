@@ -46,7 +46,7 @@ export const PromptComponent: FC<Props> = ({
   return (
     <>
       <button
-        className="text-sidebar flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-[12px] transition-colors duration-200 hover:bg-[#343541]/90"
+        className="text-sidebar flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-[14px] transition-colors duration-200 hover:bg-[#343541]/90"
         draggable="true"
         onClick={() => onSelectPrompt(prompt)}
         onDragStart={(e) => handleDragStart(e, prompt)}
