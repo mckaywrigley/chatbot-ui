@@ -15,9 +15,9 @@ export const ModelSelect: FC<Props> = ({ model, models, onModelChange }) => {
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
         {t('Model')}
       </label>
-      <div className="w-full rounded-lg border border-neutral-200 pr-2 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
+      <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
         <select
-          className="bg-transparent w-full outline-0 p-2"
+          className="focus:shadow-outline w-full cursor-pointer appearance-none rounded-lg border border-neutral-500 p-3 text-neutral-900 dark:border-neutral-400 dark:bg-[#343541] dark:text-white"
           placeholder={t('Select a model') || ''}
           value={model.id}
           onChange={(e) => {
@@ -29,7 +29,11 @@ export const ModelSelect: FC<Props> = ({ model, models, onModelChange }) => {
           }}
         >
           {models.map((model) => (
-            <option key={model.id} value={model.id}>
+            <option
+              key={model.id}
+              value={model.id}
+              className="dark:bg-[#343541] dark:text-white"
+            >
               {model.name}
             </option>
           ))}
