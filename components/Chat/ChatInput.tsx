@@ -1,5 +1,5 @@
 import { Message, OpenAIModel, OpenAIModelID } from '@/types';
-import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
+import { IconPlayerStop, IconRepeat, IconSend, IconShare } from '@tabler/icons-react';
 import {
   FC,
   KeyboardEvent,
@@ -88,9 +88,8 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+        }`;
     }
   }, [content]);
 
@@ -103,26 +102,38 @@ export const ChatInput: FC<Props> = ({
 
   return (
     <div className="dark:bg-vert-dark-gradient absolute bottom-0 left-0 w-full border-transparent bg-white from-[#343541] via-[#343541] to-[#343541]/0 pt-6 dark:border-white/20 dark:bg-[#444654] dark:!bg-transparent dark:bg-gradient-to-t md:pt-2">
-      <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
-        {messageIsStreaming && (
-          <button
-            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
-            onClick={handleStopConversation}
-          >
-            <IconPlayerStop size={16} className="mb-[2px] inline-block" />{' '}
-            {t('Stop Generating')}
-          </button>
-        )}
+      <div className="stretch mx-2 mt-4 flex flex-col gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+        <div className='flex items-center gap-4 justify-center'>
+          {messageIsStreaming && (
+            <button
+              className="rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
+              onClick={handleStopConversation}
+            >
+              <IconPlayerStop size={16} className="mb-[2px] inline-block" />{' '}
+              {t('Stop Generating')}
+            </button>
+          )}
 
-        {!messageIsStreaming && messages.length > 0 && (
-          <button
-            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
-            onClick={onRegenerate}
-          >
-            <IconRepeat size={16} className="mb-[2px] inline-block" />{' '}
-            {t('Regenerate response')}
-          </button>
-        )}
+          {!messageIsStreaming && messages.length > 0 && (
+            <button
+              className="rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
+              onClick={onRegenerate}
+            >
+              <IconRepeat size={16} className="mb-[2px] inline-block" />{' '}
+              {t('Regenerate response')}
+            </button>
+          )}
+
+          {messages.length > 0 && (
+            <button
+              className="rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
+              onClick={onRegenerate}
+            >
+              <IconShare size={16} className="mb-[2px] inline-block" />{' '}
+              {t('Share')}
+            </button>
+          )}
+        </div>
 
         <div className="relative flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] md:py-3 md:pl-4">
           <textarea
@@ -132,11 +143,10 @@ export const ChatInput: FC<Props> = ({
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
-              overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
-                  ? 'auto'
-                  : 'hidden'
-              }`,
+              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+                ? 'auto'
+                : 'hidden'
+                }`,
             }}
             placeholder={t('Type a message...') || ''}
             value={content}
@@ -157,16 +167,16 @@ export const ChatInput: FC<Props> = ({
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-xs text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
         <a
-          href="https://github.com/mckaywrigley/chatbot-ui"
+          href="https://github.com/mckaywrigley/Chatify-ui"
           target="_blank"
           rel="noreferrer"
           className="underline"
         >
-          ChatBot UI
+          Chatify UI
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          "Chatify UI is an advanced Chatify kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
         )}
       </div>
     </div>
