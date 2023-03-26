@@ -52,7 +52,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
   const copyOnClick = () => {
     if (!navigator.clipboard) return;
 
-    navigator.clipboard.writeText(messageContent).then(
+    navigator.clipboard.writeText(message.content).then(
       () => {
         setMessageCopied(true);
         setTimeout(() => {
