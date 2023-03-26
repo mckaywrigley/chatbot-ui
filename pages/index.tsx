@@ -1,7 +1,8 @@
 import { Chat } from "@/components/Chat/Chat";
+import { Chatbar } from "@/components/Chatbar/Chatbar";
 import { Navbar } from "@/components/Mobile/Navbar";
-import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { ChatBody, ChatFolder, Conversation, ErrorMessage, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
+import { Promptbar } from "@/components/Promptbar/Promptbar";
+import { ChatBody, ChatFolder, Conversation, ErrorMessage, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels, Prompt } from "@/types";
 import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
 import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
 import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
@@ -9,18 +10,17 @@ import { saveFolders } from "@/utils/app/folders";
 import { exportData, importData } from "@/utils/app/importExport";
 import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
 import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { useTranslation } from "next-i18next";
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
 }
 
-
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
-  const { t } = useTranslation('chat')
+  const { t } = useTranslation("chat");
   const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>();
@@ -33,6 +33,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<ErrorMessage | null>(null);
   const [currentMessage, setCurrentMessage] = useState<Message>();
+
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
   const stopConversationRef = useRef<boolean>(false);
 
@@ -181,12 +184,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const fetchModels = async (key: string) => {
     const error = {
-      title: t('Error fetching models.'),
+      title: t("Error fetching models."),
       code: null,
-      messageLines: [
-        t('Make sure your OpenAI API key is set in the bottom left of the sidebar.'),
-        t('If you completed this step, OpenAI may be experiencing issues.')
-      ]
+      messageLines: [t("Make sure your OpenAI API key is set in the bottom left of the sidebar."), t("If you completed this step, OpenAI may be experiencing issues.")]
     } as ErrorMessage;
 
     const response = await fetch("/api/models", {
@@ -205,8 +205,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
         Object.assign(error, {
           code: data.error?.code,
           messageLines: [data.error?.message]
-        })
-      } catch (e) { }
+        });
+      } catch (e) {}
       setModelError(error);
       return;
     }
@@ -302,7 +302,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
     const newConversation: Conversation = {
       id: lastConversation ? lastConversation.id + 1 : 1,
-      name: `${t('Conversation')} ${lastConversation ? lastConversation.id + 1 : 1}`,
+      name: `${t("Conversation")} ${lastConversation ? lastConversation.id + 1 : 1}`,
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
@@ -394,6 +394,14 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setCurrentMessage(message);
     }
   };
+
+  const handleCreatePrompt = () => {};
+
+  const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {};
+
+  const handleDeletePrompt = (prompt: Prompt) => {};
+
+  const handleCreatePromptFolder = (name: string) => {};
 
   useEffect(() => {
     if (currentMessage) {
@@ -490,7 +498,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <div>
-                <Sidebar
+                <Chatbar
                   loading={messageIsStreaming}
                   conversations={conversations}
                   lightMode={lightMode}
@@ -544,6 +552,32 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
               onEditMessage={handleEditMessage}
               stopConversationRef={stopConversationRef}
             />
+
+            {showPromptbar ? (
+              <div>
+                <Promptbar
+                  prompts={prompts}
+                  onToggleSidebar={() => setShowPromptbar(!showPromptbar)}
+                  onCreatePrompt={handleCreatePrompt}
+                  onUpdatePrompt={handleUpdatePrompt}
+                  onDeletePrompt={handleDeletePrompt}
+                  onCreatePromptFolder={handleCreatePromptFolder}
+                />
+                <IconArrowBarRight
+                  className="z-50 fixed top-5 right-[270px] sm:top-0.5 sm:right-[270px] sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
+                  onClick={() => setShowPromptbar(!showPromptbar)}
+                />
+                <div
+                  onClick={() => setShowPromptbar(!showPromptbar)}
+                  className="sm:hidden bg-black opacity-70 z-10 absolute top-0 left-0 h-full w-full"
+                ></div>
+              </div>
+            ) : (
+              <IconArrowBarLeft
+                className="fixed text-white z-50 top-2.5 right-4 sm:top-0.5 sm:right-4 sm:text-neutral-700 dark:text-white cursor-pointer hover:text-gray-400 dark:hover:text-gray-300 h-7 w-7 sm:h-8 sm:w-8"
+                onClick={() => setShowPromptbar(!showPromptbar)}
+              />
+            )}
           </div>
         </main>
       )}
@@ -556,12 +590,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-      ...(await serverSideTranslations(locale ?? 'en', [
-        'common',
-        'chat',
-        'sidebar',
-        'markdown',
-      ])),
+      ...(await serverSideTranslations(locale ?? "en", ["common", "chat", "sidebar", "markdown"]))
     }
   };
 };

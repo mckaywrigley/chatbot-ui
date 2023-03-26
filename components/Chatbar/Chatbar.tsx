@@ -1,11 +1,11 @@
 import { ChatFolder, Conversation, KeyValuePair } from "@/types";
 import { IconArrowBarLeft, IconFolderPlus, IconPlus } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
+import { FC, useEffect, useState } from "react";
+import { Search } from "../Sidebar/Search";
+import { ChatbarSettings } from "./ChatbarSettings";
 import { Conversations } from "./Conversations";
 import { Folders } from "./Folders";
-import { Search } from "./Search";
-import { SidebarSettings } from "./SidebarSettings";
 
 interface Props {
   loading: boolean;
@@ -29,9 +29,8 @@ interface Props {
   onImportConversations: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, folders, onCreateFolder, onDeleteFolder, onUpdateFolder, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {
-
-  const { t } = useTranslation('sidebar');
+export const Chatbar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, folders, onCreateFolder, onDeleteFolder, onUpdateFolder, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {
+  const { t } = useTranslation("chatbar");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>(conversations);
 
@@ -80,8 +79,8 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
   }, [searchTerm, conversations]);
 
   return (
-    <aside className={`h-full transition-all flex flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-50 sm:relative sm:top-0 fixed top-0 bottom-0`}>
-      <header className="flex items-center">
+    <div className={`h-full transition-all flex flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-50 sm:relative sm:top-0 fixed top-0 bottom-0`}>
+      <div className="flex items-center">
         <button
           className="flex gap-3 p-3 items-center w-[190px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
           onClick={() => {
@@ -90,7 +89,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           }}
         >
           <IconPlus size={16} />
-          {t('New chat')}
+          {t("New chat")}
         </button>
 
         <button
@@ -105,7 +104,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           size={32}
           onClick={onToggleSidebar}
         />
-      </header>
+      </div>
 
       {conversations.length > 1 && (
         <Search
@@ -151,12 +150,12 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           </div>
         ) : (
           <div className="mt-4 text-white text-center">
-            <div>{t('No conversations.')}</div>
+            <div>{t("No conversations.")}</div>
           </div>
         )}
       </div>
 
-      <SidebarSettings
+      <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
         onToggleLightMode={onToggleLightMode}
@@ -165,6 +164,6 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
       />
-    </aside>
+    </div>
   );
 };

@@ -52,6 +52,14 @@ export interface KeyValuePair {
   value: any;
 }
 
+export interface Prompt {
+  id: number;
+  name: string;
+  prompt: string;
+  model: OpenAIModel;
+  folderId: number;
+}
+
 // keep track of local storage schema
 export interface LocalStorage {
   apiKey: string;
@@ -63,7 +71,7 @@ export interface LocalStorage {
 }
 
 export interface ErrorMessage {
-  code: String | null,
-  title: String,
-  messageLines: String[]
+  code: String | null;
+  title: String;
+  messageLines: String[];
 }

@@ -3,7 +3,7 @@ import { cleanConversationHistory } from "@/utils/app/clean";
 import { IconFileImport } from "@tabler/icons-react";
 import { useTranslation } from "next-i18next";
 import { FC } from "react";
-import { SidebarButton } from "./SidebarButton";
+import { SidebarButton } from "../Sidebar/SidebarButton";
 
 interface Props {
   onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
