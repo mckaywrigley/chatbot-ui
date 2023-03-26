@@ -13,8 +13,8 @@ interface Props {
 
 export const Conversations: FC<Props> = ({ loading, conversations, selectedConversation, onSelectConversation, onDeleteConversation, onUpdateConversation }) => {
   return (
-    <div className="flex flex-col-reverse gap-1 w-full pt-2">
-      {conversations.map((conversation, index) => (
+    <div className="flex flex-col gap-1 w-full pt-2">
+      {conversations.slice().reverse().map((conversation, index) => (
         <ConversationComponent
           key={index}
           selectedConversation={selectedConversation}
