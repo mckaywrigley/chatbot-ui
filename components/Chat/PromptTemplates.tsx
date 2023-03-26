@@ -94,7 +94,7 @@ export default function PromptTemplates({ onChangePrompt }: Props) {
                         !selected ||
                         p.act.toLowerCase().includes(selected.toLowerCase())
                     )
-                    .map((prompt: PromptTemplate, index: string) => (
+                    .map((prompt: PromptTemplate, index: number) => (
                       <PromptDisclosure
                         key={index}
                         prompt={prompt}

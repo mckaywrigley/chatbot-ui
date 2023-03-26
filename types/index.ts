@@ -69,7 +69,6 @@ export interface ErrorMessage {
 }
 
 export interface PromptTemplate {
-  title: string;
-  contributedBy: string;
-  description: string;
+  act: string;
+  prompt: string;
 }
