@@ -1,9 +1,9 @@
 {
-  "name": "Chatify UI",
+  "name": "Chatify",
   "short_name": "Chatify",
   "theme_color": "#ffffff",
   "background_color": "#004740",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",

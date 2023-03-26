@@ -513,6 +513,44 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   return (
     <>
+      <Head>
+        <title>Chatify - A better UI for ChatGPT</title>
+        <meta name="title" content="Chatify - A better UI for ChatGPT" />
+        <meta
+          name="description"
+          content="Chatify is a revolutionary user interface designed to enhance the user experience of ChatGPT, the popular AI chatbot powered by OpenAI"
+        />
+
+        <meta
+          name="keywords"
+          content="Chatify, ChatGPT, AI chatbot, user interface"
+        />
+        <meta property="og:title" content="Chatify - A better UI for ChatGPT" />
+        <meta
+          property="og:description"
+          content="Chatify is a revolutionary user interface designed to enhance the user experience of ChatGPT, the popular AI chatbot powered by OpenAI."
+        />
+        <meta
+          property="og:image"
+          content="https://chatify.blackkalu.com/og-image.png"
+        />
+        <meta property="og:url" content="https://chatify.blackkalu.com" />
+
+        <meta
+          name="twitter:title"
+          content="Chatify - A better UI for ChatGPT"
+        />
+        <meta
+          name="twitter:description"
+          content="Chatify is a revolutionary user interface designed to enhance the user experience of ChatGPT, the popular AI chatbot powered by OpenAI."
+        />
+        <meta
+          name="twitter:image"
+          content="https://chatify.blackkalu.com/og-image.png"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://chatify.blackkalu.com" />
+      </Head>
       {selectedConversation && (
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
