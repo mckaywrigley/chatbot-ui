@@ -1,16 +1,20 @@
-import { ChatFolder, Conversation, KeyValuePair } from "@/types";
-import { IconArrowBarLeft, IconFolderPlus, IconPlus } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
-import { Conversations } from "./Conversations";
-import { Folders } from "./Folders";
-import { Search } from "./Search";
-import { SidebarSettings } from "./SidebarSettings";
+import { ChatFolder, Conversation, KeyValuePair } from '@/types';
+import {
+  IconArrowBarLeft,
+  IconFolderPlus,
+  IconPlus,
+} from '@tabler/icons-react';
+import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
+import { Conversations } from './Conversations';
+import { Folders } from './Folders';
+import { Search } from './Search';
+import { SidebarSettings } from './SidebarSettings';
 
 interface Props {
   loading: boolean;
   conversations: Conversation[];
-  lightMode: "light" | "dark";
+  lightMode: 'light' | 'dark';
   selectedConversation: Conversation;
   apiKey: string;
   folders: ChatFolder[];
@@ -18,39 +22,68 @@ interface Props {
   onDeleteFolder: (folderId: number) => void;
   onUpdateFolder: (folderId: number, name: string) => void;
   onNewConversation: () => void;
-  onToggleLightMode: (mode: "light" | "dark") => void;
+  onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
   onToggleSidebar: () => void;
-  onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
+  onUpdateConversation: (
+    conversation: Conversation,
+    data: KeyValuePair,
+  ) => void;
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
-  onImportConversations: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
+  onImportConversations: (data: {
+    conversations: Conversation[];
+    folders: ChatFolder[];
+  }) => void;
 }
 
-export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selectedConversation, apiKey, folders, onCreateFolder, onDeleteFolder, onUpdateFolder, onNewConversation, onToggleLightMode, onSelectConversation, onDeleteConversation, onToggleSidebar, onUpdateConversation, onApiKeyChange, onClearConversations, onExportConversations, onImportConversations }) => {
-
+export const Sidebar: FC<Props> = ({
+  loading,
+  conversations,
+  lightMode,
+  selectedConversation,
+  apiKey,
+  folders,
+  onCreateFolder,
+  onDeleteFolder,
+  onUpdateFolder,
+  onNewConversation,
+  onToggleLightMode,
+  onSelectConversation,
+  onDeleteConversation,
+  onToggleSidebar,
+  onUpdateConversation,
+  onApiKeyChange,
+  onClearConversations,
+  onExportConversations,
+  onImportConversations,
+}) => {
   const { t } = useTranslation('sidebar');
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filteredConversations, setFilteredConversations] = useState<Conversation[]>(conversations);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filteredConversations, setFilteredConversations] =
+    useState<Conversation[]>(conversations);
 
-  const handleUpdateConversation = (conversation: Conversation, data: KeyValuePair) => {
+  const handleUpdateConversation = (
+    conversation: Conversation,
+    data: KeyValuePair,
+  ) => {
     onUpdateConversation(conversation, data);
-    setSearchTerm("");
+    setSearchTerm('');
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
     onDeleteConversation(conversation);
-    setSearchTerm("");
+    setSearchTerm('');
   };
 
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
-      const conversation = JSON.parse(e.dataTransfer.getData("conversation"));
-      onUpdateConversation(conversation, { key: "folderId", value: 0 });
+      const conversation = JSON.parse(e.dataTransfer.getData('conversation'));
+      onUpdateConversation(conversation, { key: 'folderId', value: 0 });
 
-      e.target.style.background = "none";
+      e.target.style.background = 'none';
     }
   };
 
@@ -59,20 +92,23 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
   };
 
   const highlightDrop = (e: any) => {
-    e.target.style.background = "#343541";
+    e.target.style.background = '#343541';
   };
 
   const removeHighlight = (e: any) => {
-    e.target.style.background = "none";
+    e.target.style.background = 'none';
   };
 
   useEffect(() => {
     if (searchTerm) {
       setFilteredConversations(
         conversations.filter((conversation) => {
-          const searchable = conversation.name.toLocaleLowerCase() + " " + conversation.messages.map((message) => message.content).join(" ");
+          const searchable =
+            conversation.name.toLocaleLowerCase() +
+            ' ' +
+            conversation.messages.map((message) => message.content).join(' ');
           return searchable.toLowerCase().includes(searchTerm.toLowerCase());
-        })
+        }),
       );
     } else {
       setFilteredConversations(conversations);
@@ -80,13 +116,15 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
   }, [searchTerm, conversations]);
 
   return (
-    <aside className={`h-full transition-all flex flex-none space-y-2 p-2 flex-col bg-[#202123] w-[260px] z-50 sm:relative sm:top-0 fixed top-0 bottom-0`}>
+    <aside
+      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
+    >
       <header className="flex items-center">
         <button
-          className="flex gap-3 p-3 items-center w-[190px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
+          className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
-            setSearchTerm("");
+            setSearchTerm('');
           }}
         >
           <IconPlus size={16} />
@@ -94,24 +132,21 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
         </button>
 
         <button
-          className="ml-2 flex gap-3 p-3 items-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
-          onClick={() => onCreateFolder(t("New folder"))}
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
         </button>
 
         <IconArrowBarLeft
-          className="ml-1 p-1 text-neutral-300 cursor-pointer hover:text-neutral-400 hidden sm:flex"
+          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
           size={32}
           onClick={onToggleSidebar}
         />
       </header>
 
       {conversations.length > 1 && (
-        <Search
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
+        <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
       )}
 
       <div className="flex-grow overflow-auto">
@@ -119,7 +154,9 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           <div className="flex border-b border-white/20 pb-2">
             <Folders
               searchTerm={searchTerm}
-              conversations={filteredConversations.filter((conversation) => conversation.folderId !== 0)}
+              conversations={filteredConversations.filter(
+                (conversation) => conversation.folderId !== 0,
+              )}
               folders={folders}
               onDeleteFolder={onDeleteFolder}
               onUpdateFolder={onUpdateFolder}
@@ -134,7 +171,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
 
         {conversations.length > 0 ? (
           <div
-            className="pt-2 h-full"
+            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -142,7 +179,11 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
           >
             <Conversations
               loading={loading}
-              conversations={filteredConversations.filter((conversation) => conversation.folderId === 0 || !folders[conversation.folderId - 1])}
+              conversations={filteredConversations.filter(
+                (conversation) =>
+                  conversation.folderId === 0 ||
+                  !folders[conversation.folderId - 1],
+              )}
               selectedConversation={selectedConversation}
               onSelectConversation={onSelectConversation}
               onDeleteConversation={handleDeleteConversation}
@@ -150,7 +191,7 @@ export const Sidebar: FC<Props> = ({ loading, conversations, lightMode, selected
             />
           </div>
         ) : (
-          <div className="mt-4 text-white text-center">
+          <div className="mt-4 text-center text-white">
             <div>{t('No conversations.')}</div>
           </div>
         )}

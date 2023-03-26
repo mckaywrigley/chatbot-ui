@@ -1,16 +1,19 @@
-import { ChatFolder, Conversation } from "@/types";
-import { cleanConversationHistory } from "@/utils/app/clean";
-import { IconFileImport } from "@tabler/icons-react";
-import { useTranslation } from "next-i18next";
-import { FC } from "react";
-import { SidebarButton } from "./SidebarButton";
+import { ChatFolder, Conversation } from '@/types';
+import { cleanConversationHistory } from '@/utils/app/clean';
+import { IconFileImport } from '@tabler/icons-react';
+import { useTranslation } from 'next-i18next';
+import { FC } from 'react';
+import { SidebarButton } from './SidebarButton';
 
 interface Props {
-  onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
+  onImport: (data: {
+    conversations: Conversation[];
+    folders: ChatFolder[];
+  }) => void;
 }
 
 export const Import: FC<Props> = ({ onImport }) => {
-  const { t } = useTranslation("sidebar");
+  const { t } = useTranslation('sidebar');
   return (
     <>
       <input
@@ -38,10 +41,12 @@ export const Import: FC<Props> = ({ onImport }) => {
       />
 
       <SidebarButton
-        text={t("Import conversations")}
+        text={t('Import conversations')}
         icon={<IconFileImport size={16} />}
         onClick={() => {
-          const importFile = document.querySelector("#import-file") as HTMLInputElement;
+          const importFile = document.querySelector(
+            '#import-file',
+          ) as HTMLInputElement;
           if (importFile) {
             importFile.click();
           }

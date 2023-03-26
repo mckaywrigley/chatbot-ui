@@ -17,7 +17,7 @@ module.exports = {
     ],
   },
   localePath:
-    typeof window === "undefined"
-      ? require("path").resolve("./public/locales")
-      : "/public/locales",
+    typeof window === 'undefined'
+      ? require('path').resolve('./public/locales')
+      : '/public/locales',
 };

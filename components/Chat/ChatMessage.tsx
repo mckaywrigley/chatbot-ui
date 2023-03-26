@@ -1,23 +1,28 @@
-import { Message } from "@/types";
-import { IconEdit } from "@tabler/icons-react";
-import { useTranslation } from "next-i18next";
-import { FC, useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeMathjax from "rehype-mathjax";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import { CodeBlock } from "../Markdown/CodeBlock";
-import { CopyButton } from "./CopyButton";
+import { Message } from '@/types';
+import { IconEdit } from '@tabler/icons-react';
+import { useTranslation } from 'next-i18next';
+import { FC, useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeMathjax from 'rehype-mathjax';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import { CodeBlock } from '../Markdown/CodeBlock';
+import { CopyButton } from './CopyButton';
 
 interface Props {
   message: Message;
   messageIndex: number;
-  lightMode: "light" | "dark";
+  lightMode: 'light' | 'dark';
   onEditMessage: (message: Message, messageIndex: number) => void;
 }
 
-export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage }) => {
-  const { t } = useTranslation("chat");
+export const ChatMessage: FC<Props> = ({
+  message,
+  messageIndex,
+  lightMode,
+  onEditMessage,
+}) => {
+  const { t } = useTranslation('chat');
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
@@ -32,7 +37,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageContent(event.target.value);
     if (textareaRef.current) {
-      textareaRef.current.style.height = "inherit";
+      textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
@@ -45,7 +50,7 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleEditMessage();
     }
@@ -64,23 +69,29 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "inherit";
+      textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [isEditing]);
 
   return (
     <div
-      className={`group ${message.role === "assistant" ? "border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100" : "border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100"}`}
-      style={{ overflowWrap: "anywhere" }}
+      className={`group ${
+        message.role === 'assistant'
+          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
+          : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
+      }`}
+      style={{ overflowWrap: 'anywhere' }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-        <div className="min-w-[40px] font-bold">{message.role === "assistant" ? t("AI") : t("You")}:</div>
+        <div className="min-w-[40px] font-bold">
+          {message.role === 'assistant' ? t('AI') : t('You')}:
+        </div>
 
         <div className="prose mt-[-2px] w-full dark:prose-invert">
-          {message.role === "user" ? (
+          {message.role === 'user' ? (
             <div className="flex w-full">
               {isEditing ? (
                 <div className="flex w-full flex-col">
@@ -91,12 +102,12 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
                     onChange={handleInputChange}
                     onKeyDown={handlePressEnter}
                     style={{
-                      fontFamily: "inherit",
-                      fontSize: "inherit",
-                      lineHeight: "inherit",
-                      padding: "0",
-                      margin: "0",
-                      overflow: "hidden"
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      lineHeight: 'inherit',
+                      padding: '0',
+                      margin: '0',
+                      overflow: 'hidden',
                     }}
                   />
 
@@ -120,11 +131,19 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
                   </div>
                 </div>
               ) : (
-                <div className="prose whitespace-pre-wrap dark:prose-invert">{message.content}</div>
+                <div className="prose whitespace-pre-wrap dark:prose-invert">
+                  {message.content}
+                </div>
               )}
 
               {(isHovering || window.innerWidth < 640) && !isEditing && (
-                <button className={`absolute ${window.innerWidth < 640 ? "right-3 bottom-1" : "right-[-20px] top-[26px]"}`}>
+                <button
+                  className={`absolute ${
+                    window.innerWidth < 640
+                      ? 'right-3 bottom-1'
+                      : 'right-[-20px] top-[26px]'
+                  }`}
+                >
                   <IconEdit
                     size={20}
                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -141,33 +160,42 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
                 rehypePlugins={[rehypeMathjax]}
                 components={{
                   code({ node, inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "");
+                    const match = /language-(\w+)/.exec(className || '');
                     return !inline && match ? (
                       <CodeBlock
                         key={Math.random()}
                         language={match[1]}
-                        value={String(children).replace(/\n$/, "")}
+                        value={String(children).replace(/\n$/, '')}
                         lightMode={lightMode}
                         {...props}
                       />
                     ) : (
-                      <code
-                        className={className}
-                        {...props}
-                      >
+                      <code className={className} {...props}>
                         {children}
                       </code>
                     );
                   },
                   table({ children }) {
-                    return <table className="border-collapse border border-black py-1 px-3 dark:border-white">{children}</table>;
+                    return (
+                      <table className="border-collapse border border-black py-1 px-3 dark:border-white">
+                        {children}
+                      </table>
+                    );
                   },
                   th({ children }) {
-                    return <th className="break-words border border-black bg-gray-500 py-1 px-3 text-white dark:border-white">{children}</th>;
+                    return (
+                      <th className="break-words border border-black bg-gray-500 py-1 px-3 text-white dark:border-white">
+                        {children}
+                      </th>
+                    );
                   },
                   td({ children }) {
-                    return <td className="break-words border border-black py-1 px-3 dark:border-white">{children}</td>;
-                  }
+                    return (
+                      <td className="break-words border border-black py-1 px-3 dark:border-white">
+                        {children}
+                      </td>
+                    );
+                  },
                 }}
               >
                 {message.content}

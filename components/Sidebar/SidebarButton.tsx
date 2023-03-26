@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC } from 'react';
 
 interface Props {
   text: string;
@@ -9,7 +9,7 @@ interface Props {
 export const SidebarButton: FC<Props> = ({ text, icon, onClick }) => {
   return (
     <button
-      className="flex py-3 px-3 gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer w-full items-center"
+      className="flex w-full cursor-pointer items-center gap-3 rounded-md py-3 px-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
       onClick={onClick}
     >
       <div>{icon}</div>
