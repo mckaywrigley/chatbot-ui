@@ -64,7 +64,7 @@ export const ConversationComponent: FC<Props> = ({
 
   return (
     <button
-      className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sidebar transition-colors duration-200 hover:bg-[#343541]/90 ${
+      className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-[12px] leading-normal transition-colors duration-200 hover:bg-[#343541]/90 ${
         loading ? 'disabled:cursor-not-allowed' : ''
       } ${
         selectedConversation.id === conversation.id ? 'bg-[#343541]/90' : ''

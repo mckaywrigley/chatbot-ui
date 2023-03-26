@@ -100,7 +100,7 @@ export const Folder: FC<Props> = ({
   return (
     <div>
       <div
-        className={`mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sidebar transition-colors duration-200 hover:bg-[#343541]/90`}
+        className={`mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-[12px] leading-normal transition-colors duration-200 hover:bg-[#343541]/90`}
         onClick={() => setIsOpen(!isOpen)}
         onDrop={(e) => handleDrop(e, currentFolder)}
         onDragOver={allowDrop}
