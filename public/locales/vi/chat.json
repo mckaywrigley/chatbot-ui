@@ -14,7 +14,7 @@
   "Loading...": "Đang tải...",
   "Type a message...": "Nhập một tin nhắn...",
   "Error fetching models.": "Lỗi khi truy xuất mô hình.",
-  "AI": "Trí tuệ nhân tạo",
+  "AI": "AI",
   "You": "Bạn",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Hãy đảm bảo rằng khóa API từ tài khoản OpenAI của bạn đã được nhập vào ô dưới cùng của thanh bên trái.",
   "If you completed this step, OpenAI may be experiencing issues.": "Nếu bạn đã hoàn thành bước này, OpenAI có thể đang gặp sự cố.",
