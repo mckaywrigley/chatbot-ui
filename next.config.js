@@ -1,6 +1,10 @@
 const { i18n } = require('./next-i18next.config');
 
 /** @type {import('next').NextConfig} */
+const withPWA = require('next-pwa')({
+  dest: 'public',
+});
+
 const nextConfig = {
   i18n,
   reactStrictMode: true,
@@ -15,4 +19,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

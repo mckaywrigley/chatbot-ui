@@ -513,12 +513,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   return (
     <>
-      <Head>
-        <title>Chatify UI</title>
-        <meta name="description" content="ChatGPT but better." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       {selectedConversation && (
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
