@@ -10,6 +10,7 @@ import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search } from '../Sidebar/Search';
 import { PromptbarSettings } from './PromptbarSettings';
+import { Prompts } from './Prompts';
 
 interface Props {
   prompts: Prompt[];
@@ -78,6 +79,8 @@ export const Promptbar: FC<Props> = ({
     }
   }, [searchTerm, prompts]);
 
+  console.log('filteredPrompts', filteredPrompts);
+
   return (
     <div
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
@@ -85,7 +88,10 @@ export const Promptbar: FC<Props> = ({
       <div className="flex items-center">
         <button
           className="flex w-[190px] flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => {}}
+          onClick={() => {
+            onCreatePrompt();
+            setSearchTerm('');
+          }}
         >
           <IconPlus size={16} />
           {t('New prompt')}
@@ -93,10 +99,7 @@ export const Promptbar: FC<Props> = ({
 
         <button
           className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => {
-            onCreatePromptFolder(t('New folder'));
-            setSearchTerm('');
-          }}
+          onClick={() => onCreatePromptFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
         </button>
@@ -125,7 +128,12 @@ export const Promptbar: FC<Props> = ({
             onDragEnter={highlightDrop}
             onDragLeave={removeHighlight}
           >
-            Prompts.
+            <Prompts
+              prompts={filteredPrompts.filter(
+                (prompt) =>
+                  prompt.folderId === 0 || !folders[prompt.folderId - 1],
+              )}
+            />
           </div>
         ) : (
           <div className="mt-4 text-center text-white">

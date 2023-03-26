@@ -20,6 +20,7 @@ import {
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
+import { savePrompts } from '@/utils/app/prompts';
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -33,24 +34,36 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const { t } = useTranslation('chat');
+
+  // STATE ----------------------------------------------
+
+  const [apiKey, setApiKey] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
+  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
+
+  const [messageError, setMessageError] = useState<boolean>(false);
+  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
+
+  const [models, setModels] = useState<OpenAIModel[]>([]);
+
   const [folders, setFolders] = useState<Folder[]>([]);
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [models, setModels] = useState<OpenAIModel[]>([]);
-  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
-  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
-  const [showSidebar, setShowSidebar] = useState<boolean>(true);
-  const [apiKey, setApiKey] = useState<string>('');
-  const [messageError, setMessageError] = useState<boolean>(false);
-  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
   const [currentMessage, setCurrentMessage] = useState<Message>();
+
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
+  // REFS ----------------------------------------------
+
   const stopConversationRef = useRef<boolean>(false);
+
+  // FETCH RESPONSE ----------------------------------------------
 
   const handleSend = async (message: Message, deleteCount = 0) => {
     if (selectedConversation) {
@@ -203,6 +216,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   };
 
+  // FETCH MODELS ----------------------------------------------
+
   const fetchModels = async (key: string) => {
     const error = {
       title: t('Error fetching models.'),
@@ -248,6 +263,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     setModelError(null);
   };
 
+  // BASIC HANDLERS --------------------------------------------
+
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
     localStorage.setItem('theme', mode);
@@ -276,6 +293,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     setSelectedConversation(conversation);
     saveConversation(conversation);
   };
+
+  // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string) => {
     const lastFolder = folders[folders.length - 1];
@@ -325,6 +344,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     setFolders(updatedFolders);
     saveFolders(updatedFolders);
   };
+
+  // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
@@ -439,13 +460,50 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   };
 
-  const handleCreatePrompt = () => {};
+  // PROMPT OPERATIONS --------------------------------------------
 
-  const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {};
+  const handleCreatePrompt = () => {
+    const newPrompt: Prompt = {
+      id: prompts.length + 1,
+      name: `Prompt ${prompts.length + 1}`,
+      content: '',
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      folderId: 0,
+    };
 
-  const handleDeletePrompt = (prompt: Prompt) => {};
+    const updatedPrompts = [...prompts, newPrompt];
+
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
+
+  const handleUpdatePrompt = (prompt: Prompt, data: KeyValuePair) => {
+    const updatedPrompt = {
+      ...prompt,
+      [data.key]: data.value,
+    };
+
+    const updatedPrompts = prompts.map((p) => {
+      if (p.id === updatedPrompt.id) {
+        return updatedPrompt;
+      }
+
+      return p;
+    });
+
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
+
+  const handleDeletePrompt = (prompt: Prompt) => {
+    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
 
   const handleCreatePromptFolder = (name: string) => {};
+
+  // EFFECTS  --------------------------------------------
 
   useEffect(() => {
     if (currentMessage) {
@@ -465,6 +523,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       fetchModels(apiKey);
     }
   }, [apiKey]);
+
+  // ON LOAD --------------------------------------------
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -487,6 +547,11 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     const folders = localStorage.getItem('folders');
     if (folders) {
       setFolders(JSON.parse(folders));
+    }
+
+    const prompts = localStorage.getItem('prompts');
+    if (prompts) {
+      setPrompts(JSON.parse(prompts));
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
