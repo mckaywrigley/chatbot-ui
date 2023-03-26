@@ -102,11 +102,11 @@ export const ChatInput: FC<Props> = ({
   }
 
   return (
-    <div className="dark:bg-vert-dark-gradient absolute bottom-0 left-0 w-full border-transparent bg-white from-[#343541] via-[#343541] to-[#343541]/0 pt-6 dark:border-white/20 dark:bg-[#444654] dark:!bg-transparent dark:bg-gradient-to-t md:pt-2">
+    <div className="absolute bottom-0 left-0 w-full border-transparent pt-6 dark:border-white/20 bg-gradient-to-b from-transparent via-white to-white dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
         {messageIsStreaming && (
           <button
-            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
+            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-neutral-200 dark:border-neutral-600 py-2 px-4 text-black bg-white dark:bg-[#343541] dark:text-white md:top-0"
             onClick={handleStopConversation}
           >
             <IconPlayerStop size={16} className="mb-[2px] inline-block" />{' '}
@@ -116,7 +116,7 @@ export const ChatInput: FC<Props> = ({
 
         {!messageIsStreaming && messages.length > 0 && (
           <button
-            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-gray-500 py-2 px-4 text-black hover:opacity-50 dark:bg-[#343541] dark:text-white md:top-0"
+            className="absolute -top-2 left-0 right-0 mx-auto w-fit rounded border border-neutral-200 dark:border-neutral-600 py-2 px-4 text-black bg-white dark:bg-[#343541] dark:text-white md:top-0"
             onClick={onRegenerate}
           >
             <IconRepeat size={16} className="mb-[2px] inline-block" />{' '}
@@ -148,7 +148,7 @@ export const ChatInput: FC<Props> = ({
           />
 
           <button
-            className="absolute right-5 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-3 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             <IconSend size={16} className="opacity-60" />
