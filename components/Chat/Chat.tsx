@@ -20,6 +20,8 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { Logo } from '../ui/Logo';
+import Image from 'next/image';
 
 interface Props {
   conversation: Conversation;
@@ -123,7 +125,14 @@ export const Chat: FC<Props> = ({
               <>
                 <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
                   <div className="text-center text-4xl font-semibold text-gray-800 dark:text-gray-100">
-                    {models.length === 0 ? t('Loading...') : 'Chatify UI'}
+                    {models.length === 0 ? (
+                      t('Loading...')
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <Image src="/icons/icon-152x152-white.png" width={80} height={80} alt="Chatify Logo" />
+                        <Logo />
+                      </div>
+                    )}
                   </div>
 
                   {models.length > 0 && (

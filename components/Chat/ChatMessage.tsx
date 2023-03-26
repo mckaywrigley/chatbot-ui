@@ -1,6 +1,7 @@
 import { Message } from '@/types';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconUser } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import { FC, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeMathjax from 'rehype-mathjax';
@@ -76,18 +77,28 @@ export const ChatMessage: FC<Props> = ({
 
   return (
     <div
-      className={`group ${
-        message.role === 'assistant'
-          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
-          : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
-      }`}
+      className={`group ${message.role === 'assistant'
+        ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
+        : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
+        }`}
       style={{ overflowWrap: 'anywhere' }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
         <div className="min-w-[40px] font-bold">
-          {message.role === 'assistant' ? t('AI') : t('You')}:
+          {message.role === 'assistant' ? (
+            <div className='flex items-center justify-center'>
+              <div className='dark:bg-gray-900 bg-gray-300 rounded-lg p-1'>
+                <Image className='hidden dark:block' src="/icons/icon-152x152-white.png" width={25} height={25} alt="Chatify" />
+                <Image className='block dark:hidden' src="/icons/icon-152x152.png" width={25} height={25} alt="Chatify" />
+              </div>
+            </div>
+          ) : <div className='flex items-center justify-center'>
+            <div className='dark:bg-gray-900 bg-gray-300 rounded-lg p-1'>
+              <IconUser className='dark:text-gray-100 text-gray-900' />
+            </div>
+          </div>}
         </div>
 
         <div className="prose mt-[-2px] w-full dark:prose-invert">
@@ -138,11 +149,10 @@ export const ChatMessage: FC<Props> = ({
 
               {(isHovering || window.innerWidth < 640) && !isEditing && (
                 <button
-                  className={`absolute ${
-                    window.innerWidth < 640
-                      ? 'right-3 bottom-1'
-                      : 'right-[-20px] top-[26px]'
-                  }`}
+                  className={`absolute ${window.innerWidth < 640
+                    ? 'right-3 bottom-1'
+                    : 'right-[-20px] top-[26px]'
+                    }`}
                 >
                   <IconEdit
                     size={20}
