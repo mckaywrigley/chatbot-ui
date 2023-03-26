@@ -1,10 +1,11 @@
 import { Message } from "@/types";
 import { IconEdit } from "@tabler/icons-react";
-import { FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
+import { FC, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "../Markdown/CodeBlock";
+import { CopyButton } from "./CopyButton";
 
 interface Props {
   message: Message;
@@ -14,10 +15,11 @@ interface Props {
 }
 
 export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEditMessage }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation("chat");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [messageContent, setMessageContent] = useState(message.content);
+  const [messagedCopied, setMessageCopied] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -45,6 +47,17 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
       e.preventDefault();
       handleEditMessage();
     }
+  };
+
+  const copyOnClick = () => {
+    if (!navigator.clipboard) return;
+
+    navigator.clipboard.writeText(message.content).then(() => {
+      setMessageCopied(true);
+      setTimeout(() => {
+        setMessageCopied(false);
+      }, 2000);
+    });
   };
 
   useEffect(() => {
@@ -119,41 +132,51 @@ export const ChatMessage: FC<Props> = ({ message, messageIndex, lightMode, onEdi
               )}
             </div>
           ) : (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
-                    <CodeBlock
-                      key={Math.random()}
-                      language={match[1]}
-                      value={String(children).replace(/\n$/, "")}
-                      lightMode={lightMode}
-                      {...props}
-                    />
-                  ) : (
-                    <code
-                      className={className}
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-                table({ children }) {
-                  return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;
-                },
-                th({ children }) {
-                  return <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">{children}</th>;
-                },
-                td({ children }) {
-                  return <td className="border border-black dark:border-white break-words py-1 px-3">{children}</td>;
-                }
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
+            <>
+              <ReactMarkdown
+                className="prose dark:prose-invert"
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return !inline && match ? (
+                      <CodeBlock
+                        key={Math.random()}
+                        language={match[1]}
+                        value={String(children).replace(/\n$/, "")}
+                        lightMode={lightMode}
+                        {...props}
+                      />
+                    ) : (
+                      <code
+                        className={className}
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  },
+                  table({ children }) {
+                    return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;
+                  },
+                  th({ children }) {
+                    return <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">{children}</th>;
+                  },
+                  td({ children }) {
+                    return <td className="border border-black dark:border-white break-words py-1 px-3">{children}</td>;
+                  }
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+
+              {(isHovering || window.innerWidth < 640) && (
+                <CopyButton
+                  messagedCopied={messagedCopied}
+                  copyOnClick={copyOnClick}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
