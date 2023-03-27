@@ -2,7 +2,7 @@
 
 Chatify UI is an advanced chatify kit for OpenAI's chat models built on top of [Chatify UI](https://github.com/mckaywrigley/Chatify-ui) using Next.js, TypeScript, and Tailwind CSS.
 
-![Chatify UI](./public/screenshot.png)
+![Chatify UI](./public/og-image.png)
 
 ## Updates
 
