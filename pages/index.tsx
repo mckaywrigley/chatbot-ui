@@ -1,14 +1,23 @@
-import { Chat } from "@/components/Chat/Chat";
-import { Navbar } from "@/components/Mobile/Navbar";
-import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { ChatBody, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
-import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
-import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
-import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
-import { exportConversations, importConversations } from "@/utils/app/data";
-import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
-import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { Chat } from '@/components/Chat/Chat';
+import { Navbar } from '@/components/Mobile/Navbar';
+import { Sidebar } from '@/components/Sidebar/Sidebar';
+import {
+  ChatBody, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModelID,
+  OpenAIModels
+} from '@/types';
+import {
+  cleanConversationHistory, cleanSelectedConversation
+} from '@/utils/app/clean';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import {
+  saveConversation, saveConversations, updateConversation
+} from '@/utils/app/conversation';
+import { exportConversations, importConversations } from '@/utils/app/data';
+import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
+import Head from 'next/head';
+import { useEffect, useRef, useState } from 'react';
+import { Command } from '@tauri-apps/api/shell';
+import dynamic from 'next/dynamic';
 
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -22,6 +31,9 @@ export default function Home() {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
   const stopConversationRef = useRef<boolean>(false);
+  const urls = useRef<{ CHAT_URL: string, MODEL_URL: string }>({
+    CHAT_URL: '', MODEL_URL: ''
+  });
 
   const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
@@ -55,7 +67,7 @@ export default function Home() {
       };
 
       const controller = new AbortController();
-      const response = await fetch("/api/chat", {
+      const response = await fetch(urls.current.CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -103,7 +115,10 @@ export default function Home() {
 
         if (isFirst) {
           isFirst = false;
-          const updatedMessages: Message[] = [...updatedConversation.messages, { role: "assistant", content: chunkValue }];
+          const updatedMessages: Message[] = [
+            ...updatedConversation.messages,
+            { role: 'assistant', content: chunkValue }
+          ];
 
           updatedConversation = {
             ...updatedConversation,
@@ -155,9 +170,8 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
-    console.log(key);
-    const response = await fetch("/api/models", {
-      method: "POST",
+    const response = await fetch(urls.current.MODEL_URL, {
+      method: 'POST',
       headers: {
         "Content-Type": "application/json"
       },
@@ -170,8 +184,6 @@ export default function Home() {
       setModelError(true);
       return;
     }
-
-    console.log(response.json());
 
     const data = await response.json();
 
@@ -191,7 +203,7 @@ export default function Home() {
 
   const handleApiKeyChange = (apiKey: string) => {
     setApiKey(apiKey);
-    localStorage.setItem("apiKey", apiKey);
+    localStorage.setItem('apiKey', apiKey);
     fetchModels(apiKey);
   };
 
@@ -285,7 +297,7 @@ export default function Home() {
   }, [selectedConversation]);
 
   useEffect(() => {
-    const theme = localStorage.getItem("theme");
+    const theme = localStorage.getItem('theme');
     if (theme) {
       setLightMode(theme as "dark" | "light");
     }
@@ -321,7 +333,35 @@ export default function Home() {
       });
     }
 
-    fetchModels(apiKey);
+    // Vercel API routes are not supported in tauri. We use our own server binary.
+    const CHAT_URL = (window as any).__TAURI__
+      ? 'http://localhost:5661/chat'
+      : '/api/chat';
+
+    const MODEL_URL = (window as any).__TAURI__
+      ? 'http://localhost:5661/models'
+      : '/api/models';
+    urls.current = { CHAT_URL, MODEL_URL };
+
+    if ((window as any).__TAURI__) {
+      import('@tauri-apps/api/path').then(mod => {
+        const { resolveResource } = mod;
+        resolveResource('resources/tiktoken_bg.wasm').then((path) => {
+          const command = Command.sidecar(
+            'bin/server',
+            [],
+            {
+              env: { 'PATH_TO_WASM': path }
+            }
+          );
+          command.execute().then((output) => {
+            fetchModels(apiKey);
+          });
+        });
+      });
+    } else {
+      fetchModels(apiKey);
+    }
   }, []);
 
   return (

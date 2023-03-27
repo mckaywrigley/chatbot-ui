@@ -1,30 +1,42 @@
-import { Message, OpenAIModel } from "@/types";
-import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+import { Message, OpenAIModel, OpenAIModelID } from '@/types';
+import {
+  createParser,
+  ParsedEvent,
+  ReconnectInterval,
+} from 'eventsource-parser';
+import { init, Tiktoken } from '@dqbd/tiktoken/lite/init';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 
-export const OpenAIStream = async (model: OpenAIModel, systemPrompt: string, key: string, messages: Message[]) => {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+export const OpenAIStream = async (
+  model: OpenAIModel,
+  systemPrompt: string,
+  key: string,
+  messages: Message[],
+) => {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
     },
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify({
       model: model.id,
       messages: [
         {
-          role: "system",
-          content: systemPrompt
+          role: 'system',
+          content: systemPrompt,
         },
-        ...messages
+        ...messages,
       ],
       max_tokens: 1000,
       temperature: 0.0,
-      stream: true
-    })
+      stream: true,
+    }),
   });
 
   if (res.status !== 200) {
-    const statusText = res.statusText; 
+    const statusText = res.statusText;
     throw new Error(`OpenAI API returned an error: ${statusText}`);
   }
 
@@ -34,10 +46,10 @@ export const OpenAIStream = async (model: OpenAIModel, systemPrompt: string, key
   const stream = new ReadableStream({
     async start(controller) {
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === "event") {
+        if (event.type === 'event') {
           const data = event.data;
 
-          if (data === "[DONE]") {
+          if (data === '[DONE]') {
             controller.close();
             return;
           }
@@ -58,8 +70,56 @@ export const OpenAIStream = async (model: OpenAIModel, systemPrompt: string, key
       for await (const chunk of res.body as any) {
         parser.feed(decoder.decode(chunk));
       }
-    }
+    },
   });
 
   return stream;
 };
+
+type GetStreamArgs = {
+  model: OpenAIModel;
+  messages: Message[];
+  prompt: string;
+  key: string;
+  wasm: Buffer;
+};
+
+export async function getStream({
+  model,
+  messages,
+  prompt,
+  key,
+  wasm,
+}: GetStreamArgs): Promise<ReadableStream<any>> {
+  await init((imports) => WebAssembly.instantiate(wasm, imports));
+  const encoding = new Tiktoken(
+    tiktokenModel.bpe_ranks,
+    tiktokenModel.special_tokens,
+    tiktokenModel.pat_str,
+  );
+
+  const tokenLimit = model.id === OpenAIModelID.GPT_4 ? 6000 : 3000;
+  let tokenCount = 0;
+  let messagesToSend: Message[] = [];
+
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    const tokens = encoding.encode(message.content);
+
+    if (tokenCount + tokens.length > tokenLimit) {
+      break;
+    }
+    tokenCount += tokens.length;
+    messagesToSend = [message, ...messagesToSend];
+  }
+
+  encoding.free();
+
+  let promptToSend = prompt;
+  if (!promptToSend) {
+    promptToSend = DEFAULT_SYSTEM_PROMPT;
+  }
+
+  const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+  return stream;
+}
