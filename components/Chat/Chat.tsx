@@ -191,6 +191,14 @@ export const Chat: FC<Props> = ({
                         }
                       />
                     </div>
+                    <div>
+                      <SystemPrompt conversation={conversation} onChangePrompt={
+                        (prompt) => onUpdateConversation(conversation, {
+                          key: 'prompt',
+                          value: prompt
+                        })
+                      }></SystemPrompt>
+                    </div>
                   </div>
                 )}
 
