@@ -150,7 +150,7 @@ export const Sidebar: FC<Props> = ({
         <Search searchTerm={searchTerm} onSearch={setSearchTerm} />
       )}
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-y-auto overflow-x-clip">
         {folders.length > 0 && (
           <div className="flex border-b border-white/20 pb-2">
             <Folders

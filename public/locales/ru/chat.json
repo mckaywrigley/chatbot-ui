@@ -16,6 +16,8 @@
   "Error fetching models.": "Ошибка при получении списка моделей",
   "AI": "Бот",
   "You": "Вы",
+  "Cancel": "Отмена",
+  "Save & Submit": "Сохранить и отправить",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Убедитесь, что вы ввели API-ключ OpenAI.",
   "If you completed this step, OpenAI may be experiencing issues.": "Если вы выполнили этот шаг, то возможно OpenAI может испытывать проблемы",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Лимит сообщения: {{maxLength}} символов. Вы ввели {{valueLength}} символов.",
