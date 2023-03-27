@@ -19,13 +19,21 @@ app.post('/models', async (req, res) => {
   res.type('application/json').status(200).send({ models });
 });
 
+let wasmBuffer: Buffer | null = null;
+
+function getWasm(): Buffer {
+  if (wasmBuffer) {
+    return wasmBuffer;
+  }
+  // This is sent up from the client when the sidecar is started.
+  // Tauri gives us the path to the resource folder.
+  const buf = readFileSync(process.env.PATH_TO_WASM || '');
+  wasmBuffer = buf;
+  return buf;
+}
+
 app.post('/chat', async (req, res) => {
-  const currentWorkingDirectory = process.cwd();
-  const isProd = process.env.IS_PROD === '1';
-  const pathToWasm = isProd
-    ? process.env.PATH_TO_WASM || ''
-    : path.resolve(currentWorkingDirectory, 'server', 'tiktoken_bg.wasm');
-  const wasm = readFileSync(pathToWasm);
+  const wasm = getWasm();
   const stream = await getStream({
     model: req.body.model,
     messages: req.body.messages,

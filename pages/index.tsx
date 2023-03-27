@@ -333,6 +333,7 @@ export default function Home() {
       });
     }
 
+    // Vercel API routes are not supported in tauri. We use our own server binary.
     const CHAT_URL = (window as any).__TAURI__
       ? 'http://localhost:5661/chat'
       : '/api/chat';
@@ -342,8 +343,6 @@ export default function Home() {
       : '/api/models';
     urls.current = { CHAT_URL, MODEL_URL };
 
-    console.log({ CHAT_URL, MODEL_URL })
-    // Need to start the server in tauri because Vercel API routes don't work
     if ((window as any).__TAURI__) {
       import('@tauri-apps/api/path').then(mod => {
         const { resolveResource } = mod;
@@ -352,7 +351,7 @@ export default function Home() {
             'bin/server',
             [],
             {
-              env: { 'IS_PROD': '1', 'PATH_TO_WASM': path }
+              env: { 'PATH_TO_WASM': path }
             }
           );
           command.execute().then((output) => {
