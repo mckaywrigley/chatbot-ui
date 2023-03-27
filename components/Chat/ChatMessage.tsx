@@ -139,7 +139,7 @@ export const ChatMessage: FC<Props> = ({
                   className={`absolute ${
                     window.innerWidth < 640
                       ? 'right-3 bottom-1'
-                      : 'right-[-20px] top-[26px]'
+                      : 'right-0 top-[26px]'
                   }`}
                 >
                   <IconEdit
