@@ -5,24 +5,16 @@ import {
   Message,
   OpenAIModel,
 } from '@/types';
-import {
-  FC,
-  memo,
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { throttle } from '@/utils';
+import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
+import { FC, memo, MutableRefObject, useEffect, useRef, useState } from 'react';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
-import { IconSettings } from '@tabler/icons-react';
-import { throttle } from '@/utils';
 
 interface Props {
   conversation: Conversation;
@@ -68,6 +60,12 @@ export const Chat: FC<Props> = memo(
 
     const handleSettings = () => {
       setShowSettings(!showSettings);
+    };
+
+    const onClearAll = () => {
+      if (confirm(t<string>('Are you sure you want to clear all messages?'))) {
+        onUpdateConversation(conversation, { key: 'messages', value: [] });
+      }
     };
 
     const scrollDown = () => {
@@ -180,6 +178,11 @@ export const Chat: FC<Props> = memo(
                     <IconSettings
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
+                      size={18}
+                    />
+                    <IconClearAll
+                      className="ml-2 cursor-pointer hover:opacity-50"
+                      onClick={onClearAll}
                       size={18}
                     />
                   </div>

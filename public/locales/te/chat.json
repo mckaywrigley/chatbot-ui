@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "మీరు ఈ హంతం పూర్తి చేసినా, OpenAI సమస్యలు ఉన్నట్లు ఉంటాయి.",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "సందేశం పరిమితి {{maxLength}} అక్షరాలు. మీరు {{valueLength}} అక్షరాలు నమోదు చేసారు.",
   "Please enter a message": "దయచేసి ఒక సందేశం నమోదు చేయండి",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ఒక అభ్యంతర సంవిధానం మరియు కార్యాచరణ లక్ష్యం తీసుకున్న OpenAI ఛాట్ మోడల్లలో మార్పులు చేయడానికి ప్రయత్నిస్తుంది, ChatGPT ఇంటర్ఫేస్ మరియు కార్యాచరణను అనుకరించడానికి."
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ఒక అభ్యంతర సంవిధానం మరియు కార్యాచరణ లక్ష్యం తీసుకున్న OpenAI ఛాట్ మోడల్లలో మార్పులు చేయడానికి ప్రయత్నిస్తుంది, ChatGPT ఇంటర్ఫేస్ మరియు కార్యాచరణను అనుకరించడానికి.",
+  "Are you sure you want to clear all messages?": "మీరు అన్ని సందేశాలను తొలగించాలా?"
 }

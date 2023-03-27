@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "আপনি এই ধাপটি সম্পন্ন করে থাকলে, হতে পারে যে OpenAI কোনো সমস্যার সম্মুখীন হয়েছে।",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "বার্তার সর্বোচ্চ সীমা হল {{maxLength}} অক্ষর৷ আপনি {{valueLength}} অক্ষর লিখেছেন।",
   "Please enter a message": "দয়া করে একটি মেসেজ লিখুন",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI হল OpenAI-এর চ্যাট মডেলগুলির জন্য একটি উন্নত চ্যাটবট কিট যার লক্ষ্য হল ChatGPT-এর ইন্টারফেস এবং কার্যকারিতা অনুকরণ করা।"
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI হল OpenAI-এর চ্যাট মডেলগুলির জন্য একটি উন্নত চ্যাটবট কিট যার লক্ষ্য হল ChatGPT-এর ইন্টারফেস এবং কার্যকারিতা অনুকরণ করা।",
+  "Are you sure you want to clear all messages?": "সমস্ত বার্তা মুছে ফেলতে আপনি কি নিশ্চিত?"
 }

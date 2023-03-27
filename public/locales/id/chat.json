@@ -21,5 +21,6 @@
     "click if using a .env.local file": "klik jika menggunakan file .env.local",
     "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Batas karakter untuk pesan adalah {{maxLength}} karakter. Anda telah memasukkan {{valueLength}} karakter.",
     "Please enter a message": "Silakan masukkan sebuah pesan",
-    "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI adalah kit chatbot canggih untuk model obrolan OpenAI yang bertujuan meniru antarmuka dan fungsionalitas ChatGPT."
+    "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI adalah kit chatbot canggih untuk model obrolan OpenAI yang bertujuan meniru antarmuka dan fungsionalitas ChatGPT.",
+    "Are you sure you want to clear all messages?": "Apakah Anda yakin ingin menghapus semua pesan?"
 }
