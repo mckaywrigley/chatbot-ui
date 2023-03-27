@@ -9,7 +9,14 @@ interface Props {
 export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
   const [updatedVariables, setUpdatedVariables] = useState<
     { key: string; value: string }[]
-  >(variables.map((variable) => ({ key: variable, value: '' })));
+  >(
+    variables
+      .map((variable) => ({ key: variable, value: '' }))
+      .filter(
+        (item, index, array) =>
+          array.findIndex((t) => t.key === item.key) === index,
+      ),
+  );
 
   const modalRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLTextAreaElement>(null);
@@ -26,9 +33,11 @@ export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
     onSubmit(updatedVariables.map((variable) => variable.value));
   };
 
-  const handleEnter = (e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       onSubmit(updatedVariables.map((variable) => variable.value));
+      onClose();
+    } else if (e.key === 'Escape') {
       onClose();
     }
   };
@@ -36,6 +45,7 @@ export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
       }
     };
 
@@ -47,42 +57,44 @@ export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
   }, [onClose]);
 
   useEffect(() => {
-    nameInputRef.current?.focus();
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
   }, []);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-      onKeyDown={handleEnter}
+      onKeyDown={handleKeyDown}
     >
       <div
         ref={modalRef}
-        className="rounded bg-white p-6 sm:w-[500px]"
+        className="dark:border-netural-400 inline-block max-h-[400px]  transform overflow-hidden overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
         role="dialog"
       >
-        <div className="mb-4 text-xl font-bold text-black">
-          Fill out the variables
+        <div className="mb-4 text-lg font-bold text-black dark:text-neutral-200">
+          Fill out the prompt variables
         </div>
 
         {updatedVariables.map((variable, index) => (
           <div className="mb-4" key={index}>
-            <div className="mb-2 text-sm font-bold text-gray-600">
+            <div className="mb-2 text-sm font-bold text-neutral-200">
               {variable.key}
             </div>
 
             <textarea
               ref={index === 0 ? nameInputRef : undefined}
-              className="w-full rounded border border-gray-300 p-2 text-black"
+              className="mt-1 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
               value={variable.value}
               onChange={(e) => handleChange(index, e.target.value)}
-              rows={5}
+              rows={3}
             />
           </div>
         ))}
 
         <button
-          className="rounded bg-blue-600 px-4 py-2 text-white"
+          className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
           onClick={handleSubmit}
         >
           Submit

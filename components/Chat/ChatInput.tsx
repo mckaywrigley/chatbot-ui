@@ -102,6 +102,17 @@ export const ChatInput: FC<Props> = ({
     return mobileRegex.test(userAgent);
   };
 
+  const handleInitModal = () => {
+    const selectedPrompt = filteredPrompts[activePromptIndex];
+    setContent((prevContent) => {
+      const newContent = prevContent?.replace(/\/\w*$/, selectedPrompt.content);
+      updatePromptListVisibility(newContent || '');
+      return newContent;
+    });
+    handlePromptSelect(selectedPrompt.content);
+    setShowPromptList(false);
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (showPromptList) {
       if (e.key === 'ArrowDown') {
@@ -114,17 +125,14 @@ export const ChatInput: FC<Props> = ({
         setActivePromptIndex((prevIndex) =>
           prevIndex > 0 ? prevIndex - 1 : prevIndex,
         );
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        setActivePromptIndex((prevIndex) =>
+          prevIndex < prompts.length - 1 ? prevIndex + 1 : 0,
+        );
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        const selectedPrompt = filteredPrompts[activePromptIndex];
-        setContent((prevContent) => {
-          const newContent = prevContent?.replace(
-            /\/\w*$/,
-            selectedPrompt.content,
-          );
-          updatePromptListVisibility(newContent || '');
-          return newContent;
-        });
+        handleInitModal();
       } else if (e.key === 'Escape') {
         e.preventDefault();
         setShowPromptList(false);
@@ -151,6 +159,7 @@ export const ChatInput: FC<Props> = ({
 
   const updatePromptListVisibility = useCallback((text: string) => {
     const match = text.match(/\/\w*$/);
+
     if (match) {
       setShowPromptList(true);
       setPromptInputValue(match[0].slice(1));
@@ -164,10 +173,7 @@ export const ChatInput: FC<Props> = ({
     const parsedVariables = parseVariables(promptText);
     setVariables(parsedVariables);
 
-    console.log(parsedVariables);
-
     if (parsedVariables.length > 0) {
-      console.log('show modal');
       setIsModalVisible(true);
     } else {
       setContent((prevContent) => prevContent?.replace(/\/\w*$/, promptText));
@@ -186,6 +192,11 @@ export const ChatInput: FC<Props> = ({
     });
 
     setContent(newContent);
+
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+
     setIsModalVisible(false);
   };
 
@@ -204,6 +215,23 @@ export const ChatInput: FC<Props> = ({
       }`;
     }
   }, [content]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (
+        promptListRef.current &&
+        !promptListRef.current.contains(e.target as Node)
+      ) {
+        setShowPromptList(false);
+      }
+    };
+
+    window.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, []);
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
@@ -276,12 +304,13 @@ export const ChatInput: FC<Props> = ({
                   key={prompt.id}
                   className={`${
                     index === activePromptIndex
-                      ? 'dark:bg[#202123] bg-gray-200 dark:text-black'
+                      ? 'bg-gray-200 dark:bg-[#202123] dark:text-black'
                       : ''
-                  } cursor-pointer px-3 py-2 text-sm text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-200`}
-                  onClick={() => {
-                    console.log('prompt', prompt);
-                    handlePromptSelect(prompt.content);
+                  } cursor-pointer px-3 py-2 text-sm text-black dark:text-white`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleInitModal();
                   }}
                   onMouseEnter={() => setActivePromptIndex(index)}
                 >
