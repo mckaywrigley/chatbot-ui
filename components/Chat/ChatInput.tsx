@@ -18,6 +18,7 @@ import { VariableModal } from './VariableModal';
 interface Props {
   messageIsStreaming: boolean;
   model: OpenAIModel;
+  conversationIsEmpty: boolean;
   messages: Message[];
   prompts: Prompt[];
   onSend: (message: Message) => void;
@@ -29,6 +30,7 @@ interface Props {
 export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
+  conversationIsEmpty,
   messages,
   prompts,
   onSend,
@@ -243,7 +245,7 @@ export const ChatInput: FC<Props> = ({
           </button>
         )}
 
-        {!messageIsStreaming && messages.length > 0 && (
+        {!messageIsStreaming && !conversationIsEmpty && (
           <button
             className="absolute left-0 right-0 mx-auto mt-2 w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
             onClick={onRegenerate}

@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "אם טרם השלמת חלק זה יש סבירות גבוהה להתרחשות תקלה",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "מגבלת תווים היא {{maxLength}}. אתה הקלדת עד עכשיו {{valueLength}} תווים.",
   "Please enter a message": "הקלד את הודעתך",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "מערכת הצאטבוט היא ערכה מתקדמת לניהול שיחה המכוונת לחקות את המראה והפונקציונאלית של ChatGPT"
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "מערכת הצאטבוט היא ערכה מתקדמת לניהול שיחה המכוונת לחקות את המראה והפונקציונאלית של ChatGPT",
+  "Are you sure you want to clear all messages?": "האם אתה בטוח שברצונך למחוק את כל ההודעות?"
 }
