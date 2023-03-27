@@ -6,7 +6,15 @@ import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
-import { FC, memo, MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
@@ -40,7 +48,6 @@ export const Chat: FC<Props> = memo(
     serverSideApiKeyIsSet,
     messageIsStreaming,
     modelError,
-    messageError,
     loading,
     prompts,
     onSend,
@@ -53,30 +60,30 @@ export const Chat: FC<Props> = memo(
     const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
     const [showSettings, setShowSettings] = useState<boolean>(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = useCallback(() => {
-    if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      textareaRef.current?.focus();
-    }
-  }, [autoScrollEnabled]);
+    const scrollToBottom = useCallback(() => {
+      if (autoScrollEnabled) {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        textareaRef.current?.focus();
+      }
+    }, [autoScrollEnabled]);
 
-  const handleScroll = () => {
-    if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        chatContainerRef.current;
+    const handleScroll = () => {
+      if (chatContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } =
+          chatContainerRef.current;
         const bottomTolerance = 30;
 
-      if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
-        setAutoScrollEnabled(false);
-      } else {
-        setAutoScrollEnabled(true);
+        if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
+          setAutoScrollEnabled(false);
+        } else {
+          setAutoScrollEnabled(true);
+        }
       }
-    }
-  };
+    };
 
     const handleSettings = () => {
       setShowSettings(!showSettings);
@@ -242,25 +249,28 @@ export const Chat: FC<Props> = memo(
               )}
             </div>
 
-          <ChatInput
-            stopConversationRef={stopConversationRef}
-            textareaRef={textareaRef}
-            messageIsStreaming={messageIsStreaming}
-            messages={conversation.messages}
-            conversationIsEmpty={conversation.messages.length > 0}
-            model={conversation.model}
-            onSend={(message) => {
-              setCurrentMessage(message);
-              onSend(message);
-            }}
-            onRegenerate={() => {
-              if (currentMessage) {
-                onSend(currentMessage, 2);
-              }
-            }}
-          />
-        </>
-      )}
-    </div>
-  );
-};
+            <ChatInput
+              stopConversationRef={stopConversationRef}
+              textareaRef={textareaRef}
+              messageIsStreaming={messageIsStreaming}
+              messages={conversation.messages}
+              conversationIsEmpty={conversation.messages.length > 0}
+              model={conversation.model}
+              prompts={prompts}
+              onSend={(message) => {
+                setCurrentMessage(message);
+                onSend(message);
+              }}
+              onRegenerate={() => {
+                if (currentMessage) {
+                  onSend(currentMessage, 2);
+                }
+              }}
+            />
+          </>
+        )}
+      </div>
+    );
+  },
+);
+Chat.displayName = 'Chat';

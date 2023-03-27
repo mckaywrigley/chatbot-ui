@@ -23,9 +23,7 @@ export const Prompts: FC<Props> = ({
         .map((prompt, index) => (
           <PromptComponent
             key={index}
-            selectedPrompt={selectedPrompt}
             prompt={prompt}
-            onSelectPrompt={setSelectedPrompt}
             onUpdatePrompt={onUpdatePrompt}
             onDeletePrompt={onDeletePrompt}
           />
