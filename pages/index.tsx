@@ -517,7 +517,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       <Head>
         <title>Chatbot UI</title>
         <meta name="description" content="ChatGPT but better." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
