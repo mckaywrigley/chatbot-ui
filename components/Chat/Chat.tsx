@@ -111,7 +111,7 @@ export const Chat: FC<Props> = memo(
       <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
         {!(apiKey || serverSideApiKeyIsSet) ? (
           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
-            <div className="mx-auto mb-5">
+            <div className="mx-auto mb-5 text-gray-800 dark:text-gray-100">
               <IconKey size={36} />
             </div>
             <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
@@ -201,8 +201,8 @@ export const Chat: FC<Props> = memo(
                     />
                   </div>
                   {showSettings && (
-                    <div className="mx-auto flex w-[200px] flex-col space-y-10 pt-8 sm:w-[300px]">
-                      <div className="flex h-full flex-col space-y-4 rounded border border-neutral-500 p-2">
+                    <div className="flex flex-col space-y-10 md:max-w-xl md:gap-6 md:py-3 md:pt-6 md:mx-auto lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+                      <div className="flex h-full flex-col space-y-4 border-b md:rounded-lg md:border border-neutral-200 p-4 dark:border-neutral-600">
                         <ModelSelect
                           model={conversation.model}
                           models={models}
