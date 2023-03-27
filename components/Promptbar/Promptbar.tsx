@@ -52,7 +52,13 @@ export const Promptbar: FC<Props> = ({
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
       const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
-      onUpdatePrompt(prompt);
+
+      const updatedPrompt = {
+        ...prompt,
+        folderId: e.target.dataset.folderId,
+      };
+
+      onUpdatePrompt(updatedPrompt);
 
       e.target.style.background = 'none';
     }
