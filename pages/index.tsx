@@ -289,10 +289,15 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     conversations: Conversation[];
     folders: Folder[];
   }) => {
-    importData(data.conversations, data.folders);
-    setConversations(data.conversations);
-    setSelectedConversation(data.conversations[data.conversations.length - 1]);
-    setFolders(data.folders);
+    const updatedConversations = [...conversations, ...data.conversations];
+    const updatedFolders = [...folders, ...data.folders];
+
+    importData(updatedConversations, updatedFolders);
+    setConversations(updatedConversations);
+    setSelectedConversation(
+      updatedConversations[updatedConversations.length - 1],
+    );
+    setFolders(updatedFolders);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
