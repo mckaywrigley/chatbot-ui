@@ -49,9 +49,11 @@ export const ConversationComponent: FC<Props> = ({
   };
 
   const handleRename = (conversation: Conversation) => {
-    onUpdateConversation(conversation, { key: 'name', value: renameValue });
-    setRenameValue('');
-    setIsRenaming(false);
+    if (renameValue.trim().length > 0) {
+      onUpdateConversation(conversation, { key: 'name', value: renameValue });
+      setRenameValue('');
+      setIsRenaming(false);
+    }
   };
 
   useEffect(() => {
@@ -65,10 +67,10 @@ export const ConversationComponent: FC<Props> = ({
   return (
     <div className="relative flex items-center">
       {isRenaming && selectedConversation.id === conversation.id ? (
-        <div className="flex w-full items-center gap-3 bg-[#343541]/90 p-3">
+        <div className="flex w-full items-center gap-3 rounded-lg bg-gray-500/10 p-3">
           <IconMessage size={18} />
           <input
-            className="mr-12 flex-1 overflow-hidden text-[12.5px] leading-3 overflow-ellipsis border-neutral-400 bg-transparent text-left text-white outline-none focus:border-neutral-100"
+            className="mr-12 flex-1 overflow-hidden overflow-ellipsis border-neutral-400 bg-transparent text-left text-[12.5px] leading-4 text-white outline-none focus:border-neutral-100"
             type="text"
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
@@ -78,10 +80,10 @@ export const ConversationComponent: FC<Props> = ({
         </div>
       ) : (
         <button
-          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90 ${
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-gray-500/10 ${
             loading ? 'disabled:cursor-not-allowed' : ''
           } ${
-            selectedConversation.id === conversation.id ? 'bg-[#343541]/90' : ''
+            selectedConversation.id === conversation.id ? 'bg-gray-500/10' : ''
           }`}
           onClick={() => onSelectConversation(conversation)}
           disabled={loading}
@@ -90,7 +92,7 @@ export const ConversationComponent: FC<Props> = ({
         >
           <IconMessage size={18} />
           <div
-            className={`relative max-h-5 flex-1 text-[12.5px] leading-3 overflow-hidden text-ellipsis whitespace-nowrap break-all text-left ${
+            className={`relative max-h-5 flex-1 overflow-hidden text-ellipsis whitespace-nowrap break-all text-left text-[12.5px] leading-3 ${
               selectedConversation.id === conversation.id ? 'pr-12' : 'pr-1'
             }`}
           >
