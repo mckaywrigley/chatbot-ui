@@ -240,7 +240,7 @@ export const Chat: FC<Props> = memo(
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
-              conversationIsEmpty={conversation.messages.length > 0}
+              conversationIsEmpty={conversation.messages.length === 0}
               model={conversation.model}
               onSend={(message) => {
                 setCurrentMessage(message);
