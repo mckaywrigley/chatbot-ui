@@ -7,6 +7,7 @@ import {
 } from '@/types';
 import {
   FC,
+  memo,
   MutableRefObject,
   useCallback,
   useEffect,
@@ -21,6 +22,7 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { IconSettings } from '@tabler/icons-react';
+import { throttle } from '@/utils';
 
 interface Props {
   conversation: Conversation;
@@ -40,197 +42,203 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat: FC<Props> = ({
-  conversation,
-  models,
-  apiKey,
-  serverSideApiKeyIsSet,
-  messageIsStreaming,
-  modelError,
-  messageError,
-  loading,
-  onSend,
-  onUpdateConversation,
-  onEditMessage,
-  stopConversationRef,
-}) => {
-  const { t } = useTranslation('chat');
-  const [currentMessage, setCurrentMessage] = useState<Message>();
-  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
+export const Chat: FC<Props> = memo(
+  ({
+    conversation,
+    models,
+    apiKey,
+    serverSideApiKeyIsSet,
+    messageIsStreaming,
+    modelError,
+    messageError,
+    loading,
+    onSend,
+    onUpdateConversation,
+    onEditMessage,
+    stopConversationRef,
+  }) => {
+    const { t } = useTranslation('chat');
+    const [currentMessage, setCurrentMessage] = useState<Message>();
+    const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+    const [showSettings, setShowSettings] = useState<boolean>(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = useCallback(() => {
-    if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      textareaRef.current?.focus();
-    }
-  }, [autoScrollEnabled]);
+    const handleSettings = () => {
+      setShowSettings(!showSettings);
+    };
 
-  const handleScroll = () => {
-    if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        chatContainerRef.current;
-      const bottomTolerance = 5;
-
-      if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
-        setAutoScrollEnabled(false);
-      } else {
-        setAutoScrollEnabled(true);
+    const scrollDown = () => {
+      if (autoScrollEnabled) {
+        messagesEndRef.current?.scrollIntoView(true);
       }
-    }
-  };
+    };
+    const throttledScrollDown = throttle(scrollDown, 250);
 
-  const handleSettings = () => {
-    setShowSettings(!showSettings);
-  };
+    useEffect(() => {
+      throttledScrollDown();
+      setCurrentMessage(
+        conversation.messages[conversation.messages.length - 2],
+      );
+    }, [conversation.messages, throttledScrollDown]);
 
-  useEffect(() => {
-    scrollToBottom();
-    setCurrentMessage(conversation.messages[conversation.messages.length - 2]);
-  }, [conversation.messages, scrollToBottom]);
-
-  useEffect(() => {
-    const chatContainer = chatContainerRef.current;
-
-    if (chatContainer) {
-      chatContainer.addEventListener('scroll', handleScroll);
-
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setAutoScrollEnabled(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            textareaRef.current?.focus();
+          }
+        },
+        {
+          root: null,
+          threshold: 0.5,
+        },
+      );
+      const messagesEndElement = messagesEndRef.current;
+      if (messagesEndElement) {
+        observer.observe(messagesEndElement);
+      }
       return () => {
-        chatContainer.removeEventListener('scroll', handleScroll);
+        if (messagesEndElement) {
+          observer.unobserve(messagesEndElement);
+        }
       };
-    }
-  }, []);
+    }, [messagesEndRef]);
 
-  return (
-    <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
-      {!(apiKey || serverSideApiKeyIsSet) ? (
-        <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
-          <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-            {t('OpenAI API Key Required')}
+    return (
+      <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
+        {!(apiKey || serverSideApiKeyIsSet) ? (
+          <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
+            <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+              {t('OpenAI API Key Required')}
+            </div>
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              {t(
+                'Please set your OpenAI API key in the bottom left of the sidebar.',
+              )}
+            </div>
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              {t("If you don't have an OpenAI API key, you can get one here: ")}
+              <a
+                href="https://platform.openai.com/account/api-keys"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                openai.com
+              </a>
+            </div>
           </div>
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            {t(
-              'Please set your OpenAI API key in the bottom left of the sidebar.',
-            )}
-          </div>
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            {t("If you don't have an OpenAI API key, you can get one here: ")}
-            <a
-              href="https://platform.openai.com/account/api-keys"
-              target="_blank"
-              rel="noreferrer"
-              className="text-blue-500 hover:underline"
+        ) : modelError ? (
+          <ErrorMessageDiv error={modelError} />
+        ) : (
+          <>
+            <div
+              className="max-h-full overflow-x-hidden"
+              ref={chatContainerRef}
             >
-              openai.com
-            </a>
-          </div>
-        </div>
-      ) : modelError ? (
-        <ErrorMessageDiv error={modelError} />
-      ) : (
-        <>
-          <div className="max-h-full overflow-scroll" ref={chatContainerRef}>
-            {conversation.messages.length === 0 ? (
-              <>
-                <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
-                  <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                    {models.length === 0 ? t('Loading...') : 'Chatbot UI'}
+              {conversation.messages.length === 0 ? (
+                <>
+                  <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
+                    <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                      {models.length === 0 ? t('Loading...') : 'Chatbot UI'}
+                    </div>
+
+                    {models.length > 0 && (
+                      <div className="flex h-full flex-col space-y-4 rounded border border-neutral-200 p-4 dark:border-neutral-600">
+                        <ModelSelect
+                          model={conversation.model}
+                          models={models}
+                          onModelChange={(model) =>
+                            onUpdateConversation(conversation, {
+                              key: 'model',
+                              value: model,
+                            })
+                          }
+                        />
+
+                        <SystemPrompt
+                          conversation={conversation}
+                          onChangePrompt={(prompt) =>
+                            onUpdateConversation(conversation, {
+                              key: 'prompt',
+                              value: prompt,
+                            })
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
-
-                  {models.length > 0 && (
-                    <div className="flex h-full flex-col space-y-4 rounded border border-neutral-200 p-4 dark:border-neutral-600">
-                      <ModelSelect
-                        model={conversation.model}
-                        models={models}
-                        onModelChange={(model) =>
-                          onUpdateConversation(conversation, {
-                            key: 'model',
-                            value: model,
-                          })
-                        }
-                      />
-
-                      <SystemPrompt
-                        conversation={conversation}
-                        onChangePrompt={(prompt) =>
-                          onUpdateConversation(conversation, {
-                            key: 'prompt',
-                            value: prompt,
-                          })
-                        }
-                      />
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                    {t('Model')}: {conversation.model.name}
+                    <IconSettings
+                      className="ml-2 cursor-pointer hover:opacity-50"
+                      onClick={handleSettings}
+                      size={18}
+                    />
+                  </div>
+                  {showSettings && (
+                    <div className="mx-auto flex w-[200px] flex-col space-y-10 pt-8 sm:w-[300px]">
+                      <div className="flex h-full flex-col space-y-4 rounded border border-neutral-500 p-2">
+                        <ModelSelect
+                          model={conversation.model}
+                          models={models}
+                          onModelChange={(model) =>
+                            onUpdateConversation(conversation, {
+                              key: 'model',
+                              value: model,
+                            })
+                          }
+                        />
+                      </div>
                     </div>
                   )}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                  {t('Model')}: {conversation.model.name}
-                  <IconSettings
-                    className="ml-2 cursor-pointer hover:opacity-50"
-                    onClick={handleSettings}
-                    size={18}
+
+                  {conversation.messages.map((message, index) => (
+                    <ChatMessage
+                      key={index}
+                      message={message}
+                      messageIndex={index}
+                      onEditMessage={onEditMessage}
+                    />
+                  ))}
+
+                  {loading && <ChatLoader />}
+
+                  <div
+                    className="h-[162px] bg-white dark:bg-[#343541]"
+                    ref={messagesEndRef}
                   />
-                </div>
-                {showSettings && (
-                  <div className="mx-auto flex w-[200px] flex-col space-y-10 pt-8 sm:w-[300px]">
-                    <div className="flex h-full flex-col space-y-4 rounded border border-neutral-500 p-2">
-                      <ModelSelect
-                        model={conversation.model}
-                        models={models}
-                        onModelChange={(model) =>
-                          onUpdateConversation(conversation, {
-                            key: 'model',
-                            value: model,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
+                </>
+              )}
+            </div>
 
-                {conversation.messages.map((message, index) => (
-                  <ChatMessage
-                    key={index}
-                    message={message}
-                    messageIndex={index}
-                    onEditMessage={onEditMessage}
-                  />
-                ))}
-
-                {loading && <ChatLoader />}
-
-                <div
-                  className="h-[162px] bg-white dark:bg-[#343541]"
-                  ref={messagesEndRef}
-                />
-              </>
-            )}
-          </div>
-
-          <ChatInput
-            stopConversationRef={stopConversationRef}
-            textareaRef={textareaRef}
-            messageIsStreaming={messageIsStreaming}
-            messages={conversation.messages}
-            model={conversation.model}
-            onSend={(message) => {
-              setCurrentMessage(message);
-              onSend(message);
-            }}
-            onRegenerate={() => {
-              if (currentMessage) {
-                onSend(currentMessage, 2);
-              }
-            }}
-          />
-        </>
-      )}
-    </div>
-  );
-};
+            <ChatInput
+              stopConversationRef={stopConversationRef}
+              textareaRef={textareaRef}
+              messageIsStreaming={messageIsStreaming}
+              conversationIsEmpty={conversation.messages.length > 0}
+              model={conversation.model}
+              onSend={(message) => {
+                setCurrentMessage(message);
+                onSend(message);
+              }}
+              onRegenerate={() => {
+                if (currentMessage) {
+                  onSend(currentMessage, 2);
+                }
+              }}
+            />
+          </>
+        )}
+      </div>
+    );
+  },
+);
+Chat.displayName = 'Chat';
