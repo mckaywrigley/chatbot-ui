@@ -1,13 +1,13 @@
 {
   "New folder": "Neuer Ordner",
-  "New chat": "Neuer Chat",
-  "No conversations.": "Keine Unterhaltungen.",
-  "Search conversations...": "Unterhaltungen suchen...",
+  "New chat": "Neue Konversation",
+  "No conversations.": "Keine Konversationen.",
+  "Search conversations...": "Konversationen suchen...",
   "OpenAI API Key": "OpenAI API-Schlüssel",
-  "Import conversations": "Unterhaltungen importieren",
-  "Are you sure?": "Sind Sie sicher?",
-  "Clear conversations": "Unterhaltungen löschen",
-  "Export conversations": "Unterhaltungen exportieren",
-  "Dark mode": "Dunkelmodus",
-  "Light mode": "Hellmodus"
+  "Import conversations": "Konversationen importieren",
+  "Are you sure?": "Bist du sicher?",
+  "Clear conversations": "Konversationen löschen",
+  "Export conversations": "Konversationen exportieren",
+  "Dark mode": "Dark Mode",
+  "Light mode": "Light Mode"
 }

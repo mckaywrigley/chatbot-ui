@@ -11,6 +11,7 @@ import { ClearConversations } from './ClearConversations';
 interface Props {
   lightMode: 'light' | 'dark';
   apiKey: string;
+  conversationsCount: number;
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
@@ -24,6 +25,7 @@ interface Props {
 export const ChatbarSettings: FC<Props> = ({
   lightMode,
   apiKey,
+  conversationsCount,
   onToggleLightMode,
   onApiKeyChange,
   onClearConversations,
@@ -33,7 +35,9 @@ export const ChatbarSettings: FC<Props> = ({
   const { t } = useTranslation('sidebar');
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
-      <ClearConversations onClearConversations={onClearConversations} />
+      {conversationsCount > 0 ? (
+        <ClearConversations onClearConversations={onClearConversations} />
+      ) : null}
 
       <Import onImport={onImportConversations} />
 
