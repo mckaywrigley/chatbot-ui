@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "Wenn Sie diesen Schritt abgeschlossen haben, kann OpenAI möglicherweise Probleme haben.",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Nachrichtenlimit beträgt {{maxLength}} Zeichen. Sie haben {{valueLength}} Zeichen eingegeben.",
   "Please enter a message": "Bitte geben Sie eine Nachricht ein",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ist ein fortschrittliches Chatbot-Toolkit für OpenAIs Chat-Modelle, das darauf abzielt, die Benutzeroberfläche und Funktionalität von ChatGPT nachzuahmen."
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ist ein fortschrittliches Chatbot-Toolkit für OpenAIs Chat-Modelle, das darauf abzielt, die Benutzeroberfläche und Funktionalität von ChatGPT nachzuahmen.",
+  "Are you sure you want to clear all messages?": "Sind Sie sicher, dass Sie alle Nachrichten löschen möchten?"
 }

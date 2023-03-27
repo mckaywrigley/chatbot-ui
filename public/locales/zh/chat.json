@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "如果您已完成此步骤，OpenAI 可能遇到了问题。",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "消息字数限制为 {{maxLength}} 个字符。您已输入 {{valueLength}} 个字符。",
   "Please enter a message": "请输入一条消息",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI 是一个高级聊天机器人工具包，旨在模仿 OpenAI 聊天模型的 ChatGPT 界面和功能。"
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI 是一个高级聊天机器人工具包，旨在模仿 OpenAI 聊天模型的 ChatGPT 界面和功能。",
+  "Are you sure you want to clear all messages?": "你确定要清除所有的消息吗？"
 }

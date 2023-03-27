@@ -21,5 +21,6 @@
   "click if using a .env.local file": "clique se estiver usando um arquivo .env.local",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "O limite de mensagens é de {{maxLength}} caracteres. Você inseriu {{valueLength}} caracteres",
   "Please enter a message": "Por favor, insira uma mensagem",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI é um kit de chatbot avançado para os modelos de chat do OpenAI com o objetivo de imitar a interface e a funcionalidade do ChatGPT."
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI é um kit de chatbot avançado para os modelos de chat do OpenAI com o objetivo de imitar a interface e a funcionalidade do ChatGPT.",
+  "Are you sure you want to clear all messages?": "Tem certeza de que deseja limpar todas as mensagens?"
 }

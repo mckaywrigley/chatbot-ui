@@ -20,7 +20,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
-import { IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconSettings } from '@tabler/icons-react';
 
 interface Props {
   conversation: Conversation;
@@ -87,6 +87,12 @@ export const Chat: FC<Props> = ({
   const handleSettings = () => {
     setShowSettings(!showSettings);
   };
+
+  const onClearAll = () => {
+    if (confirm(t<string>("Are you sure you want to clear all messages?"))) {
+      onUpdateConversation(conversation, { key: 'messages', value: [] })
+    }
+  }
 
   useEffect(() => {
     scrollToBottom();
@@ -174,6 +180,11 @@ export const Chat: FC<Props> = ({
                   <IconSettings
                     className="ml-2 cursor-pointer hover:opacity-50"
                     onClick={handleSettings}
+                    size={18}
+                  />
+                  <IconClearAll
+                    className="ml-2 cursor-pointer hover:opacity-50"
+                    onClick={onClearAll}
                     size={18}
                   />
                 </div>
