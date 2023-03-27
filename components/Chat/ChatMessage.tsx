@@ -1,7 +1,7 @@
-import { Message } from '@/types';
+import { Message } from '@/types/chat';
 import { IconEdit } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
-import { FC, useEffect, useRef, useState, memo } from 'react';
+import { FC, memo, useEffect, useRef, useState } from 'react';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -73,7 +73,7 @@ export const ChatMessage: FC<Props> = memo(
 
     return (
       <div
-        className={`group ${
+        className={`group px-4 ${
           message.role === 'assistant'
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
@@ -138,7 +138,7 @@ export const ChatMessage: FC<Props> = memo(
                     className={`absolute ${
                       window.innerWidth < 640
                         ? 'right-3 bottom-1'
-                        : 'right-[-20px] top-[26px]'
+                        : 'right-0 top-[26px]'
                     }`}
                   >
                     <IconEdit

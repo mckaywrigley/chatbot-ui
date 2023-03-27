@@ -1,7 +1,7 @@
 import { IconCheck, IconKey, IconX } from '@tabler/icons-react';
-import { FC, KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import { SidebarButton } from './SidebarButton';
+import { FC, KeyboardEvent, useState } from 'react';
+import { SidebarButton } from '../Sidebar/SidebarButton';
 
 interface Props {
   apiKey: string;

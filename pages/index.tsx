@@ -1,17 +1,13 @@
 import { Chat } from '@/components/Chat/Chat';
+import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
-import { Sidebar } from '@/components/Sidebar/Sidebar';
-import {
-  ChatBody,
-  ChatFolder,
-  Conversation,
-  ErrorMessage,
-  KeyValuePair,
-  Message,
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-} from '@/types';
+import { Promptbar } from '@/components/Promptbar/Promptbar';
+import { ChatBody, Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { Folder, FolderType } from '@/types/folder';
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -24,12 +20,14 @@ import {
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
+import { savePrompts } from '@/utils/app/prompts';
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
+import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -37,21 +35,35 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const { t } = useTranslation('chat');
-  const [folders, setFolders] = useState<ChatFolder[]>([]);
+
+  // STATE ----------------------------------------------
+
+  const [apiKey, setApiKey] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
+  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
+
+  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
+
+  const [models, setModels] = useState<OpenAIModel[]>([]);
+
+  const [folders, setFolders] = useState<Folder[]>([]);
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [models, setModels] = useState<OpenAIModel[]>([]);
-  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
-  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
-  const [showSidebar, setShowSidebar] = useState<boolean>(true);
-  const [apiKey, setApiKey] = useState<string>('');
-  const [messageError, setMessageError] = useState<boolean>(false);
-  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
   const [currentMessage, setCurrentMessage] = useState<Message>();
 
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
+
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
+
+  // REFS ----------------------------------------------
+
   const stopConversationRef = useRef<boolean>(false);
+
+  // FETCH RESPONSE ----------------------------------------------
 
   const handleSend = async (message: Message, deleteCount = 0) => {
     if (selectedConversation) {
@@ -77,7 +89,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
-      setMessageError(false);
 
       const chatBody: ChatBody = {
         model: updatedConversation.model,
@@ -99,7 +110,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setMessageError(true);
         return;
       }
 
@@ -108,8 +118,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
-        setMessageError(true);
-
         return;
       }
 
@@ -204,6 +212,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   };
 
+  // FETCH MODELS ----------------------------------------------
+
   const fetchModels = async (key: string) => {
     const error = {
       title: t('Error fetching models.'),
@@ -249,6 +259,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     setModelError(null);
   };
 
+  // BASIC HANDLERS --------------------------------------------
+
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
     localStorage.setItem('theme', mode);
@@ -259,18 +271,33 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     localStorage.setItem('apiKey', apiKey);
   };
 
+  const handleToggleChatbar = () => {
+    setShowSidebar(!showSidebar);
+    localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
+  };
+
+  const handleTogglePromptbar = () => {
+    setShowPromptbar(!showPromptbar);
+    localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
+  };
+
   const handleExportData = () => {
     exportData();
   };
 
   const handleImportConversations = (data: {
     conversations: Conversation[];
-    folders: ChatFolder[];
+    folders: Folder[];
   }) => {
-    importData(data.conversations, data.folders);
-    setConversations(data.conversations);
-    setSelectedConversation(data.conversations[data.conversations.length - 1]);
-    setFolders(data.folders);
+    const updatedConversations = [...conversations, ...data.conversations];
+    const updatedFolders = [...folders, ...data.folders];
+
+    importData(updatedConversations, updatedFolders);
+    setConversations(updatedConversations);
+    setSelectedConversation(
+      updatedConversations[updatedConversations.length - 1],
+    );
+    setFolders(updatedFolders);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -278,12 +305,13 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveConversation(conversation);
   };
 
-  const handleCreateFolder = (name: string) => {
-    const lastFolder = folders[folders.length - 1];
+  // FOLDER OPERATIONS  --------------------------------------------
 
-    const newFolder: ChatFolder = {
-      id: lastFolder ? lastFolder.id + 1 : 1,
+  const handleCreateFolder = (name: string, type: FolderType) => {
+    const newFolder: Folder = {
+      id: uuidv4(),
       name,
+      type,
     };
 
     const updatedFolders = [...folders, newFolder];
@@ -292,7 +320,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveFolders(updatedFolders);
   };
 
-  const handleDeleteFolder = (folderId: number) => {
+  const handleDeleteFolder = (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
     setFolders(updatedFolders);
     saveFolders(updatedFolders);
@@ -301,7 +329,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (c.folderId === folderId) {
         return {
           ...c,
-          folderId: 0,
+          folderId: null,
         };
       }
 
@@ -309,9 +337,22 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     });
     setConversations(updatedConversations);
     saveConversations(updatedConversations);
+
+    const updatedPrompts: Prompt[] = prompts.map((p) => {
+      if (p.folderId === folderId) {
+        return {
+          ...p,
+          folderId: null,
+        };
+      }
+
+      return p;
+    });
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
   };
 
-  const handleUpdateFolder = (folderId: number, name: string) => {
+  const handleUpdateFolder = (folderId: string, name: string) => {
     const updatedFolders = folders.map((f) => {
       if (f.id === folderId) {
         return {
@@ -327,18 +368,18 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveFolders(updatedFolders);
   };
 
+  // CONVERSATION OPERATIONS  --------------------------------------------
+
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
-      id: lastConversation ? lastConversation.id + 1 : 1,
-      name: `${t('Conversation')} ${
-        lastConversation ? lastConversation.id + 1 : 1
-      }`,
+      id: uuidv4(),
+      name: `${t('New Conversation')}`,
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0,
+      folderId: null,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -366,12 +407,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
       setSelectedConversation({
-        id: 1,
+        id: uuidv4(),
         name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0,
+        folderId: null,
       });
       localStorage.removeItem('selectedConversation');
     }
@@ -400,17 +441,18 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     localStorage.removeItem('conversationHistory');
 
     setSelectedConversation({
-      id: 1,
+      id: uuidv4(),
       name: 'New conversation',
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0,
+      folderId: null,
     });
     localStorage.removeItem('selectedConversation');
 
-    setFolders([]);
-    localStorage.removeItem('folders');
+    const updatedFolders = folders.filter((f) => f.type !== 'chat');
+    setFolders(updatedFolders);
+    saveFolders(updatedFolders);
   };
 
   const handleEditMessage = (message: Message, messageIndex: number) => {
@@ -440,6 +482,49 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   };
 
+  // PROMPT OPERATIONS --------------------------------------------
+
+  const handleCreatePrompt = () => {
+    const lastPrompt = prompts[prompts.length - 1];
+
+    const newPrompt: Prompt = {
+      id: uuidv4(),
+      name: `Prompt ${prompts.length + 1}`,
+      description: '',
+      content: '',
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      folderId: null,
+    };
+
+    const updatedPrompts = [...prompts, newPrompt];
+
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
+
+  const handleUpdatePrompt = (prompt: Prompt) => {
+    const updatedPrompts = prompts.map((p) => {
+      if (p.id === prompt.id) {
+        return prompt;
+      }
+
+      return p;
+    });
+
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
+
+  const handleDeletePrompt = (prompt: Prompt) => {
+    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
+  };
+
+  const handleCreatePromptFolder = (name: string) => {};
+
+  // EFFECTS  --------------------------------------------
+
   useEffect(() => {
     if (currentMessage) {
       handleSend(currentMessage);
@@ -459,6 +544,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     }
   }, [apiKey]);
 
+  // ON LOAD --------------------------------------------
+
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme) {
@@ -477,9 +564,24 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setShowSidebar(false);
     }
 
+    const showChatbar = localStorage.getItem('showChatbar');
+    if (showChatbar) {
+      setShowSidebar(showChatbar === 'true');
+    }
+
+    const showPromptbar = localStorage.getItem('showPromptbar');
+    if (showPromptbar) {
+      setShowPromptbar(showPromptbar === 'true');
+    }
+
     const folders = localStorage.getItem('folders');
     if (folders) {
       setFolders(JSON.parse(folders));
+    }
+
+    const prompts = localStorage.getItem('prompts');
+    if (prompts) {
+      setPrompts(JSON.parse(prompts));
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
@@ -502,12 +604,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setSelectedConversation(cleanedSelectedConversation);
     } else {
       setSelectedConversation({
-        id: 1,
+        id: uuidv4(),
         name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0,
+        folderId: null,
       });
     }
   }, [serverSideApiKeyIsSet]);
@@ -517,7 +619,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       <Head>
         <title>Chatbot UI</title>
         <meta name="description" content="ChatGPT but better." />
-        <meta name="viewport" content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
@@ -534,7 +639,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <div>
-                <Sidebar
+                <Chatbar
                   loading={messageIsStreaming}
                   conversations={conversations}
                   lightMode={lightMode}
@@ -542,13 +647,13 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   apiKey={apiKey}
                   folders={folders}
                   onToggleLightMode={handleLightMode}
-                  onCreateFolder={handleCreateFolder}
+                  onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
                   onDeleteFolder={handleDeleteFolder}
                   onUpdateFolder={handleUpdateFolder}
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={() => setShowSidebar(!showSidebar)}
+                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
@@ -558,35 +663,66 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
                 <IconArrowBarLeft
                   className="fixed top-5 left-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
-                  onClick={() => setShowSidebar(!showSidebar)}
+                  onClick={handleToggleChatbar}
                 />
 
                 <div
-                  onClick={() => setShowSidebar(!showSidebar)}
+                  onClick={handleToggleChatbar}
                   className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
               <IconArrowBarRight
                 className="fixed top-2.5 left-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-4 sm:h-8 sm:w-8 sm:text-neutral-700"
-                onClick={() => setShowSidebar(!showSidebar)}
+                onClick={handleToggleChatbar}
               />
             )}
 
-            <Chat
-              conversation={selectedConversation}
-              messageIsStreaming={messageIsStreaming}
-              apiKey={apiKey}
-              serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-              modelError={modelError}
-              messageError={messageError}
-              models={models}
-              loading={loading}
-              onSend={handleSend}
-              onUpdateConversation={handleUpdateConversation}
-              onEditMessage={handleEditMessage}
-              stopConversationRef={stopConversationRef}
-            />
+            <div className="flex flex-1">
+              <Chat
+                conversation={selectedConversation}
+                messageIsStreaming={messageIsStreaming}
+                apiKey={apiKey}
+                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+                modelError={modelError}
+                models={models}
+                loading={loading}
+                prompts={prompts}
+                onSend={handleSend}
+                onUpdateConversation={handleUpdateConversation}
+                onEditMessage={handleEditMessage}
+                stopConversationRef={stopConversationRef}
+              />
+            </div>
+
+            {showPromptbar ? (
+              <div>
+                <Promptbar
+                  prompts={prompts}
+                  folders={folders}
+                  onToggleSidebar={handleTogglePromptbar}
+                  onCreatePrompt={handleCreatePrompt}
+                  onUpdatePrompt={handleUpdatePrompt}
+                  onDeletePrompt={handleDeletePrompt}
+                  onCreateFolder={(name) => handleCreateFolder(name, 'prompt')}
+                  onDeleteFolder={handleDeleteFolder}
+                  onUpdateFolder={handleUpdateFolder}
+                />
+                <IconArrowBarRight
+                  className="fixed top-5 right-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
+                  onClick={handleTogglePromptbar}
+                />
+                <div
+                  onClick={handleTogglePromptbar}
+                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
+                ></div>
+              </div>
+            ) : (
+              <IconArrowBarLeft
+                className="fixed top-2.5 right-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-4 sm:h-8 sm:w-8 sm:text-neutral-700"
+                onClick={handleTogglePromptbar}
+              />
+            )}
           </div>
         </main>
       )}

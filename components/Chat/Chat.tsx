@@ -1,14 +1,20 @@
-import {
-  Conversation,
-  ErrorMessage,
-  KeyValuePair,
-  Message,
-  OpenAIModel,
-} from '@/types';
+import { Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { OpenAIModel } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconClearAll, IconKey, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
-import { FC, memo, MutableRefObject, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Spinner } from '../Global/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
@@ -24,8 +30,8 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
-  messageError: boolean;
   loading: boolean;
+  prompts: Prompt[];
   onSend: (message: Message, deleteCount?: number) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -43,8 +49,8 @@ export const Chat: FC<Props> = memo(
     serverSideApiKeyIsSet,
     messageIsStreaming,
     modelError,
-    messageError,
     loading,
+    prompts,
     onSend,
     onUpdateConversation,
     onEditMessage,
@@ -58,6 +64,27 @@ export const Chat: FC<Props> = memo(
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const scrollToBottom = useCallback(() => {
+      if (autoScrollEnabled) {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        textareaRef.current?.focus();
+      }
+    }, [autoScrollEnabled]);
+
+    const handleScroll = () => {
+      if (chatContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } =
+          chatContainerRef.current;
+        const bottomTolerance = 30;
+
+        if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
+          setAutoScrollEnabled(false);
+        } else {
+          setAutoScrollEnabled(true);
+        }
+      }
+    };
 
     const handleSettings = () => {
       setShowSettings(!showSettings);
@@ -174,6 +201,7 @@ export const Chat: FC<Props> = memo(
 
                         <SystemPrompt
                           conversation={conversation}
+                          prompts={prompts}
                           onChangePrompt={(prompt) =>
                             onUpdateConversation(conversation, {
                               key: 'prompt',
@@ -201,8 +229,8 @@ export const Chat: FC<Props> = memo(
                     />
                   </div>
                   {showSettings && (
-                    <div className="flex flex-col space-y-10 md:max-w-xl md:gap-6 md:py-3 md:pt-6 md:mx-auto lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-                      <div className="flex h-full flex-col space-y-4 border-b md:rounded-lg md:border border-neutral-200 p-4 dark:border-neutral-600">
+                    <div className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+                      <div className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
                         <ModelSelect
                           model={conversation.model}
                           models={models}
@@ -241,7 +269,9 @@ export const Chat: FC<Props> = memo(
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
               conversationIsEmpty={conversation.messages.length === 0}
+              messages={conversation.messages}
               model={conversation.model}
+              prompts={prompts}
               onSend={(message) => {
                 setCurrentMessage(message);
                 onSend(message);

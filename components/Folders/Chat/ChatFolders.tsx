@@ -1,13 +1,15 @@
-import { ChatFolder, Conversation, KeyValuePair } from '@/types';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { Folder } from '@/types/folder';
 import { FC } from 'react';
-import { Folder } from './Folder';
+import { ChatFolder } from './ChatFolder';
 
 interface Props {
   searchTerm: string;
   conversations: Conversation[];
-  folders: ChatFolder[];
-  onDeleteFolder: (folder: number) => void;
-  onUpdateFolder: (folder: number, name: string) => void;
+  folders: Folder[];
+  onDeleteFolder: (folder: string) => void;
+  onUpdateFolder: (folder: string, name: string) => void;
   // conversation props
   selectedConversation: Conversation;
   loading: boolean;
@@ -19,7 +21,7 @@ interface Props {
   ) => void;
 }
 
-export const Folders: FC<Props> = ({
+export const ChatFolders: FC<Props> = ({
   searchTerm,
   conversations,
   folders,
@@ -35,7 +37,7 @@ export const Folders: FC<Props> = ({
   return (
     <div className="flex w-full flex-col gap-1 pt-2">
       {folders.map((folder, index) => (
-        <Folder
+        <ChatFolder
           key={index}
           searchTerm={searchTerm}
           conversations={conversations.filter((c) => c.folderId)}
