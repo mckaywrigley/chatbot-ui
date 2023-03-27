@@ -2,7 +2,7 @@ import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { Folder } from '@/types/folder';
 import { FC } from 'react';
-import { FolderComponent } from './Folder';
+import { ChatFolder } from './ChatFolder';
 
 interface Props {
   searchTerm: string;
@@ -21,7 +21,7 @@ interface Props {
   ) => void;
 }
 
-export const Folders: FC<Props> = ({
+export const ChatFolders: FC<Props> = ({
   searchTerm,
   conversations,
   folders,
@@ -37,7 +37,7 @@ export const Folders: FC<Props> = ({
   return (
     <div className="flex w-full flex-col gap-1 pt-2">
       {folders.map((folder, index) => (
-        <FolderComponent
+        <ChatFolder
           key={index}
           searchTerm={searchTerm}
           conversations={conversations.filter((c) => c.folderId)}

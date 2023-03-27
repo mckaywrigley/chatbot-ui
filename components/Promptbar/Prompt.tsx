@@ -9,17 +9,13 @@ import { DragEvent, FC, useEffect, useState } from 'react';
 import { PromptModal } from './PromptModal';
 
 interface Props {
-  selectedPrompt: Prompt | undefined;
   prompt: Prompt;
-  onSelectPrompt: (prompt: Prompt | undefined) => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
 export const PromptComponent: FC<Props> = ({
-  selectedPrompt,
   prompt,
-  onSelectPrompt,
   onUpdatePrompt,
   onDeletePrompt,
 }) => {
@@ -50,12 +46,9 @@ export const PromptComponent: FC<Props> = ({
         onClick={(e) => {
           e.stopPropagation();
           setShowModal(true);
-          onSelectPrompt(prompt);
         }}
         onDragStart={(e) => handleDragStart(e, prompt)}
-        onMouseEnter={() => onSelectPrompt(prompt)}
         onMouseLeave={() => {
-          onSelectPrompt(undefined);
           setIsDeleting(false);
           setIsRenaming(false);
           setRenameValue('');
@@ -63,7 +56,7 @@ export const PromptComponent: FC<Props> = ({
       >
         <IconBulbFilled size={16} />
 
-        {isRenaming && selectedPrompt?.id === prompt.id ? (
+        {isRenaming ? (
           <input
             className="flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-left text-white outline-none focus:border-neutral-100"
             type="text"
@@ -77,7 +70,7 @@ export const PromptComponent: FC<Props> = ({
           </div>
         )}
 
-        {(isDeleting || isRenaming) && selectedPrompt?.id === prompt.id && (
+        {(isDeleting || isRenaming) && (
           <div className="-ml-2 flex gap-1">
             <IconCheck
               className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
@@ -104,7 +97,7 @@ export const PromptComponent: FC<Props> = ({
           </div>
         )}
 
-        {selectedPrompt?.id === prompt.id && !isDeleting && !isRenaming && (
+        {!isDeleting && !isRenaming && (
           <div className="-ml-2 flex gap-1">
             <IconTrash
               className=" min-w-[20px] text-neutral-400 hover:text-neutral-100"

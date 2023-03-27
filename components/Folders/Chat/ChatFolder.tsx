@@ -10,7 +10,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { FC, KeyboardEvent, useEffect, useState } from 'react';
-import { ConversationComponent } from './Conversation';
+import { ConversationComponent } from '../../Chatbar/Conversation';
 
 interface Props {
   searchTerm: string;
@@ -29,7 +29,7 @@ interface Props {
   ) => void;
 }
 
-export const FolderComponent: FC<Props> = ({
+export const ChatFolder: FC<Props> = ({
   searchTerm,
   conversations,
   currentFolder,

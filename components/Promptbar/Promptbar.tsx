@@ -7,6 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PromptFolders } from '../Folders/Prompt/PromptFolders';
 import { Search } from '../Sidebar/Search';
 import { PromptbarSettings } from './PromptbarSettings';
 import { Prompts } from './Prompts';
@@ -14,18 +15,22 @@ import { Prompts } from './Prompts';
 interface Props {
   prompts: Prompt[];
   folders: Folder[];
+  onCreateFolder: (name: string) => void;
+  onDeleteFolder: (folderId: string) => void;
+  onUpdateFolder: (folderId: string, name: string) => void;
   onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
-  onCreatePromptFolder: (name: string) => void;
 }
 
 export const Promptbar: FC<Props> = ({
   folders,
   prompts,
+  onCreateFolder,
+  onDeleteFolder,
+  onUpdateFolder,
   onCreatePrompt,
-  onCreatePromptFolder,
   onUpdatePrompt,
   onDeletePrompt,
   onToggleSidebar,
@@ -96,7 +101,7 @@ export const Promptbar: FC<Props> = ({
 
         <button
           className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => onCreatePromptFolder(t('New folder'))}
+          onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
         </button>
@@ -118,7 +123,18 @@ export const Promptbar: FC<Props> = ({
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
-          <div className="flex border-b border-white/20 pb-2">Folders</div>
+          <div className="flex border-b border-white/20 pb-2">
+            <PromptFolders
+              searchTerm={searchTerm}
+              prompts={prompts}
+              folders={folders.filter((folder) => folder.type === 'prompt')}
+              onUpdateFolder={onUpdateFolder}
+              onDeleteFolder={onDeleteFolder}
+              // prompt props
+              onDeletePrompt={handleDeletePrompt}
+              onUpdatePrompt={handleUpdatePrompt}
+            />
+          </div>
         )}
 
         {prompts.length > 0 ? (

@@ -3,10 +3,10 @@ import { Folder } from '@/types/folder';
 import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
+import { Import } from '../Settings/Import';
+import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
-import { Import } from './Import';
-import { Key } from './Key';
 
 interface Props {
   lightMode: 'light' | 'dark';

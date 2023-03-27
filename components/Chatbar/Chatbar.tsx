@@ -9,10 +9,10 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
+import { ChatFolders } from '../Folders/Chat/ChatFolders';
 import { Search } from '../Sidebar/Search';
 import { ChatbarSettings } from './ChatbarSettings';
 import { Conversations } from './Conversations';
-import { Folders } from './Folders';
 
 interface Props {
   loading: boolean;
@@ -162,12 +162,12 @@ export const Chatbar: FC<Props> = ({
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
           <div className="flex border-b border-white/20 pb-2">
-            <Folders
+            <ChatFolders
               searchTerm={searchTerm}
               conversations={filteredConversations.filter(
                 (conversation) => conversation.folderId,
               )}
-              folders={folders}
+              folders={folders.filter((folder) => folder.type === 'chat')}
               onDeleteFolder={onDeleteFolder}
               onUpdateFolder={onUpdateFolder}
               selectedConversation={selectedConversation}

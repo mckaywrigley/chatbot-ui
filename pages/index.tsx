@@ -684,7 +684,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}
-                  onCreatePromptFolder={handleCreatePromptFolder}
+                  onCreateFolder={(name) => handleCreateFolder(name, 'prompt')}
+                  onDeleteFolder={handleDeleteFolder}
+                  onUpdateFolder={handleUpdateFolder}
                 />
                 <IconArrowBarRight
                   className="fixed top-5 right-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
