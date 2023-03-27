@@ -1,4 +1,5 @@
-import { Conversation, KeyValuePair } from '@/types';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
 import { FC } from 'react';
 import { ConversationComponent } from './Conversation';
 
@@ -23,18 +24,21 @@ export const Conversations: FC<Props> = ({
   onUpdateConversation,
 }) => {
   return (
-    <div className="flex w-full flex-col gap-1 pt-2">
-      {conversations.slice().reverse().map((conversation, index) => (
-        <ConversationComponent
-          key={index}
-          selectedConversation={selectedConversation}
-          conversation={conversation}
-          loading={loading}
-          onSelectConversation={onSelectConversation}
-          onDeleteConversation={onDeleteConversation}
-          onUpdateConversation={onUpdateConversation}
-        />
-      ))}
+    <div className="flex w-full flex-col gap-1">
+      {conversations
+        .slice()
+        .reverse()
+        .map((conversation, index) => (
+          <ConversationComponent
+            key={index}
+            selectedConversation={selectedConversation}
+            conversation={conversation}
+            loading={loading}
+            onSelectConversation={onSelectConversation}
+            onDeleteConversation={onDeleteConversation}
+            onUpdateConversation={onUpdateConversation}
+          />
+        ))}
     </div>
   );
 };

@@ -1,10 +1,12 @@
-import { Conversation, OpenAIModelID, OpenAIModels } from '@/types';
+import { Conversation } from '@/types/chat';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
   // added system prompt for each conversation (3/21/23)
   // added folders (3/23/23)
+  // added prompts (3/26/23)
 
   let updatedConversation = conversation;
 
@@ -27,7 +29,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folderId: updatedConversation.folderId || 0,
+      folderId: updatedConversation.folderId || null,
     };
   }
 
@@ -38,6 +40,7 @@ export const cleanConversationHistory = (history: Conversation[]) => {
   // added model for each conversation (3/20/23)
   // added system prompt for each conversation (3/21/23)
   // added folders (3/23/23)
+  // added prompts (3/26/23)
 
   return history.reduce((acc: Conversation[], conversation) => {
     try {
@@ -50,7 +53,7 @@ export const cleanConversationHistory = (history: Conversation[]) => {
       }
 
       if (!conversation.folderId) {
-        conversation.folderId = 0;
+        conversation.folderId = null;
       }
 
       acc.push(conversation);
