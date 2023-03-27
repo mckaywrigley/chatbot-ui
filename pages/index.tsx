@@ -5,7 +5,7 @@ import { Promptbar } from '@/components/Promptbar/Promptbar';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { Folder } from '@/types/folder';
+import { Folder, FolderType } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import {
@@ -27,6 +27,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -301,12 +302,11 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   // FOLDER OPERATIONS  --------------------------------------------
 
-  const handleCreateFolder = (name: string) => {
-    const lastFolder = folders[folders.length - 1];
-
+  const handleCreateFolder = (name: string, type: FolderType) => {
     const newFolder: Folder = {
-      id: lastFolder ? lastFolder.id + 1 : 1,
+      id: uuidv4(),
       name,
+      type,
     };
 
     const updatedFolders = [...folders, newFolder];
@@ -315,7 +315,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveFolders(updatedFolders);
   };
 
-  const handleDeleteFolder = (folderId: number) => {
+  const handleDeleteFolder = (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
     setFolders(updatedFolders);
     saveFolders(updatedFolders);
@@ -324,7 +324,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       if (c.folderId === folderId) {
         return {
           ...c,
-          folderId: 0,
+          folderId: null,
         };
       }
 
@@ -334,7 +334,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveConversations(updatedConversations);
   };
 
-  const handleUpdateFolder = (folderId: number, name: string) => {
+  const handleUpdateFolder = (folderId: string, name: string) => {
     const updatedFolders = folders.map((f) => {
       if (f.id === folderId) {
         return {
@@ -356,14 +356,14 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
-      id: lastConversation ? lastConversation.id + 1 : 1,
+      id: uuidv4(),
       name: `${t('Conversation')} ${
         lastConversation ? lastConversation.id + 1 : 1
       }`,
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0,
+      folderId: null,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -391,12 +391,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
       setSelectedConversation({
-        id: 1,
+        id: uuidv4(),
         name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0,
+        folderId: null,
       });
       localStorage.removeItem('selectedConversation');
     }
@@ -425,12 +425,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     localStorage.removeItem('conversationHistory');
 
     setSelectedConversation({
-      id: 1,
+      id: uuidv4(),
       name: 'New conversation',
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0,
+      folderId: null,
     });
     localStorage.removeItem('selectedConversation');
 
@@ -471,12 +471,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     const lastPrompt = prompts[prompts.length - 1];
 
     const newPrompt: Prompt = {
-      id: lastPrompt ? lastPrompt.id + 1 : 1,
+      id: uuidv4(),
       name: `Prompt ${prompts.length + 1}`,
       description: '',
       content: '',
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
-      folderId: 0,
+      folderId: null,
     };
 
     const updatedPrompts = [...prompts, newPrompt];
@@ -587,12 +587,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setSelectedConversation(cleanedSelectedConversation);
     } else {
       setSelectedConversation({
-        id: 1,
+        id: uuidv4(),
         name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0,
+        folderId: null,
       });
     }
   }, [serverSideApiKeyIsSet]);
@@ -627,7 +627,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   apiKey={apiKey}
                   folders={folders}
                   onToggleLightMode={handleLightMode}
-                  onCreateFolder={handleCreateFolder}
+                  onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
                   onDeleteFolder={handleDeleteFolder}
                   onUpdateFolder={handleUpdateFolder}
                   onNewConversation={handleNewConversation}

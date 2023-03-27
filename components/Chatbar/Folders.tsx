@@ -8,8 +8,8 @@ interface Props {
   searchTerm: string;
   conversations: Conversation[];
   folders: Folder[];
-  onDeleteFolder: (folder: number) => void;
-  onUpdateFolder: (folder: number, name: string) => void;
+  onDeleteFolder: (folder: string) => void;
+  onUpdateFolder: (folder: string, name: string) => void;
   // conversation props
   selectedConversation: Conversation;
   loading: boolean;

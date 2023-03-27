@@ -130,10 +130,7 @@ export const Promptbar: FC<Props> = ({
             onDragLeave={removeHighlight}
           >
             <Prompts
-              prompts={filteredPrompts.filter(
-                (prompt) =>
-                  prompt.folderId === 0 || !folders[prompt.folderId - 1],
-              )}
+              prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
               onUpdatePrompt={handleUpdatePrompt}
               onDeletePrompt={handleDeletePrompt}
             />

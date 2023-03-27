@@ -40,8 +40,6 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
     nameInputRef.current?.focus();
   }, []);
 
-  console.log('prompt', prompt);
-
   return (
     <div
       className="z-100 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"

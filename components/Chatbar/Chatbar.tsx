@@ -22,8 +22,8 @@ interface Props {
   apiKey: string;
   folders: Folder[];
   onCreateFolder: (name: string) => void;
-  onDeleteFolder: (folderId: number) => void;
-  onUpdateFolder: (folderId: number, name: string) => void;
+  onDeleteFolder: (folderId: string) => void;
+  onUpdateFolder: (folderId: string, name: string) => void;
   onNewConversation: () => void;
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
@@ -118,6 +118,9 @@ export const Chatbar: FC<Props> = ({
     }
   }, [searchTerm, conversations]);
 
+  console.log(filteredConversations);
+  console.log(folders);
+
   return (
     <div
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
@@ -162,7 +165,7 @@ export const Chatbar: FC<Props> = ({
             <Folders
               searchTerm={searchTerm}
               conversations={filteredConversations.filter(
-                (conversation) => conversation.folderId !== 0,
+                (conversation) => conversation.folderId,
               )}
               folders={folders}
               onDeleteFolder={onDeleteFolder}
@@ -187,9 +190,7 @@ export const Chatbar: FC<Props> = ({
             <Conversations
               loading={loading}
               conversations={filteredConversations.filter(
-                (conversation) =>
-                  conversation.folderId === 0 ||
-                  !folders[conversation.folderId - 1],
+                (conversation) => !conversation.folderId,
               )}
               selectedConversation={selectedConversation}
               onSelectConversation={onSelectConversation}

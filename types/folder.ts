@@ -1,4 +1,7 @@
 export interface Folder {
-  id: number;
+  id: string;
   name: string;
+  type: FolderType;
 }
+
+export type FolderType = 'chat' | 'prompt';

@@ -1,10 +1,10 @@
 import { OpenAIModel } from './openai';
 
 export interface Prompt {
-  id: number;
+  id: string;
   name: string;
   description: string;
   content: string;
   model: OpenAIModel;
-  folderId: number;
+  folderId: string | null;
 }

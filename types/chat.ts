@@ -15,10 +15,10 @@ export interface ChatBody {
 }
 
 export interface Conversation {
-  id: number;
+  id: string;
   name: string;
   messages: Message[];
   model: OpenAIModel;
   prompt: string;
-  folderId: number;
+  folderId: string | null;
 }

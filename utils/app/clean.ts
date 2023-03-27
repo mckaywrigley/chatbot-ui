@@ -29,7 +29,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.folderId) {
     updatedConversation = {
       ...updatedConversation,
-      folderId: updatedConversation.folderId || 0,
+      folderId: updatedConversation.folderId || null,
     };
   }
 
@@ -53,7 +53,7 @@ export const cleanConversationHistory = (history: Conversation[]) => {
       }
 
       if (!conversation.folderId) {
-        conversation.folderId = 0;
+        conversation.folderId = null;
       }
 
       acc.push(conversation);
