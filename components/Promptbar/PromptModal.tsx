@@ -57,7 +57,9 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
             className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-hidden rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
-            <div className="text-sm font-bold text-neutral-200">Name</div>
+            <div className="text-sm font-bold text-black dark:text-neutral-200">
+              Name
+            </div>
             <input
               ref={nameInputRef}
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
@@ -65,7 +67,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               onChange={(e) => setName(e.target.value)}
             />
 
-            <div className="mt-6 text-sm font-bold text-neutral-200">
+            <div className="mt-6 text-sm font-bold text-black dark:text-neutral-200">
               Description
             </div>
             <textarea
@@ -76,7 +78,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               rows={3}
             />
 
-            <div className="mt-6 text-sm font-bold text-neutral-200">
+            <div className="mt-6 text-sm font-bold text-black dark:text-neutral-200">
               Prompt
             </div>
             <textarea

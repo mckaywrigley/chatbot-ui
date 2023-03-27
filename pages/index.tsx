@@ -332,6 +332,19 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     });
     setConversations(updatedConversations);
     saveConversations(updatedConversations);
+
+    const updatedPrompts: Prompt[] = prompts.map((p) => {
+      if (p.folderId === folderId) {
+        return {
+          ...p,
+          folderId: null,
+        };
+      }
+
+      return p;
+    });
+    setPrompts(updatedPrompts);
+    savePrompts(updatedPrompts);
   };
 
   const handleUpdateFolder = (folderId: string, name: string) => {
@@ -357,9 +370,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
     const newConversation: Conversation = {
       id: uuidv4(),
-      name: `${t('Conversation')} ${
-        lastConversation ? lastConversation.id + 1 : 1
-      }`,
+      name: `${t('New Conversation')}`,
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
@@ -434,8 +445,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     });
     localStorage.removeItem('selectedConversation');
 
-    setFolders([]);
-    localStorage.removeItem('folders');
+    const updatedFolders = folders.filter((f) => f.type !== 'chat');
+    setFolders(updatedFolders);
+    saveFolders(updatedFolders);
   };
 
   const handleEditMessage = (message: Message, messageIndex: number) => {
@@ -602,7 +614,10 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       <Head>
         <title>Chatbot UI</title>
         <meta name="description" content="ChatGPT but better." />
-        <meta name="viewport" content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (

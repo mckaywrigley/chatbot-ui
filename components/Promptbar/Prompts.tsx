@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/prompt';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { PromptComponent } from './Prompt';
 
 interface Props {
@@ -13,8 +13,6 @@ export const Prompts: FC<Props> = ({
   onUpdatePrompt,
   onDeletePrompt,
 }) => {
-  const [selectedPrompt, setSelectedPrompt] = useState<Prompt>();
-
   return (
     <div className="flex w-full flex-col gap-1">
       {prompts
