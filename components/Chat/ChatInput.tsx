@@ -107,7 +107,6 @@ export const ChatInput: FC<Props> = ({
     const selectedPrompt = filteredPrompts[activePromptIndex];
     setContent((prevContent) => {
       const newContent = prevContent?.replace(/\/\w*$/, selectedPrompt.content);
-      updatePromptListVisibility(newContent || '');
       return newContent;
     });
     handlePromptSelect(selectedPrompt);
@@ -177,21 +176,18 @@ export const ChatInput: FC<Props> = ({
     if (parsedVariables.length > 0) {
       setIsModalVisible(true);
     } else {
-      setContent((prevContent) =>
-        prevContent?.replace(/\/\w*$/, prompt.content),
-      );
+      setContent((prevContent) => {
+        const updatedContent = prevContent?.replace(/\/\w*$/, prompt.content);
+        return updatedContent;
+      });
       updatePromptListVisibility(prompt.content);
     }
   };
 
   const handleSubmit = (updatedVariables: string[]) => {
-    let newContent = content?.replace(/\/\w*$/, variables[0]);
-
-    variables.forEach((variable, index) => {
-      newContent = newContent?.replace(
-        `{{${variable}}}`,
-        updatedVariables[index],
-      );
+    const newContent = content?.replace(/{{(.*?)}}/g, (match, variable) => {
+      const index = variables.indexOf(variable);
+      return updatedVariables[index];
     });
 
     setContent(newContent);
@@ -199,8 +195,6 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.focus();
     }
-
-    setIsModalVisible(false);
   };
 
   useEffect(() => {

@@ -74,7 +74,12 @@ export const Promptbar: FC<Props> = ({
     if (searchTerm) {
       setFilteredPrompts(
         prompts.filter((prompt) => {
-          const searchable = prompt.name.toLowerCase();
+          const searchable =
+            prompt.name.toLowerCase() +
+            ' ' +
+            prompt.description.toLowerCase() +
+            ' ' +
+            prompt.content.toLowerCase();
           return searchable.includes(searchTerm.toLowerCase());
         }),
       );
@@ -126,7 +131,7 @@ export const Promptbar: FC<Props> = ({
           <div className="flex border-b border-white/20 pb-2">
             <PromptFolders
               searchTerm={searchTerm}
-              prompts={prompts}
+              prompts={filteredPrompts}
               folders={folders.filter((folder) => folder.type === 'prompt')}
               onUpdateFolder={onUpdateFolder}
               onDeleteFolder={onDeleteFolder}

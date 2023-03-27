@@ -37,13 +37,19 @@ export const VariableModal: FC<Props> = ({
   };
 
   const handleSubmit = () => {
+    if (updatedVariables.some((variable) => variable.value === '')) {
+      alert('Please fill out all variables');
+      return;
+    }
+
     onSubmit(updatedVariables.map((variable) => variable.value));
+    onClose();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      onSubmit(updatedVariables.map((variable) => variable.value));
-      onClose();
+      e.preventDefault();
+      handleSubmit();
     } else if (e.key === 'Escape') {
       onClose();
     }
