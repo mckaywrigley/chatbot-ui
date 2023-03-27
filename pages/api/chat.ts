@@ -4,7 +4,7 @@ import { getStream } from '@/utils/server';
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
 
 export const config = {
-  runtime: 'edge'
+  runtime: 'edge',
 };
 
 const handler = async (req: Request) => {
@@ -12,7 +12,6 @@ const handler = async (req: Request) => {
     const { model, messages, key, prompt } = (await req.json()) as ChatBody;
     const stream = await getStream({ model, messages, prompt, key, wasm });
     return new Response(stream);
-
   } catch (error) {
     console.error(error);
     return new Response('Error', { status: 500 });

@@ -6,14 +6,14 @@ let wasmPlugin = {
   name: 'wasm',
   setup(build) {
     // Resolve ".wasm" files to a path with a namespace
-    build.onResolve({ filter: /\.wasm$/ }, args => {
+    build.onResolve({ filter: /\.wasm$/ }, (args) => {
       // If this is the import inside the stub module, import the
       // binary itself. Put the path in the "wasm-binary" namespace
       // to tell our binary load callback to load the binary file.
       if (args.namespace === 'wasm-stub') {
         return {
           path: args.path,
-          namespace: 'wasm-binary'
+          namespace: 'wasm-binary',
         };
       }
 
@@ -28,9 +28,10 @@ let wasmPlugin = {
         return; // Ignore unresolvable paths
       }
       return {
-        path: path.isAbsolute(args.path) ? args.path
+        path: path.isAbsolute(args.path)
+          ? args.path
           : path.join(args.resolveDir, args.path),
-        namespace: 'wasm-stub'
+        namespace: 'wasm-stub',
       };
     });
 
@@ -41,7 +42,7 @@ let wasmPlugin = {
       contents: `import wasm from ${JSON.stringify(args.path)}
         export default (imports) =>
           WebAssembly.instantiate(wasm, imports).then(
-            result => result.instance.exports)`
+            result => result.instance.exports)`,
     }));
 
     // Virtual modules in the "wasm-binary" namespace contain the
@@ -50,20 +51,18 @@ let wasmPlugin = {
     // binary data inside JavaScript code ourselves.
     build.onLoad({ filter: /.*/, namespace: 'wasm-binary' }, async (args) => ({
       contents: await fs.promises.readFile(args.path),
-      loader: 'binary'
+      loader: 'binary',
     }));
-  }
+  },
 };
 
 (async () => {
   await esbuild.build({
-    entryPoints: [ './server/server.ts' ],
+    entryPoints: ['./server/server.ts'],
     bundle: true,
     platform: 'node',
-    target: [ 'node18.0' ],
+    target: ['node18.0'],
     outfile: 'dist/server/server.js',
-    plugins: [
-      wasmPlugin
-    ]
+    plugins: [wasmPlugin],
   });
 })();
