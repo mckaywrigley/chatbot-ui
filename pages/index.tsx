@@ -5,6 +5,7 @@ import { Promptbar } from '@/components/Promptbar/Promptbar';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
+import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -285,19 +286,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     exportData();
   };
 
-  const handleImportConversations = (data: {
-    conversations: Conversation[];
-    folders: Folder[];
-  }) => {
-    const updatedConversations = [...conversations, ...data.conversations];
-    const updatedFolders = [...folders, ...data.folders];
+  const handleImportConversations = (data: SupportedExportFormats) => {
+    const { history, folders }: LatestExportFormat = importData(data);
 
-    importData(updatedConversations, updatedFolders);
-    setConversations(updatedConversations);
-    setSelectedConversation(
-      updatedConversations[updatedConversations.length - 1],
-    );
-    setFolders(updatedFolders);
+    setConversations(history);
+    setSelectedConversation(history[history.length - 1]);
+    setFolders(folders);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
