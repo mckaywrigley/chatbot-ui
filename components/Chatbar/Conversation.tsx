@@ -50,9 +50,11 @@ export const ConversationComponent: FC<Props> = ({
   };
 
   const handleRename = (conversation: Conversation) => {
-    onUpdateConversation(conversation, { key: 'name', value: renameValue });
-    setRenameValue('');
-    setIsRenaming(false);
+    if (renameValue.trim().length > 0) {
+      onUpdateConversation(conversation, { key: 'name', value: renameValue });
+      setRenameValue('');
+      setIsRenaming(false);
+    }
   };
 
   useEffect(() => {
