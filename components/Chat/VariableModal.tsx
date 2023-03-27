@@ -1,12 +1,19 @@
+import { Prompt } from '@/types/prompt';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 interface Props {
+  prompt: Prompt;
   variables: string[];
   onSubmit: (updatedVariables: string[]) => void;
   onClose: () => void;
 }
 
-export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
+export const VariableModal: FC<Props> = ({
+  prompt,
+  variables,
+  onSubmit,
+  onClose,
+}) => {
   const [updatedVariables, setUpdatedVariables] = useState<
     { key: string; value: string }[]
   >(
@@ -69,11 +76,15 @@ export const VariableModal: FC<Props> = ({ variables, onSubmit, onClose }) => {
     >
       <div
         ref={modalRef}
-        className="dark:border-netural-400 inline-block max-h-[400px]  transform overflow-hidden overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+        className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-hidden overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
         role="dialog"
       >
-        <div className="mb-4 text-lg font-bold text-black dark:text-neutral-200">
-          Fill out the prompt variables
+        <div className="mb-4 text-xl font-bold text-black dark:text-neutral-200">
+          {prompt.name}
+        </div>
+
+        <div className="mb-4 text-sm italic text-black dark:text-neutral-200">
+          {prompt.description}
         </div>
 
         {updatedVariables.map((variable, index) => (

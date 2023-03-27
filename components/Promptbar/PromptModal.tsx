@@ -7,13 +7,9 @@ interface Props {
   onUpdatePrompt: (prompt: Prompt) => void;
 }
 
-export const PromptModal: FC<Props> = ({
-  prompt,
-
-  onClose,
-  onUpdatePrompt,
-}) => {
+export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
   const [name, setName] = useState(prompt.name);
+  const [description, setDescription] = useState(prompt.description);
   const [content, setContent] = useState(prompt.content);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -21,7 +17,7 @@ export const PromptModal: FC<Props> = ({
 
   const handleEnter = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      onUpdatePrompt({ ...prompt, name, content: content.trim() });
+      onUpdatePrompt({ ...prompt, name, description, content: content.trim() });
       onClose();
     }
   };
@@ -44,6 +40,8 @@ export const PromptModal: FC<Props> = ({
     nameInputRef.current?.focus();
   }, []);
 
+  console.log('prompt', prompt);
+
   return (
     <div
       className="z-100 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
@@ -58,18 +56,33 @@ export const PromptModal: FC<Props> = ({
 
           <div
             ref={modalRef}
-            className="dark:border-netural-400 inline-block transform overflow-hidden rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-hidden rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
+            <div className="text-sm font-bold text-neutral-200">Name</div>
             <input
               ref={nameInputRef}
-              className="w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+              className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
 
+            <div className="mt-6 text-sm font-bold text-neutral-200">
+              Description
+            </div>
             <textarea
-              className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+              className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+              style={{ resize: 'none' }}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
+
+            <div className="mt-6 text-sm font-bold text-neutral-200">
+              Prompt
+            </div>
+            <textarea
+              className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -83,6 +96,7 @@ export const PromptModal: FC<Props> = ({
                 const updatedPrompt = {
                   ...prompt,
                   name,
+                  description,
                   content: content.trim(),
                 };
 

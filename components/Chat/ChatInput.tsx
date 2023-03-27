@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 interface Props {
@@ -109,7 +110,7 @@ export const ChatInput: FC<Props> = ({
       updatePromptListVisibility(newContent || '');
       return newContent;
     });
-    handlePromptSelect(selectedPrompt.content);
+    handlePromptSelect(selectedPrompt);
     setShowPromptList(false);
   };
 
@@ -169,15 +170,17 @@ export const ChatInput: FC<Props> = ({
     }
   }, []);
 
-  const handlePromptSelect = (promptText: string) => {
-    const parsedVariables = parseVariables(promptText);
+  const handlePromptSelect = (prompt: Prompt) => {
+    const parsedVariables = parseVariables(prompt.content);
     setVariables(parsedVariables);
 
     if (parsedVariables.length > 0) {
       setIsModalVisible(true);
     } else {
-      setContent((prevContent) => prevContent?.replace(/\/\w*$/, promptText));
-      updatePromptListVisibility(promptText);
+      setContent((prevContent) =>
+        prevContent?.replace(/\/\w*$/, prompt.content),
+      );
+      updatePromptListVisibility(prompt.content);
     }
   };
 
@@ -289,39 +292,18 @@ export const ChatInput: FC<Props> = ({
           </button>
 
           {showPromptList && (
-            <ul
-              ref={promptListRef}
-              className="absolute z-10 w-full rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
-              style={{
-                width: 'calc(100% - 48px)',
-                bottom: '100%',
-                marginBottom: '4px',
-                maxHeight: '200px',
-              }}
-            >
-              {filteredPrompts.map((prompt, index) => (
-                <li
-                  key={prompt.id}
-                  className={`${
-                    index === activePromptIndex
-                      ? 'bg-gray-200 dark:bg-[#202123] dark:text-black'
-                      : ''
-                  } cursor-pointer px-3 py-2 text-sm text-black dark:text-white`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleInitModal();
-                  }}
-                  onMouseEnter={() => setActivePromptIndex(index)}
-                >
-                  {prompt.name}
-                </li>
-              ))}
-            </ul>
+            <PromptList
+              activePromptIndex={activePromptIndex}
+              prompts={filteredPrompts}
+              onSelect={handleInitModal}
+              onMouseOver={setActivePromptIndex}
+              promptListRef={promptListRef}
+            />
           )}
 
           {isModalVisible && (
             <VariableModal
+              prompt={prompts[activePromptIndex]}
               variables={variables}
               onSubmit={handleSubmit}
               onClose={() => setIsModalVisible(false)}

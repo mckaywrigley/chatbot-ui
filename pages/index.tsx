@@ -463,6 +463,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     const newPrompt: Prompt = {
       id: lastPrompt ? lastPrompt.id + 1 : 1,
       name: `Prompt ${prompts.length + 1}`,
+      description: '',
       content: '',
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       folderId: 0,
