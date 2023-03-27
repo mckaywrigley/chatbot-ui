@@ -270,6 +270,16 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     localStorage.setItem('apiKey', apiKey);
   };
 
+  const handleToggleChatbar = () => {
+    setShowSidebar(!showSidebar);
+    localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
+  };
+
+  const handleTogglePromptbar = () => {
+    setShowPromptbar(!showPromptbar);
+    localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
+  };
+
   const handleExportData = () => {
     exportData();
   };
@@ -537,6 +547,16 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       setShowSidebar(false);
     }
 
+    const showChatbar = localStorage.getItem('showChatbar');
+    if (showChatbar) {
+      setShowSidebar(showChatbar === 'true');
+    }
+
+    const showPromptbar = localStorage.getItem('showPromptbar');
+    if (showPromptbar) {
+      setShowPromptbar(showPromptbar === 'true');
+    }
+
     const folders = localStorage.getItem('folders');
     if (folders) {
       setFolders(JSON.parse(folders));
@@ -613,7 +633,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={() => setShowSidebar(!showSidebar)}
+                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
@@ -623,18 +643,18 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
                 <IconArrowBarLeft
                   className="fixed top-5 left-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
-                  onClick={() => setShowSidebar(!showSidebar)}
+                  onClick={handleToggleChatbar}
                 />
 
                 <div
-                  onClick={() => setShowSidebar(!showSidebar)}
+                  onClick={handleToggleChatbar}
                   className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
               <IconArrowBarRight
                 className="fixed top-2.5 left-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-4 sm:h-8 sm:w-8 sm:text-neutral-700"
-                onClick={() => setShowSidebar(!showSidebar)}
+                onClick={handleToggleChatbar}
               />
             )}
 
@@ -660,7 +680,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 <Promptbar
                   prompts={prompts}
                   folders={folders}
-                  onToggleSidebar={() => setShowPromptbar(!showPromptbar)}
+                  onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}
@@ -668,17 +688,17 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 />
                 <IconArrowBarRight
                   className="fixed top-5 right-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
-                  onClick={() => setShowPromptbar(!showPromptbar)}
+                  onClick={handleTogglePromptbar}
                 />
                 <div
-                  onClick={() => setShowPromptbar(!showPromptbar)}
+                  onClick={handleTogglePromptbar}
                   className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
               <IconArrowBarLeft
                 className="fixed top-2.5 right-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-4 sm:h-8 sm:w-8 sm:text-neutral-700"
-                onClick={() => setShowPromptbar(!showPromptbar)}
+                onClick={handleTogglePromptbar}
               />
             )}
           </div>

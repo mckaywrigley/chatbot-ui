@@ -12,4 +12,7 @@ export interface LocalStorage {
   folders: Folder[];
   // added prompts (3/26/23)
   prompts: Prompt[];
+  // added showChatbar and showPromptbar (3/26/23)
+  showChatbar: boolean;
+  showPromptbar: boolean;
 }
