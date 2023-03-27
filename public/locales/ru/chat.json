@@ -6,7 +6,7 @@
   "System Prompt": "Системное сообщение",
   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Вы ChatGPT, большая языковая модель, созданная компанией OpenAI. Следуйте инструкциям пользователя. Отвечайте на сообщения, используя Markdown",
   "Enter a prompt": "Введите сообщение",
-  "Regenerate response": "Сгенерировать сообщение снова",
+  "Regenerate response": "Перегенерировать сообщение",
   "Sorry, there was an error.": "Просим прощения, произошла ошибка",
   "Model": "Модель",
   "Conversation": "Чат",
@@ -17,11 +17,11 @@
   "AI": "Бот",
   "You": "Вы",
   "Cancel": "Отмена",
-  "Save & Submit": "Сохранить и отправить",
+  "Save & Submit": "Отредактировать",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Убедитесь, что вы ввели API-ключ OpenAI.",
   "If you completed this step, OpenAI may be experiencing issues.": "Если вы выполнили этот шаг, то возможно OpenAI может испытывать проблемы",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Лимит сообщения: {{maxLength}} символов. Вы ввели {{valueLength}} символов.",
   "Please enter a message": "Пожалуйста введите сообщение",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI - продвинутый интерфейс чатбота для чат-моделей OpenAI, которое имитирует интерфейс ChatGPT",
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI - продвинутый интерфейс чатбота для чат-моделей OpenAI, имитирующий интерфейс ChatGPT",
   "Are you sure you want to clear all messages?": "Вы уверены, что хотите удалить все сообщения?"
 }

@@ -6,9 +6,10 @@ import {
   OpenAIModel,
 } from '@/types';
 import { throttle } from '@/utils';
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconKey, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, memo, MutableRefObject, useEffect, useRef, useState } from 'react';
+import { Spinner } from '../Global/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
@@ -110,24 +111,31 @@ export const Chat: FC<Props> = memo(
       <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
         {!(apiKey || serverSideApiKeyIsSet) ? (
           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
+            <div className="mx-auto mb-5">
+              <IconKey size={36} />
+            </div>
             <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
               {t('OpenAI API Key Required')}
             </div>
             <div className="text-center text-gray-500 dark:text-gray-400">
-              {t(
-                'Please set your OpenAI API key in the bottom left of the sidebar.',
-              )}
-            </div>
-            <div className="text-center text-gray-500 dark:text-gray-400">
-              {t("If you don't have an OpenAI API key, you can get one here: ")}
-              <a
-                href="https://platform.openai.com/account/api-keys"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 hover:underline"
-              >
-                openai.com
-              </a>
+              <div className="mb-2">
+                {t(
+                  'Please set your OpenAI API key in the bottom left of the sidebar.',
+                )}
+              </div>
+              <div>
+                {t(
+                  "If you don't have an OpenAI API key, you can get one here: ",
+                )}
+                <a
+                  href="https://platform.openai.com/account/api-keys"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  openai.com
+                </a>
+              </div>
             </div>
           </div>
         ) : modelError ? (
@@ -142,11 +150,17 @@ export const Chat: FC<Props> = memo(
                 <>
                   <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
                     <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                      {models.length === 0 ? t('Loading...') : 'Chatbot UI'}
+                      {models.length === 0 ? (
+                        <div>
+                          <Spinner size="16px" className="mx-auto" />
+                        </div>
+                      ) : (
+                        'Chatbot UI'
+                      )}
                     </div>
 
                     {models.length > 0 && (
-                      <div className="flex h-full flex-col space-y-4 rounded border border-neutral-200 p-4 dark:border-neutral-600">
+                      <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                         <ModelSelect
                           model={conversation.model}
                           models={models}
