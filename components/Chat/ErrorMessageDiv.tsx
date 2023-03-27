@@ -1,4 +1,5 @@
 import { ErrorMessage } from '@/types';
+import { IconCircleX } from '@tabler/icons-react';
 import { FC } from 'react';
 
 interface Props {
@@ -7,16 +8,20 @@ interface Props {
 
 export const ErrorMessageDiv: FC<Props> = ({ error }) => {
   return (
-    <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
-      <div className="text-center text-red-500">
-        {error.title} {error.code ? <i>({error.code}) </i> : ''}
+    <div className="mx-6 flex h-full flex-col items-center justify-center text-red-500">
+      <div className="mb-5">
+        <IconCircleX size={36} />
       </div>
+      <div className="mb-3 text-2xl font-medium">{error.title}</div>
       {error.messageLines.map((line, index) => (
-        <div key={index} className="text-center text-red-500">
+        <div key={index} className="text-center">
           {' '}
           {line}{' '}
         </div>
       ))}
+      <div className="text-xs dark:text-red-400 opacity-50 mt-4">
+        {error.code ? <i>Code: {error.code}</i> : ''}
+      </div>
     </div>
   );
 };
