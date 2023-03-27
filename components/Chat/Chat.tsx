@@ -201,6 +201,7 @@ export const Chat: FC<Props> = memo(
 
                         <SystemPrompt
                           conversation={conversation}
+                          prompts={prompts}
                           onChangePrompt={(prompt) =>
                             onUpdateConversation(conversation, {
                               key: 'prompt',

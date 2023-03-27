@@ -19,7 +19,7 @@ export const PromptList: FC<Props> = ({
   return (
     <ul
       ref={promptListRef}
-      className="absolute z-10 w-full rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
+      className="z-10 w-full rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
       style={{
         width: 'calc(100% - 48px)',
         bottom: '100%',

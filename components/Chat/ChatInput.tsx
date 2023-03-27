@@ -258,7 +258,7 @@ export const ChatInput: FC<Props> = ({
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 md:py-3 md:pl-4">
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 pl-2 text-black outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:text-white md:pl-0"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-8 pl-2 text-black outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:text-white md:pl-0"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -287,14 +287,16 @@ export const ChatInput: FC<Props> = ({
             <IconSend size={16} className="opacity-60" />
           </button>
 
-          {showPromptList && (
-            <PromptList
-              activePromptIndex={activePromptIndex}
-              prompts={filteredPrompts}
-              onSelect={handleInitModal}
-              onMouseOver={setActivePromptIndex}
-              promptListRef={promptListRef}
-            />
+          {showPromptList && prompts.length > 0 && (
+            <div className="absolute bottom-12 w-full">
+              <PromptList
+                activePromptIndex={activePromptIndex}
+                prompts={filteredPrompts}
+                onSelect={handleInitModal}
+                onMouseOver={setActivePromptIndex}
+                promptListRef={promptListRef}
+              />
+            </div>
           )}
 
           {isModalVisible && (
