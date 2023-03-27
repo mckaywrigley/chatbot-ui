@@ -1,6 +1,6 @@
 import { ChatFolder, Conversation } from '@/types';
 
-function currentDate() {
+export function currentDate() {
   const date = new Date();
   let month = date.getMonth() + 1;
   let day = date.getDate();
@@ -29,7 +29,7 @@ export const exportData = () => {
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `chatbot_ui_history_${currentDate()}.json`;
+  link.download = `cahtify_ui_history_${currentDate()}.json`;
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);
