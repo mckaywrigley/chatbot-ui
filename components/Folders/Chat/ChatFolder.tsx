@@ -201,7 +201,7 @@ export const ChatFolder: FC<Props> = ({
         ? conversations.map((conversation, index) => {
             if (conversation.folderId === currentFolder.id) {
               return (
-                <div key={index} className="ml-5 gap-2 border-l pl-2 pt-2">
+                <div key={index} className="ml-5 gap-2 border-l pl-2">
                   <ConversationComponent
                     selectedConversation={selectedConversation}
                     conversation={conversation}

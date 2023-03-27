@@ -196,7 +196,7 @@ export const PromptFolder: FC<Props> = ({
         ? prompts.map((prompt, index) => {
             if (prompt.folderId === currentFolder.id) {
               return (
-                <div key={index} className="ml-5 gap-2 border-l pl-2 pt-2">
+                <div key={index} className="ml-5 gap-2 border-l pl-2">
                   <PromptComponent
                     prompt={prompt}
                     onDeletePrompt={onDeletePrompt}
