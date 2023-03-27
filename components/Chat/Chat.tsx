@@ -144,7 +144,8 @@ export const Chat: FC<Props> = ({
                       t('Loading...')
                     ) : (
                       <div className="flex items-center justify-center">
-                        <Image src="/icons/icon-152x152-white.png" width={80} height={80} alt="Chatify Logo" />
+                        <Image className="hidden dark:inline" src="/icons/icon-152x152-white.png" width={80} height={80} alt="Chatify Logo" />
+                        <Image className="inline dark:hidden" src="/icons/icon-152x152.png" width={80} height={80} alt="Chatify Logo" />
                         <Logo />
                       </div>
                     )}

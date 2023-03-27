@@ -14,7 +14,7 @@ export default function Document(props: Props) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Chatify UI"></meta>
         <meta name="description" content="ChatGPT but better." />
-        <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta charSet='utf-8' />
         <meta property='og:type' content='website' />
         <link rel="manifest" href="/manifest.json" />
