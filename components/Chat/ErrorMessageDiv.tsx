@@ -1,4 +1,4 @@
-import { ErrorMessage } from '@/types';
+import { ErrorMessage } from '@/types/error';
 import { IconCircleX } from '@tabler/icons-react';
 import { FC } from 'react';
 
