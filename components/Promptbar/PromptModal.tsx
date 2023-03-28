@@ -1,5 +1,6 @@
 import { Prompt } from '@/types/prompt';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   prompt: Prompt;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
+  const { t } = useTranslation('promptbar');
   const [name, setName] = useState(prompt.name);
   const [description, setDescription] = useState(prompt.description);
   const [content, setContent] = useState(prompt.content);
@@ -42,11 +44,11 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
 
   return (
     <div
-      className="z-100 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-100"
       onKeyDown={handleEnter}
     >
       <div className="fixed inset-0 z-10 overflow-y-auto">
-        <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
           <div
             className="hidden sm:inline-block sm:h-screen sm:align-middle"
             aria-hidden="true"
@@ -58,7 +60,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
             role="dialog"
           >
             <div className="text-sm font-bold text-black dark:text-neutral-200">
-              Name
+              {t('Name')}
             </div>
             <input
               ref={nameInputRef}
@@ -69,24 +71,28 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
             />
 
             <div className="mt-6 text-sm font-bold text-black dark:text-neutral-200">
-              Description
+              {t('Description')}
             </div>
             <textarea
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
-              placeholder="A description for your prompt."
+              placeholder={t('A description for your prompt.') || ''}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
             />
 
             <div className="mt-6 text-sm font-bold text-black dark:text-neutral-200">
-              Prompt
+              {t('Prompt')}
             </div>
             <textarea
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
-              placeholder="Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}"
+              placeholder={
+                t(
+                  'Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}',
+                ) || ''
+              }
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={10}
@@ -94,7 +100,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
 
             <button
               type="button"
-              className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
               onClick={() => {
                 const updatedPrompt = {
                   ...prompt,
@@ -107,7 +113,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
                 onClose();
               }}
             >
-              Save
+              {t('Save')}
             </button>
           </div>
         </div>

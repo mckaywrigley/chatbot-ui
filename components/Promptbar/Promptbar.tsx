@@ -127,7 +127,7 @@ export const Promptbar: FC<Props> = ({
 
       {prompts.length > 1 && (
         <Search
-          placeholder="Search prompts..."
+          placeholder={t('Search prompts...') || ''}
           searchTerm={searchTerm}
           onSearch={setSearchTerm}
         />

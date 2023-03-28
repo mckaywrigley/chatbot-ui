@@ -663,7 +663,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 </button>
                 <div
                   onClick={handleToggleChatbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
+                  className="absolute top-0 left-0 z-10 w-full h-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
@@ -713,7 +713,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 </button>
                 <div
                   onClick={handleTogglePromptbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
+                  className="absolute top-0 left-0 z-10 w-full h-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
@@ -741,6 +741,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'chat',
         'sidebar',
         'markdown',
+        'promptbar'
       ])),
     },
   };
