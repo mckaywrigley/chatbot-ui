@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { countTokens, messagesTokensCount } from '@/utils/app/token';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -283,6 +284,7 @@ export const ChatInput: FC<Props> = ({
           >
             <IconSend size={18} />
           </button>
+          <div className='absolute top-[-30px] right-2 p-1 text-right'>new tokens: {countTokens(content)}, total tokens: {messagesTokensCount(messages)}</div>
 
           {showPromptList && prompts.length > 0 && (
             <div className="absolute bottom-12 w-full">
