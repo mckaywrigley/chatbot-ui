@@ -20,9 +20,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "jsdom"
-  }
+  "exclude": ["node_modules"]
 }
