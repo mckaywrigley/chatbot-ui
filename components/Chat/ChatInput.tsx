@@ -107,11 +107,13 @@ export const ChatInput: FC<Props> = ({
 
   const handleInitModal = () => {
     const selectedPrompt = filteredPrompts[activePromptIndex];
-    setContent((prevContent) => {
-      const newContent = prevContent?.replace(/\/\w*$/, selectedPrompt.content);
-      return newContent;
-    });
-    handlePromptSelect(selectedPrompt);
+    if (selectedPrompt) {
+      setContent((prevContent) => {
+        const newContent = prevContent?.replace(/\/\w*$/, selectedPrompt.content);
+        return newContent;
+      });
+      handlePromptSelect(selectedPrompt);
+    }
     setShowPromptList(false);
   };
 
@@ -209,9 +211,8 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+        }`;
     }
   }, [content]);
 
@@ -261,11 +262,10 @@ export const ChatInput: FC<Props> = ({
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
-              overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
-                  ? 'auto'
-                  : 'hidden'
-              }`,
+              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+                ? 'auto'
+                : 'hidden'
+                }`,
             }}
             placeholder={
               t('Type a message or type "/" to select a prompt...') || ''
