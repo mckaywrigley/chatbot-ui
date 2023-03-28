@@ -278,10 +278,10 @@ export const ChatInput: FC<Props> = ({
             onKeyDown={handleKeyDown}
           />
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200 opacity-60"
             onClick={handleSend}
           >
-            <IconSend size={18} className="opacity-60" />
+            <IconSend size={18} />
           </button>
 
           {showPromptList && prompts.length > 0 && (
