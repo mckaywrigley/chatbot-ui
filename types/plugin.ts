@@ -5,6 +5,14 @@ export interface Plugin {
 }
 
 type ManifestAuthType = 'none' | 'user_http' | 'service_http' | 'oauth';
+const ManifestAuthType: {
+  [key in ManifestAuthType]: ManifestAuthType;
+} = {
+  none: 'none',
+  user_http: 'user_http',
+  service_http: 'service_http',
+  oauth: 'oauth',
+};
 
 interface BaseManifestAuth {
   type: ManifestAuthType;
@@ -64,7 +72,7 @@ export const dummyPlugins = [
       description_for_model: 'plugin1',
       description_for_human: 'Plugin 1',
       auth: {
-        type: 'none',
+        type: ManifestAuthType.none,
         instructions: 'No auth',
       },
       api: {},
@@ -72,7 +80,7 @@ export const dummyPlugins = [
       contact_email: '',
       legal_info_url: 'https://via.placeholder.com/150',
     },
-  },
+  } as Plugin,
   {
     id: '2',
     name: 'plugin2',
@@ -83,7 +91,7 @@ export const dummyPlugins = [
       description_for_model: 'plugin2',
       description_for_human: 'Plugin 2',
       auth: {
-        type: 'service_http',
+        type: ManifestAuthType.service_http,
         instructions: 'Service HTTP auth',
         httpAuthorizationType: 'basic',
       },
@@ -92,5 +100,5 @@ export const dummyPlugins = [
       contact_email: '',
       legal_info_url: 'https://via.placeholder.com/150',
     },
-  },
+  } as Plugin,
 ];

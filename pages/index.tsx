@@ -8,7 +8,7 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { dummyPlugins, Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
@@ -61,7 +61,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
-  const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const [plugins, setPlugins] = useState<Plugin[]>([...dummyPlugins]);
   //@colin
   // plugins todo
   // - we also need a way to handle installing new plugins
