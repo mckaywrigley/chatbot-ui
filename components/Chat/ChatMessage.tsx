@@ -19,6 +19,7 @@ export const ChatMessage: FC<Props> = memo(
   ({ message, messageIndex, onEditMessage }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isTyping, setIsTyping] = useState<boolean>(false);
     const [isHovering, setIsHovering] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
@@ -47,7 +48,7 @@ export const ChatMessage: FC<Props> = memo(
     };
 
     const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
         e.preventDefault();
         handleEditMessage();
       }
@@ -98,6 +99,8 @@ export const ChatMessage: FC<Props> = memo(
                       value={messageContent}
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
+                      onCompositionStart={() => setIsTyping(true)}
+                      onCompositionEnd={() => setIsTyping(false)}
                       style={{
                         fontFamily: 'inherit',
                         fontSize: 'inherit',
