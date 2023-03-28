@@ -261,6 +261,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   // BASIC HANDLERS --------------------------------------------
 
+  // BASIC HANDLERS --------------------------------------------
+
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
     localStorage.setItem('theme', mode);
@@ -549,6 +551,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       fetchModels(apiKey);
     }
   }, [apiKey, fetchModels]);
+
+  // ON LOAD --------------------------------------------
 
   // ON LOAD --------------------------------------------
 
