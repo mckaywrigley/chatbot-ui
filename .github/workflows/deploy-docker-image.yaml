@@ -15,7 +15,7 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
   # Date format: YYYYMMDD
-  DATE_TAG: ${{ github.event.head_commit.timestamp | strftime('%Y%m%d') }}
+  DATE_TAG: $(date '+%Y%m%d')
 
 jobs:
   build:
