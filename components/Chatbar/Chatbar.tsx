@@ -1,5 +1,6 @@
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
+import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import {
   IconArrowBarLeft,
@@ -36,10 +37,7 @@ interface Props {
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
-  onImportConversations: (data: {
-    conversations: Conversation[];
-    folders: Folder[];
-  }) => void;
+  onImportConversations: (data: SupportedExportFormats) => void;
 }
 
 export const Chatbar: FC<Props> = ({
