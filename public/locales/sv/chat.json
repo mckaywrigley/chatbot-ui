@@ -20,5 +20,6 @@
   "If you completed this step, OpenAI may be experiencing issues.": "Om du slutförde det här steget kan OpenAI ha problem.",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Meddelandegränsen är {{maxLength}} tecken. Du har angett {{valueLength}} tecken.",
   "Please enter a message": "Vänligen ange ett meddelande",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI är ett avancerat chatbot-kit för OpenAI:s chattmodeller som syftar till att efterlikna ChatGPT:s gränssnitt och funktionalitet."
+  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI är ett avancerat chatbot-kit för OpenAI:s chattmodeller som syftar till att efterlikna ChatGPT:s gränssnitt och funktionalitet.",
+  "Are you sure you want to clear all messages?": "Är du säker på att du vill rensa alla meddelanden?"
 }

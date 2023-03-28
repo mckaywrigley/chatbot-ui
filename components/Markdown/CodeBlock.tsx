@@ -3,8 +3,8 @@ import {
   programmingLanguages,
 } from '@/utils/app/codeblock';
 import { IconCheck, IconClipboard, IconDownload } from '@tabler/icons-react';
-import { FC, useState } from 'react';
 import { useTranslation } from 'next-i18next';
+import { FC, memo, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
@@ -13,7 +13,7 @@ interface Props {
   value: string;
 }
 
-export const CodeBlock: FC<Props> = ({ language, value }) => {
+export const CodeBlock: FC<Props> = memo(({ language, value }) => {
   const { t } = useTranslation('markdown');
   const [isCopied, setIsCopied] = useState<Boolean>(false);
 
@@ -64,18 +64,18 @@ export const CodeBlock: FC<Props> = ({ language, value }) => {
 
         <div className="flex items-center">
           <button
-            className="flex items-center rounded bg-none py-0.5 px-2 text-xs text-white focus:outline-none"
+            className="flex gap-1.5 items-center rounded bg-none p-1 text-xs text-white"
             onClick={copyToClipboard}
           >
             {isCopied ? (
-              <IconCheck size={18} className="mr-1.5" />
+              <IconCheck size={18} />
             ) : (
-              <IconClipboard size={18} className="mr-1.5" />
+              <IconClipboard size={18} />
             )}
             {isCopied ? t('Copied!') : t('Copy code')}
           </button>
           <button
-            className="flex items-center rounded bg-none py-0.5 pl-2 text-xs text-white focus:outline-none"
+            className="flex items-center rounded bg-none p-1 text-xs text-white"
             onClick={downloadAsFile}
           >
             <IconDownload size={18} />
@@ -92,4 +92,5 @@ export const CodeBlock: FC<Props> = ({ language, value }) => {
       </SyntaxHighlighter>
     </div>
   );
-};
+});
+CodeBlock.displayName = 'CodeBlock';

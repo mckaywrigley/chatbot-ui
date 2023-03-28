@@ -1,7 +1,5 @@
 # Chatbot UI
 
-**Note: Chatbot UI Pro has been renamed to Chatbot UI.**
-
 Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
@@ -16,14 +14,14 @@ Expect frequent improvements.
 
 **Next up:**
 
+- [ ] Delete messages
 - [ ] More model settings
-- [ ] Custom themes
-- [ ] Prompt templates
 - [ ] Plugins
 
 **Recent updates:**
 
-- [x] Regenerate & edit responses
+- [x] Prompt templates (3/27/23)
+- [x] Regenerate & edit responses (3/25/23)
 - [x] Folders (3/24/23)
 - [x] Search chat content (3/23/23)
 - [x] Stop message generation (3/22/23)

@@ -1,4 +1,4 @@
-import { Conversation } from '@/types';
+import { Conversation } from '@/types/chat';
 import { IconPlus } from '@tabler/icons-react';
 import { FC } from 'react';
 
@@ -20,7 +20,7 @@ export const Navbar: FC<Props> = ({
       </div>
 
       <IconPlus
-        className="cursor-pointer hover:text-neutral-400"
+        className="cursor-pointer hover:text-neutral-400 mr-8"
         onClick={onNewConversation}
       />
     </nav>
