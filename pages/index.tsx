@@ -27,7 +27,7 @@ import { exportData, importData } from '@/utils/app/importExport';
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
@@ -53,7 +53,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const handleSend = async (message: Message, deleteCount = 0) => {
+  const handleSend = useCallback(async (message: Message, deleteCount = 0) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
@@ -202,9 +202,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
       setMessageIsStreaming(false);
     }
-  };
+  }, [selectedConversation, apiKey, conversations]);
 
-  const fetchModels = async (key: string) => {
+  const fetchModels = useCallback(async (key: string) => {
     const error = {
       title: t('Error fetching models.'),
       code: null,
@@ -247,7 +247,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
     setModels(data);
     setModelError(null);
-  };
+  }, [t]);
 
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
@@ -445,7 +445,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       handleSend(currentMessage);
       setCurrentMessage(undefined);
     }
-  }, [currentMessage]);
+  }, [currentMessage, handleSend]);
 
   useEffect(() => {
     if (window.innerWidth < 640) {
@@ -457,7 +457,13 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     if (apiKey) {
       fetchModels(apiKey);
     }
-  }, [apiKey]);
+  }, [apiKey, fetchModels]);
+
+  useEffect(() => {
+    if (apiKey) {
+      fetchModels(apiKey);
+    }
+  }, [apiKey, fetchModels]);
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
@@ -510,7 +516,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
         folderId: 0,
       });
     }
-  }, [serverSideApiKeyIsSet]);
+  }, [fetchModels, serverSideApiKeyIsSet]);
 
   return (
     <>
