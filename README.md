@@ -59,9 +59,14 @@ Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro
 
 **Docker**
 
+Build locally:
 ```shell
 docker build -t chatgpt-ui .
 docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
+```
+Pull from ghcr:
+```
+docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
 ```
 
 ## Running Locally
@@ -85,6 +90,8 @@ Create a .env.local file in the root of the repo with your OpenAI API Key:
 ```bash
 OPENAI_API_KEY=YOUR_KEY
 ```
+
+> you can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
 
 **4. Run App**
 
