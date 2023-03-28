@@ -52,3 +52,45 @@ interface PluginManifest {
   contact_email: string;
   legal_info_url: string;
 }
+
+export const dummyPlugins = [
+  {
+    id: '1',
+    name: 'plugin1',
+    manifest: {
+      schema_version: '1.0.0',
+      name_for_model: 'plugin1',
+      name_for_human: 'Plugin 1',
+      description_for_model: 'plugin1',
+      description_for_human: 'Plugin 1',
+      auth: {
+        type: 'none',
+        instructions: 'No auth',
+      },
+      api: {},
+      logo_url: 'https://via.placeholder.com/150',
+      contact_email: '',
+      legal_info_url: 'https://via.placeholder.com/150',
+    },
+  },
+  {
+    id: '2',
+    name: 'plugin2',
+    manifest: {
+      schema_version: '1.0.0',
+      name_for_model: 'plugin2',
+      name_for_human: 'Plugin 2',
+      description_for_model: 'plugin2',
+      description_for_human: 'Plugin 2',
+      auth: {
+        type: 'service_http',
+        instructions: 'Service HTTP auth',
+        httpAuthorizationType: 'basic',
+      },
+      api: {},
+      logo_url: 'https://via.placeholder.com/150',
+      contact_email: '',
+      legal_info_url: 'https://via.placeholder.com/150',
+    },
+  },
+];
