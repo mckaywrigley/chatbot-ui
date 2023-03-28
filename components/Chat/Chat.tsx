@@ -312,14 +312,14 @@ export const Chat: FC<Props> = memo(
                       }
                     }}
                   >
-                    <IconRepeat size={16} /> {t('Regenerate response')}
+                    <IconRepeat size={18} /> {t('Regenerate response')}
                   </button>
                 )}
 
                 {showScrollDownButton && (
                   <div className="absolute bottom-0 right-0">
                     <button
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg dark:bg-[#515152d7]"
                       onClick={handleScrollDown}
                     >
                       <IconArrowDown size={18} />
