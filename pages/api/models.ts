@@ -45,7 +45,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
         }
       })
-      .filter(Boolean);
+      .filter(Boolean).filter((model: OpenAIModel) => model.id.match("gpt-3.5"));
 
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {
