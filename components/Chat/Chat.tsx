@@ -23,6 +23,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { Plugins } from '../Plugins/Plugins';
 
 interface Props {
   conversation: Conversation;
@@ -224,6 +225,7 @@ export const Chat: FC<Props> = memo(
                             })
                           }
                         />
+                        <Plugins />
                       </div>
                     )}
                   </div>
@@ -236,12 +238,13 @@ export const Chat: FC<Props> = memo(
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
                     >
-                    <IconSettings size={18} />
+                      <IconSettings size={18} />
                     </button>
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
-                      onClick={onClearAll}>
-                    <IconClearAll size={18} />
+                      onClick={onClearAll}
+                    >
+                      <IconClearAll size={18} />
                     </button>
                   </div>
                   {showSettings && (
@@ -306,7 +309,7 @@ export const Chat: FC<Props> = memo(
               className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
               onClick={handleScrollDown}
             >
-              <IconArrowDown size={18}/>
+              <IconArrowDown size={18} />
             </button>
           </div>
         )}
