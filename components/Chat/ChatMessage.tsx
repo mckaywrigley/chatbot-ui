@@ -18,6 +18,7 @@ export const ChatMessage: FC<Props> = memo(
   ({ message, messageIndex, onEditMessage }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
 
