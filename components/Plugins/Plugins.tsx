@@ -1,52 +1,13 @@
+import { Plugin } from '@/types/plugin';
 import { FC, useState } from 'react';
 import { Spinner } from '../Global/Spinner';
 
-interface Props {}
+interface Props {
+  plugins: Plugin[];
+  onInstall: (plugin: Plugin) => void;
+}
 
-const availablePlugins = [
-  {
-    name: 'Plugin 1',
-    description: 'Description of plugin 1',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 2',
-    description: 'Description of plugin 2',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 1',
-    description: 'Description of plugin 1',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 2',
-    description: 'Description of plugin 2',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 1',
-    description: 'Description of plugin 1',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 2',
-    description: 'Description of plugin 2',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 1',
-    description: 'Description of plugin 1',
-    enabled: false,
-  },
-  {
-    name: 'Plugin 2',
-    description: 'Description of plugin 2',
-    enabled: false,
-  },
-];
-
-const DropdownButton: FC<{ enabledPlugins: any[]; onClick: () => void }> = ({
+const DropdownButton: FC<{ enabledPlugins: Plugin[]; onClick: () => void }> = ({
   enabledPlugins,
   onClick,
 }) => {
@@ -67,16 +28,15 @@ const DropdownButton: FC<{ enabledPlugins: any[]; onClick: () => void }> = ({
   );
 };
 
-export const Plugins: FC<Props> = () => {
-  const [plugins, setPlugins] = useState<any>([]);
+export const Plugins: FC<Props> = ({ plugins, onInstall }: Props) => {
   const [showPluginStore, setShowPluginStore] = useState(false);
 
   const onShowPlugins = () => {
     setShowPluginStore(!showPluginStore);
   };
 
-  const handleInstallPlugin = (plugin: any) => {
-    setPlugins([...plugins, plugin]);
+  const handleInstallPlugin = (plugin: Plugin) => {
+    onInstall(plugin);
     setShowPluginStore(false);
   };
 
@@ -96,7 +56,10 @@ export const Plugins: FC<Props> = () => {
               >
                 &#x2715;
               </button>
-              <PluginStore handleInstallPlugin={handleInstallPlugin} />
+              <PluginStore
+                plugins={plugins}
+                handleInstallPlugin={handleInstallPlugin}
+              />
             </div>
           </div>
         )}
@@ -106,15 +69,17 @@ export const Plugins: FC<Props> = () => {
 };
 
 const PluginStore = ({
+  plugins,
   handleInstallPlugin,
 }: {
+  plugins: Plugin[];
   handleInstallPlugin: (plugin: any) => void;
 }) => {
   return (
     <div className="flex h-full flex-col space-y-4 p-10">
       <div className="text-xl">Plugin Store</div>
       <div className="grid h-full gap-4 overflow-y-auto rounded-sm p-4">
-        {availablePlugins.map((ap, i) => (
+        {plugins.map((ap, i) => (
           <Plugin
             key={ap.name + i}
             plugin={ap}
@@ -130,14 +95,14 @@ const Plugin = ({
   plugin,
   handleInstallPlugin,
 }: {
-  plugin: any;
+  plugin: Plugin;
   handleInstallPlugin: (plugin: any) => void;
 }) => {
   return (
     <div className="flex flex-col space-y-4 rounded-sm border border-gray-500 p-5">
       <div className="flex space-x-4">
         {/** a stock square image */}
-        <img src="https://via.placeholder.com/75" />
+        <img src={plugin.manifest.logo_url} alt="logo" className="h-16 w-16" />
         <div className="flex flex-col space-y-2">
           <div className="text-lg font-semibold">{plugin.name}</div>
           <InstallButton
@@ -147,7 +112,7 @@ const Plugin = ({
         </div>
       </div>
       <div className="flex text-sm text-gray-300">
-        <p>{plugin.description}</p>
+        <p>{plugin.manifest.description_for_model}</p>
       </div>
     </div>
   );

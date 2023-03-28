@@ -723,6 +723,8 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                plugins={plugins}
+                onInstallPlugin={handleInstallPlugin}
               />
             </div>
 

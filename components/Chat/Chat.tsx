@@ -24,6 +24,7 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { Plugins } from '../Plugins/Plugins';
+import { Plugin } from '@/types/plugin';
 
 interface Props {
   conversation: Conversation;
@@ -41,6 +42,8 @@ interface Props {
   ) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
+  plugins: Plugin[];
+  onInstallPlugin: (plugin: Plugin) => void;
 }
 
 export const Chat: FC<Props> = memo(
@@ -57,6 +60,8 @@ export const Chat: FC<Props> = memo(
     onUpdateConversation,
     onEditMessage,
     stopConversationRef,
+    plugins,
+    onInstallPlugin,
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -150,7 +155,7 @@ export const Chat: FC<Props> = memo(
     }, [messagesEndRef]);
 
     return (
-      <div className="overflow-hidden relative flex-1 bg-white dark:bg-[#343541]">
+      <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
         {!(apiKey || serverSideApiKeyIsSet) ? (
           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
             <div className="mx-auto mb-5 text-gray-800 dark:text-gray-100">
@@ -225,7 +230,10 @@ export const Chat: FC<Props> = memo(
                             })
                           }
                         />
-                        <Plugins />
+                        <Plugins
+                          plugins={plugins}
+                          onInstall={onInstallPlugin}
+                        />
                       </div>
                     )}
                   </div>
