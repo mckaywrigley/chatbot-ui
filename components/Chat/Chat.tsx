@@ -25,6 +25,9 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { Plugins } from '../Plugins/Plugins';
 
+// TODO: delete this, use actual plugin state
+const plugins = [{name: "Plugin 1"}, {name: "Plugin 2"}]
+
 interface Props {
   conversation: Conversation;
   models: OpenAIModel[];
@@ -234,6 +237,15 @@ export const Chat: FC<Props> = memo(
                 <>
                   <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}
+                    <div className="ml-1 flex flex-row items-center">
+                      | Installed Plugins:
+                      {/* TODO: replace with actual plugins */}
+                      {plugins.map((plugin) => (
+                        <span className="ml-1" key={plugin.name}>
+                          <img src="https://via.placeholder.com/20" />
+                        </span>
+                      ))}
+                    </div>
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
@@ -246,6 +258,7 @@ export const Chat: FC<Props> = memo(
                     >
                       <IconClearAll size={18} />
                     </button>
+                    
                   </div>
                   {showSettings && (
                     <div className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
