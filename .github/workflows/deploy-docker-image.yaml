@@ -9,7 +9,10 @@ on:
   push:
     branches: [ "main" ]
   workflow_run:
-    workflows: ["Run Jest Tests"]
+    workflows:
+      - run-test-suite
+    branches:
+      - main
     types:
       - completed
 
