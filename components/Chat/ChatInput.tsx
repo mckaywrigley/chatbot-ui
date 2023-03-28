@@ -141,7 +141,7 @@ export const ChatInput: FC<Props> = ({
       } else {
         setActivePromptIndex(0);
       }
-    } else if (e.key === 'Enter' && !isMobile() && !e.shiftKey) {
+    } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
