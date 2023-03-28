@@ -64,18 +64,18 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
 
         <div className="flex items-center">
           <button
-            className="flex items-center rounded bg-none py-0.5 px-2 text-xs text-white focus:outline-none"
+            className="flex gap-1.5 items-center rounded bg-none p-1 text-xs text-white"
             onClick={copyToClipboard}
           >
             {isCopied ? (
-              <IconCheck size={18} className="mr-1.5" />
+              <IconCheck size={18} />
             ) : (
-              <IconClipboard size={18} className="mr-1.5" />
+              <IconClipboard size={18} />
             )}
             {isCopied ? t('Copied!') : t('Copy code')}
           </button>
           <button
-            className="flex items-center rounded bg-none py-0.5 pl-2 text-xs text-white focus:outline-none"
+            className="flex items-center rounded bg-none p-1 text-xs text-white"
             onClick={downloadAsFile}
           >
             <IconDownload size={18} />

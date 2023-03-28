@@ -1,5 +1,6 @@
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
+import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import {
   IconArrowBarLeft,
@@ -36,10 +37,7 @@ interface Props {
   onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
-  onImportConversations: (data: {
-    conversations: Conversation[];
-    folders: Folder[];
-  }) => void;
+  onImportConversations: (data: SupportedExportFormats) => void;
 }
 
 export const Chatbar: FC<Props> = ({
@@ -196,11 +194,9 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 select-none text-center text-white opacity-50">
-            <IconMessagesOff className="mx-auto mb-3" />
-            <span className="text-[14px] leading-normal">
+          <div className="flex flex-col gap-3 items-center text-sm leading-normal mt-8 text-white opacity-50">
+            <IconMessagesOff />
               {t('No conversations.')}
-            </span>
           </div>
         )}
       </div>

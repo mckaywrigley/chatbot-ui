@@ -5,6 +5,7 @@ import { Promptbar } from '@/components/Promptbar/Promptbar';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
+import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -285,19 +286,12 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     exportData();
   };
 
-  const handleImportConversations = (data: {
-    conversations: Conversation[];
-    folders: Folder[];
-  }) => {
-    const updatedConversations = [...conversations, ...data.conversations];
-    const updatedFolders = [...folders, ...data.folders];
+  const handleImportConversations = (data: SupportedExportFormats) => {
+    const { history, folders }: LatestExportFormat = importData(data);
 
-    importData(updatedConversations, updatedFolders);
-    setConversations(updatedConversations);
-    setSelectedConversation(
-      updatedConversations[updatedConversations.length - 1],
-    );
-    setFolders(updatedFolders);
+    setConversations(history);
+    setSelectedConversation(history[history.length - 1]);
+    setFolders(folders);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -661,21 +655,24 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   onImportConversations={handleImportConversations}
                 />
 
-                <IconArrowBarLeft
-                  className="fixed top-5 left-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
+                <button
+                  className="fixed top-5 left-[270px] z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
                   onClick={handleToggleChatbar}
-                />
-
+                >
+                  <IconArrowBarLeft />
+                </button>
                 <div
                   onClick={handleToggleChatbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
+                  className="absolute top-0 left-0 z-10 w-full h-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
-              <IconArrowBarRight
-                className="fixed top-2.5 left-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-4 sm:h-8 sm:w-8 sm:text-neutral-700"
+              <button
+                className="fixed top-2.5 left-4 z-50 h-7 w-7 text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-4 sm:h-8 sm:w-8 sm:text-neutral-700"
                 onClick={handleToggleChatbar}
-              />
+              >
+                <IconArrowBarRight />
+              </button>
             )}
 
             <div className="flex flex-1">
@@ -708,20 +705,24 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                   onDeleteFolder={handleDeleteFolder}
                   onUpdateFolder={handleUpdateFolder}
                 />
-                <IconArrowBarRight
-                  className="fixed top-5 right-[270px] z-50 h-7 w-7 cursor-pointer hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
+                <button
+                  className="fixed top-5 right-[270px] z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
                   onClick={handleTogglePromptbar}
-                />
+                >
+                  <IconArrowBarRight />
+                </button>
                 <div
                   onClick={handleTogglePromptbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
+                  className="absolute top-0 left-0 z-10 w-full h-full bg-black opacity-70 sm:hidden"
                 ></div>
               </div>
             ) : (
-              <IconArrowBarLeft
-                className="fixed top-2.5 right-4 z-50 h-7 w-7 cursor-pointer text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-4 sm:h-8 sm:w-8 sm:text-neutral-700"
+              <button
+                className="fixed top-2.5 right-4 z-50 h-7 w-7 text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-4 sm:h-8 sm:w-8 sm:text-neutral-700"
                 onClick={handleTogglePromptbar}
-              />
+              >
+                <IconArrowBarLeft />
+              </button>
             )}
           </div>
         </main>
@@ -740,6 +741,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'chat',
         'sidebar',
         'markdown',
+        'promptbar'
       ])),
     },
   };

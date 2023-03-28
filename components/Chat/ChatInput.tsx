@@ -237,28 +237,26 @@ export const ChatInput: FC<Props> = ({
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
         {messageIsStreaming && (
           <button
-            className="absolute top-2 left-0 right-0 mx-auto mt-2 w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+            className="absolute left-0 right-0 mx-auto mt-2 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
             onClick={handleStopConversation}
           >
-            <IconPlayerStop size={16} className="mb-[2px] inline-block" />{' '}
-            {t('Stop Generating')}
+            <IconPlayerStop size={16} /> {t('Stop Generating')}
           </button>
         )}
 
         {!messageIsStreaming && !conversationIsEmpty && (
           <button
-            className="absolute left-0 right-0 mx-auto mt-2 w-fit rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+            className="absolute left-0 right-0 mx-auto mt-2 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
             onClick={onRegenerate}
           >
-            <IconRepeat size={16} className="mb-[2px] inline-block" />{' '}
-            {t('Regenerate response')}
+            <IconRepeat size={16} /> {t('Regenerate response')}
           </button>
         )}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 md:py-3 md:pl-4">
+        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-8 pl-2 text-black outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:text-white md:pl-0"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-8 pl-2 text-black dark:bg-transparent dark:text-white py-2 md:py-3 md:pl-4"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -279,12 +277,11 @@ export const ChatInput: FC<Props> = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
-
           <button
-            className="absolute right-3 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 focus:outline-none dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200 opacity-60"
             onClick={handleSend}
           >
-            <IconSend size={16} className="opacity-60" />
+            <IconSend size={18} />
           </button>
 
           {showPromptList && prompts.length > 0 && (

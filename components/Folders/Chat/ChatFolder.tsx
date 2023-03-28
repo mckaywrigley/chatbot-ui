@@ -100,37 +100,50 @@ export const ChatFolder: FC<Props> = ({
   }, [searchTerm]);
 
   return (
-    <div>
-      <div
-        className={`mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-[14px] leading-normal transition-colors duration-200 hover:bg-[#343541]/90`}
-        onClick={() => setIsOpen(!isOpen)}
-        onDrop={(e) => handleDrop(e, currentFolder)}
-        onDragOver={allowDrop}
-        onDragEnter={highlightDrop}
-        onDragLeave={removeHighlight}
-      >
-        {isOpen ? <IconCaretDown size={16} /> : <IconCaretRight size={16} />}
-
+    <>
+      <div className="relative flex items-center">
         {isRenaming ? (
-          <input
-            className="flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-left text-white outline-none focus:border-neutral-100"
-            type="text"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onKeyDown={handleEnterDown}
-            autoFocus
-          />
-        ) : (
-          <div className="flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap pr-1 text-left">
-            {currentFolder.name}
+          <div className="flex w-full items-center gap-3 bg-[#343541]/90 p-3">
+            {isOpen ? (
+              <IconCaretDown size={18} />
+            ) : (
+              <IconCaretRight size={18} />
+            )}
+
+            <input
+              className="mr-12 flex-1 overflow-hidden overflow-ellipsis border-neutral-400 bg-transparent text-left text-[12.5px] leading-3 text-white outline-none focus:border-neutral-100"
+              type="text"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={handleEnterDown}
+              autoFocus
+            />
           </div>
+        ) : (
+          <button
+            className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
+            onClick={() => setIsOpen(!isOpen)}
+            onDrop={(e) => handleDrop(e, currentFolder)}
+            onDragOver={allowDrop}
+            onDragEnter={highlightDrop}
+            onDragLeave={removeHighlight}
+          >
+            {isOpen ? (
+              <IconCaretDown size={18} />
+            ) : (
+              <IconCaretRight size={18} />
+            )}
+
+            <div className="relative max-h-5 flex-1 overflow-hidden text-ellipsis whitespace-nowrap break-all text-left text-[12.5px] leading-3">
+              {currentFolder.name}
+            </div>
+          </button>
         )}
 
         {(isDeleting || isRenaming) && (
-          <div className="-ml-2 flex gap-1">
-            <IconCheck
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={16}
+          <div className="absolute right-1 z-10 flex text-gray-300">
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
 
@@ -143,40 +156,43 @@ export const ChatFolder: FC<Props> = ({
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
-            />
-
-            <IconX
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={16}
+            >
+              <IconCheck size={18} />
+            </button>
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
-            />
+            >
+              <IconX size={18} />
+            </button>
           </div>
         )}
 
         {!isDeleting && !isRenaming && (
-          <div className="ml-2 flex gap-1">
-            <IconPencil
-              className="min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={18}
+          <div className="absolute right-1 z-10 flex text-gray-300">
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRenaming(true);
                 setRenameValue(currentFolder.name);
               }}
-            />
-
-            <IconTrash
-              className=" min-w-[20px] text-neutral-400 hover:text-neutral-100"
-              size={18}
+            >
+              <IconPencil size={18} />
+            </button>
+            <button
+              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(true);
               }}
-            />
+            >
+              <IconTrash size={18} />
+            </button>
           </div>
         )}
       </div>
@@ -185,7 +201,7 @@ export const ChatFolder: FC<Props> = ({
         ? conversations.map((conversation, index) => {
             if (conversation.folderId === currentFolder.id) {
               return (
-                <div key={index} className="ml-5 gap-2 border-l pl-2 pt-2">
+                <div key={index} className="ml-5 gap-2 border-l pl-2">
                   <ConversationComponent
                     selectedConversation={selectedConversation}
                     conversation={conversation}
@@ -199,6 +215,6 @@ export const ChatFolder: FC<Props> = ({
             }
           })
         : null}
-    </div>
+    </>
   );
 };
