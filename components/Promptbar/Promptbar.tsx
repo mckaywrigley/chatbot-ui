@@ -3,6 +3,7 @@ import { Prompt } from '@/types/prompt';
 import {
   IconArrowBarRight,
   IconFolderPlus,
+  IconMistOff,
   IconPlus,
 } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
@@ -111,14 +112,14 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
         </button>
 
         <IconArrowBarRight
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
+          className="hidden p-1 ml-1 cursor-pointer text-neutral-300 hover:text-neutral-400 sm:flex"
           size={32}
           onClick={onToggleSidebar}
         />
@@ -134,7 +135,7 @@ export const Promptbar: FC<Props> = ({
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
-          <div className="flex border-b border-white/20 pb-2">
+          <div className="flex pb-2 border-b border-white/20">
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
@@ -163,8 +164,11 @@ export const Promptbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-4 text-center text-white">
-            <div>{t('No prompts.')}</div>
+          <div className="mt-8 text-center text-white opacity-50 select-none">
+            <IconMistOff className="mx-auto mb-3" />
+            <span className="text-[14px] leading-normal">
+            {t('No prompts.')}
+            </span>
           </div>
         )}
       </div>
