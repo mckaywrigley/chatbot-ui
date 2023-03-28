@@ -1,0 +1,12 @@
+{
+  "New prompt": "مطلب جديد",
+  "New folder": "مجلد جديد",
+  "No prompts.": "لا يوجد مطالبات.",
+  "Search prompts...": "...البحث عن مطالبات",
+  "Name": "الاسم",
+  "Description": "الوصف",
+  "A description for your prompt.": "وصف لمطلبك",
+  "Prompt": "مطلب",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "محتوى المطلب. استخدم {{}} للإشارة إلى متغير. مثال: {{الاسم}} هي {{صفة}} {{اسم}}",
+  "Save": "حفظ"
+  }

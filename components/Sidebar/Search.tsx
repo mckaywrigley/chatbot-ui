@@ -1,13 +1,14 @@
-import { IconX } from "@tabler/icons-react";
-import { FC } from "react";
-import { useTranslation } from "next-i18next";
+import { IconX } from '@tabler/icons-react';
+import { useTranslation } from 'next-i18next';
+import { FC } from 'react';
 
 interface Props {
+  placeholder: string;
   searchTerm: string;
   onSearch: (searchTerm: string) => void;
 }
 
-export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
+export const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
   const { t } = useTranslation('sidebar');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,23 +16,23 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
   };
 
   const clearSearch = () => {
-    onSearch("");
+    onSearch('');
   };
 
   return (
     <div className="relative flex items-center">
       <input
-        className="flex-1 w-full pr-10 bg-[#202123] border border-neutral-600 text-sm rounded-md px-4 py-3 text-white"
+        className="w-full flex-1 rounded-md border border-neutral-600 bg-[#202123] px-4 py-3 pr-10 text-[14px] leading-3 text-white"
         type="text"
-        placeholder={t('Search conversations...') || ''}
+        placeholder={t(placeholder) || ''}
         value={searchTerm}
         onChange={handleSearchChange}
       />
 
       {searchTerm && (
         <IconX
-          className="absolute right-4 text-neutral-300 cursor-pointer hover:text-neutral-400"
-          size={24}
+          className="absolute right-4 cursor-pointer text-neutral-300 hover:text-neutral-400"
+          size={18}
           onClick={clearSearch}
         />
       )}

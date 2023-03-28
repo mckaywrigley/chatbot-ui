@@ -1,7 +1,5 @@
 # Chatbot UI
 
-**Note: Chatbot UI Pro has been renamed to Chatbot UI.**
-
 Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
@@ -16,14 +14,14 @@ Expect frequent improvements.
 
 **Next up:**
 
+- [ ] Delete messages
 - [ ] More model settings
-- [ ] Custom themes
-- [ ] Prompt templates
 - [ ] Plugins
 
 **Recent updates:**
 
-- [x] Regenerate & edit responses
+- [x] Prompt templates (3/27/23)
+- [x] Regenerate & edit responses (3/25/23)
 - [x] Folders (3/24/23)
 - [x] Search chat content (3/23/23)
 - [x] Stop message generation (3/22/23)
@@ -61,9 +59,14 @@ Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro
 
 **Docker**
 
+Build locally:
 ```shell
 docker build -t chatgpt-ui .
 docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
+```
+Pull from ghcr:
+```
+docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
 ```
 
 ## Running Locally
@@ -87,6 +90,8 @@ Create a .env.local file in the root of the repo with your OpenAI API Key:
 ```bash
 OPENAI_API_KEY=YOUR_KEY
 ```
+
+> you can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
 
 **4. Run App**
 
