@@ -8,6 +8,9 @@ name: Docker
 on:
   push:
     branches: [ "main" ]
+  workflow:
+    jobs:
+      - 'Run Jest Tests'
 
 env:
   # Use docker.io for Docker Hub if empty
