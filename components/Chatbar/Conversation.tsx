@@ -104,7 +104,7 @@ export const ConversationComponent: FC<Props> = ({
 
       {(isDeleting || isRenaming) &&
         selectedConversation.id === conversation.id && (
-          <div className="visible absolute right-1 z-10 flex text-gray-300">
+          <div className="absolute right-1 z-10 flex text-gray-300">
             <button
               className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
@@ -136,7 +136,7 @@ export const ConversationComponent: FC<Props> = ({
       {selectedConversation.id === conversation.id &&
         !isDeleting &&
         !isRenaming && (
-          <div className="visible absolute right-1 z-10 flex text-gray-300">
+          <div className="absolute right-1 z-10 flex text-gray-300">
             <button
               className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
               onClick={(e) => {
