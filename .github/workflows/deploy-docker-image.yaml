@@ -14,8 +14,6 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  # Date format: YYYYMMDD
-  DATE_TAG: $(date '+%Y%m%d')
 
 jobs:
   build:
@@ -31,6 +29,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # Tag format: YYYYMMDD
+      - name: Set date tag
+        run: |
+          DATE_TAG="$(date '+%Y%m%d')"
+          echo "DATE_TAG=${DATE_TAG}" >> $GITHUB_ENV
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
