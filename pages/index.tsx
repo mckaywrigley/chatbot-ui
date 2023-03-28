@@ -8,6 +8,7 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
@@ -27,7 +28,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
@@ -60,10 +61,9 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
-  const [plugins, setPlugins] = useState<any[]>([]);
+  const [plugins, setPlugins] = useState<Plugin[]>([]);
   //@colin
   // plugins todo
-  // - we should load plugins from local storage
   // - we also need a way to handle installing new plugins
   // - we should create a plugin 'model' which is just a toolformer prompt wrapper i think?
   // - we need to implement an auth flow for plugins
@@ -76,199 +76,205 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   // FETCH RESPONSE ----------------------------------------------
 
-  const handleSend = async (message: Message, deleteCount = 0) => {
-    if (selectedConversation) {
-      let updatedConversation: Conversation;
+  const handleSend = useCallback(
+    async (message: Message, deleteCount = 0) => {
+      if (selectedConversation) {
+        let updatedConversation: Conversation;
 
-      if (deleteCount) {
-        const updatedMessages = [...selectedConversation.messages];
-        for (let i = 0; i < deleteCount; i++) {
-          updatedMessages.pop();
+        if (deleteCount) {
+          const updatedMessages = [...selectedConversation.messages];
+          for (let i = 0; i < deleteCount; i++) {
+            updatedMessages.pop();
+          }
+
+          updatedConversation = {
+            ...selectedConversation,
+            messages: [...updatedMessages, message],
+          };
+        } else {
+          updatedConversation = {
+            ...selectedConversation,
+            messages: [...selectedConversation.messages, message],
+          };
         }
 
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...updatedMessages, message],
+        setSelectedConversation(updatedConversation);
+        setLoading(true);
+        setMessageIsStreaming(true);
+
+        const chatBody: ChatBody = {
+          model: updatedConversation.model,
+          messages: updatedConversation.messages,
+          key: apiKey,
+          prompt: updatedConversation.prompt,
         };
-      } else {
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...selectedConversation.messages, message],
-        };
+
+        const controller = new AbortController();
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal,
+          body: JSON.stringify(chatBody),
+        });
+
+        if (!response.ok) {
+          setLoading(false);
+          setMessageIsStreaming(false);
+          return;
+        }
+
+        const data = response.body;
+
+        if (!data) {
+          setLoading(false);
+          setMessageIsStreaming(false);
+          return;
+        }
+
+        if (updatedConversation.messages.length === 1) {
+          const { content } = message;
+          const customName =
+            content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+          updatedConversation = {
+            ...updatedConversation,
+            name: customName,
+          };
+        }
+
+        setLoading(false);
+
+        const reader = data.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let isFirst = true;
+        let text = '';
+
+        while (!done) {
+          if (stopConversationRef.current === true) {
+            controller.abort();
+            done = true;
+            break;
+          }
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          const chunkValue = decoder.decode(value);
+
+          text += chunkValue;
+
+          if (isFirst) {
+            isFirst = false;
+            const updatedMessages: Message[] = [
+              ...updatedConversation.messages,
+              { role: 'assistant', content: chunkValue },
+            ];
+
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+
+            setSelectedConversation(updatedConversation);
+          } else {
+            const updatedMessages: Message[] = updatedConversation.messages.map(
+              (message, index) => {
+                if (index === updatedConversation.messages.length - 1) {
+                  return {
+                    ...message,
+                    content: text,
+                  };
+                }
+
+                return message;
+              },
+            );
+
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+
+            setSelectedConversation(updatedConversation);
+          }
+        }
+
+        saveConversation(updatedConversation);
+
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+
+            return conversation;
+          },
+        );
+
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
+        }
+
+        setConversations(updatedConversations);
+
+        saveConversations(updatedConversations);
+
+        setMessageIsStreaming(false);
       }
+    },
+    [apiKey, conversations, selectedConversation],
+  );
 
-      setSelectedConversation(updatedConversation);
-      setLoading(true);
-      setMessageIsStreaming(true);
+  // FETCH MODELS ----------------------------------------------
 
-      const chatBody: ChatBody = {
-        model: updatedConversation.model,
-        messages: updatedConversation.messages,
-        key: apiKey,
-        prompt: updatedConversation.prompt,
-      };
+  const fetchModels = useCallback(
+    async (key: string) => {
+      const error = {
+        title: t('Error fetching models.'),
+        code: null,
+        messageLines: [
+          t(
+            'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
+          ),
+          t('If you completed this step, OpenAI may be experiencing issues.'),
+        ],
+      } as ErrorMessage;
 
-      const controller = new AbortController();
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/models', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        signal: controller.signal,
-        body: JSON.stringify(chatBody),
+        body: JSON.stringify({
+          key,
+        }),
       });
 
       if (!response.ok) {
-        setLoading(false);
-        setMessageIsStreaming(false);
+        try {
+          const data = await response.json();
+          Object.assign(error, {
+            code: data.error?.code,
+            messageLines: [data.error?.message],
+          });
+        } catch (e) {}
+        setModelError(error);
         return;
       }
 
-      const data = response.body;
+      const data = await response.json();
 
       if (!data) {
-        setLoading(false);
-        setMessageIsStreaming(false);
+        setModelError(error);
         return;
       }
 
-      if (updatedConversation.messages.length === 1) {
-        const { content } = message;
-        const customName =
-          content.length > 30 ? content.substring(0, 30) + '...' : content;
-
-        updatedConversation = {
-          ...updatedConversation,
-          name: customName,
-        };
-      }
-
-      setLoading(false);
-
-      const reader = data.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let isFirst = true;
-      let text = '';
-
-      while (!done) {
-        if (stopConversationRef.current === true) {
-          controller.abort();
-          done = true;
-          break;
-        }
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-
-        text += chunkValue;
-
-        if (isFirst) {
-          isFirst = false;
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: chunkValue },
-          ];
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        } else {
-          const updatedMessages: Message[] = updatedConversation.messages.map(
-            (message, index) => {
-              if (index === updatedConversation.messages.length - 1) {
-                return {
-                  ...message,
-                  content: text,
-                };
-              }
-
-              return message;
-            },
-          );
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        }
-      }
-
-      saveConversation(updatedConversation);
-
-      const updatedConversations: Conversation[] = conversations.map(
-        (conversation) => {
-          if (conversation.id === selectedConversation.id) {
-            return updatedConversation;
-          }
-
-          return conversation;
-        },
-      );
-
-      if (updatedConversations.length === 0) {
-        updatedConversations.push(updatedConversation);
-      }
-
-      setConversations(updatedConversations);
-
-      saveConversations(updatedConversations);
-
-      setMessageIsStreaming(false);
-    }
-  };
-
-  // FETCH MODELS ----------------------------------------------
-
-  const fetchModels = async (key: string) => {
-    const error = {
-      title: t('Error fetching models.'),
-      code: null,
-      messageLines: [
-        t(
-          'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
-        ),
-        t('If you completed this step, OpenAI may be experiencing issues.'),
-      ],
-    } as ErrorMessage;
-
-    const response = await fetch('/api/models', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        key,
-      }),
-    });
-
-    if (!response.ok) {
-      try {
-        const data = await response.json();
-        Object.assign(error, {
-          code: data.error?.code,
-          messageLines: [data.error?.message],
-        });
-      } catch (e) {}
-      setModelError(error);
-      return;
-    }
-
-    const data = await response.json();
-
-    if (!data) {
-      setModelError(error);
-      return;
-    }
-
-    setModels(data);
-    setModelError(null);
-  };
+      setModels(data);
+      setModelError(null);
+    },
+    [t],
+  );
 
   // BASIC HANDLERS --------------------------------------------
 
@@ -309,6 +315,11 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveConversation(conversation);
   };
 
+  const handleInstallPlugin = (plugin: Plugin) => {
+    const updatedPlugins = [...plugins, plugin];
+    setPlugins(updatedPlugins);
+    savePlugins(updatedPlugins);
+  };
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
@@ -527,6 +538,13 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const handleCreatePromptFolder = (name: string) => {};
 
+  // PLUGIN OPERATIONS --------------------------------------------
+
+  const savePlugins = (plugins: Plugin[]) => {
+    // save to local storage
+    localStorage.setItem('plugins', JSON.stringify(plugins));
+  };
+
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -534,7 +552,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
       handleSend(currentMessage);
       setCurrentMessage(undefined);
     }
-  }, [currentMessage]);
+  }, [currentMessage, fetchModels, handleSend]);
 
   useEffect(() => {
     if (window.innerWidth < 640) {
@@ -546,7 +564,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     if (apiKey) {
       fetchModels(apiKey);
     }
-  }, [apiKey]);
+  }, [apiKey, fetchModels]);
 
   // ON LOAD --------------------------------------------
 
@@ -616,7 +634,13 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
         folderId: null,
       });
     }
-  }, [serverSideApiKeyIsSet]);
+
+    // load plugins
+    const plugins = localStorage.getItem('plugins');
+    if (plugins) {
+      setPlugins(JSON.parse(plugins));
+    }
+  }, [serverSideApiKeyIsSet, fetchModels]);
 
   return (
     <>
