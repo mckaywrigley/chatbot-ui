@@ -62,7 +62,7 @@ export const ChatInput: FC<Props> = ({
     onSend({ role: 'user', content });
     setContent('');
 
-    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
+    if (window.innerWidth < 640 && textareaRef?.current) {
       textareaRef.current.blur();
     }
   };
@@ -85,7 +85,7 @@ export const ChatInput: FC<Props> = ({
   };
 
   useEffect(() => {
-    if (textareaRef && textareaRef.current) {
+    if (textareaRef?.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
       textareaRef.current.style.overflow = `${
@@ -133,7 +133,7 @@ export const ChatInput: FC<Props> = ({
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
               overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
+                (textareaRef.current?.scrollHeight ?? 0) > 400
                   ? 'auto'
                   : 'hidden'
               }`,
