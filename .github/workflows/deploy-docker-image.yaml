@@ -6,11 +6,8 @@ name: Docker
 # documentation.
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_run:
-    workflows:
-      - run-test-suite
+    workflows: ["Run Jest Tests"]
     branches:
       - main
     types:
