@@ -1,4 +1,5 @@
 import { Conversation, Message } from '@/types/chat';
+import { IconArrowDown } from '@tabler/icons-react';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel } from '@/types/openai';
@@ -58,8 +59,10 @@ export const Chat: FC<Props> = memo(
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
-    const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+    const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
     const [showSettings, setShowSettings] = useState<boolean>(false);
+    const [showScrollDownButton, setShowScrollDownButton] =
+      useState<boolean>(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -80,10 +83,19 @@ export const Chat: FC<Props> = memo(
 
         if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
           setAutoScrollEnabled(false);
+          setShowScrollDownButton(true);
         } else {
           setAutoScrollEnabled(true);
+          setShowScrollDownButton(false);
         }
       }
+    };
+
+    const handleScrollDown = () => {
+      chatContainerRef.current?.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     };
 
     const handleSettings = () => {
@@ -102,6 +114,8 @@ export const Chat: FC<Props> = memo(
       }
     };
     const throttledScrollDown = throttle(scrollDown, 250);
+
+    // appear scroll down button only when user scrolls up
 
     useEffect(() => {
       throttledScrollDown();
@@ -172,6 +186,7 @@ export const Chat: FC<Props> = memo(
             <div
               className="max-h-full overflow-x-hidden"
               ref={chatContainerRef}
+              onScroll={handleScroll}
             >
               {conversation.messages.length === 0 ? (
                 <>
@@ -284,6 +299,16 @@ export const Chat: FC<Props> = memo(
               }}
             />
           </>
+        )}
+        {showScrollDownButton && (
+          <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
+            <button
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
+              onClick={handleScrollDown}
+            >
+              <IconArrowDown className="h-4 w-4" />
+            </button>
+          </div>
         )}
       </div>
     );
