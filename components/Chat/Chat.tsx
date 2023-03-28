@@ -240,8 +240,17 @@ export const Chat: FC<Props> = memo(
                 </>
               ) : (
                 <>
-                  <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                  <div className="flex items-center justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}
+                    <div className="ml-1 flex flex-row items-center">
+                      | Installed Plugins:
+                      {/* TODO: replace with actual plugins */}
+                      {plugins.map((plugin) => (
+                        <span className="ml-1" key={plugin.id}>
+                          <img src={plugin.manifest.logo_url} width={24} />
+                        </span>
+                      ))}
+                    </div>
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
