@@ -24,9 +24,7 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { Plugins } from '../Plugins/Plugins';
-
-// TODO: delete this, use actual plugin state
-const plugins = [{name: "Plugin 1"}, {name: "Plugin 2"}]
+import { dummyPlugins } from '@/types/plugin';
 
 interface Props {
   conversation: Conversation;
@@ -235,14 +233,14 @@ export const Chat: FC<Props> = memo(
                 </>
               ) : (
                 <>
-                  <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                  <div className="flex items-center justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}
                     <div className="ml-1 flex flex-row items-center">
                       | Installed Plugins:
                       {/* TODO: replace with actual plugins */}
-                      {plugins.map((plugin) => (
-                        <span className="ml-1" key={plugin.name}>
-                          <img src="https://via.placeholder.com/20" />
+                      {dummyPlugins.map((plugin) => (
+                        <span className="ml-1" key={plugin.id}>
+                          <img src={plugin.manifest.logo_url} width={24}/>
                         </span>
                       ))}
                     </div>
