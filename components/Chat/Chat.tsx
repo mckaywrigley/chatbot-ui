@@ -5,7 +5,7 @@ import { ErrorMessage } from '@/types/error';
 import { OpenAIModel } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
-import { IconClearAll, IconKey, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconKey, IconSettings, IconPlayerStop, IconRepeat } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -29,7 +29,9 @@ interface Props {
   models: OpenAIModel[];
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
+  conversationIsEmpty: boolean;
   messageIsStreaming: boolean;
+  onRegenerate: () => void;
   modelError: ErrorMessage | null;
   loading: boolean;
   prompts: Prompt[];
@@ -48,10 +50,12 @@ export const Chat: FC<Props> = memo(
     models,
     apiKey,
     serverSideApiKeyIsSet,
+    conversationIsEmpty,
     messageIsStreaming,
     modelError,
     loading,
     prompts,
+    onRegenerate,
     onSend,
     onUpdateConversation,
     onEditMessage,
@@ -100,6 +104,13 @@ export const Chat: FC<Props> = memo(
 
     const handleSettings = () => {
       setShowSettings(!showSettings);
+    };
+
+    const handleStopConversation = () => {
+      stopConversationRef.current = true;
+      setTimeout(() => {
+        stopConversationRef.current = false;
+      }, 1000);
     };
 
     const onClearAll = () => {
@@ -236,12 +247,13 @@ export const Chat: FC<Props> = memo(
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
                     >
-                    <IconSettings size={18} />
+                      <IconSettings size={18} />
                     </button>
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
-                      onClick={onClearAll}>
-                    <IconClearAll size={18} />
+                      onClick={onClearAll}
+                    >
+                      <IconClearAll size={18} />
                     </button>
                   </div>
                   {showSettings && (
@@ -280,35 +292,72 @@ export const Chat: FC<Props> = memo(
               )}
             </div>
 
-            <ChatInput
-              stopConversationRef={stopConversationRef}
-              textareaRef={textareaRef}
-              messageIsStreaming={messageIsStreaming}
-              conversationIsEmpty={conversation.messages.length === 0}
-              messages={conversation.messages}
-              model={conversation.model}
-              prompts={prompts}
-              onSend={(message) => {
-                setCurrentMessage(message);
-                onSend(message);
-              }}
-              onRegenerate={() => {
-                if (currentMessage) {
-                  onSend(currentMessage, 2);
-                }
-              }}
-            />
+            <div className="absolute bottom-0 left-0 flex w-full flex-col items-center gap-3 border-transparent bg-gradient-to-b from-transparent via-white to-white px-4 pt-6 pb-2 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
+              <div className="relative flex w-full flex-col items-center">
+                {messageIsStreaming && (
+                  <button
+                    className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+                    onClick={handleStopConversation}
+                  >
+                    <IconPlayerStop size={16} /> {t('Stop Generating')}
+                  </button>
+                )}
+
+                {!messageIsStreaming && !conversationIsEmpty && (
+                  <button
+                    className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+                    onClick={() => {
+                      if (currentMessage) {
+                        onSend(currentMessage, 2);
+                      }
+                    }}
+                  >
+                    <IconRepeat size={16} /> {t('Regenerate response')}
+                  </button>
+                )}
+
+                {showScrollDownButton && (
+                  <div className="absolute bottom-0 right-0">
+                    <button
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
+                      onClick={handleScrollDown}
+                    >
+                      <IconArrowDown size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <ChatInput
+                stopConversationRef={stopConversationRef}
+                textareaRef={textareaRef}
+                messageIsStreaming={messageIsStreaming}
+                conversationIsEmpty={conversation.messages.length === 0}
+                messages={conversation.messages}
+                model={conversation.model}
+                prompts={prompts}
+                onSend={(message) => {
+                  setCurrentMessage(message);
+                  onSend(message);
+                }}
+              />
+
+              <div className="text-center text-[12px] text-black/50 dark:text-white/50">
+                <a
+                  href="https://github.com/mckaywrigley/chatbot-ui"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  ChatBot UI
+                </a>
+                .{' '}
+                {t(
+                  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+                )}
+              </div>
+            </div>
           </>
-        )}
-        {showScrollDownButton && (
-          <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
-            <button
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
-              onClick={handleScrollDown}
-            >
-              <IconArrowDown size={18}/>
-            </button>
-          </div>
         )}
       </div>
     );
