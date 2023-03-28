@@ -42,6 +42,11 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
   // added folders (3/23/23)
   // added prompts (3/26/23)
 
+  if (!Array.isArray(history)) {
+    console.warn('history is not an array. Returning an empty array.');
+    return [];
+  }
+
   return history.reduce((acc: any[], conversation) => {
     try {
       if (!conversation.model) {
