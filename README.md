@@ -99,6 +99,21 @@ OPENAI_API_KEY=YOUR_KEY
 npm run dev
 ```
 
+> you can use `proxychain4` to help you access the official OpenAI API, if you have a proxy.
+
+```bash
+// First: install proxychains4
+apt-get install proxychain4 // in ubuntu
+// Second: set your proxy in the proxychains.conf
+// For example: if you are using ubuntu, in the /etc/proxychains.conf
+socks5 yourIp yourSocket
+// or
+http yourIP yourSocket
+
+// Run APP
+proxychains4 npm run dev
+``` 
+
 **5. Use It**
 
 You should be able to start chatting.
