@@ -23,6 +23,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: github.repository == 'mckaywrigley/chatbot-ui'
     permissions:
       contents: read
       packages: write
