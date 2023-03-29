@@ -1,5 +1,9 @@
 # Chatbot UI
 
+**WE HAVE BEEN TOLD TO TAKE DOWN CHATBOTUI.COM DOWN BY OPENAI EFFECTIVE IMMEDIATELY**
+
+**WE ARE WORKING ON GETTING THIS RESOLVED**
+
 Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
