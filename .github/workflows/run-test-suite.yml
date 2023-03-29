@@ -1,5 +1,4 @@
-name: Run Jest Tests
-
+name: Run Unit Tests
 on:
   push:
     branches:
@@ -21,11 +20,5 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run Jest Test Suite
+    - name: Run Vitest Suite
       run: npm test
-    
-    - name: Publish Test Report
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      with:
-        files: test-results/**/results.xml

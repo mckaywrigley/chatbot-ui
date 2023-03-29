@@ -32,6 +32,12 @@ html {
   background: #202123;
 }
 
+@media (max-width: 720px) {
+  pre {
+    width: calc(100vw - 110px);
+  }
+}
+
 pre:has(div.codeblock) {
   padding: 0;
 }

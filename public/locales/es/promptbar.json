@@ -1,0 +1,12 @@
+{
+  "New prompt": "Nuevo prompt",
+  "New folder": "Nueva carpeta",
+  "No prompts.": "No hay prompts.",
+  "Search prompts...": "Buscar prompts...",
+  "Name": "Nombre",
+  "Description": "Descripción",
+  "A description for your prompt.": "Descripción de su prompt.",
+  "Prompt": "Prompt",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Contenido del prompt. Utilice {{}} para indicar una variable. Ej: {{nombre}} es un {{adjetivo}} {{nombre}}",
+  "Save": "Guardar"
+}
