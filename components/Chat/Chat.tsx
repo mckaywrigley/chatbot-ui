@@ -285,69 +285,71 @@ export const Chat: FC<Props> = memo(
               )}
             </div>
 
-            <div className="absolute bottom-0 left-0 flex w-full flex-col items-center gap-3 border-transparent bg-gradient-to-b from-transparent via-white to-white px-4 pt-6 pb-2 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
-              <div className="relative flex w-full flex-col items-center">
-                {messageIsStreaming && (
-                  <button
-                    className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
-                    onClick={handleStopConversation}
-                  >
-                    <IconPlayerStop size={16} /> {t('Stop Generating')}
-                  </button>
-                )}
-
-                {!messageIsStreaming && !conversationIsEmpty && (
-                  <button
-                    className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
-                    onClick={() => {
-                      if (currentMessage) {
-                        onSend(currentMessage, 2);
-                      }
-                    }}
-                  >
-                    <IconRepeat size={18} /> {t('Regenerate response')}
-                  </button>
-                )}
-
-                {showScrollDownButton && (
-                  <div className="absolute bottom-0 right-0">
+            <div className="absolute bottom-0 left-0 w-full  border-transparent bg-gradient-to-b from-transparent via-white to-white px-4 pt-6 pb-2 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
+              <div className="lg:max-w-3xl flex flex-col gap-3 mx-auto">
+                <div className="relative flex w-full flex-col items-center">
+                  {messageIsStreaming && (
                     <button
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg dark:bg-[#515152d7]"
-                      onClick={handleScrollDown}
+                      className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+                      onClick={handleStopConversation}
                     >
-                      <IconArrowDown size={18} />
+                      <IconPlayerStop size={16} /> {t('Stop Generating')}
                     </button>
-                  </div>
-                )}
-              </div>
+                  )}
 
-              <ChatInput
-                stopConversationRef={stopConversationRef}
-                textareaRef={textareaRef}
-                messageIsStreaming={messageIsStreaming}
-                conversationIsEmpty={conversation.messages.length === 0}
-                messages={conversation.messages}
-                model={conversation.model}
-                prompts={prompts}
-                onSend={(message) => {
-                  setCurrentMessage(message);
-                  onSend(message);
-                }}
-              />
+                  {!messageIsStreaming && !conversationIsEmpty && (
+                    <button
+                      className="flex items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:top-0"
+                      onClick={() => {
+                        if (currentMessage) {
+                          onSend(currentMessage, 2);
+                        }
+                      }}
+                    >
+                      <IconRepeat size={18} /> {t('Regenerate response')}
+                    </button>
+                  )}
 
-              <div className="text-center text-[12px] text-black/50 dark:text-white/50">
-                <a
-                  href="https://github.com/mckaywrigley/chatbot-ui"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  ChatBot UI
-                </a>
-                .{' '}
-                {t(
-                  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
-                )}
+                  {showScrollDownButton && (
+                    <div className="absolute bottom-0 right-0">
+                      <button
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg dark:bg-[#515152d7]"
+                        onClick={handleScrollDown}
+                      >
+                        <IconArrowDown size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <ChatInput
+                  stopConversationRef={stopConversationRef}
+                  textareaRef={textareaRef}
+                  messageIsStreaming={messageIsStreaming}
+                  conversationIsEmpty={conversation.messages.length === 0}
+                  messages={conversation.messages}
+                  model={conversation.model}
+                  prompts={prompts}
+                  onSend={(message) => {
+                    setCurrentMessage(message);
+                    onSend(message);
+                  }}
+                />
+
+                <div className="text-center text-[12px] text-black/50 dark:text-white/50">
+                  <a
+                    href="https://github.com/mckaywrigley/chatbot-ui"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    ChatBot UI
+                  </a>
+                  .{' '}
+                  {t(
+                    "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+                  )}
+                </div>
               </div>
             </div>
           </>
