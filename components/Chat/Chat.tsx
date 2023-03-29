@@ -2,7 +2,7 @@ import { Conversation, Message } from '@/types/chat';
 import { IconArrowDown } from '@tabler/icons-react';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { OpenAIModel } from '@/types/openai';
+import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconClearAll, IconKey, IconSettings, IconPlayerStop, IconRepeat } from '@tabler/icons-react';
@@ -11,7 +11,6 @@ import {
   FC,
   memo,
   MutableRefObject,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -30,6 +29,7 @@ interface Props {
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
   conversationIsEmpty: boolean;
+  defaultModelId: OpenAIModelID;
   messageIsStreaming: boolean;
   onRegenerate: () => void;
   modelError: ErrorMessage | null;
@@ -51,11 +51,11 @@ export const Chat: FC<Props> = memo(
     apiKey,
     serverSideApiKeyIsSet,
     conversationIsEmpty,
+    defaultModelId,
     messageIsStreaming,
     modelError,
     loading,
     prompts,
-    onRegenerate,
     onSend,
     onUpdateConversation,
     onEditMessage,
@@ -153,7 +153,7 @@ export const Chat: FC<Props> = memo(
     }, [messagesEndRef]);
 
     return (
-      <div className="overflow-none relative flex-1 bg-white dark:bg-[#343541]">
+      <div className="overflow-hidden relative flex-1 bg-white dark:bg-[#343541]">
         {!(apiKey || serverSideApiKeyIsSet) ? (
           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
             <div className="mx-auto mb-5 text-gray-800 dark:text-gray-100">
@@ -210,6 +210,7 @@ export const Chat: FC<Props> = memo(
                         <ModelSelect
                           model={conversation.model}
                           models={models}
+                          defaultModelId={defaultModelId}
                           onModelChange={(model) =>
                             onUpdateConversation(conversation, {
                               key: 'model',
@@ -255,6 +256,7 @@ export const Chat: FC<Props> = memo(
                         <ModelSelect
                           model={conversation.model}
                           models={models}
+                          defaultModelId={defaultModelId}
                           onModelChange={(model) =>
                             onUpdateConversation(conversation, {
                               key: 'model',

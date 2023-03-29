@@ -1,5 +1,5 @@
 import { Message } from '@/types/chat';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { OpenAIModel } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { IconSend } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
@@ -51,7 +51,7 @@ export const ChatInput: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = model.id === OpenAIModelID.GPT_3_5 ? 12000 : 24000;
+    const maxLength = model.maxLength;
 
     if (value.length > maxLength) {
       alert(
@@ -97,7 +97,10 @@ export const ChatInput: FC<Props> = ({
     const selectedPrompt = filteredPrompts[activePromptIndex];
     if (selectedPrompt) {
       setContent((prevContent) => {
-        const newContent = prevContent?.replace(/\/\w*$/, selectedPrompt.content);
+        const newContent = prevContent?.replace(
+          /\/\w*$/,
+          selectedPrompt.content,
+        );
         return newContent;
       });
       handlePromptSelect(selectedPrompt);
@@ -199,8 +202,9 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-        }`;
+      textareaRef.current.style.overflow = `${
+        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+      }`;
     }
   }, [content]);
 
