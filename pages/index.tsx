@@ -76,7 +76,49 @@ const Home: React.FC<HomeProps> = ({
   // FETCH RESPONSE ----------------------------------------------
 
   const handleSend = async (message: Message, deleteCount = 0) => {
-    if (selectedConversation) {
+    if (selectedConversation && message.role === 'assistant') {
+      let updatedConversation: Conversation;
+
+      if (deleteCount) {
+        const updatedMessages = [...selectedConversation.messages];
+        for (let i = 0; i < deleteCount; i++) {
+          updatedMessages.pop();
+        }
+
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...updatedMessages, message],
+        };
+      } else {
+        updatedConversation = {
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, message],
+        };
+      }
+      setSelectedConversation(updatedConversation);
+
+      saveConversation(updatedConversation);
+
+      const updatedConversations: Conversation[] = conversations.map(
+        (conversation) => {
+          if (conversation.id === selectedConversation.id) {
+            return updatedConversation;
+          }
+
+          return conversation;
+        },
+      );
+
+      if (updatedConversations.length === 0) {
+        updatedConversations.push(updatedConversation);
+      }
+
+      setConversations(updatedConversations);
+
+      saveConversations(updatedConversations);
+    }
+
+    if (selectedConversation && message.role === "user") {
       let updatedConversation: Conversation;
 
       if (deleteCount) {
@@ -459,7 +501,7 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleEditMessage = (message: Message, messageIndex: number) => {
-    if (selectedConversation) {
+    if (selectedConversation && message.role === 'user') {
       const updatedMessages = selectedConversation.messages
         .map((m, i) => {
           if (i < messageIndex) {
@@ -473,6 +515,28 @@ const Home: React.FC<HomeProps> = ({
         messages: updatedMessages,
       };
 
+      const { single, all } = updateConversation(
+        updatedConversation,
+        conversations,
+      );
+
+      setSelectedConversation(single);
+      setConversations(all);
+
+      setCurrentMessage(message);
+    } else if (selectedConversation && message.role === 'assistant') {
+      const updatedMessages = selectedConversation.messages
+        .map((m, i) => {
+          if (i < messageIndex) {
+            return m;
+          }
+        })
+        .filter((m) => m) as Message[];
+
+      const updatedConversation = {
+        ...selectedConversation,
+        messages: updatedMessages,
+      };
       const { single, all } = updateConversation(
         updatedConversation,
         conversations,
@@ -699,6 +763,7 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                lightMode={lightMode}
               />
             </div>
 

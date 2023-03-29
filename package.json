@@ -14,10 +14,12 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
+    "@uiw/react-md-editor": "^3.20.5",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",
     "next-i18next": "^13.2.2",
+    "next-remove-imports": "^1.0.10",
     "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
