@@ -315,11 +315,41 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
     saveConversation(conversation);
   };
 
+  // PLUGIN OPERATIONS --------------------------------------------
+
   const handleInstallPlugin = (plugin: Plugin) => {
-    const updatedPlugins = [...plugins, plugin];
-    setPlugins(updatedPlugins);
-    savePlugins(updatedPlugins);
+    // update the plugin in the list of installed plugins
+    setPlugins((prev) => {
+      const updatedInstalledPlugins = prev.map((p) => {
+        if (p.id === plugin.id) {
+          return {
+            ...p,
+            installed: true,
+          };
+        }
+
+        return p;
+      });
+
+      savePlugins(updatedInstalledPlugins);
+
+      return updatedInstalledPlugins;
+    });
   };
+
+  // add a plugin to the list
+  const handleAddPlugin = (plugin: Plugin) => {
+    setPlugins((prev) => {
+      const updatedPlugins = [...prev, plugin];
+      savePlugins(updatedPlugins);
+      return updatedPlugins;
+    });
+  };
+
+  const savePlugins = (plugins: Plugin[]) => {
+    localStorage.setItem('plugins', JSON.stringify(plugins));
+  };
+
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
@@ -538,13 +568,6 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
 
   const handleCreatePromptFolder = (name: string) => {};
 
-  // PLUGIN OPERATIONS --------------------------------------------
-
-  const savePlugins = (plugins: Plugin[]) => {
-    // save to local storage
-    localStorage.setItem('plugins', JSON.stringify(plugins));
-  };
-
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -725,6 +748,7 @@ const Home: React.FC<HomeProps> = ({ serverSideApiKeyIsSet }) => {
                 stopConversationRef={stopConversationRef}
                 plugins={plugins}
                 onInstallPlugin={handleInstallPlugin}
+                onAddPlugin={handleAddPlugin}
               />
             </div>
 

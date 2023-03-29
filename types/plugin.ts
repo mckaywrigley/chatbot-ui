@@ -1,6 +1,7 @@
 export interface Plugin {
   id: string;
   name: string;
+  installed: boolean;
   manifest: PluginManifest;
 }
 

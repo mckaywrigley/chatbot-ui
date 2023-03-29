@@ -25,6 +25,7 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { Plugins } from '../Plugins/Plugins';
 import { Plugin } from '@/types/plugin';
+import { InstalledPlugins } from '../Plugins/InstalledPlugins';
 
 interface Props {
   conversation: Conversation;
@@ -44,6 +45,7 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
   plugins: Plugin[];
   onInstallPlugin: (plugin: Plugin) => void;
+  onAddPlugin: (plugin: Plugin) => void;
 }
 
 export const Chat: FC<Props> = memo(
@@ -62,6 +64,7 @@ export const Chat: FC<Props> = memo(
     stopConversationRef,
     plugins,
     onInstallPlugin,
+    onAddPlugin,
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -242,15 +245,7 @@ export const Chat: FC<Props> = memo(
                 <>
                   <div className="flex items-center justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}
-                    <div className="ml-1 flex flex-row items-center">
-                      | Installed Plugins:
-                      {/* TODO: replace with actual plugins */}
-                      {plugins.map((plugin) => (
-                        <span className="ml-1" key={plugin.id}>
-                          <img src={plugin.manifest.logo_url} width={24} />
-                        </span>
-                      ))}
-                    </div>
+                    <InstalledPlugins plugins={plugins} />
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
