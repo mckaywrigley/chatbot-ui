@@ -7,7 +7,7 @@ name: Docker
 
 on:
   workflow_run:
-    workflows: ["Run Jest Tests"]
+    workflows: ["Run Unit Tests"]
     branches:
       - main
     types:
