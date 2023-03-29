@@ -118,11 +118,12 @@ export const Chatbar: FC<Props> = ({
 
   return (
     <div
-      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
+      // fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0
+      className="z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative sm:top-0"
     >
-      <div className="flex items-center">
+      <div className="flex gap-2">
         <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
             setSearchTerm('');
@@ -133,17 +134,11 @@ export const Chatbar: FC<Props> = ({
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex items-center rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarLeft
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {conversations.length > 1 && (
@@ -194,9 +189,9 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-3 items-center text-sm leading-normal mt-8 text-white opacity-50">
+          <div className="mt-8 flex flex-col items-center gap-3 text-sm leading-normal text-white opacity-50">
             <IconMessagesOff />
-              {t('No conversations.')}
+            {t('No conversations.')}
           </div>
         )}
       </div>
