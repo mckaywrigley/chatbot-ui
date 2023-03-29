@@ -44,11 +44,11 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-100"
+      className="z-100 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       onKeyDown={handleEnter}
     >
       <div className="fixed inset-0 z-10 overflow-y-auto">
-        <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
           <div
             className="hidden sm:inline-block sm:h-screen sm:align-middle"
             aria-hidden="true"
@@ -100,7 +100,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
 
             <button
               type="button"
-              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+              className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
               onClick={() => {
                 const updatedPrompt = {
                   ...prompt,
