@@ -1,0 +1,5 @@
+node_modules
+**/.next/**
+**/_next/**
+**/dist/**
+package-lock.json
