@@ -192,11 +192,12 @@ export const PromptFolder: FC<Props> = ({
         )}
       </div>
 
-      {isOpen
-        ? prompts.map((prompt, index) => {
+      {isOpen && (
+        <div className="flex flex-col ml-5 gap-2 border-l pl-2 mt-1">
+          {prompts.map((prompt, index) => {
             if (prompt.folderId === currentFolder.id) {
               return (
-                <div key={index} className="ml-5 gap-2 border-l pl-2">
+                <div key={index}>
                   <PromptComponent
                     prompt={prompt}
                     onDeletePrompt={onDeletePrompt}
@@ -205,8 +206,9 @@ export const PromptFolder: FC<Props> = ({
                 </div>
               );
             }
-          })
-        : null}
+          })}
+        </div>
+      )}
     </>
   );
 };
