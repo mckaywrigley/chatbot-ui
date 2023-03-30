@@ -43,8 +43,7 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength =
-      conversation.model.id === OpenAIModelID.GPT_3_5 ? 12000 : 24000;
+    const maxLength = conversation.model.maxLength;
 
     if (value.length > maxLength) {
       alert(
