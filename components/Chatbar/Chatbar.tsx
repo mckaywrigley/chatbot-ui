@@ -29,6 +29,7 @@ interface Props {
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
+  onToggleSidebar: () => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -53,6 +54,7 @@ export const Chatbar: FC<Props> = ({
   onToggleLightMode,
   onSelectConversation,
   onDeleteConversation,
+  onToggleSidebar,
   onUpdateConversation,
   onApiKeyChange,
   onClearConversations,
@@ -136,6 +138,15 @@ export const Chatbar: FC<Props> = ({
         >
           <IconFolderPlus size={18} />
         </button>
+
+        <button
+          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400"
+          onClick={onToggleSidebar}
+        >
+        <IconArrowBarLeft size={32} />
+        </button>
+
+
       </div>
 
       {conversations.length > 1 && (
