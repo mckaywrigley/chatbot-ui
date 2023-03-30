@@ -253,7 +253,7 @@ const Home: React.FC<HomeProps> = ({
           code: data.error?.code,
           messageLines: [data.error?.message],
         });
-      } catch (e) {}
+      } catch (e) { }
       setModelError(error);
       return;
     }
@@ -524,7 +524,7 @@ const Home: React.FC<HomeProps> = ({
     savePrompts(updatedPrompts);
   };
 
-  const handleCreatePromptFolder = (name: string) => {};
+  const handleCreatePromptFolder = (name: string) => { };
 
   // EFFECTS  --------------------------------------------
 
@@ -648,7 +648,7 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
-                  folders={folders}
+                  folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
                   onDeleteFolder={handleDeleteFolder}
@@ -706,7 +706,7 @@ const Home: React.FC<HomeProps> = ({
               <div>
                 <Promptbar
                   prompts={prompts}
-                  folders={folders}
+                  folders={folders.filter((folder) => folder.type === 'prompt')}
                   onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
