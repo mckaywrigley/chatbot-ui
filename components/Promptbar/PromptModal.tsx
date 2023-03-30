@@ -25,16 +25,21 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
   };
 
   useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
+        window.addEventListener('mouseup', handleMouseUp);
       }
     };
 
-    window.addEventListener('click', handleOutsideClick);
+    const handleMouseUp = (e: MouseEvent) => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      onClose();
+    };
+
+    window.addEventListener('mousedown', handleMouseDown);
 
     return () => {
-      window.removeEventListener('click', handleOutsideClick);
+      window.removeEventListener('mousedown', handleMouseDown);
     };
   }, [onClose]);
 
