@@ -166,7 +166,6 @@ export const Chatbar: FC<Props> = ({
 
         {conversations.length > 0 ? (
           <div
-            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -191,7 +190,6 @@ export const Chatbar: FC<Props> = ({
         )}
       </div>
         
-      <div className="px-1">
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
@@ -202,7 +200,6 @@ export const Chatbar: FC<Props> = ({
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
       />
-      </div>
     </div>
   );
 };
