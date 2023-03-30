@@ -26,37 +26,40 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
   };
 
   return isChanging ? (
-    <div className="duration:200 flex w-full cursor-pointer items-center rounded-md py-3 px-3 transition-colors hover:bg-gray-500/10">
+    <div className="relative flex items-center">
+      <div className="flex w-full items-center gap-3 bg-[#343541]/90 p-3 rounded-lg">
       <IconKey size={18} />
 
       <input
-        className="ml-2 h-[20px] flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-[12.5px] leading-3 text-left text-white outline-none focus:border-neutral-100"
+        className="mr-12 flex-1 overflow-hidden overflow-ellipsis border-neutral-400 bg-transparent text-left text-[12.5px] leading-3 text-white outline-none focus:border-neutral-100"
         type="password"
         value={newKey}
         onChange={(e) => setNewKey(e.target.value)}
         onKeyDown={handleEnterDown}
         placeholder={t('API Key') || 'API Key'}
       />
+      </div>
 
-      <div className="flex w-[40px]">
-        <IconCheck
-          className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-          size={18}
+      <div className="absolute right-1 z-10 flex text-gray-300">
+        <button
+          className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
           onClick={(e) => {
             e.stopPropagation();
             handleUpdateKey(newKey);
           }}
-        />
-
-        <IconX
-          className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-          size={18}
+        >
+          <IconCheck size={18} />
+        </button>
+        <button
+          className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
           onClick={(e) => {
             e.stopPropagation();
             setIsChanging(false);
             setNewKey(apiKey);
           }}
-        />
+        >
+          <IconX size={18} />
+        </button>
       </div>
     </div>
   ) : (
