@@ -3,7 +3,6 @@ import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import {
-  IconArrowBarLeft,
   IconFolderPlus,
   IconMessagesOff,
   IconPlus,
@@ -138,15 +137,6 @@ export const Chatbar: FC<Props> = ({
         >
           <IconFolderPlus size={18} />
         </button>
-
-        <button
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400"
-          onClick={onToggleSidebar}
-        >
-        <IconArrowBarLeft size={32} />
-        </button>
-
-
       </div>
 
       {conversations.length > 1 && (

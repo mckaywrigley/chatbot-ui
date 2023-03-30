@@ -1,7 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
-  IconArrowBarRight,
   IconFolderPlus,
   IconMistOff,
   IconPlus,
