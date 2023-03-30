@@ -194,7 +194,7 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
+          <div className="flex flex-col items-center mt-8 text-white opacity-50 select-none">
             <IconMessagesOff />
             {t('No conversations.')}
           </div>
