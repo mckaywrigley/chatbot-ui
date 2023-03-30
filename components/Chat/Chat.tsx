@@ -1,11 +1,10 @@
 import { Conversation, Message } from '@/types/chat';
-import { IconArrowDown } from '@tabler/icons-react';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
-import { IconClearAll, IconKey, IconSettings } from '@tabler/icons-react';
+import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -153,14 +152,25 @@ export const Chat: FC<Props> = memo(
     return (
       <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
         {!(apiKey || serverSideApiKeyIsSet) ? (
-          <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[500px]">
-            <div className="mx-auto mb-5 text-gray-800 dark:text-gray-100">
-              <IconKey size={36} />
+          <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
+            <div className="text-center text-4xl font-bold text-black dark:text-white">
+              Welcome to Chatbot UI
             </div>
-            <div className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-              {t('OpenAI API Key Required')}
+            <div className="text-center text-lg text-black dark:text-white">
+              <div className="mb-8">{`Chatbot UI is an open source clone of OpenAI's ChatGPT UI.`}</div>
+              <div className="mb-2 font-bold">
+                Important: Chatbot UI is 100% unaffiliated with OpenAI.
+              </div>
             </div>
             <div className="text-center text-gray-500 dark:text-gray-400">
+              <div className="mb-2">
+                Chatbot UI allows you to plug in your API key to use this UI
+                with their API.
+              </div>
+              <div className="mb-2">
+                It is <span className="italic">only</span> used to communicate
+                with their API.
+              </div>
               <div className="mb-2">
                 {t(
                   'Please set your OpenAI API key in the bottom left of the sidebar.',
@@ -308,10 +318,10 @@ export const Chat: FC<Props> = memo(
         {showScrollDownButton && (
           <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
             <button
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#515152d7]"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
               onClick={handleScrollDown}
             >
-              <IconArrowDown size={18} />
+              <IconArrowDown size={18}/>
             </button>
           </div>
         )}
