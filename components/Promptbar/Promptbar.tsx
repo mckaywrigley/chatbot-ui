@@ -96,11 +96,8 @@ export const Promptbar: FC<Props> = ({
   }, [searchTerm, prompts]);
 
   return (
-    //fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0
-    <div
-      className="fixed top-0 right-0 z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative bg-[#202123]"
-    >
-      <div className="flex gap-2">
+    <div className="fixed top-0 right-0 z-50 flex h-full w-[260px] flex-col gap-2 bg-[#202123] p-2 transition-all sm:relative">
+      <div className="flex gap-2 px-1">
         <button
           className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
@@ -121,32 +118,29 @@ export const Promptbar: FC<Props> = ({
       </div>
 
       {prompts.length > 1 && (
-        <Search
-          placeholder={t('Search prompts...') || ''}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
+          <Search
+            placeholder={t('Search prompts...') || ''}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+          />
       )}
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto p-1">
         {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
-            <PromptFolders
-              searchTerm={searchTerm}
-              prompts={filteredPrompts}
-              folders={folders.filter((folder) => folder.type === 'prompt')}
-              onUpdateFolder={onUpdateFolder}
-              onDeleteFolder={onDeleteFolder}
-              // prompt props
-              onDeletePrompt={handleDeletePrompt}
-              onUpdatePrompt={handleUpdatePrompt}
-            />
-          </div>
+          <PromptFolders
+            searchTerm={searchTerm}
+            prompts={filteredPrompts}
+            folders={folders.filter((folder) => folder.type === 'prompt')}
+            onUpdateFolder={onUpdateFolder}
+            onDeleteFolder={onDeleteFolder}
+            // prompt props
+            onDeletePrompt={handleDeletePrompt}
+            onUpdatePrompt={handleUpdatePrompt}
+          />
         )}
 
         {prompts.length > 0 ? (
           <div
-            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -159,16 +153,15 @@ export const Promptbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
-            <IconMistOff className="mx-auto mb-3" />
-            <span className="text-[14px] leading-normal">
+          <>
+            <IconMistOff />
             {t('No prompts.')}
-            </span>
-          </div>
+          </>
         )}
       </div>
-
-      <PromptbarSettings />
+      <div className="px-1">
+        <PromptbarSettings />
+      </div>
     </div>
   );
 };

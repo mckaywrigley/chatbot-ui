@@ -116,9 +116,9 @@ export const Chatbar: FC<Props> = ({
 
   return (
     <div
-      className="fixed top-0 left-0 z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative bg-[#202123]"
+      className="fixed top-0 left-0 z-50 flex h-full w-[260px] flex-col gap-2 p-2 transition-all sm:relative bg-[#202123]"
     >
-      <div className="flex gap-2">
+      <div className="flex gap-2 px-1">
         <button
           className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
@@ -146,9 +146,8 @@ export const Chatbar: FC<Props> = ({
         />
       )}
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto p-1">
         {folders.length > 0 && (
-          <div className="flex border-b border-white/20 pb-2">
             <ChatFolders
               searchTerm={searchTerm}
               conversations={filteredConversations.filter(
@@ -163,7 +162,6 @@ export const Chatbar: FC<Props> = ({
               onDeleteConversation={handleDeleteConversation}
               onUpdateConversation={handleUpdateConversation}
             />
-          </div>
         )}
 
         {conversations.length > 0 ? (
@@ -186,13 +184,14 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 flex flex-col items-center gap-3 text-sm leading-normal text-white opacity-50">
+          <>
             <IconMessagesOff />
             {t('No conversations.')}
-          </div>
+          </>
         )}
       </div>
-
+        
+      <div className="px-1">
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
@@ -203,6 +202,7 @@ export const Chatbar: FC<Props> = ({
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
       />
+      </div>
     </div>
   );
 };
