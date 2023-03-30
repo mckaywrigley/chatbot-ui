@@ -18,7 +18,6 @@ interface Props {
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onUpdateFolder: (folderId: string, name: string) => void;
-  onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
@@ -33,7 +32,6 @@ export const Promptbar: FC<Props> = ({
   onCreatePrompt,
   onUpdatePrompt,
   onDeletePrompt,
-  onToggleSidebar,
 }) => {
   const { t } = useTranslation('promptbar');
   const [searchTerm, setSearchTerm] = useState<string>('');
