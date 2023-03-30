@@ -35,7 +35,7 @@ export const ChatFolders: FC<Props> = ({
   onUpdateConversation,
 }) => {
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col border-b pb-2">
       {folders.map((folder, index) => (
         <ChatFolder
           key={index}

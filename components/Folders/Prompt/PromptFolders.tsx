@@ -25,7 +25,7 @@ export const PromptFolders: FC<Props> = ({
   onUpdatePrompt,
 }) => {
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col border-b pb-2">
       {folders.map((folder, index) => (
         <PromptFolder
           key={index}
