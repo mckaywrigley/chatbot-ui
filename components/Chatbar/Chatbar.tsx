@@ -164,7 +164,7 @@ export const Chatbar: FC<Props> = ({
               conversations={filteredConversations.filter(
                 (conversation) => conversation.folderId,
               )}
-              folders={folders.filter((folder) => folder.type === 'chat')}
+              folders={folders}
               onDeleteFolder={onDeleteFolder}
               onUpdateFolder={onUpdateFolder}
               selectedConversation={selectedConversation}
@@ -194,10 +194,10 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <>
+          <div className="mt-8 text-center text-white opacity-50 select-none">
             <IconMessagesOff />
             {t('No conversations.')}
-          </>
+          </div>
         )}
       </div>
         
