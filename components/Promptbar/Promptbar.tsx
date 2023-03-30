@@ -96,12 +96,13 @@ export const Promptbar: FC<Props> = ({
   }, [searchTerm, prompts]);
 
   return (
+    //fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0
     <div
-      className={`fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
+      className="fixed top-0 right-0 z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative bg-[#202123]"
     >
-      <div className="flex items-center">
+      <div className="flex gap-2">
         <button
-          className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onCreatePrompt();
             setSearchTerm('');
@@ -112,17 +113,11 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
+          className="flex items-center rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
-          <IconFolderPlus size={16} />
+          <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarRight
-          className="hidden p-1 ml-1 cursor-pointer text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {prompts.length > 1 && (

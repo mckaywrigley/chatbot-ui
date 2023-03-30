@@ -29,7 +29,6 @@ interface Props {
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onToggleSidebar: () => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -54,7 +53,6 @@ export const Chatbar: FC<Props> = ({
   onToggleLightMode,
   onSelectConversation,
   onDeleteConversation,
-  onToggleSidebar,
   onUpdateConversation,
   onApiKeyChange,
   onClearConversations,
@@ -118,8 +116,7 @@ export const Chatbar: FC<Props> = ({
 
   return (
     <div
-      // fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0
-      className="z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative sm:top-0"
+      className="fixed top-0 left-0 z-50 flex h-full w-[260px] flex-col gap-2 border-2 border-rose-600 p-2 transition-all sm:relative bg-[#202123]"
     >
       <div className="flex gap-2">
         <button
