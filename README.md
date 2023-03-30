@@ -118,5 +118,3 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 ## Contact
 
 If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
-
-
