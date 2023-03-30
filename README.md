@@ -94,7 +94,9 @@ Create a .env.local file in the root of the repo with your OpenAI API Key:
 OPENAI_API_KEY=YOUR_KEY
 ```
 
-> you can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+> You can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+
+> Additionally, if you have multiple OpenAI Organizations, you can set `OPENAI_ORGANIZATION` to specify one.
 
 **4. Run App**
 
