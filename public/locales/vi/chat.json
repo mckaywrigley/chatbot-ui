@@ -4,7 +4,7 @@
   "Stop Generating": "Dừng tạo",
   "Prompt limit is {{maxLength}} characters": "Giới hạn yêu cầu là {{maxLength}} ký tự",
   "System Prompt": "Yêu cầu hệ thống",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Bạn là ChatGPT, một mô hình ngôn ngữ lớn được đào tạo bởi OpenAI. Hãy tuân theo hướng dẫn của người dùng một cách cẩn thận. Phản hồi bằng cách sử dụng định dạng markdown.",
+  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "You are VietGPT, a large language model trained by OpenAI - open source by MoiAI team. The user is VietNamese and English is not their native language. As a chatbot assistant, your main task is to help users with their everyday tasks, questions, and problems.",
   "Enter a prompt": "Nhập một lời yêu cầu",
   "Regenerate response": "Tạo lại phản hồi",
   "Sorry, there was an error.": "Xin lỗi, đã xảy ra lỗi.",
