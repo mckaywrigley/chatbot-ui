@@ -1,0 +1,38 @@
+name: Update fork with upstream changes
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'tests/**'
+      - '.github/**'
+      - 'README.md'
+      - '__tests__/utils/app/**'
+
+jobs:
+  update-fork:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream changes into fork
+        run: git merge upstream/main
+
+      - name: Push changes to fork
+        run: git push
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update fork with upstream changes
+          title: Update fork with upstream changes
+          body: |
+            This pull request was automatically created to update the fork with the latest changes from the upstream repository.
+          branch: update-fork
+          base: main
