@@ -34,6 +34,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -120,6 +121,7 @@ const Home: React.FC<HomeProps> = ({
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
+        toast.error(response.statusText);
         return;
       }
 
