@@ -381,7 +381,12 @@ const Home: React.FC<HomeProps> = ({
       id: uuidv4(),
       name: `${t('New Conversation')}`,
       messages: [],
-      model: lastConversation?.model || defaultModelId,
+      model: lastConversation?.model || {
+        id: OpenAIModels[defaultModelId].id,
+        name: OpenAIModels[defaultModelId].name,
+        maxLength: OpenAIModels[defaultModelId].maxLength,
+        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+      },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
     };
