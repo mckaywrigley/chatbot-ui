@@ -1,5 +1,6 @@
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { useTranslation } from 'next-i18next';
+import { IconExternalLink } from '@tabler/icons-react';
 import { FC } from 'react';
 
 interface Props {
