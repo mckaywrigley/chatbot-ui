@@ -48,6 +48,11 @@ export const ModelSelect: FC<Props> = ({
           ))}
         </select>
       </div>
+      <div className="w-full">
+        <a href="https://platform.openai.com/account/usage" target="_blank">
+          {t('View Account Usage')}
+        </a>
+      </div>
     </div>
   );
 };
