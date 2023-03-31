@@ -13,6 +13,7 @@ import {
   OpenAIModelID,
   OpenAIModels,
 } from '@/types/openai';
+import { dummyPlugins, Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
@@ -617,6 +618,51 @@ const Home: React.FC<HomeProps> = ({
     }
   }, [serverSideApiKeyIsSet]);
 
+  // ---- PLUGINS ----
+  const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const savePlugins = (plugins: Plugin[]) => {
+    localStorage.setItem('plugins', JSON.stringify(plugins));
+  };
+
+  // fetch plugins
+  useEffect(() => {
+    const fetchPlugins = async () => {
+      const r = await fetch('/api/plugins');
+
+      const json = await r.json();
+
+      console.log(json);
+
+      setPlugins(json.plugins);
+    };
+
+    try {
+      fetchPlugins();
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleAddPlugin = (plugin: Plugin) => {
+    const updatedPlugins = [...plugins, plugin];
+    setPlugins(updatedPlugins);
+    savePlugins(updatedPlugins);
+  };
+
+  const handleInstallPlugin = (plugin: Plugin) => {
+    const updatedPlugins = plugins.map((p) => {
+      if (p.name === plugin.name) {
+        plugin.installed = true;
+        return plugin;
+      }
+
+      return p;
+    });
+
+    setPlugins(updatedPlugins);
+    savePlugins(updatedPlugins);
+  };
+
   return (
     <>
       <Head>
@@ -699,6 +745,9 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                plugins={plugins}
+                onAddPlugin={handleAddPlugin}
+                onInstallPlugin={handleInstallPlugin}
               />
             </div>
 
