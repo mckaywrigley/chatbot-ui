@@ -11,8 +11,8 @@ module.exports = {
   },
   variants: {
     extend: {
-      visibility: ["group-hover"],
+      visibility: ['group-hover'],
     },
-   },
+  },
   plugins: [require('@tailwindcss/typography')],
 };
