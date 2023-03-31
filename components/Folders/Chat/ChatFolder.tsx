@@ -121,7 +121,7 @@ export const ChatFolder: FC<Props> = ({
           </div>
         ) : (
           <button
-            className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
+            className={`flex w-full items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
             onClick={() => setIsOpen(!isOpen)}
             onDrop={(e) => handleDrop(e, currentFolder)}
             onDragOver={allowDrop}
@@ -197,11 +197,12 @@ export const ChatFolder: FC<Props> = ({
         )}
       </div>
 
-      {isOpen
-        ? conversations.map((conversation, index) => {
+    {isOpen && (
+      <div className="flex flex-col ml-5 gap-2 border-l pl-2 mt-1">
+        {conversations.map((conversation, index) => {
           if (conversation.folderId === currentFolder.id) {
             return (
-              <div key={index} className="ml-5 gap-2 border-l pl-2">
+              <div key={index}>
                 <ConversationComponent
                   selectedConversation={selectedConversation}
                   conversation={conversation}
@@ -213,8 +214,9 @@ export const ChatFolder: FC<Props> = ({
               </div>
             );
           }
-        })
-        : null}
+        })}
+      </div>
+    )}
     </>
   );
 };

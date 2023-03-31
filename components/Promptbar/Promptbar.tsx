@@ -1,7 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
-  IconArrowBarRight,
   IconFolderPlus,
   IconMistOff,
   IconPlus,
@@ -19,7 +18,6 @@ interface Props {
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onUpdateFolder: (folderId: string, name: string) => void;
-  onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
@@ -34,7 +32,6 @@ export const Promptbar: FC<Props> = ({
   onCreatePrompt,
   onUpdatePrompt,
   onDeletePrompt,
-  onToggleSidebar,
 }) => {
   const { t } = useTranslation('promptbar');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -96,12 +93,10 @@ export const Promptbar: FC<Props> = ({
   }, [searchTerm, prompts]);
 
   return (
-    <div
-      className={`fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
-    >
-      <div className="flex items-center">
+    <div className='flex flex-col gap-2 h-full z-50'>
+      <div className="flex gap-2 px-1">
         <button
-          className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onCreatePrompt();
             setSearchTerm('');
@@ -112,46 +107,37 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
+          className="flex items-center rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
-          <IconFolderPlus size={16} />
+          <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarRight
-          className="hidden p-1 ml-1 cursor-pointer text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {prompts.length > 1 && (
-        <Search
-          placeholder={t('Search prompts...') || ''}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
+          <Search
+            placeholder={t('Search prompts...') || ''}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+          />
       )}
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto p-1">
         {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
-            <PromptFolders
-              searchTerm={searchTerm}
-              prompts={filteredPrompts}
-              folders={folders}
-              onUpdateFolder={onUpdateFolder}
-              onDeleteFolder={onDeleteFolder}
-              // prompt props
-              onDeletePrompt={handleDeletePrompt}
-              onUpdatePrompt={handleUpdatePrompt}
-            />
-          </div>
+          <PromptFolders
+            searchTerm={searchTerm}
+            prompts={filteredPrompts}
+            folders={folders}
+            onUpdateFolder={onUpdateFolder}
+            onDeleteFolder={onDeleteFolder}
+            // prompt props
+            onDeletePrompt={handleDeletePrompt}
+            onUpdatePrompt={handleUpdatePrompt}
+          />
         )}
 
         {prompts.length > 0 ? (
           <div
-            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -164,16 +150,15 @@ export const Promptbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
-            <IconMistOff className="mx-auto mb-3" />
-            <span className="text-[14px] leading-normal">
-              {t('No prompts.')}
-            </span>
+          <div className="flex flex-col items-center mt-8 text-white opacity-50 select-none">
+            <IconMistOff />
+            {t('No prompts.')}
           </div>
         )}
       </div>
-
-      <PromptbarSettings />
+      <div className="px-1">
+        <PromptbarSettings />
+      </div>
     </div>
   );
 };

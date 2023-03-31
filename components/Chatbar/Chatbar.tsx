@@ -3,7 +3,6 @@ import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import {
-  IconArrowBarLeft,
   IconFolderPlus,
   IconMessagesOff,
   IconPlus,
@@ -29,7 +28,6 @@ interface Props {
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onToggleSidebar: () => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -54,7 +52,6 @@ export const Chatbar: FC<Props> = ({
   onToggleLightMode,
   onSelectConversation,
   onDeleteConversation,
-  onToggleSidebar,
   onUpdateConversation,
   onApiKeyChange,
   onClearConversations,
@@ -117,12 +114,11 @@ export const Chatbar: FC<Props> = ({
   }, [searchTerm, conversations]);
 
   return (
-    <div
-      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
-    >
-      <div className="flex items-center">
+    //fixed top-0 left-0 z-50 flex h-full w-[260px] flex-col gap-2 p-2 transition-all sm:relative bg-[#202123]
+    <div className="flex flex-col gap-2 h-full  z-50">
+      <div className="flex gap-2 px-1">
         <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex flex-grow items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
             setSearchTerm('');
@@ -133,17 +129,11 @@ export const Chatbar: FC<Props> = ({
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex items-center rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarLeft
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {conversations.length > 1 && (
@@ -154,9 +144,8 @@ export const Chatbar: FC<Props> = ({
         />
       )}
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto p-1">
         {folders.length > 0 && (
-          <div className="flex border-b border-white/20 pb-2">
             <ChatFolders
               searchTerm={searchTerm}
               conversations={filteredConversations.filter(
@@ -171,12 +160,10 @@ export const Chatbar: FC<Props> = ({
               onDeleteConversation={handleDeleteConversation}
               onUpdateConversation={handleUpdateConversation}
             />
-          </div>
         )}
 
         {conversations.length > 0 ? (
           <div
-            className="h-full pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -194,13 +181,13 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-3 items-center text-sm leading-normal mt-8 text-white opacity-50">
+          <div className="flex flex-col items-center mt-8 text-white opacity-50 select-none">
             <IconMessagesOff />
             {t('No conversations.')}
           </div>
         )}
       </div>
-
+        
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}

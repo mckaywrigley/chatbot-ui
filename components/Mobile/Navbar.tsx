@@ -19,10 +19,12 @@ export const Navbar: FC<Props> = ({
         {selectedConversation.name}
       </div>
 
-      <IconPlus
-        className="cursor-pointer hover:text-neutral-400 mr-8"
+      <button
+        className="mr-8 hover:text-neutral-400"
         onClick={onNewConversation}
-      />
+      >
+        <IconPlus />
+      </button>
     </nav>
   );
 };

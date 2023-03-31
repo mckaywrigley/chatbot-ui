@@ -30,7 +30,7 @@ export const ChatbarSettings: FC<Props> = ({
 }) => {
   const { t } = useTranslation('sidebar');
   return (
-    <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+    <div className="flex w-full flex-col gap-1 border-t border-white/20 pt-1 px-1">
       {conversationsCount > 0 ? (
         <ClearConversations onClearConversations={onClearConversations} />
       ) : null}
