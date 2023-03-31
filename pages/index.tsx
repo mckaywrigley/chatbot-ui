@@ -1,3 +1,4 @@
+import authMiddleware from '../lib/authMiddleware';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
@@ -45,6 +46,12 @@ const Home: React.FC<HomeProps> = ({
   defaultModelId,
 }) => {
   const { t } = useTranslation('chat');
+
+
+const handler = async (req, res) => {
+  res.status(200).json({ message: 'This is a protected route', user: req.user });
+};
+
 
   // STATE ----------------------------------------------
 
@@ -745,7 +752,7 @@ const Home: React.FC<HomeProps> = ({
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+const getServerSidePropsWithAuth = authMiddleware(async ({ locale, req }) => {
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
@@ -767,4 +774,11 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ])),
     },
   };
+});
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // Change this line to call the getServerSidePropsWithAuth function
+  const result = await getServerSidePropsWithAuth(context);
+
+  return result;
 };
