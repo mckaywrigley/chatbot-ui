@@ -24,7 +24,7 @@ export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
   return obj.version === 4;
 }
 
-export const isLatestExportFormat = isExportFormatV3;
+export const isLatestExportFormat = isExportFormatV4;
 
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   if (isExportFormatV1(data)) {
