@@ -642,6 +642,7 @@ const Home: React.FC<HomeProps> = ({
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <div>
+                <h1>hello world</h1>
                 <Chatbar
                   loading={messageIsStreaming}
                   conversations={conversations}
@@ -669,10 +670,6 @@ const Home: React.FC<HomeProps> = ({
                 >
                   <IconArrowBarLeft />
                 </button>
-                <div
-                  onClick={handleToggleChatbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
-                ></div>
               </div>
             ) : (
               <button
@@ -719,10 +716,6 @@ const Home: React.FC<HomeProps> = ({
                 >
                   <IconArrowBarRight />
                 </button>
-                <div
-                  onClick={handleTogglePromptbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
-                ></div>
               </div>
             ) : (
               <button
