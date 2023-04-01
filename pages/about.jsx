@@ -5,7 +5,7 @@ const faqs = [
   {
     question: "HoiGPT là gì?",
     answer:
-      "Hỏi GPT (Hoigpt) là một dự án phi lợi nhuận, giúp người dùng ở Việt Nam tiếp cận với mô hình trí tuệ nhân tạo hàng đầu hiện nay, dùng nó để hỗ trợ vào những việc có ích.",
+      "Hỏi GPT (Hoigpt) là một dự án phi lợi nhuận, dùng mô hình trí tuệ nhân tạo hàng đầu hiện nay là GPT của OpenAI. Mục đích của chúng tôi là giúp người dùng ở Việt Nam tiếp cận với GPT, dùng nó để hỗ trợ vào những việc có ích. Trang web dựa trên mã nguồn mở https://github.com/mckaywrigley/chatbot-ui.",
   },
   {
     question: "Tôi có thể biết thêm thông tin hay hỗ trợ dự án ở đâu?",
