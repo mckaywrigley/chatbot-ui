@@ -5,7 +5,7 @@ export interface Message {
   content: string;
 }
 
-export type Role = 'assistant' | 'user';
+export type Role = 'assistant' | 'user' | 'system';
 
 export interface ChatBody {
   model: OpenAIModel;
@@ -14,11 +14,19 @@ export interface ChatBody {
   prompt: string;
 }
 
+export interface ChatNode {
+  id: string;
+  message: Message;
+  parentMessageId?: string;
+  children: string[];
+}
+
 export interface Conversation {
   id: string;
   name: string;
-  messages: Message[];
   model: OpenAIModel;
   prompt: string;
   folderId: string | null;
+  mapping: Record<string, ChatNode>;
+  current_node: string;
 }

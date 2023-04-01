@@ -1,8 +1,9 @@
-import { Message } from '@/types/chat';
+import { ChatNode } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import {
   FC,
   KeyboardEvent,
@@ -11,17 +12,19 @@ import {
   useEffect,
   useRef,
   useState,
+  useContext,
 } from 'react';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
 
 interface Props {
   messageIsStreaming: boolean;
   model: OpenAIModel;
   conversationIsEmpty: boolean;
-  messages: Message[];
+  chatNodes: ChatNode[];
   prompts: Prompt[];
-  onSend: (message: Message) => void;
+  onSend: (chatNode: ChatNode) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -31,7 +34,7 @@ export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
   conversationIsEmpty,
-  messages,
+  chatNodes,
   prompts,
   onSend,
   onRegenerate,
@@ -47,6 +50,9 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const { selectedConversation } =
+    useContext(ConversationContext);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -82,7 +88,12 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    onSend({ role: 'user', content });
+    onSend({
+      id: uuidv4(),
+      message: { role: 'user', content },
+      parentMessageId: selectedConversation?.current_node,
+      children: [],
+    });
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {

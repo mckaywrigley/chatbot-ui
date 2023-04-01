@@ -1,4 +1,5 @@
-import { Conversation, Message } from '@/types/chat';
+import { ChatNode, Conversation, Message } from '@/types/chat';
+import { SendAction } from '@/types/conversation';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
@@ -14,6 +15,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useContext,
 } from 'react';
 import { Spinner } from '../Global/Spinner';
 import { ChatInput } from './ChatInput';
@@ -22,6 +24,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
 
 interface Props {
   conversation: Conversation;
@@ -33,12 +36,16 @@ interface Props {
   modelError: ErrorMessage | null;
   loading: boolean;
   prompts: Prompt[];
-  onSend: (message: Message, deleteCount?: number) => void;
+  onSend: (
+    chatNode: ChatNode,
+    sendAction: SendAction,
+    messageIndex?: number,
+  ) => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
   ) => void;
-  onEditMessage: (message: Message, messageIndex: number) => void;
+  onEditMessage: (chatNode: ChatNode, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
@@ -59,11 +66,13 @@ export const Chat: FC<Props> = memo(
     stopConversationRef,
   }) => {
     const { t } = useTranslation('chat');
-    const [currentMessage, setCurrentMessage] = useState<Message>();
+    const [currentNode, setCurrentNode] = useState<ChatNode>();
     const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [showScrollDownButton, setShowScrollDownButton] =
       useState<boolean>(false);
+
+    const { currentMessageList } = useContext(ConversationContext);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -120,10 +129,8 @@ export const Chat: FC<Props> = memo(
 
     useEffect(() => {
       throttledScrollDown();
-      setCurrentMessage(
-        conversation.messages[conversation.messages.length - 2],
-      );
-    }, [conversation.messages, throttledScrollDown]);
+      setCurrentNode(currentMessageList[currentMessageList.length - 2]);
+    }, [currentMessageList, throttledScrollDown]);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -200,7 +207,7 @@ export const Chat: FC<Props> = memo(
               ref={chatContainerRef}
               onScroll={handleScroll}
             >
-              {conversation.messages.length === 0 ? (
+              {currentMessageList.length === 0 ? (
                 <>
                   <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
                     <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
@@ -276,10 +283,10 @@ export const Chat: FC<Props> = memo(
                     </div>
                   )}
 
-                  {conversation.messages.map((message, index) => (
+                  {currentMessageList.map((chatNode, index) => (
                     <ChatMessage
-                      key={index}
-                      message={message}
+                      key={chatNode.id}
+                      chatNode={chatNode}
                       messageIndex={index}
                       onEditMessage={onEditMessage}
                     />
@@ -299,17 +306,17 @@ export const Chat: FC<Props> = memo(
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
-              conversationIsEmpty={conversation.messages.length === 0}
-              messages={conversation.messages}
+              conversationIsEmpty={currentMessageList.length === 0}
+              chatNodes={currentMessageList}
               model={conversation.model}
               prompts={prompts}
-              onSend={(message) => {
-                setCurrentMessage(message);
-                onSend(message);
+              onSend={(chatNode) => {
+                setCurrentNode(chatNode);
+                onSend(chatNode, SendAction.SEND);
               }}
               onRegenerate={() => {
-                if (currentMessage) {
-                  onSend(currentMessage, 2);
+                if (currentNode) {
+                  onSend(currentNode, SendAction.REGENERATE);
                 }
               }}
             />
