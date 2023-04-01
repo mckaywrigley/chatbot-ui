@@ -1,0 +1,41 @@
+# Configuration file for MegaLinter
+# See all available variables at https://megalinter.github.io/configuration/ and in linters documentation
+
+DISABLE:
+  - COPYPASTE
+  - SPELL
+  - ESLINT
+
+DISABLE_LINTERS:
+  - CSS_STYLELINT
+  - EDITORCONFIG_EDITORCONFIG_CHECKER
+  - JAVASCRIPT_ES
+  - JAVASCRIPT_PRETTIER
+  - JSON_PRETTIER
+  - MAKEFILE_CHECKMAKE
+  - MARKDOWN_MARKDOWNLINT
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER
+  - REPOSITORY_CHECKOV
+  - REPOSITORY_TRIVY
+  - TSX_ESLINT
+  - TYPESCRIPT_ES
+  - TYPESCRIPT_PRETTIER
+  - YAML_PRETTIER
+  - YAML_V8R
+  - YAML_YAMLLINT
+
+SHOW_ELAPSED_TIME: true
+IGNORE_GENERATED_FILES: true
+PRINT_ALL_FILES: false
+FORMATTERS_DISABLE_ERRORS: false
+MARKDOWN_MARKDOWNLINT_DISABLE_ERRORS: false
+TYPESCRIPT_DEFAULT_STYLE: prettier
+JAVASCRIPT_DEFAULT_STYLE: prettier
+PRE_COMMANDS:
+  - command: |
+      npm install eslint-plugin-react \
+                  prettier-plugin-tailwindcss \
+                  eslint-config-next \
+                  eslint-config-prettier \
+                  eslint-plugin-tailwindcss \
+                  @tailwindcss/typography
