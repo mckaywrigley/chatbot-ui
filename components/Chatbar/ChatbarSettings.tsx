@@ -3,7 +3,6 @@ import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
-import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
 
@@ -20,10 +19,8 @@ interface Props {
 
 export const ChatbarSettings: FC<Props> = ({
   lightMode,
-  apiKey,
   conversationsCount,
   onToggleLightMode,
-  onApiKeyChange,
   onClearConversations,
   onExportConversations,
   onImportConversations,
@@ -52,8 +49,6 @@ export const ChatbarSettings: FC<Props> = ({
           onToggleLightMode(lightMode === 'light' ? 'dark' : 'light')
         }
       />
-
-      <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
     </div>
   );
 };
