@@ -114,7 +114,6 @@ export const Chatbar: FC<Props> = ({
   }, [searchTerm, conversations]);
 
   return (
-    //fixed top-0 left-0 z-50 flex h-full w-[260px] flex-col gap-2 p-2 transition-all sm:relative bg-[#202123]
     <div className="flex flex-col gap-2 h-full  z-50">
       <div className="flex gap-2 px-1">
         <button
