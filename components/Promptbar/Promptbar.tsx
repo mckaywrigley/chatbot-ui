@@ -139,7 +139,7 @@ export const Promptbar: FC<Props> = ({
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
-              folders={folders.filter((folder) => folder.type === 'prompt')}
+              folders={folders}
               onUpdateFolder={onUpdateFolder}
               onDeleteFolder={onDeleteFolder}
               // prompt props
@@ -167,7 +167,7 @@ export const Promptbar: FC<Props> = ({
           <div className="mt-8 text-center text-white opacity-50 select-none">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
-            {t('No prompts.')}
+              {t('No prompts.')}
             </span>
           </div>
         )}
