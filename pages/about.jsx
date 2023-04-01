@@ -53,7 +53,7 @@ const faqs = [
 export default function About() {
   return (
     <div className="bg-gray-900">
-      <div className="mx-auto max-w-7xl py-24 sm:px-6 sm:py-32 lg:px-8">
+      <div className="mx-auto max-w-7xl py-3 sm:px-6 sm:py-4 lg:px-8">
         <div className="relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl sm:rounded-3xl sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             HoiGPT.com - GPT cho người Việt
@@ -87,7 +87,7 @@ export default function About() {
           </svg>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
+      <div className="mx-auto max-w-7xl px-6 py-3 sm:py-4 lg:px-8 lg:py-5">
         <div className="mx-auto max-w-4xl divide-y divide-white/10">
           <h2 className="text-2xl font-bold leading-10 tracking-tight text-white">Câu hỏi thường gặp:</h2>
           <dl className="mt-10 space-y-6 divide-y divide-white/10">
@@ -117,6 +117,23 @@ export default function About() {
           </dl>
         </div>
       </div>
+    <footer className="bg-gray-900">
+      <div className="mx-auto max-w-7xl px-6 py-3 sm:py-4 lg:px-8 lg:py-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-x-6">
+          <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
+            &copy; 2023 HoiGPT.com, Vietnam. All rights reserved.
+          </p>
+          </div>
+          <div className="flex items-center gap-x-6">
+            <a href="https://www.facebook.com/hoiGPT" className="text-sm font-semibold leading-6 text-white">
+              Fanpage HoiGPT <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
     </div>
+
   )
 }
