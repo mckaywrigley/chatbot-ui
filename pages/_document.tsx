@@ -12,7 +12,7 @@ export default function Document(props: Props) {
     <Html lang={currentLocale}>
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Chatbot UI"></meta>
+        <meta name="apple-mobile-web-app-title" content="Chat Everywhere"></meta>
       </Head>
       <body>
         <Main />
