@@ -53,7 +53,6 @@ export const ChatbarSettings: FC<Props> = ({
         }
       />
 
-      <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
       <SidebarButton
         text={t('About')}
         icon={
