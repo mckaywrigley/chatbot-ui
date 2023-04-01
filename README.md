@@ -1,5 +1,7 @@
 # Chat Everywhere by [Explorator Labs](https://exploratorlabs.com)
 
+[中文版](README-zh.md)
+
 Our goal is to promote awareness of AI technologies like ChatGPT, making them accessible to everyone and everywhere on Earth. Currently, the official ChatGPT is not available in certain countries without a VPN (e.g. China, HK, Macao, etc). Until official support is provided, we need an alternative to access groundbreaking technologies like this.
 
 ## Technological Background
