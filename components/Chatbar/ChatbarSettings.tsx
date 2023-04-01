@@ -1,5 +1,5 @@
 import { SupportedExportFormats } from '@/types/export';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconFileExport, IconMoon, IconSun, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
@@ -54,6 +54,14 @@ export const ChatbarSettings: FC<Props> = ({
       />
 
       <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
+      <SidebarButton
+        text={t('About')}
+        icon={
+          <IconInfoCircle size={18} />
+        }
+        onClick={() => window.open('/about', '_blank')
+        }
+      />
     </div>
   );
 };
