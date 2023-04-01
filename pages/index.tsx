@@ -35,6 +35,8 @@ import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+import { defaultPromptList } from '@/components/promptList';
+
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
   defaultModelId: OpenAIModelID;
@@ -66,7 +68,7 @@ const Home: React.FC<HomeProps> = ({
 
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [prompts, setPrompts] = useState<Prompt[]>(defaultPromptList);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
   // REFS ----------------------------------------------
