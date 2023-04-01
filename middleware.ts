@@ -12,6 +12,9 @@ export const config = {
 
 export function middleware(req: NextRequest) {
   // Extract country
+  if (!req.geo) {
+      return NextResponse.next()
+  }
   const country = req.geo.country || 'US'
   // Specify the correct pathname
   if (country === ALLOWED_COUNTRY) {
