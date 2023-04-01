@@ -52,7 +52,7 @@ export const ModelSelect: FC<Props> = ({
       <div className="w-full mt-3 text-left text-neutral-700 dark:text-neutral-400 flex items-center">
         <a href="https://openai.com/blog/chatgpt" target="_blank" className="flex items-center">
           <IconExternalLink size={18} className={"inline mr-1"} />
-          {t('ChatGPT')}
+          {t('OpenAI ChatGPT')}
         </a>
       </div>
     </div>
