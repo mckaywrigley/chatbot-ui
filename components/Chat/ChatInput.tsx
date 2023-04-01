@@ -289,7 +289,7 @@ export const ChatInput: FC<Props> = ({
             <IconSend size={18} />
           </button>
 
-          {showPromptList && prompts.length > 0 && (
+          {showPromptList && filteredPrompts.length > 0 && (
             <div className="absolute bottom-12 w-full">
               <PromptList
                 activePromptIndex={activePromptIndex}
