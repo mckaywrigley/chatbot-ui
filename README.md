@@ -1,83 +1,23 @@
-# Chatbot UI
+# Chat Everywhere by [Explorator Labs](https://exploratorlabs.com)
 
-Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
+[中文版](README-zh.md)
 
-See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
+Our goal is to promote awareness of AI technologies like ChatGPT, making them accessible to everyone and everywhere on Earth. Currently, the official ChatGPT is not available in certain countries without a VPN (e.g. China, HK, Macao, etc). Until official support is provided, we need an alternative to access groundbreaking technologies like this.
 
-![Chatbot UI](./public/screenshot.png)
+## Technological Background
+This project is forked from [Chatbot UI](https://github.com/mckaywrigley/chatbot-ui), an initiative started by [Mckay](https://twitter.com/mckaywrigley) to build a better and open-source user interface compared to the official one.
 
-## Updates
+## Funding for This Project
+To lower the barrier to accessing technology like ChatGPT, [Explorator Labs](https://exploratorlabs.com) is pledging a fixed budget every month to make this project available for everyone without the need to log in or pay.
 
-Chatbot UI will be updated over time.
+However, if the cost of OpenAI's API exceeds our set budget, we will evaluate options to cover the costs while maintaining accessibility and affordability. Further announcements will be made as needed.
 
-Expect frequent improvements.
-
-**Next up:**
-
-- [ ] Delete messages
-- [ ] More model settings
-- [ ] Plugins
-
-**Recent updates:**
-
-- [x] Prompt templates (3/27/23)
-- [x] Regenerate & edit responses (3/25/23)
-- [x] Folders (3/24/23)
-- [x] Search chat content (3/23/23)
-- [x] Stop message generation (3/22/23)
-- [x] Import/Export chats (3/22/23)
-- [x] Custom system prompt (3/21/23)
-- [x] Error handling (3/20/23)
-- [x] GPT-4 support (access required) (3/20/23)
-- [x] Search conversations (3/19/23)
-- [x] Code syntax highlighting (3/18/23)
-- [x] Toggle sidebar (3/18/23)
-- [x] Conversation naming (3/18/23)
-- [x] Github flavored markdown (3/18/23)
-- [x] Add OpenAI API key in app (3/18/23)
-- [x] Markdown support (3/17/23)
-
-## Modifications
-
-Modify the chat interface in `components/Chat`.
-
-Modify the sidebar interface in `components/Sidebar`.
-
-Modify the system prompt in `utils/index.ts`.
-
-## Deploy
-
-**Vercel**
-
-Host your own live version of Chatbot UI with Vercel.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
-
-**Replit**
-
-Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
-
-**Docker**
-
-Build locally:
-
-```shell
-docker build -t chatgpt-ui .
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
-```
-
-Pull from ghcr:
-
-```
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
-```
-
-## Running Locally
+## Development
 
 **1. Clone Repo**
 
 ```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
+git clone https://github.com/exploratortech/chat-everywhere
 ```
 
 **2. Install Dependencies**
@@ -94,7 +34,9 @@ Create a .env.local file in the root of the repo with your OpenAI API Key:
 OPENAI_API_KEY=YOUR_KEY
 ```
 
-> you can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+> You can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+
+> Additionally, if you have multiple OpenAI Organizations, you can set `OPENAI_ORGANIZATION` to specify one.
 
 **4. Run App**
 
@@ -117,7 +59,3 @@ When deploying the application, the following environment variables can be set:
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
-
-## Contact
-
-If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).

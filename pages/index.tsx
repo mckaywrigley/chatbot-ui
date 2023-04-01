@@ -67,7 +67,7 @@ const Home: React.FC<HomeProps> = ({
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
+  const [showPromptbar, setShowPromptbar] = useState<boolean>(false);
 
   // REFS ----------------------------------------------
 
@@ -380,7 +380,12 @@ const Home: React.FC<HomeProps> = ({
       id: uuidv4(),
       name: `${t('New Conversation')}`,
       messages: [],
-      model: lastConversation?.model || defaultModelId,
+      model: lastConversation?.model || {
+        id: OpenAIModels[defaultModelId].id,
+        name: OpenAIModels[defaultModelId].name,
+        maxLength: OpenAIModels[defaultModelId].maxLength,
+        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+      },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
     };
@@ -524,8 +529,6 @@ const Home: React.FC<HomeProps> = ({
     savePrompts(updatedPrompts);
   };
 
-  const handleCreatePromptFolder = (name: string) => {};
-
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -620,8 +623,8 @@ const Home: React.FC<HomeProps> = ({
   return (
     <>
       <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
+        <title>Chat Everywhere</title>
+        <meta name="description" content="Use ChatGPT anywhere" />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
@@ -648,7 +651,7 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
-                  folders={folders}
+                  folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
                   onDeleteFolder={handleDeleteFolder}
@@ -706,7 +709,7 @@ const Home: React.FC<HomeProps> = ({
               <div>
                 <Promptbar
                   prompts={prompts}
-                  folders={folders}
+                  folders={folders.filter((folder) => folder.type === 'prompt')}
                   onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}

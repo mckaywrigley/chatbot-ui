@@ -18,6 +18,8 @@ module.exports = {
       "vi",
       "zh",
       "ar",
+      "zh-Hans",
+      "zh-Hant",
     ],
   },
   localePath:
