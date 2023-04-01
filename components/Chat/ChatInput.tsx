@@ -320,9 +320,20 @@ export const ChatInput: FC<Props> = ({
         >
           Chat Everywhere
         </a>
+        {' '}
+        by 
+        {' '}
+        <a
+          href="https://exploratorlabs.com"
+          target="_blank"
+          rel="noreferrer"
+          className="underline"
+        >
+          Explorator Labs
+        </a>
         .{' '}
         {t(
-          "Welcome to Chat Everywhere, where the forefront of AI technology meets universal access.",
+          "Where the forefront of AI technology meets universal access.",
         )}
       </div>
     </div>
