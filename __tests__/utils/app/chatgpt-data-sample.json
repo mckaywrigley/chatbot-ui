@@ -1,0 +1,102 @@
+[
+  {
+    "type": "fetch",
+    "url": "https://chat.openai.com/backend-api/conversation/ebde96fa-f6eb-4074-8c7c-dade6a6a6986",
+    "response": {
+      "title": "Merging Original Repo to Fork",
+      "create_time": 1680451988.043534,
+      "update_time": 1680451997,
+      "mapping": {
+        "8f605ba2-4963-4036-8941-639970b75983": {
+          "id": "8f605ba2-4963-4036-8941-639970b75983",
+          "message": {
+            "id": "8f605ba2-4963-4036-8941-639970b75983",
+            "author": {
+              "role": "system",
+              "metadata": {}
+            },
+            "create_time": 1680451988.043534,
+            "content": {
+              "content_type": "text",
+              "parts": [
+                ""
+              ]
+            },
+            "end_turn": true,
+            "weight": 1,
+            "metadata": {},
+            "recipient": "all"
+          },
+          "parent": "40f06f25-35b4-4e4a-a55f-5437cfe1525b",
+          "children": [
+            "bc8d680d-d082-4133-8563-4659f4f01a64"
+          ]
+        },
+        "40f06f25-35b4-4e4a-a55f-5437cfe1525b": {
+          "id": "40f06f25-35b4-4e4a-a55f-5437cfe1525b",
+          "children": [
+            "8f605ba2-4963-4036-8941-639970b75983"
+          ]
+        },
+        "bc8d680d-d082-4133-8563-4659f4f01a64": {
+          "id": "bc8d680d-d082-4133-8563-4659f4f01a64",
+          "message": {
+            "id": "bc8d680d-d082-4133-8563-4659f4f01a64",
+            "author": {
+              "role": "user",
+              "metadata": {}
+            },
+            "create_time": 1680451988.047835,
+            "content": {
+              "content_type": "text",
+              "parts": [
+                "If I fork a repo on GitHub, can I keep merging the original repo into my fork?"
+              ]
+            },
+            "weight": 1,
+            "metadata": {
+              "timestamp_": "absolute"
+            },
+            "recipient": "all"
+          },
+          "parent": "8f605ba2-4963-4036-8941-639970b75983",
+          "children": [
+            "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b"
+          ]
+        },
+        "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b": {
+          "id": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b",
+          "message": {
+            "id": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b",
+            "author": {
+              "role": "assistant",
+              "metadata": {}
+            },
+            "create_time": 1680451996.191271,
+            "content": {
+              "content_type": "text",
+              "parts": [
+                "Yes, if you fork a repository on GitHub, you can keep merging the original repository into your fork. This is because forking creates a copy of the original repository in your GitHub account, which you can modify and work on independently.\n\nTo keep your fork up-to-date with the original repository, you can follow these steps:\n\n1. Clone your forked repository to your local machine.\n2. Add the original repository as a remote to your forked repository using the following command:\n```\ngit remote add upstream <original repository URL>\n```\n3. Fetch the changes from the original repository using the following command:\n```\ngit fetch upstream\n```\n4. Merge the changes from the original repository into your forked repository using the following command:\n```\ngit merge upstream/main\n```\nNote that in step 4, `main` refers to the name of the default branch of the repository. If the original repository uses a different default branch, replace `main` with the name of that branch.\n\nAfter completing these steps, your forked repository should be up-to-date with the original repository."
+              ]
+            },
+            "end_turn": true,
+            "weight": 1,
+            "metadata": {
+              "model_slug": "text-davinci-002-render-sha",
+              "finish_details": {
+                "type": "stop",
+                "stop": "<|im_end|>"
+              },
+              "timestamp_": "absolute"
+            },
+            "recipient": "all"
+          },
+          "parent": "bc8d680d-d082-4133-8563-4659f4f01a64",
+          "children": []
+        }
+      },
+      "moderation_results": [],
+      "current_node": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b"
+    }
+  }
+]

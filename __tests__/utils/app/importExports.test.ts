@@ -1,7 +1,14 @@
-import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '@/types/export';
+import {
+  ExportFormatV1,
+  ExportFormatV2,
+  ExportFormatV4,
+  LatestExportFormat,
+} from '@/types/export';
 import { OpenAIModels, OpenAIModelID } from '@/types/openai';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { it, describe, expect } from 'vitest';
+import chatgptDataSample from './chatgpt-data-sample.json';
+import cleanedChatgptDataSample from './cleaned-chatgpt-data-sample.json';
 
 import {
   cleanData,
@@ -10,7 +17,14 @@ import {
   isExportFormatV3,
   isExportFormatV4,
   isLatestExportFormat,
+  mergeData,
 } from '@/utils/app/importExport';
+import {
+  convertChatGPTDataToNativeFormat,
+  isChatGPTDataFormat,
+} from '@/utils/app/chatgpt/chatgpt-data';
+import type { InterceptedChatGPTFileFormat } from '@/utils/app/chatgpt/chatgpt-data';
+import { Conversation } from '@/types/chat';
 
 describe('Export Format Functions', () => {
   describe('isExportFormatV1', () => {
@@ -60,6 +74,93 @@ describe('Export Format Functions', () => {
       expect(isExportFormatV4(obj)).toBe(false);
     });
   });
+
+  describe('isChatGPTDataFormat', () => {
+    it('should return true for ChatGPT Data format', () => {
+      const obj = chatgptDataSample;
+      expect(isChatGPTDataFormat(obj)).toBe(true);
+    });
+
+    it('should return false for non-ChatGPT formats', () => {
+      const obj = { version: 3, history: [], folders: [] };
+      expect(isChatGPTDataFormat(obj)).toBe(false);
+    });
+  });
+});
+
+describe('mergeData Functions', () => {
+  it('should merge two data objects', () => {
+    const message1: Conversation = {
+      id: '1',
+      name: 'conversation 1',
+      messages: [
+        {
+          role: 'user',
+          content: "what's up ?",
+        },
+        {
+          role: 'assistant',
+          content: 'Hi',
+        },
+      ],
+      model: OpenAIModels[OpenAIModelID.GPT_3_5],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      folderId: null,
+    };
+    const message2: Conversation = {
+      id: '2',
+      name: 'conversation 2',
+      messages: [
+        {
+          role: 'user',
+          content: 'Hello again',
+        },
+        {
+          role: 'assistant',
+          content: 'Again!',
+        },
+      ],
+      model: OpenAIModels[OpenAIModelID.GPT_4],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      folderId: null,
+    };
+    const message3: Conversation = {
+      id: '3',
+      name: 'conversation 3',
+      messages: [
+        {
+          role: 'user',
+          content: 'A third time?',
+        },
+        {
+          role: 'assistant',
+          content: 'Indeed',
+        },
+      ],
+      model: OpenAIModels[OpenAIModelID.GPT_4],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      folderId: null,
+    };
+    const data1: LatestExportFormat = {
+      version: 4,
+      history: [message1, message3],
+      folders: [],
+      prompts: [],
+    };
+    const data2: LatestExportFormat = {
+      version: 4,
+      history: [message1, message2],
+      folders: [],
+      prompts: [],
+    };
+    const mergedData = {
+      version: 4,
+      history: [message1, message3, message2],
+      folders: [],
+      prompts: [],
+    };
+    expect(mergeData(data1, data2)).toEqual(mergedData);
+  });
 });
 
 describe('cleanData Functions', () => {
@@ -105,7 +206,7 @@ describe('cleanData Functions', () => {
           },
         ],
         folders: [],
-        prompts:[]
+        prompts: [],
       });
     });
   });
@@ -212,7 +313,7 @@ describe('cleanData Functions', () => {
           },
         ],
       } as ExportFormatV4;
-      
+
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
@@ -253,9 +354,18 @@ describe('cleanData Functions', () => {
             folderId: null,
           },
         ],
-
       });
     });
   });
-  
+
+  describe('cleaning ChatGPT data', () => {
+    it('should return the latest format', () => {
+      const data = chatgptDataSample as InterceptedChatGPTFileFormat;
+
+      const obj = convertChatGPTDataToNativeFormat(data);
+      expect(isLatestExportFormat(obj)).toBe(true);
+
+      expect(obj).toEqual(cleanedChatgptDataSample);
+    });
+  });
 });
