@@ -4,10 +4,10 @@
   "No conversations.": "Inga konversationer.",
   "Search conversations...": "Sök konversationer...",
   "OpenAI API Key": "OpenAI API-nyckel",
-  "Import conversations": "Importera konversationer",
+  "import data": "Importera konversationer",
   "Are you sure?": "Är du säker?",
   "Clear conversations": "Radera konversationer",
-  "Export conversations": "Exportera konversationer",
+  "export data": "Exportera konversationer",
   "Dark mode": "Mörkt läge",
   "Light mode": "Ljust läge"
 }

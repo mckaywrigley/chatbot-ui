@@ -4,10 +4,10 @@
   "No conversations.": "సంభాషణలు లేవు.",
   "Search conversations...": "సంభాషణలు వెతకండి...",
   "OpenAI API Key": "ఒపెన్ ఎయి ఐ API కీ ",
-  "Import conversations": "సంభాషణలు దిగుమతి చేయండి",
+  "import data": "సంభాషణలు దిగుమతి చేయండి",
   "Are you sure?": "మీరు ఖచ్చితంగా ఉన్నారా?",
   "Clear conversations": "సంభాషణలు తొలగించు",
-  "Export conversations": "సంభాషణలు ఎగుమతి చేయండి",
+  "export data": "సంభాషణలు ఎగుమతి చేయండి",
   "Dark mode": "డార్క్ మోడ్",
   "Light mode": "లైట్ మోడ్"
 }

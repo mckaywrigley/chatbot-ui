@@ -1,13 +1,13 @@
 {
-    "New folder": "Folder baru",
-    "New chat": "Percakapan baru",
-    "No conversations.": "Tidak ada percakapan.",
-    "Search conversations...": "Cari percakapan...",
-    "OpenAI API Key": "Kunci API OpenAI",
-    "Import conversations": "Impor percakapan",
-    "Are you sure?": "Apakah Anda yakin?",
-    "Clear conversations": "Hapus percakapan",
-    "Export conversations": "Ekspor percakapan",
-    "Dark mode": "Mode gelap",
-    "Light mode": "Mode terang"
+  "New folder": "Folder baru",
+  "New chat": "Percakapan baru",
+  "No conversations.": "Tidak ada percakapan.",
+  "Search conversations...": "Cari percakapan...",
+  "OpenAI API Key": "Kunci API OpenAI",
+  "import data": "Impor percakapan",
+  "Are you sure?": "Apakah Anda yakin?",
+  "Clear conversations": "Hapus percakapan",
+  "export data": "Ekspor percakapan",
+  "Dark mode": "Mode gelap",
+  "Light mode": "Mode terang"
 }
