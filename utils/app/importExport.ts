@@ -6,6 +6,10 @@ import {
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
+import {
+  convertChatGPTDataToNativeFormat,
+  isChatGPTDataFormat,
+} from './chatgpt/chatgpt-data';
 import { cleanConversationHistory } from './clean';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
@@ -27,6 +31,10 @@ export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
 export const isLatestExportFormat = isExportFormatV4;
 
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
+  if (isChatGPTDataFormat(data)) {
+    return convertChatGPTDataToNativeFormat(data);
+  }
+
   if (isExportFormatV1(data)) {
     return {
       version: 4,
