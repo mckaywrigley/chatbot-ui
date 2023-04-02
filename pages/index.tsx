@@ -34,6 +34,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { event } from "nextjs-google-analytics";
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -219,6 +220,11 @@ const Home: React.FC<HomeProps> = ({
       saveConversations(updatedConversations);
 
       setMessageIsStreaming(false);
+
+      event("interaction", {
+        category: "Chat",
+        label: "Send chat message",
+      });
     }
   };
 
@@ -274,6 +280,11 @@ const Home: React.FC<HomeProps> = ({
   const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
     localStorage.setItem('theme', mode);
+
+    event("interaction", {
+      category: "Theme",
+      label: "Switch dark/light theme",
+    });
   };
 
   const handleApiKeyChange = (apiKey: string) => {
@@ -282,11 +293,19 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleToggleChatbar = () => {
+    event("interaction", {
+      category: "Chat",
+      label: "Toggle Chatbar",
+    });
     setShowSidebar(!showSidebar);
     localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
   };
 
   const handleTogglePromptbar = () => {
+    event("interaction", {
+      category: "Prompt",
+      label: "Toggle Promptbar",
+    });
     setShowPromptbar(!showPromptbar);
     localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
   };
@@ -399,6 +418,11 @@ const Home: React.FC<HomeProps> = ({
     saveConversations(updatedConversations);
 
     setLoading(false);
+
+    event("interaction", {
+      category: "Conversation",
+      label: "Create New Conversation",
+    });
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
@@ -424,6 +448,11 @@ const Home: React.FC<HomeProps> = ({
       });
       localStorage.removeItem('selectedConversation');
     }
+
+    event("interaction", {
+      category: "Conversation",
+      label: "Delete Conversation",
+    });
   };
 
   const handleUpdateConversation = (
@@ -461,6 +490,11 @@ const Home: React.FC<HomeProps> = ({
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
     setFolders(updatedFolders);
     saveFolders(updatedFolders);
+
+    event("interaction", {
+      category: "Conversation",
+      label: "Clear conversations",
+    });
   };
 
   const handleEditMessage = (message: Message, messageIndex: number) => {
@@ -487,6 +521,11 @@ const Home: React.FC<HomeProps> = ({
       setConversations(all);
 
       setCurrentMessage(message);
+
+      event("interaction", {
+        category: "Conversation",
+        label: "Edited message",
+      });
     }
   };
 
