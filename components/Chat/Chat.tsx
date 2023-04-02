@@ -13,7 +13,7 @@ import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { event } from 'nextjs-google-analytics';
-import { NewConversationMessagesContainer } from './NewConversationMessagesContainer';
+import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
 
 interface Props {
   conversation: Conversation;
