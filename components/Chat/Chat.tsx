@@ -22,6 +22,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { event } from "nextjs-google-analytics";
 
 interface Props {
   conversation: Conversation;
@@ -261,6 +262,11 @@ export const Chat: FC<Props> = memo(
               onRegenerate={() => {
                 if (currentMessage) {
                   onSend(currentMessage, 2);
+
+                  event("interaction", {
+                    category: "Chat",
+                    label: "Regenerate Message",
+                  });
                 }
               }}
             />
