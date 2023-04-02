@@ -8,10 +8,10 @@ const inter = Inter({ subsets: ['latin'] });
 
 function App({ Component, pageProps }: AppProps<{}>) {
   return (
-    <main className={inter.className}>
+    <div className={inter.className}>
       <Toaster />
       <Component {...pageProps} />
-    </main>
+    </div>
   );
 }
 
