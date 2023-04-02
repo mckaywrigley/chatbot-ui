@@ -38,7 +38,7 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
 
       <input
         ref={inputRef}
-        className="ml-2 h-[20px] flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-[12.5px] leading-3 text-left text-white outline-none focus:border-neutral-100"
+        className="ml-2 h-[20px] flex-1 overflow-hidden overflow-ellipsis border-b border-neutral-400 bg-transparent pr-1 text-left text-[12.5px] leading-3 text-white outline-none focus:border-neutral-100"
         type="password"
         value={newKey}
         onChange={(e) => setNewKey(e.target.value)}
@@ -47,24 +47,26 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
       />
 
       <div className="flex w-[40px]">
-        <IconCheck
+        <button
           className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-          size={18}
           onClick={(e) => {
             e.stopPropagation();
             handleUpdateKey(newKey);
           }}
-        />
+        >
+          <IconCheck size={18} />
+        </button>
 
-        <IconX
+        <button
           className="ml-auto min-w-[20px] text-neutral-400 hover:text-neutral-100"
-          size={18}
           onClick={(e) => {
             e.stopPropagation();
             setIsChanging(false);
             setNewKey(apiKey);
           }}
-        />
+        >
+          <IconX size={18} />
+        </button>
       </div>
     </div>
   ) : (
