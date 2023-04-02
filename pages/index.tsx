@@ -16,7 +16,6 @@ import {
 import { Prompt } from '@/types/prompt';
 import {
   cleanConversationHistory,
-  cleanSelectedConversation,
 } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import {
@@ -657,24 +656,14 @@ const Home: React.FC<HomeProps> = ({
       setConversations(cleanedConversationHistory);
     }
 
-    const selectedConversation = localStorage.getItem('selectedConversation');
-    if (selectedConversation) {
-      const parsedSelectedConversation: Conversation =
-        JSON.parse(selectedConversation);
-      const cleanedSelectedConversation = cleanSelectedConversation(
-        parsedSelectedConversation,
-      );
-      setSelectedConversation(cleanedSelectedConversation);
-    } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
-      });
-    }
+    setSelectedConversation({
+      id: uuidv4(),
+      name: 'New conversation',
+      messages: [],
+      model: OpenAIModels[defaultModelId],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      folderId: null,
+    });
   }, [serverSideApiKeyIsSet]);
 
   return (
