@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { SamplePrompts } from './SamplePrompts';
 import { RolePlayPrompts } from './RolePlayPrompts';
+import { event } from 'nextjs-google-analytics';
 
 type Props = {
   promptOnClick: (prompt: string) => void;
@@ -42,7 +43,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
   promptOnClick,
 }) => {
   const { t } = useTranslation('chat');
-  const [rolePlayMode, setRolePlayMode] = useState(false);
+  const [rolePlayMode, setRolePlayMode] = useState(true);
 
   const switchButtonOnClick = () => {
     setRolePlayMode(!rolePlayMode);
@@ -50,6 +51,11 @@ export const NewConversationMessagesContainer: FC<Props> = ({
 
   const roleOnClick = (roleName: string, roleContent: string) => {
     promptOnClick(roleContent);
+
+    event("interaction", {
+      category: "New Conversation",
+      label: roleName,
+    });
   }
 
   return (
