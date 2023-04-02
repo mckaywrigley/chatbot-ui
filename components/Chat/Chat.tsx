@@ -146,7 +146,19 @@ export const Chat: FC<Props> = memo(
                           <Spinner size="16px" className="mx-auto" />
                         </div>
                       ) : (
-                        <NewConversationMessagesContainer />
+                        <NewConversationMessagesContainer promptOnClick={
+                          (prompt: string) => {
+                            event('interaction', {
+                              category: 'Prompt',
+                              label: 'Click on sample prompt',
+                            });
+
+                            onSend({
+                              role: 'user',
+                              content: prompt,
+                            });
+                          }
+                        }/>
                       )}
                     </div>
                   </div>
