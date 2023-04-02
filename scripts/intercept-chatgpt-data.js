@@ -36,7 +36,7 @@
 
     // Update the "Save Intercepted Data" button text
     const exportButton = document.getElementById(exportButtonId);
-    if (saveButexportButtonton) {
+    if (exportButton) {
       exportButton.textContent = `Harvest and Export (${loggedData.length})`;
     } else {
       console.error('No export button found!');
