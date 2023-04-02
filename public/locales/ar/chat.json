@@ -16,6 +16,8 @@
   "Error fetching models.": "خطأ في جلب النماذج",
   "AI": "الذكاء الاصطناعي",
   "You": "أنت",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "تأكد من تعيين مفتاح واجهة برمجة تطبيقات الخاص بك في الجزء السفلي الأيسر من الشريط",
   "If you completed this step, OpenAI may be experiencing issues.": "من مشاكل OpenAI إذا اكتملت هذه الخطوة، فقد يعاني",
 

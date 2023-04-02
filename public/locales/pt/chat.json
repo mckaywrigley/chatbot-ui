@@ -16,6 +16,8 @@
   "Error fetching models.": "Erro ao buscar os modelos.",
   "AI": "IA",
   "You": "Você",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Certifique-se de que sua API Key da OpenAI esteja definida na parte inferior esquerda da barra lateral.",
   "If you completed this step, OpenAI may be experiencing issues.": "Se você concluiu esta etapa, o OpenAI pode estar com problemas.",
   "click if using a .env.local file": "clique se estiver usando um arquivo .env.local",
