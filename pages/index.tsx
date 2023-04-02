@@ -296,11 +296,12 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders }: LatestExportFormat = importData(data);
+    const { history, folders, prompts }: LatestExportFormat = importData(data);
 
     setConversations(history);
     setSelectedConversation(history[history.length - 1]);
     setFolders(folders);
+    setPrompts(prompts);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
