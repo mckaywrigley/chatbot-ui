@@ -57,14 +57,13 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
     };
   }
 
-  if (isExportFormatV3(data)) {    
-    return {...data, version: 4, prompts: []};
+  if (isExportFormatV3(data)) {
+    return { ...data, version: 4, prompts: [] };
   }
 
-  if(isExportFormatV4(data)){
+  if (isExportFormatV4(data)) {
     return data;
   }
-
 
   throw new Error('Unsupported data format');
 }
@@ -76,7 +75,7 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
+export const getCurrentData = () => {
   let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
   let prompts = localStorage.getItem('prompts');
@@ -89,7 +88,7 @@ export const exportData = () => {
     folders = JSON.parse(folders);
   }
 
-  if(prompts){
+  if (prompts) {
     prompts = JSON.parse(prompts);
   }
 
@@ -100,6 +99,11 @@ export const exportData = () => {
     prompts: prompts || [],
   } as LatestExportFormat;
 
+  return data;
+};
+
+export const exportData = () => {
+  const data = getCurrentData();
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',
   });
