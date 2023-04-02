@@ -18,7 +18,7 @@
   "You": "Tu",
   "Cancel": "Annulla",
   "Save & Submit": "Salva e invia",
-  "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Assicurati che la tua Chiave API OpenAI sia inserita in basso a sinistra nella barra laterale",
+  "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Assicurati che la tua chiave API OpenAI sia inserita in basso a sinistra nella barra laterale",
   "If you completed this step, OpenAI may be experiencing issues.": "Se hai completato questo passaggio, OpenAI potrebbe avere problemi.",
   "click if using a .env.local file": "Fai click se stai utilizzando un file .env.local",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Il limite del messaggio è di {{maxLength}} caratteri. Hai inserito {{valueLength}} caratteri.",
