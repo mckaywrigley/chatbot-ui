@@ -170,5 +170,5 @@ export const importData = (
   localStorage.setItem('folders', JSON.stringify(folders));
   localStorage.setItem('prompts', JSON.stringify(prompts));
 
-  return cleanedData;
+  return mergedData;
 };
