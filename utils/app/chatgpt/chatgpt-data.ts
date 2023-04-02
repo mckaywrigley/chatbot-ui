@@ -92,9 +92,13 @@ export function convertChatGPTDataToNativeFormat(
 
     for (const node of nodes) {
       if (node.message) {
+        const content = node.message.content.parts.join(' ');
+        if (!content) {
+          continue;
+        }
         messages.push({
           role: node.message.author.role as any,
-          content: node.message.content.parts.join(' '),
+          content: content,
         });
       }
     }
