@@ -662,7 +662,6 @@ const Home: React.FC<HomeProps> = ({
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
@@ -713,7 +712,6 @@ const Home: React.FC<HomeProps> = ({
                 <Promptbar
                   prompts={prompts}
                   folders={folders.filter((folder) => folder.type === 'prompt')}
-                  onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}
