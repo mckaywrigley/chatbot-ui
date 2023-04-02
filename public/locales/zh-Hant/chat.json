@@ -24,5 +24,7 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "訊息字數限制為 {{maxLength}} 個字元。您已輸入 {{valueLength}} 個字元。",
   "Please enter a message": "請輸入一條訊息",
   "Where the forefront of AI technology meets universal access.": "把AI帶到每個人的生活中",
-  "Are you sure you want to clear all messages?": "您確定要清除所有訊息嗎？"
+  "Are you sure you want to clear all messages?": "您確定要清除所有訊息嗎？",
+  "Switch to Sample Prompts": "切换到範例",
+  "Switch to Role Play": "切换到角色扮演"
   }

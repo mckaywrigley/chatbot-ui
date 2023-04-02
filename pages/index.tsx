@@ -216,6 +216,15 @@ const Home: React.FC<HomeProps> = ({
         updatedConversations.push(updatedConversation);
       }
 
+      // push in new conversation if it doesn't exist
+      if (
+        updatedConversations.filter(
+          (conversation) => conversation.id === updatedConversation.id,
+        ).length === 0
+      ) {
+        updatedConversations.push(updatedConversation);
+      }
+      
       setConversations(updatedConversations);
 
       saveConversations(updatedConversations);
@@ -572,23 +581,19 @@ const Home: React.FC<HomeProps> = ({
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
+    fetchModels("");
+    if (window.innerWidth < 640) {
+      setShowSidebar(false);
+    }
+  }, []);
+
+  useEffect(() => {    
     if (currentMessage) {
       handleSend(currentMessage);
       setCurrentMessage(undefined);
     }
   }, [currentMessage]);
 
-  useEffect(() => {
-    if (window.innerWidth < 640) {
-      setShowSidebar(false);
-    }
-  }, [selectedConversation]);
-
-  useEffect(() => {
-    if (apiKey) {
-      fetchModels(apiKey);
-    }
-  }, [apiKey]);
 
   // ON LOAD --------------------------------------------
 
@@ -811,7 +816,9 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'sidebar',
         'markdown',
         'promptbar',
-        'prompts'
+        'prompts',
+        'roles',
+        'rolesContent'
       ])),
     },
   };

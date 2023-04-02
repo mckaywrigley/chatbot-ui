@@ -13,7 +13,7 @@ import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { event } from 'nextjs-google-analytics';
-import { NewConversationMessagesContainer } from './NewConversationMessagesContainer';
+import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
 
 interface Props {
   conversation: Conversation;
@@ -165,7 +165,7 @@ export const Chat: FC<Props> = memo(
                 </>
               ) : (
                 <>
-                  <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                  <div className="hidden justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200 sm:flex">
                     {conversation.name}
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
