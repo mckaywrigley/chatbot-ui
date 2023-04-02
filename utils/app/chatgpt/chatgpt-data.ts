@@ -48,13 +48,50 @@ export interface ChatGPTMessageMetdata {
 }
 
 export interface ChatGPTMessageAuthor {
-  role: string;
+  role: string | 'tool' | 'assistant' | 'user' | 'system';
+  /**
+   * The name of the tool used if role is 'tool'
+   */
+  name?: string;
   metadata: Record<string, any>;
 }
 
 export interface ChatGPTMessageContent {
-  content_type: string;
-  parts: string[];
+  content_type:
+    | string
+    | 'tether_browsing_display'
+    | 'code'
+    | 'text'
+    | 'tether_quote';
+
+  text?: string;
+
+  /**
+   * Used when content_type is 'text'
+   */
+  parts?: string[];
+
+  /**
+   * Used when content_type is 'code'
+   */
+  language?: string;
+  /**
+   * Used when content_type is 'tether_browsing_display'
+   */
+  result?: string;
+  /**
+   * Used when content_type is 'tether_browsing_display'
+   */
+  summary?: string;
+
+  /**
+   * Used when content_type is 'tether_quote'
+   */
+  url?: string;
+  /**
+   * Used when content_type is 'tether_quote'
+   */
+  domain?: string;
 }
 
 export function isChatGPTDataFormat(
@@ -91,13 +128,38 @@ export function convertChatGPTDataToNativeFormat(
     });
 
     for (const node of nodes) {
-      if (node.message) {
-        const content = node.message.content.parts.join(' ');
+      const messageContent = node.message?.content;
+      if (node.message && messageContent) {
+        let contentPieces: string[] = [];
+
+        if (messageContent.parts?.length) {
+          contentPieces = [...contentPieces, ...messageContent.parts];
+        }
+        if (messageContent.text?.length) {
+          contentPieces = [...contentPieces, messageContent.text];
+        }
+        if (messageContent.result?.length) {
+          contentPieces = [...contentPieces, messageContent.result];
+        }
+        if (messageContent.summary?.length) {
+          contentPieces = [...contentPieces, messageContent.summary];
+        }
+        if (messageContent.url?.length) {
+          contentPieces = [...contentPieces, `[${messageContent.url}]`];
+        }
+        const content = contentPieces
+          .filter((piece) => {
+            return !!piece.length;
+          })
+          .join('\n');
+
         if (!content) {
           continue;
         }
+        const author = node.message.author;
+        const role = `${author.role}${author.name ? ` (${author.name})` : ''}`;
         messages.push({
-          role: node.message.author.role as any,
+          role: role as any,
           content: content,
         });
       }

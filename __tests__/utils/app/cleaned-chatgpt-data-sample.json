@@ -6,10 +6,6 @@
             "name": "Merging Original Repo to Fork",
             "messages": [
                 {
-                    "role": "system",
-                    "content": ""
-                },
-                {
                     "role": "user",
                     "content": "If I fork a repo on GitHub, can I keep merging the original repo into my fork?"
                 },
