@@ -67,7 +67,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
         {demoPrompts.map((prompt, index) => (
           <div
             key={index}
-            className="mb-2 cursor-pointer rounded-md border border-neutral-200 bg-transparent p-1 pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white"
+            className="mb-2 cursor-pointer rounded-md border border-neutral-200 bg-transparent p-1 pr-2 text-neutral-400 dark:border-neutral-600 dark:text-white"
             onClick={() => promptOnClick(t(prompt))}
           >
             {t(prompt)}
