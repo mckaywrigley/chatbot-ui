@@ -79,8 +79,8 @@ export const ChatMessage: FC<Props> = memo(
         }`}
         style={{ overflowWrap: 'anywhere' }}
       >
-        <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-          <div className="md:min-w-[40px] text-right font-bold whitespace-nowrap">
+        <div className="relative m-auto flex gap-4 p-0 pt-2 pb-2 text-base md:max-w-2xl md:gap-6 md:p-4 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+          <div className="whitespace-nowrap text-right font-bold md:min-w-[40px]">
             {message.role === 'assistant' ? t('AI') : t('You')}:
           </div>
 
