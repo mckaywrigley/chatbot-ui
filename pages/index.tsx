@@ -69,6 +69,8 @@ const Home: React.FC<HomeProps> = ({
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(false);
 
+  const [containerHeight, setContainerHeight] = useState('100vh');
+
   // REFS ----------------------------------------------
 
   const stopConversationRef = useRef<boolean>(false);
@@ -553,6 +555,22 @@ const Home: React.FC<HomeProps> = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+      // If you want to set the height directly in the state
+      setContainerHeight(`${window.innerHeight}px`);
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
+
+  useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme) {
       setLightMode(theme as 'dark' | 'light');
@@ -633,7 +651,8 @@ const Home: React.FC<HomeProps> = ({
       </Head>
       {selectedConversation && (
         <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+          className={`flex w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+          style={{ height: containerHeight }}
         >
           <div className="fixed top-0 w-full sm:hidden">
             <Navbar
