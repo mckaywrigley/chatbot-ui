@@ -68,7 +68,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
           <SamplePrompts promptOnClick={promptOnClick} />
         )
       }
-      <button className="border border-neutral-200 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-sm text-sm mb-3" onClick={switchButtonOnClick}>
+      <button className="border border-neutral-600 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-md text-sm mb-3 dark:text-gray-100 dark:hover:bg-neutral-800 " onClick={switchButtonOnClick}>
         {rolePlayMode ? t('Switch to Sample Prompts') : t('Switch to Role Play')}
       </button>
       <FootNoteMessage />
