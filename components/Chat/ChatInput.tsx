@@ -1,7 +1,7 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
-import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
+import { IconLoader, IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -286,7 +286,13 @@ export const ChatInput: FC<Props> = ({
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
-            <IconSend size={18} />
+            {
+              messageIsStreaming ? (
+                <IconLoader size={18} />
+              ) : (
+                <IconSend size={18} />
+              )
+            }
           </button>
 
           {showPromptList && prompts.length > 0 && (
