@@ -419,7 +419,7 @@ const Home: React.FC<HomeProps> = ({
     } else {
       setSelectedConversation({
         id: uuidv4(),
-        name: 'New conversation',
+        name: t('New conversation'),
         messages: [],
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
@@ -453,7 +453,7 @@ const Home: React.FC<HomeProps> = ({
 
     setSelectedConversation({
       id: uuidv4(),
-      name: 'New conversation',
+      name: t('New conversation'),
       messages: [],
       model: OpenAIModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
@@ -500,7 +500,7 @@ const Home: React.FC<HomeProps> = ({
 
     const newPrompt: Prompt = {
       id: uuidv4(),
-      name: `Prompt ${prompts.length + 1}`,
+      name: `${t('Prompt')} ${prompts.length + 1}`,
       description: '',
       content: '',
       model: OpenAIModels[defaultModelId],
@@ -571,6 +571,7 @@ const Home: React.FC<HomeProps> = ({
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
+      setShowPromptbar(false);
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
@@ -614,7 +615,7 @@ const Home: React.FC<HomeProps> = ({
     } else {
       setSelectedConversation({
         id: uuidv4(),
-        name: 'New conversation',
+        name: t('New conversation'),
         messages: [],
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
