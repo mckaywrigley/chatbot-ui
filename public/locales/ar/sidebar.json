@@ -4,10 +4,10 @@
   "No conversations.": "لا يوجد محادثات",
   "Search conversations...": "...البحث عن المحادثات",
   "OpenAI API Key": " (أوبن أيه أي) OpenAI API Key (مفتاح واجهة برمجة تطبيقات)",
-  "Import conversations": "استيراد المحادثات",
+  "import data": "استيراد المحادثات",
   "Are you sure?": "هل أنت متأكد؟",
   "Clear conversations": "مسح المحادثات",
-  "Export conversations": "تصدير المحادثات",
+  "export data": "تصدير المحادثات",
   "Dark mode": "الوضع الداكن",
   "Light mode": "الوضع الفاتح"
-  }
+}

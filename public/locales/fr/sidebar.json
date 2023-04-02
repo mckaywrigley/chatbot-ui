@@ -4,10 +4,10 @@
   "No conversations.": "Aucune conversation.",
   "Search conversations...": "Rechercher des conversations...",
   "OpenAI API Key": "Clé API OpenAI",
-  "Import conversations": "Importer des conversations",
+  "import data": "Importer des conversations",
   "Are you sure?": "Êtes-vous sûr ?",
   "Clear conversations": "Effacer les conversations",
-  "Export conversations": "Exporter les conversations",
+  "export data": "Exporter les conversations",
   "Dark mode": "Mode sombre",
   "Light mode": "Mode clair"
 }

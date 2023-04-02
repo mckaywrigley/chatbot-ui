@@ -34,6 +34,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -120,6 +121,7 @@ const Home: React.FC<HomeProps> = ({
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
+        toast.error(response.statusText);
         return;
       }
 
@@ -296,11 +298,12 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders }: LatestExportFormat = importData(data);
+    const { history, folders, prompts }: LatestExportFormat = importData(data);
 
     setConversations(history);
     setSelectedConversation(history[history.length - 1]);
     setFolders(folders);
+    setPrompts(prompts);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -659,7 +662,6 @@ const Home: React.FC<HomeProps> = ({
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
@@ -710,7 +712,6 @@ const Home: React.FC<HomeProps> = ({
                 <Promptbar
                   prompts={prompts}
                   folders={folders.filter((folder) => folder.type === 'prompt')}
-                  onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}
