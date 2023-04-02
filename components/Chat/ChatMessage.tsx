@@ -7,21 +7,15 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
-import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
-import dynamic from 'next/dynamic';
-
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface Props {
   message: Message;
   messageIndex: number;
   onEditMessage: (message: Message, messageIndex: number) => void;
-  lightMode: 'light' | 'dark';
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage, lightMode }) => {
+  ({ message, messageIndex, onEditMessage }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -41,12 +35,6 @@ export const ChatMessage: FC<Props> = memo(
       if (textareaRef.current) {
         textareaRef.current.style.height = 'inherit';
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
-    };
-
-    const handleMDEditorChange = (value?: string) => {
-      if (value !== undefined) {
-        setMessageContent(value);
       }
     };
 
@@ -167,11 +155,23 @@ export const ChatMessage: FC<Props> = memo(
             ) : (
               <>
                 {isEditing ? (
-                  <div data-color-mode={lightMode}>
-                    <MDEditor
+                  <div>
+                    <textarea
+                      ref={textareaRef}
+                      className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541]"
                       value={messageContent}
-                      onChange={handleMDEditorChange}
-                      height={250}
+                      onChange={handleInputChange}
+                      onKeyDown={handlePressEnter}
+                      onCompositionStart={() => setIsTyping(true)}
+                      onCompositionEnd={() => setIsTyping(false)}
+                      style={{
+                        fontFamily: 'inherit',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
+                        padding: '0',
+                        margin: '0',
+                        overflow: 'hidden',
+                      }}
                     />
 
                     <div className="mt-10 flex justify-center space-x-4">
@@ -216,7 +216,7 @@ export const ChatMessage: FC<Props> = memo(
                           <IconCopy size={20} />
                         </button>
                       )}
-                
+
                       <IconEdit
                         size={20}
                         className="translate-x-[1000px] text-gray-500 hover:text-gray-700  group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"

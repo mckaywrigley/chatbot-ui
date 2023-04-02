@@ -41,7 +41,6 @@ interface Props {
   ) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
-  lightMode: 'light' | 'dark'; 
 }
 
 export const Chat: FC<Props> = memo(
@@ -58,8 +57,7 @@ export const Chat: FC<Props> = memo(
     onSend,
     onUpdateConversation,
     onEditMessage,
-    stopConversationRef,
-    lightMode
+    stopConversationRef
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -274,7 +272,6 @@ export const Chat: FC<Props> = memo(
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}
-                      lightMode={lightMode}
                     />
                   ))}
 
