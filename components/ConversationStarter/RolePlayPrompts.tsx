@@ -14,6 +14,7 @@ const DEMO_ROLES = [
   'Automobile Mechanic',
   'Financial Analyst',
   'Dream Interpreter',
+  'IELTS Tester'
 ];
 
 type Props = {
