@@ -571,7 +571,6 @@ const Home: React.FC<HomeProps> = ({
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
-      setShowPromptbar(false);
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
