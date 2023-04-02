@@ -1,7 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
-  IconArrowBarRight,
   IconFolderPlus,
   IconMistOff,
   IconPlus,
@@ -19,7 +18,6 @@ interface Props {
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onUpdateFolder: (folderId: string, name: string) => void;
-  onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
@@ -34,7 +32,6 @@ export const Promptbar: FC<Props> = ({
   onCreatePrompt,
   onUpdatePrompt,
   onDeletePrompt,
-  onToggleSidebar,
 }) => {
   const { t } = useTranslation('promptbar');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -117,12 +114,6 @@ export const Promptbar: FC<Props> = ({
         >
           <IconFolderPlus size={16} />
         </button>
-
-        <IconArrowBarRight
-          className="hidden p-1 ml-1 cursor-pointer text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {prompts.length > 1 && (
