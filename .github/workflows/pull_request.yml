@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           fetch-depth: 0
@@ -23,7 +23,7 @@ jobs:
 
       - name: Fetch upstream changes
         run: |
-          git remote add upstream https://github.com/UPSTREAM_OWNER/UPSTREAM_REPO.git
+          git remote add upstream https://github.com/mckaywrigley/chatbot-ui.git
           git fetch upstream
 
       - name: Merge upstream changes into fork
