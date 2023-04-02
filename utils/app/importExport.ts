@@ -129,11 +129,12 @@ export const mergeData = (data1: ExportFormatV4, data2: ExportFormatV4) => {
     list1: T[],
     list2: T[],
   ): T[] => {
-    const mergedList = [...list1];
-    const existingIds = new Set(list1.map((item) => item.id));
+    const mergedList: T[] = [];
+    const existingIds = new Set();
 
-    list2.forEach((item) => {
+    [...list1, ...list2].forEach((item) => {
       if (!existingIds.has(item.id)) {
+        existingIds.add(item.id);
         mergedList.push(item);
       }
     });
