@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 
 const DEMO_PROMPTS = [
   'Compose a heartfelt apology email to my boss for missing an important meeting.',
-  "Generate a witty toast for my best friend\'s wedding.",
+  "Generate a witty toast for my best friend's wedding.",
   'Create a catchy slogan for my new eco-friendly laundry detergent.',
   'Draft an engaging social media post announcing the launch of my online store.',
   'Craft a persuasive pitch for my innovative smartphone app to potential investors.',
@@ -22,7 +22,7 @@ const FootNoteMessage: FC = () => {
   const { t } = useTranslation('chat');
 
   return (
-    <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
+    <div className="px-3 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pb-6">
       <div className="leading-5">
         <a
           href="https://github.com/exploratortech/chat-everywhere"
@@ -41,7 +41,7 @@ const FootNoteMessage: FC = () => {
         >
           Explorator Labs
         </a>
-        . 
+        .
         <br />
         {t('Where the forefront of AI technology meets universal access.')}
       </div>
@@ -63,7 +63,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
   return (
     <div>
       <span className="font-semibold">Chat Everywhere</span>
-      <div className="mt-2 flex flex-col text-sm">
+      <div className="mt-5 flex flex-col text-sm">
         {demoPrompts.map((prompt, index) => (
           <div
             key={index}
