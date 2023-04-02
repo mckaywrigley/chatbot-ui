@@ -4,13 +4,12 @@ import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
-import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconArrowDown, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
   memo,
   MutableRefObject,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -20,8 +19,6 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
 import { event } from "nextjs-google-analytics";
 
 interface Props {
@@ -47,7 +44,6 @@ export const Chat: FC<Props> = memo(
   ({
     conversation,
     models,
-    defaultModelId,
     messageIsStreaming,
     modelError,
     loading,
@@ -60,7 +56,6 @@ export const Chat: FC<Props> = memo(
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
     const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
-    const [showSettings, setShowSettings] = useState<boolean>(false);
     const [showScrollDownButton, setShowScrollDownButton] =
       useState<boolean>(false);
 
@@ -89,10 +84,6 @@ export const Chat: FC<Props> = memo(
         top: chatContainerRef.current.scrollHeight,
         behavior: 'smooth',
       });
-    };
-
-    const handleSettings = () => {
-      setShowSettings(!showSettings);
     };
 
     const onClearAll = () => {
@@ -164,45 +155,12 @@ export const Chat: FC<Props> = memo(
                         'Chat Everywhere'
                       )}
                     </div>
-
-                    {models.length > 0 && (
-                      <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                        <ModelSelect
-                          model={conversation.model}
-                          models={models}
-                          defaultModelId={defaultModelId}
-                          onModelChange={(model) =>
-                            onUpdateConversation(conversation, {
-                              key: 'model',
-                              value: model,
-                            })
-                          }
-                        />
-
-                        <SystemPrompt
-                          conversation={conversation}
-                          prompts={prompts}
-                          onChangePrompt={(prompt) =>
-                            onUpdateConversation(conversation, {
-                              key: 'prompt',
-                              value: prompt,
-                            })
-                          }
-                        />
-                      </div>
-                    )}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                    {t('Model')}: {conversation.model.name}
-                    <button
-                      className="ml-2 cursor-pointer hover:opacity-50"
-                      onClick={handleSettings}
-                    >
-                      <IconSettings size={18} />
-                    </button>
+                    {conversation.name}
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={onClearAll}
@@ -210,23 +168,6 @@ export const Chat: FC<Props> = memo(
                       <IconClearAll size={18} />
                     </button>
                   </div>
-                  {showSettings && (
-                    <div className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-                      <div className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
-                        <ModelSelect
-                          model={conversation.model}
-                          models={models}
-                          defaultModelId={defaultModelId}
-                          onModelChange={(model) =>
-                            onUpdateConversation(conversation, {
-                              key: 'model',
-                              value: model,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  )}
 
                   {conversation.messages.map((message, index) => (
                     <ChatMessage
