@@ -118,11 +118,47 @@ export const exportData = () => {
   URL.revokeObjectURL(url);
 };
 
+/**
+ * Merges two export formats together and returns the result. Items are deduplicated by ID.
+ * @param data1
+ * @param data2
+ * @returns
+ */
+export const mergeData = (data1: ExportFormatV4, data2: ExportFormatV4) => {
+  const mergeListsById = <T extends { id: string }>(
+    list1: T[],
+    list2: T[],
+  ): T[] => {
+    const mergedList = [...list1];
+    const existingIds = new Set(list1.map((item) => item.id));
+
+    list2.forEach((item) => {
+      if (!existingIds.has(item.id)) {
+        mergedList.push(item);
+      }
+    });
+
+    return mergedList;
+  };
+
+  const merged = {
+    ...data1,
+    history: mergeListsById(data1.history, data2.history),
+    folders: mergeListsById(data1.folders, data2.folders),
+    prompts: mergeListsById(data1.prompts, data2.prompts),
+  };
+  return merged;
+};
+
 export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
+  const currentData = getCurrentData();
+
   const cleanedData = cleanData(data);
-  const { history,folders, prompts } = cleanedData;
+
+  const mergedData = mergeData(currentData, cleanedData);
+  const { history, folders, prompts } = mergedData;
 
   const conversations = history;
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
