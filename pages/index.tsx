@@ -500,13 +500,6 @@ const Home: React.FC<HomeProps> = ({
 
   // EFFECTS  --------------------------------------------
 
-  // useEffect(() => {
-  //   if (currentMessage) {
-  //     handleSend(currentMessage);
-  //     setCurrentMessage(undefined);
-  //   }
-  // }, [currentMessage]);
-
   useEffect(() => {
     if (window.innerWidth < 640) {
       setShowSidebar(false);
