@@ -6,20 +6,14 @@ import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
-import {
-  FC,
-  memo,
-  MutableRefObject,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FC, memo, MutableRefObject, useEffect, useRef, useState } from 'react';
 import { Spinner } from '../Global/Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { event } from "nextjs-google-analytics";
+import { event } from 'nextjs-google-analytics';
+import { NewConversationMessagesContainer } from './NewConversationMessagesContainer';
 
 interface Props {
   conversation: Conversation;
@@ -146,13 +140,13 @@ export const Chat: FC<Props> = memo(
               {conversation.messages.length === 0 ? (
                 <>
                   <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
-                    <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                    <div className="text-center text-3xl text-gray-800 dark:text-gray-100">
                       {models.length === 0 ? (
                         <div>
                           <Spinner size="16px" className="mx-auto" />
                         </div>
                       ) : (
-                        'Chat Everywhere'
+                        <NewConversationMessagesContainer />
                       )}
                     </div>
                   </div>
@@ -204,9 +198,9 @@ export const Chat: FC<Props> = memo(
                 if (currentMessage) {
                   onSend(currentMessage, 2);
 
-                  event("interaction", {
-                    category: "Chat",
-                    label: "Regenerate Message",
+                  event('interaction', {
+                    category: 'Chat',
+                    label: 'Regenerate Message',
                   });
                 }
               }}
