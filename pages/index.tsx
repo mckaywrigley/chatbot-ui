@@ -811,7 +811,9 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'sidebar',
         'markdown',
         'promptbar',
-        'prompts'
+        'prompts',
+        'roles',
+        'rolesContent'
       ])),
     },
   };
