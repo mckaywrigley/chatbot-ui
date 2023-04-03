@@ -1,7 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
-  IconArrowBarRight,
   IconFolderPlus,
   IconMistOff,
   IconPlus,
@@ -19,7 +18,6 @@ interface Props {
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onUpdateFolder: (folderId: string, name: string) => void;
-  onToggleSidebar: () => void;
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
@@ -34,7 +32,6 @@ export const Promptbar: FC<Props> = ({
   onCreatePrompt,
   onUpdatePrompt,
   onDeletePrompt,
-  onToggleSidebar,
 }) => {
   const { t } = useTranslation('promptbar');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -117,12 +114,6 @@ export const Promptbar: FC<Props> = ({
         >
           <IconFolderPlus size={16} />
         </button>
-
-        <IconArrowBarRight
-          className="hidden p-1 ml-1 cursor-pointer text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {prompts.length > 1 && (
@@ -139,7 +130,7 @@ export const Promptbar: FC<Props> = ({
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
-              folders={folders.filter((folder) => folder.type === 'prompt')}
+              folders={folders}
               onUpdateFolder={onUpdateFolder}
               onDeleteFolder={onDeleteFolder}
               // prompt props
@@ -151,7 +142,7 @@ export const Promptbar: FC<Props> = ({
 
         {prompts.length > 0 ? (
           <div
-            className="h-full pt-2"
+            className="pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -167,7 +158,7 @@ export const Promptbar: FC<Props> = ({
           <div className="mt-8 text-center text-white opacity-50 select-none">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
-            {t('No prompts.')}
+              {t('No prompts.')}
             </span>
           </div>
         )}

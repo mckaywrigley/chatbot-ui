@@ -215,7 +215,7 @@ export const SystemPrompt: FC<Props> = ({
         onKeyDown={handleKeyDown}
       />
 
-      {showPromptList && prompts.length > 0 && (
+      {showPromptList && filteredPrompts.length > 0 && (
         <div>
           <PromptList
             activePromptIndex={activePromptIndex}

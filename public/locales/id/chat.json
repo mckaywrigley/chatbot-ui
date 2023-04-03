@@ -16,6 +16,8 @@
     "Error fetching models.": "Kesalahan dalam mengambil model.",
     "AI": "AI",
     "You": "Anda",
+    "Cancel": "Cancel",
+    "Save & Submit": "Save & Submit",
     "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Pastikan kunci API OpenAI Anda diatur di bagian kiri bawah bilah sisi.",
     "If you completed this step, OpenAI may be experiencing issues.": "Jika Anda telah menyelesaikan langkah ini, OpenAI mungkin mengalami masalah.",
     "click if using a .env.local file": "klik jika menggunakan file .env.local",

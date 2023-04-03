@@ -38,7 +38,7 @@ export const ChatbarSettings: FC<Props> = ({
       <Import onImport={onImportConversations} />
 
       <SidebarButton
-        text={t('Export conversations')}
+        text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => onExportConversations()}
       />
