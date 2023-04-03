@@ -50,6 +50,8 @@ const handler = async (req: Request): Promise<Response> => {
       })
       .filter(Boolean);
 
+    models.push(OpenAIModels[OpenAIModelID.TURTLE]);
+
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {
     console.error(error);

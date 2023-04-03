@@ -3,3 +3,6 @@ export const DEFAULT_SYSTEM_PROMPT =
 
 export const OPENAI_API_HOST =
   process.env.OPENAI_API_HOST || 'https://api.openai.com';
+
+export const TURTLE_HOST = 
+  process.env.TURTLE_HOST || 'https://api.turtle.ai';
