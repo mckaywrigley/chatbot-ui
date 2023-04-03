@@ -1,4 +1,3 @@
-import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import { Promptbar } from '@/components/Promptbar/Promptbar';
@@ -35,6 +34,16 @@ import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+import { Spinner } from '@/components/Global/Spinner';
+
+const Chat = dynamic(() => import('@/components/Chat/Chat'), {
+  loading: () => (
+    <div className="flex min-h-screen w-full items-center justify-center">
+      <Spinner />
+    </div>
+  ),
+});
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;

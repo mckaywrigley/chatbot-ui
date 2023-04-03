@@ -42,7 +42,7 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat: FC<Props> = memo(
+const Chat: FC<Props> = memo(
   ({
     conversation,
     models,
@@ -329,4 +329,7 @@ export const Chat: FC<Props> = memo(
     );
   },
 );
+
+export default Chat;
+
 Chat.displayName = 'Chat';
