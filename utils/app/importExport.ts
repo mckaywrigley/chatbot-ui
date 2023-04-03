@@ -3,10 +3,16 @@ import {
   ExportFormatV2,
   ExportFormatV3,
   ExportFormatV4,
+  ExportFormatV5,
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
-import { cleanConversationHistory } from './clean';
+import {
+  convertV1ToV2,
+  convertV2ToV3,
+  convertV3ToV4,
+  convertV4ToV5,
+} from './clean';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -24,41 +30,43 @@ export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
   return obj.version === 4;
 }
 
-export const isLatestExportFormat = isExportFormatV4;
+export function isExportFormatV5(obj: any): obj is ExportFormatV5 {
+  return obj.version === 5;
+}
+
+export const isLatestExportFormat = isExportFormatV5;
 
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
+  let originalDataFormat: string | null = null;
+  // Convert V1 to V2
   if (isExportFormatV1(data)) {
-    return {
-      version: 4,
-      history: cleanConversationHistory(data),
-      folders: [],
-      prompts: [],
-    };
+    originalDataFormat = '1';
+    data = convertV1ToV2(data);
   }
 
+  // Convert V2 to V3
   if (isExportFormatV2(data)) {
-    return {
-      version: 4,
-      history: cleanConversationHistory(data.history || []),
-      folders: (data.folders || []).map((chatFolder) => ({
-        id: chatFolder.id.toString(),
-        name: chatFolder.name,
-        type: 'chat',
-      })),
-      prompts: [],
-    };
+    originalDataFormat = '2';
+    data = convertV2ToV3(data);
   }
 
-  if (isExportFormatV3(data)) {    
-    return {...data, version: 4, prompts: []};
+  // Convert V3 to V4
+  if (isExportFormatV3(data)) {
+    originalDataFormat = '3';
+    data = convertV3ToV4(data);
   }
 
-  if(isExportFormatV4(data)){
+  // Convert V4 to V5
+  if (isExportFormatV4(data)) {
+    originalDataFormat = '4';
+    data = convertV4ToV5(data);
+  }
+
+  if (!originalDataFormat) {
+    throw new Error('Unsupported data format');
+  } else {
     return data;
   }
-
-
-  throw new Error('Unsupported data format');
 }
 
 function currentDate() {
@@ -81,12 +89,12 @@ export const exportData = () => {
     folders = JSON.parse(folders);
   }
 
-  if(prompts){
+  if (prompts) {
     prompts = JSON.parse(prompts);
   }
 
   const data = {
-    version: 4,
+    version: 5,
     history: history || [],
     folders: folders || [],
     prompts: prompts || [],
@@ -110,7 +118,7 @@ export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
-  const { history,folders, prompts } = cleanedData;
+  const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));

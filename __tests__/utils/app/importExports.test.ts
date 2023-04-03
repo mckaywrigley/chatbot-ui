@@ -60,6 +60,19 @@ describe('Export Format Functions', () => {
       expect(isExportFormatV4(obj)).toBe(false);
     });
   });
+
+  k;
+  describe('isExportFormatV5', () => {
+    it('should return true for v5 format', () => {
+      const obj = { version: 5, history: [], folders: [], prompts: [] };
+      expect(isExportFormatV5(obj)).toBe(true);
+    });
+
+    it('should return false for non-v5 formats', () => {
+      const obj = { version: 6, history: [], folders: [], prompts: [] };
+      expect(isExportFormatV5(obj)).toBe(false);
+    });
+  });
 });
 
 describe('cleanData Functions', () => {
@@ -211,8 +224,13 @@ describe('cleanData Functions', () => {
             folderId: null,
           },
         ],
+<<<<<<< Updated upstream
       } as ExportFormatV4;
       
+=======
+      } as ExportFormatV5;
+
+>>>>>>> Stashed changes
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
