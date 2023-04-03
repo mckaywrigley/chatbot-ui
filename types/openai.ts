@@ -14,14 +14,14 @@ export enum OpenAIModelID {
   GPT_4_32K = 'gpt-4-32k',
   LLAMA_7B = 'llama-7b',
   LLAMA_13B = 'llama-13b',
-  LLAMA_30B = 'llama-30b',
+  LLAMA_33B = 'llama-33b',
   LLAMA_65B = 'llama-65b',
 }
 
 export const LlamaModels = [
   { id: OpenAIModelID.LLAMA_7B, name: "LLAMA-7B" },
   { id: OpenAIModelID.LLAMA_13B, name: "LLAMA-13B" },
-  { id: OpenAIModelID.LLAMA_30B, name: "LLAMA-30B" },
+  { id: OpenAIModelID.LLAMA_33B, name: "LLAMA-33B" },
   { id: OpenAIModelID.LLAMA_65B, name: "LLAMA-65B" },
 ];
 
@@ -71,9 +71,9 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     maxLength: 24000,
     tokenLimit: 8000,
   },
-  [OpenAIModelID.LLAMA_30B]: {
-    id: OpenAIModelID.LLAMA_30B,
-    name: 'LLAMA-30B',
+  [OpenAIModelID.LLAMA_33B]: {
+    id: OpenAIModelID.LLAMA_33B,
+    name: 'LLAMA-33B',
     maxLength: 24000,
     tokenLimit: 8000,
   },
