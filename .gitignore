@@ -37,3 +37,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .idea
+
+# models
+*.bin
+/src-tauri/binaries/
