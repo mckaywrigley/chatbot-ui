@@ -12,6 +12,23 @@ export enum OpenAIModelID {
   GPT_3_5_AZ = 'gpt-35-turbo',
   GPT_4 = 'gpt-4',
   GPT_4_32K = 'gpt-4-32k',
+  LLAMA_7B = 'llama-7b',
+  LLAMA_13B = 'llama-13b',
+  LLAMA_30B = 'llama-30b',
+  LLAMA_65B = 'llama-65b',
+}
+
+export const LlamaModels = [
+  { id: OpenAIModelID.LLAMA_7B, name: "LLAMA-7B" },
+  { id: OpenAIModelID.LLAMA_13B, name: "LLAMA-13B" },
+  { id: OpenAIModelID.LLAMA_30B, name: "LLAMA-30B" },
+  { id: OpenAIModelID.LLAMA_65B, name: "LLAMA-65B" },
+];
+
+const LlamaModelSet = new Set(LlamaModels.map(item => item.id.valueOf()));
+
+export function is_llama(model_name: string) {
+  return LlamaModelSet.has(model_name);
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -41,5 +58,29 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     name: 'GPT-4-32K',
     maxLength: 96000,
     tokenLimit: 32000,
+  },
+  [OpenAIModelID.LLAMA_7B]: {
+    id: OpenAIModelID.LLAMA_7B,
+    name: 'LLAMA-7B',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [OpenAIModelID.LLAMA_13B]: {
+    id: OpenAIModelID.LLAMA_13B,
+    name: 'LLAMA-13B',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [OpenAIModelID.LLAMA_30B]: {
+    id: OpenAIModelID.LLAMA_30B,
+    name: 'LLAMA-30B',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [OpenAIModelID.LLAMA_65B]: {
+    id: OpenAIModelID.LLAMA_65B,
+    name: 'LLAMA-65B',
+    maxLength: 24000,
+    tokenLimit: 8000,
   },
 };
