@@ -1,3 +1,4 @@
+import { ConversationV1, ConversationV4 } from './export';
 import { OpenAIModel } from './openai';
 
 export interface Message {
@@ -30,3 +31,8 @@ export interface Conversation {
   mapping: Record<string, ChatNode>;
   current_node: string;
 }
+
+export type SupportedConversationFormats =
+  | ConversationV1
+  | ConversationV4
+  | Conversation;

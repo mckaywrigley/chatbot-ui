@@ -1,4 +1,9 @@
+import { Conversation } from '@/types/chat';
 import {
+  ConversationV1,
+  ConversationV4,
+  ConversationV5,
+  ExportFormatsV2AndUp,
   ExportFormatV1,
   ExportFormatV2,
   ExportFormatV3,
@@ -8,10 +13,13 @@ import {
   SupportedExportFormats,
 } from '@/types/export';
 import {
+  cleanHistoryItem,
+  convertV1HistoryToV2History,
   convertV1ToV2,
   convertV2ToV3,
   convertV3ToV4,
   convertV4ToV5,
+  isHistoryFormatV1,
 } from './clean';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {

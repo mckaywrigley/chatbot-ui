@@ -3,12 +3,13 @@ import { Folder } from './folder';
 import { OpenAIModel } from './openai';
 import { Prompt } from './prompt';
 
-export type SupportedExportFormats =
-  | ExportFormatV1
+export type ExportFormatsV2AndUp =
   | ExportFormatV2
   | ExportFormatV3
   | ExportFormatV4
   | ExportFormatV5;
+export type SupportedExportFormats = ExportFormatV1 | ExportFormatsV2AndUp;
+
 export type LatestExportFormat = ExportFormatV5;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,8 @@ export interface ConversationV4 {
   prompt: string;
   folderId: string | null;
 }
+
+export type ConversationV5 = Conversation;
 
 export type ExportFormatV1 = ConversationV1[];
 
@@ -58,5 +61,5 @@ export interface ExportFormatV5 {
   version: 5;
   history: Conversation[];
   folders: Folder[];
-  prompts: Prompt[]
+  prompts: Prompt[];
 }
