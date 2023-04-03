@@ -20,6 +20,7 @@ import {
 } from '@/utils/app/importExport';
 import { ChatNode } from '@/types/chat';
 import { getChatNodeIdFromMessage } from '@/utils/app/clean';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 describe('Export Format Functions', () => {
   describe('isExportFormatV1', () => {
@@ -84,11 +85,14 @@ describe('Export Format Functions', () => {
 });
 
 describe('cleanData Functions', () => {
+  const currentTime = getCurrentUnixTime();
   const latestFormatNode1: ChatNode = {
     id: getChatNodeIdFromMessage(0),
     message: {
+      id: getChatNodeIdFromMessage(0),
       role: 'user',
       content: "what's up ?",
+      create_time: currentTime,
     },
     parentMessageId: undefined,
     children: [getChatNodeIdFromMessage(1)],
@@ -96,8 +100,10 @@ describe('cleanData Functions', () => {
   const latestFormatNode2: ChatNode = {
     id: getChatNodeIdFromMessage(1),
     message: {
+      id: getChatNodeIdFromMessage(1),
       role: 'assistant',
       content: 'Hi',
+      create_time: currentTime,
     },
     parentMessageId: latestFormatNode1.id,
     children: [],
@@ -116,6 +122,8 @@ describe('cleanData Functions', () => {
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
+        create_time: currentTime,
+        update_time: currentTime,
       },
     ],
     folders: [],
@@ -166,7 +174,9 @@ describe('cleanData Functions', () => {
       ] as ExportFormatV1;
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
-      expect(obj).toEqual(latestFormatWithoutFoldersOrPrompts);
+      expect(obj).toEqual({
+        ...latestFormatWithoutFoldersOrPrompts,
+      });
     });
   });
 

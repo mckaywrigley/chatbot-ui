@@ -1,4 +1,4 @@
-import { Conversation, Message } from './chat';
+import { Conversation, Message, Role } from './chat';
 import { Folder } from './folder';
 import { OpenAIModel } from './openai';
 import { Prompt } from './prompt';
@@ -13,16 +13,23 @@ export type SupportedExportFormats = ExportFormatV1 | ExportFormatsV2AndUp;
 export type LatestExportFormat = ExportFormatV5;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+export interface MessageV4 {
+  role: Role;
+  content: string;
+}
+export type MessageV5 = Message;
+
 export interface ConversationV1 {
   id: number;
   name: string;
-  messages: Message[];
+  messages: MessageV4[];
 }
 
 export interface ConversationV4 {
   id: string;
   name: string;
-  messages: Message[];
+  messages: MessageV4[];
   model: OpenAIModel;
   prompt: string;
   folderId: string | null;

@@ -15,6 +15,7 @@ import {
   ExportFormatV5,
 } from '@/types/export';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { getCurrentUnixTime } from './chatRoomUtils';
 import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
@@ -120,7 +121,11 @@ export const convertV4HistoryToV5History = (
     const id = getChatNodeIdFromMessage(index);
     return {
       id: id,
-      message: message,
+      message: {
+        ...message,
+        id: id,
+        create_time: getCurrentUnixTime(),
+      },
       parentMessageId: undefined,
       children: [],
     } as ChatNode;
@@ -135,6 +140,7 @@ export const convertV4HistoryToV5History = (
     node.children = nextNode ? [nextNode.id] : [];
   });
 
+  const creationTime = getCurrentUnixTime();
   const result = {
     ...historyItem,
     mapping: chatNodes.reduce((acc, node) => {
@@ -142,6 +148,8 @@ export const convertV4HistoryToV5History = (
       return acc;
     }, {} as Record<string, ChatNode>),
     current_node: chatNodes[chatNodes.length - 1].id,
+    create_time: creationTime,
+    update_time: creationTime,
   } as Conversation;
   delete result['messages' as keyof Conversation];
   return result;

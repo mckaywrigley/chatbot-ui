@@ -18,6 +18,7 @@ import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface Props {
   chatNode: ChatNode;
@@ -72,12 +73,15 @@ export const ChatMessage: FC<Props> = memo(
 
     const handleEditMessage = () => {
       if (chatNode.message.content != messageContent) {
+        const nodeId = uuidv4();
         onEditMessage(
           {
-            id: uuidv4(),
+            id: nodeId,
             message: {
+              id: nodeId,
               role: chatNode.message.role,
               content: messageContent,
+              create_time: getCurrentUnixTime()
             },
             parentMessageId: chatNode.parentMessageId,
             children: [],

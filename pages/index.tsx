@@ -37,6 +37,7 @@ import { useEffect, useRef, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
 import toast from 'react-hot-toast';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -180,9 +181,11 @@ const Home: React.FC<HomeProps> = ({
         text += chunkValue;
 
       }
+      const nodeId = uuidv4();
+      const currentTime = getCurrentUnixTime();
       let responseNode: ChatNode = {
-        id: uuidv4(),
-        message: { role: 'assistant', content: text },
+        id: nodeId,
+        message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
         children: [],
         parentMessageId: chatNode.id,
       };
@@ -369,6 +372,7 @@ const Home: React.FC<HomeProps> = ({
 
   const createNewConversation = (lastConversation?: Conversation) => {
     let id = uuidv4();
+    const currentTime = getCurrentUnixTime();
     let conversation: Conversation = {
       id,
       name: `${t('New Conversation')}`,
@@ -384,13 +388,17 @@ const Home: React.FC<HomeProps> = ({
         [id]: {
           id,
           message: {
+            id,
             role: 'system',
             content: '',
+            create_time: currentTime
           },
           children: [],
         },
       },
       current_node: id,
+      create_time: currentTime,
+      update_time: currentTime,
     };
     return conversation;
   };
