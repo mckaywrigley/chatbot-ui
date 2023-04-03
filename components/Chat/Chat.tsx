@@ -22,6 +22,9 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { Plugins } from '../Plugins/Plugins';
+import { Plugin } from '@/types/plugin';
+import { InstalledPlugins } from '../Plugins/InstalledPlugins';
 
 interface Props {
   conversation: Conversation;
@@ -40,6 +43,9 @@ interface Props {
   ) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
+  plugins: Plugin[];
+  onInstallPlugin: (plugin: Plugin) => void;
+  onAddPlugin: (plugin: Plugin) => void;
 }
 
 export const Chat: FC<Props> = memo(
@@ -57,6 +63,9 @@ export const Chat: FC<Props> = memo(
     onUpdateConversation,
     onEditMessage,
     stopConversationRef,
+    plugins,
+    onInstallPlugin,
+    onAddPlugin,
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -237,14 +246,19 @@ export const Chat: FC<Props> = memo(
                             })
                           }
                         />
+                        <Plugins
+                          plugins={plugins}
+                          onInstall={onInstallPlugin}
+                        />
                       </div>
                     )}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                  <div className="flex items-center justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}
+                    <InstalledPlugins plugins={plugins} />
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}
