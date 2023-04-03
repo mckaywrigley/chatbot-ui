@@ -35,6 +35,7 @@ import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
+import { createPrompt } from '@/utils/app/prompt';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -498,14 +499,10 @@ const Home: React.FC<HomeProps> = ({
   const handleCreatePrompt = () => {
     const lastPrompt = prompts[prompts.length - 1];
 
-    const newPrompt: Prompt = {
-      id: uuidv4(),
-      name: `Prompt ${prompts.length + 1}`,
-      description: '',
-      content: '',
-      model: OpenAIModels[defaultModelId],
-      folderId: null,
-    };
+    const newPrompt = createPrompt(
+      `Prompt ${prompts.length + 1}`,
+      OpenAIModels[defaultModelId],
+    );
 
     const updatedPrompts = [...prompts, newPrompt];
 
