@@ -632,6 +632,7 @@ const Home: React.FC<HomeProps> = ({
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
         />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
