@@ -49,7 +49,7 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
     };
   }
 
-  if (isExportFormatV3(data)) {    
+  if (isExportFormatV3(data)) {
     return {...data, version: 4, prompts: []};
   }
 
