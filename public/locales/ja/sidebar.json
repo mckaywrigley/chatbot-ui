@@ -4,10 +4,10 @@
   "No conversations.": "会話履歴はありません。",
   "Search conversations...": "会話を検索...",
   "OpenAI API Key": "OpenAI API Key",
-  "import data": "会話履歴をインポート",
+  "Import data": "会話履歴をインポート",
   "Are you sure?": "よろしいですか？",
   "Clear conversations": " 会話をクリア",
-  "export data": "会話履歴をエクスポート",
+  "Export data": "会話履歴をエクスポート",
   "Dark mode": "ダークモード",
   "Light mode": "ライトモード"
 }
