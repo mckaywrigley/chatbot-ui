@@ -10,12 +10,14 @@ import { PromptModal } from './PromptModal';
 
 interface Props {
   prompt: Prompt;
+  isShowing?: boolean;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
 export const PromptComponent: FC<Props> = ({
   prompt,
+  isShowing,
   onUpdatePrompt,
   onDeletePrompt,
 }) => {
@@ -29,6 +31,10 @@ export const PromptComponent: FC<Props> = ({
       e.dataTransfer.setData('prompt', JSON.stringify(prompt));
     }
   };
+
+  useEffect(() => {
+    setShowModal(isShowing ?? false);
+  }, [isShowing]);
 
   useEffect(() => {
     if (isRenaming) {
