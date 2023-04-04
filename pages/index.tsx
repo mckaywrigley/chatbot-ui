@@ -93,8 +93,9 @@ const Home: React.FC<HomeProps> = ({
     sendAction: SendAction,
     messageIndex?: number,
   ) => {
+    let updatedConversation: Conversation|null;
     if (selectedConversation) {
-      let updatedConversation: Conversation;
+      
       let sendMessages: SendMessage[];
 
       // regenergate
@@ -182,6 +183,9 @@ const Home: React.FC<HomeProps> = ({
         parentMessageId: chatNode.id,
       };
       actions.addMessage(responseNode);
+      updatedConversation = {
+        ...selectedConversation
+      };
 
       const reader = data.getReader();
       const decoder = new TextDecoder();
@@ -202,31 +206,38 @@ const Home: React.FC<HomeProps> = ({
         text += chunkValue;
         
         // Update the chatNode in the selectedConversation
-        modifiedMessage({
+        let updateChatNode: ChatNode = {
           id: nodeId,
           message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
           children: [],
           parentMessageId: chatNode.id,
-        })
-        saveConversation(selectedConversation!);
+        }
+
+        updatedConversation = {
+          ...updatedConversation,
+          mapping:{
+            ...updatedConversation.mapping,
+            [updateChatNode.id]: updateChatNode
+          }
+        }
+
+        modifiedMessage(updateChatNode)
+        saveConversation({...updatedConversation});
       }
       
     }
 
-    let updatedConversation: Conversation = {
-      ...selectedConversation!,
-    };
     const updatedConversations: Conversation[] = conversations.map(
       (conversation) => {
         if (conversation.id === selectedConversation!.id) {
-          return updatedConversation;
+          return updatedConversation!;
         }
 
         return conversation;
       },
     );
 
-    if (updatedConversations.length === 0) {
+    if (updatedConversations.length === 0 && updatedConversation!) {
       updatedConversations.push(updatedConversation);
     }
 
@@ -320,6 +331,7 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
+    console.log("handleselected", conversation)
     setSelectedConversation(conversation);
     saveConversation(conversation);
   };
