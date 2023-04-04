@@ -1,27 +1,46 @@
 {
-    "version": 4,
+    "version": 5,
     "history": [
         {
             "id": "chat-gpt-8f605ba2-4963-4036-8941-639970b75983",
             "name": "Merging Original Repo to Fork",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "If I fork a repo on GitHub, can I keep merging the original repo into my fork?"
+            "mapping": {
+                "bc8d680d-d082-4133-8563-4659f4f01a64": {
+                    "id": "bc8d680d-d082-4133-8563-4659f4f01a64",
+                    "children": [
+                        "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b"
+                    ],
+                    "parentMessageId": "8f605ba2-4963-4036-8941-639970b75983",
+                    "message": {
+                        "id": "bc8d680d-d082-4133-8563-4659f4f01a64",
+                        "role": "user",
+                        "content": "If I fork a repo on GitHub, can I keep merging the original repo into my fork?",
+                        "create_time": 1680451988.047835
+                    }
                 },
-                {
-                    "role": "assistant",
-                    "content": "Yes, if you fork a repository on GitHub, you can keep merging the original repository into your fork. This is because forking creates a copy of the original repository in your GitHub account, which you can modify and work on independently.\n\nTo keep your fork up-to-date with the original repository, you can follow these steps:\n\n1. Clone your forked repository to your local machine.\n2. Add the original repository as a remote to your forked repository using the following command:\n```\ngit remote add upstream <original repository URL>\n```\n3. Fetch the changes from the original repository using the following command:\n```\ngit fetch upstream\n```\n4. Merge the changes from the original repository into your forked repository using the following command:\n```\ngit merge upstream/main\n```\nNote that in step 4, `main` refers to the name of the default branch of the repository. If the original repository uses a different default branch, replace `main` with the name of that branch.\n\nAfter completing these steps, your forked repository should be up-to-date with the original repository."
+                "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b": {
+                    "id": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b",
+                    "children": [],
+                    "parentMessageId": "bc8d680d-d082-4133-8563-4659f4f01a64",
+                    "message": {
+                        "id": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b",
+                        "role": "assistant",
+                        "content": "Yes, if you fork a repository on GitHub, you can keep merging the original repository into your fork. This is because forking creates a copy of the original repository in your GitHub account, which you can modify and work on independently.\n\nTo keep your fork up-to-date with the original repository, you can follow these steps:\n\n1. Clone your forked repository to your local machine.\n2. Add the original repository as a remote to your forked repository using the following command:\n```\ngit remote add upstream <original repository URL>\n```\n3. Fetch the changes from the original repository using the following command:\n```\ngit fetch upstream\n```\n4. Merge the changes from the original repository into your forked repository using the following command:\n```\ngit merge upstream/main\n```\nNote that in step 4, `main` refers to the name of the default branch of the repository. If the original repository uses a different default branch, replace `main` with the name of that branch.\n\nAfter completing these steps, your forked repository should be up-to-date with the original repository.",
+                        "create_time": 1680451996.191271
+                    }
                 }
-            ],
+            },
             "model": {
                 "id": "gpt-3.5-turbo",
                 "name": "GPT-3.5",
                 "maxLength": 12000,
-                "tokenLimit": 3000
+                "tokenLimit": 4000
             },
             "prompt": "",
-            "folderId": null
+            "folderId": null,
+            "create_time": 1680451988.043534,
+            "update_time": 1680451997,
+            "current_node": "3f3681a4-2fa9-462f-a744-14cd2bbd0d7b"
         }
     ],
     "folders": [],
