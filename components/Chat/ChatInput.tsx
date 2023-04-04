@@ -17,6 +17,7 @@ import {
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -88,9 +89,10 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
+    const nodeId = uuidv4();
     onSend({
-      id: uuidv4(),
-      message: { role: 'user', content },
+      id: nodeId,
+      message: { id: nodeId, role: 'user', content, create_time: getCurrentUnixTime() },
       parentMessageId: selectedConversation?.current_node,
       children: [],
     });
