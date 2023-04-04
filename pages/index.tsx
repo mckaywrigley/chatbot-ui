@@ -32,7 +32,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 
@@ -69,6 +69,8 @@ const Home: React.FC<HomeProps> = ({
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
+
+  const [apisReady, setApisReady] = useState(false);
 
   // REFS ----------------------------------------------
 
@@ -548,10 +550,31 @@ const Home: React.FC<HomeProps> = ({
   }, [selectedConversation]);
 
   useEffect(() => {
-    if (apiKey) {
-      fetchModels(apiKey);
+    async function checkApisStatus() {
+      console.log("Waiting for APIs to be ready...");
+  
+      const response = await fetch('http://localhost:8001/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (response.ok) {
+        setApisReady(true);
+        console.log("APIs are ready!");
+      } else {
+        try {
+          const data = await response.json();
+          console.log("APIs are not ready yet!");
+        } catch (e) {}
+        setTimeout(checkApisStatus, 3000); // Call the function again after 3 seconds
+      }
     }
-  }, [apiKey]);
+
+    checkApisStatus();
+  }, []);
+
 
   // ON LOAD --------------------------------------------
 
@@ -634,7 +657,7 @@ const Home: React.FC<HomeProps> = ({
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {selectedConversation && (
+      {apisReady && selectedConversation ? (
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
@@ -740,7 +763,7 @@ const Home: React.FC<HomeProps> = ({
             )}
           </div>
         </main>
-      )}
+      ) : <main> Hello </main>}
     </>
   );
 };
