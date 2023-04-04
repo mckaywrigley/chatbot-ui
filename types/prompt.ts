@@ -7,4 +7,5 @@ export interface Prompt {
   content: string;
   model: OpenAIModel;
   folderId: string | null;
+  time: number;
 }
