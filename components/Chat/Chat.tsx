@@ -2,14 +2,15 @@ import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
-  memo,
   MutableRefObject,
+  memo,
   useCallback,
   useEffect,
   useRef,
@@ -33,7 +34,11 @@ interface Props {
   modelError: ErrorMessage | null;
   loading: boolean;
   prompts: Prompt[];
-  onSend: (message: Message, deleteCount?: number) => void;
+  onSend: (
+    message: Message,
+    deleteCount: number,
+    plugin: Plugin | null,
+  ) => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -115,8 +120,6 @@ export const Chat: FC<Props> = memo(
       }
     };
     const throttledScrollDown = throttle(scrollDown, 250);
-
-    // appear scroll down button only when user scrolls up
 
     useEffect(() => {
       throttledScrollDown();
@@ -300,16 +303,15 @@ export const Chat: FC<Props> = memo(
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
               conversationIsEmpty={conversation.messages.length === 0}
-              messages={conversation.messages}
               model={conversation.model}
               prompts={prompts}
-              onSend={(message) => {
+              onSend={(message, plugin) => {
                 setCurrentMessage(message);
-                onSend(message);
+                onSend(message, 0, plugin);
               }}
               onRegenerate={() => {
                 if (currentMessage) {
-                  onSend(currentMessage, 2);
+                  onSend(currentMessage, 2, null);
                 }
               }}
             />
