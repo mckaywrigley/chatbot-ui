@@ -1,6 +1,11 @@
 import { SupportedExportFormats } from '@/types/export';
 import { PluginKey } from '@/types/plugin';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import {
+  IconFileExport,
+  IconMoon,
+  IconSettings,
+  IconSun,
+} from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
@@ -8,6 +13,7 @@ import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
+import { useState } from 'react';
 
 interface Props {
   lightMode: 'light' | 'dark';
@@ -37,37 +43,56 @@ export const ChatbarSettings: FC<Props> = ({
   onClearPluginKey,
 }) => {
   const { t } = useTranslation('sidebar');
+  const [showSettings, setShowSettings] = useState(false);
+
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
+  };
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
-      {conversationsCount > 0 ? (
-        <ClearConversations onClearConversations={onClearConversations} />
-      ) : null}
+      {showSettings && (
+        <>
+          {conversationsCount > 0 ? (
+            <ClearConversations onClearConversations={onClearConversations} />
+          ) : null}
 
-      <Import onImport={onImportConversations} />
+          <Import onImport={onImportConversations} />
+
+          <SidebarButton
+            text={t('Export data')}
+            icon={<IconFileExport size={18} />}
+            onClick={() => onExportConversations()}
+          />
+
+          <SidebarButton
+            text={lightMode === 'light' ? t('Dark mode') : t('Light mode')}
+            icon={
+              lightMode === 'light' ? (
+                <IconMoon size={18} />
+              ) : (
+                <IconSun size={18} />
+              )
+            }
+            onClick={() =>
+              onToggleLightMode(lightMode === 'light' ? 'dark' : 'light')
+            }
+          />
+
+          <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
+
+          <PluginKeys
+            pluginKeys={pluginKeys}
+            onPluginKeyChange={onPluginKeyChange}
+            onClearPluginKey={onClearPluginKey}
+          />
+        </>
+      )}
 
       <SidebarButton
-        text={t('Export data')}
-        icon={<IconFileExport size={18} />}
-        onClick={() => onExportConversations()}
-      />
-
-      <SidebarButton
-        text={lightMode === 'light' ? t('Dark mode') : t('Light mode')}
-        icon={
-          lightMode === 'light' ? <IconMoon size={18} /> : <IconSun size={18} />
-        }
-        onClick={() =>
-          onToggleLightMode(lightMode === 'light' ? 'dark' : 'light')
-        }
-      />
-
-      <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
-
-      <PluginKeys
-        pluginKeys={pluginKeys}
-        onPluginKeyChange={onPluginKeyChange}
-        onClearPluginKey={onClearPluginKey}
+        text={t('Settings')}
+        icon={<IconSettings size={18} />}
+        onClick={() => toggleSettings()}
       />
     </div>
   );

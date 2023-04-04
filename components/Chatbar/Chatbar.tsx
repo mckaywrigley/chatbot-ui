@@ -3,7 +3,11 @@ import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import { PluginKey } from '@/types/plugin';
-import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
+import {
+  IconFolderPlus,
+  IconMessagesOff,
+  IconMessagePlus,
+} from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
 import { ChatFolders } from '../Folders/Chat/ChatFolders';
@@ -122,31 +126,30 @@ export const Chatbar: FC<Props> = ({
     >
       <div className="flex items-center">
         <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="flex flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
             onNewConversation();
             setSearchTerm('');
           }}
         >
-          <IconPlus size={18} />
-          {t('New chat')}
+          <IconMessagePlus size={18} />
         </button>
 
         <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+          className="mx-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={18} />
         </button>
-      </div>
 
-      {conversations.length > 1 && (
-        <Search
-          placeholder="Search conversations..."
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      )}
+        {conversations.length > 1 && (
+          <Search
+            placeholder="Search"
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+          />
+        )}
+      </div>
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
