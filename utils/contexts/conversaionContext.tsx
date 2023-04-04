@@ -18,6 +18,7 @@ interface CurrentUserContextType {
   currentMessageList: ChatNode[];
   selectedConversation: Conversation | null;
   setSelectedConversation: (conversation: Conversation) => void;
+  modifiedMessage: (updateChatNode: ChatNode)=>void,
   actions: Actions;
 }
 
@@ -25,6 +26,7 @@ export const ConversationContext = createContext<CurrentUserContextType>({
   currentMessageList: [],
   selectedConversation: null,
   setSelectedConversation: () => {},
+  modifiedMessage: (updateChatNode: ChatNode)=>{},
   actions: {
     clickSwitchNode: (index: number, increment: number) => {},
     setSelectedConversation: (conversation: Conversation) => {},
@@ -46,6 +48,9 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     setSelectedId(selectedConversation?.id || '');
+    if (selectedConversation) {
+      setCurrentMessageList(collectMessagesFromTail(selectedConversation));
+    }
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -85,6 +90,21 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
     setCurrentMessageList([...messageList]);
   };
 
+  const modifiedMessage = (updateChatNode: ChatNode) => {
+    if(selectedConversation){
+      let nodeId = updateChatNode.id
+      let { mapping, ...others} = selectedConversation
+      let updatedConversation: Conversation = {
+        ...others,
+        mapping:{
+          ...mapping,
+          [nodeId]: updateChatNode
+        }
+      }
+      setSelectedConversation(updatedConversation);
+    }
+  }
+
   const popCurrentMessageList = () => {
     if (selectedConversation) {
       // let updateCurrentMessageList = currentMessageList.slice(0, -1) // currently, I don't know why it cannot work.
@@ -108,6 +128,7 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
     currentMessageList,
     selectedConversation,
     setSelectedConversation,
+    modifiedMessage,
     actions,
   };
 
