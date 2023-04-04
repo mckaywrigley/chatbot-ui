@@ -331,7 +331,6 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
-    console.log("handleselected", conversation)
     setSelectedConversation(conversation);
     saveConversation(conversation);
   };
@@ -500,7 +499,6 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleEditMessage = (chatNode: ChatNode, messageIndex: number) => {
-    console.log('edit');
     handleSend(chatNode, SendAction.EDIT, messageIndex);
   };
 
