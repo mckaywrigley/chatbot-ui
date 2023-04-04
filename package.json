@@ -31,7 +31,9 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@mozilla/readability": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
+    "@types/jsdom": "^21.1.1",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
@@ -39,8 +41,11 @@
     "@types/uuid": "^9.0.1",
     "@vitest/coverage-c8": "^0.29.7",
     "autoprefixer": "^10.4.14",
+    "endent": "^2.1.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "gpt-3-encoder": "^1.1.4",
+    "jsdom": "^21.1.1",
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.5",

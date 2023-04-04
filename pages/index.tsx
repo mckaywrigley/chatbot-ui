@@ -9,12 +9,14 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import {
-  fallbackModelID,
   OpenAIModel,
   OpenAIModelID,
   OpenAIModels,
+  fallbackModelID,
 } from '@/types/openai';
+import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { getEndpoint } from '@/utils/app/api';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -38,14 +40,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
 import toast from 'react-hot-toast';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import { maxElementOrDefault } from '@/utils/utils';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
+  serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
+  serverSidePluginKeysSet,
   defaultModelId,
 }) => {
   const { t } = useTranslation('chat');
@@ -53,6 +58,7 @@ const Home: React.FC<HomeProps> = ({
   // STATE ----------------------------------------------
 
   const [apiKey, setApiKey] = useState<string>('');
+  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
@@ -89,11 +95,19 @@ const Home: React.FC<HomeProps> = ({
   // FETCH RESPONSE ----------------------------------------------
 
   const handleSend = async (
-    chatNode: ChatNode,
-    sendAction: SendAction,
-    messageIndex?: number,
+    {
+    chatNode,
+    sendAction,
+    messageIndex,
+    deleteCount,
+    plugin
+  } :{chatNode: ChatNode;
+    sendAction: SendAction;
+    messageIndex?: number;
+    deleteCount: number;
+    plugin: Plugin | null;}
   ) => {
-    let updatedConversation: Conversation|null;
+    let updatedConversationMaybe: Conversation | null = null;
     if (selectedConversation) {
       
       let sendMessages: SendMessage[];
@@ -136,8 +150,10 @@ const Home: React.FC<HomeProps> = ({
         prompt: selectedConversation.prompt,
       };
 
+      const endpoint = getEndpoint(plugin);
+
       const controller = new AbortController();
-      const response = await fetch('/api/chat', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,54 +177,120 @@ const Home: React.FC<HomeProps> = ({
         return;
       }
 
-      if (currentMessageList.length === 1) {
-        const { content } = currentMessageList[0].message;
-        const customName =
-          content.length > 30 ? content.substring(0, 30) + '...' : content;
-
-        updatedConversation = {
-          ...selectedConversation,
-          name: customName,
-        };
-      }
-
-      setLoading(false);
-
-      const nodeId = uuidv4();
-      const currentTime = getCurrentUnixTime();
-      let responseNode: ChatNode = {
-        id: nodeId,
-        message: { id: nodeId, role: 'assistant', content: '', create_time: currentTime },
-        children: [],
-        parentMessageId: chatNode.id,
-      };
-      actions.addMessage(responseNode);
-      updatedConversation = {
+      let updatedConversation = {
         ...selectedConversation
       };
 
-      const reader = data.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let isFirst = true;
-      let text = '';
+      const nodeId = uuidv4();
+      const currentTime = getCurrentUnixTime();
+      if (!plugin) {
 
-      while (!done) {
-        if (stopConversationRef.current === true) {
-          controller.abort();
-          done = true;
-          break;
+        if (currentMessageList.length === 1) {
+          const { content } = currentMessageList[0].message;
+          const customName =
+            content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+          updatedConversation.name = customName;
         }
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
 
-        text += chunkValue;
+        setLoading(false);
+
+        let responseNode: ChatNode = {
+          id: nodeId,
+          message: { id: nodeId, role: 'assistant', content: '', create_time: currentTime },
+          children: [],
+          parentMessageId: chatNode.id,
+        };
+        actions.addMessage(responseNode);
         
-        // Update the chatNode in the selectedConversation
+        const reader = data.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let isFirst = true;
+        let text = '';
+
+        while (!done) {
+          if (stopConversationRef.current === true) {
+            controller.abort();
+            done = true;
+            break;
+          }
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          const chunkValue = decoder.decode(value);
+
+          text += chunkValue;
+
+          if (isFirst) {
+            isFirst = false;
+            /*
+            const updatedMessages: Message[] = [
+              ...updatedConversation.messages,
+              { role: 'assistant', content: chunkValue },
+            ];
+
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+            */
+            // Update the chatNode in the selectedConversation
+            let updateChatNode: ChatNode = {
+              id: nodeId,
+              message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
+              children: [],
+              parentMessageId: chatNode.id,
+            }
+
+            updatedConversation = {
+              ...updatedConversation,
+              mapping:{
+                ...updatedConversation?.mapping,
+                [updateChatNode.id]: updateChatNode
+              }
+            }
+
+            modifiedMessage(updateChatNode)
+
+            setSelectedConversation(updatedConversation);
+          } else {
+            // Get the last message in the updatedConversation
+            // Set the content to text
+            const recentNode = maxElementOrDefault(Object.values(updatedConversation.mapping), (node) => node.message.create_time);
+            if(recentNode) {
+              recentNode.message.content = text;
+            }
+
+            setSelectedConversation(updatedConversation);
+          }
+        }
+
+        saveConversation(updatedConversation);
+
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+
+            return conversation;
+          },
+        );
+
+        if (updatedConversations.length === 0 && updatedConversation) {
+          updatedConversations.push(updatedConversation);
+        }
+
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
+
+        setMessageIsStreaming(false);
+      } else {
+        const { answer } = await response.json();
+
         let updateChatNode: ChatNode = {
           id: nodeId,
-          message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
+          message: { id: nodeId, role: 'assistant', content: answer, create_time: currentTime },
           children: [],
           parentMessageId: chatNode.id,
         }
@@ -216,29 +298,51 @@ const Home: React.FC<HomeProps> = ({
         updatedConversation = {
           ...updatedConversation,
           mapping:{
-            ...updatedConversation.mapping,
+            ...updatedConversation?.mapping,
             [updateChatNode.id]: updateChatNode
           }
         }
 
-        modifiedMessage(updateChatNode)
-        saveConversation({...updatedConversation});
+        setSelectedConversation(updatedConversation);
+        saveConversation(updatedConversation);
+
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+
+            return conversation;
+          },
+        );
+
+        if (updatedConversations.length === 0 && updatedConversation) {
+          updatedConversations.push(updatedConversation);
+        }
+
+
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
+
+        setLoading(false);
+        setMessageIsStreaming(false);
       }
       
+      updatedConversationMaybe = updatedConversation;
     }
 
     const updatedConversations: Conversation[] = conversations.map(
       (conversation) => {
         if (conversation.id === selectedConversation!.id) {
-          return updatedConversation!;
+          return updatedConversationMaybe;
         }
 
         return conversation;
       },
-    );
+    ).filter((conversation) => !!conversation) as Conversation[];
 
-    if (updatedConversations.length === 0 && updatedConversation!) {
-      updatedConversations.push(updatedConversation);
+    if (updatedConversations.length === 0 && updatedConversationMaybe) {
+      updatedConversations.push(updatedConversationMaybe);
     }
 
     setConversations(updatedConversations);
@@ -305,6 +409,45 @@ const Home: React.FC<HomeProps> = ({
   const handleApiKeyChange = (apiKey: string) => {
     setApiKey(apiKey);
     localStorage.setItem('apiKey', apiKey);
+  };
+
+  const handlePluginKeyChange = (pluginKey: PluginKey) => {
+    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
+      const updatedPluginKeys = pluginKeys.map((key) => {
+        if (key.pluginId === pluginKey.pluginId) {
+          return pluginKey;
+        }
+
+        return key;
+      });
+
+      setPluginKeys(updatedPluginKeys);
+
+      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+    } else {
+      setPluginKeys([...pluginKeys, pluginKey]);
+
+      localStorage.setItem(
+        'pluginKeys',
+        JSON.stringify([...pluginKeys, pluginKey]),
+      );
+    }
+  };
+
+  const handleClearPluginKey = (pluginKey: PluginKey) => {
+    const updatedPluginKeys = pluginKeys.filter(
+      (key) => key.pluginId !== pluginKey.pluginId,
+    );
+
+    if (updatedPluginKeys.length === 0) {
+      setPluginKeys([]);
+      localStorage.removeItem('pluginKeys');
+      return;
+    }
+
+    setPluginKeys(updatedPluginKeys);
+
+    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
   const handleToggleChatbar = () => {
@@ -499,14 +642,18 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleEditMessage = (chatNode: ChatNode, messageIndex: number) => {
-    handleSend(chatNode, SendAction.EDIT, messageIndex);
+    handleSend({
+      chatNode: chatNode,
+      sendAction: SendAction.EDIT, 
+      messageIndex,
+      deleteCount: 0,
+      plugin: null
+    });
   };
 
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
-    const lastPrompt = prompts[prompts.length - 1];
-
     const newPrompt: Prompt = {
       id: uuidv4(),
       name: `Prompt ${prompts.length + 1}`,
@@ -564,11 +711,21 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const apiKey = localStorage.getItem('apiKey');
-    if (apiKey) {
+    if (serverSideApiKeyIsSet) {
+      fetchModels('');
+      setApiKey('');
+      localStorage.removeItem('apiKey');
+    } else if (apiKey) {
       setApiKey(apiKey);
       fetchModels(apiKey);
-    } else if (serverSideApiKeyIsSet) {
-      fetchModels('');
+    }
+
+    const pluginKeys = localStorage.getItem('pluginKeys');
+    if (serverSidePluginKeysSet) {
+      setPluginKeys([]);
+      localStorage.removeItem('pluginKeys');
+    } else if (pluginKeys) {
+      setPluginKeys(JSON.parse(pluginKeys));
     }
 
     if (window.innerWidth < 640) {
@@ -649,6 +806,7 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
+                  pluginKeys={pluginKeys}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
@@ -662,6 +820,8 @@ const Home: React.FC<HomeProps> = ({
                   onClearConversations={handleClearConversations}
                   onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
+                  onPluginKeyChange={handlePluginKeyChange}
+                  onClearPluginKey={handleClearPluginKey}
                 />
 
                 <button
@@ -750,10 +910,20 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
+  let serverSidePluginKeysSet = false;
+
+  const googleApiKey = process.env.GOOGLE_API_KEY;
+  const googleCSEId = process.env.GOOGLE_CSE_ID;
+
+  if (googleApiKey && googleCSEId) {
+    serverSidePluginKeysSet = true;
+  }
+
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
+      serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',
