@@ -17,7 +17,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
         ...(process.env.OPENAI_ORGANIZATION && {
           'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-        })
+        }),
       },
     });
 
@@ -39,17 +39,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     const models: OpenAIModel[] = json.data
       .map((model: any) => {
-        for (const [key, value] of Object.entries(OpenAIModelID)) {
-          if (value === model.id) {
-            return {
-              id: model.id,
-              name: OpenAIModels[value].name,
-            };
-          }
+        const modelId: OpenAIModelID = model.id;
+        if (Object.values(OpenAIModelID).includes(modelId)) {
+          return {
+            id: model.id,
+            name: OpenAIModels[modelId].name,
+          };
         }
       })
       .filter(Boolean);
-
     return new Response(JSON.stringify(models), { status: 200 });
   } catch (error) {
     console.error(error);
