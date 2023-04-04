@@ -492,6 +492,7 @@ const Home: React.FC<HomeProps> = ({
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
+      time: new Date().getTime(),
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -525,6 +526,7 @@ const Home: React.FC<HomeProps> = ({
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
+        time: new Date().getTime(),
       });
       localStorage.removeItem('selectedConversation');
     }
@@ -559,6 +561,7 @@ const Home: React.FC<HomeProps> = ({
       model: OpenAIModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
+      time: new Date().getTime(),
     });
     localStorage.removeItem('selectedConversation');
 
@@ -604,6 +607,7 @@ const Home: React.FC<HomeProps> = ({
       content: '',
       model: OpenAIModels[defaultModelId],
       folderId: null,
+      time: new Date().getTime(),
     };
 
     const updatedPrompts = [...prompts, newPrompt];
@@ -728,6 +732,7 @@ const Home: React.FC<HomeProps> = ({
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
+        time: new Date().getTime(),
       });
     }
   }, [serverSideApiKeyIsSet]);
