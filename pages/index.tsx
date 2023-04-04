@@ -2,7 +2,8 @@ import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import { Promptbar } from '@/components/Promptbar/Promptbar';
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { ChatBody, ChatNode, Conversation, Message } from '@/types/chat';
+import { SendAction } from '@/types/conversation';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
@@ -32,9 +33,11 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
 import toast from 'react-hot-toast';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -61,51 +64,64 @@ const Home: React.FC<HomeProps> = ({
   const [folders, setFolders] = useState<Folder[]>([]);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation>();
-  const [currentMessage, setCurrentMessage] = useState<Message>();
+  
+  // const [selectedConversation, setSelectedConversation] =
+  //   useState<Conversation>();
+  // const [currentMessage, setCurrentMessage] = useState<Message>();
 
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
+  const {
+    currentMessageList,
+    selectedConversation,
+    setSelectedConversation,
+    actions,
+  } = useContext(ConversationContext);
   // REFS ----------------------------------------------
 
   const stopConversationRef = useRef<boolean>(false);
 
   // FETCH RESPONSE ----------------------------------------------
 
-  const handleSend = async (message: Message, deleteCount = 0) => {
+  const handleSend = async (
+    chatNode: ChatNode,
+    sendAction: SendAction,
+    messageIndex?: number,
+  ) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
+      let sendMessages: Message[];
 
-      if (deleteCount) {
-        const updatedMessages = [...selectedConversation.messages];
-        for (let i = 0; i < deleteCount; i++) {
-          updatedMessages.pop();
-        }
-
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...updatedMessages, message],
-        };
-      } else {
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...selectedConversation.messages, message],
-        };
+      // regenergate
+      switch (sendAction) {
+        case SendAction.SEND:
+          // Perform the SEND action
+          actions.addMessage(chatNode);
+          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          break;
+        case SendAction.EDIT:
+          // Perform the EDIT action
+          actions.addMessage(chatNode, messageIndex);
+          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          break;
+        case SendAction.REGENERATE:
+          // Perform the REGENERATE action
+          actions.popCurrentMessageList();
+          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          break;
       }
 
-      setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
 
       const chatBody: ChatBody = {
-        model: updatedConversation.model,
-        messages: updatedConversation.messages,
+        model: selectedConversation.model,
+        messages: sendMessages,
         key: apiKey,
-        prompt: updatedConversation.prompt,
+        prompt: selectedConversation.prompt,
       };
 
       const controller = new AbortController();
@@ -133,13 +149,13 @@ const Home: React.FC<HomeProps> = ({
         return;
       }
 
-      if (updatedConversation.messages.length === 1) {
-        const { content } = message;
+      if (currentMessageList.length === 1) {
+        const { content } = currentMessageList[0].message;
         const customName =
           content.length > 30 ? content.substring(0, 30) + '...' : content;
 
         updatedConversation = {
-          ...updatedConversation,
+          ...selectedConversation,
           name: customName,
         };
       }
@@ -164,64 +180,42 @@ const Home: React.FC<HomeProps> = ({
 
         text += chunkValue;
 
-        if (isFirst) {
-          isFirst = false;
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: chunkValue },
-          ];
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        } else {
-          const updatedMessages: Message[] = updatedConversation.messages.map(
-            (message, index) => {
-              if (index === updatedConversation.messages.length - 1) {
-                return {
-                  ...message,
-                  content: text,
-                };
-              }
-
-              return message;
-            },
-          );
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        }
       }
-
-      saveConversation(updatedConversation);
-
-      const updatedConversations: Conversation[] = conversations.map(
-        (conversation) => {
-          if (conversation.id === selectedConversation.id) {
-            return updatedConversation;
-          }
-
-          return conversation;
-        },
-      );
-
-      if (updatedConversations.length === 0) {
-        updatedConversations.push(updatedConversation);
-      }
-
-      setConversations(updatedConversations);
-
-      saveConversations(updatedConversations);
-
-      setMessageIsStreaming(false);
+      const nodeId = uuidv4();
+      const currentTime = getCurrentUnixTime();
+      let responseNode: ChatNode = {
+        id: nodeId,
+        message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
+        children: [],
+        parentMessageId: chatNode.id,
+      };
+      actions.addMessage(responseNode);
     }
+
+    saveConversation(selectedConversation!);
+
+    let updatedConversation: Conversation = {
+      ...selectedConversation!,
+    };
+    const updatedConversations: Conversation[] = conversations.map(
+      (conversation) => {
+        if (conversation.id === selectedConversation!.id) {
+          return updatedConversation;
+        }
+
+        return conversation;
+      },
+    );
+
+    if (updatedConversations.length === 0) {
+      updatedConversations.push(updatedConversation);
+    }
+
+    setConversations(updatedConversations);
+
+    saveConversations(updatedConversations);
+
+    setMessageIsStreaming(false);
   };
 
   // FETCH MODELS ----------------------------------------------
@@ -376,13 +370,12 @@ const Home: React.FC<HomeProps> = ({
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
-    const lastConversation = conversations[conversations.length - 1];
-
-    const newConversation: Conversation = {
-      id: uuidv4(),
+  const createNewConversation = (lastConversation?: Conversation) => {
+    let id = uuidv4();
+    const currentTime = getCurrentUnixTime();
+    let conversation: Conversation = {
+      id,
       name: `${t('New Conversation')}`,
-      messages: [],
       model: lastConversation?.model || {
         id: OpenAIModels[defaultModelId].id,
         name: OpenAIModels[defaultModelId].name,
@@ -391,7 +384,30 @@ const Home: React.FC<HomeProps> = ({
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
+      mapping: {
+        [id]: {
+          id,
+          message: {
+            id,
+            role: 'system',
+            content: '',
+            create_time: currentTime
+          },
+          children: [],
+        },
+      },
+      current_node: id,
+      create_time: currentTime,
+      update_time: currentTime,
     };
+    return conversation;
+  };
+
+  const handleNewConversation = () => {
+    const lastConversation = conversations.length ? conversations[conversations.length - 1] : undefined;
+    const newConversation: Conversation = createNewConversation(
+      lastConversation
+    );
 
     const updatedConversations = [...conversations, newConversation];
 
@@ -417,14 +433,7 @@ const Home: React.FC<HomeProps> = ({
       );
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
-      });
+      setSelectedConversation(createNewConversation());
       localStorage.removeItem('selectedConversation');
     }
   };
@@ -451,14 +460,7 @@ const Home: React.FC<HomeProps> = ({
     setConversations([]);
     localStorage.removeItem('conversationHistory');
 
-    setSelectedConversation({
-      id: uuidv4(),
-      name: 'New conversation',
-      messages: [],
-      model: OpenAIModels[defaultModelId],
-      prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: null,
-    });
+    setSelectedConversation(createNewConversation());
     localStorage.removeItem('selectedConversation');
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
@@ -466,31 +468,9 @@ const Home: React.FC<HomeProps> = ({
     saveFolders(updatedFolders);
   };
 
-  const handleEditMessage = (message: Message, messageIndex: number) => {
-    if (selectedConversation) {
-      const updatedMessages = selectedConversation.messages
-        .map((m, i) => {
-          if (i < messageIndex) {
-            return m;
-          }
-        })
-        .filter((m) => m) as Message[];
-
-      const updatedConversation = {
-        ...selectedConversation,
-        messages: updatedMessages,
-      };
-
-      const { single, all } = updateConversation(
-        updatedConversation,
-        conversations,
-      );
-
-      setSelectedConversation(single);
-      setConversations(all);
-
-      setCurrentMessage(message);
-    }
+  const handleEditMessage = (chatNode: ChatNode, messageIndex: number) => {
+    console.log('edit');
+    handleSend(chatNode, SendAction.EDIT, messageIndex);
   };
 
   // PROMPT OPERATIONS --------------------------------------------
@@ -533,13 +513,6 @@ const Home: React.FC<HomeProps> = ({
   };
 
   // EFFECTS  --------------------------------------------
-
-  useEffect(() => {
-    if (currentMessage) {
-      handleSend(currentMessage);
-      setCurrentMessage(undefined);
-    }
-  }, [currentMessage]);
 
   useEffect(() => {
     if (window.innerWidth < 640) {
@@ -612,14 +585,7 @@ const Home: React.FC<HomeProps> = ({
       );
       setSelectedConversation(cleanedSelectedConversation);
     } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
-      });
+      setSelectedConversation(createNewConversation());
     }
   }, [serverSideApiKeyIsSet]);
 

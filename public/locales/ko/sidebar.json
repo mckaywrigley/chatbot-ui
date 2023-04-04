@@ -4,10 +4,10 @@
   "No conversations.": "대화가 없습니다.",
   "Search conversations...": "대화 검색...",
   "OpenAI API Key": "OpenAI API 키",
-  "import data": "대화 가져오기",
+  "Import data": "대화 가져오기",
   "Are you sure?": "확실합니까?",
   "Clear conversations": "대화 지우기",
-  "export data": "대화 내보내기",
+  "Export data": "대화 내보내기",
   "Dark mode": "다크 모드",
   "Light mode": "라이트 모드"
 }

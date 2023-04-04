@@ -1,26 +1,59 @@
-import { Message } from '@/types/chat';
-import { IconCheck, IconCopy, IconEdit } from '@tabler/icons-react';
+
+import { ChatNode } from '@/types/chat';
+import { IconCheck, IconCopy, IconEdit, IconUser, IconRobot } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
-import { FC, memo, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import rehypeMathjax from 'rehype-mathjax';
+import { v4 as uuidv4 } from 'uuid';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface Props {
-  message: Message;
+  chatNode: ChatNode;
   messageIndex: number;
-  onEditMessage: (message: Message, messageIndex: number) => void;
+  onEditMessage: (chatNode: ChatNode, messageIndex: number) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage }) => {
+  ({ chatNode, messageIndex, onEditMessage }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
-    const [messageContent, setMessageContent] = useState(message.content);
+    const [messageContent, setMessageContent] = useState(
+      chatNode.message.content,
+    );
     const [messagedCopied, setMessageCopied] = useState(false);
+
+    const { selectedConversation, actions } = useContext(ConversationContext);
+   
+    const totalPages = useMemo(() => {
+      return chatNode.parentMessageId
+        ? selectedConversation?.mapping[chatNode.parentMessageId]?.children
+            ?.length ?? 0
+        : 0;
+    }, [chatNode]);
+
+    const currentPage = useMemo(() => {
+      return (
+        (chatNode.parentMessageId
+          ? selectedConversation?.mapping[
+              chatNode.parentMessageId
+            ]?.children?.indexOf(chatNode.id) ?? 0
+          : 0) + 1
+      );
+    }, [chatNode]);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -39,8 +72,22 @@ export const ChatMessage: FC<Props> = memo(
     };
 
     const handleEditMessage = () => {
-      if (message.content != messageContent) {
-        onEditMessage({ ...message, content: messageContent }, messageIndex);
+      if (chatNode.message.content != messageContent) {
+        const nodeId = uuidv4();
+        onEditMessage(
+          {
+            id: nodeId,
+            message: {
+              id: nodeId,
+              role: chatNode.message.role,
+              content: messageContent,
+              create_time: getCurrentUnixTime()
+            },
+            parentMessageId: chatNode.parentMessageId,
+            children: [],
+          },
+          messageIndex,
+        );
       }
       setIsEditing(false);
     };
@@ -55,7 +102,7 @@ export const ChatMessage: FC<Props> = memo(
     const copyOnClick = () => {
       if (!navigator.clipboard) return;
 
-      navigator.clipboard.writeText(message.content).then(() => {
+      navigator.clipboard.writeText(chatNode.message.content).then(() => {
         setMessageCopied(true);
         setTimeout(() => {
           setMessageCopied(false);
@@ -73,7 +120,7 @@ export const ChatMessage: FC<Props> = memo(
     return (
       <div
         className={`group px-4 ${
-          message.role === 'assistant'
+          chatNode.message.role === 'assistant'
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
         }`}
@@ -81,11 +128,36 @@ export const ChatMessage: FC<Props> = memo(
       >
         <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
-            {message.role === 'assistant' ? t('AI') : t('You')}:
+            {/* switch page */}
+            <div className="flex flex-col">
+              <div>
+                {chatNode.message.role === 'assistant' ? t('AI') : t('You')}:
+              </div>
+              <div className="flex justify-between text-xs font-normal">
+                <button
+                  disabled={currentPage == 1}
+                  className={currentPage == 1 ?"text-slate-500" :""}
+                  onClick={() => actions.clickSwitchNode(messageIndex, -1)}
+                >
+                  &lt;
+                </button>
+                <div>
+                {currentPage}/{totalPages}
+
+                </div>
+                <button
+                   disabled={currentPage == totalPages}
+                   className={currentPage == totalPages ?"text-slate-500" :""}
+                  onClick={() => actions.clickSwitchNode(messageIndex, +1)}
+                >
+                  &gt;
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
-            {message.role === 'user' ? (
+            {chatNode.message.role === 'user' ? (
               <div className="flex w-full">
                 {isEditing ? (
                   <div className="flex w-full flex-col">
@@ -118,7 +190,7 @@ export const ChatMessage: FC<Props> = memo(
                       <button
                         className="h-[40px] rounded-md border border-neutral-300 px-4 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                         onClick={() => {
-                          setMessageContent(message.content);
+                          setMessageContent(chatNode.message.content);
                           setIsEditing(false);
                         }}
                       >
@@ -128,7 +200,7 @@ export const ChatMessage: FC<Props> = memo(
                   </div>
                 ) : (
                   <div className="prose whitespace-pre-wrap dark:prose-invert">
-                    {message.content}
+                    {chatNode.message.content}
                   </div>
                 )}
 
@@ -214,7 +286,7 @@ export const ChatMessage: FC<Props> = memo(
                     },
                   }}
                 >
-                  {message.content}
+                  {chatNode.message.content}
                 </MemoizedReactMarkdown>
               </>
             )}
