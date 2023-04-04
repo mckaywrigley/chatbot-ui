@@ -7,7 +7,6 @@ import {
   IconFolderPlus,
   IconMessagesOff,
   IconMessagePlus,
-  IconNotes,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
@@ -149,7 +148,7 @@ export const Chatbar: FC<Props> = ({
               className="mx-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
               onClick={() => onCreateFolder(t('New folder'))}
             >
-              <IconNotes size={18} />
+              <IconFolderPlus size={18} />
             </button>
           </>
         )}
