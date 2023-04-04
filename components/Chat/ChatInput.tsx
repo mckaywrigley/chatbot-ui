@@ -32,6 +32,7 @@ interface Props {
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
+  onNewConversation: () => void;
 }
 
 export const ChatInput: FC<Props> = ({
@@ -43,6 +44,7 @@ export const ChatInput: FC<Props> = ({
   onRegenerate,
   stopConversationRef,
   textareaRef,
+  onNewConversation,
 }) => {
   const { t } = useTranslation('chat');
 
@@ -161,6 +163,10 @@ export const ChatInput: FC<Props> = ({
     } else if (e.key === '/' && e.metaKey) {
       e.preventDefault();
       setShowPluginSelect(!showPluginSelect);
+    } else if (e.key === '÷') {
+      // macos: Cmd + Opt + /
+      e.preventDefault();
+      onNewConversation();
     }
   };
 

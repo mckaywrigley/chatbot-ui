@@ -816,6 +816,7 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                onNewConversation={handleNewConversation}
               />
             </div>
 
