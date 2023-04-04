@@ -1,10 +1,11 @@
 import { ChatBody, Message } from '@/types/chat';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError, OpenAIStream, TurtleStream } from '@/utils/server';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
+import { OpenAIModelID } from '@/types/openai';
 
 export const config = {
   runtime: 'edge',
@@ -44,7 +45,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    var stream = null;
+    if (model.id === OpenAIModelID.TURTLE) {
+      stream = await TurtleStream(model, promptToSend, key, messagesToSend);
+    } else {
+      stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    }
 
     return new Response(stream);
   } catch (error) {
