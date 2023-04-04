@@ -24,32 +24,12 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   // added folders (3/23/23)
   // added prompts (3/26/23)
 
-  let updatedConversation = conversation;
-
-  // check for model on each conversation
-  if (!updatedConversation.model) {
-    updatedConversation = {
-      ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
-    };
+  const updatedConversationMaybe = cleanHistoryItem(conversation);
+  if (updatedConversationMaybe) {
+    return updatedConversationMaybe;
+  } else {
+    return conversation;
   }
-
-  // check for system prompt on each conversation
-  if (!updatedConversation.prompt) {
-    updatedConversation = {
-      ...updatedConversation,
-      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
-    };
-  }
-
-  if (!updatedConversation.folderId) {
-    updatedConversation = {
-      ...updatedConversation,
-      folderId: updatedConversation.folderId || null,
-    };
-  }
-
-  return updatedConversation;
 };
 
 export const isHistoryFormatV1 = (
@@ -93,11 +73,16 @@ export const convertV1HistoryToV2History = (
   const result = {
     ...historyItem,
     id: historyItem.id.toString(),
-    folderId: 'folderId' in historyItem ? historyItem.folderId : null,
+    folderId:
+      'folderId' in historyItem && historyItem.folderId
+        ? historyItem.folderId
+        : null,
     prompt:
-      'prompt' in historyItem ? historyItem.prompt : DEFAULT_SYSTEM_PROMPT,
+      'prompt' in historyItem && historyItem.prompt
+        ? historyItem.prompt
+        : DEFAULT_SYSTEM_PROMPT,
     model:
-      'model' in historyItem
+      'model' in historyItem && historyItem.model
         ? historyItem.model
         : OpenAIModels[OpenAIModelID.GPT_3_5],
   } as ConversationV4;
