@@ -1,6 +1,11 @@
-
 import { ChatNode } from '@/types/chat';
-import { IconCheck, IconCopy, IconEdit, IconUser, IconRobot } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconCopy,
+  IconEdit,
+  IconUser,
+  IconRobot,
+} from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -37,7 +42,7 @@ export const ChatMessage: FC<Props> = memo(
     const [messagedCopied, setMessageCopied] = useState(false);
 
     const { selectedConversation, actions } = useContext(ConversationContext);
-   
+
     const totalPages = useMemo(() => {
       return chatNode.parentMessageId
         ? selectedConversation?.mapping[chatNode.parentMessageId]?.children
@@ -81,7 +86,7 @@ export const ChatMessage: FC<Props> = memo(
               id: nodeId,
               role: chatNode.message.role,
               content: messageContent,
-              create_time: getCurrentUnixTime()
+              create_time: getCurrentUnixTime(),
             },
             parentMessageId: chatNode.parentMessageId,
             children: [],
@@ -133,26 +138,29 @@ export const ChatMessage: FC<Props> = memo(
               <div>
                 {chatNode.message.role === 'assistant' ? t('AI') : t('You')}:
               </div>
-              <div className="flex justify-between text-xs font-normal">
-                <button
-                  disabled={currentPage == 1}
-                  className={currentPage == 1 ?"text-slate-500" :""}
-                  onClick={() => actions.clickSwitchNode(messageIndex, -1)}
-                >
-                  &lt;
-                </button>
-                <div>
-                {currentPage}/{totalPages}
-
+              {totalPages > 1 && (
+                <div className="flex justify-between text-xs font-normal">
+                  <button
+                    disabled={currentPage == 1}
+                    className={currentPage == 1 ? 'text-slate-500' : ''}
+                    onClick={() => actions.clickSwitchNode(messageIndex, -1)}
+                  >
+                    &lt;
+                  </button>
+                  <div>
+                    {currentPage}/{totalPages}
+                  </div>
+                  <button
+                    disabled={currentPage == totalPages}
+                    className={
+                      currentPage == totalPages ? 'text-slate-500' : ''
+                    }
+                    onClick={() => actions.clickSwitchNode(messageIndex, +1)}
+                  >
+                    &gt;
+                  </button>
                 </div>
-                <button
-                   disabled={currentPage == totalPages}
-                   className={currentPage == totalPages ?"text-slate-500" :""}
-                  onClick={() => actions.clickSwitchNode(messageIndex, +1)}
-                >
-                  &gt;
-                </button>
-              </div>
+              )}
             </div>
           </div>
 
