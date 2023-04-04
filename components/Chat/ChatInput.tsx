@@ -164,7 +164,7 @@ export const ChatInput: FC<Props> = ({
       e.preventDefault();
       setShowPluginSelect(!showPluginSelect);
     } else if (e.key === '÷') {
-      // macos: Cmd + Opt + /
+      // macos: Opt + /
       e.preventDefault();
       onNewConversation();
     }
