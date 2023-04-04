@@ -4,9 +4,8 @@ import { it, expect, describe } from 'vitest';
 import { Promptbar } from '@/components/Promptbar/Promptbar';
 import { createPrompt } from '@/utils/app/prompt';
 
-describe('Export Format Functions', () => {
-  // create a mock Prompt model
-  it('test', () => {
+describe('Promptbar', () => {
+  it('Has the right copy', () => {
     let mockPrompt = createPrompt('hello', OpenAIModels[OpenAIModelID.GPT_3_5]);
     const { getByText } = render(
       <Promptbar
