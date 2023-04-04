@@ -73,11 +73,16 @@ export const convertV1HistoryToV2History = (
   const result = {
     ...historyItem,
     id: historyItem.id.toString(),
-    folderId: 'folderId' in historyItem ? historyItem.folderId : null,
+    folderId:
+      'folderId' in historyItem && historyItem.folderId
+        ? historyItem.folderId
+        : null,
     prompt:
-      'prompt' in historyItem ? historyItem.prompt : DEFAULT_SYSTEM_PROMPT,
+      'prompt' in historyItem && historyItem.prompt
+        ? historyItem.prompt
+        : DEFAULT_SYSTEM_PROMPT,
     model:
-      'model' in historyItem
+      'model' in historyItem && historyItem.model
         ? historyItem.model
         : OpenAIModels[OpenAIModelID.GPT_3_5],
   } as ConversationV4;
