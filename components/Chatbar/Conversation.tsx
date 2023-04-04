@@ -100,7 +100,9 @@ export const ConversationComponent: FC<Props> = ({
             {conversation.name}
             {selectedConversation.id === conversation.id && (
               <div className="block text-[12.5px] text-gray-400">
-                {new Date(conversation.time).toLocaleString()}
+                {conversation?.time
+                  ? new Date(conversation?.time).toLocaleString()
+                  : ''}
               </div>
             )}
           </div>
