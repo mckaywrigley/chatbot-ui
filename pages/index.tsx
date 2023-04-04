@@ -763,7 +763,9 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
+                  serverSideApiKeyIsSet={serverSideApiKeyIsSet}
                   pluginKeys={pluginKeys}
+                  serverSidePluginKeysSet={serverSidePluginKeysSet}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
