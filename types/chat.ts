@@ -1,18 +1,23 @@
 import { ConversationV1, ConversationV4 } from './export';
 import { OpenAIModel } from './openai';
 
-export interface Message {
+export interface Message extends SendMessage{
   id: string;
+  // role: Role;
+  // content: string;
+  create_time: number;
+}
+
+export interface SendMessage {
   role: Role;
   content: string;
-  create_time: number;
 }
 
 export type Role = 'assistant' | 'user' | 'tool' | 'system';
 
 export interface ChatBody {
   model: OpenAIModel;
-  messages: Message[];
+  messages: SendMessage[];
   key: string;
   prompt: string;
 }

@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { SendMessage } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 import {
   createParser,
@@ -25,7 +25,7 @@ export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
   key: string,
-  messages: Message[],
+  messages: SendMessage[],
 ) => {
   const res = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
     headers: {

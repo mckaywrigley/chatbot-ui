@@ -31,8 +31,12 @@ export const collectMessagesFromTail = (
     messageList.push(currentNode);
     currentNode = conversation.mapping[currentNode.parentMessageId];
   }
+
   // ignore system
-  // messageList.push(currentNode)
+  if (currentNode.message.role !== 'system') {
+    messageList.push(currentNode);
+  }
+
   return messageList.reverse();
 };
 

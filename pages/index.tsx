@@ -2,7 +2,7 @@ import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import { Promptbar } from '@/components/Promptbar/Promptbar';
-import { ChatBody, ChatNode, Conversation, Message } from '@/types/chat';
+import { ChatBody, ChatNode, Conversation, Message, SendMessage } from '@/types/chat';
 import { SendAction } from '@/types/conversation';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
@@ -68,6 +68,7 @@ const Home: React.FC<HomeProps> = ({
   // const [selectedConversation, setSelectedConversation] =
   //   useState<Conversation>();
   // const [currentMessage, setCurrentMessage] = useState<Message>();
+  const [updateChatNode, setUpdateChatNode] = useState<ChatNode>();
 
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
@@ -78,6 +79,7 @@ const Home: React.FC<HomeProps> = ({
     currentMessageList,
     selectedConversation,
     setSelectedConversation,
+    modifiedMessage,
     actions,
   } = useContext(ConversationContext);
   // REFS ----------------------------------------------
@@ -91,26 +93,36 @@ const Home: React.FC<HomeProps> = ({
     sendAction: SendAction,
     messageIndex?: number,
   ) => {
+    let updatedConversation: Conversation|null;
     if (selectedConversation) {
-      let updatedConversation: Conversation;
-      let sendMessages: Message[];
+      
+      let sendMessages: SendMessage[];
 
       // regenergate
       switch (sendAction) {
         case SendAction.SEND:
           // Perform the SEND action
           actions.addMessage(chatNode);
-          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          sendMessages = currentMessageList.map((chatNode) => {
+            let {id, create_time, ...message} = chatNode.message
+            return message
+          });
           break;
         case SendAction.EDIT:
           // Perform the EDIT action
           actions.addMessage(chatNode, messageIndex);
-          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          sendMessages = currentMessageList.map((chatNode) => {
+            let {id, create_time, ...message} = chatNode.message
+            return message
+          });
           break;
         case SendAction.REGENERATE:
           // Perform the REGENERATE action
           actions.popCurrentMessageList();
-          sendMessages = currentMessageList.map((chatNode) => chatNode.message);
+          sendMessages = currentMessageList.map((chatNode) => {
+            let {id, create_time, ...message} = chatNode.message
+            return message
+          });
           break;
       }
 
@@ -162,6 +174,19 @@ const Home: React.FC<HomeProps> = ({
 
       setLoading(false);
 
+      const nodeId = uuidv4();
+      const currentTime = getCurrentUnixTime();
+      let responseNode: ChatNode = {
+        id: nodeId,
+        message: { id: nodeId, role: 'assistant', content: '', create_time: currentTime },
+        children: [],
+        parentMessageId: chatNode.id,
+      };
+      actions.addMessage(responseNode);
+      updatedConversation = {
+        ...selectedConversation
+      };
+
       const reader = data.getReader();
       const decoder = new TextDecoder();
       let done = false;
@@ -179,35 +204,40 @@ const Home: React.FC<HomeProps> = ({
         const chunkValue = decoder.decode(value);
 
         text += chunkValue;
+        
+        // Update the chatNode in the selectedConversation
+        let updateChatNode: ChatNode = {
+          id: nodeId,
+          message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
+          children: [],
+          parentMessageId: chatNode.id,
+        }
 
+        updatedConversation = {
+          ...updatedConversation,
+          mapping:{
+            ...updatedConversation.mapping,
+            [updateChatNode.id]: updateChatNode
+          }
+        }
+
+        modifiedMessage(updateChatNode)
+        saveConversation({...updatedConversation});
       }
-      const nodeId = uuidv4();
-      const currentTime = getCurrentUnixTime();
-      let responseNode: ChatNode = {
-        id: nodeId,
-        message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
-        children: [],
-        parentMessageId: chatNode.id,
-      };
-      actions.addMessage(responseNode);
+      
     }
 
-    saveConversation(selectedConversation!);
-
-    let updatedConversation: Conversation = {
-      ...selectedConversation!,
-    };
     const updatedConversations: Conversation[] = conversations.map(
       (conversation) => {
         if (conversation.id === selectedConversation!.id) {
-          return updatedConversation;
+          return updatedConversation!;
         }
 
         return conversation;
       },
     );
 
-    if (updatedConversations.length === 0) {
+    if (updatedConversations.length === 0 && updatedConversation!) {
       updatedConversations.push(updatedConversation);
     }
 
@@ -469,7 +499,6 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleEditMessage = (chatNode: ChatNode, messageIndex: number) => {
-    console.log('edit');
     handleSend(chatNode, SendAction.EDIT, messageIndex);
   };
 

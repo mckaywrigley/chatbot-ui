@@ -52,8 +52,7 @@ export const ChatInput: FC<Props> = ({
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const { selectedConversation } =
-    useContext(ConversationContext);
+  const { selectedConversation } = useContext(ConversationContext);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -227,8 +226,9 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-        }`;
+      textareaRef.current.style.overflow = `${
+        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+      }`;
     }
   }, [content]);
 
@@ -254,7 +254,7 @@ export const ChatInput: FC<Props> = ({
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
         {messageIsStreaming && (
           <button
-            className="absolute top-0 left-0 right-0 mb-3 md:mb-0 md:mt-2 mx-auto flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white"
+            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
             onClick={handleStopConversation}
           >
             <IconPlayerStop size={16} /> {t('Stop Generating')}
@@ -263,7 +263,7 @@ export const ChatInput: FC<Props> = ({
 
         {!messageIsStreaming && !conversationIsEmpty && (
           <button
-            className="absolute top-0 left-0 right-0 mb-3 md:mb-0 md:mt-2 mx-auto flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white"
+            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
             onClick={onRegenerate}
           >
             <IconRepeat size={16} /> {t('Regenerate response')}
@@ -278,9 +278,11 @@ export const ChatInput: FC<Props> = ({
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
-              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
-                ? 'auto' : 'hidden'
-                }`,
+              overflow: `${
+                textareaRef.current && textareaRef.current.scrollHeight > 400
+                  ? 'auto'
+                  : 'hidden'
+              }`,
             }}
             placeholder={
               t('Type a message or type "/" to select a prompt...') || ''

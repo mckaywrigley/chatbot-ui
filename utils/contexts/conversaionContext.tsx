@@ -18,6 +18,7 @@ interface CurrentUserContextType {
   currentMessageList: ChatNode[];
   selectedConversation: Conversation | null;
   setSelectedConversation: (conversation: Conversation) => void;
+  modifiedMessage: (updateChatNode: ChatNode) => void;
   actions: Actions;
 }
 
@@ -25,6 +26,7 @@ export const ConversationContext = createContext<CurrentUserContextType>({
   currentMessageList: [],
   selectedConversation: null,
   setSelectedConversation: () => {},
+  modifiedMessage: (updateChatNode: ChatNode) => {},
   actions: {
     clickSwitchNode: (index: number, increment: number) => {},
     setSelectedConversation: (conversation: Conversation) => {},
@@ -46,6 +48,9 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     setSelectedId(selectedConversation?.id || '');
+    if (selectedConversation) {
+      setCurrentMessageList(collectMessagesFromTail(selectedConversation));
+    }
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -62,7 +67,6 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
       increment,
       selectedConversation,
     );
-    setCurrentMessageList([...messageList]);
     setSelectedConversation({
       ...selectedConversation,
       current_node,
@@ -82,7 +86,21 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
       ...selectedConversation!,
       current_node,
     });
-    setCurrentMessageList([...messageList]);
+  };
+
+  const modifiedMessage = (updateChatNode: ChatNode) => {
+    if (selectedConversation) {
+      let nodeId = updateChatNode.id;
+      let { mapping, ...others } = selectedConversation;
+      let updatedConversation: Conversation = {
+        ...others,
+        mapping: {
+          ...mapping,
+          [nodeId]: updateChatNode,
+        },
+      };
+      setSelectedConversation(updatedConversation);
+    }
   };
 
   const popCurrentMessageList = () => {
@@ -108,6 +126,7 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
     currentMessageList,
     selectedConversation,
     setSelectedConversation,
+    modifiedMessage,
     actions,
   };
 
