@@ -4,12 +4,14 @@ import { PromptComponent } from './Prompt';
 
 interface Props {
   prompts: Prompt[];
+  currentPrompt?: Prompt;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
 export const Prompts: FC<Props> = ({
   prompts,
+  currentPrompt,
   onUpdatePrompt,
   onDeletePrompt,
 }) => {
@@ -22,6 +24,7 @@ export const Prompts: FC<Props> = ({
           <PromptComponent
             key={index}
             prompt={prompt}
+            isShowing={ prompt.id === currentPrompt?.id }
             onUpdatePrompt={onUpdatePrompt}
             onDeletePrompt={onDeletePrompt}
           />

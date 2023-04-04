@@ -14,6 +14,7 @@ import { Prompts } from './Prompts';
 
 interface Props {
   prompts: Prompt[];
+  currentPrompt?: Prompt;
   folders: Folder[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -26,6 +27,7 @@ interface Props {
 export const Promptbar: FC<Props> = ({
   folders,
   prompts,
+  currentPrompt,
   onCreateFolder,
   onDeleteFolder,
   onUpdateFolder,
@@ -150,6 +152,7 @@ export const Promptbar: FC<Props> = ({
           >
             <Prompts
               prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
+              currentPrompt={currentPrompt}
               onUpdatePrompt={handleUpdatePrompt}
               onDeletePrompt={handleDeletePrompt}
             />

@@ -68,6 +68,7 @@ const Home: React.FC<HomeProps> = ({
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [currentPrompt, setCurrentPrompt] = useState<Prompt>();
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
   // REFS ----------------------------------------------
@@ -496,8 +497,6 @@ const Home: React.FC<HomeProps> = ({
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
-    const lastPrompt = prompts[prompts.length - 1];
-
     const newPrompt: Prompt = {
       id: uuidv4(),
       name: `Prompt ${prompts.length + 1}`,
@@ -511,6 +510,7 @@ const Home: React.FC<HomeProps> = ({
 
     setPrompts(updatedPrompts);
     savePrompts(updatedPrompts);
+    setCurrentPrompt(newPrompt);
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
@@ -711,6 +711,7 @@ const Home: React.FC<HomeProps> = ({
               <div>
                 <Promptbar
                   prompts={prompts}
+                  currentPrompt={currentPrompt}
                   folders={folders.filter((folder) => folder.type === 'prompt')}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
