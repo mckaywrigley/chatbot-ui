@@ -36,6 +36,8 @@ import Head from 'next/head';
 import { useEffect, useRef, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import toast from 'react-hot-toast';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -135,6 +137,7 @@ const Home: React.FC<HomeProps> = ({
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
+        toast.error(response.statusText);
         return;
       }
 
@@ -178,9 +181,11 @@ const Home: React.FC<HomeProps> = ({
         text += chunkValue;
 
       }
+      const nodeId = uuidv4();
+      const currentTime = getCurrentUnixTime();
       let responseNode: ChatNode = {
-        id: uuidv4(),
-        message: { role: 'assistant', content: text },
+        id: nodeId,
+        message: { id: nodeId, role: 'assistant', content: text, create_time: currentTime },
         children: [],
         parentMessageId: chatNode.id,
       };
@@ -287,11 +292,12 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders }: LatestExportFormat = importData(data);
+    const { history, folders, prompts }: LatestExportFormat = importData(data);
 
     setConversations(history);
     setSelectedConversation(history[history.length - 1]);
     setFolders(folders);
+    setPrompts(prompts);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -364,33 +370,43 @@ const Home: React.FC<HomeProps> = ({
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const createNewConversation = (model?: OpenAIModel) => {
+  const createNewConversation = (lastConversation?: Conversation) => {
     let id = uuidv4();
+    const currentTime = getCurrentUnixTime();
     let conversation: Conversation = {
       id,
       name: `${t('New Conversation')}`,
-      model: model || OpenAIModels[defaultModelId],
+      model: lastConversation?.model || {
+        id: OpenAIModels[defaultModelId].id,
+        name: OpenAIModels[defaultModelId].name,
+        maxLength: OpenAIModels[defaultModelId].maxLength,
+        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+      },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
       mapping: {
         [id]: {
           id,
           message: {
+            id,
             role: 'system',
             content: '',
+            create_time: currentTime
           },
           children: [],
         },
       },
       current_node: id,
+      create_time: currentTime,
+      update_time: currentTime,
     };
     return conversation;
   };
 
   const handleNewConversation = () => {
-    const lastConversation = conversations[conversations.length - 1];
+    const lastConversation = conversations.length ? conversations[conversations.length - 1] : undefined;
     const newConversation: Conversation = createNewConversation(
-      lastConversation?.model,
+      lastConversation
     );
 
     const updatedConversations = [...conversations, newConversation];
@@ -495,8 +511,6 @@ const Home: React.FC<HomeProps> = ({
     setPrompts(updatedPrompts);
     savePrompts(updatedPrompts);
   };
-
-  const handleCreatePromptFolder = (name: string) => {};
 
   // EFFECTS  --------------------------------------------
 
@@ -606,7 +620,7 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
-                  folders={folders}
+                  folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
                   onDeleteFolder={handleDeleteFolder}
@@ -614,7 +628,6 @@ const Home: React.FC<HomeProps> = ({
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
@@ -664,8 +677,7 @@ const Home: React.FC<HomeProps> = ({
               <div>
                 <Promptbar
                   prompts={prompts}
-                  folders={folders}
-                  onToggleSidebar={handleTogglePromptbar}
+                  folders={folders.filter((folder) => folder.type === 'prompt')}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}

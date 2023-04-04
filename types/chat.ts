@@ -1,8 +1,11 @@
+import { ConversationV1, ConversationV4 } from './export';
 import { OpenAIModel } from './openai';
 
 export interface Message {
+  id: string;
   role: Role;
   content: string;
+  create_time: number;
 }
 
 export type Role = 'assistant' | 'user' | 'system';
@@ -29,4 +32,11 @@ export interface Conversation {
   folderId: string | null;
   mapping: Record<string, ChatNode>;
   current_node: string;
+  create_time: number;
+  update_time: number;
 }
+
+export type SupportedConversationFormats =
+  | ConversationV1
+  | ConversationV4
+  | Conversation;

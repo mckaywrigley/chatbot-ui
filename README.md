@@ -2,7 +2,7 @@
 
 Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
 
-See a [demo](https://twitter.com/mckaywrigley/status/1636103188733640704).
+See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
 ![Chatbot UI](./public/screenshot.png)
 
@@ -94,7 +94,9 @@ Create a .env.local file in the root of the repo with your OpenAI API Key:
 OPENAI_API_KEY=YOUR_KEY
 ```
 
-> you can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+> You can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
+
+> Additionally, if you have multiple OpenAI Organizations, you can set `OPENAI_ORGANIZATION` to specify one.
 
 **4. Run App**
 
@@ -110,10 +112,11 @@ You should be able to start chatting.
 
 When deploying the application, the following environment variables can be set:
 
-| Environment Variable | Default value   | Description                                             |
-| -------------------- | --------------- | ------------------------------------------------------- |
-| OPENAI_API_KEY       |                 | The default API key used for authentication with OpenAI |
-| DEFAULT_MODEL        | `gpt-3.5-turbo` | The default model to use on new conversations           |
+| Environment Variable  | Default value                  | Description                                             |
+| --------------------- | ------------------------------ | ------------------------------------------------------- |
+| OPENAI_API_KEY        |                                | The default API key used for authentication with OpenAI |
+| DEFAULT_MODEL         | `gpt-3.5-turbo`                | The default model to use on new conversations           |
+| DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The defaut system prompt to use on new conversations    |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).

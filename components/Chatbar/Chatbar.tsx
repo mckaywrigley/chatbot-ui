@@ -3,7 +3,6 @@ import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import {
-  IconArrowBarLeft,
   IconFolderPlus,
   IconMessagesOff,
   IconPlus,
@@ -30,7 +29,6 @@ interface Props {
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onToggleSidebar: () => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -55,7 +53,6 @@ export const Chatbar: FC<Props> = ({
   onToggleLightMode,
   onSelectConversation,
   onDeleteConversation,
-  onToggleSidebar,
   onUpdateConversation,
   onApiKeyChange,
   onClearConversations,
@@ -145,12 +142,6 @@ export const Chatbar: FC<Props> = ({
         >
           <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarLeft
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {conversations.length > 1 && (
@@ -169,7 +160,7 @@ export const Chatbar: FC<Props> = ({
               conversations={filteredConversations.filter(
                 (conversation) => conversation.folderId,
               )}
-              folders={folders.filter((folder) => folder.type === 'chat')}
+              folders={folders}
               onDeleteFolder={onDeleteFolder}
               onUpdateFolder={onUpdateFolder}
               selectedConversation={selectedConversation}
@@ -183,7 +174,7 @@ export const Chatbar: FC<Props> = ({
 
         {conversations.length > 0 ? (
           <div
-            className="h-full pt-2"
+            className="pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}

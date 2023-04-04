@@ -7,6 +7,20 @@ import {
 } from 'eventsource-parser';
 import { OPENAI_API_HOST } from '../app/const';
 
+export class OpenAIError extends Error {
+  type: string;
+  param: string;
+  code: string;
+
+  constructor(message: string, type: string, param: string, code: string) {
+    super(message);
+    this.name = 'OpenAIError';
+    this.type = type;
+    this.param = param;
+    this.code = code;
+  }
+}
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
@@ -17,6 +31,9 @@ export const OpenAIStream = async (
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+      ...(process.env.OPENAI_ORGANIZATION && {
+        'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
+      }),
     },
     method: 'POST',
     body: JSON.stringify({
@@ -34,13 +51,26 @@ export const OpenAIStream = async (
     }),
   });
 
-  if (res.status !== 200) {
-    const statusText = res.statusText;
-    throw new Error(`OpenAI API returned an error: ${statusText}`);
-  }
-
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
+
+  if (res.status !== 200) {
+    const result = await res.json();
+    if (result.error) {
+      throw new OpenAIError(
+        result.error.message,
+        result.error.type,
+        result.error.param,
+        result.error.code,
+      );
+    } else {
+      throw new Error(
+        `OpenAI API returned an error: ${
+          decoder.decode(result?.value) || result.statusText
+        }`,
+      );
+    }
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
