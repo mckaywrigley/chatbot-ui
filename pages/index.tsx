@@ -201,6 +201,7 @@ const Home: React.FC<HomeProps> = ({
           children: [],
           parentMessageId: chatNode.id,
         };
+        updatedConversation.current_node = responseNode.id;
         actions.addMessage(responseNode);
         
         const reader = data.getReader();
@@ -247,7 +248,8 @@ const Home: React.FC<HomeProps> = ({
               mapping:{
                 ...updatedConversation?.mapping,
                 [updateChatNode.id]: updateChatNode
-              }
+              },
+              current_node: updateChatNode.id
             }
 
             modifiedMessage(updateChatNode)
@@ -300,7 +302,8 @@ const Home: React.FC<HomeProps> = ({
           mapping:{
             ...updatedConversation?.mapping,
             [updateChatNode.id]: updateChatNode
-          }
+          },
+          current_node: updateChatNode.id
         }
 
         setSelectedConversation(updatedConversation);
