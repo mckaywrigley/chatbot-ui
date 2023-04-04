@@ -14,6 +14,9 @@ interface Props {
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
+/**
+ * TODO setIsRenaming does not set to true yet
+ */
 export const PromptComponent: FC<Props> = ({
   prompt,
   onUpdatePrompt,
