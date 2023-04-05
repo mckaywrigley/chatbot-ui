@@ -1,5 +1,5 @@
 import { ChatBody, Message } from '@/types/chat';
-import { GoogleSource } from '@/types/google';
+import { GoogleBody, GoogleSource } from '@/types/google';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 import { OPENAI_API_HOST } from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
@@ -11,14 +11,17 @@ import { v4 as uuidv4 } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
-    const { messages, key, model } = req.body as ChatBody;
+    const { messages, key, model, googleAPIKey, googleCSEId } =
+      req.body as GoogleBody;
 
     const userMessage = messages[messages.length - 1];
 
     const googleRes = await fetch(
       `https://customsearch.googleapis.com/customsearch/v1?key=${
-        process.env.GOOGLE_API_KEY
-      }&cx=${process.env.GOOGLE_CSE_ID}&q=${userMessage.content.trim()}&num=5`,
+        googleAPIKey ? googleAPIKey : process.env.GOOGLE_API_KEY
+      }&cx=${
+        googleCSEId ? googleCSEId : process.env.GOOGLE_CSE_ID
+      }&q=${userMessage.content.trim()}&num=5`,
     );
 
     const googleData = await googleRes.json();
@@ -35,7 +38,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const sourcesWithText: any = await Promise.all(
       sources.map(async (source) => {
         try {
-          const res = await fetch(source.link);
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), 5000),
+          );
+
+          const res = (await Promise.race([
+            fetch(source.link),
+            timeoutPromise,
+          ])) as any;
+
+          // if (res) {
           const html = await res.text();
 
           const virtualConsole = new jsdom.VirtualConsole();
@@ -58,9 +70,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
               text: sourceText.slice(0, 2000),
             } as GoogleSource;
           }
+          // }
 
           return null;
         } catch (error) {
+          console.error(error);
           return null;
         }
       }),
@@ -115,7 +129,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         messages: [
           {
             role: 'system',
-            content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link), etc, as you use them.`,
+            content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link), etc, as you use them. Maximum 4 sentences.`,
           },
           answerMessage,
         ],
