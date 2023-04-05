@@ -1,12 +1,12 @@
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
-import { Folder } from '@/types/folder';
+import { FolderInterface } from '@/types/folder';
 import { PluginKey } from '@/types/plugin';
 import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
-import { ChatFolders } from '../Folders/Chat/ChatFolders';
+import { ChatFolders } from './ChatFolders';
 import { Search } from '../Search/Search';
 import { ChatbarSettings } from './ChatbarSettings';
 import { Conversations } from './Conversations';
@@ -20,7 +20,7 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   pluginKeys: PluginKey[];
   serverSidePluginKeysSet: boolean;
-  folders: Folder[];
+  folders: FolderInterface[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onUpdateFolder: (folderId: string, name: string) => void;

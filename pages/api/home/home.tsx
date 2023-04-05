@@ -6,7 +6,7 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
-import { Folder, FolderType } from '@/types/folder';
+import { FolderType, FolderInterface } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
@@ -431,7 +431,7 @@ const Home: React.FC<HomeProps> = ({
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
-    const newFolder: Folder = {
+    const newFolder: FolderInterface = {
       id: uuidv4(),
       name,
       type,

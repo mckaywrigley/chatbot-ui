@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Prompt } from '@/types/prompt';
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { PromptFolders } from '../Folders/Prompt/PromptFolders';
+import { PromptFolders } from './components/PromptFolders';
 import { Search } from '../Search/Search';
 import { PromptbarSettings } from './components/PromptbarSettings';
 import { Prompts } from './components/Prompts';
@@ -22,8 +22,6 @@ const Promptbar = () => {
     state: { prompts, folders, defaultModelId },
     dispatch: homeDispatch,
     handleCreateFolder,
-    handleDeleteFolder,
-    handleUpdateFolder,
   } = useContext(HomeContext);
 
   const promptBarContextValue = useCreateReducer<PromptbarInitialState>({
@@ -78,16 +76,6 @@ const Promptbar = () => {
     savePrompts(updatedPrompts);
   };
 
-  const handleUpdate = (prompt: Prompt) => {
-    handleUpdatePrompt(prompt);
-    promptDispatch({ field: 'searchTerm', value: '' });
-  };
-
-  const handleDelete = (prompt: Prompt) => {
-    handleDeletePrompt(prompt);
-    promptDispatch({ field: 'searchTerm', value: '' });
-  };
-
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
       const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
@@ -116,6 +104,20 @@ const Promptbar = () => {
   };
 
   useEffect(() => {
+    console.log(
+      'searchTerm',
+      searchTerm,
+      prompts,
+      prompts.filter((prompt) => {
+        const searchable =
+          prompt.name.toLowerCase() +
+          ' ' +
+          prompt.description.toLowerCase() +
+          ' ' +
+          prompt.content.toLowerCase();
+        return searchable.includes(searchTerm.toLowerCase());
+      }),
+    );
     if (searchTerm) {
       promptDispatch({
         field: 'filteredPrompts',
@@ -177,15 +179,7 @@ const Promptbar = () => {
         <div className="flex-grow overflow-auto">
           {folders.length > 0 && (
             <div className="flex border-b border-white/20 pb-2">
-              <PromptFolders
-                searchTerm={searchTerm}
-                prompts={filteredPrompts}
-                folders={folders}
-                onUpdateFolder={handleUpdateFolder}
-                onDeleteFolder={handleDeleteFolder}
-                onDeletePrompt={handleDelete}
-                onUpdatePrompt={handleUpdate}
-              />
+              <PromptFolders />
             </div>
           )}
 
@@ -199,8 +193,6 @@ const Promptbar = () => {
             >
               <Prompts
                 prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
-                onUpdatePrompt={handleUpdate}
-                onDeletePrompt={handleDelete}
               />
             </div>
           ) : (

@@ -5,24 +5,37 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { DragEvent, FC, useEffect, useState } from 'react';
+import { DragEvent, useEffect, useState, useContext } from 'react';
 import { PromptModal } from './PromptModal';
+
+import PromptbarContext from '../PromptBar.context';
 
 interface Props {
   prompt: Prompt;
-  onUpdatePrompt: (prompt: Prompt) => void;
-  onDeletePrompt: (prompt: Prompt) => void;
 }
 
-export const PromptComponent: FC<Props> = ({
-  prompt,
-  onUpdatePrompt,
-  onDeletePrompt,
-}) => {
+export const PromptComponent = ({ prompt }: Props) => {
+  const {
+    state: {},
+    dispatch: promptDispatch,
+    handleUpdatePrompt,
+    handleDeletePrompt,
+  } = useContext(PromptbarContext);
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
+
+  const handleUpdate = (prompt: Prompt) => {
+    handleUpdatePrompt(prompt);
+    promptDispatch({ field: 'searchTerm', value: '' });
+  };
+
+  const handleDelete = (prompt: Prompt) => {
+    handleDeletePrompt(prompt);
+    promptDispatch({ field: 'searchTerm', value: '' });
+  };
 
   const handleDragStart = (e: DragEvent<HTMLButtonElement>, prompt: Prompt) => {
     if (e.dataTransfer) {
@@ -69,7 +82,7 @@ export const PromptComponent: FC<Props> = ({
               e.stopPropagation();
 
               if (isDeleting) {
-                onDeletePrompt(prompt);
+                handleDelete(prompt);
               }
 
               setIsDeleting(false);
@@ -108,7 +121,7 @@ export const PromptComponent: FC<Props> = ({
         <PromptModal
           prompt={prompt}
           onClose={() => setShowModal(false)}
-          onUpdatePrompt={onUpdatePrompt}
+          onUpdatePrompt={handleUpdate}
         />
       )}
     </div>

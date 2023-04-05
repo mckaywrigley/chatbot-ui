@@ -1,6 +1,6 @@
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { ErrorMessage } from '@/types/error';
-import { Folder } from '@/types/folder';
+import { FolderInterface } from '@/types/folder';
 import { Message, Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
 import { PluginKey } from '@/types/plugin';
@@ -13,7 +13,7 @@ export interface HomeInitialState {
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   models: OpenAIModel[];
-  folders: Folder[];
+  folders: FolderInterface[];
   conversations: Conversation[];
   selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
@@ -21,7 +21,7 @@ export interface HomeInitialState {
   showSidebar: boolean;
   showPromptbar: boolean;
 
-  currentFolder: Folder | undefined;
+  currentFolder: FolderInterface | undefined;
   messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
