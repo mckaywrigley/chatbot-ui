@@ -23,7 +23,6 @@ jobs:
 
       - name: Move the binaries in the correct folder
         run: |
-          cd ../../
           mkdir ./src-tauri/binaries/
           cp -r ./the-ai-box/cpu/ ./src-tauri/binaries/
 
