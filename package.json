@@ -26,6 +26,7 @@
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^12.2.0",
     "react-markdown": "^8.0.5",
+    "react-progressbar-fancy": "^1.1.4",
     "react-spinners": "^0.13.8",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-mathjax": "^4.0.2",

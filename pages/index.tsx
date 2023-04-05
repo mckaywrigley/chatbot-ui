@@ -32,14 +32,24 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
-import { PacmanLoader } from "react-spinners";
+import { ProgressBar } from "react-progressbar-fancy";
+
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
   defaultModelId: OpenAIModelID;
 }
+
+const FeatureCard = ({ title, description }: { title: string; description: string; }) => {
+  return (
+    <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
+      <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>{title}</h3>
+      <p style={{ fontSize: '1.2rem', margin: '0' }}>{description}</p>
+    </div>
+  );
+};
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
@@ -70,7 +80,10 @@ const Home: React.FC<HomeProps> = ({
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
+  // PREM CUSTOM ----------------------------------------------
   const [apisReady, setApisReady] = useState(false);
+  const [percentage, setPercentage] = useState(0);
+  const [showChat, setShowChat] = useState(false);
 
   // REFS ----------------------------------------------
 
@@ -311,6 +324,10 @@ const Home: React.FC<HomeProps> = ({
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
     saveConversation(conversation);
+  };
+
+  const handleShowChat = () => {
+    setShowChat(true);
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
@@ -566,7 +583,8 @@ const Home: React.FC<HomeProps> = ({
       } else {
         try {
           const data = await response.json();
-          console.log("APIs are not ready yet!");
+          console.log(`APIs are not ready yet! Amount completed ${data.percentate}%`);
+          setPercentage(data.percentage);
         } catch (e) { }
         setTimeout(checkApisStatus, 3000); // Call the function again after 3 seconds
       }
@@ -585,11 +603,9 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const apiKey = localStorage.getItem('apiKey');
-    if (apiKey) {
+    if (apiKey && apisReady) {
       setApiKey(apiKey);
       fetchModels(apiKey);
-    } else if (serverSideApiKeyIsSet) {
-      fetchModels('');
     }
 
     if (window.innerWidth < 640) {
@@ -657,7 +673,7 @@ const Home: React.FC<HomeProps> = ({
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {apisReady && selectedConversation ? (
+      {showChat && selectedConversation ? (
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
@@ -763,11 +779,30 @@ const Home: React.FC<HomeProps> = ({
             )}
           </div>
         </main>
-      ) : <main>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <PacmanLoader color="#36d7b7" />
-        </div>
-      </main>}
+      ) : (<main>
+        {apisReady ?
+          // Dashboard with some info and CTA
+          (<div style={{ backgroundColor: '#333', color: '#fff', padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div style={{ maxWidth: '50%', textAlign: 'center' }}>
+              <h1 style={{ fontSize: '3rem', margin: '0' }}>Cool Title</h1>
+              <h2 style={{ fontSize: '2rem', margin: '0 0 1rem' }}>Awesome Subtitle</h2>
+              <p style={{ fontSize: '1.2rem' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget risus velit. Donec euismod, lorem sit amet eleifend convallis, sapien mauris consequat nibh, eget tincidunt enim ipsum a lorem.</p>
+              <FeatureCard title="Feature 1" description="Description of feature 1" />
+              <FeatureCard title="Feature 2" description="Description of feature 2" />
+              <FeatureCard title="Feature 3" description="Description of feature 3" />
+              <button style={{ backgroundColor: '#fff', color: '#333', padding: '0.5rem 1rem', fontSize: '1.2rem', borderRadius: '0.5rem', border: 'none' }} onClick={handleShowChat}>Start Chatting</button>
+            </div>
+          </div>) :
+          // Progressbar downloading the model
+          (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div style={{ maxWidth: '50%', width: '100%' }}>
+              <p style={{ color: '#fff', justifyContent: 'center', display: 'flex' }}> We are downloading the model on your computer. Be sure to have enough space 4.5+ GB </p>
+              <ProgressBar score={percentage} />
+            </div>
+          </div>
+          )}
+      </main >)
+      }
     </>
   );
 };
