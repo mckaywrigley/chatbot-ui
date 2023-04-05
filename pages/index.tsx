@@ -570,7 +570,7 @@ const Home: React.FC<HomeProps> = ({
     async function checkApisStatus() {
       console.log("Waiting for APIs to be ready...");
 
-      const response = await fetch('http://localhost:8001/', {
+      const response = await fetch('http://localhost:8001/status/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

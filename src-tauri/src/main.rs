@@ -9,7 +9,7 @@ fn launch_model_apis() {
   let binary_path = if cfg!(windows) {
       "./binaries/python-binary.exe"
   } else {
-      "./binaries/cpu/dist/apis/apis"
+      "./binaries/dist/apis/apis"
   };
   let _ = Command::new(binary_path).spawn();
 }
@@ -29,7 +29,7 @@ fn wait_for_api(port: u16) {
 fn main() {
   launch_model_apis();
 
-  wait_for_api(8000);
+  wait_for_api(8001);
 
   tauri::Builder::default()
     .run(tauri::generate_context!())
