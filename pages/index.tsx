@@ -603,10 +603,13 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const apiKey = localStorage.getItem('apiKey');
-    if (apiKey && apisReady) {
+    if (apiKey) {
       setApiKey(apiKey);
       fetchModels(apiKey);
+    } else if (serverSideApiKeyIsSet) {
+      fetchModels('');
     }
+
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
