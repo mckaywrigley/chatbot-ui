@@ -37,7 +37,7 @@ jobs:
       - name: Create pull request
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPOTKN }}
           commit-message: Update fork with upstream changes
           title: Update fork with upstream changes
           body: |
