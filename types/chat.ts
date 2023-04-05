@@ -3,8 +3,6 @@ import { OpenAIModel } from './openai';
 
 export interface Message extends SendMessage {
   id: string;
-  // role: Role;
-  // content: string;
   create_time: number;
 }
 
