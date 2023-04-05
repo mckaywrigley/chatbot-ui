@@ -308,6 +308,7 @@ export const ChatInput: FC<Props> = ({
                   : 'hidden'
               }`,
             }}
+            dir="auto"
             placeholder={
               t('Type a message or type "/" to select a prompt...') || ''
             }

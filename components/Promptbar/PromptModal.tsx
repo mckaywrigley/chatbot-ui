@@ -68,6 +68,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               {t('Name')}
             </div>
             <input
+              dir="auto"
               ref={nameInputRef}
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               placeholder={t('A name for your prompt.') || ''}
@@ -79,6 +80,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               {t('Description')}
             </div>
             <textarea
+              dir="auto"
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
               placeholder={t('A description for your prompt.') || ''}
@@ -91,6 +93,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               {t('Prompt')}
             </div>
             <textarea
+              dir="auto"
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
               style={{ resize: 'none' }}
               placeholder={

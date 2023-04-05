@@ -77,22 +77,24 @@ export const ChatMessage: FC<Props> = memo(
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
         }`}
+        dir="auto"
         style={{ overflowWrap: 'anywhere' }}
       >
-        <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+        <div dir="auto" className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
             {message.role === 'assistant' ? <IconRobot size={30}/> : <IconUser size={30}/>}
           </div>
 
-          <div className="prose mt-[-2px] w-full dark:prose-invert">
+          <div dir="auto" className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
-              <div className="flex w-full">
+              <div dir="auto" className="flex w-full">
                 {isEditing ? (
                   <div className="flex w-full flex-col">
                     <textarea
                       ref={textareaRef}
                       className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541]"
                       value={messageContent}
+                      dir="auto"
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
                       onCompositionStart={() => setIsTyping(true)}
@@ -127,7 +129,7 @@ export const ChatMessage: FC<Props> = memo(
                     </div>
                   </div>
                 ) : (
-                  <div className="prose whitespace-pre-wrap dark:prose-invert">
+                  <div dir="auto" className="prose whitespace-pre-wrap dark:prose-invert">
                     {message.content}
                   </div>
                 )}

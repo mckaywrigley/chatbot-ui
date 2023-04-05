@@ -71,6 +71,7 @@ export const ConversationComponent: FC<Props> = ({
         <div className="flex w-full items-center gap-3 bg-[#343541]/90 p-3 rounded-lg">
           <IconMessage size={18} />
           <input
+            dir="auto"
             className="mr-12 flex-1 overflow-hidden overflow-ellipsis border-neutral-400 bg-transparent text-left text-[12.5px] leading-3 text-white outline-none focus:border-neutral-100"
             type="text"
             value={renameValue}
@@ -93,6 +94,7 @@ export const ConversationComponent: FC<Props> = ({
         >
           <IconMessage size={18} />
           <div
+            dir="auto"
             className={`relative max-h-5 flex-1 overflow-hidden text-ellipsis whitespace-nowrap break-all text-left text-[12.5px] leading-3 ${
               selectedConversation.id === conversation.id ? 'pr-12' : 'pr-1'
             }`}
