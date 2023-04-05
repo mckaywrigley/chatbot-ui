@@ -5,7 +5,6 @@ import { FolderType } from '@/types/folder';
 import { SupportedExportFormats } from '@/types/export';
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
-import { Prompt } from '@/types/prompt';
 
 export interface HomeContextProps {
   state: HomeInitialState;
@@ -16,9 +15,6 @@ export interface HomeContextProps {
   handleCreateFolder: (name: string, type: FolderType) => void;
   handleDeleteFolder: (folderId: string) => void;
   handleUpdateFolder: (folderId: string, name: string) => void;
-  handleCreatePrompt: () => void;
-  handleDeletePrompt: (prompt: Prompt) => void;
-  handleUpdatePrompt: (prompt: Prompt) => void;
   handleSelectConversation: (conversation: Conversation) => void;
   handleDeleteConversation: (conversation: Conversation) => void;
   handleUpdateConversation: (

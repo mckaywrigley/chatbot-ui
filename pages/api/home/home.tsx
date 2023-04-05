@@ -1,18 +1,13 @@
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
-import { Promptbar } from '@/components/Promptbar/Promptbar';
+import Promptbar from '@/components/Promptbar';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
-import {
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-  fallbackModelID,
-} from '@/types/openai';
+import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
@@ -34,7 +29,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -646,26 +641,6 @@ const Home: React.FC<HomeProps> = ({
     savePrompts(updatedPrompts);
   };
 
-  const handleUpdatePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.map((p) => {
-      if (p.id === prompt.id) {
-        return prompt;
-      }
-
-      return p;
-    });
-    dispatch({ field: 'prompts', value: updatedPrompts });
-
-    savePrompts(updatedPrompts);
-  };
-
-  const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
-
-    dispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(updatedPrompts);
-  };
-
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -686,6 +661,10 @@ const Home: React.FC<HomeProps> = ({
       fetchModels(apiKey);
     }
   }, [apiKey]);
+
+  useEffect(() => {
+    dispatch({ field: 'defaultModelId', value: defaultModelId });
+  }, [defaultModelId]);
 
   // ON LOAD --------------------------------------------
 
@@ -785,9 +764,6 @@ const Home: React.FC<HomeProps> = ({
         handleCreateFolder,
         handleDeleteFolder,
         handleUpdateFolder,
-        handleCreatePrompt,
-        handleDeletePrompt,
-        handleUpdatePrompt,
         handleSelectConversation,
         handleDeleteConversation,
         handleUpdateConversation,

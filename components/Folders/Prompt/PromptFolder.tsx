@@ -1,4 +1,4 @@
-import { PromptComponent } from '@/components/Promptbar/Prompt';
+import { PromptComponent } from '@/components/Promptbar/components/Prompt';
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 import {
