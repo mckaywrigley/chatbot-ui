@@ -1,49 +1,48 @@
+import { useEffect, useState, useContext } from 'react';
+
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
-import {
-  IconFolderPlus,
-  IconMistOff,
-  IconPlus,
-} from '@tabler/icons-react';
-import { FC, useEffect, useState } from 'react';
+import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { PromptFolders } from '../Folders/Prompt/PromptFolders';
 import { Search } from '../Sidebar/Search';
 import { PromptbarSettings } from './PromptbarSettings';
 import { Prompts } from './Prompts';
 
+import HomeContext from '@/pages/api/home/home.context';
+
 interface Props {
   prompts: Prompt[];
   folders: Folder[];
-  onCreateFolder: (name: string) => void;
-  onDeleteFolder: (folderId: string) => void;
-  onUpdateFolder: (folderId: string, name: string) => void;
+
   onCreatePrompt: () => void;
   onUpdatePrompt: (prompt: Prompt) => void;
   onDeletePrompt: (prompt: Prompt) => void;
 }
 
-export const Promptbar: FC<Props> = ({
-  folders,
-  prompts,
-  onCreateFolder,
-  onDeleteFolder,
-  onUpdateFolder,
-  onCreatePrompt,
-  onUpdatePrompt,
-  onDeletePrompt,
-}) => {
+export const Promptbar = () => {
   const { t } = useTranslation('promptbar');
+
+  const {
+    state: { prompts, folders },
+    handleCreateFolder,
+    handleDeleteFolder,
+    handleUpdateFolder,
+    handleCreatePrompt,
+    handleDeletePrompt,
+    handleUpdatePrompt,
+  } = useContext(HomeContext);
+
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>(prompts);
 
-  const handleUpdatePrompt = (prompt: Prompt) => {
-    onUpdatePrompt(prompt);
+  const handleUpdate = (prompt: Prompt) => {
+    handleUpdatePrompt(prompt);
     setSearchTerm('');
   };
 
-  const handleDeletePrompt = (prompt: Prompt) => {
-    onDeletePrompt(prompt);
+  const handleDelete = (prompt: Prompt) => {
+    handleDeletePrompt(prompt);
     setSearchTerm('');
   };
 
@@ -56,7 +55,7 @@ export const Promptbar: FC<Props> = ({
         folderId: e.target.dataset.folderId,
       };
 
-      onUpdatePrompt(updatedPrompt);
+      handleUpdatePrompt(updatedPrompt);
 
       e.target.style.background = 'none';
     }
@@ -100,7 +99,7 @@ export const Promptbar: FC<Props> = ({
         <button
           className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => {
-            onCreatePrompt();
+            handleCreatePrompt();
             setSearchTerm('');
           }}
         >
@@ -109,8 +108,8 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+          onClick={() => handleCreateFolder(t('New folder'), 'prompt')}
         >
           <IconFolderPlus size={16} />
         </button>
@@ -126,16 +125,15 @@ export const Promptbar: FC<Props> = ({
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
+          <div className="flex border-b border-white/20 pb-2">
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
               folders={folders}
-              onUpdateFolder={onUpdateFolder}
-              onDeleteFolder={onDeleteFolder}
-              // prompt props
-              onDeletePrompt={handleDeletePrompt}
-              onUpdatePrompt={handleUpdatePrompt}
+              onUpdateFolder={handleUpdateFolder}
+              onDeleteFolder={handleDeleteFolder}
+              onDeletePrompt={handleDelete}
+              onUpdatePrompt={handleUpdate}
             />
           </div>
         )}
@@ -150,12 +148,12 @@ export const Promptbar: FC<Props> = ({
           >
             <Prompts
               prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
-              onUpdatePrompt={handleUpdatePrompt}
-              onDeletePrompt={handleDeletePrompt}
+              onUpdatePrompt={handleUpdate}
+              onDeletePrompt={handleDelete}
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
+          <div className="mt-8 select-none text-center text-white opacity-50">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
               {t('No prompts.')}

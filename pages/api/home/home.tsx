@@ -34,7 +34,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -777,7 +777,26 @@ const Home: React.FC<HomeProps> = ({
   }, [serverSideApiKeyIsSet]);
 
   return (
-    <>
+    <HomeContext.Provider
+      value={{
+        ...contextValue,
+        handleNewConversation,
+        handleLightMode,
+        handleCreateFolder,
+        handleDeleteFolder,
+        handleUpdateFolder,
+        handleCreatePrompt,
+        handleDeletePrompt,
+        handleUpdatePrompt,
+        handleSelectConversation,
+        handleDeleteConversation,
+        handleUpdateConversation,
+        handleApiKeyChange,
+        handleClearConversations,
+        handleExportData,
+        handleImportConversations,
+      }}
+    >
       <Head>
         <title>Chatbot UI</title>
         <meta name="description" content="ChatGPT but better." />
@@ -867,16 +886,7 @@ const Home: React.FC<HomeProps> = ({
 
             {showPromptbar ? (
               <div>
-                <Promptbar
-                  prompts={prompts}
-                  folders={folders.filter((folder) => folder.type === 'prompt')}
-                  onCreatePrompt={handleCreatePrompt}
-                  onUpdatePrompt={handleUpdatePrompt}
-                  onDeletePrompt={handleDeletePrompt}
-                  onCreateFolder={(name) => handleCreateFolder(name, 'prompt')}
-                  onDeleteFolder={handleDeleteFolder}
-                  onUpdateFolder={handleUpdateFolder}
-                />
+                <Promptbar />
                 <button
                   className="fixed top-5 right-[270px] z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
                   onClick={handleTogglePromptbar}
@@ -899,7 +909,7 @@ const Home: React.FC<HomeProps> = ({
           </div>
         </main>
       )}
-    </>
+    </HomeContext.Provider>
   );
 };
 export default Home;
