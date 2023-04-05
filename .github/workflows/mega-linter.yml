@@ -1,0 +1,46 @@
+---
+# MegaLinter GitHub Action configuration file
+# More info at https://megalinter.io
+name: MegaLinter
+
+on:
+  # Trigger mega-linter at every push. Action will also be visible from Pull Requests to main
+  push: # Comment this line to trigger action only on pull-requests (not recommended if you don't pay for GH Actions)
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      # Git Checkout
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}
+
+      # MegaLinter
+      - name: MegaLinter
+        id: ml
+        # cupcake is the recommended flavour based on current files in the repository
+        uses: oxsecurity/megalinter/flavors/cupcake@v6
+        env:
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'pull_request' }} # Validates all source when its a PR, else just the git diff with main.
+          PAT: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: ${{ success() }} || ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
