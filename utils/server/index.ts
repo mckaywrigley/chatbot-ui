@@ -33,7 +33,7 @@ export const OpenAIStream = async (
       Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
       ...(process.env.OPENAI_ORGANIZATION && {
         'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-      })
+      }),
     },
     method: 'POST',
     body: JSON.stringify({

@@ -1,12 +1,12 @@
 {
-  "New prompt": "New prompt",
-  "New folder": "New folder",
-  "No prompts.": "No prompts.",
-  "Search prompts...": "Search prompts...",
-  "Name": "Name",
-  "Description": "Description",
-  "A description for your prompt.": "A description for your prompt.",
-  "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}",
+  "New prompt": "פקודת מכונה חדשה",
+  "New folder": "תיקיה חדשה",
+  "No prompts.": "לא נמצאו פקודות מכונות",
+  "Search prompts...": "חיפוש פקודות...",
+  "Name": "שם",
+  "Description": "תיאור",
+  "A description for your prompt.": "תיאור שורת הפקודה למכונה",
+  "Prompt": "פקודה",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "תיאור הפקודה. השתמש {{}} להגדרת משתנים. לדוגמא {{שם משתנה}} הוא {{תואר}} {{שם עצם}}",
   "Save": "Save"
 }
