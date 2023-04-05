@@ -6,8 +6,12 @@ name: Docker
 # documentation.
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["Run Unit Tests"]
+    branches:
+      - main
+    types:
+      - completed
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -15,11 +19,11 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: github.repository == 'mckaywrigley/chatbot-ui'
     permissions:
       contents: read
       packages: write
@@ -30,6 +34,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # Tag format: YYYYMMDD
+      - name: Set date tag
+        run: |
+          DATE_TAG="$(date '+%Y%m%d')"
+          echo "DATE_TAG=${DATE_TAG}" >> $GITHUB_ENV
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -56,12 +66,15 @@ jobs:
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
-        id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
