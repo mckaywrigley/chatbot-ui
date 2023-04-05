@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  mac-m1:
+  pacakge:
     runs-on: ubuntu-latest
     container:
       image: python:10
