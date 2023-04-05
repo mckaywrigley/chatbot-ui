@@ -14,10 +14,10 @@ jobs:
 
       - name: Install node and npm
         run: |
-          apt-get update
-          apt-get install -y curl git binutils build-essential
+          sudo apt-get update
+          sudo apt-get install -y curl git binutils build-essential
           curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-          apt-get install -y nodejs
+          sudo apt-get install -y nodejs
 
       - name: Clone the-ai-box repo
         run: git clone https://github.com/PremAI-Org/the-ai-box.git
