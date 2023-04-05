@@ -116,7 +116,9 @@ When deploying the application, the following environment variables can be set:
 | --------------------- | ------------------------------ | ------------------------------------------------------- |
 | OPENAI_API_KEY        |                                | The default API key used for authentication with OpenAI |
 | DEFAULT_MODEL         | `gpt-3.5-turbo`                | The default model to use on new conversations           |
-| DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The defaut system prompt to use on new conversations    |
+| DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations   |
+| GOOGLE_API_KEY        |                                | See [Custom Search JSON API documentation][GCSE]        |
+| GOOGLE_CSE_ID         |                                | See [Custom Search JSON API documentation][GCSE]        |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
@@ -124,3 +126,5 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 ## Contact
 
 If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+
+[GCSE]: https://developers.google.com/custom-search/v1/overview
