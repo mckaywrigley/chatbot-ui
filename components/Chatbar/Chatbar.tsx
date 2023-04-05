@@ -10,6 +10,7 @@ import { ChatFolders } from '../Folders/Chat/ChatFolders';
 import { Search } from '../Sidebar/Search';
 import { ChatbarSettings } from './ChatbarSettings';
 import { Conversations } from './Conversations';
+import { collectMessagesFromTail } from '@/utils/app/chatRoomUtils';
 
 interface Props {
   loading: boolean;
@@ -104,6 +105,12 @@ export const Chatbar: FC<Props> = ({
     e.target.style.background = 'none';
   };
 
+  const getContent = (conversation: Conversation) => {
+    return collectMessagesFromTail(conversation)
+      .map((message) => message.message.content)
+      .join('');
+  };
+
   useEffect(() => {
     if (searchTerm) {
       setFilteredConversations(
@@ -111,7 +118,7 @@ export const Chatbar: FC<Props> = ({
           const searchable =
             conversation.name.toLocaleLowerCase() +
             ' ' +
-            conversation.messages.map((message) => message.content).join(' ');
+            getContent(conversation);
           return searchable.toLowerCase().includes(searchTerm.toLowerCase());
         }),
       );

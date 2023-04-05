@@ -1,11 +1,13 @@
-import { Message } from '@/types/chat';
+import { ChatBody, Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 import { OPENAI_API_HOST } from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { v4 as uuidv4 } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
@@ -106,7 +108,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
-    const answerMessage: Message = { role: 'user', content: answerPrompt };
+    const answerMessage: Message = {
+      id: uuidv4(),
+      role: 'user',
+      content: answerPrompt,
+      create_time: getCurrentUnixTime(),
+    };
 
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
       headers: {

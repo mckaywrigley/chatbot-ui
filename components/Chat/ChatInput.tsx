@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { ChatNode } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
@@ -10,6 +10,7 @@ import {
   IconSend,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import {
   FC,
   KeyboardEvent,
@@ -18,17 +19,21 @@ import {
   useEffect,
   useRef,
   useState,
+  useContext,
 } from 'react';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface Props {
   messageIsStreaming: boolean;
   model: OpenAIModel;
   conversationIsEmpty: boolean;
+  chatNodes: ChatNode[];
   prompts: Prompt[];
-  onSend: (message: Message, plugin: Plugin | null) => void;
+  onSend: (chatNode: ChatNode, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -38,6 +43,7 @@ export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
   conversationIsEmpty,
+  chatNodes,
   prompts,
   onSend,
   onRegenerate,
@@ -55,6 +61,8 @@ export const ChatInput: FC<Props> = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+
+  const { selectedConversation } = useContext(ConversationContext);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -90,7 +98,13 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    const nodeId = uuidv4();
+    onSend({
+      id: nodeId,
+      message: { id: nodeId, role: 'user', content, create_time: getCurrentUnixTime() },
+      parentMessageId: selectedConversation?.current_node,
+      children: [],
+    }, plugin);
     setContent('');
     setPlugin(null);
 
