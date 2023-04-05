@@ -107,6 +107,7 @@ export const VariableModal: FC<Props> = ({
               value={variable.value}
               onChange={(e) => handleChange(index, e.target.value)}
               rows={3}
+              dir="auto"
             />
           </div>
         ))}

@@ -211,6 +211,7 @@ export const SystemPrompt: FC<Props> = ({
         }
         value={t(value) || ''}
         rows={1}
+        dir="auto"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
