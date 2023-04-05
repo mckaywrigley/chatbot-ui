@@ -10,7 +10,7 @@ import {
 } from 'eventsource-parser';
 
 import { is_llama } from '@/types/openai';
-import { LLAMA_API_HOST } from '../app/const';
+import { LLAMA_API_HOST, LLAMA_STREAM_MODE } from '../app/const';
 
 export class OpenAIError extends Error {
   type: string;
@@ -40,6 +40,7 @@ export const OpenAIStream = async (
   if (is_llama(model.id)) {
     url = `${LLAMA_API_HOST}/v1/chat/completions`;
   }
+  const streaming = !is_llama(model.id) || (LLAMA_STREAM_MODE === '1');
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -65,7 +66,7 @@ export const OpenAIStream = async (
       ],
       max_tokens: 1000,
       temperature: temperature,
-      stream: true,
+      stream: streaming,
     }),
   });
 
@@ -89,7 +90,7 @@ export const OpenAIStream = async (
     }
   }
 
-  const stream = is_llama(model.id) ?
+  const stream = !streaming ?
     new ReadableStream({
       async start(controller) {
         try {
