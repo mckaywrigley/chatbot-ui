@@ -151,6 +151,21 @@ const Home: React.FC<HomeProps> = ({
       };
 
       const endpoint = getEndpoint(plugin);
+      let body;
+
+      if (!plugin) {
+        body = JSON.stringify(chatBody);
+      } else {
+        body = JSON.stringify({
+          ...chatBody,
+          googleAPIKey: pluginKeys
+            .find((key) => key.pluginId === 'google-search')
+            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
+          googleCSEId: pluginKeys
+            .find((key) => key.pluginId === 'google-search')
+            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+        });
+      }
 
       const controller = new AbortController();
       const response = await fetch(endpoint, {
@@ -159,7 +174,7 @@ const Home: React.FC<HomeProps> = ({
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
-        body: JSON.stringify(chatBody),
+        body,
       });
 
       if (!response.ok) {
@@ -809,7 +824,9 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
+                  serverSideApiKeyIsSet={serverSideApiKeyIsSet}
                   pluginKeys={pluginKeys}
+                  serverSidePluginKeysSet={serverSidePluginKeysSet}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
