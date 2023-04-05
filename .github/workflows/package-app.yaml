@@ -5,8 +5,13 @@ on:
     branches: ["main", "test"]
 
 jobs:
-  pacakge:
-    runs-on: ubuntu-latest
+  publish-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-20.04]
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout code
