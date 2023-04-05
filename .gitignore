@@ -38,6 +38,7 @@ yarn-error.log*
 next-env.d.ts
 .idea
 
-# models
+# custom prem
 *.bin
 /src-tauri/binaries/
+/the-ai-box/
