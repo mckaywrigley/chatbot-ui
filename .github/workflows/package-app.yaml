@@ -7,8 +7,6 @@ on:
 jobs:
   pacakge:
     runs-on: ubuntu-latest
-    container:
-      image: python:10
 
     steps:
       - name: Checkout code
@@ -17,12 +15,9 @@ jobs:
       - name: Install node and npm
         run: |
           apt-get update
-          apt-get install -y curl git binutils
+          apt-get install -y curl git binutils build-essential
           curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
           apt-get install -y nodejs
-
-      - name: Install node dependencies
-        run: npm ci
 
       - name: Clone the-ai-box repo
         run: git clone https://github.com/PremAI-Org/the-ai-box.git
@@ -41,6 +36,17 @@ jobs:
 
       - name: Create the .env file from example
         run: cp .env.local.prem .env.local
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: npm install
 
       - name: Build the app
         run: npm run tauri build
