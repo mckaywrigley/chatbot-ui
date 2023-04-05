@@ -20,7 +20,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -115,6 +115,7 @@ const Home: React.FC<HomeProps> = ({
         messages: updatedConversation.messages,
         key: apiKey,
         prompt: updatedConversation.prompt,
+        temperature: updatedConversation.temperature
       };
 
       const endpoint = getEndpoint(plugin);
@@ -491,6 +492,7 @@ const Home: React.FC<HomeProps> = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
+      temperature: DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
@@ -524,6 +526,7 @@ const Home: React.FC<HomeProps> = ({
         messages: [],
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
+        temperature: DEFAULT_TEMPERATURE,
         folderId: null,
       });
       localStorage.removeItem('selectedConversation');
@@ -558,6 +561,7 @@ const Home: React.FC<HomeProps> = ({
       messages: [],
       model: OpenAIModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
+      temperature: DEFAULT_TEMPERATURE,
       folderId: null,
     });
     localStorage.removeItem('selectedConversation');
@@ -727,6 +731,7 @@ const Home: React.FC<HomeProps> = ({
         messages: [],
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
+        temperature: DEFAULT_TEMPERATURE,
         folderId: null,
       });
     }

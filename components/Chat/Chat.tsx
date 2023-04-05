@@ -23,6 +23,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { TemperatureSlider } from './Temperature';
 
 interface Props {
   conversation: Conversation;
@@ -240,6 +241,17 @@ export const Chat: FC<Props> = memo(
                             })
                           }
                         />
+
+                        <TemperatureSlider
+                          label="Temperature"
+                          onChangeTemperature={(temperature) =>
+                            onUpdateConversation(conversation, {
+                              key: 'temperature',
+                              value: temperature,
+                            })
+                          }
+                        />
+
                       </div>
                     )}
                   </div>
