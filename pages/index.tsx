@@ -35,7 +35,7 @@ import Head from 'next/head';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
-
+import { PacmanLoader } from "react-spinners";
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
   defaultModelId: OpenAIModelID;
@@ -257,7 +257,7 @@ const Home: React.FC<HomeProps> = ({
           code: data.error?.code,
           messageLines: [data.error?.message],
         });
-      } catch (e) {}
+      } catch (e) { }
       setModelError(error);
       return;
     }
@@ -552,14 +552,14 @@ const Home: React.FC<HomeProps> = ({
   useEffect(() => {
     async function checkApisStatus() {
       console.log("Waiting for APIs to be ready...");
-  
+
       const response = await fetch('http://localhost:8001/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         }
       });
-  
+
       if (response.ok) {
         setApisReady(true);
         console.log("APIs are ready!");
@@ -567,7 +567,7 @@ const Home: React.FC<HomeProps> = ({
         try {
           const data = await response.json();
           console.log("APIs are not ready yet!");
-        } catch (e) {}
+        } catch (e) { }
         setTimeout(checkApisStatus, 3000); // Call the function again after 3 seconds
       }
     }
@@ -763,7 +763,11 @@ const Home: React.FC<HomeProps> = ({
             )}
           </div>
         </main>
-      ) : <main> Hello </main>}
+      ) : <main>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <PacmanLoader color="#36d7b7" />
+        </div>
+      </main>}
     </>
   );
 };
