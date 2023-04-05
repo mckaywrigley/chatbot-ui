@@ -1,4 +1,4 @@
-import { ChatBody, Message } from '@/types/chat';
+import { ChatBody, SendMessage } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 import { OPENAI_API_HOST } from '@/utils/app/const';
@@ -108,11 +108,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
-    const answerMessage: Message = {
-      id: uuidv4(),
+    const answerMessage: SendMessage = {
       role: 'user',
       content: answerPrompt,
-      create_time: getCurrentUnixTime(),
     };
 
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
