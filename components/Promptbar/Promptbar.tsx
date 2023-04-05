@@ -6,7 +6,6 @@ import {
   IconPlus,
 } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { PromptFolders } from '../Folders/Prompt/PromptFolders';
 import { Search } from '../Sidebar/Search';
 import { PromptbarSettings } from './PromptbarSettings';
@@ -33,7 +32,6 @@ export const Promptbar: FC<Props> = ({
   onUpdatePrompt,
   onDeletePrompt,
 }) => {
-  const { t } = useTranslation('promptbar');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>(prompts);
 
@@ -105,12 +103,12 @@ export const Promptbar: FC<Props> = ({
           }}
         >
           <IconPlus size={16} />
-          {t('New prompt')}
+          {'New prompt'}
         </button>
 
         <button
           className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
+          onClick={() => onCreateFolder('New folder')}
         >
           <IconFolderPlus size={16} />
         </button>
@@ -118,7 +116,7 @@ export const Promptbar: FC<Props> = ({
 
       {prompts.length > 1 && (
         <Search
-          placeholder={t('Search prompts...') || ''}
+          placeholder={'Search prompts...' || ''}
           searchTerm={searchTerm}
           onSearch={setSearchTerm}
         />
@@ -158,7 +156,7 @@ export const Promptbar: FC<Props> = ({
           <div className="mt-8 text-center text-white opacity-50 select-none">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
-              {t('No prompts.')}
+              {'No prompts.'}
             </span>
           </div>
         )}

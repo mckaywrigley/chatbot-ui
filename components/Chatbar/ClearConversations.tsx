@@ -1,5 +1,4 @@
 import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import { FC, useState } from 'react';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 
@@ -9,8 +8,6 @@ interface Props {
 
 export const ClearConversations: FC<Props> = ({ onClearConversations }) => {
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
-
-  const { t } = useTranslation('sidebar');
 
   const handleClearConversations = () => {
     onClearConversations();
@@ -22,7 +19,7 @@ export const ClearConversations: FC<Props> = ({ onClearConversations }) => {
       <IconTrash size={18} />
 
       <div className="ml-3 flex-1 text-left text-[12.5px] leading-3 text-white">
-        {t('Are you sure?')}
+        {'Are you sure?'}
       </div>
 
       <div className="flex w-[40px]">
@@ -47,7 +44,7 @@ export const ClearConversations: FC<Props> = ({ onClearConversations }) => {
     </div>
   ) : (
     <SidebarButton
-      text={t('Clear conversations')}
+      text={'Clear conversations'}
       icon={<IconTrash size={18} />}
       onClick={() => setIsConfirming(true)}
     />

@@ -1,16 +1,25 @@
-name: Package
+name: Package Tauri App
 
 on:
   push:
     branches: ["main", "test"]
 
 jobs:
-  pacakge:
-    runs-on: ubuntu-latest
+  publish-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-20.04]
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
       - name: Clone the-ai-box repo
         run: git clone https://github.com/PremAI-Org/the-ai-box.git
