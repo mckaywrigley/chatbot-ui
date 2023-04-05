@@ -1,6 +1,5 @@
 import { Message } from '@/types/chat';
 import { IconCheck, IconCopy, IconEdit, IconUser, IconRobot } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
@@ -16,7 +15,6 @@ interface Props {
 
 export const ChatMessage: FC<Props> = memo(
   ({ message, messageIndex, onEditMessage }) => {
-    const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
@@ -72,16 +70,15 @@ export const ChatMessage: FC<Props> = memo(
 
     return (
       <div
-        className={`group px-4 ${
-          message.role === 'assistant'
-            ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
-            : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
-        }`}
+        className={`group px-4 ${message.role === 'assistant'
+          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
+          : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
+          }`}
         style={{ overflowWrap: 'anywhere' }}
       >
         <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
-            {message.role === 'assistant' ? <IconRobot size={30}/> : <IconUser size={30}/>}
+            {message.role === 'assistant' ? <IconRobot size={30} /> : <IconUser size={30} />}
           </div>
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
@@ -113,7 +110,7 @@ export const ChatMessage: FC<Props> = memo(
                         onClick={handleEditMessage}
                         disabled={messageContent.trim().length <= 0}
                       >
-                        {t('Save & Submit')}
+                        {'Save & Submit'}
                       </button>
                       <button
                         className="h-[40px] rounded-md border border-neutral-300 px-4 py-1 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
@@ -122,7 +119,7 @@ export const ChatMessage: FC<Props> = memo(
                           setIsEditing(false);
                         }}
                       >
-                        {t('Cancel')}
+                        {'Cancel'}
                       </button>
                     </div>
                   </div>
@@ -134,11 +131,10 @@ export const ChatMessage: FC<Props> = memo(
 
                 {(window.innerWidth < 640 || !isEditing) && (
                   <button
-                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                      window.innerWidth < 640
-                        ? 'right-3 bottom-1'
-                        : 'right-0 top-[26px]'
-                    }
+                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${window.innerWidth < 640
+                      ? 'right-3 bottom-1'
+                      : 'right-0 top-[26px]'
+                      }
                     `}
                     onClick={toggleEditing}
                   >
@@ -149,11 +145,10 @@ export const ChatMessage: FC<Props> = memo(
             ) : (
               <>
                 <div
-                  className={`absolute ${
-                    window.innerWidth < 640
-                      ? 'right-3 bottom-1'
-                      : 'right-0 top-[26px] m-0'
-                  }`}
+                  className={`absolute ${window.innerWidth < 640
+                    ? 'right-3 bottom-1'
+                    : 'right-0 top-[26px] m-0'
+                    }`}
                 >
                   {messagedCopied ? (
                     <IconCheck

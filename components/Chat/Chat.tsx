@@ -5,7 +5,6 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import {
   FC,
   memo,
@@ -58,7 +57,6 @@ export const Chat: FC<Props> = memo(
     onEditMessage,
     stopConversationRef,
   }) => {
-    const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
     const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
     const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -104,7 +102,7 @@ export const Chat: FC<Props> = memo(
     };
 
     const onClearAll = () => {
-      if (confirm(t<string>('Are you sure you want to clear all messages?'))) {
+      if (confirm('Are you sure you want to clear all messages?')) {
         onUpdateConversation(conversation, { key: 'messages', value: [] });
       }
     };
@@ -172,14 +170,10 @@ export const Chat: FC<Props> = memo(
                 with their API.
               </div>
               <div className="mb-2">
-                {t(
-                  'Please set your OpenAI API key in the bottom left of the sidebar.',
-                )}
+                Please set your OpenAI API key in the bottom left of the sidebar.
               </div>
               <div>
-                {t(
-                  "If you don't have an OpenAI API key, you can get one here: ",
-                )}
+                If you don't have an OpenAI API key, you can get one here:
                 <a
                   href="https://platform.openai.com/account/api-keys"
                   target="_blank"
@@ -244,7 +238,7 @@ export const Chat: FC<Props> = memo(
               ) : (
                 <>
                   <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                    {t('Model')}: {conversation.model.name}
+                    Model: {conversation.model.name}
                     <button
                       className="ml-2 cursor-pointer hover:opacity-50"
                       onClick={handleSettings}

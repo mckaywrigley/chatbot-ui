@@ -29,8 +29,6 @@ import { exportData, importData } from '@/utils/app/importExport';
 import { savePrompts } from '@/utils/app/prompts';
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -55,7 +53,6 @@ const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
   defaultModelId,
 }) => {
-  const { t } = useTranslation('chat');
 
   // STATE ----------------------------------------------
 
@@ -243,13 +240,11 @@ const Home: React.FC<HomeProps> = ({
 
   const fetchModels = async (key: string) => {
     const error = {
-      title: t('Error fetching models.'),
+      title: 'Error fetching models.',
       code: null,
       messageLines: [
-        t(
-          'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
-        ),
-        t('If you completed this step, OpenAI may be experiencing issues.'),
+        'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
+        'If you completed this step, OpenAI may be experiencing issues.',
       ],
     } as ErrorMessage;
 
@@ -400,7 +395,7 @@ const Home: React.FC<HomeProps> = ({
 
     const newConversation: Conversation = {
       id: uuidv4(),
-      name: `${t('New Conversation')}`,
+      name: `${'New Conversation'}`,
       messages: [],
       model: lastConversation?.model || {
         id: OpenAIModels[defaultModelId].id,
@@ -824,13 +819,13 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
-      ...(await serverSideTranslations(locale ?? 'en', [
+      ...[
         'common',
         'chat',
         'sidebar',
         'markdown',
         'promptbar',
-      ])),
+      ],
     },
   };
 };
