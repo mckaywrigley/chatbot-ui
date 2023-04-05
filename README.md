@@ -14,12 +14,12 @@ Expect frequent improvements.
 
 **Next up:**
 
-- [ ] Delete messages
 - [ ] More model settings
 - [ ] Plugins
 
 **Recent updates:**
 
+- [x] Delete messages (4/5/23)
 - [x] Prompt templates (3/27/23)
 - [x] Regenerate & edit responses (3/25/23)
 - [x] Folders (3/24/23)
