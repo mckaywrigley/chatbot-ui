@@ -9,7 +9,7 @@ fn launch_model_apis() {
   let binary_path = if cfg!(windows) {
       "./binaries/python-binary.exe"
   } else {
-      "./binaries/dist/apis/apis"
+      "./binaries/cpu/dist/apis/apis"
   };
   let _ = Command::new(binary_path).spawn();
 }

@@ -1,0 +1,46 @@
+name: Package
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  mac-m1:
+    runs-on: ubuntu-latest
+    container:
+      image: python:10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install node and npm
+        run: |
+          apt-get update
+          apt-get install -y curl git binutils
+          curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+          apt-get install -y nodejs
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Clone the-ai-box repo
+        run: git clone https://github.com/PremAI-Org/the-ai-box.git
+
+      - name: Compile the python app
+        run: |
+          cd ./the-ai-box/cpu/
+          pip install -r requirements.txt
+          pyinstaller apis.py
+
+      - name: Move the binaries in the correct folder
+        run: |
+          cd ../../
+          mkdir ./src-tauri/binaries/
+          cp -r ./the-ai-box/cpu/ ./src-tauri/binaries/
+
+      - name: Create the .env file from example
+        run: cp .env.local.prem .env.local
+
+      - name: Build the app
+        run: npm run tauri build
