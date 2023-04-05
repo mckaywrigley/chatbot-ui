@@ -8,6 +8,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { DragEvent, FC, KeyboardEvent, useEffect, useState } from 'react';
+import SidebarActionButton from '../Buttons/SidebarActionButton';
 
 interface Props {
   selectedConversation: Conversation;
@@ -68,7 +69,7 @@ export const ConversationComponent: FC<Props> = ({
   return (
     <div className="relative flex items-center">
       {isRenaming && selectedConversation.id === conversation.id ? (
-        <div className="flex w-full items-center gap-3 bg-[#343541]/90 p-3 rounded-lg">
+        <div className="flex w-full items-center gap-3 rounded-lg bg-[#343541]/90 p-3">
           <IconMessage size={18} />
           <input
             className="mr-12 flex-1 overflow-hidden overflow-ellipsis border-neutral-400 bg-transparent text-left text-[12.5px] leading-3 text-white outline-none focus:border-neutral-100"
@@ -105,9 +106,8 @@ export const ConversationComponent: FC<Props> = ({
       {(isDeleting || isRenaming) &&
         selectedConversation.id === conversation.id && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 if (isDeleting) {
                   onDeleteConversation(conversation);
@@ -119,17 +119,16 @@ export const ConversationComponent: FC<Props> = ({
               }}
             >
               <IconCheck size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
             >
               <IconX size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
 
@@ -137,25 +136,23 @@ export const ConversationComponent: FC<Props> = ({
         !isDeleting &&
         !isRenaming && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsRenaming(true);
                 setRenameValue(selectedConversation.name);
               }}
             >
               <IconPencil size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(true);
               }}
             >
               <IconTrash size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
     </div>

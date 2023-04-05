@@ -1,5 +1,5 @@
 import { FolderInterface, FolderType } from '@/types/folder';
-
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import {
   IconCaretDown,
   IconCaretRight,
@@ -131,9 +131,8 @@ const Folder = ({
 
         {(isDeleting || isRenaming) && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
 
                 if (isDeleting) {
@@ -147,41 +146,38 @@ const Folder = ({
               }}
             >
               <IconCheck size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
             >
               <IconX size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
 
         {!isDeleting && !isRenaming && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsRenaming(true);
                 setRenameValue(currentFolder.name);
               }}
             >
               <IconPencil size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(true);
               }}
             >
               <IconTrash size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
       </div>
