@@ -56,34 +56,33 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   }
 
   let originalDataFormat: string | null = null;
-  // Convert V1 to V2
-  if (isExportFormatV1(data)) {
-    originalDataFormat = '1';
-    data = convertV1ToV2(data);
-  }
 
-  // Convert V2 to V3
-  if (isExportFormatV2(data)) {
-    originalDataFormat = '2';
-    data = convertV2ToV3(data);
-  }
+  const convertData = (
+    versionNumber: string,
+    isData: (obj: any) => boolean,
+    convertData?: (obj: any) => any,
+  ) => {
+    if (isData(data)) {
+      if (!originalDataFormat) {
+        originalDataFormat = versionNumber;
+      }
+      if (convertData) {
+        data = convertData(data);
+      }
+    }
+  };
 
-  // Convert V3 to V4
-  if (isExportFormatV3(data)) {
-    originalDataFormat = '3';
-    data = convertV3ToV4(data);
-  }
-
-  // Convert V4 to V5
-  if (isExportFormatV4(data)) {
-    originalDataFormat = '4';
-    data = convertV4ToV5(data);
-  }
+  // Convert data between formats
+  convertData('1', isExportFormatV1, convertV1ToV2);
+  convertData('2', isExportFormatV2, convertV2ToV3);
+  convertData('3', isExportFormatV3, convertV3ToV4);
+  convertData('4', isExportFormatV4, convertV4ToV5);
+  convertData('5', isExportFormatV5);
 
   if (!originalDataFormat) {
     throw new Error('Unsupported data format');
   } else {
-    return data;
+    return data as LatestExportFormat;
   }
 }
 

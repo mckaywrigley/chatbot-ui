@@ -3,14 +3,15 @@ import { SendAction } from '@/types/conversation';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
-  memo,
   MutableRefObject,
+  memo,
   useCallback,
   useEffect,
   useRef,
@@ -36,11 +37,17 @@ interface Props {
   modelError: ErrorMessage | null;
   loading: boolean;
   prompts: Prompt[];
-  onSend: (
-    chatNode: ChatNode,
-    sendAction: SendAction,
-    messageIndex?: number,
-  ) => void;
+  onSend: ({
+    chatNode,
+    sendAction,
+    messageIndex,
+    deleteCount,
+    plugin
+  } :{chatNode: ChatNode;
+    sendAction: SendAction;
+    messageIndex?: number;
+    deleteCount: number;
+    plugin: Plugin | null;}) => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -124,8 +131,6 @@ export const Chat: FC<Props> = memo(
       }
     };
     const throttledScrollDown = throttle(scrollDown, 250);
-
-    // appear scroll down button only when user scrolls up
 
     useEffect(() => {
       throttledScrollDown();
@@ -310,13 +315,23 @@ export const Chat: FC<Props> = memo(
               chatNodes={currentMessageList}
               model={conversation.model}
               prompts={prompts}
-              onSend={(chatNode) => {
-                setCurrentNode(chatNode);
-                onSend(chatNode, SendAction.SEND);
+              onSend={(node, plugin) => {
+                setCurrentNode(node);
+                onSend({
+                  chatNode: node, 
+                  deleteCount: 0, 
+                  plugin: plugin, 
+                  sendAction: SendAction.SEND
+                });
               }}
               onRegenerate={() => {
                 if (currentNode) {
-                  onSend(currentNode, SendAction.REGENERATE);
+                  onSend({
+                    chatNode: currentNode, 
+                    deleteCount: 2, 
+                    plugin: null, 
+                    sendAction: SendAction.REGENERATE
+                  });
                 }
               }}
             />
