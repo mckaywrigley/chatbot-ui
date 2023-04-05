@@ -5,7 +5,7 @@ interface Props {
   className?: string;
 }
 
-export const Spinner: FC<Props> = ({ size = '1em', className="" }) => {
+export const Spinner: FC<Props> = ({ size = '1em', className='' }) => {
   return (
     <svg
       stroke="currentColor"

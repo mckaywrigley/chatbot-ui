@@ -48,7 +48,7 @@ export const SystemPrompt: FC<Props> = ({
     if (value.length > maxLength) {
       alert(
         t(
-          `Prompt limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
+          'Prompt limit is {{maxLength}} characters. You have entered {{valueLength}} characters.',
           { maxLength, valueLength: value.length },
         ),
       );
@@ -207,7 +207,7 @@ export const SystemPrompt: FC<Props> = ({
           }`,
         }}
         placeholder={
-          t(`Enter a prompt or type "/" to select a prompt...`) || ''
+          t('Enter a prompt or type "/" to select a prompt...') || ''
         }
         value={t(value) || ''}
         rows={1}

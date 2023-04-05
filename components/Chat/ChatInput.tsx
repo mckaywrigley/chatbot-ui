@@ -69,7 +69,7 @@ export const ChatInput: FC<Props> = ({
     if (value.length > maxLength) {
       alert(
         t(
-          `Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
+          'Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.',
           { maxLength, valueLength: value.length },
         ),
       );
@@ -363,7 +363,7 @@ export const ChatInput: FC<Props> = ({
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          'Chatbot UI is an advanced chatbot kit for OpenAI\'s chat models aiming to mimic ChatGPT\'s interface and functionality.',
         )}
       </div>
     </div>

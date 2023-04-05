@@ -110,7 +110,7 @@ export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
-  const { history,folders, prompts } = cleanedData;
+  const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
