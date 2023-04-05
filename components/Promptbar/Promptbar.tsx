@@ -104,20 +104,6 @@ const Promptbar = () => {
   };
 
   useEffect(() => {
-    console.log(
-      'searchTerm',
-      searchTerm,
-      prompts,
-      prompts.filter((prompt) => {
-        const searchable =
-          prompt.name.toLowerCase() +
-          ' ' +
-          prompt.description.toLowerCase() +
-          ' ' +
-          prompt.content.toLowerCase();
-        return searchable.includes(searchTerm.toLowerCase());
-      }),
-    );
     if (searchTerm) {
       promptDispatch({
         field: 'filteredPrompts',
