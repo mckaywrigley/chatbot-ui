@@ -3,44 +3,49 @@ import { ErrorMessage } from '@/types/error';
 import { Folder } from '@/types/folder';
 import { Message, Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
+import { PluginKey } from '@/types/plugin';
 
 export interface HomeInitialState {
-  currentFolder: Folder | undefined;
-  folders: Folder[];
-  prompts: Prompt[];
-  conversations: Conversation[];
-  selectedConversation: Conversation | undefined;
+  apiKey: string;
+  pluginKeys: PluginKey[];
   loading: boolean;
-  models: OpenAIModel[];
   lightMode: 'light' | 'dark';
   messageIsStreaming: boolean;
-  showPromptbar: boolean;
-  showSidebar: boolean;
-  apiKey: string;
-  messageError: boolean;
   modelError: ErrorMessage | null;
+  models: OpenAIModel[];
+  folders: Folder[];
+  conversations: Conversation[];
+  selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
+  prompts: Prompt[];
+  showSidebar: boolean;
+  showPromptbar: boolean;
+
+  currentFolder: Folder | undefined;
+  messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
   serverSideApiKeyIsSet: boolean;
 }
 
 export const initialState: HomeInitialState = {
-  currentFolder: undefined,
+  apiKey: '',
+  loading: false,
+  pluginKeys: [],
+  lightMode: 'dark',
+  messageIsStreaming: false,
+  modelError: null,
+  models: [],
   folders: [],
-  prompts: [],
   conversations: [],
   selectedConversation: undefined,
-  loading: false,
-  models: [],
-  lightMode: 'light',
-  messageIsStreaming: false,
+  currentMessage: undefined,
+  prompts: [],
   showPromptbar: true,
   showSidebar: true,
-  apiKey: '',
+
+  currentFolder: undefined,
   messageError: false,
-  modelError: null,
-  currentMessage: undefined,
   searchTerm: '',
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,

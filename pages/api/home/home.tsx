@@ -38,6 +38,10 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
+import HomeContext from './home.context';
+import { useCreateReducer } from '@/hooks/useCreateReducer';
+import { HomeInitialState, initialState } from './home.state';
+
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
@@ -51,29 +55,31 @@ const Home: React.FC<HomeProps> = ({
 }) => {
   const { t } = useTranslation('chat');
 
-  // STATE ----------------------------------------------
+  const contextValue = useCreateReducer<HomeInitialState>({
+    initialState,
+  });
 
-  const [apiKey, setApiKey] = useState<string>('');
-  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
-  const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
+  const {
+    state: {
+      apiKey,
+      loading,
+      pluginKeys,
+      lightMode,
+      messageIsStreaming,
+      modelError,
+      models,
+      folders,
+      conversations,
+      selectedConversation,
+      currentMessage,
+      prompts,
+      showSidebar,
+      showPromptbar,
 
-  const [modelError, setModelError] = useState<ErrorMessage | null>(null);
-
-  const [models, setModels] = useState<OpenAIModel[]>([]);
-
-  const [folders, setFolders] = useState<Folder[]>([]);
-
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation>();
-  const [currentMessage, setCurrentMessage] = useState<Message>();
-
-  const [showSidebar, setShowSidebar] = useState<boolean>(true);
-
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
+      messageError,
+    },
+    dispatch,
+  } = contextValue;
 
   // REFS ----------------------------------------------
 
@@ -106,9 +112,9 @@ const Home: React.FC<HomeProps> = ({
         };
       }
 
-      setSelectedConversation(updatedConversation);
-      setLoading(true);
-      setMessageIsStreaming(true);
+      dispatch({ field: 'selectedConversation', value: updatedConversation });
+      dispatch({ field: 'loading', value: true });
+      dispatch({ field: 'messageIsStreaming', value: true });
 
       const chatBody: ChatBody = {
         model: updatedConversation.model,
@@ -145,8 +151,9 @@ const Home: React.FC<HomeProps> = ({
       });
 
       if (!response.ok) {
-        setLoading(false);
-        setMessageIsStreaming(false);
+        dispatch({ field: 'loading', value: false });
+        dispatch({ field: 'messageIsStreaming', value: false });
+
         toast.error(response.statusText);
         return;
       }
@@ -154,8 +161,8 @@ const Home: React.FC<HomeProps> = ({
       const data = response.body;
 
       if (!data) {
-        setLoading(false);
-        setMessageIsStreaming(false);
+        dispatch({ field: 'loading', value: false });
+        dispatch({ field: 'messageIsStreaming', value: false });
         return;
       }
 
@@ -170,8 +177,7 @@ const Home: React.FC<HomeProps> = ({
             name: customName,
           };
         }
-
-        setLoading(false);
+        dispatch({ field: 'loading', value: false });
 
         const reader = data.getReader();
         const decoder = new TextDecoder();
@@ -202,8 +208,10 @@ const Home: React.FC<HomeProps> = ({
               ...updatedConversation,
               messages: updatedMessages,
             };
-
-            setSelectedConversation(updatedConversation);
+            dispatch({
+              field: 'selectedConversation',
+              value: updatedConversation,
+            });
           } else {
             const updatedMessages: Message[] = updatedConversation.messages.map(
               (message, index) => {
@@ -222,8 +230,10 @@ const Home: React.FC<HomeProps> = ({
               ...updatedConversation,
               messages: updatedMessages,
             };
-
-            setSelectedConversation(updatedConversation);
+            dispatch({
+              field: 'selectedConversation',
+              value: updatedConversation,
+            });
           }
         }
 
@@ -243,10 +253,11 @@ const Home: React.FC<HomeProps> = ({
           updatedConversations.push(updatedConversation);
         }
 
-        setConversations(updatedConversations);
+        dispatch({ field: 'conversations', value: updatedConversations });
+
         saveConversations(updatedConversations);
 
-        setMessageIsStreaming(false);
+        dispatch({ field: 'messageIsStreaming', value: false });
       } else {
         const { answer } = await response.json();
 
@@ -260,7 +271,8 @@ const Home: React.FC<HomeProps> = ({
           messages: updatedMessages,
         };
 
-        setSelectedConversation(updatedConversation);
+        dispatch({ field: 'selectedConversation', value: updateConversation });
+
         saveConversation(updatedConversation);
 
         const updatedConversations: Conversation[] = conversations.map(
@@ -277,11 +289,12 @@ const Home: React.FC<HomeProps> = ({
           updatedConversations.push(updatedConversation);
         }
 
-        setConversations(updatedConversations);
+        dispatch({ field: 'conversations', value: updatedConversations });
+
         saveConversations(updatedConversations);
 
-        setLoading(false);
-        setMessageIsStreaming(false);
+        dispatch({ field: 'loading', value: false });
+        dispatch({ field: 'messageIsStreaming', value: false });
       }
     }
   };
@@ -318,30 +331,32 @@ const Home: React.FC<HomeProps> = ({
           messageLines: [data.error?.message],
         });
       } catch (e) {}
-      setModelError(error);
+
+      dispatch({ field: 'modelError', value: error });
       return;
     }
 
     const data = await response.json();
 
     if (!data) {
-      setModelError(error);
+      dispatch({ field: 'modelError', value: error });
       return;
     }
 
-    setModels(data);
-    setModelError(null);
+    dispatch({ field: 'models', value: data });
+    dispatch({ field: 'modelError', value: null });
   };
 
   // BASIC HANDLERS --------------------------------------------
 
   const handleLightMode = (mode: 'dark' | 'light') => {
-    setLightMode(mode);
+    dispatch({ field: 'lightMode', value: mode });
     localStorage.setItem('theme', mode);
   };
 
   const handleApiKeyChange = (apiKey: string) => {
-    setApiKey(apiKey);
+    dispatch({ field: 'apiKey', value: apiKey });
+
     localStorage.setItem('apiKey', apiKey);
   };
 
@@ -355,11 +370,11 @@ const Home: React.FC<HomeProps> = ({
         return key;
       });
 
-      setPluginKeys(updatedPluginKeys);
+      dispatch({ field: 'pluginKeys', value: updatedPluginKeys });
 
       localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
     } else {
-      setPluginKeys([...pluginKeys, pluginKey]);
+      dispatch({ field: 'pluginKeys', value: [...pluginKeys, pluginKey] });
 
       localStorage.setItem(
         'pluginKeys',
@@ -374,23 +389,23 @@ const Home: React.FC<HomeProps> = ({
     );
 
     if (updatedPluginKeys.length === 0) {
-      setPluginKeys([]);
+      dispatch({ field: 'pluginKeys', value: [] });
       localStorage.removeItem('pluginKeys');
       return;
     }
 
-    setPluginKeys(updatedPluginKeys);
+    dispatch({ field: 'pluginKeys', value: updatedPluginKeys });
 
     localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
   const handleToggleChatbar = () => {
-    setShowSidebar(!showSidebar);
+    dispatch({ field: 'showSidebar', value: !showSidebar });
     localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
   };
 
   const handleTogglePromptbar = () => {
-    setShowPromptbar(!showPromptbar);
+    dispatch({ field: 'showPromptbar', value: !showPromptbar });
     localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
   };
 
@@ -400,15 +415,21 @@ const Home: React.FC<HomeProps> = ({
 
   const handleImportConversations = (data: SupportedExportFormats) => {
     const { history, folders, prompts }: LatestExportFormat = importData(data);
-
-    setConversations(history);
-    setSelectedConversation(history[history.length - 1]);
-    setFolders(folders);
-    setPrompts(prompts);
+    dispatch({ field: 'conversations', value: history });
+    dispatch({
+      field: 'selectedConversation',
+      value: history[history.length - 1],
+    });
+    dispatch({ field: 'folders', value: folders });
+    dispatch({ field: 'prompts', value: prompts });
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
+    dispatch({
+      field: 'selectedConversation',
+      value: conversation,
+    });
+
     saveConversation(conversation);
   };
 
@@ -423,13 +444,13 @@ const Home: React.FC<HomeProps> = ({
 
     const updatedFolders = [...folders, newFolder];
 
-    setFolders(updatedFolders);
+    dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
   };
 
   const handleDeleteFolder = (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
-    setFolders(updatedFolders);
+    dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
 
     const updatedConversations: Conversation[] = conversations.map((c) => {
@@ -442,7 +463,8 @@ const Home: React.FC<HomeProps> = ({
 
       return c;
     });
-    setConversations(updatedConversations);
+
+    dispatch({ field: 'conversations', value: updatedConversations });
     saveConversations(updatedConversations);
 
     const updatedPrompts: Prompt[] = prompts.map((p) => {
@@ -455,7 +477,8 @@ const Home: React.FC<HomeProps> = ({
 
       return p;
     });
-    setPrompts(updatedPrompts);
+
+    dispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
   };
 
@@ -471,7 +494,8 @@ const Home: React.FC<HomeProps> = ({
       return f;
     });
 
-    setFolders(updatedFolders);
+    dispatch({ field: 'folders', value: updatedFolders });
+
     saveFolders(updatedFolders);
   };
 
@@ -496,36 +520,42 @@ const Home: React.FC<HomeProps> = ({
 
     const updatedConversations = [...conversations, newConversation];
 
-    setSelectedConversation(newConversation);
-    setConversations(updatedConversations);
+    dispatch({ field: 'selectedConversation', value: newConversation });
+    dispatch({ field: 'conversations', value: updatedConversations });
 
     saveConversation(newConversation);
     saveConversations(updatedConversations);
 
-    setLoading(false);
+    dispatch({ field: 'loading', value: false });
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = conversations.filter(
       (c) => c.id !== conversation.id,
     );
-    setConversations(updatedConversations);
+    dispatch({ field: 'conversations', value: updatedConversations });
     saveConversations(updatedConversations);
 
     if (updatedConversations.length > 0) {
-      setSelectedConversation(
-        updatedConversations[updatedConversations.length - 1],
-      );
+      dispatch({
+        field: 'conversations',
+        value: updatedConversations[updatedConversations.length - 1],
+      });
+
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
+      dispatch({
+        field: 'selectedConversation',
+        value: {
+          id: uuidv4(),
+          name: 'New conversation',
+          messages: [],
+          model: OpenAIModels[defaultModelId],
+          prompt: DEFAULT_SYSTEM_PROMPT,
+          folderId: null,
+        },
       });
+
       localStorage.removeItem('selectedConversation');
     }
   };
@@ -544,26 +574,30 @@ const Home: React.FC<HomeProps> = ({
       conversations,
     );
 
-    setSelectedConversation(single);
-    setConversations(all);
+    dispatch({ field: 'selectedConversation', value: single });
+    dispatch({ field: 'conversations', value: all });
   };
 
   const handleClearConversations = () => {
-    setConversations([]);
-    localStorage.removeItem('conversationHistory');
-
-    setSelectedConversation({
-      id: uuidv4(),
-      name: 'New conversation',
-      messages: [],
-      model: OpenAIModels[defaultModelId],
-      prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: null,
+    dispatch({
+      field: 'selectedConversation',
+      value: {
+        id: uuidv4(),
+        name: 'New conversation',
+        messages: [],
+        model: OpenAIModels[defaultModelId],
+        prompt: DEFAULT_SYSTEM_PROMPT,
+        folderId: null,
+      },
     });
+    dispatch({ field: 'conversations', value: [] });
+
+    localStorage.removeItem('conversationHistory');
     localStorage.removeItem('selectedConversation');
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
-    setFolders(updatedFolders);
+
+    dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
   };
 
@@ -587,10 +621,9 @@ const Home: React.FC<HomeProps> = ({
         conversations,
       );
 
-      setSelectedConversation(single);
-      setConversations(all);
-
-      setCurrentMessage(message);
+      dispatch({ field: 'selectedConversation', value: single });
+      dispatch({ field: 'conversations', value: all });
+      dispatch({ field: 'currentMessage', value: message });
     }
   };
 
@@ -608,7 +641,8 @@ const Home: React.FC<HomeProps> = ({
 
     const updatedPrompts = [...prompts, newPrompt];
 
-    setPrompts(updatedPrompts);
+    dispatch({ field: 'prompts', value: updatedPrompts });
+
     savePrompts(updatedPrompts);
   };
 
@@ -620,14 +654,15 @@ const Home: React.FC<HomeProps> = ({
 
       return p;
     });
+    dispatch({ field: 'prompts', value: updatedPrompts });
 
-    setPrompts(updatedPrompts);
     savePrompts(updatedPrompts);
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
     const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
-    setPrompts(updatedPrompts);
+
+    dispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
   };
 
@@ -636,13 +671,13 @@ const Home: React.FC<HomeProps> = ({
   useEffect(() => {
     if (currentMessage) {
       handleSend(currentMessage);
-      setCurrentMessage(undefined);
+      dispatch({ field: 'currentMessage', value: undefined });
     }
   }, [currentMessage]);
 
   useEffect(() => {
     if (window.innerWidth < 640) {
-      setShowSidebar(false);
+      dispatch({ field: 'showSidebar', value: false });
     }
   }, [selectedConversation]);
 
@@ -657,49 +692,50 @@ const Home: React.FC<HomeProps> = ({
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme) {
-      setLightMode(theme as 'dark' | 'light');
+      dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
     }
 
     const apiKey = localStorage.getItem('apiKey');
     if (serverSideApiKeyIsSet) {
       fetchModels('');
-      setApiKey('');
+      dispatch({ field: 'apiKey', value: '' });
+
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
-      setApiKey(apiKey);
+      dispatch({ field: 'apiKey', value: apiKey });
       fetchModels(apiKey);
     }
 
     const pluginKeys = localStorage.getItem('pluginKeys');
     if (serverSidePluginKeysSet) {
-      setPluginKeys([]);
+      dispatch({ field: 'pluginKeys', value: [] });
       localStorage.removeItem('pluginKeys');
     } else if (pluginKeys) {
-      setPluginKeys(JSON.parse(pluginKeys));
+      dispatch({ field: 'pluginKeys', value: pluginKeys });
     }
 
     if (window.innerWidth < 640) {
-      setShowSidebar(false);
+      dispatch({ field: 'showSidebar', value: false });
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
     if (showChatbar) {
-      setShowSidebar(showChatbar === 'true');
+      dispatch({ field: 'showSidebar', value: showChatbar === 'true' });
     }
 
     const showPromptbar = localStorage.getItem('showPromptbar');
     if (showPromptbar) {
-      setShowPromptbar(showPromptbar === 'true');
+      dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
     const folders = localStorage.getItem('folders');
     if (folders) {
-      setFolders(JSON.parse(folders));
+      dispatch({ field: 'folders', value: folders });
     }
 
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
-      setPrompts(JSON.parse(prompts));
+      dispatch({ field: 'prompts', value: prompts });
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
@@ -709,7 +745,8 @@ const Home: React.FC<HomeProps> = ({
       const cleanedConversationHistory = cleanConversationHistory(
         parsedConversationHistory,
       );
-      setConversations(cleanedConversationHistory);
+
+      dispatch({ field: 'conversations', value: cleanedConversationHistory });
     }
 
     const selectedConversation = localStorage.getItem('selectedConversation');
@@ -719,15 +756,22 @@ const Home: React.FC<HomeProps> = ({
       const cleanedSelectedConversation = cleanSelectedConversation(
         parsedSelectedConversation,
       );
-      setSelectedConversation(cleanedSelectedConversation);
+
+      dispatch({
+        field: 'selectedConversation',
+        value: cleanedSelectedConversation,
+      });
     } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
+      dispatch({
+        field: 'selectedConversation',
+        value: {
+          id: uuidv4(),
+          name: 'New conversation',
+          messages: [],
+          model: OpenAIModels[defaultModelId],
+          prompt: DEFAULT_SYSTEM_PROMPT,
+          folderId: null,
+        },
       });
     }
   }, [serverSideApiKeyIsSet]);
