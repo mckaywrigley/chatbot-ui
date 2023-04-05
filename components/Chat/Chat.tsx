@@ -45,6 +45,8 @@ interface Props {
   ) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
+  onNewConversation: () => void;
+  onDeleteMessage: (messageIndex: number) => void;
 }
 
 export const Chat: FC<Props> = memo(
@@ -62,6 +64,8 @@ export const Chat: FC<Props> = memo(
     onUpdateConversation,
     onEditMessage,
     stopConversationRef,
+    onNewConversation,
+    onDeleteMessage,
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -285,6 +289,7 @@ export const Chat: FC<Props> = memo(
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}
+                      onDeleteMessage={onDeleteMessage}
                     />
                   ))}
 

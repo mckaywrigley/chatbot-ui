@@ -5,6 +5,7 @@ import {
   IconEdit,
   IconUser,
   IconRobot,
+  IconX,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
@@ -18,10 +19,11 @@ interface Props {
   message: Message;
   messageIndex: number;
   onEditMessage: (message: Message, messageIndex: number) => void;
+  onDeleteMessage: (messageIndex: number) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage }) => {
+  ({ message, messageIndex, onEditMessage, onDeleteMessage }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -143,17 +145,31 @@ export const ChatMessage: FC<Props> = memo(
                 )}
 
                 {(window.innerWidth < 640 || !isEditing) && (
-                  <button
-                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                      window.innerWidth < 640
-                        ? 'bottom-1 right-3'
-                        : 'right-0 top-[26px]'
-                    }
+                  <>
+                    <button
+                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                        window.innerWidth < 640
+                          ? 'right-6 bottom-1'
+                          : 'right-6 top-[26px]'
+                      }
                     `}
-                    onClick={toggleEditing}
-                  >
-                    <IconEdit size={20} />
-                  </button>
+                      onClick={toggleEditing}
+                    >
+                      <IconEdit size={20} />
+                    </button>
+
+                    <button
+                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                        window.innerWidth < 640
+                          ? 'right-3 bottom-1'
+                          : 'right-0 top-[26px]'
+                      }
+                    `}
+                      onClick={() => onDeleteMessage(messageIndex)}
+                    >
+                      <IconX size={20} />
+                    </button>
+                  </>
                 )}
               </div>
             ) : (
@@ -172,12 +188,18 @@ export const ChatMessage: FC<Props> = memo(
                     />
                   ) : (
                     <button
-                      className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
+                      className="mr-1 translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
                       onClick={copyOnClick}
                     >
                       <IconCopy size={20} />
                     </button>
                   )}
+                  <button
+                    className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
+                    onClick={() => onDeleteMessage(messageIndex)}
+                  >
+                    <IconX size={20} />
+                  </button>
                 </div>
 
                 <MemoizedReactMarkdown

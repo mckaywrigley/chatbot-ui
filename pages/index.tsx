@@ -594,6 +594,31 @@ const Home: React.FC<HomeProps> = ({
     }
   };
 
+  const handleDeleteMessage = (messageIndex: number) => {
+    if (selectedConversation) {
+      const updatedMessages = selectedConversation.messages
+        .map((m, i) => {
+          if (i < messageIndex) {
+            return m;
+          }
+        })
+        .filter((m) => m) as Message[];
+
+      const updatedConversation = {
+        ...selectedConversation,
+        messages: updatedMessages,
+      };
+
+      const { single, all } = updateConversation(
+        updatedConversation,
+        conversations,
+      );
+
+      setSelectedConversation(single);
+      setConversations(all);
+    }
+  };
+
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
@@ -818,6 +843,8 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                onNewConversation={handleNewConversation}
+                onDeleteMessage={handleDeleteMessage}
               />
             </div>
 
