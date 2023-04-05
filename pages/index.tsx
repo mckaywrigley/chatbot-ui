@@ -28,7 +28,6 @@ import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 import { savePrompts } from '@/utils/app/prompts';
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
-import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -805,27 +804,3 @@ const Home: React.FC<HomeProps> = ({
   );
 };
 export default Home;
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const defaultModelId =
-    (process.env.DEFAULT_MODEL &&
-      Object.values(OpenAIModelID).includes(
-        process.env.DEFAULT_MODEL as OpenAIModelID,
-      ) &&
-      process.env.DEFAULT_MODEL) ||
-    fallbackModelID;
-
-  return {
-    props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-      defaultModelId,
-      ...[
-        'common',
-        'chat',
-        'sidebar',
-        'markdown',
-        'promptbar',
-      ],
-    },
-  };
-};
