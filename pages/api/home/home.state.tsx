@@ -20,12 +20,12 @@ export interface HomeInitialState {
   prompts: Prompt[];
   showChatbar: boolean;
   showPromptbar: boolean;
-
   currentFolder: FolderInterface | undefined;
   messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
   serverSideApiKeyIsSet: boolean;
+  serverSidePluginKeysSet: boolean;
 }
 
 export const initialState: HomeInitialState = {
@@ -43,10 +43,10 @@ export const initialState: HomeInitialState = {
   prompts: [],
   showPromptbar: true,
   showChatbar: true,
-
   currentFolder: undefined,
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
+  serverSidePluginKeysSet: false,
 };

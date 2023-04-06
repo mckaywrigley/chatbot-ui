@@ -7,8 +7,7 @@ interface Props {
   searchTerm: string;
   onSearch: (searchTerm: string) => void;
 }
-
-export const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
+const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
   const { t } = useTranslation('sidebar');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,3 +38,5 @@ export const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
     </div>
   );
 };
+
+export default Search;

@@ -1,21 +1,21 @@
 import { PluginID, PluginKey } from '@/types/plugin';
 import { IconKey } from '@tabler/icons-react';
-import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { useContext, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SidebarButton } from '../Sidebar/SidebarButton';
+import { SidebarButton } from '@/components/Sidebar/SidebarButton';
 
-interface Props {
-  pluginKeys: PluginKey[];
-  onPluginKeyChange: (pluginKey: PluginKey) => void;
-  onClearPluginKey: (pluginKey: PluginKey) => void;
-}
+import ChatbarContext from '../Chatbar.context';
+import HomeContext from '@/pages/api/home/home.context';
 
-export const PluginKeys: FC<Props> = ({
-  pluginKeys,
-  onPluginKeyChange,
-  onClearPluginKey,
-}) => {
+export const PluginKeys = () => {
   const { t } = useTranslation('sidebar');
+
+  const {
+    state: { pluginKeys },
+  } = useContext(HomeContext);
+
+  const { handlePluginKeyChange, handleClearPluginKey } =
+    useContext(ChatbarContext);
 
   const [isChanging, setIsChanging] = useState(false);
 
@@ -118,7 +118,7 @@ export const PluginKeys: FC<Props> = ({
                             }),
                           };
 
-                          onPluginKeyChange(updatedPluginKey);
+                          handlePluginKeyChange(updatedPluginKey);
                         }
                       } else {
                         const newPluginKey: PluginKey = {
@@ -135,7 +135,7 @@ export const PluginKeys: FC<Props> = ({
                           ],
                         };
 
-                        onPluginKeyChange(newPluginKey);
+                        handlePluginKeyChange(newPluginKey);
                       }
                     }}
                   />
@@ -177,7 +177,7 @@ export const PluginKeys: FC<Props> = ({
                             }),
                           };
 
-                          onPluginKeyChange(updatedPluginKey);
+                          handlePluginKeyChange(updatedPluginKey);
                         }
                       } else {
                         const newPluginKey: PluginKey = {
@@ -194,7 +194,7 @@ export const PluginKeys: FC<Props> = ({
                           ],
                         };
 
-                        onPluginKeyChange(newPluginKey);
+                        handlePluginKeyChange(newPluginKey);
                       }
                     }}
                   />
@@ -207,7 +207,7 @@ export const PluginKeys: FC<Props> = ({
                       );
 
                       if (pluginKey) {
-                        onClearPluginKey(pluginKey);
+                        handleClearPluginKey(pluginKey);
                       }
                     }}
                   >

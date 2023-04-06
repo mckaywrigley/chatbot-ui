@@ -1,11 +1,10 @@
-import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
+
 import { FolderType, FolderInterface } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Plugin, PluginKey } from '@/types/plugin';
@@ -22,9 +21,7 @@ import {
   updateConversation,
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
-import { exportData, importData } from '@/utils/app/importExport';
 import { savePrompts } from '@/utils/app/prompts';
-import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -36,19 +33,19 @@ import { v4 as uuidv4 } from 'uuid';
 import HomeContext from './home.context';
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 import { HomeInitialState, initialState } from './home.state';
-import Sidebar from '@/components/Sidebar';
+import { Chat } from '@/components/Chat/Chat';
 
-interface HomeProps {
+interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
 
-const Home: React.FC<HomeProps> = ({
+const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
-}) => {
+}: Props) => {
   const { t } = useTranslation('chat');
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -58,7 +55,6 @@ const Home: React.FC<HomeProps> = ({
   const {
     state: {
       apiKey,
-      loading,
       pluginKeys,
       lightMode,
       messageIsStreaming,
@@ -69,10 +65,7 @@ const Home: React.FC<HomeProps> = ({
       selectedConversation,
       currentMessage,
       prompts,
-      showChatbar,
-      showPromptbar,
-
-      messageError,
+      loading,
     },
     dispatch,
   } = contextValue;
@@ -343,83 +336,6 @@ const Home: React.FC<HomeProps> = ({
     dispatch({ field: 'modelError', value: null });
   };
 
-  // BASIC HANDLERS --------------------------------------------
-
-  const handleLightMode = (mode: 'dark' | 'light') => {
-    dispatch({ field: 'lightMode', value: mode });
-    localStorage.setItem('theme', mode);
-  };
-
-  const handleApiKeyChange = (apiKey: string) => {
-    dispatch({ field: 'apiKey', value: apiKey });
-
-    localStorage.setItem('apiKey', apiKey);
-  };
-
-  const handlePluginKeyChange = (pluginKey: PluginKey) => {
-    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
-      const updatedPluginKeys = pluginKeys.map((key) => {
-        if (key.pluginId === pluginKey.pluginId) {
-          return pluginKey;
-        }
-
-        return key;
-      });
-
-      dispatch({ field: 'pluginKeys', value: updatedPluginKeys });
-
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
-    } else {
-      dispatch({ field: 'pluginKeys', value: [...pluginKeys, pluginKey] });
-
-      localStorage.setItem(
-        'pluginKeys',
-        JSON.stringify([...pluginKeys, pluginKey]),
-      );
-    }
-  };
-
-  const handleClearPluginKey = (pluginKey: PluginKey) => {
-    const updatedPluginKeys = pluginKeys.filter(
-      (key) => key.pluginId !== pluginKey.pluginId,
-    );
-
-    if (updatedPluginKeys.length === 0) {
-      dispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
-      return;
-    }
-
-    dispatch({ field: 'pluginKeys', value: updatedPluginKeys });
-
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
-  };
-
-  const handleToggleChatbar = () => {
-    dispatch({ field: 'showChatbar', value: !showChatbar });
-    localStorage.setItem('showChatbar', JSON.stringify(!showChatbar));
-  };
-
-  const handleTogglePromptbar = () => {
-    dispatch({ field: 'showPromptbar', value: !showPromptbar });
-    localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
-  };
-
-  const handleExportData = () => {
-    exportData();
-  };
-
-  const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
-    dispatch({ field: 'conversations', value: history });
-    dispatch({
-      field: 'selectedConversation',
-      value: history[history.length - 1],
-    });
-    dispatch({ field: 'folders', value: folders });
-    dispatch({ field: 'prompts', value: prompts });
-  };
-
   const handleSelectConversation = (conversation: Conversation) => {
     dispatch({
       field: 'selectedConversation',
@@ -525,37 +441,6 @@ const Home: React.FC<HomeProps> = ({
     dispatch({ field: 'loading', value: false });
   };
 
-  const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
-    );
-    dispatch({ field: 'conversations', value: updatedConversations });
-    saveConversations(updatedConversations);
-
-    if (updatedConversations.length > 0) {
-      dispatch({
-        field: 'conversations',
-        value: updatedConversations[updatedConversations.length - 1],
-      });
-
-      saveConversation(updatedConversations[updatedConversations.length - 1]);
-    } else {
-      dispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: 'New conversation',
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          folderId: null,
-        },
-      });
-
-      localStorage.removeItem('selectedConversation');
-    }
-  };
-
   const handleUpdateConversation = (
     conversation: Conversation,
     data: KeyValuePair,
@@ -572,29 +457,6 @@ const Home: React.FC<HomeProps> = ({
 
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
-  };
-
-  const handleClearConversations = () => {
-    dispatch({
-      field: 'selectedConversation',
-      value: {
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: null,
-      },
-    });
-    dispatch({ field: 'conversations', value: [] });
-
-    localStorage.removeItem('conversationHistory');
-    localStorage.removeItem('selectedConversation');
-
-    const updatedFolders = folders.filter((f) => f.type !== 'chat');
-
-    dispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(updatedFolders);
   };
 
   const handleEditMessage = (message: Message, messageIndex: number) => {
@@ -664,8 +526,19 @@ const Home: React.FC<HomeProps> = ({
   }, [apiKey]);
 
   useEffect(() => {
-    dispatch({ field: 'defaultModelId', value: defaultModelId });
-  }, [defaultModelId]);
+    defaultModelId &&
+      dispatch({ field: 'defaultModelId', value: defaultModelId });
+    serverSideApiKeyIsSet &&
+      dispatch({
+        field: 'serverSideApiKeyIsSet',
+        value: serverSideApiKeyIsSet,
+      });
+    serverSidePluginKeysSet &&
+      dispatch({
+        field: 'serverSidePluginKeysSet',
+        value: serverSidePluginKeysSet,
+      });
+  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
 
@@ -761,17 +634,11 @@ const Home: React.FC<HomeProps> = ({
       value={{
         ...contextValue,
         handleNewConversation,
-        handleLightMode,
         handleCreateFolder,
         handleDeleteFolder,
         handleUpdateFolder,
         handleSelectConversation,
-        handleDeleteConversation,
         handleUpdateConversation,
-        handleApiKeyChange,
-        handleClearConversations,
-        handleExportData,
-        handleImportConversations,
       }}
     >
       <Head>
@@ -795,37 +662,7 @@ const Home: React.FC<HomeProps> = ({
           </div>
 
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Sidebar
-              side={'left'}
-              isOpen={showChatbar}
-              toggleOpen={handleToggleChatbar}
-            >
-              <Chatbar
-                loading={messageIsStreaming}
-                conversations={conversations}
-                lightMode={lightMode}
-                selectedConversation={selectedConversation}
-                apiKey={apiKey}
-                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-                pluginKeys={pluginKeys}
-                serverSidePluginKeysSet={serverSidePluginKeysSet}
-                folders={folders.filter((folder) => folder.type === 'chat')}
-                onToggleLightMode={handleLightMode}
-                onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
-                onDeleteFolder={handleDeleteFolder}
-                onUpdateFolder={handleUpdateFolder}
-                onNewConversation={handleNewConversation}
-                onSelectConversation={handleSelectConversation}
-                onDeleteConversation={handleDeleteConversation}
-                onUpdateConversation={handleUpdateConversation}
-                onApiKeyChange={handleApiKeyChange}
-                onClearConversations={handleClearConversations}
-                onExportConversations={handleExportData}
-                onImportConversations={handleImportConversations}
-                onPluginKeyChange={handlePluginKeyChange}
-                onClearPluginKey={handleClearPluginKey}
-              />
-            </Sidebar>
+            <Chatbar />
 
             <div className="flex flex-1">
               <Chat
@@ -845,13 +682,7 @@ const Home: React.FC<HomeProps> = ({
               />
             </div>
 
-            <Sidebar
-              side={'right'}
-              isOpen={showPromptbar}
-              toggleOpen={handleTogglePromptbar}
-            >
-              <Promptbar />
-            </Sidebar>
+            <Promptbar />
           </div>
         </main>
       )}

@@ -23,7 +23,6 @@ interface Props {
 
 export const PromptComponent = ({ prompt }: Props) => {
   const {
-    state: {},
     dispatch: promptDispatch,
     handleUpdatePrompt,
     handleDeletePrompt,
