@@ -143,7 +143,7 @@ export const ChatMessage: FC<Props> = memo(
                 )}
               </div>
               {totalPages > 1 && (
-                <div className="flex justify-between text-xs font-normal">
+                <div className="flex justify-between text-xs font-normal absolute left-[-2px] bottom-[5px]">
                   <button
                     disabled={currentPage == 1}
                     className={currentPage == 1 ? 'text-slate-500' : ''}
