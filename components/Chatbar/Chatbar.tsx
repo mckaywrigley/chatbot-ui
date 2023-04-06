@@ -21,7 +21,9 @@ interface Props {
   lightMode: 'light' | 'dark';
   selectedConversation: Conversation;
   apiKey: string;
+  serverSideApiKeyIsSet: boolean;
   pluginKeys: PluginKey[];
+  serverSidePluginKeysSet: boolean;
   folders: Folder[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -48,7 +50,9 @@ export const Chatbar: FC<Props> = ({
   lightMode,
   selectedConversation,
   apiKey,
+  serverSideApiKeyIsSet,
   pluginKeys,
+  serverSidePluginKeysSet,
   folders,
   onCreateFolder,
   onDeleteFolder,
@@ -214,7 +218,9 @@ export const Chatbar: FC<Props> = ({
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
+        serverSideApiKeyIsSet={serverSideApiKeyIsSet}
         pluginKeys={pluginKeys}
+        serverSidePluginKeysSet={serverSidePluginKeysSet}
         conversationsCount={conversations.length}
         onToggleLightMode={onToggleLightMode}
         onApiKeyChange={onApiKeyChange}

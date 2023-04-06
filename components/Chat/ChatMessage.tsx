@@ -1,5 +1,11 @@
 import { Message } from '@/types/chat';
-import { IconCheck, IconCopy, IconEdit, IconUser, IconRobot } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconCopy,
+  IconEdit,
+  IconUser,
+  IconRobot,
+} from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
 import rehypeMathjax from 'rehype-mathjax';
@@ -81,7 +87,11 @@ export const ChatMessage: FC<Props> = memo(
       >
         <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="min-w-[40px] text-right font-bold">
-            {message.role === 'assistant' ? <IconRobot size={30}/> : <IconUser size={30}/>}
+            {message.role === 'assistant' ? (
+              <IconRobot size={30} />
+            ) : (
+              <IconUser size={30} />
+            )}
           </div>
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
@@ -136,7 +146,7 @@ export const ChatMessage: FC<Props> = memo(
                   <button
                     className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
                       window.innerWidth < 640
-                        ? 'right-3 bottom-1'
+                        ? 'bottom-1 right-3'
                         : 'right-0 top-[26px]'
                     }
                     `}
@@ -151,7 +161,7 @@ export const ChatMessage: FC<Props> = memo(
                 <div
                   className={`absolute ${
                     window.innerWidth < 640
-                      ? 'right-3 bottom-1'
+                      ? 'bottom-1 right-3'
                       : 'right-0 top-[26px] m-0'
                   }`}
                 >
@@ -178,10 +188,10 @@ export const ChatMessage: FC<Props> = memo(
                     code({ node, inline, className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || '');
 
-                      return !inline && match ? (
+                      return !inline ? (
                         <CodeBlock
                           key={Math.random()}
-                          language={match[1]}
+                          language={(match && match[1]) || ''}
                           value={String(children).replace(/\n$/, '')}
                           {...props}
                         />
@@ -193,21 +203,21 @@ export const ChatMessage: FC<Props> = memo(
                     },
                     table({ children }) {
                       return (
-                        <table className="border-collapse border border-black py-1 px-3 dark:border-white">
+                        <table className="border-collapse border border-black px-3 py-1 dark:border-white">
                           {children}
                         </table>
                       );
                     },
                     th({ children }) {
                       return (
-                        <th className="break-words border border-black bg-gray-500 py-1 px-3 text-white dark:border-white">
+                        <th className="break-words border border-black bg-gray-500 px-3 py-1 text-white dark:border-white">
                           {children}
                         </th>
                       );
                     },
                     td({ children }) {
                       return (
-                        <td className="break-words border border-black py-1 px-3 dark:border-white">
+                        <td className="break-words border border-black px-3 py-1 dark:border-white">
                           {children}
                         </td>
                       );
