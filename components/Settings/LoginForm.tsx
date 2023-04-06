@@ -3,32 +3,45 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 type Props = {
-    onLogin: () => void;
-    username: string | undefined;
-    password: string | undefined;
+  onLogin: () => void;
+  username: string | undefined;
+  password: string | undefined;
 };
 
 export default function LoginForm({ onLogin, username, password }: Props) {
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const bypassAuth = true; // Set to true to enable bypass, set to false to disable bypass
 
-    const handleSubmit = async (values: { username: string, password: string }) => {
-        setIsLoading(true);
+  const handleSubmit = async (values: { username: string; password: string }) => {
+    setIsLoading(true);
 
-        // Check if the entered username and password match the ones from the .env file
-        if (values.username === username && values.password === password) {
-            console.log('Credentials match.');
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', values.username);
-            onLogin();
-        } else {
-            console.log('Credentials do not match.');
-            // If the authentication fails, show an error message
-            toast.error('Invalid username or password.');
-        }
+    if (
+      bypassAuth &&
+      values.username.trim() === '' &&
+      values.password.trim() === ''
+    ) {
+      console.log('Bypassing authentication');
+      localStorage.setItem('isLoggedIn', 'true');
+      onLogin();
+      setIsLoading(false);
+      return;
+    }
 
-        setIsLoading(false);
-    };
+    // Check if the entered username and password match the ones from the .env file
+    if (values.username === username && values.password === password) {
+      console.log('Credentials match.');
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', values.username);
+      onLogin();
+    } else {
+      console.log('Credentials do not match.');
+      // If the authentication fails, show an error message
+      toast.error('Invalid username or password.');
+    }
+
+    setIsLoading(false);
+  };
 
     return (
         
