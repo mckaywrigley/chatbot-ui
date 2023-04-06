@@ -8,6 +8,7 @@ import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
+import FontSelector from '../Settings/FontSelector';
 
 interface Props {
   lightMode: 'light' | 'dark';
@@ -44,6 +45,8 @@ export const ChatbarSettings: FC<Props> = ({
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+      <FontSelector />
+
       {conversationsCount > 0 ? (
         <ClearConversations onClearConversations={onClearConversations} />
       ) : null}
@@ -66,11 +69,11 @@ export const ChatbarSettings: FC<Props> = ({
         }
       />
 
-      {!(serverSideApiKeyIsSet) ? (
+      {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
       ) : null}
 
-      {!(serverSidePluginKeysSet) ? (
+      {!serverSidePluginKeysSet ? (
         <PluginKeys
           pluginKeys={pluginKeys}
           onPluginKeyChange={onPluginKeyChange}
