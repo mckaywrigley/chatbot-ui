@@ -32,7 +32,7 @@ jobs:
           git merge upstream/main --no-edit
 
       - name: Push changes to fork
-        run: git push https://x-access-token:${{ secrets.REPOTKN }}@github.com/seichris/chatbot-ui.git main
+        run: git push https://x-access-token:${{ secrets.PUSH }}@github.com/seichris/chatbot-ui.git main
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v3
