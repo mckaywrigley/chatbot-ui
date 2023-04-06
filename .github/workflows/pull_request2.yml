@@ -1,0 +1,42 @@
+on:
+  workflow_run:
+    workflows: ["Update Fork"]
+    types:
+      - completed
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight
+jobs:
+  update-fork:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+      - name: Fetch upstream changes
+        run: |
+          git remote add upstream https://github.com/mckaywrigley/chatbot-ui.git
+          git fetch upstream
+      - name: Merge upstream changes into fork
+        run: |
+          git checkout main
+          git merge upstream/main --no-edit
+      - name: Push changes to fork
+        run: git push https://x-access-token:${{ secrets.PUSH }}@github.com/seichris/chatbot-ui.git main
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.PUSH }}
+          commit-message: Update fork with upstream changes
+          title: Update fork with upstream changes
+          body: |
+            This pull request was automatically created to update the fork with the latest changes from the upstream repository.
+          branch: update-fork
+          base: main
