@@ -6,7 +6,13 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { DragEvent, useEffect, useState, useContext } from 'react';
+import {
+  DragEvent,
+  useEffect,
+  useState,
+  useContext,
+  MouseEventHandler,
+} from 'react';
 import { PromptModal } from './PromptModal';
 
 import PromptbarContext from '../PromptBar.context';
@@ -33,9 +39,25 @@ export const PromptComponent = ({ prompt }: Props) => {
     promptDispatch({ field: 'searchTerm', value: '' });
   };
 
-  const handleDelete = (prompt: Prompt) => {
-    handleDeletePrompt(prompt);
-    promptDispatch({ field: 'searchTerm', value: '' });
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+
+    if (isDeleting) {
+      handleDeletePrompt(prompt);
+      promptDispatch({ field: 'searchTerm', value: '' });
+    }
+
+    setIsDeleting(false);
+  };
+
+  const handleCancelDelete: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    setIsDeleting(false);
+  };
+
+  const handleOpenDeleteModal: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    setIsDeleting(true);
   };
 
   const handleDragStart = (e: DragEvent<HTMLButtonElement>, prompt: Prompt) => {
@@ -77,26 +99,11 @@ export const PromptComponent = ({ prompt }: Props) => {
 
       {(isDeleting || isRenaming) && (
         <div className="absolute right-1 z-10 flex text-gray-300">
-          <SidebarActionButton
-            handleClick={(e) => {
-              e.stopPropagation();
-
-              if (isDeleting) {
-                handleDelete(prompt);
-              }
-
-              setIsDeleting(false);
-            }}
-          >
+          <SidebarActionButton handleClick={handleDelete}>
             <IconCheck size={18} />
           </SidebarActionButton>
 
-          <SidebarActionButton
-            handleClick={(e) => {
-              e.stopPropagation();
-              setIsDeleting(false);
-            }}
-          >
+          <SidebarActionButton handleClick={handleCancelDelete}>
             <IconX size={18} />
           </SidebarActionButton>
         </div>
@@ -104,12 +111,7 @@ export const PromptComponent = ({ prompt }: Props) => {
 
       {!isDeleting && !isRenaming && (
         <div className="absolute right-1 z-10 flex text-gray-300">
-          <SidebarActionButton
-            handleClick={(e) => {
-              e.stopPropagation();
-              setIsDeleting(true);
-            }}
-          >
+          <SidebarActionButton handleClick={handleOpenDeleteModal}>
             <IconTrash size={18} />
           </SidebarActionButton>
         </div>
