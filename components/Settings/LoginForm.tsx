@@ -1,6 +1,6 @@
 import { Formik, Field, Form } from 'formik';
 import toast from 'react-hot-toast';
-import { useState} from 'react';
+import { useState } from 'react';
 
 type Props = {
     onLogin: () => void;
@@ -10,6 +10,7 @@ type Props = {
 
 export default function LoginForm({ onLogin, username, password }: Props) {
     const [isLoading, setIsLoading] = useState(false);
+
 
     const handleSubmit = async (values: { username: string, password: string }) => {
         setIsLoading(true);
@@ -22,9 +23,6 @@ export default function LoginForm({ onLogin, username, password }: Props) {
             onLogin();
         } else {
             console.log('Credentials do not match.');
-            console.log('Username: ' + values.username);
-            console.log('Password: ' + values.password);
-
             // If the authentication fails, show an error message
             toast.error('Invalid username or password.');
         }
@@ -33,7 +31,6 @@ export default function LoginForm({ onLogin, username, password }: Props) {
     };
 
     return (
-
         
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <Formik
