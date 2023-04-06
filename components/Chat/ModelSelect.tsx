@@ -1,7 +1,9 @@
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
-import { useTranslation } from 'next-i18next';
 import { IconExternalLink } from '@tabler/icons-react';
 import { FC } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
+import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
 interface Props {
   model: OpenAIModel;
@@ -50,8 +52,12 @@ export const ModelSelect: FC<Props> = ({
         </select>
       </div>
       <div className="w-full mt-3 text-left text-neutral-700 dark:text-neutral-400 flex items-center">
-        <a href="https://platform.openai.com/account/usage" target="_blank" className="flex items-center">
-          <IconExternalLink size={18} className={"inline mr-1"} />
+        <a
+          href="https://platform.openai.com/account/usage"
+          target="_blank"
+          className="flex items-center"
+        >
+          <IconExternalLink size={18} className={'inline mr-1'} />
           {t('View Account Usage')}
         </a>
       </div>

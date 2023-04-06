@@ -1,10 +1,13 @@
+import { useContext } from 'react';
+
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface } from '@/types/folder';
-import { useContext } from 'react';
+
 import HomeContext from '@/pages/api/home/home.context';
 
 import Folder from '@/components/Folder';
+
 import { ConversationComponent } from './Conversation';
 
 interface Props {

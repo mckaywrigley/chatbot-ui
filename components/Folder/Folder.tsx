@@ -1,5 +1,3 @@
-import { FolderInterface, FolderType } from '@/types/folder';
-import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import {
   IconCaretDown,
   IconCaretRight,
@@ -10,13 +8,17 @@ import {
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
+  ReactElement,
+  useContext,
   useEffect,
   useState,
-  useContext,
-  ReactElement,
 } from 'react';
 
+import { FolderInterface, FolderType } from '@/types/folder';
+
 import HomeContext from '@/pages/api/home/home.context';
+
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 
 interface Props {
   currentFolder: FolderInterface;

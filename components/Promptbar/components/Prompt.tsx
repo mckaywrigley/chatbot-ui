@@ -1,5 +1,3 @@
-import { Prompt } from '@/types/prompt';
-import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import {
   IconBulbFilled,
   IconCheck,
@@ -8,14 +6,18 @@ import {
 } from '@tabler/icons-react';
 import {
   DragEvent,
+  MouseEventHandler,
+  useContext,
   useEffect,
   useState,
-  useContext,
-  MouseEventHandler,
 } from 'react';
-import { PromptModal } from './PromptModal';
+
+import { Prompt } from '@/types/prompt';
+
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 
 import PromptbarContext from '../PromptBar.context';
+import { PromptModal } from './PromptModal';
 
 interface Props {
   prompt: Prompt;

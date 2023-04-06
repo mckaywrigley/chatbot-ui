@@ -1,12 +1,4 @@
-import { Conversation, Message } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
-import { ErrorMessage } from '@/types/error';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
-import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import {
   FC,
   MutableRefObject,
@@ -16,6 +8,16 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
+import { Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { Plugin } from '@/types/plugin';
+import { Prompt } from '@/types/prompt';
+
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
@@ -23,6 +25,8 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+
+import { throttle } from '@/utils';
 
 interface Props {
   conversation: Conversation;

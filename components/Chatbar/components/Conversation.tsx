@@ -1,5 +1,3 @@
-import { Conversation } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
 import {
   IconCheck,
   IconMessage,
@@ -9,14 +7,19 @@ import {
 } from '@tabler/icons-react';
 import {
   DragEvent,
-  useContext,
   KeyboardEvent,
+  MouseEventHandler,
+  useContext,
   useEffect,
   useState,
-  MouseEventHandler,
 } from 'react';
-import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
+
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+
 import HomeContext from '@/pages/api/home/home.context';
+
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 import ChatbarContext from '@/components/Chatbar/Chatbar.context';
 
 interface Props {

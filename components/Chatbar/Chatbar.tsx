@@ -1,32 +1,35 @@
-import { Conversation } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
-import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { useContext, useEffect, useState } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
 import { useCreateReducer } from '@/hooks/useCreateReducer';
-import { ChatbarInitialState, initialState } from './Chatbar.state';
 
-import { PluginKey } from '@/types/plugin';
-
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import { exportData, importData } from '@/utils/app/importExport';
 import { saveFolders } from '@/utils/app/folders';
+import { exportData, importData } from '@/utils/app/importExport';
 
-import { v4 as uuidv4 } from 'uuid';
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
+import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
+import { PluginKey } from '@/types/plugin';
 
-import { useTranslation } from 'next-i18next';
-import { useEffect, useState, useContext } from 'react';
+import HomeContext from '@/pages/api/home/home.context';
+
 import { ChatFolders } from './components/ChatFolders';
+import { ChatbarSettings } from './components/ChatbarSettings';
 import { Conversations } from './components/Conversations';
 
 import Sidebar from '../Sidebar';
-import HomeContext from '@/pages/api/home/home.context';
 import ChatbarContext from './Chatbar.context';
-import { ChatbarSettings } from './components/ChatbarSettings';
+import { ChatbarInitialState, initialState } from './Chatbar.state';
+
+import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');

@@ -1,7 +1,3 @@
-import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
   IconBrandGoogle,
@@ -9,7 +5,6 @@ import {
   IconRepeat,
   IconSend,
 } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import {
   FC,
   KeyboardEvent,
@@ -19,6 +14,14 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
+import { Message } from '@/types/chat';
+import { OpenAIModel } from '@/types/openai';
+import { Plugin } from '@/types/plugin';
+import { Prompt } from '@/types/prompt';
+
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';

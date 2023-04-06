@@ -1,11 +1,13 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
+
+import { OPENAI_API_HOST } from '../app/const';
+
 import {
-  createParser,
   ParsedEvent,
   ReconnectInterval,
+  createParser,
 } from 'eventsource-parser';
-import { OPENAI_API_HOST } from '../app/const';
 
 export class OpenAIError extends Error {
   type: string;

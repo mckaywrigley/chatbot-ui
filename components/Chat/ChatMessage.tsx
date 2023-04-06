@@ -1,18 +1,22 @@
-import { Message } from '@/types/chat';
 import {
   IconCheck,
   IconCopy,
   IconEdit,
-  IconUser,
   IconRobot,
+  IconUser,
 } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
+import { Message } from '@/types/chat';
+
+import { CodeBlock } from '../Markdown/CodeBlock';
+import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { CodeBlock } from '../Markdown/CodeBlock';
-import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 
 interface Props {
   message: Message;

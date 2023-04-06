@@ -1,16 +1,19 @@
+import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { useContext } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
 import { SupportedExportFormats } from '@/types/export';
 import { PluginKey } from '@/types/plugin';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
-import { useContext } from 'react';
+
+import HomeContext from '@/pages/api/home/home.context';
+
 import { Import } from '../../Settings/Import';
 import { Key } from '../../Settings/Key';
 import { SidebarButton } from '../../Sidebar/SidebarButton';
+import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
-
-import HomeContext from '@/pages/api/home/home.context';
-import ChatbarContext from '../Chatbar.context';
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');

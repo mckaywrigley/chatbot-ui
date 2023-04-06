@@ -1,14 +1,13 @@
-import { Chatbar } from '@/components/Chatbar/Chatbar';
-import { Navbar } from '@/components/Mobile/Navbar';
-import Promptbar from '@/components/Promptbar';
-import { ChatBody, Conversation, Message } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
-import { ErrorMessage } from '@/types/error';
+import { useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 
-import { FolderType, FolderInterface } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
-import { Plugin, PluginKey } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
+
+import { useCreateReducer } from '@/hooks/useCreateReducer';
+
 import { getEndpoint } from '@/utils/app/api';
 import {
   cleanConversationHistory,
@@ -22,18 +21,24 @@ import {
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
-import { GetServerSideProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Head from 'next/head';
-import { useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
-import { v4 as uuidv4 } from 'uuid';
+
+import { ChatBody, Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { ErrorMessage } from '@/types/error';
+import { FolderInterface, FolderType } from '@/types/folder';
+import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
+import { Plugin, PluginKey } from '@/types/plugin';
+import { Prompt } from '@/types/prompt';
+
+import { Chat } from '@/components/Chat/Chat';
+import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { Navbar } from '@/components/Mobile/Navbar';
+import Promptbar from '@/components/Promptbar';
 
 import HomeContext from './home.context';
-import { useCreateReducer } from '@/hooks/useCreateReducer';
 import { HomeInitialState, initialState } from './home.state';
-import { Chat } from '@/components/Chat/Chat';
+
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;

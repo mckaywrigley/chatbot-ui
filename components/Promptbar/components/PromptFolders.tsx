@@ -1,8 +1,12 @@
 import { useContext } from 'react';
+
+import { FolderInterface } from '@/types/folder';
+
+import HomeContext from '@/pages/api/home/home.context';
+
 import Folder from '@/components/Folder';
 import { PromptComponent } from '@/components/Promptbar/components/Prompt';
-import { FolderInterface } from '@/types/folder';
-import HomeContext from '@/pages/api/home/home.context';
+
 import PromptbarContext from '../PromptBar.context';
 
 export const PromptFolders = () => {
