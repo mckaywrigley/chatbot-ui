@@ -1,0 +1,74 @@
+name: CI & CD
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  AWS_DEFAULT_REGION: us-west-2
+  AWS_REGION: us-west-2
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: node:16
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Vitest Suite
+      run: npm test
+
+  build:
+    needs:
+      - test
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - run: make build
+      - uses: aws-actions/configure-aws-credentials@v1-node16
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: loilo-inc/actions-setup-cage@v4.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: loilo-inc/actions-deploy-cage@v3.1.0
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          region: us-west-2
+          deploy-context: .deploy/chatbot
+          create-deployment: true
+          environment: production
+          github-repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-ref: ${{ github.sha }}
