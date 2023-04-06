@@ -3,7 +3,11 @@ import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
 import { PluginKey } from '@/types/plugin';
-import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
+import {
+  IconFolderPlus,
+  IconMessagesOff,
+  IconMessagePlus,
+} from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
 import { ChatFolders } from '../Folders/Chat/ChatFolders';
@@ -120,37 +124,49 @@ export const Chatbar: FC<Props> = ({
     }
   }, [searchTerm, conversations]);
 
+  const [showChatbarIcons, setShowChatbarIcons] = useState<boolean>(true);
+
+  const toggleChatbarIcons = () => {
+    console.log('toggleChatbarIcons');
+    setShowChatbarIcons(!showChatbarIcons);
+  };
+
   return (
     <div
       className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 transition-all sm:relative sm:top-0`}
     >
       <div className="flex items-center">
-        <button
-          className="flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => {
-            onNewConversation();
-            setSearchTerm('');
-          }}
-        >
-          <IconPlus size={18} />
-          {t('New chat')}
-        </button>
+        {showChatbarIcons && (
+          <>
+            <button
+              className="flex flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+              onClick={() => {
+                onNewConversation();
+                setSearchTerm('');
+              }}
+            >
+              <IconMessagePlus size={18} />
+            </button>
 
-        <button
-          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
-        >
-          <IconFolderPlus size={18} />
-        </button>
+            <button
+              className="mx-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-[14px] leading-normal text-white transition-colors duration-200 hover:bg-gray-500/10"
+              onClick={() => onCreateFolder(t('New folder'))}
+            >
+              <IconFolderPlus size={18} />
+            </button>
+          </>
+        )}
+
+        {conversations.length > 1 && (
+          <Search
+            placeholder="Search"
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+            onFocus={toggleChatbarIcons}
+            onBlur={toggleChatbarIcons}
+          />
+        )}
       </div>
-
-      {conversations.length > 1 && (
-        <Search
-          placeholder="Search conversations..."
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      )}
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (

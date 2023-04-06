@@ -1,10 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
-import {
-  IconFolderPlus,
-  IconMistOff,
-  IconPlus,
-} from '@tabler/icons-react';
+import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PromptFolders } from '../Folders/Prompt/PromptFolders';
@@ -92,41 +88,53 @@ export const Promptbar: FC<Props> = ({
     }
   }, [searchTerm, prompts]);
 
+  const [showChatbarIcons, setShowChatbarIcons] = useState<boolean>(true);
+
+  const toggleChatbarIcons = () => {
+    console.log('toggleChatbarIcons');
+    setShowChatbarIcons(!showChatbarIcons);
+  };
+
   return (
     <div
       className={`fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
     >
       <div className="flex items-center">
-        <button
-          className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => {
-            onCreatePrompt();
-            setSearchTerm('');
-          }}
-        >
-          <IconPlus size={16} />
-          {t('New prompt')}
-        </button>
+        {showChatbarIcons && (
+          <>
+            <button
+              className="text-sidebar flex flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
+              onClick={() => {
+                onCreatePrompt();
+                setSearchTerm('');
+              }}
+            >
+              <IconPlus size={16} />
+            </button>
 
-        <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
-        >
-          <IconFolderPlus size={16} />
-        </button>
+            <button
+              className="mx-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+              onClick={() => onCreateFolder(t('New folder'))}
+            >
+              <IconFolderPlus size={16} />
+            </button>
+          </>
+        )}
+
+        {prompts.length > 1 && (
+          <Search
+            placeholder={t('Search') || ''}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+            onFocus={toggleChatbarIcons}
+            onBlur={toggleChatbarIcons}
+          />
+        )}
       </div>
-
-      {prompts.length > 1 && (
-        <Search
-          placeholder={t('Search prompts...') || ''}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      )}
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
+          <div className="flex border-b border-white/20 pb-2">
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
@@ -155,7 +163,7 @@ export const Promptbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
+          <div className="mt-8 select-none text-center text-white opacity-50">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
               {t('No prompts.')}
