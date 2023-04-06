@@ -485,25 +485,6 @@ const Home = ({
     }
   };
 
-  // PROMPT OPERATIONS --------------------------------------------
-
-  const handleCreatePrompt = () => {
-    const newPrompt: Prompt = {
-      id: uuidv4(),
-      name: `Prompt ${prompts.length + 1}`,
-      description: '',
-      content: '',
-      model: OpenAIModels[defaultModelId],
-      folderId: null,
-    };
-
-    const updatedPrompts = [...prompts, newPrompt];
-
-    dispatch({ field: 'prompts', value: updatedPrompts });
-
-    savePrompts(updatedPrompts);
-  };
-
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
