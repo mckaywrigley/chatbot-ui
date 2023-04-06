@@ -143,21 +143,21 @@ export const ChatMessage: FC<Props> = memo(
                 )}
               </div>
               {totalPages > 1 && (
-                <div className="flex justify-between text-xs font-normal absolute left-[-2px] bottom-[5px]">
+                <div className="flex justify-between text-xs font-normal absolute left-[-60px] top-[30px]">
                   <button
                     disabled={currentPage == 1}
-                    className={currentPage == 1 ? 'text-slate-500' : ''}
+                    className={(currentPage == 1 ? 'text-slate-500' : '') + ' pr-1'}
                     onClick={() => actions.clickSwitchNode(messageIndex, -1)}
                   >
                     &lt;
                   </button>
                   <div>
-                    {currentPage}/{totalPages}
+                    <span>{currentPage} / {totalPages}</span>
                   </div>
                   <button
                     disabled={currentPage == totalPages}
                     className={
-                      currentPage == totalPages ? 'text-slate-500' : ''
+                      (currentPage == totalPages ? 'text-slate-500' : '') + ' pl-1'
                     }
                     onClick={() => actions.clickSwitchNode(messageIndex, +1)}
                   >
