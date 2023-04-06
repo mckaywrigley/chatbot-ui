@@ -18,11 +18,15 @@ function App({ Component, pageProps }: AppProps<{}>) {
     }
   }, []);
 
-  const authKey = process.env.NEXT_PUBLIC_AUTH_KEY;
-
-  if (!isLoggedIn && authKey !== 'my-secret-auth-key') {
-    // If the user is not logged in and the auth key doesn't match, show the login form
-    return <LoginForm onLogin={() => setIsLoggedIn(true)} />
+  if (!isLoggedIn) {
+    // If the user is not logged in, show the login form
+    return (
+      <LoginForm
+        onLogin={() => setIsLoggedIn(true)}
+        username={process.env.NEXT_PUBLIC_USERNAME}
+        password={process.env.NEXT_PUBLIC_PASSWORD}
+      />
+    );
   }
 
   return (
