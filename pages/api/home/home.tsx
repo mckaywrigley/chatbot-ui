@@ -800,7 +800,31 @@ const Home: React.FC<HomeProps> = ({
               isOpen={showChatbar}
               toggleOpen={handleToggleChatbar}
             >
-              <Promptbar />
+              <Chatbar
+                loading={messageIsStreaming}
+                conversations={conversations}
+                lightMode={lightMode}
+                selectedConversation={selectedConversation}
+                apiKey={apiKey}
+                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+                pluginKeys={pluginKeys}
+                serverSidePluginKeysSet={serverSidePluginKeysSet}
+                folders={folders.filter((folder) => folder.type === 'chat')}
+                onToggleLightMode={handleLightMode}
+                onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
+                onDeleteFolder={handleDeleteFolder}
+                onUpdateFolder={handleUpdateFolder}
+                onNewConversation={handleNewConversation}
+                onSelectConversation={handleSelectConversation}
+                onDeleteConversation={handleDeleteConversation}
+                onUpdateConversation={handleUpdateConversation}
+                onApiKeyChange={handleApiKeyChange}
+                onClearConversations={handleClearConversations}
+                onExportConversations={handleExportData}
+                onImportConversations={handleImportConversations}
+                onPluginKeyChange={handlePluginKeyChange}
+                onClearPluginKey={handleClearPluginKey}
+              />
             </Sidebar>
 
             <div className="flex flex-1">
