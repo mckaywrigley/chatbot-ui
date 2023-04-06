@@ -1,6 +1,7 @@
 import { Formik, Field, Form } from 'formik';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 
 type Props = {
   onLogin: () => void;
@@ -22,7 +23,7 @@ export default function LoginForm({ onLogin, username, password }: Props) {
       values.password.trim() === ''
     ) {
       console.log('Bypassing authentication');
-      localStorage.setItem('isLoggedIn', 'true');
+      Cookies.set('isLoggedIn', 'true', { expires: 1 });
       onLogin();
       setIsLoading(false);
       return;
@@ -31,8 +32,7 @@ export default function LoginForm({ onLogin, username, password }: Props) {
     // Check if the entered username and password match the ones from the .env file
     if (values.username === username && values.password === password) {
       console.log('Credentials match.');
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', values.username);
+      Cookies.set('isLoggedIn', 'true', { expires: 1 }); // Set a cookie for 1 day
       onLogin();
     } else {
       console.log('Credentials do not match.');
@@ -43,7 +43,7 @@ export default function LoginForm({ onLogin, username, password }: Props) {
     setIsLoading(false);
   };
 
-    return (
+  return (
         
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <Formik
