@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import LoginForm from '../components/Settings/LoginForm';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const inter = Inter({ subsets: ['latin'] });
 const isBrowser = typeof window !== "undefined";
@@ -14,7 +15,7 @@ function App({ Component, pageProps }: AppProps<{}>) {
 
   useEffect(() => {
     if (isBrowser) {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setIsLoggedIn(Cookies.get('isLoggedIn') === 'true');
     }
   }, []);
 
