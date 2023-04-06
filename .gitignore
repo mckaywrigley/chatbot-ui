@@ -42,3 +42,4 @@ next-env.d.ts
 *.bin
 /src-tauri/binaries/
 /the-ai-box/
+/src-tauri/chat/

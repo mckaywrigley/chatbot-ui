@@ -34,10 +34,7 @@ import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { ProgressBar } from "react-progressbar-fancy";
 
-interface HomeProps {
-  serverSideApiKeyIsSet: boolean;
-  defaultModelId: OpenAIModelID;
-}
+interface HomeProps { }
 
 const FeatureCard = ({ title, description }: { title: string; description: string; }) => {
   return (
@@ -48,10 +45,7 @@ const FeatureCard = ({ title, description }: { title: string; description: strin
   );
 };
 
-const Home: React.FC<HomeProps> = ({
-  serverSideApiKeyIsSet,
-  defaultModelId,
-}) => {
+const Home: React.FC<HomeProps> = () => {
 
   // STATE ----------------------------------------------
 
@@ -80,6 +74,7 @@ const Home: React.FC<HomeProps> = ({
   const [apisReady, setApisReady] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [showChat, setShowChat] = useState(false);
+  const [defaultModelId, setDefaultModelId] = useState(fallbackModelID);
 
   // REFS ----------------------------------------------
 
@@ -587,6 +582,9 @@ const Home: React.FC<HomeProps> = ({
     checkApisStatus();
   }, []);
 
+  useEffect(() => {
+    fetchModels("");
+  }, []);
 
   // ON LOAD --------------------------------------------
 
@@ -595,15 +593,6 @@ const Home: React.FC<HomeProps> = ({
     if (theme) {
       setLightMode(theme as 'dark' | 'light');
     }
-
-    const apiKey = localStorage.getItem('apiKey');
-    if (apiKey) {
-      setApiKey(apiKey);
-      fetchModels(apiKey);
-    } else if (serverSideApiKeyIsSet) {
-      fetchModels('');
-    }
-
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -657,7 +646,7 @@ const Home: React.FC<HomeProps> = ({
         folderId: null,
       });
     }
-  }, [serverSideApiKeyIsSet]);
+  }, []);
 
   return (
     <>
@@ -730,7 +719,6 @@ const Home: React.FC<HomeProps> = ({
                 conversation={selectedConversation}
                 messageIsStreaming={messageIsStreaming}
                 apiKey={apiKey}
-                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
                 defaultModelId={defaultModelId}
                 modelError={modelError}
                 models={models}
@@ -804,3 +792,20 @@ const Home: React.FC<HomeProps> = ({
   );
 };
 export default Home;
+
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   const defaultModelId =
+//     (process.env.DEFAULT_MODEL &&
+//       Object.values(OpenAIModelID).includes(
+//         process.env.DEFAULT_MODEL as OpenAIModelID,
+//       ) &&
+//       process.env.DEFAULT_MODEL) ||
+//     fallbackModelID;
+
+//   return {
+//     props: {
+//       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+//       defaultModelId
+//     },
+//   };
+// };
