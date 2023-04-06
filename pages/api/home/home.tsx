@@ -36,6 +36,7 @@ import { v4 as uuidv4 } from 'uuid';
 import HomeContext from './home.context';
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 import { HomeInitialState, initialState } from './home.state';
+import Sidebar from '@/components/Sidebar';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
@@ -68,7 +69,7 @@ const Home: React.FC<HomeProps> = ({
       selectedConversation,
       currentMessage,
       prompts,
-      showSidebar,
+      showChatbar,
       showPromptbar,
 
       messageError,
@@ -395,8 +396,8 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleToggleChatbar = () => {
-    dispatch({ field: 'showSidebar', value: !showSidebar });
-    localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
+    dispatch({ field: 'showChatbar', value: !showChatbar });
+    localStorage.setItem('showChatbar', JSON.stringify(!showChatbar));
   };
 
   const handleTogglePromptbar = () => {
@@ -652,7 +653,7 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     if (window.innerWidth < 640) {
-      dispatch({ field: 'showSidebar', value: false });
+      dispatch({ field: 'showChatbar', value: false });
     }
   }, [selectedConversation]);
 
@@ -694,12 +695,12 @@ const Home: React.FC<HomeProps> = ({
     }
 
     if (window.innerWidth < 640) {
-      dispatch({ field: 'showSidebar', value: false });
+      dispatch({ field: 'showChatbar', value: false });
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
     if (showChatbar) {
-      dispatch({ field: 'showSidebar', value: showChatbar === 'true' });
+      dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
     }
 
     const showPromptbar = localStorage.getItem('showPromptbar');
@@ -794,53 +795,13 @@ const Home: React.FC<HomeProps> = ({
           </div>
 
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            {showSidebar ? (
-              <div>
-                <Chatbar
-                  loading={messageIsStreaming}
-                  conversations={conversations}
-                  lightMode={lightMode}
-                  selectedConversation={selectedConversation}
-                  apiKey={apiKey}
-                  serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-                  pluginKeys={pluginKeys}
-                  serverSidePluginKeysSet={serverSidePluginKeysSet}
-                  folders={folders.filter((folder) => folder.type === 'chat')}
-                  onToggleLightMode={handleLightMode}
-                  onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
-                  onDeleteFolder={handleDeleteFolder}
-                  onUpdateFolder={handleUpdateFolder}
-                  onNewConversation={handleNewConversation}
-                  onSelectConversation={handleSelectConversation}
-                  onDeleteConversation={handleDeleteConversation}
-                  onUpdateConversation={handleUpdateConversation}
-                  onApiKeyChange={handleApiKeyChange}
-                  onClearConversations={handleClearConversations}
-                  onExportConversations={handleExportData}
-                  onImportConversations={handleImportConversations}
-                  onPluginKeyChange={handlePluginKeyChange}
-                  onClearPluginKey={handleClearPluginKey}
-                />
-
-                <button
-                  className="fixed top-5 left-[270px] z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
-                  onClick={handleToggleChatbar}
-                >
-                  <IconArrowBarLeft />
-                </button>
-                <div
-                  onClick={handleToggleChatbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
-                ></div>
-              </div>
-            ) : (
-              <button
-                className="fixed top-2.5 left-4 z-50 h-7 w-7 text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:left-4 sm:h-8 sm:w-8 sm:text-neutral-700"
-                onClick={handleToggleChatbar}
-              >
-                <IconArrowBarRight />
-              </button>
-            )}
+            <Sidebar
+              side={'left'}
+              isOpen={showChatbar}
+              toggleOpen={handleToggleChatbar}
+            >
+              <Promptbar />
+            </Sidebar>
 
             <div className="flex flex-1">
               <Chat
@@ -860,28 +821,13 @@ const Home: React.FC<HomeProps> = ({
               />
             </div>
 
-            {showPromptbar ? (
-              <div>
-                <Promptbar />
-                <button
-                  className="fixed top-5 right-[270px] z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-[270px] sm:h-8 sm:w-8 sm:text-neutral-700"
-                  onClick={handleTogglePromptbar}
-                >
-                  <IconArrowBarRight />
-                </button>
-                <div
-                  onClick={handleTogglePromptbar}
-                  className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
-                ></div>
-              </div>
-            ) : (
-              <button
-                className="fixed top-2.5 right-4 z-50 h-7 w-7 text-white hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:right-4 sm:h-8 sm:w-8 sm:text-neutral-700"
-                onClick={handleTogglePromptbar}
-              >
-                <IconArrowBarLeft />
-              </button>
-            )}
+            <Sidebar
+              side={'right'}
+              isOpen={showPromptbar}
+              toggleOpen={handleTogglePromptbar}
+            >
+              <Promptbar />
+            </Sidebar>
           </div>
         </main>
       )}

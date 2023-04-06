@@ -18,7 +18,7 @@ export interface HomeInitialState {
   selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
   prompts: Prompt[];
-  showSidebar: boolean;
+  showChatbar: boolean;
   showPromptbar: boolean;
 
   currentFolder: FolderInterface | undefined;
@@ -42,7 +42,7 @@ export const initialState: HomeInitialState = {
   currentMessage: undefined,
   prompts: [],
   showPromptbar: true,
-  showSidebar: true,
+  showChatbar: true,
 
   currentFolder: undefined,
   messageError: false,

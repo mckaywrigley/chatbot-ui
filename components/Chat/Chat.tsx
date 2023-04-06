@@ -16,7 +16,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Spinner } from '../Global/Spinner';
+import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
