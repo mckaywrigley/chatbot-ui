@@ -16,7 +16,7 @@ interface FontContextValue {
 const FontContext = createContext<FontContextValue | undefined>(undefined);
 
 export const FontProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const [selectedFont, setSelectedFont] = useState('Arial');
+  const [selectedFont, setSelectedFont] = useState('Inter');
 
   return (
     <FontContext.Provider value={{ selectedFont, setSelectedFont }}>
