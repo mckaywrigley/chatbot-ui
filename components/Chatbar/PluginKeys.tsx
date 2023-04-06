@@ -72,11 +72,11 @@ export const PluginKeys: FC<Props> = ({
                 className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-hidden rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
                 role="dialog"
               >
-                <div className="mb-10 text-4xl">Plugin Keys</div>
+                <div className="mb-10 text-4xl text-black dark:text-white">Plugin Keys</div>
 
                 <div className="mt-6 rounded border p-4">
-                  <div className="text-xl font-bold">Google Search Plugin</div>
-                  <div className="mt-4 italic">
+                  <div className="text-xl font-bold text-black dark:text-white">Google Search Plugin</div>
+                  <div className="mt-4 italic text-black dark:text-white">
                     Please enter your Google API Key and Google CSE ID to enable
                     the Google Search Plugin.
                   </div>
