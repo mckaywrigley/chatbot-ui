@@ -22,8 +22,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
-import { ConversationContext } from '@/utils/contexts/conversaionContext';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import { ChatSwitch } from './ChatSwitch';
 
 interface Props {
   chatNode: ChatNode;
@@ -36,29 +36,11 @@ export const ChatMessage: FC<Props> = memo(
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
+    const [isHoverMessage, setIsHoverMessage] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(
       chatNode.message.content,
     );
     const [messagedCopied, setMessageCopied] = useState(false);
-
-    const { selectedConversation, actions } = useContext(ConversationContext);
-
-    const totalPages = useMemo(() => {
-      return chatNode.parentMessageId
-        ? selectedConversation?.mapping[chatNode.parentMessageId]?.children
-            ?.length ?? 0
-        : 0;
-    }, [chatNode]);
-
-    const currentPage = useMemo(() => {
-      return (
-        (chatNode.parentMessageId
-          ? selectedConversation?.mapping[
-              chatNode.parentMessageId
-            ]?.children?.indexOf(chatNode.id) ?? 0
-          : 0) + 1
-      );
-    }, [chatNode]);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -124,46 +106,29 @@ export const ChatMessage: FC<Props> = memo(
 
     return (
       <div
-        className={`group px-4 ${
+        className={`group px-2 ${
           chatNode.message.role === 'assistant'
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
         }`}
         style={{ overflowWrap: 'anywhere' }}
+        onMouseEnter={() => setIsHoverMessage(true)}
+        onMouseLeave={() => setIsHoverMessage(false)}
       >
         <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-          <div className="min-w-[40px] text-right font-bold">
-            {/* switch page */}
-            <div className="flex flex-col">
-              <div>
-                {chatNode.message.role === 'assistant' ? (
-                  <IconRobot size={30} />
-                ) : (
-                  <IconUser size={30} />
-                )}
-              </div>
-              {totalPages > 1 && (
-                <div className="flex justify-between text-xs font-normal absolute left-[-60px] top-[30px]">
-                  <button
-                    disabled={currentPage == 1}
-                    className={(currentPage == 1 ? 'text-slate-500' : '') + ' pr-1'}
-                    onClick={() => actions.clickSwitchNode(messageIndex, -1)}
-                  >
-                    &lt;
-                  </button>
-                  <div>
-                    <span>{currentPage} / {totalPages}</span>
-                  </div>
-                  <button
-                    disabled={currentPage == totalPages}
-                    className={
-                      (currentPage == totalPages ? 'text-slate-500' : '') + ' pl-1'
-                    }
-                    onClick={() => actions.clickSwitchNode(messageIndex, +1)}
-                  >
-                    &gt;
-                  </button>
-                </div>
+          <div className="flex min-w-[40px] text-right font-bold">
+            <div className="absolute left-0 hidden self-center md:-ml-10 lg:-ml-16 lg:flex">
+              <ChatSwitch
+                key={chatNode.id}
+                chatNode={chatNode}
+                messageIndex={messageIndex}
+              />
+            </div>
+            <div className="flex justify-center">
+              {chatNode.message.role === 'assistant' ? (
+                <IconRobot size={30} />
+              ) : (
+                <IconUser size={30} />
               )}
             </div>
           </div>
@@ -211,51 +176,39 @@ export const ChatMessage: FC<Props> = memo(
                     </div>
                   </div>
                 ) : (
-                  <div className="prose whitespace-pre-wrap dark:prose-invert">
-                    {chatNode.message.content}
+                  <div className="flex w-full flex-col content-around lg:flex-row">
+                    <div className="prose whitespace-pre-wrap dark:prose-invert lg:flex-grow">
+                      {chatNode.message.content}
+                    </div>
+                    <div className="flex justify-between pt-3 lg:pt-0">
+                      <span className="lg:hidden">
+                        <ChatSwitch
+                          key={chatNode.id}
+                          chatNode={chatNode}
+                          messageIndex={messageIndex}
+                        />
+                      </span>
+                      <>
+                        {(window.innerWidth < 640 || !isEditing) && (
+                          <button
+                            className={
+                              (isHoverMessage ? 'visible' : 'lg:invisible') +
+                              ' self-end justify-self-end text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 lg:self-start'
+                            }
+                            onClick={toggleEditing}
+                          >
+                            <IconEdit size={20} />
+                          </button>
+                        )}
+                      </>
+                    </div>
                   </div>
-                )}
-
-                {(window.innerWidth < 640 || !isEditing) && (
-                  <button
-                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                      window.innerWidth < 640
-                        ? 'bottom-1 right-3'
-                        : 'right-0 top-[26px]'
-                    }
-                    `}
-                    onClick={toggleEditing}
-                  >
-                    <IconEdit size={20} />
-                  </button>
                 )}
               </div>
             ) : (
-              <>
-                <div
-                  className={`absolute ${
-                    window.innerWidth < 640
-                      ? 'bottom-1 right-3'
-                      : 'right-0 top-[26px] m-0'
-                  }`}
-                >
-                  {messagedCopied ? (
-                    <IconCheck
-                      size={20}
-                      className="text-green-500 dark:text-green-400"
-                    />
-                  ) : (
-                    <button
-                      className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
-                      onClick={copyOnClick}
-                    >
-                      <IconCopy size={20} />
-                    </button>
-                  )}
-                </div>
-
+              <div className="flex flex-col lg:flex-row">
                 <MemoizedReactMarkdown
-                  className="prose dark:prose-invert"
+                  className="prose w-full dark:prose-invert"
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeMathjax]}
                   components={{
@@ -300,7 +253,33 @@ export const ChatMessage: FC<Props> = memo(
                 >
                   {chatNode.message.content}
                 </MemoizedReactMarkdown>
-              </>
+                <div
+                  // className={`absolute ${
+                  //   window.innerWidth < 640
+                  //     ? 'bottom-1 right-3'
+                  //     : 'right-0 top-[26px] m-0'
+                  // }`}
+                  className="self-end lg:self-start pt-3 lg:pt-0"
+                >
+                  {messagedCopied ? (
+                    <IconCheck
+                      size={20}
+                      className="text-green-500 dark:text-green-400"
+                    />
+                  ) : (
+                    <button
+                      className={
+                        (isHoverMessage ? 'visible' : 'lg:invisible') +
+                        ' text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300'
+                      }
+                      // className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
+                      onClick={copyOnClick}
+                    >
+                      <IconCopy size={20} />
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
