@@ -13,7 +13,7 @@
   "Conversation": "对话",
   "OR": "或",
   "Loading...": "加载中...",
-  "Type a message or type \"/\" to select a prompt...": "输入一条消息或键入 \"/\" 以选择提示...",
+  "Type a message ...": "输入一条消息 ...",
   "Error fetching models.": "获取模型时出错。",
   "AI": "AI",
   "You": "你",
