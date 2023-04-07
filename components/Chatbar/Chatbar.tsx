@@ -2,12 +2,8 @@ import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
-import {
-  IconArrowBarLeft,
-  IconFolderPlus,
-  IconMessagesOff,
-  IconPlus,
-} from '@tabler/icons-react';
+import { PluginKey } from '@/types/plugin';
+import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
 import { ChatFolders } from '../Folders/Chat/ChatFolders';
@@ -21,6 +17,9 @@ interface Props {
   lightMode: 'light' | 'dark';
   selectedConversation: Conversation;
   apiKey: string;
+  serverSideApiKeyIsSet: boolean;
+  pluginKeys: PluginKey[];
+  serverSidePluginKeysSet: boolean;
   folders: Folder[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -29,7 +28,6 @@ interface Props {
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onSelectConversation: (conversation: Conversation) => void;
   onDeleteConversation: (conversation: Conversation) => void;
-  onToggleSidebar: () => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -38,6 +36,8 @@ interface Props {
   onClearConversations: () => void;
   onExportConversations: () => void;
   onImportConversations: (data: SupportedExportFormats) => void;
+  onPluginKeyChange: (pluginKey: PluginKey) => void;
+  onClearPluginKey: (pluginKey: PluginKey) => void;
 }
 
 export const Chatbar: FC<Props> = ({
@@ -46,6 +46,9 @@ export const Chatbar: FC<Props> = ({
   lightMode,
   selectedConversation,
   apiKey,
+  serverSideApiKeyIsSet,
+  pluginKeys,
+  serverSidePluginKeysSet,
   folders,
   onCreateFolder,
   onDeleteFolder,
@@ -54,12 +57,13 @@ export const Chatbar: FC<Props> = ({
   onToggleLightMode,
   onSelectConversation,
   onDeleteConversation,
-  onToggleSidebar,
   onUpdateConversation,
   onApiKeyChange,
   onClearConversations,
   onExportConversations,
   onImportConversations,
+  onPluginKeyChange,
+  onClearPluginKey,
 }) => {
   const { t } = useTranslation('sidebar');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -138,12 +142,6 @@ export const Chatbar: FC<Props> = ({
         >
           <IconFolderPlus size={18} />
         </button>
-
-        <IconArrowBarLeft
-          className="ml-1 hidden cursor-pointer p-1 text-neutral-300 hover:text-neutral-400 sm:flex"
-          size={32}
-          onClick={onToggleSidebar}
-        />
       </div>
 
       {conversations.length > 1 && (
@@ -176,7 +174,7 @@ export const Chatbar: FC<Props> = ({
 
         {conversations.length > 0 ? (
           <div
-            className="h-full pt-2"
+            className="pt-2"
             onDrop={(e) => handleDrop(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
@@ -194,7 +192,7 @@ export const Chatbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-3 items-center text-sm leading-normal mt-8 text-white opacity-50">
+          <div className="mt-8 flex flex-col items-center gap-3 text-sm leading-normal text-white opacity-50">
             <IconMessagesOff />
             {t('No conversations.')}
           </div>
@@ -204,12 +202,17 @@ export const Chatbar: FC<Props> = ({
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
+        serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+        pluginKeys={pluginKeys}
+        serverSidePluginKeysSet={serverSidePluginKeysSet}
         conversationsCount={conversations.length}
         onToggleLightMode={onToggleLightMode}
         onApiKeyChange={onApiKeyChange}
         onClearConversations={onClearConversations}
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
+        onPluginKeyChange={onPluginKeyChange}
+        onClearPluginKey={onClearPluginKey}
       />
     </div>
   );

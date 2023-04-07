@@ -2,6 +2,7 @@ import {
   ExportFormatV1,
   ExportFormatV2,
   ExportFormatV3,
+  ExportFormatV4,
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
@@ -19,32 +20,43 @@ export function isExportFormatV3(obj: any): obj is ExportFormatV3 {
   return obj.version === 3;
 }
 
-export const isLatestExportFormat = isExportFormatV3;
+export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
+  return obj.version === 4;
+}
+
+export const isLatestExportFormat = isExportFormatV4;
 
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   if (isExportFormatV1(data)) {
     return {
-      version: 3,
+      version: 4,
       history: cleanConversationHistory(data),
       folders: [],
+      prompts: [],
     };
   }
 
   if (isExportFormatV2(data)) {
     return {
-      version: 3,
+      version: 4,
       history: cleanConversationHistory(data.history || []),
       folders: (data.folders || []).map((chatFolder) => ({
         id: chatFolder.id.toString(),
         name: chatFolder.name,
         type: 'chat',
       })),
+      prompts: [],
     };
   }
 
-  if (isExportFormatV3(data)) {
+  if (isExportFormatV3(data)) {    
+    return {...data, version: 4, prompts: []};
+  }
+
+  if(isExportFormatV4(data)){
     return data;
   }
+
 
   throw new Error('Unsupported data format');
 }
@@ -59,6 +71,7 @@ function currentDate() {
 export const exportData = () => {
   let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
+  let prompts = localStorage.getItem('prompts');
 
   if (history) {
     history = JSON.parse(history);
@@ -68,10 +81,15 @@ export const exportData = () => {
     folders = JSON.parse(folders);
   }
 
+  if(prompts){
+    prompts = JSON.parse(prompts);
+  }
+
   const data = {
-    version: 3,
+    version: 4,
     history: history || [],
     folders: folders || [],
+    prompts: prompts || [],
   } as LatestExportFormat;
 
   const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -92,15 +110,17 @@ export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
+  const { history,folders, prompts } = cleanedData;
 
-  const conversations = cleanedData.history;
+  const conversations = history;
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
   localStorage.setItem(
     'selectedConversation',
     JSON.stringify(conversations[conversations.length - 1]),
   );
 
-  localStorage.setItem('folders', JSON.stringify(cleanedData.folders));
+  localStorage.setItem('folders', JSON.stringify(folders));
+  localStorage.setItem('prompts', JSON.stringify(prompts));
 
   return cleanedData;
 };
