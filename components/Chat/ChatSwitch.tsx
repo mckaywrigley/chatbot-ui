@@ -33,18 +33,19 @@ interface Props {
 export const ChatSwitch: FC<Props> = memo(({ chatNode, messageIndex }) => {
   const { selectedConversation, actions } = useContext(ConversationContext);
   const totalPages = useMemo(() => {
+    if (!selectedConversation) return 0;
     return chatNode.parentMessageId
-      ? selectedConversation?.mapping[chatNode.parentMessageId]?.children
-          ?.length ?? 0
+      ? selectedConversation.mapping[chatNode.parentMessageId].children.length
       : 0;
   }, [chatNode]);
 
   const currentPage = useMemo(() => {
+    if (!selectedConversation) return 0;
     return (
       (chatNode.parentMessageId
-        ? selectedConversation?.mapping[
+        ? selectedConversation.mapping[
             chatNode.parentMessageId
-          ]?.children?.indexOf(chatNode.id) ?? 0
+          ].children.indexOf(chatNode.id)
         : 0) + 1
     );
   }, [chatNode]);
@@ -78,3 +79,4 @@ export const ChatSwitch: FC<Props> = memo(({ chatNode, messageIndex }) => {
     </>
   );
 });
+ChatSwitch.displayName = 'ChatSwitch';
