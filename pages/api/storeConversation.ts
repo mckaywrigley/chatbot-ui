@@ -7,15 +7,16 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface RequestBody {
+  title: string;
   prompts: any[];
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { prompts } = req.body as RequestBody;
+    const { title, prompts } = req.body as RequestBody;
 
-    if (!prompts) {
-      res.status(400).json({ error: 'Missing prompts parameter' });
+    if (!title || !prompts) {
+      res.status(400).json({ error: 'Missing title or prompts parameter' });
       return;
     }
 
@@ -28,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .insert([
           {
             accessible_id: accessible_id,
+            title: title,
             prompts: JSON.stringify(prompts),
           },
         ]);

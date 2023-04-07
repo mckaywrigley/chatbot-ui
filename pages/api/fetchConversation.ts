@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { data, error } = await supabase
         .from('share_conversations')
-        .select('prompts')
+        .select('title, prompts')
         .eq('accessible_id', accessible_id)
         .single();
 
@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
-      res.status(200).json(data.prompts);
+      res.status(200).json({ title: data.title, prompts: data.prompts });
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Error fetching data' });
