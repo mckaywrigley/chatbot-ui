@@ -83,7 +83,7 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, isLoading, error, refetch } = useQuery(
+  const { data, error } = useQuery(
     ['GetModels', apiKey],
     ({ signal }) =>
       getModels(
@@ -97,11 +97,11 @@ const Home = ({
 
   useEffect(() => {
     if (data) dispatch({ field: 'models', value: data });
-  }, [data]);
+  }, [data, dispatch]);
 
   useEffect(() => {
     dispatch({ field: 'modelError', value: getModelsError(error) });
-  }, [error]);
+  }, [dispatch, error, getModelsError]);
 
   const handleSend = async (
     message: Message,
