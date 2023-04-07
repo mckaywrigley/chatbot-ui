@@ -7,17 +7,10 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { key } = (await req.json()) as {
-      key: string;
-    };
-
     const response = await fetch(`${OPENAI_API_HOST}/v1/models`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-        ...(process.env.OPENAI_ORGANIZATION && {
-          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-        })
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
     });
 
