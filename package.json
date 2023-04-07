@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
+    "@supabase/supabase-js": "^2.15.0",
     "@tabler/icons-react": "^2.9.0",
     "@vercel/analytics": "^0.1.11",
     "eventsource-parser": "^0.1.0",
