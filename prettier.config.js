@@ -12,6 +12,7 @@ module.exports = {
     '^next-.*$', // Next-related imports
     '^next/.*$', // Next-related imports
     '^.*/hooks/.*$', // Hooks
+    '^.*/services/.*$', // Services
     '^.*/utils/.*$', // Utils
     '^.*/types/.*$', // Types
     '^.*/pages/.*$', // Components

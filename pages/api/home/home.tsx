@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { GetServerSideProps } from 'next';
@@ -26,8 +26,13 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface, FolderType } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
-import { Plugin, PluginKey } from '@/types/plugin';
+import {
+  OpenAIModel,
+  OpenAIModelID,
+  OpenAIModels,
+  fallbackModelID,
+} from '@/types/openai';
+import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import { Chat } from '@/components/Chat/Chat';
@@ -75,11 +80,7 @@ const Home = ({
     dispatch,
   } = contextValue;
 
-  // REFS ----------------------------------------------
-
   const stopConversationRef = useRef<boolean>(false);
-
-  // FETCH RESPONSE ----------------------------------------------
 
   const handleSend = async (
     message: Message,

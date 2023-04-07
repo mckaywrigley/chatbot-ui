@@ -1,46 +1,37 @@
-import { useCallback, useState } from 'react';
-
 export type RequestModel = {
   params?: object;
   headers?: object;
   signal?: AbortSignal;
+};
+
+export type RequestWithBodyModel = RequestModel & {
   body?: object | FormData;
 };
 
 export const useFetch = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [data, setData] = useState<any>(null);
-  const [error, setError] = useState<any>(null);
+  const handleFetch = async (
+    url: string,
+    request: any,
+    signal?: AbortSignal,
+  ) => {
+    const requestUrl = request?.params ? `${url}${request.params}` : url;
 
-  const fetchHandler = useCallback(
-    async (method: string, url: string, request: RequestModel) => {
-      setIsLoading(true);
-      setError(null);
-      setData(null);
+    const requestBody = request?.body
+      ? request.body instanceof FormData
+        ? { ...request, body: request.body }
+        : { ...request, body: JSON.stringify(request.body) }
+      : request;
 
-      const requestUrl = request?.params ? `${url}${request.params}` : url;
+    const headers = {
+      ...(request?.headers
+        ? request.headers
+        : request?.body && request.body instanceof FormData
+        ? {}
+        : { 'Content-type': 'application/json' }),
+    };
 
-      const requestBody = request?.body
-        ? request.body instanceof FormData
-          ? { ...request, body: request.body }
-          : { ...request, body: JSON.stringify(request.body) }
-        : request;
-
-      const headers = {
-        ...(request?.headers
-          ? request.headers
-          : request?.body && request.body instanceof FormData
-          ? {}
-          : { 'Content-type': 'application/json' }),
-      };
-
-      try {
-        const response = await fetch(requestUrl, {
-          ...(requestBody as RequestInit),
-          headers,
-          method,
-        });
-
+    return fetch(requestUrl, { ...requestBody, headers, signal })
+      .then((response) => {
         if (!response.ok) throw response;
 
         const contentType = response.headers.get('content-type');
@@ -48,14 +39,14 @@ export const useFetch = () => {
 
         const result =
           contentType && contentType?.indexOf('application/json') !== -1
-            ? await response.json()
+            ? response.json()
             : contentDisposition?.indexOf('attachment') !== -1
-            ? await response.blob()
+            ? response.blob()
             : response;
 
-        setData(result);
-        setIsLoading(false);
-      } catch (err: any) {
+        return result;
+      })
+      .catch(async (err) => {
         const contentType = err.headers.get('content-type');
 
         const errResult =
@@ -63,56 +54,31 @@ export const useFetch = () => {
             ? await err.json()
             : err;
 
-        setError(errResult);
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
-
-  const get = useCallback(
-    async (url: string, request: RequestModel) => {
-      await fetchHandler('get', url, request);
-    },
-    [fetchHandler],
-  );
-
-  const post = useCallback(
-    async (url: string, request: RequestModel) => {
-      await fetchHandler('post', url, request);
-    },
-    [fetchHandler],
-  );
-
-  const put = useCallback(
-    async (url: string, request: RequestModel) => {
-      await fetchHandler('put', url, request);
-    },
-    [fetchHandler],
-  );
-
-  const patch = useCallback(
-    async (url: string, request: RequestModel) => {
-      await fetchHandler('patch', url, request);
-    },
-    [fetchHandler],
-  );
-
-  const deleteReq = useCallback(
-    async (url: string, request: RequestModel) => {
-      await fetchHandler('delete', url, request);
-    },
-    [fetchHandler],
-  );
+        throw errResult;
+      });
+  };
 
   return {
-    isLoading,
-    data,
-    error,
-    get,
-    post,
-    put,
-    patch,
-    delete: deleteReq,
+    get: async <T>(url: string, request?: RequestModel): Promise<T> => {
+      return handleFetch(url, { ...request, method: 'get' });
+    },
+    post: async <T>(
+      url: string,
+      request?: RequestWithBodyModel,
+    ): Promise<T> => {
+      return handleFetch(url, { ...request, method: 'post' });
+    },
+    put: async <T>(url: string, request?: RequestWithBodyModel): Promise<T> => {
+      return handleFetch(url, { ...request, method: 'put' });
+    },
+    patch: async <T>(
+      url: string,
+      request?: RequestWithBodyModel,
+    ): Promise<T> => {
+      return handleFetch(url, { ...request, method: 'patch' });
+    },
+    delete: async <T>(url: string, request?: RequestModel): Promise<T> => {
+      return handleFetch(url, { ...request, method: 'delete' });
+    },
   };
 };
