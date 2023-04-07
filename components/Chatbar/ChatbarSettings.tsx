@@ -1,4 +1,5 @@
 import { SupportedExportFormats } from '@/types/export';
+import { PluginKey } from '@/types/plugin';
 import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
@@ -9,6 +10,9 @@ import { ClearConversations } from './ClearConversations';
 interface Props {
   lightMode: 'light' | 'dark';
   apiKey: string;
+  serverSideApiKeyIsSet: boolean;
+  pluginKeys: PluginKey[];
+  serverSidePluginKeysSet: boolean;
   conversationsCount: number;
   onToggleLightMode: (mode: 'light' | 'dark') => void;
   onApiKeyChange: (apiKey: string) => void;
@@ -26,6 +30,7 @@ export const ChatbarSettings: FC<Props> = ({
   onImportConversations,
 }) => {
   const { t } = useTranslation('sidebar');
+
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
       {conversationsCount > 0 ? (
@@ -35,7 +40,7 @@ export const ChatbarSettings: FC<Props> = ({
       <Import onImport={onImportConversations} />
 
       <SidebarButton
-        text={t('Export conversations')}
+        text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => onExportConversations()}
       />

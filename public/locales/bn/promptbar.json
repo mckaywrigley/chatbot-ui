@@ -1,0 +1,12 @@
+{
+  "New prompt": "New prompt",
+  "New folder": "New folder",
+  "No prompts.": "No prompts.",
+  "Search prompts...": "Search prompts...",
+  "Name": "Name",
+  "Description": "Description",
+  "A description for your prompt.": "A description for your prompt.",
+  "Prompt": "Prompt",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}",
+  "Save": "Save"
+}

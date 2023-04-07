@@ -1,0 +1,12 @@
+{
+  "New prompt": "Ny prompt",
+  "New folder": "Ny mapp",
+  "No prompts.": "Inga prompts.",
+  "Search prompts...": "Sök prompts...",
+  "Name": "Namn",
+  "Description": "Beskrivning",
+  "A description for your prompt.": "En beskrivning för din prompt.",
+  "Prompt": "Prompt",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt-innehåll. Använd {{}} för att beteckna en variabel. Ex: {{namn}} är ett {{adjektiv}} {{substantiv}}",
+  "Save": "Spara"
+}
