@@ -10,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.PUSH }}
 
       - name: Setup Git
         run: |
