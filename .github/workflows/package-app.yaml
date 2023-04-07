@@ -65,10 +65,30 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm install
-      
+
       - name: tag
         id: next_tag
         run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: version
+        id: next_version
+        run: |
+          tag=${{ steps.next_tag.outputs.tag }}
+          echo "version=${tag:1}" >> $GITHUB_OUTPUT
+
+      - name: Git config and pull
+        run: |
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+          git config pull.rebase true
+          git fetch origin main
+          git pull origin main
+
+      - name: Increment version
+        run: |
+          dasel put string -f package.json ".version" "${{ steps.next_version.outputs.version }}"
+          dasel put string -f src-tauri/tauri.conf.json ".package.version" "${{ steps.next_version.outputs.version }}"
+          dasel put string -f src-tauri/Cargo.toml ".package.version" "${{ steps.next_version.outputs.version }}"
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
@@ -78,5 +98,4 @@ jobs:
           tagName: ${{ steps.next_tag.outputs.tag }}
           releaseName: "PremAI App ${{ steps.next_tag.outputs.tag }}"
           releaseBody: "See the assets to download and install this version."
-          releaseDraft: true
-          prerelease: false
+          includeDebug: true
