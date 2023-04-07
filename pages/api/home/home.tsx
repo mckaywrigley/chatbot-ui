@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
@@ -12,7 +11,6 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 
-import { getEndpoint } from '@/utils/app/api';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -26,12 +24,10 @@ import {
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
-import { ErrorMessage } from '@/types/error';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import { Chat } from '@/components/Chat/Chat';
@@ -68,15 +64,11 @@ const Home = ({
       apiKey,
       pluginKeys,
       lightMode,
-      messageIsStreaming,
-      modelError,
-      models,
       folders,
       conversations,
       selectedConversation,
       currentMessage,
       prompts,
-      loading,
     },
     dispatch,
   } = contextValue;
@@ -102,218 +94,6 @@ const Home = ({
   useEffect(() => {
     dispatch({ field: 'modelError', value: getModelsError(error) });
   }, [dispatch, error, getModelsError]);
-
-  const handleSend = async (
-    message: Message,
-    deleteCount = 0,
-    plugin: Plugin | null = null,
-  ) => {
-    if (selectedConversation) {
-      let updatedConversation: Conversation;
-
-      if (deleteCount) {
-        const updatedMessages = [...selectedConversation.messages];
-        for (let i = 0; i < deleteCount; i++) {
-          updatedMessages.pop();
-        }
-
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...updatedMessages, message],
-        };
-      } else {
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...selectedConversation.messages, message],
-        };
-      }
-
-      dispatch({ field: 'selectedConversation', value: updatedConversation });
-      dispatch({ field: 'loading', value: true });
-      dispatch({ field: 'messageIsStreaming', value: true });
-
-      const chatBody: ChatBody = {
-        model: updatedConversation.model,
-        messages: updatedConversation.messages,
-        key: apiKey,
-        prompt: updatedConversation.prompt,
-      };
-
-      const endpoint = getEndpoint(plugin);
-      let body;
-
-      if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
-        body = JSON.stringify({
-          ...chatBody,
-          googleAPIKey: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-          googleCSEId: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-        });
-      }
-
-      const controller = new AbortController();
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-        body,
-      });
-
-      if (!response.ok) {
-        dispatch({ field: 'loading', value: false });
-        dispatch({ field: 'messageIsStreaming', value: false });
-
-        toast.error(response.statusText);
-        return;
-      }
-
-      const data = response.body;
-
-      if (!data) {
-        dispatch({ field: 'loading', value: false });
-        dispatch({ field: 'messageIsStreaming', value: false });
-        return;
-      }
-
-      if (!plugin) {
-        if (updatedConversation.messages.length === 1) {
-          const { content } = message;
-          const customName =
-            content.length > 30 ? content.substring(0, 30) + '...' : content;
-
-          updatedConversation = {
-            ...updatedConversation,
-            name: customName,
-          };
-        }
-        dispatch({ field: 'loading', value: false });
-
-        const reader = data.getReader();
-        const decoder = new TextDecoder();
-        let done = false;
-        let isFirst = true;
-        let text = '';
-
-        while (!done) {
-          if (stopConversationRef.current === true) {
-            controller.abort();
-            done = true;
-            break;
-          }
-          const { value, done: doneReading } = await reader.read();
-          done = doneReading;
-          const chunkValue = decoder.decode(value);
-
-          text += chunkValue;
-
-          if (isFirst) {
-            isFirst = false;
-            const updatedMessages: Message[] = [
-              ...updatedConversation.messages,
-              { role: 'assistant', content: chunkValue },
-            ];
-
-            updatedConversation = {
-              ...updatedConversation,
-              messages: updatedMessages,
-            };
-            dispatch({
-              field: 'selectedConversation',
-              value: updatedConversation,
-            });
-          } else {
-            const updatedMessages: Message[] = updatedConversation.messages.map(
-              (message, index) => {
-                if (index === updatedConversation.messages.length - 1) {
-                  return {
-                    ...message,
-                    content: text,
-                  };
-                }
-
-                return message;
-              },
-            );
-
-            updatedConversation = {
-              ...updatedConversation,
-              messages: updatedMessages,
-            };
-            dispatch({
-              field: 'selectedConversation',
-              value: updatedConversation,
-            });
-          }
-        }
-
-        saveConversation(updatedConversation);
-
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation;
-            }
-
-            return conversation;
-          },
-        );
-
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation);
-        }
-
-        dispatch({ field: 'conversations', value: updatedConversations });
-
-        saveConversations(updatedConversations);
-
-        dispatch({ field: 'messageIsStreaming', value: false });
-      } else {
-        const { answer } = await response.json();
-
-        const updatedMessages: Message[] = [
-          ...updatedConversation.messages,
-          { role: 'assistant', content: answer },
-        ];
-
-        updatedConversation = {
-          ...updatedConversation,
-          messages: updatedMessages,
-        };
-
-        dispatch({ field: 'selectedConversation', value: updateConversation });
-
-        saveConversation(updatedConversation);
-
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation;
-            }
-
-            return conversation;
-          },
-        );
-
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation);
-        }
-
-        dispatch({ field: 'conversations', value: updatedConversations });
-
-        saveConversations(updatedConversations);
-
-        dispatch({ field: 'loading', value: false });
-        dispatch({ field: 'messageIsStreaming', value: false });
-      }
-    }
-  };
 
   // FETCH MODELS ----------------------------------------------
 
@@ -440,40 +220,7 @@ const Home = ({
     dispatch({ field: 'conversations', value: all });
   };
 
-  const handleEditMessage = (message: Message, messageIndex: number) => {
-    if (selectedConversation) {
-      const updatedMessages = selectedConversation.messages
-        .map((m, i) => {
-          if (i < messageIndex) {
-            return m;
-          }
-        })
-        .filter((m) => m) as Message[];
-
-      const updatedConversation = {
-        ...selectedConversation,
-        messages: updatedMessages,
-      };
-
-      const { single, all } = updateConversation(
-        updatedConversation,
-        conversations,
-      );
-
-      dispatch({ field: 'selectedConversation', value: single });
-      dispatch({ field: 'conversations', value: all });
-      dispatch({ field: 'currentMessage', value: message });
-    }
-  };
-
   // EFFECTS  --------------------------------------------
-
-  useEffect(() => {
-    if (currentMessage) {
-      handleSend(currentMessage);
-      dispatch({ field: 'currentMessage', value: undefined });
-    }
-  }, [currentMessage]);
 
   useEffect(() => {
     if (window.innerWidth < 640) {
@@ -619,21 +366,7 @@ const Home = ({
             <Chatbar />
 
             <div className="flex flex-1">
-              <Chat
-                conversation={selectedConversation}
-                messageIsStreaming={messageIsStreaming}
-                apiKey={apiKey}
-                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-                defaultModelId={defaultModelId}
-                modelError={modelError}
-                models={models}
-                loading={loading}
-                prompts={prompts}
-                onSend={handleSend}
-                onUpdateConversation={handleUpdateConversation}
-                onEditMessage={handleEditMessage}
-                stopConversationRef={stopConversationRef}
-              />
+              <Chat stopConversationRef={stopConversationRef} />
             </div>
 
             <Promptbar />
