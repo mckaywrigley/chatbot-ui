@@ -37,8 +37,12 @@ export const useFetch = () => {
         const contentType = response.headers.get('content-type');
         const contentDisposition = response.headers.get('content-disposition');
 
+        const headers = response.headers;
+
         const result =
-          contentType && contentType?.indexOf('application/json') !== -1
+          contentType &&
+          (contentType?.indexOf('application/json') !== -1 ||
+            contentType?.indexOf('text/plain') !== -1)
             ? response.json()
             : contentDisposition?.indexOf('attachment') !== -1
             ? response.blob()

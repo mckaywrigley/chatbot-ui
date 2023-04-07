@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -7,6 +8,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+
+import useErrorService from '@/services/errorService';
+import useApiService from '@/services/useApiService';
 
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -26,12 +30,7 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface, FolderType } from '@/types/folder';
-import {
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-  fallbackModelID,
-} from '@/types/openai';
+import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -57,6 +56,8 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
+  const { getModels } = useApiService();
+  const { getModelsError } = useErrorService();
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -81,6 +82,26 @@ const Home = ({
   } = contextValue;
 
   const stopConversationRef = useRef<boolean>(false);
+
+  const { data, isLoading, error, refetch } = useQuery(
+    ['GetModels', apiKey],
+    ({ signal }) =>
+      getModels(
+        {
+          key: apiKey,
+        },
+        signal,
+      ),
+    { enabled: true },
+  );
+
+  useEffect(() => {
+    if (data) dispatch({ field: 'models', value: data });
+  }, [data]);
+
+  useEffect(() => {
+    dispatch({ field: 'modelError', value: getModelsError(error) });
+  }, [error]);
 
   const handleSend = async (
     message: Message,
@@ -296,52 +317,6 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
-  const fetchModels = async (key: string) => {
-    const error = {
-      title: t('Error fetching models.'),
-      code: null,
-      messageLines: [
-        t(
-          'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
-        ),
-        t('If you completed this step, OpenAI may be experiencing issues.'),
-      ],
-    } as ErrorMessage;
-
-    const response = await fetch('/api/models', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        key,
-      }),
-    });
-
-    if (!response.ok) {
-      try {
-        const data = await response.json();
-        Object.assign(error, {
-          code: data.error?.code,
-          messageLines: [data.error?.message],
-        });
-      } catch (e) {}
-
-      dispatch({ field: 'modelError', value: error });
-      return;
-    }
-
-    const data = await response.json();
-
-    if (!data) {
-      dispatch({ field: 'modelError', value: error });
-      return;
-    }
-
-    dispatch({ field: 'models', value: data });
-    dispatch({ field: 'modelError', value: null });
-  };
-
   const handleSelectConversation = (conversation: Conversation) => {
     dispatch({
       field: 'selectedConversation',
@@ -507,12 +482,6 @@ const Home = ({
   }, [selectedConversation]);
 
   useEffect(() => {
-    if (apiKey) {
-      fetchModels(apiKey);
-    }
-  }, [apiKey]);
-
-  useEffect(() => {
     defaultModelId &&
       dispatch({ field: 'defaultModelId', value: defaultModelId });
     serverSideApiKeyIsSet &&
@@ -537,13 +506,11 @@ const Home = ({
 
     const apiKey = localStorage.getItem('apiKey');
     if (serverSideApiKeyIsSet) {
-      fetchModels('');
       dispatch({ field: 'apiKey', value: '' });
 
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
       dispatch({ field: 'apiKey', value: apiKey });
-      fetchModels(apiKey);
     }
 
     const pluginKeys = localStorage.getItem('pluginKeys');
