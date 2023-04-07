@@ -2,7 +2,8 @@ name: Package Tauri App
 
 on:
   push:
-    branches: ["main", "test"]
+    tags:
+      - "*"
 
 jobs:
   publish-tauri:
@@ -64,14 +65,18 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm install
+      
+      - name: tag
+        id: next_tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: "v0.0.1" # This only works if your workflow triggers on new tags.
-          releaseName: "PremAI App v__VERSION__" # tauri-action replaces \_\_VERSION\_\_ with the app version.
+          tagName: ${{ steps.next_tag.outputs.tag }}
+          releaseName: "PremAI App ${{ steps.next_tag.outputs.tag }}"
           releaseBody: "See the assets to download and install this version."
           releaseDraft: true
           prerelease: false
