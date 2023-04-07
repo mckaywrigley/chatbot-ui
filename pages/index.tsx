@@ -8,12 +8,14 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import {
-  fallbackModelID,
   OpenAIModel,
   OpenAIModelID,
   OpenAIModels,
+  fallbackModelID,
 } from '@/types/openai';
+import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { getEndpoint } from '@/utils/app/api';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -33,15 +35,18 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
+  serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
+  serverSidePluginKeysSet,
   defaultModelId,
 }) => {
   const { t } = useTranslation('chat');
@@ -49,6 +54,7 @@ const Home: React.FC<HomeProps> = ({
   // STATE ----------------------------------------------
 
   const [apiKey, setApiKey] = useState<string>('');
+  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
@@ -75,7 +81,11 @@ const Home: React.FC<HomeProps> = ({
 
   // FETCH RESPONSE ----------------------------------------------
 
-  const handleSend = async (message: Message, deleteCount = 0) => {
+  const handleSend = async (
+    message: Message,
+    deleteCount = 0,
+    plugin: Plugin | null = null,
+  ) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
@@ -107,19 +117,37 @@ const Home: React.FC<HomeProps> = ({
         prompt: updatedConversation.prompt,
       };
 
+      const endpoint = getEndpoint(plugin);
+      let body;
+
+      if (!plugin) {
+        body = JSON.stringify(chatBody);
+      } else {
+        body = JSON.stringify({
+          ...chatBody,
+          googleAPIKey: pluginKeys
+            .find((key) => key.pluginId === 'google-search')
+            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
+          googleCSEId: pluginKeys
+            .find((key) => key.pluginId === 'google-search')
+            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+        });
+      }
+
       const controller = new AbortController();
-      const response = await fetch('/api/chat', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
-        body: JSON.stringify(chatBody),
+        body,
       });
 
       if (!response.ok) {
         setLoading(false);
         setMessageIsStreaming(false);
+        toast.error(response.statusText);
         return;
       }
 
@@ -131,94 +159,130 @@ const Home: React.FC<HomeProps> = ({
         return;
       }
 
-      if (updatedConversation.messages.length === 1) {
-        const { content } = message;
-        const customName =
-          content.length > 30 ? content.substring(0, 30) + '...' : content;
+      if (!plugin) {
+        if (updatedConversation.messages.length === 1) {
+          const { content } = message;
+          const customName =
+            content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+          updatedConversation = {
+            ...updatedConversation,
+            name: customName,
+          };
+        }
+
+        setLoading(false);
+
+        const reader = data.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let isFirst = true;
+        let text = '';
+
+        while (!done) {
+          if (stopConversationRef.current === true) {
+            controller.abort();
+            done = true;
+            break;
+          }
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          const chunkValue = decoder.decode(value);
+
+          text += chunkValue;
+
+          if (isFirst) {
+            isFirst = false;
+            const updatedMessages: Message[] = [
+              ...updatedConversation.messages,
+              { role: 'assistant', content: chunkValue },
+            ];
+
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+
+            setSelectedConversation(updatedConversation);
+          } else {
+            const updatedMessages: Message[] = updatedConversation.messages.map(
+              (message, index) => {
+                if (index === updatedConversation.messages.length - 1) {
+                  return {
+                    ...message,
+                    content: text,
+                  };
+                }
+
+                return message;
+              },
+            );
+
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+
+            setSelectedConversation(updatedConversation);
+          }
+        }
+
+        saveConversation(updatedConversation);
+
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+
+            return conversation;
+          },
+        );
+
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
+        }
+
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
+
+        setMessageIsStreaming(false);
+      } else {
+        const { answer } = await response.json();
+
+        const updatedMessages: Message[] = [
+          ...updatedConversation.messages,
+          { role: 'assistant', content: answer },
+        ];
 
         updatedConversation = {
           ...updatedConversation,
-          name: customName,
+          messages: updatedMessages,
         };
-      }
 
-      setLoading(false);
+        setSelectedConversation(updatedConversation);
+        saveConversation(updatedConversation);
 
-      const reader = data.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let isFirst = true;
-      let text = '';
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
 
-      while (!done) {
-        if (stopConversationRef.current === true) {
-          controller.abort();
-          done = true;
-          break;
+            return conversation;
+          },
+        );
+
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
         }
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
 
-        text += chunkValue;
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
 
-        if (isFirst) {
-          isFirst = false;
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: chunkValue },
-          ];
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        } else {
-          const updatedMessages: Message[] = updatedConversation.messages.map(
-            (message, index) => {
-              if (index === updatedConversation.messages.length - 1) {
-                return {
-                  ...message,
-                  content: text,
-                };
-              }
-
-              return message;
-            },
-          );
-
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-
-          setSelectedConversation(updatedConversation);
-        }
+        setLoading(false);
+        setMessageIsStreaming(false);
       }
-
-      saveConversation(updatedConversation);
-
-      const updatedConversations: Conversation[] = conversations.map(
-        (conversation) => {
-          if (conversation.id === selectedConversation.id) {
-            return updatedConversation;
-          }
-
-          return conversation;
-        },
-      );
-
-      if (updatedConversations.length === 0) {
-        updatedConversations.push(updatedConversation);
-      }
-
-      setConversations(updatedConversations);
-
-      saveConversations(updatedConversations);
-
-      setMessageIsStreaming(false);
     }
   };
 
@@ -281,6 +345,45 @@ const Home: React.FC<HomeProps> = ({
     localStorage.setItem('apiKey', apiKey);
   };
 
+  const handlePluginKeyChange = (pluginKey: PluginKey) => {
+    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
+      const updatedPluginKeys = pluginKeys.map((key) => {
+        if (key.pluginId === pluginKey.pluginId) {
+          return pluginKey;
+        }
+
+        return key;
+      });
+
+      setPluginKeys(updatedPluginKeys);
+
+      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+    } else {
+      setPluginKeys([...pluginKeys, pluginKey]);
+
+      localStorage.setItem(
+        'pluginKeys',
+        JSON.stringify([...pluginKeys, pluginKey]),
+      );
+    }
+  };
+
+  const handleClearPluginKey = (pluginKey: PluginKey) => {
+    const updatedPluginKeys = pluginKeys.filter(
+      (key) => key.pluginId !== pluginKey.pluginId,
+    );
+
+    if (updatedPluginKeys.length === 0) {
+      setPluginKeys([]);
+      localStorage.removeItem('pluginKeys');
+      return;
+    }
+
+    setPluginKeys(updatedPluginKeys);
+
+    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+  };
+
   const handleToggleChatbar = () => {
     setShowSidebar(!showSidebar);
     localStorage.setItem('showChatbar', JSON.stringify(!showSidebar));
@@ -296,11 +399,12 @@ const Home: React.FC<HomeProps> = ({
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders }: LatestExportFormat = importData(data);
+    const { history, folders, prompts }: LatestExportFormat = importData(data);
 
     setConversations(history);
     setSelectedConversation(history[history.length - 1]);
     setFolders(folders);
+    setPrompts(prompts);
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -493,8 +597,6 @@ const Home: React.FC<HomeProps> = ({
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
-    const lastPrompt = prompts[prompts.length - 1];
-
     const newPrompt: Prompt = {
       id: uuidv4(),
       name: `Prompt ${prompts.length + 1}`,
@@ -559,11 +661,21 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const apiKey = localStorage.getItem('apiKey');
-    if (apiKey) {
+    if (serverSideApiKeyIsSet) {
+      fetchModels('');
+      setApiKey('');
+      localStorage.removeItem('apiKey');
+    } else if (apiKey) {
       setApiKey(apiKey);
       fetchModels(apiKey);
-    } else if (serverSideApiKeyIsSet) {
-      fetchModels('');
+    }
+
+    const pluginKeys = localStorage.getItem('pluginKeys');
+    if (serverSidePluginKeysSet) {
+      setPluginKeys([]);
+      localStorage.removeItem('pluginKeys');
+    } else if (pluginKeys) {
+      setPluginKeys(JSON.parse(pluginKeys));
     }
 
     if (window.innerWidth < 640) {
@@ -651,6 +763,9 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
+                  serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+                  pluginKeys={pluginKeys}
+                  serverSidePluginKeysSet={serverSidePluginKeysSet}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
@@ -659,12 +774,13 @@ const Home: React.FC<HomeProps> = ({
                   onNewConversation={handleNewConversation}
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
-                  onToggleSidebar={handleToggleChatbar}
                   onUpdateConversation={handleUpdateConversation}
                   onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
                   onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
+                  onPluginKeyChange={handlePluginKeyChange}
+                  onClearPluginKey={handleClearPluginKey}
                 />
 
                 <button
@@ -710,7 +826,6 @@ const Home: React.FC<HomeProps> = ({
                 <Promptbar
                   prompts={prompts}
                   folders={folders.filter((folder) => folder.type === 'prompt')}
-                  onToggleSidebar={handleTogglePromptbar}
                   onCreatePrompt={handleCreatePrompt}
                   onUpdatePrompt={handleUpdatePrompt}
                   onDeletePrompt={handleDeletePrompt}
@@ -754,10 +869,20 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
+  let serverSidePluginKeysSet = false;
+
+  const googleApiKey = process.env.GOOGLE_API_KEY;
+  const googleCSEId = process.env.GOOGLE_CSE_ID;
+
+  if (googleApiKey && googleCSEId) {
+    serverSidePluginKeysSet = true;
+  }
+
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
+      serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',
