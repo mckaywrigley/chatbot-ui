@@ -22,6 +22,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { event } from 'nextjs-google-analytics';
 import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
+import { StoreConversationButton } from '../Global/StoreConversationButton';
 
 interface Props {
   conversation: Conversation;
@@ -183,6 +184,7 @@ export const Chat: FC<Props> = memo(
                     >
                       <IconClearAll size={18} />
                     </button>
+                    <StoreConversationButton conversation={conversation} />
                   </div>
 
                   {conversation.messages.map((message, index) => (
