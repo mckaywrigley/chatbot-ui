@@ -2,17 +2,22 @@ import { IconBrandStackshare, IconLoader } from '@tabler/icons-react';
 import { FC, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Conversation } from '@/types/chat';
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   conversation: Conversation;
 }
 
 export const StoreConversationButton: FC<Props> = ({ conversation }) => {
+  const { t } = useTranslation('chat');
   const [loading, setLoading] = useState(false);
 
   const storeConversation = async () => {
     const confirmed = window.confirm(
-      'Are you sure you want to store this conversation on our server?',
+      t(
+        'By sharing this conversation, it will be stored on our server. Are you sure you want to share this conversation?',
+      ) ||
+        'By sharing this conversation, it will be stored on our server. Are you sure you want to share this conversation?',
     );
 
     if (!confirmed) {
@@ -41,7 +46,7 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
 
       const url = `${window.location.origin}?shareable_conversation_id=${accessible_id}`;
       await navigator.clipboard.writeText(url);
-      toast.success(`Conversation saved! URL copied to clipboard.`);
+      toast.success(t(`Conversation saved! The sharable link is copied to clipboard.`));
     } catch (error) {
       toast.error(error.message);
     }
@@ -51,7 +56,7 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
 
   return (
     <>
-      {loading  ? (
+      {loading ? (
         <IconLoader size={18} className="ml-2" />
       ) : (
         <IconBrandStackshare

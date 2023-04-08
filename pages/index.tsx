@@ -703,33 +703,6 @@ const Home: React.FC<HomeProps> = ({
 
   // EFFECTS  --------------------------------------------
 
-  useEffect(() => {
-    fetchModels("");
-    const { shareable_conversation_id: accessibleConversationId } = router.query;
-
-    if (window.innerWidth < 640) {
-      setShowSidebar(false);
-    }
-
-    if(!accessibleConversationId) return;
-
-    fetchShareableConversation(accessibleConversationId as string).then((conversation) => {
-      console.log(conversation);
-      console.log(conversations);
-      
-      if(conversation) {
-        const updatedConversations = [...conversations, conversation];
-        setConversations(updatedConversations);
-        saveConversations(updatedConversations);
-        setSelectedConversation(conversation);
-        saveConversation(conversation);
-        router.replace(router.pathname, router.pathname, { shallow: true });
-      }
-    }).catch(() => {
-      toast.error(t('Sorry, we could not find this shared conversation.'));
-    });
-  }, []);
-
   useEffect(() => {    
     if (currentMessage) {
       handleSend(currentMessage);
@@ -741,6 +714,8 @@ const Home: React.FC<HomeProps> = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
+    fetchModels("");
+
     const updateHeight = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -760,24 +735,6 @@ const Home: React.FC<HomeProps> = ({
     const theme = localStorage.getItem('theme');
     if (theme) {
       setLightMode(theme as 'dark' | 'light');
-    }
-
-    const apiKey = localStorage.getItem('apiKey');
-    if (serverSideApiKeyIsSet) {
-      fetchModels('');
-      setApiKey('');
-      localStorage.removeItem('apiKey');
-    } else if (apiKey) {
-      setApiKey(apiKey);
-      fetchModels(apiKey);
-    }
-
-    const pluginKeys = localStorage.getItem('pluginKeys');
-    if (serverSidePluginKeysSet) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      setPluginKeys(JSON.parse(pluginKeys));
     }
 
     if (window.innerWidth < 640) {
@@ -805,10 +762,11 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
+    let cleanedConversationHistory: Conversation[] = [];
+
     if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
+      const parsedConversationHistory: Conversation[] =JSON.parse(conversationHistory);
+      cleanedConversationHistory = cleanConversationHistory(
         parsedConversationHistory,
       );
       setConversations(cleanedConversationHistory);
@@ -821,6 +779,26 @@ const Home: React.FC<HomeProps> = ({
       model: OpenAIModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
+    });
+
+    // Load shareable conversations
+    const { shareable_conversation_id: accessibleConversationId } = router.query;
+
+    if(!accessibleConversationId) return;
+
+    fetchShareableConversation(accessibleConversationId as string).then((conversation) => {
+      if(conversation) {
+        const updatedConversations = [...cleanedConversationHistory, conversation];
+    
+        setSelectedConversation(conversation);
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
+
+        toast.success(t('Conversation loaded successfully.'));
+        router.replace(router.pathname, router.pathname, { shallow: true });
+      }
+    }).catch(() => {
+      toast.error(t('Sorry, we could not find this shared conversation.'));
     });
   }, [serverSideApiKeyIsSet]);
 

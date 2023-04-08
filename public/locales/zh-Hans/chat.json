@@ -27,5 +27,9 @@
   "Where the forefront of AI technology meets universal access.": "把AI帶到每個人的生活中",
   "Are you sure you want to clear all messages?": "你确定要清除所有的消息吗？",
   "Switch to Sample Prompts": "切换到范例",
-  "Switch to Role Play": "切换到角色扮演"
+  "Switch to Role Play": "切换到角色扮演",
+  "Conversation loaded successfully.": "对话加载成功",
+  "Sorry, we could not find this shared conversation.": "抱歉，我们找不到这个对话",
+  "By sharing this conversation, it will be stored on our server. Are you sure you want to share this conversation?": "这个对话将被保存在我们的服务器上。您确定要分享吗？",,
+  "Conversation saved! The sharable link is copied to clipboard.": "对话已保存！链接已复制到剪贴板"
 }

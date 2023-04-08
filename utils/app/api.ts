@@ -25,14 +25,14 @@ export async function fetchShareableConversation(accessibleId: string): Promise<
     });
 
     if (!response.ok) {
-      throw new Error(t('Failed to fetch the conversation'));
+      throw new Error('Failed to fetch the conversation');
     }
 
     const { title, prompts } = await response.json();
 
     return {
       id: accessibleId,
-      name: title,
+      name: title + ' (Shared)',
       messages: JSON.parse(prompts),
       model: OpenAIModels['gpt-3.5-turbo'],
       prompt: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
