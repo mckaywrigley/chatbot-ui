@@ -809,6 +809,7 @@ const Home: React.FC<HomeProps> = ({
                 messageIsStreaming={messageIsStreaming}
                 apiKey={apiKey}
                 serverSideApiKeyIsSet={serverSideApiKeyIsSet}
+                serverSidePluginKeysSet={serverSidePluginKeysSet}
                 defaultModelId={defaultModelId}
                 modelError={modelError}
                 models={models}

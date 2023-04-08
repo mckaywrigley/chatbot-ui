@@ -29,6 +29,7 @@ interface Props {
   models: OpenAIModel[];
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
+  serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
@@ -53,6 +54,7 @@ export const Chat: FC<Props> = memo(
     models,
     apiKey,
     serverSideApiKeyIsSet,
+    serverSidePluginKeysSet,
     defaultModelId,
     messageIsStreaming,
     modelError,
@@ -305,6 +307,7 @@ export const Chat: FC<Props> = memo(
               conversationIsEmpty={conversation.messages.length === 0}
               model={conversation.model}
               prompts={prompts}
+              serverSidePluginKeysSet={serverSidePluginKeysSet}
               onSend={(message, plugin) => {
                 setCurrentMessage(message);
                 onSend(message, 0, plugin);

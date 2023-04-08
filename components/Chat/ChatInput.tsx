@@ -1,6 +1,6 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginList } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
@@ -27,6 +27,7 @@ interface Props {
   messageIsStreaming: boolean;
   model: OpenAIModel;
   conversationIsEmpty: boolean;
+  serverSidePluginKeysSet: boolean;
   prompts: Prompt[];
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
@@ -38,6 +39,7 @@ export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
   conversationIsEmpty,
+  serverSidePluginKeysSet,
   prompts,
   onSend,
   onRegenerate,
@@ -53,7 +55,7 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [showPluginSelect, setShowPluginSelect] = useState(false);
+  const [showPluginSelect, setShowPluginSelect] = useState(serverSidePluginKeysSet);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
@@ -280,7 +282,7 @@ export const ChatInput: FC<Props> = ({
           </button>
 
           {showPluginSelect && (
-            <div className="absolute left-0 bottom-14 bg-white dark:bg-[#343541]">
+            <div className="absolute left-0 bottom-14">
               <PluginSelect
                 plugin={plugin}
                 onPluginChange={(plugin: Plugin) => {
