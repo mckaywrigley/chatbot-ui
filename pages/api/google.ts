@@ -8,6 +8,8 @@ import jsdom, { JSDOM } from 'jsdom';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
+  return; // Disable for now
+
   try {
     const { messages, key, model } =
       req.body as GoogleBody;
