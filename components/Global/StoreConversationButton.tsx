@@ -12,6 +12,33 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
   const { t } = useTranslation('chat');
   const [loading, setLoading] = useState(false);
 
+  const shareConversationCopyButtonOnClick = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(t('Link copied to clipboard!'));
+    } catch (error) {
+      toast(
+        <div>
+          <p>{t('Failed to copy the link to clipboard.')}</p>
+          <p>{t('Please copy it manually:')}</p>
+          <input
+            readOnly
+            value={url}
+            onClick={(e) => {
+              (e.target as HTMLInputElement).select();
+            }}
+            className="mt-2 w-full rounded border border-gray-300 p-1"
+          />
+        </div>,
+        {
+          id: 'manual-copy-toast',
+          icon: '❗️',
+        },
+      );
+    }
+    toast.dismiss('store-conversation-toast');
+  };
+
   const storeConversation = async () => {
     const confirmed = window.confirm(
       t(
@@ -39,14 +66,38 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to store the conversation');
+        throw new Error(
+          t('Failed to store the conversation') ||
+            'Failed to store the conversation',
+        );
       }
 
       const { accessible_id } = await response.json();
 
       const url = `${window.location.origin}?shareable_conversation_id=${accessible_id}`;
-      await navigator.clipboard.writeText(url);
-      toast.success(t(`Conversation saved! The sharable link is copied to clipboard.`));
+
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        toast.error(t(`Failed to copy the sharable link to clipboard.`));
+      } else {
+        toast(
+          <div>
+            <span>{t('Conversation saved!')}</span>
+            <button
+              onClick={() => {
+                shareConversationCopyButtonOnClick(url);
+              }}
+              className="m-auto mt-2 block rounded-md bg-blue-500 px-2 py-1 text-sm text-white"
+            >
+              {t('Copy link')}
+            </button>
+          </div>,
+          {
+            id: 'store-conversation-toast',
+            icon: '🔗',
+            duration: 8000,
+          },
+        );
+      }
     } catch (error) {
       toast.error((error as any).message);
     }
