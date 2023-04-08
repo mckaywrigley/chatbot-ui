@@ -207,12 +207,9 @@ export const Chatbar: FC<Props> = ({
         serverSidePluginKeysSet={serverSidePluginKeysSet}
         conversationsCount={conversations.length}
         onToggleLightMode={onToggleLightMode}
-        onApiKeyChange={onApiKeyChange}
         onClearConversations={onClearConversations}
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
-        onPluginKeyChange={onPluginKeyChange}
-        onClearPluginKey={onClearPluginKey}
       />
     </div>
   );

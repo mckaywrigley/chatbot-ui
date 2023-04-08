@@ -15,7 +15,6 @@ interface Props {
   serverSidePluginKeysSet: boolean;
   conversationsCount: number;
   onToggleLightMode: (mode: 'light' | 'dark') => void;
-  onApiKeyChange: (apiKey: string) => void;
   onClearConversations: () => void;
   onExportConversations: () => void;
   onImportConversations: (data: SupportedExportFormats) => void;

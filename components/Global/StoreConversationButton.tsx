@@ -48,7 +48,7 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
       await navigator.clipboard.writeText(url);
       toast.success(t(`Conversation saved! The sharable link is copied to clipboard.`));
     } catch (error) {
-      toast.error(error.message);
+      toast.error((error as any).message);
     }
 
     setLoading(false);
