@@ -15,7 +15,7 @@ import {
 } from '@/types/openai';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-import { getEndpoint } from '@/utils/app/api';
+import { getEndpoint, fetchShareableConversation } from '@/utils/app/api';
 import {
   cleanConversationHistory,
 } from '@/utils/app/clean';
@@ -36,6 +36,7 @@ import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from 'next/router';
 import { event } from "nextjs-google-analytics";
 
 interface HomeProps {
@@ -80,6 +81,7 @@ const Home: React.FC<HomeProps> = ({
   // REFS ----------------------------------------------
 
   const stopConversationRef = useRef<boolean>(false);
+  const router = useRouter();
 
   // FETCH RESPONSE ----------------------------------------------
 
@@ -703,9 +705,29 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     fetchModels("");
+    const { shareable_conversation_id: accessibleConversationId } = router.query;
+
     if (window.innerWidth < 640) {
       setShowSidebar(false);
     }
+
+    if(!accessibleConversationId) return;
+
+    fetchShareableConversation(accessibleConversationId as string).then((conversation) => {
+      console.log(conversation);
+      console.log(conversations);
+      
+      if(conversation) {
+        const updatedConversations = [...conversations, conversation];
+        setConversations(updatedConversations);
+        saveConversations(updatedConversations);
+        setSelectedConversation(conversation);
+        saveConversation(conversation);
+        router.replace(router.pathname, router.pathname, { shallow: true });
+      }
+    }).catch(() => {
+      toast.error(t('Sorry, we could not find this shared conversation.'));
+    });
   }, []);
 
   useEffect(() => {    
