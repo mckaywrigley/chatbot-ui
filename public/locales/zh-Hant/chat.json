@@ -30,5 +30,11 @@
   "Conversation loaded successfully.": "對話加載成功",
   "Sorry, we could not find this shared conversation.": "抱歉，我們找不到這個對話",
   "By sharing this conversation, it will be stored on our server. Are you sure you want to share this conversation?": "這個對話將被保存在我們的服務器上。您確定要分享嗎？",
-  "Conversation saved! The sharable link is copied to clipboard.": "對話已保存！鏈接已複製到剪貼板"
+  "Conversation saved!": "對話已保存！",
+  "Copy link": "複製鏈結",
+  "Failed to copy the sharable link to clipboard.": "無法複製鏈結到剪貼板",
+  "Failed to store the conversation": "無法保存對話",
+  "Link copied to clipboard!" : "鏈結已複製到剪貼板！",
+  "Failed to copy the link to clipboard.": "無法複製鏈結到剪貼板",
+  "Please copy it manually:": "請手動複製以下鏈結："
 }

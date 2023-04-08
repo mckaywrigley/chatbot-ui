@@ -15,11 +15,28 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
   const shareConversationCopyButtonOnClick = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard!');
-      toast.dismiss('store-conversation-toast');
+      toast.success(t('Link copied to clipboard!'));
     } catch (error) {
-      toast.error('Failed to copy the link to clipboard');
+      toast(
+        <div>
+          <p>{t('Failed to copy the link to clipboard.')}</p>
+          <p>{t('Please copy it manually:')}</p>
+          <input
+            readOnly
+            value={url}
+            onClick={(e) => {
+              (e.target as HTMLInputElement).select();
+            }}
+            className="mt-2 w-full rounded border border-gray-300 p-1"
+          />
+        </div>,
+        {
+          id: 'manual-copy-toast',
+          icon: '❗️',
+        },
+      );
     }
+    toast.dismiss('store-conversation-toast');
   };
 
   const storeConversation = async () => {
@@ -49,7 +66,10 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to store the conversation');
+        throw new Error(
+          t('Failed to store the conversation') ||
+            'Failed to store the conversation',
+        );
       }
 
       const { accessible_id } = await response.json();
@@ -61,14 +81,14 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
       } else {
         toast(
           <div>
-            <span>Conversation saved!</span>
+            <span>{t('Conversation saved!')}</span>
             <button
               onClick={() => {
                 shareConversationCopyButtonOnClick(url);
               }}
-              className="mt-2 m-auto block rounded-md bg-blue-500 px-2 py-1 text-white text-sm"
+              className="m-auto mt-2 block rounded-md bg-blue-500 px-2 py-1 text-sm text-white"
             >
-              Copy link
+              {t('Copy link')}
             </button>
           </div>,
           {
