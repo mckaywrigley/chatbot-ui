@@ -37,3 +37,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .idea
+
+# Supabase
+supabase/.branches
+supabase/.temp
