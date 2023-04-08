@@ -786,6 +786,7 @@ const Home: React.FC<HomeProps> = ({
 
     if(!accessibleConversationId) return;
 
+    setLoading(true);
     fetchShareableConversation(accessibleConversationId as string).then((conversation) => {
       if(conversation) {
         const updatedConversations = [...cleanedConversationHistory, conversation];
@@ -794,11 +795,15 @@ const Home: React.FC<HomeProps> = ({
         setConversations(updatedConversations);
         saveConversations(updatedConversations);
 
-        toast.success(t('Conversation loaded successfully.'));
+        toast.success(t('Conversation loaded successfully.'), {
+          id: 'conversation-loaded',
+        });
         router.replace(router.pathname, router.pathname, { shallow: true });
       }
+      setLoading(false);
     }).catch(() => {
       toast.error(t('Sorry, we could not find this shared conversation.'));
+      setLoading(false);
     });
   }, [serverSideApiKeyIsSet]);
 
