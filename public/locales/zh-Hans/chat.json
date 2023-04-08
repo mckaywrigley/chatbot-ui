@@ -13,7 +13,7 @@
   "Conversation": "对话",
   "OR": "或",
   "Loading...": "加载中...",
-  "Type a message or type \"/\" to select a prompt...": "输入一条消息或键入 \"/\" 以选择提示...",
+  "Type a message ...": "输入一条消息 ...",
   "Error fetching models.": "获取模型时出错。",
   "AI": "AI",
   "You": "你",
@@ -21,10 +21,15 @@
   "Save & Submit": "保存并提交",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "请确保您的 OpenAI API 密钥已在侧边栏左下角设置。",
   "If you completed this step, OpenAI may be experiencing issues.": "如果您已完成此步骤，OpenAI 可能遇到了问题。",
+  "click if using a .env.local file": "click if using a .env.local file",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "消息字数限制为 {{maxLength}} 个字符。您已输入 {{valueLength}} 个字符。",
   "Please enter a message": "请输入一条消息",
   "Where the forefront of AI technology meets universal access.": "把AI帶到每個人的生活中",
   "Are you sure you want to clear all messages?": "你确定要清除所有的消息吗？",
   "Switch to Sample Prompts": "切换到范例",
-  "Switch to Role Play": "切换到角色扮演"
+  "Switch to Role Play": "切换到角色扮演",
+  "Conversation loaded successfully.": "对话加载成功",
+  "Sorry, we could not find this shared conversation.": "抱歉，我们找不到这个对话",
+  "By sharing this conversation, it will be stored on our server. Are you sure you want to share this conversation?": "这个对话将被保存在我们的服务器上。您确定要分享吗？",,
+  "Conversation saved! The sharable link is copied to clipboard.": "对话已保存！链接已复制到剪贴板"
 }

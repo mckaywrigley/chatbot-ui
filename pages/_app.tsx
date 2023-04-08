@@ -2,17 +2,18 @@ import '@/styles/globals.css';
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
-import { GoogleAnalytics } from "nextjs-google-analytics";
+import { GoogleAnalytics } from 'nextjs-google-analytics';
+import { Toaster } from 'react-hot-toast';
+
 const inter = Inter({ subsets: ['latin'] });
 
 function App({ Component, pageProps }: AppProps<{}>) {
   return (
-    <main className={inter.className}>
+    <div className={inter.className}>
+      <Toaster />
       <Component {...pageProps} />
-      <Analytics />
       <GoogleAnalytics trackPageViews />
-    </main>
+    </div>
   );
 }
 

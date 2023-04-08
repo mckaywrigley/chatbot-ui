@@ -12,7 +12,12 @@ export default function Document(props: Props) {
     <Html lang={currentLocale}>
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Chat Everywhere"></meta>
+        <meta name="apple-mobile-web-app-title" content="Chat Everywhere - ChatGPT for everyone"/>
+        <meta property="og:title" content="Chat Everywhere - ChatGPT for everyone" />
+        <meta property="og:description" content="Revolutionize your ChatGPT experience with our app that boasts advanced front-end features like folder organization and easily shareable chats. Keep your conversations secured by locally storing data and enjoy collaborating with anyone from around the world, without any limitations." />
+        <meta property="og:image" content="https://mugshotbot.com/m/hxYqn5DH" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="og:url" content={`https://chateverywhere.app`} />
       </Head>
       <body>
         <Main />
