@@ -20,16 +20,10 @@ type Props = {
 
 export const SamplePrompts: FC<Props> = ({ promptOnClick }) => {
   const { t } = useTranslation('prompts');
-  const [demoPrompts, setDemoPrompts] = useState<string[]>([]);
-
-  useEffect(() => {
-    const prompts = DEMO_PROMPTS.sort(() => Math.random() - 0.5).slice(0, 3);
-    setDemoPrompts(prompts);
-  }, []);
 
   return (
-    <div className="mt-5 flex flex-col text-sm">
-      {demoPrompts.map((prompt, index) => (
+    <div className="mt-5 flex flex-col text-sm overflow-y-auto h-64">
+      {DEMO_PROMPTS.map((prompt, index) => (
         <div
           key={index}
           className="mb-2 cursor-pointer rounded-md border border-neutral-200 bg-transparent p-1 pr-2 text-neutral-400 dark:border-neutral-600 dark:text-white"
