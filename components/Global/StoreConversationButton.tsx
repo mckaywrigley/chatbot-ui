@@ -1,4 +1,4 @@
-import { IconShare } from '@tabler/icons-react';
+import { IconBrandStackshare, IconLoader } from '@tabler/icons-react';
 import { FC, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Conversation } from '@/types/chat';
@@ -51,10 +51,10 @@ export const StoreConversationButton: FC<Props> = ({ conversation }) => {
 
   return (
     <>
-      {loading ? (
-        <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
+      {loading  ? (
+        <IconLoader size={18} className="ml-2" />
       ) : (
-        <IconShare
+        <IconBrandStackshare
           size={18}
           className="ml-2 cursor-pointer hover:opacity-50"
           onClick={storeConversation}
