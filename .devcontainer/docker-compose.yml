@@ -1,0 +1,13 @@
+version: '3.6'
+
+services:
+  chatgpt:
+    build: ..
+    ports:
+      - 3000:3000
+    environment:
+      - 'OPENAI_API_KEY='
+      # - 'OPENAI_API_HOST='
+    volumes:
+      - ..:/app:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
