@@ -110,3 +110,11 @@ jobs:
           releaseName: "PremAI App ${{ steps.next_tag.outputs.tag }}"
           releaseBody: "See the assets to download and install this version."
           includeDebug: true
+
+      # Commit package.json, tauri.conf.json and Cargo.toml to master
+      - name: Commit & Push
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          git add .
+          git commit -m "${{ steps.next_tag.outputs.tag }}"
+          git push origin HEAD:master
