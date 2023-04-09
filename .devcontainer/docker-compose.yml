@@ -6,8 +6,17 @@ services:
     ports:
       - 3000:3000
     environment:
-      - 'OPENAI_API_KEY='
-      # - 'OPENAI_API_HOST='
+      - 'OPENAI_API_KEY=sk-000000000000000'
+      - 'OPENAI_API_HOST=http://local-api:8000'
     volumes:
       - ..:/app:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
+
+  local-api:
+    build: ./local-api/.
+    ports:
+      - 8000:8000
+    environment:
+      - MODEL=/models/ggml-vicuna-7b-4bit.bin
+    volumes:
+      - ../models/:/models

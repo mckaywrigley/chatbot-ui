@@ -38,6 +38,10 @@
 		"3000": {
 			"label": "Chatbot UI",
 			"onAutoForward": "notify"
+		},
+		"8000": {
+			"label": "Local API",
+			"onAutoForward": "notify"
 		}
 	},
 
