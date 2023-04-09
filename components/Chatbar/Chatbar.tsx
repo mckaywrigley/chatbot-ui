@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -46,11 +46,14 @@ export const Chatbar = () => {
     dispatch: chatDispatch,
   } = chatBarContextValue;
 
-  const handleApiKeyChange = (apiKey: string) => {
-    homeDispatch({ field: 'apiKey', value: apiKey });
+  const handleApiKeyChange = useCallback(
+    (apiKey: string) => {
+      homeDispatch({ field: 'apiKey', value: apiKey });
 
-    localStorage.setItem('apiKey', apiKey);
-  };
+      localStorage.setItem('apiKey', apiKey);
+    },
+    [homeDispatch],
+  );
 
   const handlePluginKeyChange = (pluginKey: PluginKey) => {
     if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {

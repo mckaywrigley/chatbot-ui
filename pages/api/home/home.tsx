@@ -54,6 +54,7 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
+  const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -62,12 +63,11 @@ const Home = ({
   const {
     state: {
       apiKey,
-      pluginKeys,
       lightMode,
       folders,
       conversations,
       selectedConversation,
-      currentMessage,
+
       prompts,
     },
     dispatch,
@@ -75,16 +75,19 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error } = useQuery(
-    ['GetModels', apiKey],
-    ({ signal }) =>
-      getModels(
+  const { data, error, refetch } = useQuery(
+    ['GetModels', apiKey, serverSideApiKeyIsSet],
+    ({ signal }) => {
+      if (!apiKey && !serverSideApiKeyIsSet) return null;
+
+      return getModels(
         {
           key: apiKey,
         },
         signal,
-      ),
-    { enabled: true },
+      );
+    },
+    { enabled: true, refetchOnMount: false },
   );
 
   useEffect(() => {
@@ -246,13 +249,16 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
+    console.log('initialize', serverSideApiKeyIsSet);
     const theme = localStorage.getItem('theme');
     if (theme) {
       dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
     }
 
     const apiKey = localStorage.getItem('apiKey');
+
     if (serverSideApiKeyIsSet) {
+      console.log('trigger key', apiKey);
       dispatch({ field: 'apiKey', value: '' });
 
       localStorage.removeItem('apiKey');
@@ -328,7 +334,12 @@ const Home = ({
         },
       });
     }
-  }, [serverSideApiKeyIsSet]);
+  }, [
+    defaultModelId,
+    dispatch,
+    serverSideApiKeyIsSet,
+    serverSidePluginKeysSet,
+  ]);
 
   return (
     <HomeContext.Provider

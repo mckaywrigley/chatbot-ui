@@ -59,7 +59,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  console.log('trigger');
+
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
