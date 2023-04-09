@@ -117,4 +117,4 @@ jobs:
         run: |
           git add .
           git commit -m "${{ steps.next_tag.outputs.tag }}"
-          git push origin HEAD:master
+          git push origin HEAD:main
