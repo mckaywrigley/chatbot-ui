@@ -137,9 +137,7 @@ const Home: React.FC<HomeProps> = ({
             ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
         });
       }else if(plugin.id === 'langchain-chat'){
-        body = JSON.stringify({
-          ...chatBody
-        });
+        body = JSON.stringify(chatBody);
       }
 
       const controller = new AbortController();

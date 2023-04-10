@@ -7,17 +7,24 @@ import { LLMChain } from 'langchain';
 import express from 'express';
 import { Readable } from 'stream';
 import cors from 'cors';
+import { ChatBody } from "@/types/chat";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors())
+app.use(cors());
+app.use(express.json())
 
 app.post('/langchain-chat', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
 
+  const requestBody = req.body as ChatBody;
+  console.log(requestBody);
+
+  const latestUserPrompt = requestBody.messages[requestBody.messages.length - 1].content;
+  
   const tokenStream = new Readable({
     read() {},
   });
@@ -26,6 +33,7 @@ app.post('/langchain-chat', async (req, res) => {
     async handleAgentAction(action) {
       console.log('handleAgentAction', action);
       tokenStream.push(`${action.log}\n\n`);
+      tokenStream.push(`--- \n\n`);
     },
   });
 
@@ -47,7 +55,6 @@ app.post('/langchain-chat', async (req, res) => {
   const agent = new ZeroShotAgent({
     llmChain,
     allowedTools: ['search'],
-
   });
 
   const agentExecutor = AgentExecutor.fromAgentAndTools({
@@ -58,18 +65,16 @@ app.post('/langchain-chat', async (req, res) => {
 
   try{
     tokenStream.pipe(res);
-    tokenStream.push("```markdown \n");
+    tokenStream.push("```Mindlog \n");
     tokenStream.push("Start thinking ... \n\n");
 
     const result = await agentExecutor.call({
-      input:
-        "How old is the actor of John Wick? Multiple that by 3",
+      input: latestUserPrompt,
     });
 
     tokenStream.push("```\n");
   
-    tokenStream.push(`Answer: ${result.output}\n\n`);
-    await setTimeout(() => {}, 100); // Wait to send the DONE flag
+    tokenStream.push(`${result.output} \n\n`);
     tokenStream.push(`[DONE]`);
     tokenStream.destroy();
     console.log('Request closed');
@@ -82,8 +87,7 @@ app.post('/langchain-chat', async (req, res) => {
     tokenStream.push("Unable to fullfil request");
     tokenStream.destroy();
     console.log('Request closed');
-    console.log(e);
-    console.log(typeof e);
+    console.error(e);
   }
 });
 
