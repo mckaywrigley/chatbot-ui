@@ -593,6 +593,29 @@ const Home: React.FC<HomeProps> = ({
       setCurrentMessage(message);
     }
   };
+  const handleDeleteMessage = (message: Message, messageIndex: number) => {
+    if (selectedConversation) {
+      const { messages } = selectedConversation;
+      if (
+        messages[messageIndex + 1] &&
+        messages[messageIndex + 1].role === 'assistant'
+      ) {
+        messages.splice(messageIndex, 2);
+      } else if (messages[messageIndex]) {
+        messages.splice(messageIndex, 2);
+      } else return;
+      const updatedConversation = {
+        ...selectedConversation,
+        messages,
+      };
+      const { single, all } = updateConversation(
+        updatedConversation,
+        conversations,
+      );
+      setSelectedConversation(single);
+      setConversations(all);
+    }
+  };
 
   // PROMPT OPERATIONS --------------------------------------------
 
@@ -817,6 +840,7 @@ const Home: React.FC<HomeProps> = ({
                 onSend={handleSend}
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
                 stopConversationRef={stopConversationRef}
               />
             </div>
