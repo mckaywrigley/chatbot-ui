@@ -19,26 +19,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Clone the-ai-box repo
-        run: git clone https://github.com/PremAI-Org/the-ai-box.git
-
-      - name: Compile the python app
+      - name: Get the binaries
         run: |
-          cd ./the-ai-box/cpu/
-          pip install -r requirements.txt
-          pyinstaller apis.py
-
-      - name: Move the binaries in the correct folder
-        run: |
-          mkdir ./src-tauri/binaries/
-          cp -r ./the-ai-box/cpu/dist ./src-tauri/binaries/
-          cp -r ./the-ai-box/cpu/build ./src-tauri/binaries/
-          cp -r ./the-ai-box/cpu/chat ./src-tauri/
-          cp ./the-ai-box/cpu/apis.spec ./src-tauri/binaries/
+          wget https://github.com/PremAI-Org/the-ai-box/releases/download/v0.0.14/binaries-macOS.zip
+          mv binaries-macOS.zip ./src-tauri/binaries/binaries-macOS.zip
+          unzip ./src-tauri/binaries/binaries-macOS.zip -d ./src-tauri/binaries/
 
       - name: Create the .env file from example
         run: cp .env.local.prem .env.local

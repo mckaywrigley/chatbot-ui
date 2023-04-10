@@ -3,16 +3,7 @@
   windows_subsystem = "windows"
 )]
 
-use std::{env, process::Command, net::TcpStream, thread, time::Duration};
-
-fn launch_model_apis() {
-  let binary_path = if cfg!(windows) {
-      "./binaries/python-binary.exe"
-  } else {
-      "./binaries/dist/apis/apis"
-  };
-  let _ = Command::new(binary_path).spawn();
-}
+use std::{env, net::TcpStream, thread, time::Duration};
 
 fn wait_for_api(port: u16) {
   loop {
@@ -27,7 +18,6 @@ fn wait_for_api(port: u16) {
 }
 
 fn main() {
-  launch_model_apis();
 
   wait_for_api(8001);
 
