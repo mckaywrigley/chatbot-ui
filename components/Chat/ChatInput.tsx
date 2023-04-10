@@ -1,6 +1,6 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
-import { Plugin, PluginID } from '@/types/plugin';
+import { Plugin, PluginID, PluginList } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
@@ -77,6 +77,8 @@ export const ChatInput: FC<Props> = ({
         return <IconBolt size={20} />;
     }
   };
+
+  const selectedEnhanceChatMode = () => plugin === PluginList[1];
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -286,31 +288,14 @@ export const ChatInput: FC<Props> = ({
           </button>
         )}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+        <div className={`relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 ${selectedEnhanceChatMode() && "border-blue-800"}`}>
           <button
-            // className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60  dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            onClick={() => setShowPluginSelect(!showPluginSelect)}
+            onClick={() => setPlugin(selectedEnhanceChatMode() ? null : PluginList[1])}
             onKeyDown={(e) => {}}
           >
             {getPluginIcon(plugin)}
           </button>
-
-          {showPluginSelect && (
-            <div className="absolute left-0 bottom-14 bg-white dark:bg-[#343541]">
-              <PluginSelect
-                plugin={plugin}
-                onPluginChange={(plugin: Plugin) => {
-                  setPlugin(plugin);
-                  setShowPluginSelect(false);
-
-                  if (textareaRef && textareaRef.current) {
-                    textareaRef.current.focus();
-                  }
-                }}
-              />
-            </div>
-          )}
 
           <textarea
             ref={textareaRef}
@@ -367,6 +352,13 @@ export const ChatInput: FC<Props> = ({
               onClose={() => setIsModalVisible(false)}
             />
           )}
+          {
+            selectedEnhanceChatMode() && (
+              <span className="font-mono text-gray-400 m-auto text-xs px-2 md:px-0">
+                {t("In enhance chat mode, the bot has no memory of the chat")}
+              </span>
+            )
+          }
         </div>
       </div>
     </div>

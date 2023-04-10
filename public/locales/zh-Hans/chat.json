@@ -37,5 +37,6 @@
   "Failed to store the conversation": "无法保存对话",
   "Link copied to clipboard!": "链接已复制到剪贴板！",
   "Failed to copy the link to clipboard.": "无法复制链接到剪贴板",
-  "Please copy it manually:": "请手动复制以下："
+  "Please copy it manually:": "请手动复制以下：",
+  "In enhance chat mode, the bot has no memory of the chat": "在增强聊天模式下，机器人不会记住聊天记录"
 }

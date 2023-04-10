@@ -12,9 +12,14 @@ import { ChatBody } from "@/types/chat";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8000;
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.UI_DOMAIN || 'http://localhost:3000',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors(corsOptions));
 app.use(express.json())
 
 app.post('/langchain-chat', async (req, res) => {
@@ -88,6 +93,12 @@ app.post('/langchain-chat', async (req, res) => {
     tokenStream.destroy();
     console.log('Request closed');
     console.error(e);
+    console.log(typeof e)
+  }
+
+  if(tokenStream.closed === true){
+    tokenStream.push(`[DONE]`);
+    tokenStream.destroy();
   }
 });
 
