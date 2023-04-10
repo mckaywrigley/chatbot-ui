@@ -39,12 +39,7 @@ export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.LANGCHAIN_CHAT]: {
     id: PluginID.LANGCHAIN_CHAT,
     name: PluginName.LANGCHAIN_CHAT,
-    requiredKeys: [
-      {
-        key: 'ENHANCE_API_URL',
-        value: '',
-      }
-    ]
+    requiredKeys: []
   }
 };
 
