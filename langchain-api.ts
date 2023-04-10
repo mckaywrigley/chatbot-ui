@@ -26,7 +26,6 @@ app.post('/langchain-chat', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
 
   const requestBody = req.body as ChatBody;
-  console.log(requestBody);
 
   const latestUserPrompt = requestBody.messages[requestBody.messages.length - 1].content;
   

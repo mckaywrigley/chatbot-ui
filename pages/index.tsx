@@ -125,7 +125,15 @@ const Home: React.FC<HomeProps> = ({
       let body;
 
       if (!plugin) {
-        body = JSON.stringify(chatBody);
+        const filteredChatBodyMessages = chatBody.messages.map((message) => ({
+          role: message.role,
+          content: message.content
+        }));
+
+        body = JSON.stringify({
+          ...chatBody,
+          messages: filteredChatBodyMessages,
+        });
       }else if (plugin.id === 'google-search'){
         body = JSON.stringify({
           ...chatBody,
@@ -206,7 +214,7 @@ const Home: React.FC<HomeProps> = ({
             isFirst = false;
             const updatedMessages: Message[] = [
               ...updatedConversation.messages,
-              { role: 'assistant', content: chunkValue },
+              { role: 'assistant', content: chunkValue, pluginId: plugin?.id },
             ];
 
             updatedConversation = {
@@ -237,8 +245,6 @@ const Home: React.FC<HomeProps> = ({
             setSelectedConversation(updatedConversation);
           }
         }
-
-        console.log("Done streaming answer");
 
         saveConversation(updatedConversation);
 
