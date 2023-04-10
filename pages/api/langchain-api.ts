@@ -1,28 +1,13 @@
-import * as dotenv from 'dotenv';
 import { Serper, Calculator } from 'langchain/tools';
 import { ChatOpenAI } from 'langchain/chat_models';
 import { CallbackManager } from 'langchain/callbacks';
 import { AgentExecutor, ZeroShotAgent } from 'langchain/agents';
 import { LLMChain } from 'langchain';
-import express from 'express';
 import { Readable } from 'stream';
-import cors from 'cors';
 import { ChatBody } from "@/types/chat";
+import { NextApiRequest, NextApiResponse } from 'next';
 
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-const corsOptions = {
-  origin: process.env.UI_DOMAIN || 'http://localhost:3000',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-
-app.use(cors(corsOptions));
-app.use(express.json())
-
-app.post('/langchain-chat', async (req, res) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   res.setHeader('Cache-Control', 'no-cache');
 
   const requestBody = req.body as ChatBody;
@@ -99,8 +84,6 @@ app.post('/langchain-chat', async (req, res) => {
     tokenStream.push(`[DONE]`);
     tokenStream.destroy();
   }
-});
+};
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+export default handler;

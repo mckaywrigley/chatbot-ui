@@ -12,7 +12,7 @@ export const getEndpoint = (plugin: Plugin | null) => {
   }
 
   if (plugin.id === PluginID.LANGCHAIN_CHAT) {
-    return 'http://localhost:8000/langchain-chat';
+    return 'api/langchain-api';
   }
 
   return 'api/chat';
