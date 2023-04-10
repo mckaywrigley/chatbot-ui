@@ -1,33 +1,59 @@
-import { Serper, Calculator } from 'langchain/tools';
-import { ChatOpenAI } from 'langchain/chat_models';
+import { Serper } from 'langchain/tools';
+import { Calculator } from "langchain/tools/calculator";
+import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { CallbackManager } from 'langchain/callbacks';
 import { AgentExecutor, ZeroShotAgent } from 'langchain/agents';
-import { LLMChain } from 'langchain';
-import { Readable } from 'stream';
+import { LLMChain } from 'langchain/chains';
 import { ChatBody } from "@/types/chat";
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
-  res.setHeader('Cache-Control', 'no-cache');
+export const config = {
+  runtime: "edge"
+};
 
-  const requestBody = req.body as ChatBody;
-
+const handler = async (req: NextRequest, res: any) => {
+  const requestBody = (await req.json()) as ChatBody;
+  
   const latestUserPrompt = requestBody.messages[requestBody.messages.length - 1].content;
   
-  const tokenStream = new Readable({
-    read() {},
-  });
+  const encoder = new TextEncoder();
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
 
-  const callbackManager = await CallbackManager.fromHandlers({
-    async handleAgentAction(action) {
+  const writeToStream = async (text: string) => {
+    await writer.write(encoder.encode(text));
+  };
+
+  const callbackManager = CallbackManager.fromHandlers({
+    handleChainStart: async () => {
+      console.log('handleChainStart');
+      await writer.ready;
+      await writeToStream("```Mindlog \n");
+      await writeToStream("Start thinking ... \n\n");
+    },
+    handleAgentAction: async (action) => {
       console.log('handleAgentAction', action);
-      tokenStream.push(`${action.log}\n\n`);
-      tokenStream.push(`--- \n\n`);
+      await writer.ready
+      await writeToStream(`${action.log}\n\n`);
+      await writeToStream(`--- \n\n`);
+    },
+    handleAgentEnd: async (action) => {
+      console.log('handleAgentEnd', action);
+      await writer.ready;
+      await writeToStream("``` \n\n");
+      await writeToStream(action.returnValues.output);
+      await writeToStream("[DONE]");
+    },
+    handleLLMError: async (e) => {
+      await writer.ready;
+      await writeToStream("``` \n\n");
+      await writeToStream("Sorry, I am not able to answer your question. \n\n");
+      await writer.abort(e);
     },
   });
 
   const model = new ChatOpenAI({
-    temperature: 0,
+    temperature: 0.2,
     callbackManager,
     openAIApiKey: process.env.OPENAI_API_KEY,
     streaming: true,
@@ -53,36 +79,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   });
 
   try{
-    tokenStream.pipe(res);
-    tokenStream.push("```Mindlog \n");
-    tokenStream.push("Start thinking ... \n\n");
-
-    const result = await agentExecutor.call({
+    agentExecutor.call({
       input: latestUserPrompt,
     });
 
-    tokenStream.push("```\n");
-  
-    tokenStream.push(`${result.output} \n\n`);
-    tokenStream.push(`[DONE]`);
-    tokenStream.destroy();
-    console.log('Request closed');
-
-    req.on('close', () => {
-      tokenStream.destroy();
-      console.log('Request closed');
+    return new NextResponse(stream.readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+      },
     });
+
   }catch(e){
-    tokenStream.push("Unable to fullfil request");
-    tokenStream.destroy();
+    await writeToStream("Unable to fullfil request");
+    writer.abort(e);
     console.log('Request closed');
     console.error(e);
     console.log(typeof e)
-  }
-
-  if(tokenStream.closed === true){
-    tokenStream.push(`[DONE]`);
-    tokenStream.destroy();
   }
 };
 
