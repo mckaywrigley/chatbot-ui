@@ -6,36 +6,34 @@ import { AgentExecutor, ZeroShotAgent } from 'langchain/agents';
 import { LLMChain } from 'langchain';
 import express from 'express';
 import { Readable } from 'stream';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.get('/langchain-chat', async (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
+app.use(cors())
+
+app.post('/langchain-chat', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
 
   const tokenStream = new Readable({
     read() {},
   });
 
   const callbackManager = await CallbackManager.fromHandlers({
-    async handleLLMNewToken(token: string) {
-      tokenStream.push(`data: ${JSON.stringify({ token })}\n\n`);
-    },
     async handleAgentAction(action) {
       console.log('handleAgentAction', action);
+      tokenStream.push(`${action.log}\n\n`);
     },
   });
 
   const model = new ChatOpenAI({
     temperature: 0,
     callbackManager,
-    streaming: true,
     openAIApiKey: process.env.OPENAI_API_KEY,
+    streaming: true,
   });
 
   const tools = [new Serper(), new Calculator(true, callbackManager)];
@@ -49,6 +47,7 @@ app.get('/langchain-chat', async (req, res) => {
   const agent = new ZeroShotAgent({
     llmChain,
     allowedTools: ['search'],
+
   });
 
   const agentExecutor = AgentExecutor.fromAgentAndTools({
@@ -57,19 +56,37 @@ app.get('/langchain-chat', async (req, res) => {
     callbackManager,
   });
 
-  const result = await agentExecutor.call({
-    input:
-      "What's the distance between Moon and Mars? and how long would it take to travel there in 0.5 light speed?",
-  });
+  try{
+    tokenStream.pipe(res);
+    tokenStream.push("```markdown \n");
+    tokenStream.push("Start thinking ... \n\n");
 
-  console.log(`Got output: ${result.output}`);
-  tokenStream.pipe(res);
+    const result = await agentExecutor.call({
+      input:
+        "How old is the actor of John Wick? Multiple that by 3",
+    });
 
-  req.on('close', () => {
+    tokenStream.push("```\n");
+  
+    tokenStream.push(`Answer: ${result.output}\n\n`);
+    await setTimeout(() => {}, 100); // Wait to send the DONE flag
+    tokenStream.push(`[DONE]`);
     tokenStream.destroy();
-  });
+    console.log('Request closed');
+
+    req.on('close', () => {
+      tokenStream.destroy();
+      console.log('Request closed');
+    });
+  }catch(e){
+    tokenStream.push("Unable to fullfil request");
+    tokenStream.destroy();
+    console.log('Request closed');
+    console.log(e);
+    console.log(typeof e);
+  }
 });
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });

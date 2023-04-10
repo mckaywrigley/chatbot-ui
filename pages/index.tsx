@@ -126,7 +126,7 @@ const Home: React.FC<HomeProps> = ({
 
       if (!plugin) {
         body = JSON.stringify(chatBody);
-      } else {
+      }else if (plugin.id === 'google-search'){
         body = JSON.stringify({
           ...chatBody,
           googleAPIKey: pluginKeys
@@ -135,6 +135,10 @@ const Home: React.FC<HomeProps> = ({
           googleCSEId: pluginKeys
             .find((key) => key.pluginId === 'google-search')
             ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+        });
+      }else if(plugin.id === 'langchain-chat'){
+        body = JSON.stringify({
+          ...chatBody
         });
       }
 
@@ -156,14 +160,14 @@ const Home: React.FC<HomeProps> = ({
       }
 
       const data = response.body;
-
+      
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
         return;
       }
-
-      if (!plugin) {
+      
+      if (!plugin || plugin.id === 'langchain-chat') {
         if (updatedConversation.messages.length === 1) {
           const { content } = message;
           const customName =
@@ -194,6 +198,11 @@ const Home: React.FC<HomeProps> = ({
           const chunkValue = decoder.decode(value);
 
           text += chunkValue;
+
+          if(text.includes("[DONE]")){
+            text = text.replace("[DONE]", "");
+            done = true;
+          }
 
           if (isFirst) {
             isFirst = false;
@@ -230,6 +239,8 @@ const Home: React.FC<HomeProps> = ({
             setSelectedConversation(updatedConversation);
           }
         }
+
+        console.log("Done streaming answer");
 
         saveConversation(updatedConversation);
 

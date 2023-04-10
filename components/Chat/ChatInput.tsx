@@ -1,6 +1,6 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
@@ -8,6 +8,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconBrain
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
@@ -61,6 +62,21 @@ export const ChatInput: FC<Props> = ({
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
+
+  const getPluginIcon = (plugin: Plugin | null) => {
+    if (!plugin) {
+      return <IconBolt size={20} />;
+    }
+
+    switch (plugin.id) {
+      case PluginID.GOOGLE_SEARCH:
+        return <IconBrandGoogle size={20} />;
+      case PluginID.LANGCHAIN_CHAT:
+        return <IconBrain size={20} />;
+      default:
+        return <IconBolt size={20} />;
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -272,13 +288,12 @@ export const ChatInput: FC<Props> = ({
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
-            className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60  dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
-            // className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            // onClick={() => setShowPluginSelect(!showPluginSelect)}
-            // Disabled Google plugin for now
+            // className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60  dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
+            className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            {getPluginIcon(plugin)}
           </button>
 
           {showPluginSelect && (
