@@ -18,6 +18,7 @@
     "@vercel/analytics": "^0.1.11",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
+    "langchain": "^0.0.51",
     "next": "13.2.4",
     "next-i18next": "^13.2.2",
     "nextjs-google-analytics": "^2.3.3",
