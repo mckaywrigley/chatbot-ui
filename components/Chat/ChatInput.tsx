@@ -1,7 +1,3 @@
-import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
   IconBrandGoogle,
@@ -9,42 +5,48 @@ import {
   IconRepeat,
   IconSend,
 } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import {
-  FC,
   KeyboardEvent,
   MutableRefObject,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
+import { Message } from '@/types/chat';
+import { Plugin } from '@/types/plugin';
+import { Prompt } from '@/types/prompt';
+
+import HomeContext from '@/pages/api/home/home.context';
+
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 interface Props {
-  messageIsStreaming: boolean;
-  model: OpenAIModel;
-  conversationIsEmpty: boolean;
-  prompts: Prompt[];
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
 }
 
-export const ChatInput: FC<Props> = ({
-  messageIsStreaming,
-  model,
-  conversationIsEmpty,
-  prompts,
+export const ChatInput = ({
   onSend,
   onRegenerate,
   stopConversationRef,
   textareaRef,
-}) => {
+}: Props) => {
   const { t } = useTranslation('chat');
+
+  const {
+    state: { selectedConversation, messageIsStreaming, prompts },
+
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
 
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -64,9 +66,9 @@ export const ChatInput: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = model.maxLength;
+    const maxLength = selectedConversation?.model.maxLength;
 
-    if (value.length > maxLength) {
+    if (maxLength && value.length > maxLength) {
       alert(
         t(
           `Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
@@ -261,14 +263,16 @@ export const ChatInput: FC<Props> = ({
           </button>
         )}
 
-        {!messageIsStreaming && !conversationIsEmpty && (
-          <button
-            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-            onClick={onRegenerate}
-          >
-            <IconRepeat size={16} /> {t('Regenerate response')}
-          </button>
-        )}
+        {!messageIsStreaming &&
+          selectedConversation &&
+          selectedConversation.messages.length > 0 && (
+            <button
+              className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+              onClick={onRegenerate}
+            >
+              <IconRepeat size={16} /> {t('Regenerate response')}
+            </button>
+          )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
