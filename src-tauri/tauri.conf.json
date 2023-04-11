@@ -16,7 +16,7 @@
         "sidecar": true,
         "scope": [
           {
-            "name": "binaries/cpu/dist/apis",
+            "name": "./binaries/dist/apis",
             "sidecar": true
           }
         ]
@@ -30,7 +30,7 @@
         "depends": []
       },
       "externalBin": [
-        "binaries/cpu/dist/apis"
+        "./binaries/dist/apis"
       ],
       "icon": [
         "icons/32x32.png",
