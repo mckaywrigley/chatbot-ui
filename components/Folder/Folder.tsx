@@ -1,6 +1,3 @@
-import { PromptComponent } from '@/components/Promptbar/Prompt';
-import { Folder } from '@/types/folder';
-import { Prompt } from '@/types/prompt';
 import {
   IconCaretDown,
   IconCaretRight,
@@ -9,29 +6,35 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { FC, KeyboardEvent, useEffect, useState } from 'react';
+import {
+  KeyboardEvent,
+  ReactElement,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+
+import { FolderInterface } from '@/types/folder';
+
+import HomeContext from '@/pages/api/home/home.context';
+
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 
 interface Props {
+  currentFolder: FolderInterface;
   searchTerm: string;
-  prompts: Prompt[];
-  currentFolder: Folder;
-  onDeleteFolder: (folder: string) => void;
-  onUpdateFolder: (folder: string, name: string) => void;
-  // prompt props
-  onDeletePrompt: (prompt: Prompt) => void;
-  onUpdatePrompt: (prompt: Prompt) => void;
+  handleDrop: (e: any, folder: FolderInterface) => void;
+  folderComponent: (ReactElement | undefined)[];
 }
 
-export const PromptFolder: FC<Props> = ({
-  searchTerm,
-  prompts,
+const Folder = ({
   currentFolder,
-  onDeleteFolder,
-  onUpdateFolder,
-  // prompt props
-  onDeletePrompt,
-  onUpdatePrompt,
-}) => {
+  searchTerm,
+  handleDrop,
+  folderComponent,
+}: Props) => {
+  const { handleDeleteFolder, handleUpdateFolder } = useContext(HomeContext);
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
@@ -45,23 +48,16 @@ export const PromptFolder: FC<Props> = ({
   };
 
   const handleRename = () => {
-    onUpdateFolder(currentFolder.id, renameValue);
+    handleUpdateFolder(currentFolder.id, renameValue);
     setRenameValue('');
     setIsRenaming(false);
   };
 
-  const handleDrop = (e: any, folder: Folder) => {
+  const dropHandler = (e: any) => {
     if (e.dataTransfer) {
       setIsOpen(true);
 
-      const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
-
-      const updatedPrompt = {
-        ...prompt,
-        folderId: folder.id,
-      };
-
-      onUpdatePrompt(updatedPrompt);
+      handleDrop(e, currentFolder);
 
       e.target.style.background = 'none';
     }
@@ -118,7 +114,7 @@ export const PromptFolder: FC<Props> = ({
           <button
             className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
             onClick={() => setIsOpen(!isOpen)}
-            onDrop={(e) => handleDrop(e, currentFolder)}
+            onDrop={(e) => dropHandler(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
             onDragLeave={removeHighlight}
@@ -137,13 +133,12 @@ export const PromptFolder: FC<Props> = ({
 
         {(isDeleting || isRenaming) && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
 
                 if (isDeleting) {
-                  onDeleteFolder(currentFolder.id);
+                  handleDeleteFolder(currentFolder.id);
                 } else if (isRenaming) {
                   handleRename();
                 }
@@ -153,60 +148,45 @@ export const PromptFolder: FC<Props> = ({
               }}
             >
               <IconCheck size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
             >
               <IconX size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
 
         {!isDeleting && !isRenaming && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsRenaming(true);
                 setRenameValue(currentFolder.name);
               }}
             >
               <IconPencil size={18} />
-            </button>
-            <button
-              className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-              onClick={(e) => {
+            </SidebarActionButton>
+            <SidebarActionButton
+              handleClick={(e) => {
                 e.stopPropagation();
                 setIsDeleting(true);
               }}
             >
               <IconTrash size={18} />
-            </button>
+            </SidebarActionButton>
           </div>
         )}
       </div>
 
-      {isOpen
-        ? prompts.map((prompt, index) => {
-            if (prompt.folderId === currentFolder.id) {
-              return (
-                <div key={index} className="ml-5 gap-2 border-l pl-2">
-                  <PromptComponent
-                    prompt={prompt}
-                    onDeletePrompt={onDeletePrompt}
-                    onUpdatePrompt={onUpdatePrompt}
-                  />
-                </div>
-              );
-            }
-          })
-        : null}
+      {isOpen ? folderComponent : null}
     </>
   );
 };
+
+export default Folder;

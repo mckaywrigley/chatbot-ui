@@ -1,7 +1,9 @@
 import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import { FC, useState } from 'react';
-import { SidebarButton } from '../Sidebar/SidebarButton';
+
+import { useTranslation } from 'next-i18next';
+
+import { SidebarButton } from '@/components/Sidebar/SidebarButton';
 
 interface Props {
   onClearConversations: () => void;
@@ -27,7 +29,7 @@ export const ClearConversations: FC<Props> = ({ onClearConversations }) => {
 
       <div className="flex w-[40px]">
         <IconCheck
-          className="ml-auto min-w-[20px] mr-1 text-neutral-400 hover:text-neutral-100"
+          className="ml-auto mr-1 min-w-[20px] text-neutral-400 hover:text-neutral-100"
           size={18}
           onClick={(e) => {
             e.stopPropagation();
