@@ -249,7 +249,6 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    console.log('initialize', serverSideApiKeyIsSet);
     const theme = localStorage.getItem('theme');
     if (theme) {
       dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
@@ -258,7 +257,6 @@ const Home = ({
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
-      console.log('trigger key', apiKey);
       dispatch({ field: 'apiKey', value: '' });
 
       localStorage.removeItem('apiKey');
