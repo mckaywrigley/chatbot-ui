@@ -120,7 +120,7 @@ When deploying the application, the following environment variables can be set:
 | OPENAI_API_VERSION    | `2023-03-15-preview`           | Only applicable for Azure OpenAI                        |
 | AZURE_DEPLOYMENT_ID   |                                | Needed when Azure OpenAI, Ref [Azure OpenAI API](https://learn.microsoft.com/zh-cn/azure/cognitive-services/openai/reference#completions)                                |
 | OPENAI_ORGANIZATION   |                                | Your OpenAI organization ID                             |
-| DEFAULT_MODEL         | `gpt-3.5-turbo`                | The default model to use on new conversations, for Azure use `gpt-35-turbo` |
+| DEFAULT_MODEL         | `gpt-3.5-turbo` _(OpenAI)_ `gpt-35-turbo` _(Azure)_ | The default model to use on new conversations |
 | DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations   |
 | GOOGLE_API_KEY        |                                | See [Custom Search JSON API documentation][GCSE]        |
 | GOOGLE_CSE_ID         |                                | See [Custom Search JSON API documentation][GCSE]        |
