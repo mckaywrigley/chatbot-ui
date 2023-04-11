@@ -32,7 +32,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, conversations },
+    state: { selectedConversation, conversations, currentMessage },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
@@ -46,7 +46,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   const toggleEditing = () => {
     setIsEditing(!isEditing);
   };
-
+  
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageContent(event.target.value);
     if (textareaRef.current) {
@@ -84,8 +84,33 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
         });
       }
     }
+    console.log("handleEditMessage", selectedConversation, conversations, currentMessage);
     setIsEditing(false);
   };
+
+  const handleDeleteMessage = () => {
+    if (!selectedConversation) return;
+    const { messages } = selectedConversation;
+    const findIndex = messages.findIndex(elm => elm === message)
+    if (findIndex < 0) return;
+    console.log('messages: ', messages);
+    if (findIndex < messages.length - 1 && messages[findIndex + 1].role === "assistant") {
+      messages.splice(findIndex, 2);
+    } else {
+      messages.splice(findIndex, 1);
+    }
+    const updatedConversation = {
+      ...selectedConversation,
+      messages,
+    };
+
+    const { single, all } = updateConversation(
+      updatedConversation,
+      conversations,
+    );
+    homeDispatch({ field: 'selectedConversation', value: single });
+    homeDispatch({ field: 'conversations', value: all });
+  }
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
@@ -198,6 +223,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
                           : 'right-0 top-[26px]'
                       }
                       `}
+                      onClick={handleDeleteMessage}
                     >
                       <IconTrash size={20} />
                     </button>
