@@ -15,14 +15,14 @@ export const config = {
 const calculator = new DynamicTool({
   name: 'calculator',
   description:
-    'Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator. Only use this tool if you are sure that the input can be perform on a simple calculator',
+    'Useful for getting the result of a math expression. The input to this tool should ONLY be a valid mathematical expression that could be executed by a simple calculator.',
   func: (input) => {
     try {
       const ast = parse(input);
-      const value = evaluateValue(ast, {}); // 2.4
+      const value = evaluateValue(ast, {});
       return value.toString();
     } catch (e) {
-      return 'Unable to evaluate expression';
+      return 'Unable to evaluate expression, please make sure it is a valid mathematical expression with no unit';
     }
   },
 });
@@ -52,13 +52,16 @@ const handler = async (req: NextRequest, res: any) => {
       console.log('handleAgentAction', action);
       await writer.ready;
       await writeToStream(`${action.log}\n\n`);
-      await writeToStream(`--- \n\n`);
     },
     handleAgentEnd: async (action) => {
       console.log('handleAgentEnd', action);
       await writer.ready;
       await writeToStream('``` \n\n');
-      await writeToStream(action.returnValues.output);
+      if(action.returnValues.output.includes('Agent stopped due to max iterations.')){
+        await writeToStream("Sorry, I run out of time to think. Please try again with a more detailed question.");
+      }else{
+        await writeToStream(action.returnValues.output);
+      }
       await writeToStream('[DONE]');
       console.log("Done");
       writer.close();
@@ -69,15 +72,18 @@ const handler = async (req: NextRequest, res: any) => {
       await writeToStream('Sorry, I am not able to answer your question. \n\n');
       await writer.abort(e);
     },
-    handleToolError: async (e) => {
+    handleChainError: async (err, verbose) => {
       await writer.ready;
-      await writeToStream('Unable to perform this action \n\n');
-      await writer.abort(e);
-    },
+      await writeToStream('``` \n\n');
+      await writeToStream(`Sorry, I am not able to answer your question. \n\n`);
+      await writer.abort(err);
+      console.log("Chain Error");
+      console.error(err, verbose);
+    }
   });
 
   const model = new ChatOpenAI({
-    temperature: 0,
+    temperature: 0.0,
     callbackManager,
     openAIApiKey: process.env.OPENAI_API_KEY,
     streaming: false,
