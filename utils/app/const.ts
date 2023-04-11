@@ -13,6 +13,3 @@ export const OPENAI_API_VERSION =
 
 export const OPENAI_ORGANIZATION =
   process.env.OPENAI_ORGANIZATION || '';
-
-export const AZURE_DEPLOYMENT_ID =
-  process.env.AZURE_DEPLOYMENT_ID || '';
