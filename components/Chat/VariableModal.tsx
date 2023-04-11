@@ -1,5 +1,6 @@
-import { Prompt } from '@/types/prompt';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+
+import { Prompt } from '@/types/prompt';
 
 interface Props {
   prompt: Prompt;
