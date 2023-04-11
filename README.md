@@ -4,7 +4,7 @@ Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
-![Chatbot UI](./public/screenshot.png)
+![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
 
 ## Updates
 
@@ -115,6 +115,8 @@ When deploying the application, the following environment variables can be set:
 | Environment Variable  | Default value                  | Description                                             |
 | --------------------- | ------------------------------ | ------------------------------------------------------- |
 | OPENAI_API_KEY        |                                | The default API key used for authentication with OpenAI |
+| OPENAI_ORGANIZATION   |                                | Your OpenAI organization ID                             |
+| OPENAI_API_HOST       | `https://api.openai.com`       | Base url of the OpenAI API                              |
 | DEFAULT_MODEL         | `gpt-3.5-turbo`                | The default model to use on new conversations           |
 | DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations   |
 | GOOGLE_API_KEY        |                                | See [Custom Search JSON API documentation][GCSE]        |

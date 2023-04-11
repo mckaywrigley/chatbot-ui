@@ -24,6 +24,7 @@
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^12.2.0",
     "react-markdown": "^8.0.5",
+    "react-query": "^3.39.3",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/jsdom": "^21.1.1",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",
