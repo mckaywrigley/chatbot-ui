@@ -58,7 +58,7 @@ const handler = async (req: NextRequest, res: any) => {
       await writer.ready;
       await writeToStream('``` \n\n');
       if(action.returnValues.output.includes('Agent stopped due to max iterations.')){
-        await writeToStream("Sorry, I run out of time to think. Please try again with a more detailed question.");
+        await writeToStream("Sorry, I ran out of time to think (TnT) Please try again with a more detailed question.");
       }else{
         await writeToStream(action.returnValues.output);
       }
