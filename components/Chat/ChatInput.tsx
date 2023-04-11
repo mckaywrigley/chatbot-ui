@@ -284,9 +284,16 @@ export const ChatInput = ({
           </button>
 
           {showPluginSelect && (
-            <div className="absolute left-0 bottom-14 bg-white dark:bg-[#343541]">
+            <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
               <PluginSelect
                 plugin={plugin}
+                onKeyDown={(e: any) => {
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setShowPluginSelect(false);
+                    textareaRef.current?.focus();
+                  }
+                }}
                 onPluginChange={(plugin: Plugin) => {
                   setPlugin(plugin);
                   setShowPluginSelect(false);
