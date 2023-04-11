@@ -60,6 +60,8 @@ const handler = async (req: NextRequest, res: any) => {
       await writeToStream('``` \n\n');
       await writeToStream(action.returnValues.output);
       await writeToStream('[DONE]');
+      console.log("Done");
+      writer.close();
     },
     handleLLMError: async (e) => {
       await writer.ready;
@@ -78,7 +80,7 @@ const handler = async (req: NextRequest, res: any) => {
     temperature: 0,
     callbackManager,
     openAIApiKey: process.env.OPENAI_API_KEY,
-    streaming: true,
+    streaming: false,
   });
 
   const tools = [new Serper(), calculator];
