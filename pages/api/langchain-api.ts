@@ -1,15 +1,27 @@
 import { Serper } from 'langchain/tools';
-import { Calculator } from "langchain/tools/calculator";
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { CallbackManager } from 'langchain/callbacks';
 import { AgentExecutor, ZeroShotAgent } from 'langchain/agents';
 import { LLMChain } from 'langchain/chains';
 import { ChatBody } from "@/types/chat";
 import { NextRequest, NextResponse } from 'next/server';
+import { DynamicTool } from "langchain/tools";
+import { parse, eval as evaluateValue } from 'expression-eval';
 
 export const config = {
   runtime: "edge"
 };
+
+const calculator = new DynamicTool({
+  name: "FOcalculatorO",
+  description:
+    "Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.",
+  func: (input) => {
+    const ast = parse(input);
+    const value = evaluateValue(ast, {}); // 2.4
+    return value.toString();
+  },
+});
 
 const handler = async (req: NextRequest, res: any) => {
   const requestBody = (await req.json()) as ChatBody;
@@ -59,7 +71,7 @@ const handler = async (req: NextRequest, res: any) => {
     streaming: true,
   });
 
-  const tools = [new Serper(), new Calculator(true, callbackManager)];
+  const tools = [new Serper(), calculator];
 
   const agentPrompt = ZeroShotAgent.createPrompt(tools);
   const llmChain = new LLMChain({
