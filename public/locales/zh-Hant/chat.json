@@ -37,5 +37,7 @@
   "Link copied to clipboard!" : "鏈結已複製到剪貼板！",
   "Failed to copy the link to clipboard.": "無法複製鏈結到剪貼板",
   "Please copy it manually:": "請手動複製以下鏈結：",
-  "Under the enhanced mode, AI is unable to refer back to your earlier messages.": "在增強模式下 AI不會引用你的對話內容"
+  "Under the enhanced mode, AI is unable to refer back to your earlier messages.": "在增強模式下 AI不會引用你的對話內容",
+  "Try out the new internet-connected enhance chat mode clicking the": "試試最新連網增強交談模式，點擊圖示",
+  "icon": "體驗一下吧"
 }
