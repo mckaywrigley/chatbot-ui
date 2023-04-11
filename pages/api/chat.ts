@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if (tokenCount + tokens.length > model.requestLimit) {
         break;
       }
       tokenCount += tokens.length;
@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend, tokenCount);
 
     return new Response(stream);
   } catch (error) {
