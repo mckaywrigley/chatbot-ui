@@ -1,28 +1,65 @@
-import { Prompt } from '@/types/prompt';
 import {
   IconBulbFilled,
   IconCheck,
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { DragEvent, FC, useEffect, useState } from 'react';
+import {
+  DragEvent,
+  MouseEventHandler,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+
+import { Prompt } from '@/types/prompt';
+
+import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
+
+import PromptbarContext from '../PromptBar.context';
 import { PromptModal } from './PromptModal';
 
 interface Props {
   prompt: Prompt;
-  onUpdatePrompt: (prompt: Prompt) => void;
-  onDeletePrompt: (prompt: Prompt) => void;
 }
 
-export const PromptComponent: FC<Props> = ({
-  prompt,
-  onUpdatePrompt,
-  onDeletePrompt,
-}) => {
+export const PromptComponent = ({ prompt }: Props) => {
+  const {
+    dispatch: promptDispatch,
+    handleUpdatePrompt,
+    handleDeletePrompt,
+  } = useContext(PromptbarContext);
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
+
+  const handleUpdate = (prompt: Prompt) => {
+    handleUpdatePrompt(prompt);
+    promptDispatch({ field: 'searchTerm', value: '' });
+  };
+
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+
+    if (isDeleting) {
+      handleDeletePrompt(prompt);
+      promptDispatch({ field: 'searchTerm', value: '' });
+    }
+
+    setIsDeleting(false);
+  };
+
+  const handleCancelDelete: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    setIsDeleting(false);
+  };
+
+  const handleOpenDeleteModal: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    setIsDeleting(true);
+  };
 
   const handleDragStart = (e: DragEvent<HTMLButtonElement>, prompt: Prompt) => {
     if (e.dataTransfer) {
@@ -63,44 +100,21 @@ export const PromptComponent: FC<Props> = ({
 
       {(isDeleting || isRenaming) && (
         <div className="absolute right-1 z-10 flex text-gray-300">
-          <button
-            className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-            onClick={(e) => {
-              e.stopPropagation();
-
-              if (isDeleting) {
-                onDeletePrompt(prompt);
-              }
-
-              setIsDeleting(false);
-            }}
-          >
+          <SidebarActionButton handleClick={handleDelete}>
             <IconCheck size={18} />
-          </button>
+          </SidebarActionButton>
 
-          <button
-            className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDeleting(false);
-            }}
-          >
+          <SidebarActionButton handleClick={handleCancelDelete}>
             <IconX size={18} />
-          </button>
+          </SidebarActionButton>
         </div>
       )}
 
       {!isDeleting && !isRenaming && (
         <div className="absolute right-1 z-10 flex text-gray-300">
-          <button
-            className="min-w-[20px] p-1 text-neutral-400 hover:text-neutral-100"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDeleting(true);
-            }}
-          >
+          <SidebarActionButton handleClick={handleOpenDeleteModal}>
             <IconTrash size={18} />
-          </button>
+          </SidebarActionButton>
         </div>
       )}
 
@@ -108,7 +122,7 @@ export const PromptComponent: FC<Props> = ({
         <PromptModal
           prompt={prompt}
           onClose={() => setShowModal(false)}
-          onUpdatePrompt={onUpdatePrompt}
+          onUpdatePrompt={handleUpdate}
         />
       )}
     </div>
