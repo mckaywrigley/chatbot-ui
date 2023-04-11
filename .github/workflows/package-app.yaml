@@ -22,6 +22,7 @@ jobs:
       - name: Get the binaries
         run: |
           wget https://github.com/PremAI-Org/the-ai-box/releases/download/v0.0.14/binaries-macOS.zip
+          mkdir -p ./src-tauri/binaries
           mv binaries-macOS.zip ./src-tauri/binaries/binaries-macOS.zip
           unzip ./src-tauri/binaries/binaries-macOS.zip -d ./src-tauri/binaries/
 
