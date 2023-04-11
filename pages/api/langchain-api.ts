@@ -114,8 +114,10 @@ const handler = async (req: NextRequest, res: any) => {
       },
     });
   } catch (e) {
-    await writeToStream('Unable to fullfil request');
-    writer.abort(e);
+    await writer.ready;
+    await writeToStream('``` \n\n');
+    await writeToStream('Sorry, I am not able to answer your question. \n\n');
+    await writer.abort(e);
     console.log('Request closed');
     console.error(e);
     console.log(typeof e);
