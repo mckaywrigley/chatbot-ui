@@ -12,7 +12,6 @@ import { useTranslation } from 'next-i18next';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 
 import { Conversation } from '@/types/chat';
-import { OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
 import { PromptList } from './PromptList';

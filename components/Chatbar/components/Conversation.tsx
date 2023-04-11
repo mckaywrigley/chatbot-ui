@@ -15,7 +15,6 @@ import {
 } from 'react';
 
 import { Conversation } from '@/types/chat';
-import { KeyValuePair } from '@/types/data';
 
 import HomeContext from '@/pages/api/home/home.context';
 

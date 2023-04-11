@@ -6,7 +6,6 @@ import {
   IconSend,
 } from '@tabler/icons-react';
 import {
-  FC,
   KeyboardEvent,
   MutableRefObject,
   useCallback,

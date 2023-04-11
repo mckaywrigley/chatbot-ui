@@ -1,6 +1,5 @@
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
-  FC,
   MutableRefObject,
   memo,
   useCallback,
@@ -21,8 +20,7 @@ import {
 } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
-import { ChatBody, Conversation } from '@/types/chat';
-import { Message } from '@/types/chat';
+import { ChatBody, Conversation, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -58,7 +56,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
-
 
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);

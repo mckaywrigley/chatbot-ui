@@ -3,9 +3,6 @@ import { useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { SupportedExportFormats } from '@/types/export';
-import { PluginKey } from '@/types/plugin';
-
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Import } from '../../Settings/Import';
