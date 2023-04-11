@@ -4,7 +4,7 @@ Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
-![Chatbot UI](./public/screenshot.png)
+![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
 
 ## Updates
 
