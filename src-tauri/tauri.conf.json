@@ -12,7 +12,15 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "shell": {
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "./binaries/dist/apis",
+            "sidecar": true
+          }
+        ]
+      }
     },
     "bundle": {
       "active": true,
@@ -21,7 +29,9 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [],
+      "externalBin": [
+        "./binaries/dist/apis"
+      ],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
