@@ -132,6 +132,7 @@ export const ChatInput = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    setIsTyping(e.nativeEvent.isComposing);
     if (showPromptList) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -324,10 +325,9 @@ export const ChatInput = ({
             }
             value={content}
             rows={1}
-            onCompositionStart={() => setIsTyping(true)}
-            onCompositionEnd={() => setIsTyping(false)}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onKeyUp={(e) => setIsTyping(e.nativeEvent.isComposing)}
           />
 
           <button

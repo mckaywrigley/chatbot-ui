@@ -87,6 +87,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    setIsTyping(e.nativeEvent.isComposing);
     if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
       e.preventDefault();
       handleEditMessage();
@@ -140,8 +141,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
                     value={messageContent}
                     onChange={handleInputChange}
                     onKeyDown={handlePressEnter}
-                    onCompositionStart={() => setIsTyping(true)}
-                    onCompositionEnd={() => setIsTyping(false)}
+                    onKeyUp={(e) => setIsTyping(e.nativeEvent.isComposing)}
                     style={{
                       fontFamily: 'inherit',
                       fontSize: 'inherit',
