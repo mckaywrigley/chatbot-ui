@@ -1,7 +1,6 @@
 {
-  "name": "ai-chatbot-starter",
+  "name": "chat-everywhere",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,9 +14,10 @@
     "@dqbd/tiktoken": "^1.0.2",
     "@supabase/supabase-js": "^2.15.0",
     "@tabler/icons-react": "^2.9.0",
-    "@vercel/analytics": "^0.1.11",
     "eventsource-parser": "^0.1.0",
+    "expression-eval": "^5.0.0",
     "i18next": "^22.4.13",
+    "langchain": "^0.0.52",
     "next": "13.2.4",
     "next-i18next": "^13.2.2",
     "nextjs-google-analytics": "^2.3.3",
@@ -31,7 +31,9 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0"
+    "stream": "^0.0.2",
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",

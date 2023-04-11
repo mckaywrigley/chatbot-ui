@@ -11,6 +11,10 @@ export const getEndpoint = (plugin: Plugin | null) => {
     return 'api/google';
   }
 
+  if (plugin.id === PluginID.LANGCHAIN_CHAT) {
+    return 'api/langchain-api';
+  }
+
   return 'api/chat';
 };
 

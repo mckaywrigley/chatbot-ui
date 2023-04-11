@@ -125,8 +125,16 @@ const Home: React.FC<HomeProps> = ({
       let body;
 
       if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
+        const filteredChatBodyMessages = chatBody.messages.map((message) => ({
+          role: message.role,
+          content: message.content
+        }));
+
+        body = JSON.stringify({
+          ...chatBody,
+          messages: filteredChatBodyMessages,
+        });
+      }else if (plugin.id === 'google-search'){
         body = JSON.stringify({
           ...chatBody,
           googleAPIKey: pluginKeys
@@ -136,6 +144,8 @@ const Home: React.FC<HomeProps> = ({
             .find((key) => key.pluginId === 'google-search')
             ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
         });
+      }else if(plugin.id === 'langchain-chat'){
+        body = JSON.stringify(chatBody);
       }
 
       const controller = new AbortController();
@@ -156,14 +166,14 @@ const Home: React.FC<HomeProps> = ({
       }
 
       const data = response.body;
-
+      
       if (!data) {
         setLoading(false);
         setMessageIsStreaming(false);
         return;
       }
-
-      if (!plugin) {
+      
+      if (!plugin || plugin.id === 'langchain-chat') {
         if (updatedConversation.messages.length === 1) {
           const { content } = message;
           const customName =
@@ -195,11 +205,16 @@ const Home: React.FC<HomeProps> = ({
 
           text += chunkValue;
 
+          if(text.includes("[DONE]")){
+            text = text.replace("[DONE]", "");
+            done = true;
+          }
+
           if (isFirst) {
             isFirst = false;
             const updatedMessages: Message[] = [
               ...updatedConversation.messages,
-              { role: 'assistant', content: chunkValue },
+              { role: 'assistant', content: chunkValue, pluginId: plugin?.id },
             ];
 
             updatedConversation = {
