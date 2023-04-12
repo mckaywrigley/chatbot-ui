@@ -43,7 +43,7 @@ Modify the chat interface in `components/Chat`.
 
 Modify the sidebar interface in `components/Sidebar`.
 
-Modify the system prompt in `utils/index.ts`.
+Modify the system prompt in `utils/server/index.ts`.
 
 ## Deploy
 
