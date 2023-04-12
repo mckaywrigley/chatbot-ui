@@ -17,7 +17,7 @@ tauri-build = { version = "1.2.1", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.2.4", features = ["shell-sidecar"] }
+tauri = { version = "1.2.4", features = ["fs-all", "path-all", "process-exit", "shell-all"] }
 
 [features]
 # by default Tauri runs in production mode

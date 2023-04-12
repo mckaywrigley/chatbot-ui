@@ -35,6 +35,7 @@ interface Props {
   onClearConversations: () => void;
   onExportConversations: () => void;
   onImportConversations: (data: SupportedExportFormats) => void;
+  onBackToDashboard: () => void;
 }
 
 export const Chatbar: FC<Props> = ({
@@ -56,6 +57,7 @@ export const Chatbar: FC<Props> = ({
   onClearConversations,
   onExportConversations,
   onImportConversations,
+  onBackToDashboard,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredConversations, setFilteredConversations] =
@@ -199,6 +201,7 @@ export const Chatbar: FC<Props> = ({
         onClearConversations={onClearConversations}
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
+        onBackToDashboard={onBackToDashboard}
       />
     </div>
   );

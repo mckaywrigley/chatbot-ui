@@ -3,9 +3,9 @@
   windows_subsystem = "windows"
 )]
 
-use std::{env, net::TcpStream, thread, time::Duration};
+use std::{fs, env, net::TcpStream, thread, time::Duration};
 use tauri::{
-  api::process::{Command, CommandEvent},
+  api::{path,process::{Command, CommandEvent},},
   Manager,
 };
 
@@ -25,9 +25,19 @@ fn main() {
   tauri::Builder::default()
     .setup(|app| {
       let window = app.get_window("main").unwrap();
+      let config = app.config().clone();
       tauri::async_runtime::spawn(async move {
+
+        let app_dir = path::app_data_dir(&config).expect("Failed to get app directory");
+        let app_dir_str = app_dir.to_string_lossy().to_string();
+
+        fs::create_dir_all(&app_dir).expect("Failed to create app data directory");
+        
+        println!("App directory: {}", app_dir_str);
+
         let (mut rx, mut child) = Command::new_sidecar("apis")
           .expect("failed to setup `apis` sidecar")
+          .args(&[app_dir_str])
           .spawn()
           .expect("Failed to spawn packaged python.");
 
@@ -46,7 +56,7 @@ fn main() {
         }
       });
       
-      wait_for_api(8001);
+      wait_for_api(8002);
 
       Ok(())
     })
