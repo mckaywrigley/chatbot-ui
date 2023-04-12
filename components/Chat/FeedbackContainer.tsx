@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { IconThumbUp, IconThumbDown } from '@tabler/icons-react';
 import { toast } from 'react-hot-toast';
 import { Conversation } from '@/types/chat';
+import { TFunction, useTranslation } from 'next-i18next';
 
 type FeedbackContainerProps = {
   conversation: Conversation;
@@ -12,10 +13,9 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
 }) => {
   const [isThumbsUp, setIsThumbsUp] = useState<boolean | null>();
   const opinionRef = React.useRef<HTMLTextAreaElement>(null);
+  const { t } = useTranslation('chat');
 
   const submitFeedback = async (isPositiveFeedback: boolean) => {
-    console.log(isPositiveFeedback, opinionRef.current?.value);
-    
     const response = await fetch('/api/conversation-feedback', {
       method: 'POST',
       headers: {
@@ -24,34 +24,30 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
       body: JSON.stringify({
         conversation,
         positive: isPositiveFeedback,
-        opinion: opinionRef.current?.value,
+        opinion: opinionRef.current?.value || "",
       }),
     });
 
     if(!response.ok) {
-      toast.error('Something went wrong. Please try again later.');
+      toast.error(t('Something went wrong. Please try again later.'));
       return;
     }
-    
+
     toast.remove('feedback-toast');
-    toast.success('Thank you for your feedback!', { duration: 3000 });
+    toast.success(t('Thank you for your feedback!'), { duration: 3000 });
   };
 
-  const thumbButtonOnClick = (isPositiveFeedback: boolean) => {
+  const thumbButtonOnClick = (t: TFunction, isPositiveFeedback: boolean) => {    
     toast.custom(
-      (t) => (
+      () => (
         <div
-          className={`${
-            t.visible ? 'animate-enter' : 'animate-leave'
-          } pointer-events-auto flex w-full max-w-md rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-neutral-500`}
+          className={`pointer-events-auto flex w-full max-w-md rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-neutral-500`}
         >
           <div className="flex flex-col p-4 text-sm">
             <p>
-              Thank you for your feedback! Can we upload your current
-              conversation to our server for product improvement purposes? We
-              will never share your data with anyone.
+              {t('Thank you for your feedback! Can we upload your current conversation to our server for product improvement purposes? We will never share your data with anyone.')}
             </p>
-            <label className="mt-3">Feedback (Optional)</label>
+            <label className="mt-3">{t('Feedback (Optional)')}</label>
             <textarea
               className="w-full rounded-md border border-gray-300 p-2"
               ref={opinionRef}
@@ -62,14 +58,14 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
                 className="rounded-md border border-neutral-500 px-2 py-1 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
                 onClick={() => submitFeedback(isPositiveFeedback)}
               >
-                Sure!
+                {t('Sure!')}
               </button>
               <button
                 type="button"
                 className="rounded-md border border-neutral-500 px-2 py-1 text-neutral-900 shadow hover:bg-neutral-300 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:text-black dark:hover:bg-neutral-300"
                 onClick={() => toast.remove('feedback-toast')}
               >
-                No Thanks
+                {t('No Thanks')}
               </button>
             </div>
           </div>
@@ -91,7 +87,7 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
           }`}
           onClick={() => {
             setIsThumbsUp(true);
-            thumbButtonOnClick(true);
+            thumbButtonOnClick(t, true);
           }}
         >
           <IconThumbUp
@@ -107,7 +103,7 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
           }`}
           onClick={() => {
             setIsThumbsUp(false);
-            thumbButtonOnClick(false);
+            thumbButtonOnClick(t, false);
           }}
         >
           <IconThumbDown
