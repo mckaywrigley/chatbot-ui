@@ -194,6 +194,7 @@ export const Chat: FC<Props> = memo(
                       messageIndex={index}
                       onEditMessage={onEditMessage}
                       displayFeedbackButton={conversation.messages.length - 1 === index && !loading}
+                      conversation={conversation}
                     />
                   ))}
 

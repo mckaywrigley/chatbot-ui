@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { Message, Conversation } from '@/types/chat';
 import {
   IconCheck,
   IconCopy,
@@ -21,10 +21,11 @@ interface Props {
   messageIndex: number;
   onEditMessage: (message: Message, messageIndex: number) => void;
   displayFeedbackButton: boolean;
+  conversation: Conversation;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage, displayFeedbackButton }) => {
+  ({ message, messageIndex, onEditMessage, displayFeedbackButton, conversation }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -234,7 +235,7 @@ export const ChatMessage: FC<Props> = memo(
                   {message.content}
                 </MemoizedReactMarkdown>
                 {
-                  displayFeedbackButton && <FeedbackContainer />
+                  displayFeedbackButton && <FeedbackContainer conversation={conversation}/>
                 }
               </>
             )}
