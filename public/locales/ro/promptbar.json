@@ -1,0 +1,12 @@
+{
+  "New prompt": "Noua solicitare",
+  "New folder": "Dosar nou",
+  "No prompts.": "Fără solicitări.",
+  "Search prompts...": "Cereri de căutare...",
+  "Name": "Nume",
+  "Description": "Descriere",
+  "A description for your prompt.": "Descrierea solicitării prompt.",
+  "Prompt": "Îndemnuri",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Conținut prompt. Utilizați {{}} pentru a indica o variabilă. De exemplu: {{nume}} este un {{adjectiv}} {{substantiv}}",
+  "Save": "Salvați"
+}
