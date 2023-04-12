@@ -21,10 +21,20 @@ jobs:
 
       - name: Get the binaries
         run: |
-          wget https://github.com/PremAI-Org/the-ai-box/releases/download/v0.0.19/binaries-macOS.zip
-          mkdir -p ./src-tauri/binaries
-          mv binaries-macOS.zip ./src-tauri/binaries/binaries-macOS.zip
-          unzip ./src-tauri/binaries/binaries-macOS.zip -d ./src-tauri/binaries/
+          case "${{ runner.os }}" in
+            Linux)
+              wget https://github.com/PremAI-Org/the-ai-box/releases/download/v0.0.25/binaries-Linux.zip
+              mkdir -p ./src-tauri/binaries
+              mv binaries-Linux.zip ./src-tauri/binaries/binaries-Linux.zip
+              unzip ./src-tauri/binaries/binaries-Linux.zip -d ./src-tauri/binaries/
+              ;;
+            macOS)
+              wget https://github.com/PremAI-Org/the-ai-box/releases/download/v0.0.25/binaries-macOS.zip
+              mkdir -p ./src-tauri/binaries
+              mv binaries-macOS.zip ./src-tauri/binaries/binaries-macOS.zip
+              unzip ./src-tauri/binaries/binaries-macOS.zip -d ./src-tauri/binaries/
+              ;;
+          esac
 
       - name: Create the .env file from example
         run: cp .env.local.prem .env.local

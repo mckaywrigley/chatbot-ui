@@ -12,14 +12,28 @@
   },
   "tauri": {
     "allowlist": {
+      "fs": {
+        "all": true,
+        "scope": [
+          "$APP",
+          "$APP/chatbot-ui-prem"
+        ]
+      },
+      "path": {
+        "all": true
+      },
+      "process": {
+        "exit": true
+      },
       "shell": {
-        "sidecar": true,
+        "all": true,
         "scope": [
           {
             "name": "./binaries/dist/apis",
             "sidecar": true
           }
-        ]
+        ],
+        "sidecar": true
       }
     },
     "bundle": {

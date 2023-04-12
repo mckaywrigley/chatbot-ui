@@ -36,15 +36,6 @@ import { ProgressBar } from "react-progressbar-fancy";
 
 interface HomeProps { }
 
-const FeatureCard = ({ title, description }: { title: string; description: string; }) => {
-  return (
-    <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
-      <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>{title}</h3>
-      <p style={{ fontSize: '1.2rem', margin: '0' }}>{description}</p>
-    </div>
-  );
-};
-
 const Home: React.FC<HomeProps> = () => {
 
   // STATE ----------------------------------------------
@@ -501,6 +492,10 @@ const Home: React.FC<HomeProps> = () => {
     }
   };
 
+  const handleBackToDashboard = () => {
+    setShowChat(false);
+  };
+
   // PROMPT OPERATIONS --------------------------------------------
 
   const handleCreatePrompt = () => {
@@ -559,7 +554,7 @@ const Home: React.FC<HomeProps> = () => {
     async function checkApisStatus() {
       console.log("Waiting for APIs to be ready...");
 
-      const response = await fetch('http://localhost:8001/status/', {
+      const response = await fetch('http://localhost:8002/v1/status/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -575,7 +570,7 @@ const Home: React.FC<HomeProps> = () => {
           console.log(`APIs are not ready yet! Amount completed ${data.percentate}%`);
           setPercentage(data.percentage);
         } catch (e) { }
-        setTimeout(checkApisStatus, 3000); // Call the function again after 3 seconds
+        setTimeout(checkApisStatus, 3000);
       }
     }
 
@@ -692,6 +687,7 @@ const Home: React.FC<HomeProps> = () => {
                   onClearConversations={handleClearConversations}
                   onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
+                  onBackToDashboard={handleBackToDashboard}
                 />
 
                 <button
@@ -765,47 +761,42 @@ const Home: React.FC<HomeProps> = () => {
           </div>
         </main>
       ) : (<main>
-        {apisReady ?
-          // Dashboard with some info and CTA
-          (<div style={{ backgroundColor: '#333', color: '#fff', padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <div style={{ maxWidth: '50%', textAlign: 'center' }}>
-              <h1 style={{ fontSize: '3rem', margin: '0' }}>Cool Title</h1>
-              <h2 style={{ fontSize: '2rem', margin: '0 0 1rem' }}>Awesome Subtitle</h2>
-              <p style={{ fontSize: '1.2rem' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget risus velit. Donec euismod, lorem sit amet eleifend convallis, sapien mauris consequat nibh, eget tincidunt enim ipsum a lorem.</p>
-              <FeatureCard title="Feature 1" description="Description of feature 1" />
-              <FeatureCard title="Feature 2" description="Description of feature 2" />
-              <FeatureCard title="Feature 3" description="Description of feature 3" />
-              <button style={{ backgroundColor: '#fff', color: '#333', padding: '0.5rem 1rem', fontSize: '1.2rem', borderRadius: '0.5rem', border: 'none' }} onClick={handleShowChat}>Start Chatting</button>
+        <div style={{ backgroundColor: '#333', color: '#fff', padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <div style={{ maxWidth: '50%', textAlign: 'center' }}>
+            <h1 style={{ fontSize: '3rem', margin: '0' }}>Prem AI</h1>
+            <h2 style={{ fontSize: '2rem', margin: '0 0 1rem' }}>The Power of AGI, Privately Secured in Your Pocket.</h2>
+            <p style={{ fontSize: '1.2rem' }}>A groundbreaking, open-source AI platform engineered for privacy protection. Harness the power of advanced Large Language Models (LLMs) within a secure, self-hosted environment, or opt for our privacy-centric cloud infrastructure. Experience the future of AI technology without compromising your data's confidentiality.</p>
+            <button>Learn More about Prem</button>
+            {/* Apps */}
+            <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>Prem Chat</h3>
+              <p style={{ fontSize: '1.2rem', margin: '0' }}>Prem Chat is an advanced and intuitive chat interface powered by the GPT4All model, designed to deliver seamless and natural conversational experiences for users across diverse topics and applications. </p>
+              <button onClick={handleShowChat}> Start </button>
             </div>
-          </div>) :
-          // Progressbar downloading the model
-          (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <div style={{ maxWidth: '50%', width: '100%' }}>
-              <p style={{ color: '#fff', justifyContent: 'center', display: 'flex' }}> We are downloading the model on your computer. Be sure to have enough space 4.5+ GB </p>
-              <ProgressBar score={percentage} />
+            <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>Prem Michelangelo</h3>
+              <p style={{ fontSize: '1.2rem', margin: '0' }}>Prem Michelangelo is an innovative chat interface driven by the Stable Diffusion model, providing users with engaging and coherent conversations across a wide range of subjects.</p>
             </div>
+            <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>Prem Agent</h3>
+              <p style={{ fontSize: '1.2rem', margin: '0' }}>Sophisticated AI-driven communication platform designed to facilitate meaningful and interactive conversations. Leveraging advanced algorithms and a dynamic knowledge base, it delivers prompt, accurate, and personalized responses to users' queries and needs.</p>
+            </div>
+            <div style={{ backgroundColor: '#fff', color: '#333', padding: '1.5rem', borderRadius: '0.5rem', boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.2)', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.5rem', margin: '0 0 1rem' }}>Prem Copilot</h3>
+              <p style={{ fontSize: '1.2rem', margin: '0' }}>Self-hosted code assistant powered by TurboPilot, offering real-time guidance and support for developers in various programming languages. With its intelligent suggestions and error detection, it streamlines the coding process and enhances productivity across diverse projects. </p>
+            </div>
+            <h2 style={{ fontSize: '2rem', margin: '0 0 1rem' }}>Coming Soon...</h2>
+            {/* Bullet points */}
+            <ul style={{ fontSize: '1.2rem', margin: '0 0 1rem' }}>
+              <li>Encrypted data storage for conversations backup.</li>
+              <li>Multi device compatibility.</li>
+              <li>Nostr login.</li>
+            </ul>
           </div>
-          )}
+        </div>
       </main >)
       }
     </>
   );
 };
 export default Home;
-
-// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-//   const defaultModelId =
-//     (process.env.DEFAULT_MODEL &&
-//       Object.values(OpenAIModelID).includes(
-//         process.env.DEFAULT_MODEL as OpenAIModelID,
-//       ) &&
-//       process.env.DEFAULT_MODEL) ||
-//     fallbackModelID;
-
-//   return {
-//     props: {
-//       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-//       defaultModelId
-//     },
-//   };
-// };

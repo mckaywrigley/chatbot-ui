@@ -1,5 +1,5 @@
 import { SupportedExportFormats } from '@/types/export';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconFileExport, IconMoon, IconSun, IconBrandTabler } from '@tabler/icons-react';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
 import { Key } from '../Settings/Key';
@@ -15,6 +15,7 @@ interface Props {
   onClearConversations: () => void;
   onExportConversations: () => void;
   onImportConversations: (data: SupportedExportFormats) => void;
+  onBackToDashboard: () => void;
 }
 
 export const ChatbarSettings: FC<Props> = ({
@@ -26,9 +27,12 @@ export const ChatbarSettings: FC<Props> = ({
   onClearConversations,
   onExportConversations,
   onImportConversations,
+  onBackToDashboard,
 }) => {
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+      <SidebarButton text={'Back to Dashboard'} icon={<IconBrandTabler size={18} />} onClick={() => onBackToDashboard()} />
+
       {conversationsCount > 0 ? (
         <ClearConversations onClearConversations={onClearConversations} />
       ) : null}
