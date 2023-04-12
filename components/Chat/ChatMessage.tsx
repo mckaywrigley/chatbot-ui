@@ -5,7 +5,7 @@ import {
   IconEdit,
   IconUser,
   IconRobot,
-  IconBrain
+  IconBrain,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
@@ -14,15 +14,17 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import { FeedbackContainer } from './FeedbackContainer';
 
 interface Props {
   message: Message;
   messageIndex: number;
   onEditMessage: (message: Message, messageIndex: number) => void;
+  displayFeedbackButton: boolean;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage }) => {
+  ({ message, messageIndex, onEditMessage, displayFeedbackButton }) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -231,6 +233,9 @@ export const ChatMessage: FC<Props> = memo(
                 >
                   {message.content}
                 </MemoizedReactMarkdown>
+                {
+                  displayFeedbackButton && <FeedbackContainer />
+                }
               </>
             )}
           </div>
