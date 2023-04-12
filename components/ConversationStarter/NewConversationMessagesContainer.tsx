@@ -39,7 +39,7 @@ const FootNoteMessage: FC = () => {
       <div className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 dark:border-neutral-600 p-2">
       <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">New</span>
       <span className="flex flex-row items-center justify-center flex-wrap leading-4">
-        {t('Try out the new internet-connected enhance chat mode clicking the')} {' '} <IconBolt size={17} stroke={2} /> {' '} {t('icon')}!
+        {t('Try out the new internet-connected enhance chat mode by clicking the')} {' '} <IconBolt size={17} stroke={2} /> {' '} {t('icon')}!
       </span>
       </div>
     </div>
