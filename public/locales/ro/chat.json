@@ -24,5 +24,7 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Limita mesajelor este de {{maxLength}} caractere. Ați introdus {{valueLength}} caractere.",
   "Please enter a message": "Vă rugăm să scrieți un mesaj",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI este un kit de chatbot avansat pentru șabloanele de chat OpenAI, care își propune să imite interfața și funcționalitatea ChatGPT.",
-  "Are you sure you want to clear all messages?": "Sigur doriți să ștergeți toate mesajele?"
+  "Are you sure you want to clear all messages?": "Sigur doriți să ștergeți toate mesajele?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Valori mai mari, cum ar fi 0,8, vor face ieșirea mai aleatorie, în timp ce valori mai mici, cum ar fi 0,2, o vor face mai concentrată și deterministă."
+
 }
