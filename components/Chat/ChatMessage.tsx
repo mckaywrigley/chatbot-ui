@@ -89,10 +89,12 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
 
   const handleDeleteMessage = () => {
     if (!selectedConversation) return;
+
     const { messages } = selectedConversation;
     const findIndex = messages.findIndex((elm) => elm === message);
+
     if (findIndex < 0) return;
-    console.log('messages: ', messages);
+
     if (
       findIndex < messages.length - 1 &&
       messages[findIndex + 1].role === 'assistant'
