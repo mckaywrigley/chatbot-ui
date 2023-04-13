@@ -2,9 +2,9 @@ import {
   IconCheck,
   IconCopy,
   IconEdit,
+  IconRobot,
   IconTrash,
   IconUser,
-  IconRobot,
 } from '@tabler/icons-react';
 import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
 
@@ -46,7 +46,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   const toggleEditing = () => {
     setIsEditing(!isEditing);
   };
-  
+
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageContent(event.target.value);
     if (textareaRef.current) {
@@ -84,17 +84,19 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
         });
       }
     }
-    console.log("handleEditMessage", selectedConversation, conversations, currentMessage);
     setIsEditing(false);
   };
 
   const handleDeleteMessage = () => {
     if (!selectedConversation) return;
     const { messages } = selectedConversation;
-    const findIndex = messages.findIndex(elm => elm === message)
+    const findIndex = messages.findIndex((elm) => elm === message);
     if (findIndex < 0) return;
     console.log('messages: ', messages);
-    if (findIndex < messages.length - 1 && messages[findIndex + 1].role === "assistant") {
+    if (
+      findIndex < messages.length - 1 &&
+      messages[findIndex + 1].role === 'assistant'
+    ) {
       messages.splice(findIndex, 2);
     } else {
       messages.splice(findIndex, 1);
@@ -110,7 +112,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
     );
     homeDispatch({ field: 'selectedConversation', value: single });
     homeDispatch({ field: 'conversations', value: all });
-  }
+  };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
@@ -204,7 +206,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
               )}
 
               {(window.innerWidth < 640 || !isEditing) && (
-                  <>
+                <>
                   <button
                     className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
                       window.innerWidth < 640
@@ -216,18 +218,18 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
                   >
                     <IconEdit size={20} />
                   </button>
-                    <button
-                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                        window.innerWidth < 640
-                          ? 'bottom-1 right-3'
-                          : 'right-0 top-[26px]'
-                      }
+                  <button
+                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                      window.innerWidth < 640
+                        ? 'bottom-1 right-3'
+                        : 'right-0 top-[26px]'
+                    }
                       `}
-                      onClick={handleDeleteMessage}
-                    >
-                      <IconTrash size={20} />
-                    </button>
-                  </>
+                    onClick={handleDeleteMessage}
+                  >
+                    <IconTrash size={20} />
+                  </button>
+                </>
               )}
             </div>
           ) : (
