@@ -6,7 +6,7 @@ import { LLMChain } from 'langchain/chains';
 import { ChatBody } from '@/types/chat';
 import { NextRequest, NextResponse } from 'next/server';
 import { DynamicTool } from 'langchain/tools';
-import { parse, eval as evaluateValue } from 'expression-eval';
+import { create, all } from 'mathjs'
 
 export const config = {
   runtime: 'edge',
@@ -17,9 +17,10 @@ const calculator = new DynamicTool({
   description:
     'Useful for getting the result of a math expression. The input to this tool should ONLY be a valid mathematical expression that could be executed by a simple calculator.',
   func: (input) => {
+    const math = create(all, {})
+
     try {
-      const ast = parse(input);
-      const value = evaluateValue(ast, {});
+      const value = math.evaluate(input);
       return value.toString();
     } catch (e) {
       return 'Unable to evaluate expression, please make sure it is a valid mathematical expression with no unit';
@@ -46,7 +47,7 @@ const handler = async (req: NextRequest, res: any) => {
       console.log('handleChainStart');
       await writer.ready;
       await writeToStream('```Mindlog \n');
-      await writeToStream('Start thinking ... \n\n');
+      await writeToStream('Thinking ... \n\n');
     },
     handleAgentAction: async (action) => {
       console.log('handleAgentAction', action);
