@@ -1,4 +1,3 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -9,19 +8,19 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response('Error', { status: 405, statusText: 'Method not allowed' });
   }
 
-  const { opinion, conversation, positive } = req.body;
+  const { opinion, conversation, positive } = (await req.json())
 
   if (!conversation || typeof positive === 'undefined') {
-    return res.status(400).json({ error: 'Missing required fields' });
+    return new Response('Error', { status: 400, statusText: 'Missing required fields' });
   }
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('conversation_feedback')
       .insert([{ opinion, conversation, positive }]);
 
@@ -29,9 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error(error.message);
     }
 
-    return res.status(201).json({ data });
+    return new Response('Success', { status: 201 });
   } catch (err) {
     console.error(err)
-    return res.status(500).json({ error: (err as any).message });
+    return new Response('Error', { status: 500 });
   }
 }
+
+export default handler;
