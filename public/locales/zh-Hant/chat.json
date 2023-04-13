@@ -39,5 +39,11 @@
   "Please copy it manually:": "請手動複製以下鏈結：",
   "Under the enhanced mode, AI is unable to refer back to your earlier messages.": "在增強模式下 AI不會引用你的對話內容",
   "Try out the new internet-connected enhance chat mode by clicking the": "試試最新連網增強交談模式，點擊圖示",
-  "icon": "體驗一下吧"
+  "icon": "體驗一下吧",
+  "Something went wrong. Please try again later.": "出現了一些問題，請稍後再試。",
+  "Thank you for your feedback!": "感謝您的反饋！",
+  "Feedback (Optional)": "備註（可選）",
+  "Thank you for your feedback! Can we upload your current conversation to our server for product improvement purposes? We will never share your data with anyone.": "感謝您的反饋！我們可以將您當前的對話上傳到我們的服務器嗎？我們不會與任何人分享您的數據。",
+  "Sure!": "好的！",
+  "No Thanks": "不用了"
 }
