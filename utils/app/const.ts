@@ -24,4 +24,4 @@ export const LLAMA_API_HOST =
   process.env.LLAMA_API_HOST || 'http://127.0.0.1:8000';
 
 export const LLAMA_STREAM_MODE =
-  process.env.LLAMA_STREAM_MODE || '0';
+  process.env.LLAMA_STREAM_MODE || '1';
