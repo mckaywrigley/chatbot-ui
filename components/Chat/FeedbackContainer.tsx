@@ -55,14 +55,14 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
             <div className="mt-2 flex flex-row justify-between">
               <button
                 type="button"
-                className="rounded-md border border-neutral-500 px-2 py-1 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+                className="rounded-md border border-green-300 px-2 py-1 text-neutral-900 bg-green-200 shadow hover:bg-green-300 focus:outline-none"
                 onClick={() => submitFeedback(isPositiveFeedback)}
               >
                 {t('Sure!')}
               </button>
               <button
                 type="button"
-                className="rounded-md border border-neutral-500 px-2 py-1 text-neutral-900 shadow hover:bg-neutral-300 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:text-black dark:hover:bg-neutral-300"
+                className="rounded-md border px-2 py-1 text-neutral-900 hover:bg-neutral-100 focus:outline-none"
                 onClick={() => toast.remove('feedback-toast')}
               >
                 {t('No Thanks')}
