@@ -17,6 +17,7 @@ Expect frequent improvements.
 - [ ] Delete messages
 - [ ] More model settings
 - [ ] Plugins
+- [ ] Make it a PWA (ability to install as App icon on mobile)
 
 **Recent updates:**
 
