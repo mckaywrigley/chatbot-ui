@@ -4,8 +4,8 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE  } from '@/utils/app/const';
+import { saveSelectedConversation, saveConversations, deleteConversations, deleteSelectedConversation } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
@@ -34,7 +34,7 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: { conversations, showChatbar, defaultModelId, databaseType, folders, pluginKeys },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -94,12 +94,12 @@ export const Chatbar = () => {
     localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
-  const handleExportData = () => {
-    exportData();
+  const handleExportData = (databaseType: string) => {
+    exportData(databaseType);
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
+    const { history, folders, prompts }: LatestExportFormat = importData(databaseType, data);
     homeDispatch({ field: 'conversations', value: history });
     homeDispatch({
       field: 'selectedConversation',
@@ -126,13 +126,13 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: [] });
 
-    localStorage.removeItem('conversationHistory');
-    localStorage.removeItem('selectedConversation');
+    deleteConversations(databaseType);
+    deleteSelectedConversation();
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
 
     homeDispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(updatedFolders);
+    saveFolders(databaseType, updatedFolders);
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
@@ -142,7 +142,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
-    saveConversations(updatedConversations);
+    saveConversations(databaseType, updatedConversations);
 
     if (updatedConversations.length > 0) {
       homeDispatch({
@@ -150,7 +150,7 @@ export const Chatbar = () => {
         value: updatedConversations[updatedConversations.length - 1],
       });
 
-      saveConversation(updatedConversations[updatedConversations.length - 1]);
+      saveSelectedConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
       defaultModelId &&
         homeDispatch({
@@ -166,7 +166,7 @@ export const Chatbar = () => {
           },
         });
 
-      localStorage.removeItem('selectedConversation');
+      deleteSelectedConversation();
     }
   };
 

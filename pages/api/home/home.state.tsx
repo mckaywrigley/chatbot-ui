@@ -25,6 +25,7 @@ export interface HomeInitialState {
   messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
+  databaseType: string | 'localStorage';
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
 }
@@ -49,6 +50,7 @@ export const initialState: HomeInitialState = {
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
+  databaseType: 'localStorage',
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
 };

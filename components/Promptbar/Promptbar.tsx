@@ -28,7 +28,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
+    state: { prompts, defaultModelId, databaseType, showPromptbar },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -58,7 +58,7 @@ const Promptbar = () => {
 
       homeDispatch({ field: 'prompts', value: updatedPrompts });
 
-      savePrompts(updatedPrompts);
+      savePrompts(databaseType, updatedPrompts);
     }
   };
 
@@ -66,7 +66,7 @@ const Promptbar = () => {
     const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
 
     homeDispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(updatedPrompts);
+    savePrompts(databaseType, updatedPrompts);
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
@@ -79,7 +79,7 @@ const Promptbar = () => {
     });
     homeDispatch({ field: 'prompts', value: updatedPrompts });
 
-    savePrompts(updatedPrompts);
+    savePrompts(databaseType, updatedPrompts);
   };
 
   const handleDrop = (e: any) => {

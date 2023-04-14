@@ -19,6 +19,7 @@ export const ChatbarSettings = () => {
     state: {
       apiKey,
       lightMode,
+      databaseType,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
@@ -45,7 +46,7 @@ export const ChatbarSettings = () => {
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData()}
+        onClick={() => handleExportData(databaseType || 'localStorage')}
       />
 
       <SidebarButton

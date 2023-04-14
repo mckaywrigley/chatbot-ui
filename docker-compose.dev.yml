@@ -2,10 +2,9 @@ version: '3.6'
 
 services:
   chatbot:
-    image: ghcr.io/mckaywrigley/chatbot-ui:main
-    restart: unless-stopped
+    build: .
     ports:
-      - 3000:3000
+      - 3001:3000
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEFAULT_MODEL: ${DEFAULT_MODEL}
@@ -21,10 +20,11 @@ services:
 
   couchdb:
     image: couchdb:3
-    restart: unless-stopped
+    ports:
+      - 5984:5984
     volumes:
       - ./couchdb.ini:/opt/couchdb/etc/local.d/00-local.ini
-      - './data:/opt/couchdb/data'
+    #   - './data:/opt/couchdb/data'
     environment:
       COUCHDB_USER: ${COUCHDB_USER}
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
