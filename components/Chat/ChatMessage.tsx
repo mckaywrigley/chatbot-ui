@@ -32,7 +32,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, conversations, currentMessage },
+    state: { selectedConversation, conversations, currentMessage, databaseType },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
@@ -72,6 +72,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
         };
 
         const { single, all } = updateConversation(
+          databaseType,
           updatedConversation,
           conversations,
         );
@@ -109,6 +110,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
     };
 
     const { single, all } = updateConversation(
+      databaseType,
       updatedConversation,
       conversations,
     );

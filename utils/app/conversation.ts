@@ -1,6 +1,7 @@
 import { Conversation } from '@/types/chat';
 
 export const updateConversation = (
+  databaseType: string,
   updatedConversation: Conversation,
   allConversations: Conversation[],
 ) => {
@@ -12,8 +13,8 @@ export const updateConversation = (
     return c;
   });
 
-  saveConversation(updatedConversation);
-  saveConversations(updatedConversations);
+  saveSelectedConversation(updatedConversation);
+  saveConversations(databaseType, updatedConversations);
 
   return {
     single: updatedConversation,
@@ -21,10 +22,54 @@ export const updateConversation = (
   };
 };
 
-export const saveConversation = (conversation: Conversation) => {
+export const getSelectedConversation = () => {
+  return localStorage.getItem('selectedConversation');
+};
+
+export const getConversations = async (databaseType: string) => {
+  if (databaseType === 'couchdb'){
+    const response = await fetch('api/conversations');
+    return response.json() as Promise<Conversation[]>;
+  }
+  return JSON.parse(localStorage.getItem('conversationHistory') || '[]') as Conversation[];
+};
+
+export const saveSelectedConversation = (conversation: Conversation) => {
   localStorage.setItem('selectedConversation', JSON.stringify(conversation));
 };
 
-export const saveConversations = (conversations: Conversation[]) => {
+export const saveConversations = async (databaseType: string, conversations: Conversation[]) => {
+  if (databaseType === 'couchdb'){
+    const response = await fetch('api/conversations',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(conversations),
+      }
+    );
+    return response.json();
+  }
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+};
+
+export const deleteSelectedConversation = () => {
+  localStorage.removeItem('selectedConversation');
+};
+
+export const deleteConversations = async (databaseType: string) => {
+  if (databaseType === 'couchdb'){
+    const response = await fetch('api/conversations',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([]),
+      }
+    );
+    return response.json();
+  }
+  localStorage.removeItem('conversationHistory');
 };
