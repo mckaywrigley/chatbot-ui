@@ -78,7 +78,7 @@ const Sidebar = <T,>({
             <IconFolderPlus size={16} />
           </button>
         </div>
-        {items?.length > 0 && (
+        {(items?.length > 0 || searchTerm) && (
           <Search
             placeholder={t('Search prompts...') || ''}
             searchTerm={searchTerm}
