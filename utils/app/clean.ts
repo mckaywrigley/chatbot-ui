@@ -1,7 +1,7 @@
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
-import { DEFAULT_SYSTEM_PROMPT } from './const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -24,6 +24,13 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     updatedConversation = {
       ...updatedConversation,
       prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
+    };
+  }
+
+  if (!updatedConversation.temperature) {
+    updatedConversation = {
+      ...updatedConversation,
+      temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
     };
   }
 
@@ -56,6 +63,10 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
       if (!conversation.prompt) {
         conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+      }
+
+      if (!conversation.temperature) {
+        conversation.temperature = DEFAULT_TEMPERATURE;
       }
 
       if (!conversation.folderId) {

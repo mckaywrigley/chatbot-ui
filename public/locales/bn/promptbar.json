@@ -1,12 +1,12 @@
 {
-  "New prompt": "New prompt",
-  "New folder": "New folder",
-  "No prompts.": "No prompts.",
-  "Search prompts...": "Search prompts...",
-  "Name": "Name",
-  "Description": "Description",
-  "A description for your prompt.": "A description for your prompt.",
+  "New prompt": "নতুন prompt",
+  "New folder": "নতুন ফোল্ডার",
+  "No prompts.": "কোনো prompts নেই।",
+  "Search prompts...": "prompts অনুসন্ধান হচ্ছে...",
+  "Name": "নাম",
+  "Description": "বর্ণনা",
+  "A description for your prompt.": "আপনার Prompt জন্য একটি বিবরণ লিখুন.",
   "Prompt": "Prompt",
   "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}",
-  "Save": "Save"
+  "Save": "সংরক্ষণ করুন"
 }
