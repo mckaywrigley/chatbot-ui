@@ -194,7 +194,7 @@ export const Chat: FC<Props> = memo(
                     <div key={index}>
                       {
                         // Show ad every 4 messages
-                        index !== 0 && index % 4 === 0 && !messageIsStreaming && (
+                        index !== 0 && index % 4 === 0 && (
                           <AdMessage googleAdSenseId={googleAdSenseId}/>
                         )
                       }
