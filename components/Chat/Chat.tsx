@@ -23,6 +23,7 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { event } from 'nextjs-google-analytics';
 import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
 import { StoreConversationButton } from '../Global/StoreConversationButton';
+import AdMessage from './AdMessage';
 
 interface Props {
   conversation: Conversation;
@@ -30,6 +31,7 @@ interface Props {
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
   defaultModelId: OpenAIModelID;
+  googleAdSenseId: string;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   loading: boolean;
@@ -51,6 +53,7 @@ export const Chat: FC<Props> = memo(
   ({
     conversation,
     models,
+    googleAdSenseId,
     messageIsStreaming,
     modelError,
     loading,
@@ -188,14 +191,21 @@ export const Chat: FC<Props> = memo(
                   </div>
 
                   {conversation.messages.map((message, index) => (
-                    <ChatMessage
-                      key={index}
-                      message={message}
-                      messageIndex={index}
-                      onEditMessage={onEditMessage}
-                      displayFeedbackButton={conversation.messages.length - 1 === index && !loading}
-                      conversation={conversation}
-                    />
+                    <div key={index}>
+                      {
+                        // Show ad every 4 messages
+                        index !== 0 && index % 4 === 0 && (
+                          <AdMessage googleAdSenseId={googleAdSenseId}/>
+                        )
+                      }
+                      <ChatMessage
+                        message={message}
+                        messageIndex={index}
+                        onEditMessage={onEditMessage}
+                        displayFeedbackButton={conversation.messages.length - 1 === index && !loading}
+                        conversation={conversation}
+                      />
+                    </div>
                   ))}
 
                   {loading && <ChatLoader />}

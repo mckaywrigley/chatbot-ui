@@ -11,6 +11,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ctrl/react-adsense": "^1.6.2",
     "@dqbd/tiktoken": "^1.0.2",
     "@supabase/supabase-js": "^2.15.0",
     "@tabler/icons-react": "^2.9.0",
