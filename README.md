@@ -1,8 +1,8 @@
-# Chatbot UI
+# Smart Chatbot UI
 
-Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
+This is highly experimental personal project.
 
-See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
+This project attempt to add more intelligent chatbot ux to [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
 
 ![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
 
@@ -20,6 +20,7 @@ Expect frequent improvements.
 
 **Recent updates:**
 
+- [x] SSO Auth(email pattern matching only) (4/15/23)
 - [x] Prompt templates (3/27/23)
 - [x] Regenerate & edit responses (3/25/23)
 - [x] Folders (3/24/23)
@@ -139,6 +140,6 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 
 ## Contact
 
-If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/santa128bit).
 
 [GCSE]: https://developers.google.com/custom-search/v1/overview
