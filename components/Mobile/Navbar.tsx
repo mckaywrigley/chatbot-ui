@@ -15,7 +15,9 @@ export const Navbar: FC<Props> = ({
   return (
     <nav className="flex w-full items-center justify-between bg-[#202123] py-3 px-4">
       <div className="mr-4 pl-8">
-        <StoreConversationButton conversation={selectedConversation} />
+        {selectedConversation.name !== 'New conversation' && (
+          <StoreConversationButton conversation={selectedConversation} />
+        )}
       </div>
 
       <div className="max-w-[240px] overflow-hidden text-ellipsis whitespace-nowrap">
