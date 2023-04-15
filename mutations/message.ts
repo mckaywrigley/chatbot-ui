@@ -1,8 +1,6 @@
-import { Dispatch, MutableRefObject } from 'react';
+import { MutableRefObject, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
-
-import { ActionType } from '@/hooks/useCreateReducer';
 
 import useApiService from '@/services/useApiService';
 
@@ -11,13 +9,16 @@ import { updateConversationFromStream } from '@/utils/server/clientstream';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
-import { HomeInitialState } from '@/pages/api/home/home.state';
+import HomeContext from '@/pages/api/home/home.context';
 
 export function useMessageMutation(
   conversations: Conversation[],
-  homeDispatch: Dispatch<ActionType<HomeInitialState>>,
   stopConversationRef: MutableRefObject<boolean>,
 ) {
+  const {
+    state: { pluginKeys },
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
   const apiService = useApiService();
   return useMutation({
     mutationFn: async (params: {

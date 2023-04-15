@@ -1,26 +1,19 @@
-import { Dispatch, MutableRefObject, useContext } from 'react';
+import { MutableRefObject, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
-
-import { ActionType } from '@/hooks/useCreateReducer';
 
 import useApiService from '@/services/useApiService';
 
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
-import { updateConversationFromStream } from '@/utils/server/clientstream';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
-import { HomeInitialState } from '@/pages/api/home/home.state';
 
-export function useGooglePluginMessageMutation(
-  conversations: Conversation[],
-  homeDispatch: Dispatch<ActionType<HomeInitialState>>,
-  stopConversationRef: MutableRefObject<boolean>,
-) {
+export function useGooglePluginMessageMutation(conversations: Conversation[]) {
   const {
     state: { pluginKeys },
+    dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
   return useMutation({

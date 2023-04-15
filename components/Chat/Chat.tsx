@@ -66,14 +66,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   const messageMutation = useMessageMutation(
     conversations,
-    homeDispatch,
     stopConversationRef,
   );
-  const googlePluginMessageMutation = useGooglePluginMessageMutation(
-    conversations,
-    homeDispatch,
-    stopConversationRef,
-  );
+  const googlePluginMessageMutation =
+    useGooglePluginMessageMutation(conversations);
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
