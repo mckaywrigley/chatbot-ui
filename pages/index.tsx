@@ -43,12 +43,14 @@ interface HomeProps {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
+  googleAdSenseId: string;
 }
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
+  googleAdSenseId
 }) => {
   const { t } = useTranslation('chat');
 
@@ -909,6 +911,7 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                googleAdSenseId={googleAdSenseId}
               />
             </div>
 
@@ -964,6 +967,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCSEId = process.env.GOOGLE_CSE_ID;
+  const googleAdSenseId = process.env.GOOGLE_ADSENSE_ID;
 
   if (googleApiKey && googleCSEId) {
     serverSidePluginKeysSet = true;
@@ -974,6 +978,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
       serverSidePluginKeysSet,
+      googleAdSenseId,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

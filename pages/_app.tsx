@@ -14,11 +14,14 @@ function App({ Component, pageProps }: AppProps<{}>) {
       <Toaster />
       <Component {...pageProps} />
       <GoogleAnalytics trackPageViews />
-      <Script
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.GOOGLE_ADSENSE_CLIENT}`}
-        async
-        onError={ (e) => { console.error('GA failed to load') }}
-      />
+      {
+        process.env.GOOGLE_ADSENSE_CLIENT && (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.GOOGLE_ADSENSE_CLIENT}`}
+            async
+          />
+        )
+      }
     </div>
   );
 }
