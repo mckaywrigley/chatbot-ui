@@ -1,6 +1,6 @@
 import { SupportedExportFormats } from '@/types/export';
 import { PluginKey } from '@/types/plugin';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconFileExport, IconMoon, IconSun, IconBrandFacebook } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
@@ -52,6 +52,17 @@ export const ChatbarSettings: FC<Props> = ({
         onClick={() =>
           onToggleLightMode(lightMode === 'light' ? 'dark' : 'light')
         }
+      />
+
+      <SidebarButton
+        text={t('Follow for updates!')}
+        icon={<IconBrandFacebook size={18} />}
+        onClick={() => {
+          window.open(
+            'https://www.facebook.com/groups/621367689441014',
+            '_blank',
+          );
+        }}
       />
     </div>
   );
