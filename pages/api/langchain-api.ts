@@ -6,7 +6,7 @@ import { LLMChain } from 'langchain/chains';
 import { ChatBody } from '@/types/chat';
 import { NextRequest, NextResponse } from 'next/server';
 import { DynamicTool } from 'langchain/tools';
-import { create, all } from 'mathjs'
+import { create, all } from 'mathjs';
 
 export const config = {
   runtime: 'edge',
@@ -17,7 +17,7 @@ const calculator = new DynamicTool({
   description:
     'Useful for getting the result of a math expression. The input to this tool should ONLY be a valid mathematical expression that could be executed by a simple calculator.',
   func: (input) => {
-    const math = create(all, {})
+    const math = create(all, {});
 
     try {
       const value = math.evaluate(input);
@@ -58,14 +58,23 @@ const handler = async (req: NextRequest, res: any) => {
       console.log('handleAgentEnd', action);
       await writer.ready;
       await writeToStream('``` \n\n');
-      if(action.returnValues.output.includes('Agent stopped due to max iterations.')){
-        await writeToStream("Sorry, I ran out of time to think (TnT) Please try again with a more detailed question.");
-      }else{
+      if (
+        action.returnValues.output.includes(
+          'Agent stopped due to max iterations.',
+        )
+      ) {
+        await writeToStream(
+          'Sorry, I ran out of time to think (TnT) Please try again with a more detailed question.',
+        );
+      } else {
         await writeToStream(action.returnValues.output);
       }
       await writeToStream('[DONE]');
-      console.log("Done");
+      console.log('Done');
       writer.close();
+    },
+    handleChainEnd: async (outputs) => {
+      console.log('handleChainEnd', outputs);
     },
     handleLLMError: async (e) => {
       await writer.ready;
@@ -76,15 +85,27 @@ const handler = async (req: NextRequest, res: any) => {
     handleChainError: async (err, verbose) => {
       await writer.ready;
       await writeToStream('``` \n\n');
-      await writeToStream(`Sorry, I am not able to answer your question. \n\n`);
+      // This is a hack to get the output from the LLM
+      if (err.message.includes('Could not parse LLM output: ')) {
+        const output = err.message.split('Could not parse LLM output: ')[1];
+        await writeToStream(`${output} \n\n`);
+      } else {
+        await writeToStream(
+          `Sorry, I am not able to answer your question. \n\n`,
+        );
+        console.log('Chain Error: ', err.message);
+        console.error(err, verbose);
+      }
       await writer.abort(err);
-      console.log("Chain Error");
+    },
+    handleToolError: async (err, verbose) => {
+      console.log('Tool Error: ', err.message);
       console.error(err, verbose);
-    }
+    },
   });
 
   const model = new ChatOpenAI({
-    temperature: 0.0,
+    temperature: 0,
     callbackManager,
     openAIApiKey: process.env.OPENAI_API_KEY,
     streaming: false,
@@ -92,15 +113,35 @@ const handler = async (req: NextRequest, res: any) => {
 
   const tools = [new Serper(), calculator];
 
-  const agentPrompt = ZeroShotAgent.createPrompt(tools);
+  const prompt = ZeroShotAgent.createPrompt(tools, {
+    prefix: `You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.
+      
+      Your previous conversations with the user is as follows from oldest to latest, and you can use this information to answer the user's question if needed:
+      ${requestBody.messages
+        .map((message, index) => {
+          return `${index + 1}) ${
+            message.role === 'assistant' ? 'You' : 'User'
+          } ${normalizeTextAnswer(message.content)}`;
+        })
+        .join('\n')}
+
+      The current date and time is ${new Date().toLocaleString()}.
+      
+      Make sure you include the reference links to the websites you used to answer the user's question in your response using Markdown syntax. You MUST use the following Markdown syntax to include a link in your response:
+      [Link Text](https://www.example.com)
+
+      Use the following tools to help you answer the user's question:
+    `,
+  });
+
   const llmChain = new LLMChain({
     llm: model,
-    prompt: agentPrompt,
+    prompt: prompt,
   });
 
   const agent = new ZeroShotAgent({
     llmChain,
-    allowedTools: ['search'],
+    allowedTools: ['search', 'calculator'],
   });
 
   const agentExecutor = AgentExecutor.fromAgentAndTools({
@@ -110,9 +151,10 @@ const handler = async (req: NextRequest, res: any) => {
   });
 
   try {
-    agentExecutor.call({
-      input: latestUserPrompt,
-    });
+    agentExecutor
+      .call({
+        input: latestUserPrompt,
+      })
 
     return new NextResponse(stream.readable, {
       headers: {
@@ -129,6 +171,11 @@ const handler = async (req: NextRequest, res: any) => {
     console.error(e);
     console.log(typeof e);
   }
+};
+
+const normalizeTextAnswer = (text: string) => {
+  const mindlogRegex = /```Mindlog \n(.|\n)*```/g;
+  return text.replace(mindlogRegex, '');
 };
 
 export default handler;
