@@ -16,14 +16,14 @@
   "Error fetching models.": "মডেল পেতে সমস্যা হচ্ছে।",
   "AI": "AI",
   "You": "তুমি",
-  "Cancel": "Cancel",
-  "Save & Submit": "Save & Submit",
+  "Cancel": "বাতিল করুন",
+  "Save & Submit": "সংরক্ষণ করুন এবং জমা দিন",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "নিশ্চিত করুন যে আপনার OpenAI API key সাইডবারের নীচে বাম দিকে সেট করা আছে।",
   "If you completed this step, OpenAI may be experiencing issues.": "আপনি এই ধাপটি সম্পন্ন করে থাকলে, হতে পারে যে OpenAI কোনো সমস্যার সম্মুখীন হয়েছে।",
-  "click if using a .env.local file": "click if using a .env.local file",
+  "click if using a .env.local file": "একটি .env.local ফাইল ব্যবহার করলে এখানে ক্লিক করুন",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "বার্তার সর্বোচ্চ সীমা হল {{maxLength}} অক্ষর৷ আপনি {{valueLength}} অক্ষর লিখেছেন।",
   "Please enter a message": "দয়া করে একটি মেসেজ লিখুন",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI হল OpenAI-এর চ্যাট মডেলগুলির জন্য একটি উন্নত চ্যাটবট কিট যার লক্ষ্য হল ChatGPT-এর ইন্টারফেস এবং কার্যকারিতা অনুকরণ করা।",
   "Are you sure you want to clear all messages?": "সমস্ত বার্তা মুছে ফেলতে আপনি কি নিশ্চিত?",
-  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "০.৮ এর মতো বেশি মান দিলে আউটপুট আরও যেতে যেতে একটু একটু এলোমেলো হবে, যেহেতু ০.২ এর মতো নিম্নমানের মান দিলে তা আরও ফোকাস করা হবে এবং নিশ্চয়তামূলক হবে।"
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "০.৮ এর বেশি মান দিলে আউটপুট বেশি ইউনিক হবে, যেহেতু ০.২ এর মতো নিম্নমানের মান দিলে তা আরও ফোকাস এবং ধারাবাহিকতা বজায় থাকবে এবং নিশ্চয়তামূলক হবে।"
 }
