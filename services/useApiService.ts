@@ -4,7 +4,13 @@ import { useFetch } from '@/hooks/useFetch';
 
 import { getEndpoint } from '@/utils/app/api';
 
-import { ChatBody, Conversation, Message, PlanningRequest } from '@/types/chat';
+import {
+  ExecuteToolRequest,
+  PlanningRequest,
+  ReactAgentResult,
+  ToolActionResult,
+} from '@/types/agent';
+import { ChatBody, Conversation, Message } from '@/types/chat';
 
 export interface GetModelsRequestProps {
   key: string;
@@ -72,7 +78,6 @@ const useApiService = () => {
           'Content-Type': 'application/json',
         },
         signal,
-        rawResponse: true,
       });
     },
     [fetchService],
@@ -80,7 +85,20 @@ const useApiService = () => {
 
   const planning = useCallback(
     (params: PlanningRequestProps, signal?: AbortSignal) => {
-      return fetchService.post<any>(`/api/planning`, {
+      return fetchService.post<ReactAgentResult>(`/api/planning`, {
+        body: params,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+      });
+    },
+    [fetchService],
+  );
+
+  const executeTool = useCallback(
+    (params: ExecuteToolRequest, signal?: AbortSignal) => {
+      return fetchService.post<ToolActionResult>(`/api/tool`, {
         body: params,
         headers: {
           'Content-Type': 'application/json',
@@ -96,6 +114,7 @@ const useApiService = () => {
     chat,
     googleSearch,
     planning,
+    executeTool,
   };
 };
 

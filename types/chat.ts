@@ -26,10 +26,3 @@ export interface Conversation {
   temperature: number;
   folderId: string | null;
 }
-
-export interface PlanningRequest {
-  model: OpenAIModel;
-  messages: Message[];
-  prompt: string;
-  temperature: number;
-}

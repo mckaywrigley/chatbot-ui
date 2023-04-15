@@ -1,15 +1,8 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError } from '@/utils/server';
 
-import { ChatBody, Message, PlanningRequest } from '@/types/chat';
-
-// @ts-expect-error
-import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
+import { PlanningRequest } from '@/types/agent';
 
 import { executeReactAgent } from '@/agent/agent';
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
-import { initializeAgentExecutor } from 'langchain/agents';
 
 export const config = {
   runtime: 'edge',
@@ -17,11 +10,14 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, prompt, temperature } =
+    const { model, messages, prompt, temperature, toolActionResult } =
       (await req.json()) as PlanningRequest;
 
     const lastMessage = messages[messages.length - 1];
-    const result = await executeReactAgent(lastMessage.content);
+    const result = await executeReactAgent(
+      lastMessage.content,
+      toolActionResult,
+    );
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

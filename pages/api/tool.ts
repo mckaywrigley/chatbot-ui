@@ -1,11 +1,17 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
-import { ChatBody, Message, PlanningRequest } from '@/types/chat';
+import {
+  ExecuteToolRequest,
+  PlanningRequest,
+  ToolActionResult,
+} from '@/types/agent';
+import { Message } from '@/types/chat';
 
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
 
+import { createContext, executeTool } from '@/agent/tools/executor';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 import { initializeAgentExecutor } from 'langchain/agents';
@@ -16,55 +22,20 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, prompt, temperature } =
-      (await req.json()) as PlanningRequest;
+    const { model, input, toolAction } =
+      (await req.json()) as ExecuteToolRequest;
 
-    await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str,
-    );
+    const context = createContext(req);
+    const toolResult = await executeTool(context, toolAction);
+    const result: ToolActionResult = {
+      action: toolAction,
+      result: toolResult,
+    };
 
-    let promptToSend = prompt;
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
-    }
-
-    let temperatureToUse = temperature;
-    if (temperatureToUse == null) {
-      temperatureToUse = DEFAULT_TEMPERATURE;
-    }
-
-    const prompt_tokens = encoding.encode(promptToSend);
-
-    let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
-
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
-        break;
-      }
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
-    }
-
-    encoding.free();
-
-    initializeAgentExecutor();
-
-    const stream = await OpenAIStream(
-      model,
-      promptToSend,
-      temperatureToUse,
-      key,
-      messagesToSend,
-    );
-
-    return new Response(stream);
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {

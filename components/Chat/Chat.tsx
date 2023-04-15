@@ -14,7 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -27,6 +27,7 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
+import { useAgent } from '@/mutations/agent';
 import { useGooglePluginMessageMutation } from '@/mutations/google';
 import { useMessageMutation } from '@/mutations/message';
 
@@ -70,6 +71,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   );
   const googlePluginMessageMutation =
     useGooglePluginMessageMutation(conversations);
+  const agent = useAgent(conversations);
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -99,13 +101,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         prompt: updatedConversation.prompt,
         temperature: updatedConversation.temperature,
       };
-      // const controller = new AbortController();
-      // const response = await apiService.chat(body, controller.signal);
-      if (!plugin) {
+      if (plugin?.id === PluginID.GOOGLE_SEARCH) {
         messageMutation.mutate({
           body: chatBody,
           conversation: updatedConversation,
           message,
+          selectedConversation,
+        });
+      } else if (plugin?.id === PluginID.AGENT) {
+        agent.run({
+          body: chatBody,
+          message,
+          conversation: updatedConversation,
           selectedConversation,
         });
       } else {

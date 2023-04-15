@@ -1,3 +1,6 @@
+import { ReactAgentResult, ToolActionResult } from '@/types/agent';
+
+import { tools } from '@/agent/tools';
 import { initializeAgentExecutor } from 'langchain/agents';
 import { LLMChain } from 'langchain/chains';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
@@ -48,47 +51,56 @@ Previous conversation history:
 []
 
 New input: {input}
+{agent_scratchpad}
 `;
 
-export type Action = {
-  type: 'action';
-  action: string;
-  actionInput: string;
-};
-export type Answer = {
-  type: 'answer';
-  answer: string;
-};
-export type ReactAgentOutput = Action | Answer;
-
-export const executeReactAgent = async (input: string) => {
+export const executeReactAgent = async (
+  input: string,
+  toolActionResult?: ToolActionResult,
+): Promise<ReactAgentResult> => {
   const tools = [new Calculator()];
 
-  const model = new OpenAI({ temperature: 0 });
-  const prompt = PromptTemplate.fromTemplate(PREFIX + PROMPT + SUFFIX);
-  const chainA = new LLMChain({ llm: model, prompt });
-  // TODO: tool
+  const model: OpenAI = new OpenAI({ temperature: 0 });
+  const prompt: PromptTemplate = PromptTemplate.fromTemplate(
+    PREFIX + PROMPT + SUFFIX,
+  );
+  const chainA: LLMChain = new LLMChain({ llm: model, prompt });
+
+  let agentScratchpad = '';
+  if (toolActionResult) {
+    agentScratchpad = `
+\nThought: Do I need to use a tool? Yes
+Action:${toolActionResult.action.tool}
+Action Input: ${toolActionResult.action.toolInput}
+Observation: ${toolActionResult.result}
+
+Thought:
+    `;
+  }
+
+  const toolDescriptions = tools
+    .map((tool) => tool.name + ': ' + tool.description)
+    .join('\n');
+  const toolNames = tools.map((tool) => tool.name).join(',');
   const result = await chainA.call({
-    tool_descriptions: `
-Search: useful for when you need to ask with search.
-Lookup: useful for when you need to lookup the search result.
-`,
-    tool_names: 'Search, Calculator',
+    tool_descriptions: toolDescriptions,
+    tool_names: toolNames,
     input,
+    agent_scratchpad: agentScratchpad,
   });
   return _parseResult(result.text);
 };
 
-const _parseResult = (result: string): ReactAgentOutput => {
-  const m1 = result.match(/Action: (.*)/);
-  if (m1) {
-    const action = m1 ? m1[1] : '';
+const _parseResult = (result: string): ReactAgentResult => {
+  const matchAction = result.match(/Action: (.*)/);
+  if (matchAction) {
+    const action = matchAction[1];
     const matchActionInput = result.match(/Action Input: (.*)/);
-    const actionInput = matchActionInput ? matchActionInput[1] : '';
+    const actionInput = matchActionInput ? (matchActionInput[1] as string) : '';
     return {
       type: 'action',
-      action,
-      actionInput,
+      tool: action,
+      toolInput: actionInput,
     };
   } else {
     const matchAnswer = result.match(/AI:(.*)/);
