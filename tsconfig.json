@@ -19,6 +19,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "middleware.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }
