@@ -2,10 +2,11 @@ export type RequestModel = {
   params?: object;
   headers?: object;
   signal?: AbortSignal;
+  rawResponse?: boolean;
 };
 
 export type RequestWithBodyModel = RequestModel & {
-  body?: object | FormData;
+  body?: object | string | FormData;
 };
 
 export const useFetch = () => {
@@ -13,6 +14,7 @@ export const useFetch = () => {
     url: string,
     request: any,
     signal?: AbortSignal,
+    rawResponse?: boolean,
   ) => {
     const requestUrl = request?.params ? `${url}${request.params}` : url;
 
@@ -33,6 +35,7 @@ export const useFetch = () => {
     return fetch(requestUrl, { ...requestBody, headers, signal })
       .then((response) => {
         if (!response.ok) throw response;
+        if (rawResponse) return response;
 
         const contentType = response.headers.get('content-type');
         const contentDisposition = response.headers.get('content-disposition');
@@ -70,7 +73,12 @@ export const useFetch = () => {
       url: string,
       request?: RequestWithBodyModel,
     ): Promise<T> => {
-      return handleFetch(url, { ...request, method: 'post' });
+      return handleFetch(
+        url,
+        { ...request, method: 'post' },
+        request?.signal,
+        request?.rawResponse,
+      );
     },
     put: async <T>(url: string, request?: RequestWithBodyModel): Promise<T> => {
       return handleFetch(url, { ...request, method: 'put' });

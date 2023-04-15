@@ -4,6 +4,7 @@ export interface ProcessEnv {
   OPENAI_API_TYPE?: 'openai' | 'azure';
   OPENAI_API_VERSION?: string;
   OPENAI_ORGANIZATION?: string;
+  NEXT_PUBLIC_API_URL: string;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;
