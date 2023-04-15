@@ -8,21 +8,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import toast from 'react-hot-toast';
-import { useMutation } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
 
-import useApiService from '@/services/useApiService';
-
-import { getEndpoint } from '@/utils/app/api';
-import {
-  saveConversation,
-  saveConversations,
-  updateConversation,
-} from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
-import { updateConversationFromStream } from '@/utils/server/clientstream';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
@@ -38,6 +27,7 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
+import { useGooglePluginMessageMutation } from '@/mutations/google';
 import { useMessageMutation } from '@/mutations/message';
 
 interface Props {
@@ -79,6 +69,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     homeDispatch,
     stopConversationRef,
   );
+  const googlePluginMessageMutation = useGooglePluginMessageMutation(
+    conversations,
+    homeDispatch,
+    stopConversationRef,
+  );
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -110,12 +105,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       };
       // const controller = new AbortController();
       // const response = await apiService.chat(body, controller.signal);
-      messageMutation.mutate({
-        body: chatBody,
-        conversation: updatedConversation,
-        message,
-        selectedConversation,
-      });
+      if (!plugin) {
+        messageMutation.mutate({
+          body: chatBody,
+          conversation: updatedConversation,
+          message,
+          selectedConversation,
+        });
+      } else {
+        googlePluginMessageMutation.mutate({
+          body: chatBody,
+          conversation: updatedConversation,
+          message,
+          selectedConversation,
+        });
+      }
     },
     [
       apiKey,

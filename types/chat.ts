@@ -13,6 +13,8 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  googleAPIKey?: string;
+  googleCSEId?: string;
 }
 
 export interface Conversation {
