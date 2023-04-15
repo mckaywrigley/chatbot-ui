@@ -4,7 +4,7 @@
   "Stop Generating": "జెనరేట్ చేస్తున్న ప్రక్రియ నిలిపేయి",
   "Prompt limit is {{maxLength}} characters": "ప్రాంప్ట్(సంకేతం) పరిమితి {{maxLength}} అక్షరాలు మాత్రమే",
   "System Prompt": "సిస్టమ్ ప్రాంప్ట్",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "మీరు ChatGPT, ఒక పెద్ద భాషా మోడల్ ఓపెన్‌ఏఐ ద్వారా ట్రైన్ చేయబడింది. యూజర్ ఇన్స్ట్రక్షన్స్ కనుగొనండి. మార్క్‌డౌన్ ఉపయోగించి సమాధానం ఇవ్వండి.",
+  "You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Always be aware of the current date and time, and make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.": "మీరు ChatGPT, ఒక పెద్ద భాషా మోడల్ ఓపెన్‌ఏఐ ద్వారా ట్రైన్ చేయబడింది. యూజర్ ఇన్స్ట్రక్షన్స్ కనుగొనండి. మార్క్‌డౌన్ ఉపయోగించి సమాధానం ఇవ్వండి.",
   "Enter a prompt": "ఒక ప్రాంప్ట్(సంకేతం) నమోదు చేయండి",
   "Regenerate response": "పునరుత్పాదించు సమాధానం",
   "Sorry, there was an error.": "క్షమించండి, ఒక పొరపాటు జరిగింది.",

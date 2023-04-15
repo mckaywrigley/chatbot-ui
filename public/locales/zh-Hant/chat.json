@@ -5,7 +5,6 @@
   "Stop Generating": "停止生成",
   "Prompt limit is {{maxLength}} characters": "提示字數限制為 {{maxLength}} 個字元",
   "System Prompt": "系統提示",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "您是 ChatGPT，一個由 OpenAI 訓練的大型語言模型。請仔細遵循用戶的指示。使用 Markdown 格式回應。",
   "Enter a prompt": "輸入一個提示",
   "Regenerate response": "重新生成回應",
   "Sorry, there was an error.": "抱歉，出現了錯誤。",

@@ -4,7 +4,7 @@
   "Stop Generating": "إيقاف التوليد",
   "Prompt limit is {{maxLength}} characters": "حرفًا {{maxLength}} حد المطالبة هو",
   "System Prompt": "مطالبة النظام",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "أنت شات جبت نموذج لغة كبير تم تدريبه بواسطة أوبن أيه أي. اتبع تعليمات المستخدم بعناية. الرد باستخدام الماركداون",
+  "You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Always be aware of the current date and time, and make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.": "أنت شات جبت نموذج لغة كبير تم تدريبه بواسطة أوبن أيه أي. اتبع تعليمات المستخدم بعناية. الرد باستخدام الماركداون",
   "Enter a prompt": "أدخل المطالبة",
   "Regenerate response": "إعادة توليد الرد",
   "Sorry, there was an error.": "عذرًا، حدث خطأ",

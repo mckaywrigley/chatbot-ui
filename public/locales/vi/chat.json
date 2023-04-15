@@ -4,7 +4,7 @@
   "Stop Generating": "Dừng tạo",
   "Prompt limit is {{maxLength}} characters": "Giới hạn Prompt là {{maxLength}} ký tự",
   "System Prompt": "Prompt hệ thống",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Bạn là ChatGPT, một mô hình ngôn ngữ lớn được đào tạo bởi OpenAI. Hãy tuân theo hướng dẫn của người dùng một cách cẩn thận. Phản hồi bằng cách sử dụng định dạng markdown.",
+  "You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Always be aware of the current date and time, and make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.": "Bạn là ChatGPT, một mô hình ngôn ngữ lớn được đào tạo bởi OpenAI. Hãy tuân theo hướng dẫn của người dùng một cách cẩn thận. Phản hồi bằng cách sử dụng định dạng markdown.",
   "Enter a prompt": "Nhập một Prompt",
   "Regenerate response": "Tạo lại phản hồi",
   "Sorry, there was an error.": "Xin lỗi, đã xảy ra lỗi.",
