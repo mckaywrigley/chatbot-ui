@@ -1,13 +1,9 @@
 import { ReactAgentResult, ToolActionResult } from '@/types/agent';
 
 import { tools } from '@/agent/tools';
-import { initializeAgentExecutor } from 'langchain/agents';
 import { LLMChain } from 'langchain/chains';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAI } from 'langchain/llms/openai';
-import { BufferMemory } from 'langchain/memory';
 import { PromptTemplate } from 'langchain/prompts';
-import { Calculator } from 'langchain/tools/calculator';
 
 const PREFIX =
   'Answer the following questions as best you can. You have access to the following tools:';
@@ -58,8 +54,6 @@ export const executeReactAgent = async (
   input: string,
   toolActionResult?: ToolActionResult,
 ): Promise<ReactAgentResult> => {
-  const tools = [new Calculator()];
-
   const model: OpenAI = new OpenAI({ temperature: 0 });
   const prompt: PromptTemplate = PromptTemplate.fromTemplate(
     PREFIX + PROMPT + SUFFIX,
