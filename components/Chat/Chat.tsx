@@ -191,7 +191,7 @@ export const Chat: FC<Props> = memo(
                   </div>
 
                   {conversation.messages.map((message, index) => (
-                    <>
+                    <div key={index}>
                       {
                         // Show ad every 4 messages
                         index !== 0 && index % 4 === 0 && !messageIsStreaming && (
@@ -199,14 +199,13 @@ export const Chat: FC<Props> = memo(
                         )
                       }
                       <ChatMessage
-                        key={index}
                         message={message}
                         messageIndex={index}
                         onEditMessage={onEditMessage}
                         displayFeedbackButton={conversation.messages.length - 1 === index && !loading}
                         conversation={conversation}
                       />
-                    </>
+                    </div>
                   ))}
 
                   {loading && <ChatLoader />}
