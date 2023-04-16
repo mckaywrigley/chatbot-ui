@@ -357,13 +357,6 @@ export const ChatInput: FC<Props> = ({
               onClose={() => setIsModalVisible(false)}
             />
           )}
-          {
-            selectedEnhanceChatMode && (
-              <span className="font-mono text-gray-400 m-auto text-xs px-2 md:px-0 text-center">
-                {t("Under the enhanced mode, AI is unable to refer back to your earlier messages.")}
-              </span>
-            )
-          }
         </div>
       </div>
     </div>
