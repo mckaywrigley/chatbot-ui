@@ -1,4 +1,4 @@
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconFileExport, IconMoon, IconSun, IconTextWrap, IconTextWrapDisabled } from '@tabler/icons-react';
 import { useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -19,6 +19,7 @@ export const ChatbarSettings = () => {
     state: {
       apiKey,
       lightMode,
+      lineMode,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
@@ -49,16 +50,36 @@ export const ChatbarSettings = () => {
       />
 
       <SidebarButton
+        text={lineMode === 'multi' ? t('Single Line') : t('Multi Line')}
+        title={lineMode === 'multi' ? t('Send on Enter') : t('Send on Ctrl+Enter')}
+        icon={
+          lineMode === 'multi' ? <IconTextWrapDisabled size={18} /> : <IconTextWrap size={18} />
+        }
+        onClick={() => {
+          const newLineMode = lineMode === 'single' ? 'multi' : 'single'
+          localStorage.setItem('lineMode', newLineMode);
+
+          return homeDispatch({
+            field: 'lineMode',
+            value: newLineMode,
+          })
+        }}
+      />
+
+      <SidebarButton
         text={lightMode === 'light' ? t('Dark mode') : t('Light mode')}
         icon={
           lightMode === 'light' ? <IconMoon size={18} /> : <IconSun size={18} />
         }
-        onClick={() =>
-          homeDispatch({
+        onClick={() => {
+          const newTheme = lightMode === 'light' ? 'dark' : 'light'
+          localStorage.setItem('theme', newTheme);
+
+          return homeDispatch({
             field: 'lightMode',
-            value: lightMode === 'light' ? 'dark' : 'light',
+            value: newTheme,
           })
-        }
+        }}
       />
 
       {!serverSideApiKeyIsSet ? (

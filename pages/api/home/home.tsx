@@ -255,6 +255,14 @@ const Home = ({
       dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
     }
 
+    const lineMode = localStorage.getItem('lineMode');
+    if (lineMode) {
+      dispatch({ field: 'lineMode', value: lineMode as 'single' | 'multi' });
+    }
+    else {
+      dispatch({ field: 'lineMode', value: 'single' });
+    }
+
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
