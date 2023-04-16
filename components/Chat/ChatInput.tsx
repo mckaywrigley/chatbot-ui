@@ -1,10 +1,4 @@
-import {
-  IconBolt,
-  IconBrandGoogle,
-  IconPlayerStop,
-  IconRepeat,
-  IconSend,
-} from '@tabler/icons-react';
+import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
 import {
   KeyboardEvent,
   MutableRefObject,
@@ -22,6 +16,8 @@ import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
+
+import { PluginIcon } from '@/components/Chat/PluginIcon';
 
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
@@ -279,7 +275,7 @@ export const ChatInput = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            <PluginIcon plugin={plugin} />
           </button>
 
           {showPluginSelect && (
