@@ -25,8 +25,6 @@ import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import AudioPlayer from '../Chatbar/components/AudioPlayer';
-
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
@@ -536,7 +534,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     />
                   </>
                 ))}
-                {!!audioURL ? <AudioPlayer audioURL={audioURL} /> : null}
                 {loading && <ChatLoader />}
 
                 <div
