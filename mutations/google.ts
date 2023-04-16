@@ -1,10 +1,11 @@
-import { MutableRefObject, useContext } from 'react';
+import { useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
 
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
+import { HomeUpdater } from '@/utils/app/homeUpdater';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
@@ -16,6 +17,7 @@ export function useGooglePluginMessageMutation(conversations: Conversation[]) {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
+  const updater = new HomeUpdater(homeDispatch);
   return useMutation({
     mutationFn: async (params: {
       body: ChatBody;
@@ -40,24 +42,13 @@ export function useGooglePluginMessageMutation(conversations: Conversation[]) {
       homeDispatch({ field: 'messageIsStreaming', value: true });
     },
     async onSuccess(response: any, variables, context) {
-      let {
-        conversation: updatedConversation,
-        message,
-        selectedConversation,
-      } = variables;
+      let { conversation: updatedConversation, selectedConversation } =
+        variables;
 
       const { answer } = await response.json();
-      const updatedMessages: Message[] = [
-        ...updatedConversation.messages,
-        { role: 'assistant', content: answer },
-      ];
-      updatedConversation = {
-        ...updatedConversation,
-        messages: updatedMessages,
-      };
-      homeDispatch({
-        field: 'selectedConversation',
-        value: updatedConversation,
+      updatedConversation = updater.addMessage(updatedConversation, {
+        role: 'assistant',
+        content: answer,
       });
       saveConversation(updatedConversation);
       const updatedConversations: Conversation[] = conversations.map(

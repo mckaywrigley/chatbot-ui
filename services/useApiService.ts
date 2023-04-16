@@ -78,6 +78,7 @@ const useApiService = () => {
           'Content-Type': 'application/json',
         },
         signal,
+        rawResponse: true,
       });
     },
     [fetchService],

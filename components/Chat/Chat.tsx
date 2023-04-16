@@ -102,7 +102,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         temperature: updatedConversation.temperature,
       };
       if (plugin?.id === PluginID.GOOGLE_SEARCH) {
-        messageMutation.mutate({
+        googlePluginMessageMutation.mutate({
           body: chatBody,
           conversation: updatedConversation,
           message,
@@ -111,12 +111,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       } else if (plugin?.id === PluginID.AGENT) {
         agent.run({
           body: chatBody,
-          message,
           conversation: updatedConversation,
+          message,
           selectedConversation,
         });
       } else {
-        googlePluginMessageMutation.mutate({
+        messageMutation.mutate({
           body: chatBody,
           conversation: updatedConversation,
           message,
