@@ -30,39 +30,6 @@ export class OpenAIError extends Error {
   }
 }
 
-export const ElevenLabsSpeech = async (
-  text: string,
-  voice_settings: {
-    stability: number;
-    similarity_boost: number;
-  },
-) => {
-  const url = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`;
-  const res = await fetch(url, {
-    headers: {
-      accept: 'audio/mpeg',
-      'Content-Type': 'application/json',
-      'xi-api-key': `440192f914b43f96c0fc77f3d893de23`,
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      text,
-      voice_settings,
-    }),
-  });
-  if (res.status !== 200) {
-    const results = await res.json();
-    throw new Error(results.message);
-  }
-
-  const audioBlob = await res.blob().catch((e) => {
-    console.error(e);
-    throw new Error('ElevenLabSpeech: Error parsing audio blob');
-  });
-  console.log(audioBlob);
-  return audioBlob;
-};
-
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,

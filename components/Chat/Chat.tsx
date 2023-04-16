@@ -86,7 +86,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             text: text,
           }),
         });
-        console.log('elRes', elRes);
+        console.log('elRes', elRes.body);
         if (!elRes.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -94,13 +94,19 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           return;
         }
         // Create a Blob from the response data
-        const audioBlob = await elRes.blob();
-        const url = URL.createObjectURL(audioBlob);
-        setAudioURL(url);
-        console.log(audioURL);
-        const audioElement = new Audio(url);
-        audioElement.play();
-        return audioURL;
+        try {
+          const arrayBuffer = await elRes.arrayBuffer();
+          const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+          const url = URL.createObjectURL(blob);
+          const audioElement = new Audio(url);
+          // Play the audio
+          audioElement.play();
+
+          return url;
+        } catch (error) {
+          console.error(`handler: Error parsing audio blob:`, error);
+          return null;
+        }
       };
       if (selectedConversation) {
         let updatedConversation: Conversation;
