@@ -28,10 +28,11 @@ function App({ Component, pageProps }: AppProps<{}>) {
     // If the user is not logged in, show the login form
     return (
       <LoginForm
-        onLogin={() => setIsLoggedIn(true)}
-        username={undefined}
-        password={undefined}
-      />
+      onLogin={() => setIsLoggedIn(true)}
+      username={process.env.NEXT_PUBLIC_USERNAME}
+      password={process.env.NEXT_PUBLIC_PASSWORD}
+      bypassAuth={process.env.NEXT_PUBLIC_BYPASS_LOGIN === 'true'}
+    />
     );
   }
 

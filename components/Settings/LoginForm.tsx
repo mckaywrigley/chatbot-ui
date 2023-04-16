@@ -7,21 +7,21 @@ type Props = {
   onLogin: () => void;
   username: string | undefined;
   password: string | undefined;
+  bypassAuth: boolean;
 };
 
-export default function LoginForm({ onLogin, username, password }: Props) {
+export default function LoginForm({
+    onLogin,
+    username,
+    password,
+    bypassAuth,
+  }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-
-  const bypassAuth = true; // Set to true to enable bypass, set to false to disable bypass
 
   const handleSubmit = async (values: { username: string; password: string }) => {
     setIsLoading(true);
 
-    if (
-      bypassAuth &&
-      values.username.trim() === '' &&
-      values.password.trim() === ''
-    ) {
+    if (bypassAuth && values.username.trim() === '' && values.password.trim() === '') {
       console.log('Bypassing authentication');
       Cookies.set('isLoggedIn', 'true', { expires: 1 });
       onLogin();
