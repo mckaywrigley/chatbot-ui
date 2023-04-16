@@ -1,8 +1,15 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {
+  AZURE_DEPLOYMENT_ID,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION,
+} from '../app/const';
 
+import axios from 'axios';
 import {
   ParsedEvent,
   ReconnectInterval,
@@ -23,10 +30,43 @@ export class OpenAIError extends Error {
   }
 }
 
+export const ElevenLabsSpeech = async (
+  text: string,
+  voice_settings: {
+    stability: number;
+    similarity_boost: number;
+  },
+) => {
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM`;
+  const res = await fetch(url, {
+    headers: {
+      accept: 'audio/mpeg',
+      'Content-Type': 'application/json',
+      'xi-api-key': `440192f914b43f96c0fc77f3d893de23`,
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      text,
+      voice_settings,
+    }),
+  });
+  if (res.status !== 200) {
+    const results = await res.json();
+    throw new Error(results.message);
+  }
+
+  const audioBlob = await res.blob().catch((e) => {
+    console.error(e);
+    throw new Error('ElevenLabSpeech: Error parsing audio blob');
+  });
+  console.log(audioBlob);
+  return audioBlob;
+};
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   key: string,
   messages: Message[],
 ) => {
@@ -38,18 +78,19 @@ export const OpenAIStream = async (
     headers: {
       'Content-Type': 'application/json',
       ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
       }),
       ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`,
       }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
+      ...(OPENAI_API_TYPE === 'openai' &&
+        OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',

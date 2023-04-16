@@ -11,3 +11,7 @@ export const getEndpoint = (plugin: Plugin | null) => {
 
   return 'api/chat';
 };
+
+export const getELEndpoint = () => {
+  return 'api/elevenlabs';
+};

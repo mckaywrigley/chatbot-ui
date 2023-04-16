@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
 
-import { getEndpoint } from '@/utils/app/api';
+import { getELEndpoint, getEndpoint } from '@/utils/app/api';
 import {
   saveConversation,
   saveConversations,
@@ -24,6 +24,8 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
+
+import AudioPlayer from '../Chatbar/components/AudioPlayer';
 
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
@@ -68,8 +70,38 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const [audioURL, setAudioURL] = useState<string>();
+
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
+      const elEndpoint = getELEndpoint();
+      const handleElevenLabs = async (text: string) => {
+        console.log('fetch');
+        const elRes = await fetch(elEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: text,
+          }),
+        });
+        console.log('elRes', elRes);
+        if (!elRes.ok) {
+          homeDispatch({ field: 'loading', value: false });
+          homeDispatch({ field: 'messageIsStreaming', value: false });
+          toast.error(elRes.statusText);
+          return;
+        }
+        // Create a Blob from the response data
+        const audioBlob = await elRes.blob();
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURL(url);
+        console.log(audioURL);
+        const audioElement = new Audio(url);
+        audioElement.play();
+        return audioURL;
+      };
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
@@ -124,6 +156,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           signal: controller.signal,
           body,
         });
+
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -177,6 +210,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 value: updatedConversation,
               });
             } else {
+              if (!data) {
+                homeDispatch({ field: 'loading', value: false });
+                homeDispatch({ field: 'messageIsStreaming', value: false });
+                return;
+              }
               const updatedMessages: Message[] =
                 updatedConversation.messages.map((message, index) => {
                   if (index === updatedConversation.messages.length - 1) {
@@ -187,6 +225,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   }
                   return message;
                 });
+
+              // stream done reading, send to elevenlabs
+              // if (done) {
+              //   console.log('done');
+              //   const audioURL = await handleElevenLabs(text);
+              //   console.log('audioURL', audioURL);
+              //   if (!!audioURL) {
+              //     updatedConversation.messages[-1].audioURL = audioURL;
+              //     console.log(updatedConversation.messages[-1]);
+              //   }
+              //   homeDispatch({
+              //     field: 'selectedConversation',
+              //     value: updatedConversation,
+              //   });
+              // }
               updatedConversation = {
                 ...updatedConversation,
                 messages: updatedMessages,
@@ -197,6 +250,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               });
             }
           }
+          handleElevenLabs(text);
+
+          updatedConversation = {
+            ...updatedConversation,
+          };
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
             (conversation) => {
@@ -463,13 +521,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 )}
 
                 {selectedConversation?.messages.map((message, index) => (
-                  <ChatMessage
-                    key={index}
-                    message={message}
-                    messageIndex={index}
-                  />
+                  <>
+                    {' '}
+                    <ChatMessage
+                      key={index}
+                      message={message}
+                      messageIndex={index}
+                    />
+                  </>
                 ))}
-
+                {!!audioURL ? <AudioPlayer audioURL={audioURL} /> : null}
                 {loading && <ChatLoader />}
 
                 <div
