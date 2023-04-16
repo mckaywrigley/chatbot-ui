@@ -17,6 +17,17 @@ export interface ChatBody {
   googleCSEId?: string;
 }
 
+export interface ChatModeRunner {
+  run: (params: ChatPluginParams) => void;
+}
+
+export interface ChatPluginParams {
+  body: ChatBody;
+  message: Message;
+  conversation: Conversation;
+  selectedConversation: Conversation;
+}
+
 export interface Conversation {
   id: string;
   name: string;

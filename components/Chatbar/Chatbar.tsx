@@ -10,9 +10,9 @@ import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
 import { Conversation } from '@/types/chat';
+import { ChatModeKey } from '@/types/chatmode';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { OpenAIModels } from '@/types/openai';
-import { PluginKey } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -34,7 +34,13 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: {
+      conversations,
+      showChatbar,
+      defaultModelId,
+      folders,
+      chatModeKeys: pluginKeys,
+    },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -55,7 +61,7 @@ export const Chatbar = () => {
     [homeDispatch],
   );
 
-  const handlePluginKeyChange = (pluginKey: PluginKey) => {
+  const handlePluginKeyChange = (pluginKey: ChatModeKey) => {
     if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
       const updatedPluginKeys = pluginKeys.map((key) => {
         if (key.pluginId === pluginKey.pluginId) {
@@ -78,7 +84,7 @@ export const Chatbar = () => {
     }
   };
 
-  const handleClearPluginKey = (pluginKey: PluginKey) => {
+  const handleClearPluginKey = (pluginKey: ChatModeKey) => {
     const updatedPluginKeys = pluginKeys.filter(
       (key) => key.pluginId !== pluginKey.pluginId,
     );

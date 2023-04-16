@@ -1,11 +1,11 @@
-import { Plugin, PluginID } from '@/types/plugin';
+import { ChatMode, ChatModeID } from '@/types/chatmode';
 
-export const getEndpoint = (plugin: Plugin | null) => {
+export const getEndpoint = (plugin: ChatMode | null) => {
   if (!plugin) {
     return 'api/chat';
   }
 
-  if (plugin.id === PluginID.GOOGLE_SEARCH) {
+  if (plugin.id === ChatModeID.GOOGLE_SEARCH) {
     return 'api/google';
   }
 

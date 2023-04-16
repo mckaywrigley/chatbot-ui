@@ -11,10 +11,14 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import { useChatModeRunner } from '@/hooks/chatmode/useChatModeRunner';
+import { useDirectMode } from '@/hooks/chatmode/useDirectMode';
+import { useGoogleMode } from '@/hooks/chatmode/useGoogleMode';
+
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin, PluginID } from '@/types/plugin';
+import { ChatMode, ChatModeID } from '@/types/chatmode';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -26,10 +30,6 @@ import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-
-import { useAgent } from '@/mutations/agent';
-import { useGooglePluginMessageMutation } from '@/mutations/google';
-import { useMessageMutation } from '@/mutations/message';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -44,7 +44,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       conversations,
       models,
       apiKey,
-      pluginKeys,
+      chatModeKeys: chatModeKeys,
       serverSideApiKeyIsSet,
       messageIsStreaming,
       modelError,
@@ -65,16 +65,17 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const messageMutation = useMessageMutation(
+  const chatModeSelector = useChatModeRunner(
     conversations,
     stopConversationRef,
   );
-  const googlePluginMessageMutation =
-    useGooglePluginMessageMutation(conversations);
-  const agent = useAgent(conversations);
 
   const handleSend = useCallback(
-    async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
+    async (
+      message: Message,
+      deleteCount = 0,
+      chatMode: ChatMode | null = null,
+    ) => {
       if (!selectedConversation) {
         return;
       }
@@ -101,33 +102,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         prompt: updatedConversation.prompt,
         temperature: updatedConversation.temperature,
       };
-      if (plugin?.id === PluginID.GOOGLE_SEARCH) {
-        googlePluginMessageMutation.mutate({
-          body: chatBody,
-          conversation: updatedConversation,
-          message,
-          selectedConversation,
-        });
-      } else if (plugin?.id === PluginID.AGENT) {
-        agent.run({
-          body: chatBody,
-          conversation: updatedConversation,
-          message,
-          selectedConversation,
-        });
-      } else {
-        messageMutation.mutate({
-          body: chatBody,
-          conversation: updatedConversation,
-          message,
-          selectedConversation,
-        });
-      }
+      const chatModeRunner = chatModeSelector(chatMode);
+      chatModeRunner.run({
+        body: chatBody,
+        conversation: updatedConversation,
+        message,
+        selectedConversation,
+      });
     },
     [
       apiKey,
       conversations,
-      pluginKeys,
+      chatModeKeys,
       selectedConversation,
       stopConversationRef,
     ],
@@ -362,9 +348,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           <ChatInput
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
-            onSend={(message, plugin) => {
+            onSend={(message, chatMode) => {
               setCurrentMessage(message);
-              handleSend(message, 0, plugin);
+              handleSend(message, 0, chatMode);
             }}
             onRegenerate={() => {
               if (currentMessage) {

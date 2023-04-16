@@ -2,16 +2,16 @@ import { FC, useEffect, useRef } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { Plugin, PluginList } from '@/types/plugin';
+import { ChatMode, ChatModeList } from '@/types/chatmode';
 
 interface Props {
-  plugin: Plugin | null;
-  onPluginChange: (plugin: Plugin) => void;
+  chatMode: ChatMode | null;
+  onPluginChange: (plugin: ChatMode) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
 }
 
-export const PluginSelect: FC<Props> = ({
-  plugin,
+export const ChatModeSelect: FC<Props> = ({
+  chatMode,
   onPluginChange,
   onKeyDown,
 }) => {
@@ -44,10 +44,10 @@ export const PluginSelect: FC<Props> = ({
       }
 
       onPluginChange(
-        PluginList.find(
+        ChatModeList.find(
           (plugin) =>
             plugin.name === selectElement?.selectedOptions[0].innerText,
-        ) as Plugin,
+        ) as ChatMode,
       );
     } else {
       onKeyDown(e);
@@ -67,12 +67,12 @@ export const PluginSelect: FC<Props> = ({
           ref={selectRef}
           className="w-full cursor-pointer bg-transparent p-2"
           placeholder={t('Select a plugin') || ''}
-          value={plugin?.id || ''}
+          value={chatMode?.id || ''}
           onChange={(e) => {
             onPluginChange(
-              PluginList.find(
+              ChatModeList.find(
                 (plugin) => plugin.id === e.target.value,
-              ) as Plugin,
+              ) as ChatMode,
             );
           }}
           onKeyDown={(e) => {
@@ -87,7 +87,7 @@ export const PluginSelect: FC<Props> = ({
             ChatGPT
           </option>
 
-          {PluginList.map((plugin) => (
+          {ChatModeList.map((plugin) => (
             <option
               key={plugin.id}
               value={plugin.id}

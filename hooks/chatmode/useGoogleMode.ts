@@ -1,4 +1,4 @@
-import { MutableRefObject, useContext } from 'react';
+import { useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 
@@ -7,58 +7,28 @@ import useApiService from '@/services/useApiService';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
-import { Action, Answer, ToolActionResult } from '@/types/agent';
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { ChatModeRunner, ChatPluginParams, Conversation } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-type AgentParams = {
-  body: ChatBody;
-  message: Message;
-  conversation: Conversation;
-  selectedConversation: Conversation;
-};
-
-export function useAgent(conversations: Conversation[]) {
+export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
   const {
-    state: { pluginKeys },
+    state: { chatModeKeys: pluginKeys },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
   const updater = new HomeUpdater(homeDispatch);
   const mutation = useMutation({
-    mutationFn: async (params: AgentParams): Promise<Answer> => {
-      let planningCount = 0;
-      let lastToolActionResult: ToolActionResult | undefined;
-      while (true) {
-        if (planningCount > 5) {
-          // todo: handle this
-          return { type: 'answer', answer: 'No Result' };
-        }
-        const planningResponse = await apiService.planning({
-          model: params.body.model,
-          messages: params.body.messages,
-          prompt: params.body.prompt,
-          temperature: params.body.temperature,
-          toolActionResult: lastToolActionResult,
-        });
-        if (planningResponse.type === 'action') {
-          planningCount++;
-          params.conversation = updater.addMessage(params.conversation, {
-            role: 'assistant',
-            content: `${planningResponse.tool} ${planningResponse.toolInput} ...`,
-          });
-          lastToolActionResult = await apiService.executeTool({
-            model: params.body.model,
-            input: planningResponse.toolInput,
-            toolAction: planningResponse,
-          });
-        } else {
-          return { type: 'answer', answer: planningResponse.answer };
-        }
-      }
+    mutationFn: async (params: ChatPluginParams) => {
+      return apiService.googleSearch(params);
     },
     onMutate: async (variables) => {
+      variables.body.googleAPIKey = pluginKeys
+        .find((key) => key.pluginId === 'google-search')
+        ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value;
+      variables.body.googleCSEId = pluginKeys
+        .find((key) => key.pluginId === 'google-search')
+        ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value;
       homeDispatch({
         field: 'selectedConversation',
         value: variables.conversation,
@@ -66,13 +36,14 @@ export function useAgent(conversations: Conversation[]) {
       homeDispatch({ field: 'loading', value: true });
       homeDispatch({ field: 'messageIsStreaming', value: true });
     },
-    async onSuccess(answer: Answer, variables, context) {
+    async onSuccess(response: any, variables, context) {
       let { conversation: updatedConversation, selectedConversation } =
         variables;
 
-      updater.addMessage(updatedConversation, {
+      const { answer } = await response.json();
+      updatedConversation = updater.addMessage(updatedConversation, {
         role: 'assistant',
-        content: answer.answer,
+        content: answer,
       });
       saveConversation(updatedConversation);
       const updatedConversations: Conversation[] = conversations.map(
@@ -99,7 +70,7 @@ export function useAgent(conversations: Conversation[]) {
   });
 
   return {
-    run: (params: AgentParams) => {
+    run: (params: ChatPluginParams) => {
       mutation.mutate(params);
     },
   };

@@ -12,19 +12,19 @@ import {
 import { useTranslation } from 'next-i18next';
 
 import { Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { ChatMode } from '@/types/chatmode';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { PluginIcon } from '@/components/Chat/PluginIcon';
+import { ChatModeIcon } from '@/components/Chat/ChatModeIcon';
 
-import { PluginSelect } from './PluginSelect';
+import { ChatModeSelect } from './ChatModeSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
+  onSend: (message: Message, plugin: ChatMode | null) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -52,7 +52,7 @@ export const ChatInput = ({
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
-  const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const [chatMode, setChatMode] = useState<ChatMode | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -88,7 +88,7 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    onSend({ role: 'user', content }, chatMode);
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
@@ -275,13 +275,13 @@ export const ChatInput = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            <PluginIcon plugin={plugin} />
+            <ChatModeIcon chatMode={chatMode} />
           </button>
 
           {showPluginSelect && (
             <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
-              <PluginSelect
-                plugin={plugin}
+              <ChatModeSelect
+                chatMode={chatMode}
                 onKeyDown={(e: any) => {
                   if (e.key === 'Escape') {
                     e.preventDefault();
@@ -289,8 +289,8 @@ export const ChatInput = ({
                     textareaRef.current?.focus();
                   }
                 }}
-                onPluginChange={(plugin: Plugin) => {
-                  setPlugin(plugin);
+                onPluginChange={(plugin: ChatMode) => {
+                  setChatMode(plugin);
                   setShowPluginSelect(false);
 
                   if (textareaRef && textareaRef.current) {

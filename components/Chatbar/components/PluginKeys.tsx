@@ -2,7 +2,7 @@ import { IconKey } from '@tabler/icons-react';
 import { KeyboardEvent, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PluginID, PluginKey } from '@/types/plugin';
+import { ChatModeID, ChatModeKey } from '@/types/chatmode';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -14,7 +14,7 @@ export const PluginKeys = () => {
   const { t } = useTranslation('sidebar');
 
   const {
-    state: { pluginKeys },
+    state: { chatModeKeys: pluginKeys },
   } = useContext(HomeContext);
 
   const { handlePluginKeyChange, handleClearPluginKey } =
@@ -92,13 +92,13 @@ export const PluginKeys = () => {
                     type="password"
                     value={
                       pluginKeys
-                        .find((p) => p.pluginId === PluginID.GOOGLE_SEARCH)
+                        .find((p) => p.pluginId === ChatModeID.GOOGLE_SEARCH)
                         ?.requiredKeys.find((k) => k.key === 'GOOGLE_API_KEY')
                         ?.value
                     }
                     onChange={(e) => {
                       const pluginKey = pluginKeys.find(
-                        (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
+                        (p) => p.pluginId === ChatModeID.GOOGLE_SEARCH,
                       );
 
                       if (pluginKey) {
@@ -124,8 +124,8 @@ export const PluginKeys = () => {
                           handlePluginKeyChange(updatedPluginKey);
                         }
                       } else {
-                        const newPluginKey: PluginKey = {
-                          pluginId: PluginID.GOOGLE_SEARCH,
+                        const newPluginKey: ChatModeKey = {
+                          pluginId: ChatModeID.GOOGLE_SEARCH,
                           requiredKeys: [
                             {
                               key: 'GOOGLE_API_KEY',
@@ -151,13 +151,13 @@ export const PluginKeys = () => {
                     type="password"
                     value={
                       pluginKeys
-                        .find((p) => p.pluginId === PluginID.GOOGLE_SEARCH)
+                        .find((p) => p.pluginId === ChatModeID.GOOGLE_SEARCH)
                         ?.requiredKeys.find((k) => k.key === 'GOOGLE_CSE_ID')
                         ?.value
                     }
                     onChange={(e) => {
                       const pluginKey = pluginKeys.find(
-                        (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
+                        (p) => p.pluginId === ChatModeID.GOOGLE_SEARCH,
                       );
 
                       if (pluginKey) {
@@ -183,8 +183,8 @@ export const PluginKeys = () => {
                           handlePluginKeyChange(updatedPluginKey);
                         }
                       } else {
-                        const newPluginKey: PluginKey = {
-                          pluginId: PluginID.GOOGLE_SEARCH,
+                        const newPluginKey: ChatModeKey = {
+                          pluginId: ChatModeID.GOOGLE_SEARCH,
                           requiredKeys: [
                             {
                               key: 'GOOGLE_API_KEY',
@@ -206,7 +206,7 @@ export const PluginKeys = () => {
                     className="mt-6 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
                     onClick={() => {
                       const pluginKey = pluginKeys.find(
-                        (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
+                        (p) => p.pluginId === ChatModeID.GOOGLE_SEARCH,
                       );
 
                       if (pluginKey) {

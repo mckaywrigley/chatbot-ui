@@ -7,26 +7,28 @@ import useApiService from '@/services/useApiService';
 import { updateConversationFromStream } from '@/utils/app/clientstream';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { ChatBody, ChatModeRunner, Conversation, Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-export function useMessageMutation(
+export type ChatPluginParams = {
+  body: ChatBody;
+  message: Message;
+  conversation: Conversation;
+  selectedConversation: Conversation;
+};
+
+export function useDirectMode(
   conversations: Conversation[],
   stopConversationRef: MutableRefObject<boolean>,
-) {
+): ChatModeRunner {
   const {
-    state: { pluginKeys },
+    state: { chatModeKeys: pluginKeys },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
-  return useMutation({
-    mutationFn: async (params: {
-      body: ChatBody;
-      message: Message;
-      conversation: Conversation;
-      selectedConversation: Conversation;
-    }) => {
+  const mutation = useMutation({
+    mutationFn: async (params: ChatPluginParams) => {
       return apiService.chat(params);
     },
     onMutate: async (variables) => {
@@ -89,4 +91,7 @@ export function useMessageMutation(
       toast.error(error?.toString() || 'error');
     },
   });
+  return {
+    run: (params: ChatPluginParams) => mutation.mutate(params),
+  };
 }
