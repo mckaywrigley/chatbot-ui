@@ -4,7 +4,7 @@ Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
-![Chatbot UI](./public/screenshot.png)
+![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
 
 ## Updates
 
@@ -43,7 +43,7 @@ Modify the chat interface in `components/Chat`.
 
 Modify the sidebar interface in `components/Sidebar`.
 
-Modify the system prompt in `utils/index.ts`.
+Modify the system prompt in `utils/server/index.ts`.
 
 ## Deploy
 
@@ -56,6 +56,20 @@ Host your own live version of Chatbot UI with Vercel.
 **Replit**
 
 Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
+
+**Docker Compose**
+
+Production _(<http://localhost:3000>)_:
+
+```shell
+docker-compose -f docker-compose.yml --env-file .env.local up -d
+```
+
+Development _(<http://localhost:3001> & <http://localhost:5984/_utils>)_:
+
+```shell
+docker-compose -f docker-compose.dev.yml --env-file .env.local up --build
+```
 
 **Docker**
 
@@ -115,8 +129,20 @@ When deploying the application, the following environment variables can be set:
 | Environment Variable  | Default value                  | Description                                             |
 | --------------------- | ------------------------------ | ------------------------------------------------------- |
 | OPENAI_API_KEY        |                                | The default API key used for authentication with OpenAI |
-| DEFAULT_MODEL         | `gpt-3.5-turbo`                | The default model to use on new conversations           |
-| DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The defaut system prompt to use on new conversations    |
+| OPENAI_API_HOST       | `https://api.openai.com`       | The base url, for Azure use `https://<endpoint>.openai.azure.com` |
+| OPENAI_API_TYPE       | `openai`                       | The API type, options are `openai` or `azure`           |
+| OPENAI_API_VERSION    | `2023-03-15-preview`           | Only applicable for Azure OpenAI                        |
+| OPENAI_ORGANIZATION   |                                | Your OpenAI organization ID                             |
+| DEFAULT_MODEL         | `gpt-3.5-turbo` _(OpenAI)_ `gpt-35-turbo` _(Azure)_ | The default model to use on new conversations |
+| NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations   |
+| GOOGLE_API_KEY        |                                | See [Custom Search JSON API documentation][GCSE]        |
+| GOOGLE_CSE_ID         |                                | See [Custom Search JSON API documentation][GCSE]        |
+| DATABASE_TYPE         | `localStorage`                 | Options are `localStorage` and `couchdb`                |
+| COUCHDB_HOST          | `http://couchdb`               | The hostname of the CouchDB instance                    |
+| COUCHDB_PORT          | `5984`                         | The port of the CouchDB instance                        |
+| COUCHDB_USERNAME      | `admin`                        | The username of the CouchDB instance                    |
+| COUCHDB_PASSWORD      | `password`                     | The password of the CouchDB instance                    |
+| COUCHDB_DATABASE      | `chatbot`                      | The database name of the CouchDB instance               |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
@@ -124,3 +150,5 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 ## Contact
 
 If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+
+[GCSE]: https://developers.google.com/custom-search/v1/overview

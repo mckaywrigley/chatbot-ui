@@ -1,6 +1,7 @@
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { DEFAULT_SYSTEM_PROMPT } from './const';
+
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, OPENAI_API_TYPE } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -14,7 +15,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
+      model: updatedConversation.model || (OPENAI_API_TYPE === 'azure') ? OpenAIModels[OpenAIModelID.GPT_3_5_AZ] : OpenAIModels[OpenAIModelID.GPT_3_5],
     };
   }
 
@@ -23,6 +24,13 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     updatedConversation = {
       ...updatedConversation,
       prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
+    };
+  }
+
+  if (!updatedConversation.temperature) {
+    updatedConversation = {
+      ...updatedConversation,
+      temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
     };
   }
 
@@ -50,11 +58,15 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
   return history.reduce((acc: any[], conversation) => {
     try {
       if (!conversation.model) {
-        conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+        conversation.model = (OPENAI_API_TYPE === 'azure') ? OpenAIModels[OpenAIModelID.GPT_3_5_AZ] : OpenAIModels[OpenAIModelID.GPT_3_5];
       }
 
       if (!conversation.prompt) {
         conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+      }
+
+      if (!conversation.temperature) {
+        conversation.temperature = DEFAULT_TEMPERATURE;
       }
 
       if (!conversation.folderId) {

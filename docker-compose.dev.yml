@@ -1,0 +1,35 @@
+version: '3.6'
+
+services:
+  chatbot:
+    build: .
+    ports:
+      - 3001:3000
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DEFAULT_MODEL: ${DEFAULT_MODEL}
+      DATABASE_TYPE: ${DATABASE_TYPE}
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_HOST: ${COUCHDB_HOST}
+      COUCHDB_PORT: ${COUCHDB_PORT}
+    depends_on:
+      - couchdb
+    networks:
+      - chatbot
+
+  couchdb:
+    image: couchdb:3
+    ports:
+      - 5984:5984
+    volumes:
+      - ./couchdb.ini:/opt/couchdb/etc/local.d/00-local.ini
+    #   - './data:/opt/couchdb/data'
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    networks:
+      - chatbot
+
+networks:
+  chatbot:
