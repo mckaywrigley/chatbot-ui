@@ -259,9 +259,6 @@ const Home = ({
     if (lineMode) {
       dispatch({ field: 'lineMode', value: lineMode as 'single' | 'multi' });
     }
-    else {
-      dispatch({ field: 'lineMode', value: 'single' });
-    }
 
     const apiKey = localStorage.getItem('apiKey');
 
