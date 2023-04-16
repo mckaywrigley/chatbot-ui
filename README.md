@@ -57,6 +57,20 @@ Host your own live version of Chatbot UI with Vercel.
 
 Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
 
+**Docker Compose**
+
+Production _(<http://localhost:3000>)_:
+
+```shell
+docker-compose -f docker-compose.yml --env-file .env.local up -d
+```
+
+Development _(<http://localhost:3001> & <http://localhost:5984/_utils>)_:
+
+```shell
+docker-compose -f docker-compose.dev.yml --env-file .env.local up --build
+```
+
 **Docker**
 
 Build locally:
@@ -123,6 +137,12 @@ When deploying the application, the following environment variables can be set:
 | NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations   |
 | GOOGLE_API_KEY        |                                | See [Custom Search JSON API documentation][GCSE]        |
 | GOOGLE_CSE_ID         |                                | See [Custom Search JSON API documentation][GCSE]        |
+| DATABASE_TYPE         | `localStorage`                 | Options are `localStorage` and `couchdb`                |
+| COUCHDB_HOST          | `http://couchdb`               | The hostname of the CouchDB instance                    |
+| COUCHDB_PORT          | `5984`                         | The port of the CouchDB instance                        |
+| COUCHDB_USERNAME      | `admin`                        | The username of the CouchDB instance                    |
+| COUCHDB_PASSWORD      | `password`                     | The password of the CouchDB instance                    |
+| COUCHDB_DATABASE      | `chatbot`                      | The database name of the CouchDB instance               |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).

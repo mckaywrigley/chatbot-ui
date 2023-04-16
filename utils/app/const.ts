@@ -16,3 +16,21 @@ export const OPENAI_API_VERSION =
 
 export const OPENAI_ORGANIZATION =
   process.env.OPENAI_ORGANIZATION || '';
+
+export const DATABASE_TYPE =
+  process.env.DATABASE_TYPE || 'localStorage';
+
+export const COUCHDB_USER =
+  process.env.COUCHDB_USER || 'admin';
+
+export const COUCHDB_PASSWORD =
+  process.env.COUCHDB_PASSWORD || 'password';
+
+export const COUCHDB_HOST =
+  process.env.COUCHDB_HOST || 'http://couchdb';
+
+export const COUCHDB_PORT =
+  process.env.COUCHDB_PORT || 5984;
+
+export const COUCHDB_DATABASE =
+  process.env.COUCHDB_DATABASE || 'chatbot';

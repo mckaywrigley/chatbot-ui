@@ -8,6 +8,9 @@ import {
 } from '@/types/export';
 
 import { cleanConversationHistory } from './clean';
+import { getConversations, saveSelectedConversation, saveConversations } from './conversation';
+import { getFolders, saveFolders } from './folders';
+import { getPrompts, savePrompts } from './prompts';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -68,22 +71,10 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
-
-  if (history) {
-    history = JSON.parse(history);
-  }
-
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
-
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
+export const exportData = async (databaseType: string) => {
+  let history = await getConversations(databaseType);
+  let folders = await getFolders(databaseType);
+  let prompts = await getPrompts(databaseType);
 
   const data = {
     version: 4,
@@ -107,20 +98,18 @@ export const exportData = () => {
 };
 
 export const importData = (
+  databaseType: string,
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
   const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
-  localStorage.setItem('conversationHistory', JSON.stringify(conversations));
-  localStorage.setItem(
-    'selectedConversation',
-    JSON.stringify(conversations[conversations.length - 1]),
-  );
+  saveConversations(databaseType, conversations);
+  saveSelectedConversation(conversations[conversations.length - 1]);
 
-  localStorage.setItem('folders', JSON.stringify(folders));
-  localStorage.setItem('prompts', JSON.stringify(prompts));
+  saveFolders(databaseType, folders);
+  savePrompts(databaseType, prompts);
 
   return cleanedData;
 };
