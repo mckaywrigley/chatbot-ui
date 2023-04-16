@@ -43,7 +43,7 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
+    state: { selectedConversation, messageIsStreaming, prompts, lineMode },
 
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -157,7 +157,7 @@ export const ChatInput = ({
       } else {
         setActivePromptIndex(0);
       }
-    } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
+    } else if (e.key === 'Enter' && (lineMode === 'single' || (lineMode === 'multi' && e.ctrlKey)) && !isTyping && !isMobile() && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     } else if (e.key === '/' && e.metaKey) {
