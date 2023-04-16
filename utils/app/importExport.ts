@@ -6,6 +6,7 @@ import {
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
+
 import { cleanConversationHistory } from './clean';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
@@ -49,14 +50,13 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
     };
   }
 
-  if (isExportFormatV3(data)) {    
-    return {...data, version: 4, prompts: []};
+  if (isExportFormatV3(data)) {
+    return { ...data, version: 4, prompts: [] };
   }
 
-  if(isExportFormatV4(data)){
+  if (isExportFormatV4(data)) {
     return data;
   }
-
 
   throw new Error('Unsupported data format');
 }
@@ -81,7 +81,7 @@ export const exportData = () => {
     folders = JSON.parse(folders);
   }
 
-  if(prompts){
+  if (prompts) {
     prompts = JSON.parse(prompts);
   }
 
@@ -110,7 +110,7 @@ export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
-  const { history,folders, prompts } = cleanedData;
+  const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
