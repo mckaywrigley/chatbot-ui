@@ -5,6 +5,7 @@ import { useMutation } from 'react-query';
 import useApiService from '@/services/useApiService';
 
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
+import { HomeUpdater } from '@/utils/app/homeUpdater';
 
 import { Action, Answer, ToolActionResult } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -24,6 +25,7 @@ export function useAgent(conversations: Conversation[]) {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
+  const updater = new HomeUpdater(homeDispatch);
   const mutation = useMutation({
     mutationFn: async (params: AgentParams): Promise<Answer> => {
       let planningCount = 0;
@@ -40,18 +42,18 @@ export function useAgent(conversations: Conversation[]) {
           temperature: params.body.temperature,
           toolActionResult: lastToolActionResult,
         });
-        console.log(planningResponse);
         if (planningResponse.type === 'action') {
           planningCount++;
-          // todo: execute tool
+          params.conversation = updater.addMessage(params.conversation, {
+            role: 'assistant',
+            content: `${planningResponse.tool} ${planningResponse.toolInput} ...`,
+          });
           lastToolActionResult = await apiService.executeTool({
             model: params.body.model,
             input: planningResponse.toolInput,
             toolAction: planningResponse,
           });
-          console.log(lastToolActionResult);
         } else {
-          console.log('answer', planningResponse);
           return { type: 'answer', answer: planningResponse.answer };
         }
       }
@@ -65,23 +67,12 @@ export function useAgent(conversations: Conversation[]) {
       homeDispatch({ field: 'messageIsStreaming', value: true });
     },
     async onSuccess(answer: Answer, variables, context) {
-      let {
-        conversation: updatedConversation,
-        message,
-        selectedConversation,
-      } = variables;
+      let { conversation: updatedConversation, selectedConversation } =
+        variables;
 
-      const updatedMessages: Message[] = [
-        ...updatedConversation.messages,
-        { role: 'assistant', content: answer.answer },
-      ];
-      updatedConversation = {
-        ...updatedConversation,
-        messages: updatedMessages,
-      };
-      homeDispatch({
-        field: 'selectedConversation',
-        value: updatedConversation,
+      updater.addMessage(updatedConversation, {
+        role: 'assistant',
+        content: answer.answer,
       });
       saveConversation(updatedConversation);
       const updatedConversations: Conversation[] = conversations.map(

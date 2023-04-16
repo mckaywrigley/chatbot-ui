@@ -4,8 +4,8 @@ import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
 
+import { updateConversationFromStream } from '@/utils/app/clientstream';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
-import { updateConversationFromStream } from '@/utils/server/clientstream';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
