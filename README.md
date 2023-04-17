@@ -16,10 +16,10 @@ Expect frequent improvements.
 
 - [ ] Delete messages
 - [ ] More model settings
-- [ ] Plugins
 
 **Recent updates:**
 
+- [x] Plugins(ChatGPT compatible) (4/17/23)
 - [x] SSO Auth(email pattern matching only) (4/15/23)
 - [x] Prompt templates (3/27/23)
 - [x] Regenerate & edit responses (3/25/23)
