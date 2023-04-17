@@ -16,20 +16,26 @@ interface Prompt {
   folderId: string | null;
 }
 
+interface Scrapper {
+  description: string;
+  url: string;
+}
 export class PromptScrappers {
-  scrappers: ((model: OpenAIModel) => Promise<Prompt[]>)[];
   model: OpenAIModel;
+  scrappers: Scrapper[] = [];
   constructor(model: OpenAIModel) {
     this.model = model;
-    this.scrappers = [
-      this.awesomeChatGptPrompts,
-    ];
+    this.scrappers.push({
+      description: "git:f/awesome-chatgpt-prompts",
+      url: "https://raw.githubusercontent.com/f/awesome-chatgpt-prompts/main/prompts.csv"
+    })
   }
 
   init = async () => {
     var prompts = [] as Prompt[];
-    for (const scrapper of this.scrappers) {
-      const prompt = await scrapper(this.model) as Prompt[];
+    for (let i=0; i < this.scrappers.length; i++) {
+      const scrapper = this.scrappers[i];
+      const prompt = await this.runScrapper(scrapper.url, scrapper.description);
       prompts = prompts.concat(prompt);
     }
     return prompts;
@@ -42,9 +48,8 @@ export class PromptScrappers {
     if (split.length < 2) return [text, ''];
     return split;
   }
-  awesomeChatGptPrompts = async (model: OpenAIModel) => {
-    const url = "https://raw.githubusercontent.com/f/awesome-chatgpt-prompts/main/prompts.csv";
-    const description = "git:f/awesome-chatgpt-prompts";
+  getDescriptions = () => this.scrappers.map((scrapper) => scrapper.description);
+  runScrapper = async (url: string, description: string) => {
     const csv = await fetch(url).then((res) => res.text());
     const prompts = [] as Prompt[];
     csv.split("\n").forEach((prompt) => {
@@ -53,13 +58,12 @@ export class PromptScrappers {
       if (!name || !content) return;
       name = this.replaceQuote(name);
       content = this.replaceQuote(content);
-      console.log(name, content)
       const newPrompt: Prompt = {
         id: uuidv4(),
-        name,
-        description,
+        name: name,
+        description: description,
         content: content,
-        model,
+        model: this.model,
         folderId: null,
       };
       prompts.push(newPrompt);
@@ -67,6 +71,3 @@ export class PromptScrappers {
     return prompts;
   }
 }
-
-
-

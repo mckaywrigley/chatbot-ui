@@ -75,10 +75,10 @@ const Promptbar = () => {
     if (defaultModelId) {
       const scrappers = new PromptScrappers(OpenAIModels[defaultModelId]);
       const pulledPrompts = await scrappers.init();
-      const description = "git:f/awesome-chatgpt-prompts"
+      const descriptions = scrappers.getDescriptions();
       for (let i = 0; i < prompts.length; i++) {
         let prompt = prompts[i];
-        if (prompt.description === description) return;
+        if (descriptions.includes(prompt.description)) continue;
         pulledPrompts.push(prompt);
       }
       homeDispatch({ field: 'prompts', value: pulledPrompts });
