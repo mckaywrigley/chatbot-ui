@@ -13,7 +13,7 @@ import HomeContext from '@/pages/api/home/home.context';
 
 export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
   const {
-    state: { chatModeKeys: pluginKeys },
+    state: { chatModeKeys },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
@@ -23,11 +23,11 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
       return apiService.googleSearch(params);
     },
     onMutate: async (variables) => {
-      variables.body.googleAPIKey = pluginKeys
-        .find((key) => key.pluginId === 'google-search')
+      variables.body.googleAPIKey = chatModeKeys
+        .find((key) => key.chatModeId === 'google-search')
         ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value;
-      variables.body.googleCSEId = pluginKeys
-        .find((key) => key.pluginId === 'google-search')
+      variables.body.googleCSEId = chatModeKeys
+        .find((key) => key.chatModeId === 'google-search')
         ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value;
       homeDispatch({
         field: 'selectedConversation',

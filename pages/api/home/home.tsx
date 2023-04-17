@@ -269,12 +269,12 @@ const Home = ({
       dispatch({ field: 'apiKey', value: apiKey });
     }
 
-    const pluginKeys = localStorage.getItem('pluginKeys');
+    const chatModeKeys = localStorage.getItem('chatModeKeys');
     if (serverSidePluginKeysSet) {
-      dispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      dispatch({ field: 'pluginKeys', value: pluginKeys });
+      dispatch({ field: 'chatModeKeys', value: [] });
+      localStorage.removeItem('chatModeKeys');
+    } else if (chatModeKeys) {
+      dispatch({ field: 'chatModeKeys', value: chatModeKeys });
     }
 
     if (window.innerWidth < 640) {
