@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { ChatMode, ChatModeList } from '@/types/chatmode';
 
 interface Props {
-  chatMode: ChatMode | null;
+  chatMode: ChatMode;
   onPluginChange: (plugin: ChatMode) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
 }
@@ -79,14 +79,6 @@ export const ChatModeSelect: FC<Props> = ({
             handleKeyDown(e);
           }}
         >
-          <option
-            key="chatgpt"
-            value="chatgpt"
-            className="dark:bg-[#343541] dark:text-white"
-          >
-            ChatGPT
-          </option>
-
           {ChatModeList.map((plugin) => (
             <option
               key={plugin.id}

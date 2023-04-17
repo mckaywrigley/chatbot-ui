@@ -31,6 +31,7 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "sass": "^1.62.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

@@ -62,23 +62,26 @@ export const Chatbar = () => {
   );
 
   const handlePluginKeyChange = (pluginKey: ChatModeKey) => {
-    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
+    if (pluginKeys.some((key) => key.chatModeId === pluginKey.chatModeId)) {
       const updatedPluginKeys = pluginKeys.map((key) => {
-        if (key.pluginId === pluginKey.pluginId) {
+        if (key.chatModeId === pluginKey.chatModeId) {
           return pluginKey;
         }
 
         return key;
       });
 
-      homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
+      homeDispatch({ field: 'chatModeKeys', value: updatedPluginKeys });
 
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+      localStorage.setItem('chatModeKeys', JSON.stringify(updatedPluginKeys));
     } else {
-      homeDispatch({ field: 'pluginKeys', value: [...pluginKeys, pluginKey] });
+      homeDispatch({
+        field: 'chatModeKeys',
+        value: [...pluginKeys, pluginKey],
+      });
 
       localStorage.setItem(
-        'pluginKeys',
+        'chatModeKeys',
         JSON.stringify([...pluginKeys, pluginKey]),
       );
     }
@@ -86,16 +89,16 @@ export const Chatbar = () => {
 
   const handleClearPluginKey = (pluginKey: ChatModeKey) => {
     const updatedPluginKeys = pluginKeys.filter(
-      (key) => key.pluginId !== pluginKey.pluginId,
+      (key) => key.chatModeId !== pluginKey.chatModeId,
     );
 
     if (updatedPluginKeys.length === 0) {
-      homeDispatch({ field: 'pluginKeys', value: [] });
+      homeDispatch({ field: 'chatModeKeys', value: [] });
       localStorage.removeItem('pluginKeys');
       return;
     }
 
-    homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
+    homeDispatch({ field: 'chatModeKeys', value: updatedPluginKeys });
 
     localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };

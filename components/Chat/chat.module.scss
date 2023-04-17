@@ -1,0 +1,11 @@
+.chatInputContainer {
+  @layer stretch;
+  @apply mx-2 mt-0 flex flex-row gap-3;
+  @apply last:mb-2 md:mx-4 md:mt-[6px];
+  @apply md:last:mb-6 lg:mx-auto lg:max-w-3xl;
+}
+
+.chatInputContent {
+  @apply relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white;
+  @apply shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4;
+}

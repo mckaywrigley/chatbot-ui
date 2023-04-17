@@ -12,16 +12,23 @@ export interface ChatModeKey {
 }
 
 export enum ChatModeID {
+  DIRECT = 'direct',
   GOOGLE_SEARCH = 'google-search',
   AGENT = 'agent',
 }
 
 export enum ChatModeName {
+  DIRECT = 'Direct',
   GOOGLE_SEARCH = 'Google Search',
   AGENT = 'Agent',
 }
 
 export const ChatModes: Record<ChatModeID, ChatMode> = {
+  [ChatModeID.DIRECT]: {
+    id: ChatModeID.DIRECT,
+    name: ChatModeName.DIRECT,
+    requiredKeys: [],
+  },
   [ChatModeID.GOOGLE_SEARCH]: {
     id: ChatModeID.GOOGLE_SEARCH,
     name: ChatModeName.GOOGLE_SEARCH,
