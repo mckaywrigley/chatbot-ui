@@ -17,6 +17,7 @@ import { useGoogleMode } from '@/hooks/chatmode/useGoogleMode';
 
 import { throttle } from '@/utils/data/throttle';
 
+import { Tool } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { ChatMode, ChatModeID } from '@/types/chatmode';
 
@@ -75,6 +76,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       message: Message,
       deleteCount = 0,
       chatMode: ChatMode | null = null,
+      plugins: Tool[],
     ) => {
       if (!selectedConversation) {
         return;
@@ -108,6 +110,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         conversation: updatedConversation,
         message,
         selectedConversation,
+        plugins,
       });
     },
     [
@@ -338,7 +341,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 {loading && <ChatLoader />}
 
                 <div
-                  className="h-[162px] bg-white dark:bg-[#343541]"
+                  className="h-[210px] bg-white dark:bg-[#343541]"
                   ref={messagesEndRef}
                 />
               </>
@@ -348,13 +351,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           <ChatInput
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
-            onSend={(message, chatMode) => {
+            onSend={(message, chatMode, plugins) => {
               setCurrentMessage(message);
-              handleSend(message, 0, chatMode);
+              handleSend(message, 0, chatMode, plugins);
             }}
             onRegenerate={() => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, null);
+                handleSend(currentMessage, 2, null, []);
               }
             }}
           />

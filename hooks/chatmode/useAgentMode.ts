@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
@@ -8,11 +9,17 @@ import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
 import { Answer, ToolActionResult } from '@/types/agent';
-import { ChatModeRunner, ChatPluginParams, Conversation } from '@/types/chat';
+import {
+  ChatModeRunner,
+  ChatModeRunnerParams,
+  Conversation,
+} from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
+  const { t } = useTranslation('chat');
+
   const {
     state: { chatModeKeys: pluginKeys },
     dispatch: homeDispatch,
@@ -20,32 +27,34 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
   const apiService = useApiService();
   const updater = new HomeUpdater(homeDispatch);
   const mutation = useMutation({
-    mutationFn: async (params: ChatPluginParams): Promise<Answer> => {
+    mutationFn: async (params: ChatModeRunnerParams): Promise<Answer> => {
       let planningCount = 0;
-      let lastToolActionResult: ToolActionResult | undefined;
+      let toolActionResults: ToolActionResult[] = [];
       while (true) {
         if (planningCount > 5) {
           // todo: handle this
           return { type: 'answer', answer: 'No Result' };
         }
         const planningResponse = await apiService.planning({
-          model: params.body.model,
           messages: params.body.messages,
-          prompt: params.body.prompt,
-          temperature: params.body.temperature,
-          toolActionResult: lastToolActionResult,
+          toolActionResults,
+          enabledToolNames: params.plugins.map((p) => p.nameForModel),
         });
         if (planningResponse.type === 'action') {
           planningCount++;
-          params.conversation = updater.addMessage(params.conversation, {
-            role: 'assistant',
-            content: `${planningResponse.tool} ${planningResponse.toolInput} ...`,
-          });
-          lastToolActionResult = await apiService.executeTool({
+          const tool = planningResponse.tool;
+          if (tool.displayForUser) {
+            params.conversation = updater.addMessage(params.conversation, {
+              role: 'assistant',
+              content: `${tool.nameForHuman} ${t('executing...')}`,
+            });
+          }
+          const actinoResult = await apiService.runTool({
             model: params.body.model,
             input: planningResponse.toolInput,
             toolAction: planningResponse,
           });
+          toolActionResults.push(actinoResult);
         } else {
           return { type: 'answer', answer: planningResponse.answer };
         }
@@ -63,7 +72,7 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
       let { conversation: updatedConversation, selectedConversation } =
         variables;
 
-      updater.addMessage(updatedConversation, {
+      updatedConversation = updater.addMessage(updatedConversation, {
         role: 'assistant',
         content: answer.answer,
       });
@@ -92,7 +101,7 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
   });
 
   return {
-    run: (params: ChatPluginParams) => {
+    run: (params: ChatModeRunnerParams) => {
       mutation.mutate(params);
     },
   };

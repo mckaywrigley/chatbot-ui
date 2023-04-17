@@ -8,6 +8,7 @@ import {
   ExecuteToolRequest,
   PlanningRequest,
   ReactAgentResult,
+  Tool,
   ToolActionResult,
 } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -97,10 +98,22 @@ const useApiService = () => {
     [fetchService],
   );
 
-  const executeTool = useCallback(
+  const runTool = useCallback(
     (params: ExecuteToolRequest, signal?: AbortSignal) => {
-      return fetchService.post<ToolActionResult>(`/api/tool`, {
+      return fetchService.post<ToolActionResult>(`/api/runtool`, {
         body: params,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+      });
+    },
+    [fetchService],
+  );
+
+  const getTools = useCallback(
+    (signal?: AbortSignal) => {
+      return fetchService.post<Tool[]>(`/api/tools`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -115,7 +128,8 @@ const useApiService = () => {
     chat,
     googleSearch,
     planning,
-    executeTool,
+    runTool,
+    getTools,
   };
 };
 

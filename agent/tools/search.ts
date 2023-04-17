@@ -4,9 +4,10 @@ import { GoogleSource } from '@/types/google';
 import { ToolExecutionContext } from './executor';
 
 export default {
-  name: 'Search',
-  description: 'useful for when you need to ask with search.',
-  parameters: ['query'],
+  nameForModel: 'Search',
+  nameForHuman: 'Search',
+  descriptionForHuman: 'useful for when you need to ask with search.',
+  descriptionForModel: 'useful for when you need to ask with search.',
   execute: async (
     context: ToolExecutionContext,
     query: string,

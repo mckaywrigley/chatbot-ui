@@ -1,5 +1,11 @@
-import { Action, Tool } from '@/types/agent';
+import { Tool } from '@/types/agent';
 
-import search from './search';
+import { ToolExecutionContext } from './executor';
+import { RequestsGetTool, RequestsPostTool } from './requests';
 
-export const tools: Tool[] = [search];
+export const createDefaultTools = (context: ToolExecutionContext): Tool[] => {
+  return [
+    new RequestsGetTool(context.headers),
+    new RequestsPostTool(context.headers),
+  ];
+};

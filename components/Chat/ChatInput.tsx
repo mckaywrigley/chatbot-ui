@@ -11,6 +11,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import { Tool } from '@/types/agent';
 import { Message } from '@/types/chat';
 import { ChatMode, ChatModeID, ChatModes } from '@/types/chatmode';
 import { Prompt } from '@/types/prompt';
@@ -26,7 +27,11 @@ import { VariableModal } from './VariableModal';
 import styles from './chat.module.scss';
 
 interface Props {
-  onSend: (message: Message, plugin: ChatMode | null) => void;
+  onSend: (
+    message: Message,
+    chatMode: ChatMode | null,
+    plugins: Tool[],
+  ) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -58,7 +63,7 @@ function ChatControlPanel({
 }: ChatControlPanelProps) {
   const { t } = useTranslation('chat');
   return (
-    <div className="left-0 top-0 mx-auto px-4 bg-white text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2">
+    <div className="left-0 top-0 mx-auto px-4 bg-transparent text-black hover:opacity-50 dark:border-neutral-600 dark:text-white md:mb-0 md:mt-2">
       <div className="w-max flex flex-col w-fit mx-auto">
         <div className="flex w-fit items-center">
           {showStopButton && (
@@ -116,6 +121,7 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>(ChatModes.direct);
+  const [selectedPlugins, setSelectedPlugins] = useState<Tool[]>([]);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -151,7 +157,7 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, chatMode);
+    onSend({ role: 'user', content }, chatMode, selectedPlugins);
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
@@ -327,7 +333,10 @@ export const ChatInput = ({
       {process.env.NEXT_PUBLIC_FEATURE_FLAGS_PLUGIN_SELECTOR === 'true' &&
         chatMode.id === ChatModeID.AGENT && (
           <ChatInputContainer>
-            <ChatPluginList />
+            <ChatPluginList
+              selectedPlugins={selectedPlugins}
+              onChange={(plugins) => setSelectedPlugins(plugins)}
+            />
           </ChatInputContainer>
         )}
       <ChatInputContainer>

@@ -2,7 +2,8 @@ import { OpenAIError } from '@/utils/server';
 
 import { PlanningRequest } from '@/types/agent';
 
-import { executeReactAgent } from '@/agent/agent';
+import { executeNotConversationalReactAgent } from '@/agent/agent';
+import { createContext } from '@/agent/tools/executor';
 
 export const config = {
   runtime: 'edge',
@@ -10,13 +11,24 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, prompt, temperature, toolActionResult } =
+    const { messages, enabledToolNames, toolActionResults } =
       (await req.json()) as PlanningRequest;
 
     const lastMessage = messages[messages.length - 1];
+    const context = createContext(req);
+    /*
     const result = await executeReactAgent(
+      context,
+      enabledToolNames,
       lastMessage.content,
       toolActionResult,
+    );
+    */
+    const result = await executeNotConversationalReactAgent(
+      context,
+      enabledToolNames,
+      lastMessage.content,
+      toolActionResults,
     );
     return new Response(JSON.stringify(result), {
       status: 200,

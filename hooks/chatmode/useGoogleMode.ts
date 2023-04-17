@@ -7,7 +7,11 @@ import useApiService from '@/services/useApiService';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
-import { ChatModeRunner, ChatPluginParams, Conversation } from '@/types/chat';
+import {
+  ChatModeRunner,
+  ChatModeRunnerParams,
+  Conversation,
+} from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -19,7 +23,7 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
   const apiService = useApiService();
   const updater = new HomeUpdater(homeDispatch);
   const mutation = useMutation({
-    mutationFn: async (params: ChatPluginParams) => {
+    mutationFn: async (params: ChatModeRunnerParams) => {
       return apiService.googleSearch(params);
     },
     onMutate: async (variables) => {
@@ -70,7 +74,7 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
   });
 
   return {
-    run: (params: ChatPluginParams) => {
+    run: (params: ChatModeRunnerParams) => {
       mutation.mutate(params);
     },
   };

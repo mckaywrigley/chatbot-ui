@@ -1,3 +1,4 @@
+import { Tool } from './agent';
 import { OpenAIModel } from './openai';
 
 export interface Message {
@@ -18,14 +19,15 @@ export interface ChatBody {
 }
 
 export interface ChatModeRunner {
-  run: (params: ChatPluginParams) => void;
+  run: (params: ChatModeRunnerParams) => void;
 }
 
-export interface ChatPluginParams {
+export interface ChatModeRunnerParams {
   body: ChatBody;
   message: Message;
   conversation: Conversation;
   selectedConversation: Conversation;
+  plugins: Tool[];
 }
 
 export interface Conversation {

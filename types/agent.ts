@@ -5,7 +5,8 @@ import { ToolExecutionContext } from '@/agent/tools/executor';
 
 export type Action = {
   type: 'action';
-  tool: string;
+  thought: string;
+  tool: ToolSummary;
   toolInput: string;
 };
 export type Answer = {
@@ -20,11 +21,9 @@ export interface ToolActionResult {
 }
 
 export interface PlanningRequest {
-  model: OpenAIModel;
   messages: Message[];
-  prompt: string;
-  temperature: number;
-  toolActionResult?: ToolActionResult;
+  enabledToolNames: string[];
+  toolActionResults: ToolActionResult[];
 }
 
 export interface ExecuteToolRequest {
@@ -33,10 +32,41 @@ export interface ExecuteToolRequest {
   toolAction: Action;
 }
 
+export interface ToolDefinitionApi {
+  type: string;
+  url: string;
+  hasUserAuthentication: boolean;
+}
+
+export interface ToolAuth {
+  type: string;
+}
 export interface Tool {
-  type: 'internal' | 'remote';
-  name: string;
-  description: string;
-  parameters: string[];
+  nameForHuman: string;
+  nameForModel: string;
+  descriptionForModel: string;
+  descriptionForHuman: string;
   execute?: (context: ToolExecutionContext, input: string) => Promise<string>;
+  api?: ToolDefinitionApi;
+  apiSpec?: string;
+  auth?: ToolAuth;
+  logoUrl?: string;
+  contactEmail?: string;
+  legalInfoUrl?: string;
+  displayForUser: boolean;
+}
+
+export interface PluginTool extends Tool {
+  api: ToolDefinitionApi;
+  apiSpec: string;
+  auth: ToolAuth;
+}
+
+export interface ToolSummary {
+  nameForHuman: string;
+  nameForModel: string;
+  descriptionForModel: string;
+  descriptionForHuman: string;
+  displayForUser: string;
+  logoUrl?: string;
 }
