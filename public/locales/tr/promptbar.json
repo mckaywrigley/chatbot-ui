@@ -7,6 +7,6 @@
   "Description": "Açıklama",
   "A description for your prompt.": "Prompt'unuz için bir açıklama.",
   "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt içeriği. Değişken belirtmek için {{}} kullanın. Örn: {{isim}} bir {{sıfat}} {{ad}}",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt içeriği. Değişken belirtmek için {{}} kullanın. Örn: {{ad}} bir {{sıfat}} {{isim}}",
   "Save": "Kaydet"
 }
