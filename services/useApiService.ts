@@ -5,11 +5,12 @@ import { useFetch } from '@/hooks/useFetch';
 import { getEndpoint } from '@/utils/app/api';
 
 import {
-  ExecuteToolRequest,
   PlanningRequest,
+  PlanningResponse,
   Plugin,
   PluginResult,
   ReactAgentResult,
+  RunPluginRequest,
 } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
@@ -87,7 +88,7 @@ const useApiService = () => {
 
   const planning = useCallback(
     (params: PlanningRequestProps, signal?: AbortSignal) => {
-      return fetchService.post<ReactAgentResult>(`/api/planning`, {
+      return fetchService.post<PlanningResponse>(`/api/planning`, {
         body: params,
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +100,7 @@ const useApiService = () => {
   );
 
   const runPlugin = useCallback(
-    (params: ExecuteToolRequest, signal?: AbortSignal) => {
+    (params: RunPluginRequest, signal?: AbortSignal) => {
       return fetchService.post<PluginResult>(`/api/runplugin`, {
         body: params,
         headers: {

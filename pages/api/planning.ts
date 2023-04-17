@@ -1,48 +1,53 @@
-import { OpenAIError } from '@/utils/server';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-import { PlanningRequest } from '@/types/agent';
+import { OpenAIError } from '@/utils/server';
+import { getTiktokenEncoding } from '@/utils/server/tiktoken';
+
+import { PlanningRequest, PlanningResponse } from '@/types/agent';
 
 import { executeNotConversationalReactAgent } from '@/agent/agent';
 import { createContext } from '@/agent/plugins/executor';
+import { v4 } from 'uuid';
 
-export const config = {
-  runtime: 'edge',
-};
-
-const handler = async (req: Request): Promise<Response> => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const {
+      model,
       messages,
       enabledToolNames,
       pluginResults: toolActionResults,
-    } = (await req.json()) as PlanningRequest;
+    } = req.body as PlanningRequest;
+
+    let { taskId } = req.body;
+    if (!taskId) {
+      taskId = v4();
+    }
 
     const lastMessage = messages[messages.length - 1];
-    const context = createContext(req);
-    /*
-    const result = await executeReactAgent(
-      context,
-      enabledToolNames,
-      lastMessage.content,
-      toolActionResult,
-    );
-    */
-    const result = await executeNotConversationalReactAgent(
-      context,
-      enabledToolNames,
-      lastMessage.content,
-      toolActionResults,
-    );
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const encoding = await getTiktokenEncoding(model?.id || 'gpt-3.5-turbo');
+    const context = createContext(req, encoding, model);
+    try {
+      const result = await executeNotConversationalReactAgent(
+        context,
+        enabledToolNames,
+        lastMessage.content,
+        toolActionResults,
+        true,
+      );
+      const responseJson = {
+        result,
+        taskId,
+      } as PlanningResponse;
+      res.status(200).json(responseJson);
+    } finally {
+      encoding.free();
+    }
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      res.status(500).json({ error: error.message });
     } else {
-      return new Response('Error', { status: 500 });
+      res.status(500).json({ error: 'Error' });
     }
   }
 };

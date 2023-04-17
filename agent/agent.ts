@@ -1,12 +1,10 @@
-import notConversational from './prompts/react';
-
 import { Plugin, PluginResult, ReactAgentResult } from '@/types/agent';
 
 import { ToolExecutionContext } from './plugins/executor';
-import { listTools } from './plugins/list';
+import { listToolsBySpecifiedPlugins } from './plugins/list';
 import conversational from './prompts/conversational';
+import notConversational from './prompts/notConversational';
 
-import { createDefaultTools } from '@/agent/plugins';
 import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { LLMResult } from 'langchain/dist/schema';
@@ -88,10 +86,7 @@ Observation: ${actionResult.result}\n`;
   }
   agentScratchpad += 'Thought:';
 
-  const additionalTools = (await listTools()).filter((tool) =>
-    enabledToolNames.includes(tool.nameForModel),
-  );
-  const tools = [...createDefaultTools(context), ...additionalTools];
+  const tools = await listToolsBySpecifiedPlugins(context, enabledToolNames);
   const toolDescriptions = tools
     .map((tool) => tool.nameForModel + ': ' + tool.descriptionForModel)
     .join('\n');
@@ -173,18 +168,19 @@ export const executeNotConversationalReactAgent = async (
   let agentScratchpad = '';
   if (toolActionResults.length > 0) {
     for (const actionResult of toolActionResults) {
-      agentScratchpad += `Thought:${actionResult.action.thought}
-Action:${actionResult.action.plugin}
+      let observation = actionResult.result;
+      if (observation.split('\n').length > 5) {
+        observation = `"""\n${observation}\n"""`;
+      }
+      agentScratchpad += `Thought: ${actionResult.action.thought}
+Action: ${actionResult.action.plugin.nameForModel}
 Action Input: ${actionResult.action.pluginInput}
-Observation: ${actionResult.result}\n`;
+Observation: ${observation}\n`;
     }
   }
   agentScratchpad += 'Thought:';
 
-  const additionalTools = (await listTools()).filter((tool) =>
-    enabledToolNames.includes(tool.nameForModel),
-  );
-  const tools = [...createDefaultTools(context), ...additionalTools];
+  const tools = await listToolsBySpecifiedPlugins(context, enabledToolNames);
   const toolDescriptions = tools
     .map((tool) => tool.nameForModel + ': ' + tool.descriptionForModel)
     .join('\n');
@@ -203,15 +199,32 @@ export const parseResultForNotConversational = (
   tools: Plugin[],
   result: string,
 ): ReactAgentResult => {
+  const matchAnswer = result.match(/Final Answer:(.*)/);
+  const answer = matchAnswer ? matchAnswer[1] : '';
+
+  // if the positivity is high enough, return the answer
+  const matchPositivity = result.match(/\nPositivity:(.*)/);
+  if (matchPositivity && parseFloat(matchPositivity[1].trim()) >= 0.8) {
+    if (answer) {
+      return {
+        type: 'answer',
+        answer: answer.trim(),
+      };
+    }
+  }
+
   const matchThought = result.match(/(.*)\nAction:/);
   let thought = '';
   if (matchThought) {
     thought = matchThought[1] || '';
   }
   const matchAction = result.match(/Action:(.*)(\n|$)/);
+  let action = '';
   if (thought && matchAction) {
     const actionStr = matchAction[1];
-    const action = stripQuotes(actionStr.trim());
+    action = stripQuotes(actionStr.trim());
+  }
+  if (thought && action && action !== 'None') {
     const tool = tools.find((t) => t.nameForModel === action);
     if (!tool) {
       throw new Error(`Tool ${action} not found`);
@@ -234,12 +247,9 @@ export const parseResultForNotConversational = (
       },
       pluginInput: toolInput,
     };
-  } else {
-    const matchAnswer = result.match(/Final Answer:(.*)/);
-    const answer = matchAnswer ? matchAnswer[1] : '';
-    return {
-      type: 'answer',
-      answer: answer.trim(),
-    };
   }
+  return {
+    type: 'answer',
+    answer: answer.trim(),
+  };
 };

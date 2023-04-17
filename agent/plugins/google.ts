@@ -1,40 +1,33 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-
 import { OPENAI_API_HOST } from '@/utils/app/const';
-import { getTiktokenEncoding } from '@/utils/server/tiktoken';
-import { cleanSourceText } from '@/utils/server/webpage';
+import { extractTextFromHtml } from '@/utils/server/webpage';
 
+import { Plugin } from '@/types/agent';
 import { Message } from '@/types/chat';
-import { GoogleBody, GoogleSource } from '@/types/google';
+import { GoogleSource } from '@/types/google';
 
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
-import { Readability } from '@mozilla/readability';
+import { ToolExecutionContext } from './executor';
+
 import endent from 'endent';
-import jsdom, { JSDOM } from 'jsdom';
-import fs from 'node:fs';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
-  let encoding: Tiktoken | null = null;
-  try {
-    const { messages, key, model, googleAPIKey, googleCSEId } =
-      req.body as GoogleBody;
-
-    encoding = await getTiktokenEncoding(model.id);
-
-    const userMessage = messages[messages.length - 1];
-    const query = encodeURIComponent(userMessage.content.trim());
-
+export default {
+  nameForModel: 'google_search',
+  nameForHuman: 'GoogleSearch',
+  descriptionForHuman: 'useful for when you need to ask with google search.',
+  descriptionForModel: 'useful for when you need to ask with google search.',
+  displayForUser: true,
+  execute: async (
+    context: ToolExecutionContext,
+    query: string,
+  ): Promise<string> => {
+    const encoding = context.encoding;
+    const encodedQuery = encodeURIComponent(query.trim());
+    const apiKey = process.env.GOOGLE_API_KEY;
+    const cseId = process.env.GOOGLE_CSE_ID;
     const googleRes = await fetch(
-      `https://customsearch.googleapis.com/customsearch/v1?key=${
-        googleAPIKey ? googleAPIKey : process.env.GOOGLE_API_KEY
-      }&cx=${
-        googleCSEId ? googleCSEId : process.env.GOOGLE_CSE_ID
-      }&q=${query}&num=5`,
+      `https://customsearch.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cseId}&q=${encodedQuery}&num=5`,
     );
 
     const googleData = await googleRes.json();
-
     const sources: GoogleSource[] = googleData.items.map((item: any) => ({
       title: item.title,
       link: item.link,
@@ -44,7 +37,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       text: '',
     }));
 
-    const textDecoder = new TextDecoder();
     const sourcesWithText: any = await Promise.all(
       sources.map(async (source) => {
         try {
@@ -57,35 +49,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             timeoutPromise,
           ])) as any;
 
-          // if (res) {
           const html = await res.text();
-
-          const virtualConsole = new jsdom.VirtualConsole();
-          virtualConsole.on('error', (error) => {
-            if (!error.message.includes('Could not parse CSS stylesheet')) {
-              console.error(error);
-            }
-          });
-
-          const dom = new JSDOM(html, { virtualConsole });
-          const doc = dom.window.document;
-          const parsed = new Readability(doc).parse();
-
-          if (parsed) {
-            let sourceText = cleanSourceText(parsed.textContent);
-
-            // 400 tokens per source
-            let encodedText = encoding!.encode(sourceText);
-            if (encodedText.length > 400) {
-              encodedText = encodedText.slice(0, 400);
-            }
+          const text = extractTextFromHtml(encoding!, html, 400);
+          if (!text) {
             return {
               ...source,
-              text: textDecoder.decode(encoding!.decode(encodedText)),
+              text,
             } as GoogleSource;
           }
-          // }
-
           return null;
         } catch (error) {
           console.error(error);
@@ -123,7 +94,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     It's 70 degrees and sunny in San Francisco today. [[1]](https://www.google.com/search?q=weather+san+francisco)
 
     Input:
-    ${userMessage.content.trim()}
+    ${query.trim()}
 
     Sources:
     ${sourceTexts}
@@ -132,18 +103,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     `;
 
     const answerMessage: Message = { role: 'user', content: answerPrompt };
-
+    const modelId = context.model?.id ?? 'gpt-3.5-turbo';
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         ...(process.env.OPENAI_ORGANIZATION && {
           'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
         }),
       },
       method: 'POST',
       body: JSON.stringify({
-        model: model.id,
+        model: modelId,
         messages: [
           {
             role: 'system',
@@ -157,18 +128,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       }),
     });
 
-    const { choices: choices2 } = await answerRes.json();
-    const answer = choices2[0].message.content;
-
-    res.status(200).json({ answer });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error' });
-  } finally {
-    if (encoding !== null) {
-      encoding.free();
+    const json = await answerRes.json();
+    if (json.error) {
+      throw new Error(json.error);
     }
-  }
-};
-
-export default handler;
+    const answer = json.choices[0].message.content;
+    return answer;
+  },
+} as Plugin;

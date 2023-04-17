@@ -1,13 +1,21 @@
 import { Plugin, RemotePluginTool } from '@/types/agent';
 
+import { createApiTools, createWebpageTools } from '.';
 import { ToolExecutionContext } from './executor';
-import search from './search';
+import google from './google';
+import wikipedia from './wikipedia';
 
 import pluginsJson from '@/plugins.json';
 
 interface PluginsJson {
+  internals: string[];
   urls: string[];
 }
+
+const internalPlugins = {
+  [wikipedia.nameForModel]: wikipedia,
+  [google.nameForModel]: google,
+};
 
 function snakeToCamel(obj: Record<string, any>) {
   if (obj === null || typeof obj !== 'object') {
@@ -55,18 +63,59 @@ ${plugin.descriptionForHuman}`,
 };
 
 let cache: Plugin[] | null = null;
+// list plugins without private plugins.
 export const listTools = async (): Promise<Plugin[]> => {
   if (cache !== null) {
     return cache;
   }
 
   const plugins = pluginsJson as PluginsJson;
-  const result: Plugin[] = [search];
+  const result: Plugin[] = [];
+  for (const plugin of plugins.internals) {
+    if (internalPlugins[plugin] !== undefined) {
+      result.push(internalPlugins[plugin]);
+    } else {
+      console.warn(`Unknown internal plugin ${plugin}.`);
+    }
+  }
+
   for (const url of plugins.urls) {
-    const tool = await loadFromUrl(url);
-    result.push(tool);
+    try {
+      const tool = await loadFromUrl(url);
+      result.push(tool);
+    } catch (e) {
+      console.warn(`Failed to load plugin from ${url}.`, e);
+    }
   }
 
   cache = result;
   return result;
+};
+
+// list all plugins including private plugins.
+export const listAllTools = async (
+  context: ToolExecutionContext,
+): Promise<Plugin[]> => {
+  const apiTools = createApiTools(context);
+  const webTools = createWebpageTools(context);
+  const availableTools = await listTools();
+
+  return [...apiTools, ...webTools, ...availableTools];
+};
+// list plugins based on specified plugins
+export const listToolsBySpecifiedPlugins = async (
+  context: ToolExecutionContext,
+  pluginNames: string[],
+): Promise<Plugin[]> => {
+  let result: Plugin[] = [];
+  const plugins = (await listTools()).filter((p) =>
+    pluginNames.includes(p.nameForModel),
+  );
+  if (plugins.some((p) => p.api)) {
+    result = [...result, ...createApiTools(context)];
+  }
+  if (plugins.some((p) => !p.api)) {
+    result = [...result, ...createWebpageTools(context)];
+  }
+  return [...result, ...plugins];
 };

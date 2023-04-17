@@ -8,7 +8,7 @@ import useApiService from '@/services/useApiService';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
-import { Answer, PluginResult } from '@/types/agent';
+import { Answer, PlanningResponse, PluginResult } from '@/types/agent';
 import {
   ChatModeRunner,
   ChatModeRunnerParams,
@@ -30,19 +30,24 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
     mutationFn: async (params: ChatModeRunnerParams): Promise<Answer> => {
       let planningCount = 0;
       let toolActionResults: PluginResult[] = [];
+      let taskId: string | undefined = undefined;
       while (true) {
         if (planningCount > 5) {
           // todo: handle this
           return { type: 'answer', answer: 'No Result' };
         }
-        const planningResponse = await apiService.planning({
+        const planningResponse: PlanningResponse = await apiService.planning({
+          taskId,
+          model: params.body.model,
           messages: params.body.messages,
           pluginResults: toolActionResults,
           enabledToolNames: params.plugins.map((p) => p.nameForModel),
         });
-        if (planningResponse.type === 'action') {
+        taskId = planningResponse.taskId;
+        const { result } = planningResponse;
+        if (result.type === 'action') {
           planningCount++;
-          const tool = planningResponse.plugin;
+          const tool = result.plugin;
           if (tool.displayForUser) {
             params.conversation = updater.addMessage(params.conversation, {
               role: 'assistant',
@@ -50,13 +55,14 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
             });
           }
           const actinoResult = await apiService.runPlugin({
+            taskId,
             model: params.body.model,
-            input: planningResponse.pluginInput,
-            action: planningResponse,
+            input: result.pluginInput,
+            action: result,
           });
           toolActionResults.push(actinoResult);
         } else {
-          return { type: 'answer', answer: planningResponse.answer };
+          return { type: 'answer', answer: result.answer };
         }
       }
     },

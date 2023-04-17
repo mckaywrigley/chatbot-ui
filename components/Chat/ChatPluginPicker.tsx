@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { usePlugins } from '@/hooks/usePlugins';
 
@@ -24,7 +24,12 @@ const PluginListItem = ({
   return (
     <div className="flex cursor-pointer p-1" onClick={() => onChange(!checked)}>
       <div className="flex-none pr-3 self-center">
-        <Checkbox checked={checked} />
+        <Checkbox
+          checked={checked}
+          onChange={(e) => {
+            onChange(!checked);
+          }}
+        />
       </div>
       <div className="flex-1">
         <p className="text-lg">{tool.nameForHuman}</p>

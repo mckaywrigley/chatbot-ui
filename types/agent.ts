@@ -15,18 +15,26 @@ export type Answer = {
 };
 export type ReactAgentResult = Action | Answer;
 
+export interface PlanningResponse {
+  taskId: string;
+  result: ReactAgentResult;
+}
+
 export interface PluginResult {
   action: Action;
   result: string;
 }
 
 export interface PlanningRequest {
+  taskId?: string;
+  model: OpenAIModel;
   messages: Message[];
   enabledToolNames: string[];
   pluginResults: PluginResult[];
 }
 
-export interface ExecuteToolRequest {
+export interface RunPluginRequest {
+  taskId: string;
   model: OpenAIModel;
   input: string;
   action: Action;
