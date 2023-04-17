@@ -232,7 +232,8 @@ export const Chatbar = () => {
         handleCreateItem={handleNewConversation}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
         handleDrop={handleDrop}
-        footerComponent={<ChatbarSettings />}
+        footerComponent={<ChatbarSettings />} 
+        handleSetItems={null}
       />
     </ChatbarContext.Provider>
   );

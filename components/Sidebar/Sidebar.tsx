@@ -1,4 +1,4 @@
-import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
+import { IconFolderPlus, IconMistOff, IconPlus, IconWorldDownload } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,7 @@ interface Props<T> {
   handleSearchTerm: (searchTerm: string) => void;
   toggleOpen: () => void;
   handleCreateItem: () => void;
+  handleSetItems: (() => void) | null;
   handleCreateFolder: () => void;
   handleDrop: (e: any) => void;
 }
@@ -37,6 +38,7 @@ const Sidebar = <T,>({
   handleSearchTerm,
   toggleOpen,
   handleCreateItem,
+  handleSetItems,
   handleCreateFolder,
   handleDrop,
 }: Props<T>) => {
@@ -70,7 +72,14 @@ const Sidebar = <T,>({
             <IconPlus size={16} />
             {addItemButtonTitle}
           </button>
-
+          {handleSetItems && (
+            <button
+              className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+              onClick={handleSetItems}
+              >
+              <IconWorldDownload size={16} />
+            </button>
+          )}
           <button
             className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
             onClick={handleCreateFolder}

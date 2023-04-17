@@ -20,6 +20,8 @@ import { PromptbarInitialState, initialState } from './Promptbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { PromptScrappers } from '@/utils/app/promptScrapper';
+
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
 
@@ -67,6 +69,21 @@ const Promptbar = () => {
 
     homeDispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
+  };
+
+  const handleSetPrompts = async () => {
+    if (defaultModelId) {
+      const scrappers = new PromptScrappers(OpenAIModels[defaultModelId]);
+      const pulledPrompts = await scrappers.init();
+      const description = "git:f/awesome-chatgpt-prompts"
+      for (let i = 0; i < prompts.length; i++) {
+        let prompt = prompts[i];
+        if (prompt.description === description) return;
+        pulledPrompts.push(prompt);
+      }
+      homeDispatch({ field: 'prompts', value: pulledPrompts });
+      savePrompts(pulledPrompts);
+    }
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
@@ -142,6 +159,7 @@ const Promptbar = () => {
         }
         toggleOpen={handleTogglePromptbar}
         handleCreateItem={handleCreatePrompt}
+        handleSetItems={handleSetPrompts}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
       />
