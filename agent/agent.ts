@@ -204,7 +204,7 @@ export const parseResultForNotConversational = (
 
   // if the positivity is high enough, return the answer
   const matchPositivity = result.match(/\nPositivity:(.*)/);
-  if (matchPositivity && parseFloat(matchPositivity[1].trim()) >= 0.8) {
+  if (matchPositivity && parseFloat(matchPositivity[1].trim()) >= 9) {
     if (answer) {
       return {
         type: 'answer',
@@ -224,7 +224,7 @@ export const parseResultForNotConversational = (
     const actionStr = matchAction[1];
     action = stripQuotes(actionStr.trim());
   }
-  if (thought && action && action !== 'None') {
+  if (thought && action && action.indexOf('None') === -1) {
     const tool = tools.find((t) => t.nameForModel === action);
     if (!tool) {
       throw new Error(`Tool ${action} not found`);

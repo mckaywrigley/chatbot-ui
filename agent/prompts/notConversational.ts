@@ -12,7 +12,7 @@ Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
-Positivity: the positivity of the final answer. the range is 0.0 - 0.1
+Positivity: the positivity of the final answer. the range is 0 - 10
 `;
 
 export const suffix = `Begin!
