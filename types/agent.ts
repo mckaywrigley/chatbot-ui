@@ -67,6 +67,6 @@ export interface ToolSummary {
   nameForModel: string;
   descriptionForModel: string;
   descriptionForHuman: string;
-  displayForUser: string;
+  displayForUser: boolean;
   logoUrl?: string;
 }

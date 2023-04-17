@@ -224,7 +224,14 @@ export const parseResultForNotConversational = (
     return {
       type: 'action',
       thought: thought.trim(),
-      tool,
+      tool: {
+        nameForModel: tool.nameForModel,
+        nameForHuman: tool.nameForHuman,
+        descriptionForHuman: tool.descriptionForHuman,
+        descriptionForModel: tool.descriptionForModel,
+        logoUrl: tool.logoUrl,
+        displayForUser: tool.displayForUser,
+      },
       toolInput: toolInput,
     };
   } else {
