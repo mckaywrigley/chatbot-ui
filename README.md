@@ -4,7 +4,7 @@ This is highly experimental personal project.
 
 This project attempt to add more intelligent chatbot ux to [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
 
-![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
+![Chatbot UI](./docs/screenshot_2023-04-18.png)
 
 ## Updates
 
