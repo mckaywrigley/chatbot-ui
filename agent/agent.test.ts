@@ -11,12 +11,14 @@ describe('parseResultForNotConversational', () => {
       descriptionForModel: 'tool1 description',
       descriptionForHuman: 'tool1 description',
       nameForHuman: 'tool1',
+      displayForUser: true,
     },
     {
       nameForModel: 'tool2',
       descriptionForModel: 'tool2 description',
       descriptionForHuman: 'tool2 description',
       nameForHuman: 'tool2',
+      displayForUser: true,
     },
   ];
 
@@ -27,13 +29,15 @@ Action Input: "input"`;
     expect(parseResultForNotConversational(tools, result)).toEqual({
       type: 'action',
       thought: 'Some thought',
-      tool: {
+      plugin: {
         nameForModel: 'tool1',
         descriptionForModel: 'tool1 description',
         descriptionForHuman: 'tool1 description',
         nameForHuman: 'tool1',
+        displayForUser: true,
+        logoUrl: undefined,
       },
-      toolInput: 'input',
+      pluginInput: 'input',
     });
   });
 
