@@ -1,13 +1,13 @@
 import { Message } from './chat';
 import { OpenAIModel } from './openai';
 
-import { ToolExecutionContext } from '@/agent/tools/executor';
+import { ToolExecutionContext } from '@/agent/plugins/executor';
 
 export type Action = {
   type: 'action';
   thought: string;
-  tool: ToolSummary;
-  toolInput: string;
+  plugin: PluginSummary;
+  pluginInput: string;
 };
 export type Answer = {
   type: 'answer';
@@ -15,7 +15,7 @@ export type Answer = {
 };
 export type ReactAgentResult = Action | Answer;
 
-export interface ToolActionResult {
+export interface PluginResult {
   action: Action;
   result: string;
 }
@@ -23,13 +23,13 @@ export interface ToolActionResult {
 export interface PlanningRequest {
   messages: Message[];
   enabledToolNames: string[];
-  toolActionResults: ToolActionResult[];
+  pluginResults: PluginResult[];
 }
 
 export interface ExecuteToolRequest {
   model: OpenAIModel;
   input: string;
-  toolAction: Action;
+  action: Action;
 }
 
 export interface ToolDefinitionApi {
@@ -41,7 +41,7 @@ export interface ToolDefinitionApi {
 export interface ToolAuth {
   type: string;
 }
-export interface Tool {
+export interface Plugin {
   nameForHuman: string;
   nameForModel: string;
   descriptionForModel: string;
@@ -56,13 +56,13 @@ export interface Tool {
   displayForUser: boolean;
 }
 
-export interface PluginTool extends Tool {
+export interface RemotePluginTool extends Plugin {
   api: ToolDefinitionApi;
   apiSpec: string;
   auth: ToolAuth;
 }
 
-export interface ToolSummary {
+export interface PluginSummary {
   nameForHuman: string;
   nameForModel: string;
   descriptionForModel: string;

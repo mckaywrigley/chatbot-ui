@@ -17,7 +17,7 @@ import { useGoogleMode } from '@/hooks/chatmode/useGoogleMode';
 
 import { throttle } from '@/utils/data/throttle';
 
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { ChatMode, ChatModeID } from '@/types/chatmode';
 
@@ -76,7 +76,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       message: Message,
       deleteCount = 0,
       chatMode: ChatMode | null = null,
-      plugins: Tool[],
+      plugins: Plugin[],
     ) => {
       if (!selectedConversation) {
         return;

@@ -8,7 +8,7 @@ import useApiService from '@/services/useApiService';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
-import { Answer, ToolActionResult } from '@/types/agent';
+import { Answer, PluginResult } from '@/types/agent';
 import {
   ChatModeRunner,
   ChatModeRunnerParams,
@@ -29,7 +29,7 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
   const mutation = useMutation({
     mutationFn: async (params: ChatModeRunnerParams): Promise<Answer> => {
       let planningCount = 0;
-      let toolActionResults: ToolActionResult[] = [];
+      let toolActionResults: PluginResult[] = [];
       while (true) {
         if (planningCount > 5) {
           // todo: handle this
@@ -37,22 +37,22 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
         }
         const planningResponse = await apiService.planning({
           messages: params.body.messages,
-          toolActionResults,
+          pluginResults: toolActionResults,
           enabledToolNames: params.plugins.map((p) => p.nameForModel),
         });
         if (planningResponse.type === 'action') {
           planningCount++;
-          const tool = planningResponse.tool;
+          const tool = planningResponse.plugin;
           if (tool.displayForUser) {
             params.conversation = updater.addMessage(params.conversation, {
               role: 'assistant',
               content: `${tool.nameForHuman} ${t('executing...')}`,
             });
           }
-          const actinoResult = await apiService.runTool({
+          const actinoResult = await apiService.runPlugin({
             model: params.body.model,
-            input: planningResponse.toolInput,
-            toolAction: planningResponse,
+            input: planningResponse.pluginInput,
+            action: planningResponse,
           });
           toolActionResults.push(actinoResult);
         } else {

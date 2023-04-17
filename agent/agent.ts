@@ -1,12 +1,12 @@
 import notConversational from './prompts/react';
 
-import { ReactAgentResult, Tool, ToolActionResult } from '@/types/agent';
+import { Plugin, PluginResult, ReactAgentResult } from '@/types/agent';
 
+import { ToolExecutionContext } from './plugins/executor';
+import { listTools } from './plugins/list';
 import conversational from './prompts/conversational';
-import { ToolExecutionContext } from './tools/executor';
-import { listTools } from './tools/list';
 
-import { createDefaultTools } from '@/agent/tools';
+import { createDefaultTools } from '@/agent/plugins';
 import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { LLMResult } from 'langchain/dist/schema';
@@ -49,7 +49,7 @@ export const executeReactAgent = async (
   context: ToolExecutionContext,
   enabledToolNames: string[],
   input: string,
-  toolActionResults: ToolActionResult[],
+  toolActionResults: PluginResult[],
   verbose: boolean = false,
 ): Promise<ReactAgentResult> => {
   const callbackManager = new CallbackManager();
@@ -81,8 +81,8 @@ export const executeReactAgent = async (
   if (toolActionResults.length > 0) {
     for (const actionResult of toolActionResults) {
       agentScratchpad += `Thought:${actionResult.action.thought}
-Action:${actionResult.action.tool}
-Action Input: ${actionResult.action.toolInput}
+Action:${actionResult.action.plugin}
+Action Input: ${actionResult.action.pluginInput}
 Observation: ${actionResult.result}\n`;
     }
   }
@@ -105,7 +105,7 @@ Observation: ${actionResult.result}\n`;
   return _parseResult(tools, result.text);
 };
 
-const _parseResult = (tools: Tool[], result: string): ReactAgentResult => {
+const _parseResult = (tools: Plugin[], result: string): ReactAgentResult => {
   const matchThought = result.match(/(.*)\nAction:/);
   let thought = '';
   if (matchThought) {
@@ -125,8 +125,8 @@ const _parseResult = (tools: Tool[], result: string): ReactAgentResult => {
     return {
       type: 'action',
       thought: thought.trim(),
-      tool,
-      toolInput,
+      plugin: tool,
+      pluginInput: toolInput,
     };
   } else {
     const matchAnswer = result.match(/AI:(.*)/);
@@ -142,7 +142,7 @@ export const executeNotConversationalReactAgent = async (
   context: ToolExecutionContext,
   enabledToolNames: string[],
   input: string,
-  toolActionResults: ToolActionResult[],
+  toolActionResults: PluginResult[],
   verbose: boolean = false,
 ): Promise<ReactAgentResult> => {
   const callbackManager = new CallbackManager();
@@ -174,8 +174,8 @@ export const executeNotConversationalReactAgent = async (
   if (toolActionResults.length > 0) {
     for (const actionResult of toolActionResults) {
       agentScratchpad += `Thought:${actionResult.action.thought}
-Action:${actionResult.action.tool}
-Action Input: ${actionResult.action.toolInput}
+Action:${actionResult.action.plugin}
+Action Input: ${actionResult.action.pluginInput}
 Observation: ${actionResult.result}\n`;
     }
   }
@@ -200,7 +200,7 @@ Observation: ${actionResult.result}\n`;
 };
 
 export const parseResultForNotConversational = (
-  tools: Tool[],
+  tools: Plugin[],
   result: string,
 ): ReactAgentResult => {
   const matchThought = result.match(/(.*)\nAction:/);
@@ -224,7 +224,7 @@ export const parseResultForNotConversational = (
     return {
       type: 'action',
       thought: thought.trim(),
-      tool: {
+      plugin: {
         nameForModel: tool.nameForModel,
         nameForHuman: tool.nameForHuman,
         descriptionForHuman: tool.descriptionForHuman,
@@ -232,7 +232,7 @@ export const parseResultForNotConversational = (
         logoUrl: tool.logoUrl,
         displayForUser: tool.displayForUser,
       },
-      toolInput: toolInput,
+      pluginInput: toolInput,
     };
   } else {
     const matchAnswer = result.match(/Final Answer:(.*)/);

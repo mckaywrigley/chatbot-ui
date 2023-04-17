@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import { useTools } from '@/hooks/useTools';
+import { usePlugins } from '@/hooks/usePlugins';
 
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 
 import { Dialog } from '../Dialog/Dialog';
 import { Checkbox } from '../Input/Checkbox';
 
 interface Props {
   open: boolean;
-  onClose: (plugins: Tool[]) => void;
+  onClose: (plugins: Plugin[]) => void;
 }
 
 const PluginListItem = ({
@@ -17,35 +17,32 @@ const PluginListItem = ({
   checked,
   onChange,
 }: {
-  tool: Tool;
+  tool: Plugin;
   checked: boolean;
   onChange: (value: boolean) => void;
 }) => {
   return (
-    <div className="flex">
+    <div className="flex cursor-pointer p-1" onClick={() => onChange(!checked)}>
       <div className="flex-none pr-3 self-center">
-        <Checkbox
-          checked={checked}
-          onChange={(e) => {
-            onChange(e.target.checked);
-          }}
-        />
+        <Checkbox checked={checked} />
       </div>
       <div className="flex-1">
-        <p>{tool.nameForHuman}</p>
+        <p className="text-lg">{tool.nameForHuman}</p>
         <p>{tool.descriptionForHuman}</p>
       </div>
     </div>
   );
 };
-export const ChatPluginSelector = ({ open, onClose }: Props) => {
-  const [selectedPlugins, setSelectedPlugins] = useState<Set<Tool>>(new Set());
-  const { tools } = useTools();
+export const ChatPluginPicker = ({ open, onClose }: Props) => {
+  const [selectedPlugins, setSelectedPlugins] = useState<Set<Plugin>>(
+    new Set(),
+  );
+  const { plugins } = usePlugins();
   if (!open) {
     return null;
   }
 
-  const handleChange = (tool: Tool, value: boolean) => {
+  const handleChange = (tool: Plugin, value: boolean) => {
     if (value) {
       setSelectedPlugins(new Set(selectedPlugins).add(tool));
     } else {
@@ -61,14 +58,14 @@ export const ChatPluginSelector = ({ open, onClose }: Props) => {
       onClose={() => onClose(Array.from(selectedPlugins.values()))}
     >
       <p className="text-lg mb-4">Plugins</p>
-      <div className="max-h-80 overscroll-y-auto">
-        {tools &&
-          tools.map((tool) => (
+      <div className="max-h-80 overscroll-y-auto divide-y-2">
+        {plugins &&
+          plugins.map((plugin) => (
             <PluginListItem
-              key={tool.nameForModel}
-              tool={tool}
-              checked={selectedPlugins.has(tool)}
-              onChange={(value) => handleChange(tool, value)}
+              key={plugin.nameForModel}
+              tool={plugin}
+              checked={selectedPlugins.has(plugin)}
+              onChange={(value) => handleChange(plugin, value)}
             />
           ))}
       </div>

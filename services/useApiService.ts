@@ -7,9 +7,9 @@ import { getEndpoint } from '@/utils/app/api';
 import {
   ExecuteToolRequest,
   PlanningRequest,
+  Plugin,
+  PluginResult,
   ReactAgentResult,
-  Tool,
-  ToolActionResult,
 } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
 
@@ -98,9 +98,9 @@ const useApiService = () => {
     [fetchService],
   );
 
-  const runTool = useCallback(
+  const runPlugin = useCallback(
     (params: ExecuteToolRequest, signal?: AbortSignal) => {
-      return fetchService.post<ToolActionResult>(`/api/runtool`, {
+      return fetchService.post<PluginResult>(`/api/runplugin`, {
         body: params,
         headers: {
           'Content-Type': 'application/json',
@@ -111,9 +111,9 @@ const useApiService = () => {
     [fetchService],
   );
 
-  const getTools = useCallback(
+  const getPlugins = useCallback(
     (signal?: AbortSignal) => {
-      return fetchService.post<Tool[]>(`/api/tools`, {
+      return fetchService.post<Plugin[]>(`/api/plugins`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -128,8 +128,8 @@ const useApiService = () => {
     chat,
     googleSearch,
     planning,
-    runTool,
-    getTools,
+    runPlugin,
+    getPlugins,
   };
 };
 

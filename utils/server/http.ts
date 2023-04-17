@@ -1,6 +1,6 @@
 import { NextApiRequest } from 'next';
 
-import { Headers } from '@/agent/tools/requests';
+import { Headers } from '@/agent/plugins/requests';
 
 export const extractHeaders = (request: Request | NextApiRequest): Headers => {
   let headers: Record<string, string> = {};

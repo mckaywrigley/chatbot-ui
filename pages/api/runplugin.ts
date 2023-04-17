@@ -2,16 +2,20 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { OpenAIError } from '@/utils/server';
 
-import { ExecuteToolRequest, ToolActionResult } from '@/types/agent';
+import { ExecuteToolRequest, PluginResult } from '@/types/agent';
 
-import { createContext, executeTool } from '@/agent/tools/executor';
+import { createContext, executeTool } from '@/agent/plugins/executor';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const { model, input, toolAction } = (await req.body) as ExecuteToolRequest;
+    const {
+      model,
+      input,
+      action: toolAction,
+    } = (await req.body) as ExecuteToolRequest;
     const context = createContext(req);
     const toolResult = await executeTool(context, toolAction);
-    const result: ToolActionResult = {
+    const result: PluginResult = {
       action: toolAction,
       result: toolResult,
     };

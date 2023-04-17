@@ -1,4 +1,4 @@
-import { Tool } from './agent';
+import { Plugin } from './agent';
 import { OpenAIModel } from './openai';
 
 export interface Message {
@@ -27,7 +27,7 @@ export interface ChatModeRunnerParams {
   message: Message;
   conversation: Conversation;
   selectedConversation: Conversation;
-  plugins: Tool[];
+  plugins: Plugin[];
 }
 
 export interface Conversation {

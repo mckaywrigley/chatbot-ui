@@ -32,13 +32,13 @@ export const executeTool = async (
   const additionalTools = await listTools();
   const tools = [...defaultTools, ...additionalTools];
   const tool = tools.find(
-    (tool) => tool.nameForModel === action.tool.nameForModel,
+    (tool) => tool.nameForModel === action.plugin.nameForModel,
   );
   if (!tool) {
-    throw new Error(`Tool not found: ${action.tool}`);
+    throw new Error(`Tool not found: ${action.plugin}`);
   }
   if (tool.execute) {
-    return tool.execute(context, action.toolInput);
+    return tool.execute(context, action.pluginInput);
   }
-  throw new Error(`invalid tool: ${action.tool}`);
+  throw new Error(`invalid tool: ${action.plugin}`);
 };

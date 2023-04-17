@@ -1,11 +1,11 @@
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 
 import { parseResultForNotConversational } from './agent';
 
 import { describe, expect, it } from 'vitest';
 
 describe('parseResultForNotConversational', () => {
-  const tools: Tool[] = [
+  const tools: Plugin[] = [
     {
       nameForModel: 'tool1',
       descriptionForModel: 'tool1 description',

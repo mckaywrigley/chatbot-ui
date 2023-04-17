@@ -1,11 +1,13 @@
-import { PluginTool, Tool } from '@/types/agent';
+import { Plugin, RemotePluginTool } from '@/types/agent';
 
 import { ToolExecutionContext } from './executor';
 import search from './search';
 
-const pluginUrls: string[] = [
-  'https://www.klarna.com/.well-known/ai-plugin.json',
-];
+import pluginsJson from '@/plugins.json';
+
+interface PluginsJson {
+  urls: string[];
+}
 
 function snakeToCamel(obj: Record<string, any>) {
   if (obj === null || typeof obj !== 'object') {
@@ -22,14 +24,14 @@ function snakeToCamel(obj: Record<string, any>) {
   return camelObj;
 }
 
-const loadFromUrl = async (url: string): Promise<Tool> => {
+const loadFromUrl = async (url: string): Promise<Plugin> => {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(
       `Failed to fetch plugin from ${url} with status ${res.status}`,
     );
   }
-  const plugin = snakeToCamel(await res.json()) as PluginTool;
+  const plugin = snakeToCamel(await res.json()) as RemotePluginTool;
   const apiSpecRes = await fetch(plugin.api.url);
   if (!apiSpecRes.ok) {
     throw new Error(
@@ -52,14 +54,15 @@ ${plugin.descriptionForHuman}`,
   };
 };
 
-let cache: Tool[] | null = null;
-export const listTools = async (): Promise<Tool[]> => {
+let cache: Plugin[] | null = null;
+export const listTools = async (): Promise<Plugin[]> => {
   if (cache !== null) {
     return cache;
   }
 
-  const result: Tool[] = [search];
-  for (const url of pluginUrls) {
+  const plugins = pluginsJson as PluginsJson;
+  const result: Plugin[] = [search];
+  for (const url of plugins.urls) {
     const tool = await loadFromUrl(url);
     result.push(tool);
   }

@@ -1,4 +1,4 @@
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 import { GoogleSource } from '@/types/google';
 
 import { ToolExecutionContext } from './executor';
@@ -30,4 +30,4 @@ export default {
     }
     return texts.join('\n').slice(2000) || 'No Result';
   },
-} as Tool;
+} as Plugin;

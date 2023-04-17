@@ -11,7 +11,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 import { Message } from '@/types/chat';
 import { ChatMode, ChatModeID, ChatModes } from '@/types/chatmode';
 import { Prompt } from '@/types/prompt';
@@ -30,7 +30,7 @@ interface Props {
   onSend: (
     message: Message,
     chatMode: ChatMode | null,
-    plugins: Tool[],
+    plugins: Plugin[],
   ) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
@@ -121,7 +121,7 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>(ChatModes.direct);
-  const [selectedPlugins, setSelectedPlugins] = useState<Tool[]>([]);
+  const [selectedPlugins, setSelectedPlugins] = useState<Plugin[]>([]);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -330,15 +330,14 @@ export const ChatInput = ({
         onRegenerate={onRegenerate}
         onStopConversation={handleStopConversation}
       />
-      {process.env.NEXT_PUBLIC_FEATURE_FLAGS_PLUGIN_SELECTOR === 'true' &&
-        chatMode.id === ChatModeID.AGENT && (
-          <ChatInputContainer>
-            <ChatPluginList
-              selectedPlugins={selectedPlugins}
-              onChange={(plugins) => setSelectedPlugins(plugins)}
-            />
-          </ChatInputContainer>
-        )}
+      {chatMode.id === ChatModeID.AGENT && (
+        <ChatInputContainer>
+          <ChatPluginList
+            selectedPlugins={selectedPlugins}
+            onChange={(plugins) => setSelectedPlugins(plugins)}
+          />
+        </ChatInputContainer>
+      )}
       <ChatInputContainer>
         <button
           className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"

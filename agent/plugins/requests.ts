@@ -1,6 +1,6 @@
 // This file is derived from:
 // https://github.com/hwchase17/langchainjs/blob/main/langchain/src/tools/requests.ts
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 
 import { ToolExecutionContext } from './executor';
 
@@ -12,7 +12,7 @@ export interface RequestTool {
   headers: Headers;
 }
 
-export class RequestsGetTool implements Tool, RequestTool {
+export class RequestsGetTool implements Plugin, RequestTool {
   nameForHuman = 'requests_get';
   nameForModel = 'requests_get';
   displayForUser = false;
@@ -31,7 +31,7 @@ export class RequestsGetTool implements Tool, RequestTool {
   Input should be a  url (i.e. https://www.google.com). The output will be the text response of the GET request.`;
 }
 
-export class RequestsPostTool implements Tool, RequestTool {
+export class RequestsPostTool implements Plugin, RequestTool {
   nameForHuman = 'requests_post';
   nameForModel = 'requests_post';
   displayForUser = false;

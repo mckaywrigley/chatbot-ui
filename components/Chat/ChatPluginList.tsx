@@ -2,13 +2,13 @@ import { IconEdit } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Tool } from '@/types/agent';
+import { Plugin } from '@/types/agent';
 
-import { ChatPluginSelector } from './ChatPluginSelector';
+import { ChatPluginPicker } from './ChatPluginPicker';
 
 interface ChatPluginListProps {
-  selectedPlugins: Tool[];
-  onChange: (plugins: Tool[]) => void;
+  selectedPlugins: Plugin[];
+  onChange: (plugins: Plugin[]) => void;
 }
 
 export const ChatPluginList = ({
@@ -41,7 +41,7 @@ export const ChatPluginList = ({
           <IconEdit size={20} />
         </button>
       </div>
-      <ChatPluginSelector
+      <ChatPluginPicker
         open={selectorIsOpen}
         onClose={(plugins) => {
           onChange(plugins);

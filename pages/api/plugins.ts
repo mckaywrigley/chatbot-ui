@@ -1,9 +1,9 @@
 import { OpenAIError } from '@/utils/server';
 
-import { ExecuteToolRequest, ToolActionResult } from '@/types/agent';
+import { ExecuteToolRequest, PluginResult } from '@/types/agent';
 
-import { createContext, executeTool } from '@/agent/tools/executor';
-import { listTools } from '@/agent/tools/list';
+import { createContext, executeTool } from '@/agent/plugins/executor';
+import { listTools } from '@/agent/plugins/list';
 
 export const config = {
   runtime: 'edge',
