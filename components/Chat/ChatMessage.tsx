@@ -31,10 +31,11 @@ interface Props {
   messageIndex: number;
   displayFeedbackButton: boolean;
   conversation: Conversation;
+  onEdit?: (editedMessage: Message) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, displayFeedbackButton, conversation }) => {
+  ({ message, messageIndex, displayFeedbackButton, conversation, onEdit }) => {
     const { t } = useTranslation('chat');
 
     const {
@@ -64,33 +65,8 @@ export const ChatMessage: FC<Props> = memo(
     };
 
     const handleEditMessage = () => {
-      if (message.content != messageContent) {
-        if (selectedConversation) {
-          const updatedMessages = selectedConversation.messages
-            .map((m, i) => {
-              if (i < messageIndex) {
-                return m;
-              }
-            })
-            .filter((m) => m) as Message[];
-
-          const updatedConversation = {
-            ...selectedConversation,
-            messages: updatedMessages,
-          };
-
-          const { single, all } = updateConversation(
-            updatedConversation,
-            conversations,
-          );
-
-          homeDispatch({ field: 'selectedConversation', value: single });
-          homeDispatch({ field: 'conversations', value: all });
-          homeDispatch({
-            field: 'currentMessage',
-            value: { ...message, content: messageContent },
-          });
-        }
+      if (message.content != messageContent && selectedConversation && onEdit) {
+        onEdit({ ...message, content: messageContent });
       }
       setIsEditing(false);
       event('interaction', {

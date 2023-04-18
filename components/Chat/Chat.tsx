@@ -434,6 +434,11 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                       key={index}
                       message={message}
                       messageIndex={index}
+                      onEdit={(editedMessage) => {
+                        setCurrentMessage(editedMessage);
+                        // discard edited message and the ones that come after then resend
+                        handleSend(editedMessage, selectedConversation?.messages.length - index);
+                      }}
                       displayFeedbackButton={
                         selectedConversation.messages.length - 1 === index &&
                         !loading
