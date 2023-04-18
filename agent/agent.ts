@@ -5,6 +5,7 @@ import { listToolsBySpecifiedPlugins } from './plugins/list';
 import conversational from './prompts/conversational';
 import notConversational from './prompts/notConversational';
 
+import chalk from 'chalk';
 import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { LLMChain } from 'langchain/chains';
 import { LLMResult } from 'langchain/dist/schema';
@@ -31,15 +32,19 @@ class _DebugCallbackHandler extends ConsoleCallbackHandler {
     prompts: string[],
     verbose?: boolean,
   ): Promise<void> {
-    console.log('handleLLMStart ============');
+    console.log(chalk.greenBright('handleLLMStart ============'));
     console.log(prompts[0]);
+    console.log('');
   }
   async handleLLMEnd(output: LLMResult, verbose?: boolean): Promise<void> {
-    console.log('handleLLMEnd ==============');
+    console.log(chalk.greenBright('handleLLMEnd =============='));
     console.log(output.generations[0][0].text);
+    console.log('');
   }
   async handleText(text: string, verbose?: boolean): Promise<void> {
-    console.log('handleText', text);
+    console.log(chalk.greenBright('handleText =========='));
+    console.log(text);
+    console.log('');
   }
 }
 

@@ -31,13 +31,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const lastMessage = messages[messages.length - 1];
     const encoding = await getTiktokenEncoding(model?.id || 'gpt-3.5-turbo');
     const context = createContext(req, encoding, model);
+    const verbose = process.env.DEBUG_AGENT_LLM_LOGGING === 'true';
     try {
       const result = await executeNotConversationalReactAgent(
         context,
         enabledToolNames,
         lastMessage.content,
         toolActionResults,
-        true,
+        verbose,
       );
       const responseJson = {
         result,
