@@ -14,6 +14,7 @@ Expect frequent improvements.
 
 **Recent updates:**
 
+- [x] Multiple Users with MongoDB Support (4/19/23)
 - [x] Plugins(ChatGPT compatible) (4/17/23)
 - [x] SSO Auth(email pattern matching only) (4/15/23)
 - [x] Prompt templates (3/27/23)
@@ -45,17 +46,18 @@ Modify the system prompt in `utils/server/index.ts`.
 
 **Docker**
 
-Build locally:
+Setup enviroment variables:
+
+```bash
+cp .env.local.example .env.local
+# specify OPENAI_API_KEY
+vim .env.local
+```
+
+Run with docker-compose:
 
 ```shell
-docker build -t chatgpt-ui .
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
-```
-
-Pull from ghcr:
-
-```
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
+docker compose up -d
 ```
 
 ## Running Locally
@@ -77,20 +79,28 @@ npm i
 Create a .env.local file in the root of the repo with your OpenAI API Key:
 
 ```bash
-OPENAI_API_KEY=YOUR_KEY
+cp .env.local.example .env.local
+# Specify OPENAI_API_KEY
+vim .env.local
 ```
 
 > You can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
 
 > Additionally, if you have multiple OpenAI Organizations, you can set `OPENAI_ORGANIZATION` to specify one.
 
-**4. Run App**
+**4. Run MongoDB**
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+**5. Run App**
 
 ```bash
 npm run dev
 ```
 
-**5. Use It**
+**6. Use It**
 
 You should be able to start chatting.
 
