@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
@@ -16,6 +17,7 @@ import {
 import HomeContext from '@/pages/api/home/home.context';
 
 export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
+  const { t: errT } = useTranslation('error');
   const {
     state: { chatModeKeys },
     dispatch: homeDispatch,
@@ -67,10 +69,15 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
     },
-    onError: (error) => {
+    onError: async (error) => {
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
-      toast.error(error?.toString() || 'error');
+      if (error instanceof Response) {
+        const json = await error.json();
+        toast.error(errT(json.error || json.message || 'error'));
+      } else {
+        toast.error(error?.toString() || 'error');
+      }
     },
   });
 

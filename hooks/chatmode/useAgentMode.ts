@@ -22,11 +22,9 @@ export function useAgentMode(
   stopConversationRef: MutableRefObject<boolean>,
 ): ChatModeRunner {
   const { t } = useTranslation('chat');
+  const { t: errT } = useTranslation('error');
 
-  const {
-    state: { chatModeKeys: pluginKeys },
-    dispatch: homeDispatch,
-  } = useContext(HomeContext);
+  const { dispatch: homeDispatch } = useContext(HomeContext);
   const apiService = useApiService();
   const storageService = useStorageService();
   const updater = new HomeUpdater(homeDispatch);
@@ -117,10 +115,15 @@ export function useAgentMode(
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
     },
-    onError: (error) => {
+    onError: async (error) => {
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
-      toast.error(error?.toString() || 'error');
+      if (error instanceof Response) {
+        const json = await error.json();
+        toast.error(errT(json.error || json.message || 'error'));
+      } else {
+        toast.error(error?.toString() || 'error');
+      }
     },
   });
 
