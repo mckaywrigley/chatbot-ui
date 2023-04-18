@@ -471,7 +471,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     onEdit={(editedMessage) => {
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
-                      handleSend(editedMessage, selectedConversation?.messages.length - index);
+                      handleSend(
+                        editedMessage,
+                        selectedConversation?.messages.length - index,
+                      );
                     }}
                   />
                 ))}
