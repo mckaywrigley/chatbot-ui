@@ -11,7 +11,11 @@ export interface UsePluginResult {
 
 export const usePlugins = (): UsePluginResult => {
   const apiSerivce = useApiService();
-  const result = useQuery('plugins', () => apiSerivce.getPlugins());
+  const result = useQuery('plugins', () => apiSerivce.getPlugins(), {
+    enabled: true,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
   return {
     plugins: result.data,
     error: result.error,

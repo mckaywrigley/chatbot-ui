@@ -82,7 +82,7 @@ const Home = ({
         signal,
       );
     },
-    { enabled: true, refetchOnMount: false },
+    { enabled: true, refetchOnWindowFocus: false, refetchOnMount: false },
   );
 
   useEffect(() => {
