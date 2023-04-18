@@ -446,7 +446,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                     ) : (
                       <NewConversationMessagesContainer
                         promptOnClick={(prompt: string) => {
-                          console.log('click new conversation');
                           const message: Message = {
                             role: 'user',
                             content: prompt,
