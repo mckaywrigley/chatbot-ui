@@ -1,6 +1,7 @@
 module.exports = {
   i18n: {
     defaultLocale: 'en',
+    localeDetection: true,
     locales: [
       "bn",
       "de",
@@ -19,10 +20,9 @@ module.exports = {
       "sv",
       "te",
       "vi",
-      "zh",
       "ar",
-      "zh-Hans",
       "zh-Hant",
+      "zh-Hans",
     ],
   },
   localePath:

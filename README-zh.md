@@ -1,6 +1,6 @@
 # Chat Everywhere 由 [Explorator Labs](https://exploratorlabs.com) 呈獻
 
-[英文版](README-en.md)
+[英文版](https://intro.chateverywhere.app)
 
 Chat Everywhere 是一個旨在展示大型語言模型功能並讓所有人在無需登錄或地理限制的情況下使用的應用程式。在應用程式開發過程中，我們的社群貢獻了寶貴的意見反饋，使 Chat Everywhere 擁有了官方 ChatGPT 沒有的額外功能。
 
