@@ -82,7 +82,8 @@ describe('cleanData Functions', () => {
           ],
         },
       ] as ExportFormatV1;
-      const obj = cleanData(data);
+      const fallback = { temperature: 1.0 };
+      const obj = cleanData(data, fallback);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
         version: 4,
@@ -102,7 +103,7 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: 1.0,
+            temperature: fallback.temperature,
             folderId: null,
           },
         ],
@@ -138,7 +139,8 @@ describe('cleanData Functions', () => {
           },
         ],
       } as ExportFormatV2;
-      const obj = cleanData(data);
+      const fallback = { temperature: 1.0 };
+      const obj = cleanData(data, fallback);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
         version: 4,
@@ -158,7 +160,7 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: 1.0,
+            temperature: fallback.temperature,
             folderId: null,
           },
         ],
@@ -217,7 +219,8 @@ describe('cleanData Functions', () => {
         ],
       } as ExportFormatV4;
 
-      const obj = cleanData(data);
+      const fallback = { temperature: 1.0 };
+      const obj = cleanData(data, fallback);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
         version: 4,
@@ -237,7 +240,7 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: 1.0,
+            temperature: fallback.temperature,
             folderId: null,
           },
         ],

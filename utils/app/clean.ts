@@ -2,6 +2,7 @@ import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 import { DEFAULT_SYSTEM_PROMPT } from './const';
+import { CleaningFallback } from './importExport';
 import { getSettings } from './settings';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
@@ -42,9 +43,10 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   return updatedConversation;
 };
 
-export const cleanConversationHistory = (history: any[]): Conversation[] => {
-  const settings = getSettings();
-
+export const cleanConversationHistory = (
+  history: any[],
+  fallback: CleaningFallback,
+): Conversation[] => {
   if (!Array.isArray(history)) {
     console.warn('history is not an array. Returning an empty array.');
     return [];
@@ -61,7 +63,7 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
       }
 
       if (!conversation.temperature) {
-        conversation.temperature = settings.defaultTemperature;
+        conversation.temperature = fallback.temperature;
       }
 
       if (!conversation.folderId) {

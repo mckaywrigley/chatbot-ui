@@ -294,8 +294,10 @@ const Home = ({
     });
 
     storageService.getConversations().then((conversations) => {
-      const cleanedConversationHistory =
-        cleanConversationHistory(conversations);
+      const cleanedConversationHistory = cleanConversationHistory(
+        conversations,
+        { temperature: settings.defaultTemperature },
+      );
       dispatch({ field: 'conversations', value: cleanedConversationHistory });
     });
 

@@ -10,6 +10,7 @@ import {
 } from '@/types/export';
 
 import { cleanConversationHistory } from './clean';
+import { getSettings } from './settings';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -28,12 +29,18 @@ export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
 }
 
 export const isLatestExportFormat = isExportFormatV4;
+export interface CleaningFallback {
+  temperature: number;
+}
 
-export function cleanData(data: SupportedExportFormats): LatestExportFormat {
+export function cleanData(
+  data: SupportedExportFormats,
+  fallback: CleaningFallback,
+): LatestExportFormat {
   if (isExportFormatV1(data)) {
     return {
       version: 4,
-      history: cleanConversationHistory(data),
+      history: cleanConversationHistory(data, fallback),
       folders: [],
       prompts: [],
     };
@@ -42,7 +49,7 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   if (isExportFormatV2(data)) {
     return {
       version: 4,
-      history: cleanConversationHistory(data.history || []),
+      history: cleanConversationHistory(data.history || [], fallback),
       folders: (data.folders || []).map((chatFolder) => ({
         id: chatFolder.id.toString(),
         name: chatFolder.name,
@@ -100,7 +107,10 @@ export const importData = async (
   storageService: StorageService,
   data: SupportedExportFormats,
 ): Promise<LatestExportFormat> => {
-  const cleanedData = cleanData(data);
+  const settings = getSettings();
+  const cleanedData = cleanData(data, {
+    temperature: settings.defaultTemperature,
+  });
   const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
