@@ -1,6 +1,6 @@
 # Chat Everywhere by [Explorator Labs](https://exploratorlabs.com)
 
-[中文版](README-zh.md)
+[中文版](https://intro.chateverywhere.app/README-zh.html)
 
 Chat Everywhere is an app designed to showcase the capabilities of Large Language Models and make them accessible to everyone without login or geo-restrictions. Our community has contributed valuable feedback during the app's development, resulting in additional features not found in the official ChatGPT.
 

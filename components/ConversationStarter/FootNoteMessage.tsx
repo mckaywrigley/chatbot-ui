@@ -31,7 +31,7 @@ export const FootNoteMessage: FC = () => {
     <div className="px-3 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-0 md:pb-6">
       <div className="leading-5">
         <a
-          href="https://github.com/exploratortech/chat-everywhere"
+          href="https://intro.chateverywhere.app"
           target="_blank"
           rel="noreferrer"
           className="underline"
