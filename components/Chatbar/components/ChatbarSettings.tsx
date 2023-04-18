@@ -1,9 +1,4 @@
-import {
-  IconFileExport,
-  IconMoon,
-  IconSettings,
-  IconSun,
-} from '@tabler/icons-react';
+import { IconFileExport, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -38,7 +33,6 @@ export const ChatbarSettings = () => {
     handleClearConversations,
     handleImportConversations,
     handleExportData,
-
     handleApiKeyChange,
   } = useContext(ChatbarContext);
 
