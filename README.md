@@ -2,11 +2,11 @@
 
 This repo is forked from [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
 
-[DEMO](https://smart-chatbot-ui.vercel.app/)
+## [DEMO](https://smart-chatbot-ui.vercel.app/)
 
-- do not input personal information. conversation history is stored in mongodb.
+- Do not input personal information. conversation, prompts, folders are stored in mongodb.
 - streaming response is not working in vercel environment.
-- plugins are not working in vercel environment.
+- plugins are not working for vercel timeout limitation.
 
 ## Additional Features
 
