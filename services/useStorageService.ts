@@ -6,7 +6,30 @@ import { Conversation } from '@/types/chat';
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 
-const useStorageService = () => {
+export interface StorageService {
+  getConversations: (signal?: AbortSignal) => Promise<Conversation[]>;
+  removeAllConversations: (signal?: AbortSignal) => Promise<void>;
+  removeConversation: (id: string, signal?: AbortSignal) => Promise<void>;
+  saveConversations: (
+    Conversations: Conversation[],
+    signal?: AbortSignal,
+  ) => Promise<void>;
+  saveSelectedConversation: (conversation: Conversation) => Promise<void>;
+  updateSelectedConversation: (
+    updatedConversation: Conversation,
+    allConversations: Conversation[],
+    signal?: AbortSignal,
+  ) => Promise<{ single: Conversation; all: Conversation[] }>;
+  getFolders: (signal?: AbortSignal) => Promise<FolderInterface[]>;
+  saveFolders: (
+    folders: FolderInterface[],
+    signal?: AbortSignal,
+  ) => Promise<void>;
+  getPrompts: (signal?: AbortSignal) => Promise<Prompt[]>;
+  savePrompts: (prompts: Prompt[], signal?: AbortSignal) => Promise<void>;
+}
+
+const useStorageService = (): StorageService => {
   const fetchService = useFetch();
 
   const getConversations = useCallback(
@@ -22,7 +45,7 @@ const useStorageService = () => {
   );
 
   const saveConversations = useCallback(
-    (conversations: Conversation[], signal?: AbortSignal) => {
+    (conversations: Conversation[], signal?: AbortSignal): Promise<void> => {
       return fetchService.post(`/api/conversations`, {
         body: conversations,
         headers: {
@@ -34,14 +57,42 @@ const useStorageService = () => {
     [fetchService],
   );
 
-  const saveSelectedConversation = async (conversation: Conversation) => {
+  const removeAllConversations = useCallback(
+    (signal?: AbortSignal): Promise<void> => {
+      return fetchService.post(`/api/conversations-clear`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+      });
+    },
+    [fetchService],
+  );
+
+  const removeConversation = useCallback(
+    (id: string, signal?: AbortSignal): Promise<void> => {
+      return fetchService.delete(`/api/conversations/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+      });
+    },
+    [fetchService],
+  );
+
+  const saveSelectedConversation = async (
+    conversation: Conversation,
+    signal?: AbortController,
+  ): Promise<void> => {
     localStorage.setItem('selectedConversation', JSON.stringify(conversation));
   };
 
   const updateSelectedConversation = async (
     updatedConversation: Conversation,
     allConversations: Conversation[],
-  ) => {
+    signal?: AbortSignal,
+  ): Promise<{ single: Conversation; all: Conversation[] }> => {
     const updatedConversations = allConversations.map((c) => {
       if (c.id === updatedConversation.id) {
         return updatedConversation;
@@ -71,7 +122,7 @@ const useStorageService = () => {
   );
 
   const saveFolders = useCallback(
-    (folders: FolderInterface[], signal?: AbortSignal) => {
+    (folders: FolderInterface[], signal?: AbortSignal): Promise<void> => {
       return fetchService.post(`/api/folders`, {
         body: folders,
         headers: {
@@ -96,7 +147,7 @@ const useStorageService = () => {
   );
 
   const savePrompts = useCallback(
-    (prompts: Prompt[], signal?: AbortSignal) => {
+    (prompts: Prompt[], signal?: AbortSignal): Promise<void> => {
       return fetchService.post(`/api/prompts`, {
         body: prompts,
         headers: {
@@ -111,6 +162,8 @@ const useStorageService = () => {
   return {
     getConversations,
     saveConversations,
+    removeConversation,
+    removeAllConversations,
     saveSelectedConversation,
     updateSelectedConversation,
     getFolders,

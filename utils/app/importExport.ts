@@ -1,3 +1,5 @@
+import { StorageService } from '@/services/useStorageService';
+
 import {
   ExportFormatV1,
   ExportFormatV2,
@@ -68,22 +70,10 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
-
-  if (history) {
-    history = JSON.parse(history);
-  }
-
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
-
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
+export const exportData = async (storageService: StorageService) => {
+  const history = await storageService.getConversations();
+  const folders = await storageService.getFolders();
+  const prompts = await storageService.getPrompts();
 
   const data = {
     version: 4,
@@ -106,21 +96,20 @@ export const exportData = () => {
   URL.revokeObjectURL(url);
 };
 
-export const importData = (
+export const importData = async (
+  storageService: StorageService,
   data: SupportedExportFormats,
-): LatestExportFormat => {
+): Promise<LatestExportFormat> => {
   const cleanedData = cleanData(data);
   const { history, folders, prompts } = cleanedData;
 
   const conversations = history;
-  localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+  await storageService.saveConversations(conversations);
+  await storageService.saveFolders(folders);
+  await storageService.savePrompts(prompts);
   localStorage.setItem(
     'selectedConversation',
     JSON.stringify(conversations[conversations.length - 1]),
   );
-
-  localStorage.setItem('folders', JSON.stringify(folders));
-  localStorage.setItem('prompts', JSON.stringify(prompts));
-
   return cleanedData;
 };

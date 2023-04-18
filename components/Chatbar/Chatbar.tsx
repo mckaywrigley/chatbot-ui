@@ -104,12 +104,15 @@ export const Chatbar = () => {
     localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
-  const handleExportData = () => {
-    exportData();
+  const handleExportData = async () => {
+    return exportData(storageService);
   };
 
-  const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
+  const handleImportConversations = async (data: SupportedExportFormats) => {
+    const { history, folders, prompts }: LatestExportFormat = await importData(
+      storageService,
+      data,
+    );
     homeDispatch({ field: 'conversations', value: history });
     homeDispatch({
       field: 'selectedConversation',
@@ -119,7 +122,7 @@ export const Chatbar = () => {
     homeDispatch({ field: 'prompts', value: prompts });
   };
 
-  const handleClearConversations = () => {
+  const handleClearConversations = async () => {
     defaultModelId &&
       homeDispatch({
         field: 'selectedConversation',
@@ -134,25 +137,21 @@ export const Chatbar = () => {
         },
       });
 
+    await storageService.removeAllConversations();
     homeDispatch({ field: 'conversations', value: [] });
 
-    localStorage.removeItem('conversationHistory');
-    localStorage.removeItem('selectedConversation');
-
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
-
     homeDispatch({ field: 'folders', value: updatedFolders });
     storageService.saveFolders(updatedFolders);
   };
 
   const handleDeleteConversation = async (conversation: Conversation) => {
+    await storageService.removeConversation(conversation.id);
     const updatedConversations = conversations.filter(
       (c) => c.id !== conversation.id,
     );
-
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
-    await storageService.saveConversations(updatedConversations);
 
     if (updatedConversations.length > 0) {
       homeDispatch({

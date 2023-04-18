@@ -38,7 +38,6 @@ export const ChatbarSettings = () => {
     handleClearConversations,
     handleImportConversations,
     handleExportData,
-
     handleApiKeyChange,
   } = useContext(ChatbarContext);
 

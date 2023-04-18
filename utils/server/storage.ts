@@ -19,7 +19,10 @@ export async function getDb(): Promise<Db> {
   return db;
 }
 
-export type ConversationCollectionItem = Conversation & { userHash: string };
+export interface ConversationCollectionItem {
+  userHash: string;
+  conversation: Conversation;
+}
 export interface PromptsCollectionItem {
   userHash: string;
   prompts: Prompt[];
@@ -47,14 +50,16 @@ export class UserDb {
   }
 
   async getConversations(): Promise<Conversation[]> {
-    return await this._conversations.find({ userHash: this._userId }).toArray();
+    return (
+      await this._conversations.find({ userHash: this._userId }).toArray()
+    ).map((item) => item.conversation);
   }
 
   async saveConversation(conversation: Conversation) {
     // upsert
     return this._conversations.updateOne(
-      { userHash: this._userId, id: conversation.id },
-      { $set: { ...conversation } },
+      { userHash: this._userId, 'conversation.id': conversation.id },
+      { $set: { conversation } },
       { upsert: true },
     );
   }
@@ -65,7 +70,10 @@ export class UserDb {
     }
   }
   removeConversation(id: string) {
-    this._conversations.deleteOne({ userHash: this._userId, id });
+    this._conversations.deleteOne({
+      userHash: this._userId,
+      'conversation.id': id,
+    });
   }
 
   removeAllConversations() {
