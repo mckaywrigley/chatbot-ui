@@ -54,7 +54,7 @@ Setup enviroment variables:
 
 ```bash
 cp .env.local.example .env.local
-# specify OPENAI_API_KEY
+# specify OPENAI_API_KEY, MONGODB_URI
 vim .env.local
 ```
 
