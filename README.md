@@ -148,6 +148,11 @@ You can add a ChatGPT compatible plugin to `urls` field in `plugins.json`.
 
 You can control the tools you want to use with `internals` in `plugins.json`.
 
+## Vercel
+
+ - streaming response is not supported in vercel.
+ - plugin executing fails because of the timeout limit is too short in free plan.
+
 ## Contact
 
 If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/santa128bit).

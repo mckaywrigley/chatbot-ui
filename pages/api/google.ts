@@ -12,8 +12,14 @@ import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
+import path from 'node:path';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
+  // Vercel Hack
+  // https://github.com/orgs/vercel/discussions/1278
+  // eslint-disable-next-line no-unused-vars
+  const vercelFunctionHack = path.resolve('./public', '');
+
   if (!(await ensureHasValidSession(req, res))) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
