@@ -26,9 +26,10 @@ import remarkMath from 'remark-math';
 interface Props {
   message: Message;
   messageIndex: number;
+  onEdit?: (editedMessage: Message) => void
 }
 
-export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
+export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) => {
   const { t } = useTranslation('chat');
 
   const {
@@ -57,31 +58,8 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
 
   const handleEditMessage = () => {
     if (message.content != messageContent) {
-      if (selectedConversation) {
-        const updatedMessages = selectedConversation.messages
-          .map((m, i) => {
-            if (i < messageIndex) {
-              return m;
-            }
-          })
-          .filter((m) => m) as Message[];
-
-        const updatedConversation = {
-          ...selectedConversation,
-          messages: updatedMessages,
-        };
-
-        const { single, all } = updateConversation(
-          updatedConversation,
-          conversations,
-        );
-
-        homeDispatch({ field: 'selectedConversation', value: single });
-        homeDispatch({ field: 'conversations', value: all });
-        homeDispatch({
-          field: 'currentMessage',
-          value: { ...message, content: messageContent },
-        });
+      if (selectedConversation && onEdit) {
+        onEdit({ ...message, content: messageContent });
       }
     }
     setIsEditing(false);
