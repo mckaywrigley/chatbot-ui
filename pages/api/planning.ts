@@ -8,9 +8,15 @@ import { PlanningRequest, PlanningResponse } from '@/types/agent';
 
 import { executeNotConversationalReactAgent } from '@/agent/agent';
 import { createContext } from '@/agent/plugins/executor';
+import path from 'node:path';
 import { v4 } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Vercel Hack
+  // https://github.com/orgs/vercel/discussions/1278
+  // eslint-disable-next-line no-unused-vars
+  const vercelFunctionHack = path.resolve('./public', '');
+
   if (!(await ensureHasValidSession(req, res))) {
     return res.status(401).json({ error: 'Unauthorized' });
   }

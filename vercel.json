@@ -1,7 +1,7 @@
 {
   "functions": {
-    "api/*.ts": {
-      "includeFiles": "./node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm"
+    "pages/api/*.ts": {
+      "includeFiles": "./public/tiktoken_bg.wasm"
     }
   }
 }
