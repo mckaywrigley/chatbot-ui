@@ -1,8 +1,12 @@
 # Smart Chatbot UI
 
-This is highly experimental personal project.
+This repo is forked from [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
 
-This project attempt to add more intelligent chatbot ux to [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
+## Additional Features
+
+ - SSO Auth(Google, GitHub)
+ - persitent storage 
+ - ChatGPT compatible plugins
 
 ![Chatbot UI](./docs/screenshot_2023-04-18.png)
 
