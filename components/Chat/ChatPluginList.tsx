@@ -27,7 +27,7 @@ export const ChatPluginList = ({
           ) : null}
           {selectedPlugins.map((plugin) => (
             <span
-              className="bg-green-900 border text-gray-300 rounded-md p-1 mr-1"
+              className="bg-gray-200 text-gray-800 dark:text-gray-300 border rounded-md p-1 mr-1"
               key={plugin.nameForModel}
             >
               {plugin.nameForHuman}

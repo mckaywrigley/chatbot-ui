@@ -31,7 +31,7 @@ const PluginListItem = ({
           }}
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 text-gray-500 dark:text-gray-400">
         <p className="text-lg">{tool.nameForHuman}</p>
         <p>{tool.descriptionForHuman}</p>
       </div>
@@ -62,7 +62,7 @@ export const ChatPluginPicker = ({ open, onClose }: Props) => {
       open={open}
       onClose={() => onClose(Array.from(selectedPlugins.values()))}
     >
-      <p className="text-lg mb-4">Plugins</p>
+      <p className="text-lg mb-4 text-gray-500 dark:text-gray-400">Plugins</p>
       <div className="max-h-80 overscroll-y-auto divide-y-2">
         {plugins &&
           plugins.map((plugin) => (
