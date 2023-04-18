@@ -1,4 +1,4 @@
-import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -32,6 +32,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { TemperatureSlider } from './Temperature';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -97,6 +98,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           messages: updatedConversation.messages,
           key: apiKey,
           prompt: updatedConversation.prompt,
+          temperature: updatedConversation.temperature,
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -421,14 +423,25 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                           })
                         }
                       />
+
+                      <TemperatureSlider
+                        label="Temperature"
+                        onChangeTemperature={(temperature) =>
+                          handleUpdateConversation(selectedConversation, {
+                            key: 'temperature',
+                            value: temperature,
+                          })
+                        }
+                      />
                     </div>
                   )}
                 </div>
               </>
             ) : (
               <>
-                <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                  {t('Model')}: {selectedConversation?.model.name}
+                <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                  {t('Model')}: {selectedConversation?.model.name} | {t('Temp')}
+                  : {selectedConversation?.temperature} |
                   <button
                     className="ml-2 cursor-pointer hover:opacity-50"
                     onClick={handleSettings}
@@ -455,6 +468,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     key={index}
                     message={message}
                     messageIndex={index}
+                    onEdit={(editedMessage) => {
+                      setCurrentMessage(editedMessage);
+                      // discard edited message and the ones that come after then resend
+                      handleSend(
+                        editedMessage,
+                        selectedConversation?.messages.length - index,
+                      );
+                    }}
                   />
                 ))}
 
@@ -475,23 +496,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               setCurrentMessage(message);
               handleSend(message, 0, plugin);
             }}
+            onScrollDownClick={handleScrollDown}
             onRegenerate={() => {
               if (currentMessage) {
                 handleSend(currentMessage, 2, null);
               }
             }}
+            showScrollDownButton={showScrollDownButton}
           />
         </>
-      )}
-      {showScrollDownButton && (
-        <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
-          <button
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
-            onClick={handleScrollDown}
-          >
-            <IconArrowDown size={18} />
-          </button>
-        </div>
       )}
     </div>
   );

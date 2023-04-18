@@ -3,6 +3,7 @@ import {
   IconCopy,
   IconEdit,
   IconRobot,
+  IconTrash,
   IconUser,
 } from '@tabler/icons-react';
 import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
@@ -25,13 +26,14 @@ import remarkMath from 'remark-math';
 interface Props {
   message: Message;
   messageIndex: number;
+  onEdit?: (editedMessage: Message) => void
 }
 
-export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
+export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, conversations },
+    state: { selectedConversation, conversations, currentMessage },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
@@ -56,34 +58,40 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
 
   const handleEditMessage = () => {
     if (message.content != messageContent) {
-      if (selectedConversation) {
-        const updatedMessages = selectedConversation.messages
-          .map((m, i) => {
-            if (i < messageIndex) {
-              return m;
-            }
-          })
-          .filter((m) => m) as Message[];
-
-        const updatedConversation = {
-          ...selectedConversation,
-          messages: updatedMessages,
-        };
-
-        const { single, all } = updateConversation(
-          updatedConversation,
-          conversations,
-        );
-
-        homeDispatch({ field: 'selectedConversation', value: single });
-        homeDispatch({ field: 'conversations', value: all });
-        homeDispatch({
-          field: 'currentMessage',
-          value: { ...message, content: messageContent },
-        });
+      if (selectedConversation && onEdit) {
+        onEdit({ ...message, content: messageContent });
       }
     }
     setIsEditing(false);
+  };
+
+  const handleDeleteMessage = () => {
+    if (!selectedConversation) return;
+
+    const { messages } = selectedConversation;
+    const findIndex = messages.findIndex((elm) => elm === message);
+
+    if (findIndex < 0) return;
+
+    if (
+      findIndex < messages.length - 1 &&
+      messages[findIndex + 1].role === 'assistant'
+    ) {
+      messages.splice(findIndex, 2);
+    } else {
+      messages.splice(findIndex, 1);
+    }
+    const updatedConversation = {
+      ...selectedConversation,
+      messages,
+    };
+
+    const { single, all } = updateConversation(
+      updatedConversation,
+      conversations,
+    );
+    homeDispatch({ field: 'selectedConversation', value: single });
+    homeDispatch({ field: 'conversations', value: all });
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -103,6 +111,11 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
       }, 2000);
     });
   };
+
+  useEffect(() => {
+    setMessageContent(message.content);
+  }, [message.content]);
+
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -178,17 +191,30 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
               )}
 
               {(window.innerWidth < 640 || !isEditing) && (
-                <button
-                  className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                    window.innerWidth < 640
-                      ? 'bottom-1 right-3'
-                      : 'right-0 top-[26px]'
-                  }
-                    `}
-                  onClick={toggleEditing}
-                >
-                  <IconEdit size={20} />
-                </button>
+                <>
+                  <button
+                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                      window.innerWidth < 640
+                        ? 'bottom-1 right-3'
+                        : 'right-6 top-[26px]'
+                    }
+                      `}
+                    onClick={toggleEditing}
+                  >
+                    <IconEdit size={20} />
+                  </button>
+                  <button
+                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                      window.innerWidth < 640
+                        ? 'bottom-1 right-3'
+                        : 'right-0 top-[26px]'
+                    }
+                      `}
+                    onClick={handleDeleteMessage}
+                  >
+                    <IconTrash size={20} />
+                  </button>
+                </>
               )}
             </div>
           ) : (

@@ -15,7 +15,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -23,6 +23,7 @@ import {
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -67,8 +68,8 @@ const Home = ({
       folders,
       conversations,
       selectedConversation,
-
       prompts,
+      temperature,
     },
     dispatch,
   } = contextValue;
@@ -191,6 +192,7 @@ const Home = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
+      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
@@ -249,16 +251,17 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    console.log('initialize', serverSideApiKeyIsSet);
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
+    const settings = getSettings();
+    if (settings.theme) {
+      dispatch({
+        field: 'lightMode',
+        value: settings.theme,
+      });
     }
 
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
-      console.log('trigger key', apiKey);
       dispatch({ field: 'apiKey', value: '' });
 
       localStorage.removeItem('apiKey');
@@ -276,6 +279,7 @@ const Home = ({
 
     if (window.innerWidth < 640) {
       dispatch({ field: 'showChatbar', value: false });
+      dispatch({ field: 'showPromptbar', value: false });
     }
 
     const showChatbar = localStorage.getItem('showChatbar');
@@ -322,6 +326,7 @@ const Home = ({
         value: cleanedSelectedConversation,
       });
     } else {
+      const lastConversation = conversations[conversations.length - 1];
       dispatch({
         field: 'selectedConversation',
         value: {
@@ -330,6 +335,7 @@ const Home = ({
           messages: [],
           model: OpenAIModels[defaultModelId],
           prompt: DEFAULT_SYSTEM_PROMPT,
+          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
           folderId: null,
         },
       });
@@ -418,6 +424,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'sidebar',
         'markdown',
         'promptbar',
+        'settings',
       ])),
     },
   };

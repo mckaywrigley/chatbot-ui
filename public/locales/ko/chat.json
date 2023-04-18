@@ -24,5 +24,6 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "메시지 제한은 {{maxLength}}자입니다. {{valueLength}}자를 입력했습니다.",
   "Please enter a message": "메시지를 입력하세요",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI는 ChatGPT의 인터페이스와 기능을 모방하는 것을 목표로 둔 OpenAI의 채팅 모델들을 위한 고급 챗봇 키트입니다.",
-  "Are you sure you want to clear all messages?": "모든 메시지를 지우시겠습니까?"
+  "Are you sure you want to clear all messages?": "모든 메시지를 지우시겠습니까?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8과 같은 높은 값은 출력을 더 무작위로 만들고, 0.2와 같은 낮은 값은 더 집중적이고 결정론적으로 만들어줍니다."
 }
