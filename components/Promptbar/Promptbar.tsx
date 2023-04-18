@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { savePrompts } from '@/utils/app/prompts';
+import useStorageService from '@/services/useStorageService';
 
 import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -11,7 +11,6 @@ import { Prompt } from '@/types/prompt';
 import HomeContext from '@/pages/api/home/home.context';
 
 import { PromptFolders } from './components/PromptFolders';
-import { PromptbarSettings } from './components/PromptbarSettings';
 import { Prompts } from './components/Prompts';
 
 import Sidebar from '../Sidebar';
@@ -22,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
+  const storageService = useStorageService();
 
   const promptBarContextValue = useCreateReducer<PromptbarInitialState>({
     initialState,
@@ -57,8 +57,7 @@ const Promptbar = () => {
       const updatedPrompts = [...prompts, newPrompt];
 
       homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-      savePrompts(updatedPrompts);
+      storageService.savePrompts(updatedPrompts);
     }
   };
 
@@ -66,7 +65,7 @@ const Promptbar = () => {
     const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
 
     homeDispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(updatedPrompts);
+    storageService.savePrompts(updatedPrompts);
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
@@ -78,8 +77,7 @@ const Promptbar = () => {
       return p;
     });
     homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-    savePrompts(updatedPrompts);
+    storageService.savePrompts(updatedPrompts);
   };
 
   const handleDrop = (e: any) => {

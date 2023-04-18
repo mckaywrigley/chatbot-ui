@@ -54,14 +54,19 @@ export const useFetch = () => {
         return result;
       })
       .catch(async (err) => {
-        const contentType = err.headers.get('content-type');
+        console.error(err);
+        if (err.headers) {
+          const contentType = err.headers.get('content-type');
+          const errResult =
+            contentType &&
+            contentType?.indexOf('application/problem+json') !== -1
+              ? await err.json()
+              : err;
 
-        const errResult =
-          contentType && contentType?.indexOf('application/problem+json') !== -1
-            ? await err.json()
-            : err;
-
-        throw errResult;
+          throw errResult;
+        } else {
+          throw err;
+        }
       });
   };
 

@@ -3,9 +3,9 @@ import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
+import useStorageService from '@/services/useStorageService';
 
 import { updateConversationFromStream } from '@/utils/app/clientstream';
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
 
 import { ChatBody, ChatModeRunner, Conversation, Message } from '@/types/chat';
 
@@ -27,6 +27,7 @@ export function useDirectMode(
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
+  const storageService = useStorageService();
   const mutation = useMutation({
     mutationFn: async (params: ChatPluginParams) => {
       return apiService.chat(params);
@@ -69,7 +70,7 @@ export function useDirectMode(
         updatedConversation,
         stopConversationRef,
       );
-      saveConversation(updatedConversation);
+      await storageService.saveSelectedConversation(updatedConversation);
       const updatedConversations: Conversation[] = conversations.map(
         (conversation) => {
           if (conversation.id === selectedConversation.id) {
@@ -82,7 +83,7 @@ export function useDirectMode(
         updatedConversations.push(updatedConversation);
       }
       homeDispatch({ field: 'conversations', value: updatedConversations });
-      saveConversations(updatedConversations);
+      await storageService.saveConversations(updatedConversations);
       homeDispatch({ field: 'messageIsStreaming', value: false });
     },
     onError: (error) => {
