@@ -20,6 +20,13 @@ export const FootNoteMessage: FC = () => {
     setShowSurveyMessage(false);
   };
 
+  const surveyOnClick = () => {
+    window.open(
+      'https://docs.google.com/forms/d/e/1FAIpQLSdBjT3Ft9-N-zBfnbIbWiaAfAl8cEnzeEHBDc2ku4Vm4oZVNA/viewform',
+      '_blank',
+    );
+  };
+
   return (
     <div className="px-3 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-0 md:pb-6">
       <div className="leading-5">
@@ -48,16 +55,18 @@ export const FootNoteMessage: FC = () => {
       {/* Promote survey */}
       {showSurveyMessage && (
         <div className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
-          <span className="mr-2 rounded bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+          <span
+            className="mr-2 rounded bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 cursor-pointer"
+            onClick={surveyOnClick}
+          >
             New
           </span>
-          <span className="flex flex-row flex-wrap items-center justify-center leading-4">
+          <span
+            className="flex flex-row flex-wrap items-center justify-center leading-4 cursor-pointer"
+            onClick={surveyOnClick}
+          >
             {t('Help us shape the future of Chat Everywhere by taking our')}
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSdBjT3Ft9-N-zBfnbIbWiaAfAl8cEnzeEHBDc2ku4Vm4oZVNA/viewform"
-              target="_blank"
-              className="px-1 underline"
-            >
+            <a onClick={surveyOnClick} className="px-1 underline">
               {t('quick survey')}{' '}
             </a>
             {t('- your voice matters!')}
