@@ -76,11 +76,11 @@ export const ChatbarSettings = () => {
         }}
       />
 
-      {!serverSideApiKeyIsSet ? (
+      {/* {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
       ) : null}
 
-      {!serverSidePluginKeysSet ? <PluginKeys /> : null}
+      {!serverSidePluginKeysSet ? <PluginKeys /> : null} */}
     </div>
   );
 };
