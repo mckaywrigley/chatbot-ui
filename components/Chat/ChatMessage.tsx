@@ -10,7 +10,7 @@ import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { updateConversation } from '@/utils/app/conversation';
+import useStorageService from '@/services/useStorageService';
 
 import { Message } from '@/types/chat';
 
@@ -30,6 +30,7 @@ interface Props {
 
 export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   const { t } = useTranslation('chat');
+  const storageService = useStorageService();
 
   const {
     state: { selectedConversation, conversations, currentMessage },
@@ -55,7 +56,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
     }
   };
 
-  const handleEditMessage = () => {
+  const handleEditMessage = async () => {
     if (message.content != messageContent) {
       if (selectedConversation) {
         const updatedMessages = selectedConversation.messages
@@ -71,7 +72,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
           messages: updatedMessages,
         };
 
-        const { single, all } = updateConversation(
+        const { single, all } = await storageService.updateSelectedConversation(
           updatedConversation,
           conversations,
         );
@@ -87,7 +88,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
     setIsEditing(false);
   };
 
-  const handleDeleteMessage = () => {
+  const handleDeleteMessage = async () => {
     if (!selectedConversation) return;
 
     const { messages } = selectedConversation;
@@ -108,7 +109,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
       messages,
     };
 
-    const { single, all } = updateConversation(
+    const { single, all } = await storageService.updateSelectedConversation(
       updatedConversation,
       conversations,
     );

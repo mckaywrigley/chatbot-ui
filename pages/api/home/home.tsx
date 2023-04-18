@@ -10,19 +10,13 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
+import useStorageService from '@/services/useStorageService';
 
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import {
-  saveConversation,
-  saveConversations,
-  updateConversation,
-} from '@/utils/app/conversation';
-import { saveFolders } from '@/utils/app/folders';
-import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
@@ -54,6 +48,7 @@ const Home = ({
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
+  const storageService = useStorageService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
@@ -101,13 +96,12 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
-  const handleSelectConversation = (conversation: Conversation) => {
+  const handleSelectConversation = async (conversation: Conversation) => {
+    await storageService.saveSelectedConversation(conversation);
     dispatch({
       field: 'selectedConversation',
       value: conversation,
     });
-
-    saveConversation(conversation);
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
@@ -122,13 +116,13 @@ const Home = ({
     const updatedFolders = [...folders, newFolder];
 
     dispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(updatedFolders);
+    storageService.saveFolders(updatedFolders);
   };
 
-  const handleDeleteFolder = (folderId: string) => {
+  const handleDeleteFolder = async (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
     dispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(updatedFolders);
+    storageService.saveFolders(updatedFolders);
 
     const updatedConversations: Conversation[] = conversations.map((c) => {
       if (c.folderId === folderId) {
@@ -142,7 +136,7 @@ const Home = ({
     });
 
     dispatch({ field: 'conversations', value: updatedConversations });
-    saveConversations(updatedConversations);
+    await storageService.saveConversations(updatedConversations);
 
     const updatedPrompts: Prompt[] = prompts.map((p) => {
       if (p.folderId === folderId) {
@@ -156,7 +150,7 @@ const Home = ({
     });
 
     dispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(updatedPrompts);
+    storageService.savePrompts(updatedPrompts);
   };
 
   const handleUpdateFolder = (folderId: string, name: string) => {
@@ -173,12 +167,12 @@ const Home = ({
 
     dispatch({ field: 'folders', value: updatedFolders });
 
-    saveFolders(updatedFolders);
+    storageService.saveFolders(updatedFolders);
   };
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
+  const handleNewConversation = async () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -198,16 +192,15 @@ const Home = ({
 
     const updatedConversations = [...conversations, newConversation];
 
+    await storageService.saveSelectedConversation(newConversation);
+    await storageService.saveConversations(updatedConversations);
     dispatch({ field: 'selectedConversation', value: newConversation });
     dispatch({ field: 'conversations', value: updatedConversations });
-
-    saveConversation(newConversation);
-    saveConversations(updatedConversations);
 
     dispatch({ field: 'loading', value: false });
   };
 
-  const handleUpdateConversation = (
+  const handleUpdateConversation = async (
     conversation: Conversation,
     data: KeyValuePair,
   ) => {
@@ -216,11 +209,10 @@ const Home = ({
       [data.key]: data.value,
     };
 
-    const { single, all } = updateConversation(
+    const { single, all } = await storageService.updateSelectedConversation(
       updatedConversation,
       conversations,
     );
-
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
   };
@@ -292,26 +284,19 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    const folders = localStorage.getItem('folders');
-    if (folders) {
-      dispatch({ field: 'folders', value: JSON.parse(folders) });
-    }
+    storageService.getFolders().then((folders) => {
+      dispatch({ field: 'folders', value: folders });
+    });
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
+    storageService.getPrompts().then((prompts) => {
+      dispatch({ field: 'prompts', value: prompts });
+    });
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
-
+    storageService.getConversations().then((conversations) => {
+      const cleanedConversationHistory =
+        cleanConversationHistory(conversations);
       dispatch({ field: 'conversations', value: cleanedConversationHistory });
-    }
+    });
 
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {

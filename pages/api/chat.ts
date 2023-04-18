@@ -71,7 +71,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           res.end();
         } else {
           const text = decoder.decode(value);
-          console.log(text);
           res.write(text);
         }
       });

@@ -3,8 +3,8 @@ import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
+import useStorageService from '@/services/useStorageService';
 
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { HomeUpdater } from '@/utils/app/homeUpdater';
 
 import {
@@ -21,6 +21,7 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const apiService = useApiService();
+  const storageService = useStorageService();
   const updater = new HomeUpdater(homeDispatch);
   const mutation = useMutation({
     mutationFn: async (params: ChatModeRunnerParams) => {
@@ -49,7 +50,7 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
         role: 'assistant',
         content: answer,
       });
-      saveConversation(updatedConversation);
+      await storageService.saveSelectedConversation(updatedConversation);
       const updatedConversations: Conversation[] = conversations.map(
         (conversation) => {
           if (conversation.id === selectedConversation.id) {
@@ -62,7 +63,7 @@ export function useGoogleMode(conversations: Conversation[]): ChatModeRunner {
         updatedConversations.push(updatedConversation);
       }
       homeDispatch({ field: 'conversations', value: updatedConversations });
-      saveConversations(updatedConversations);
+      await storageService.saveConversations(updatedConversations);
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
     },
