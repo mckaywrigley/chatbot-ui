@@ -24,7 +24,6 @@ import { ChatModeSelect } from './ChatModeSelect';
 import { ChatPluginList } from './ChatPluginList';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
-import styles from './chat.module.scss';
 
 interface Props {
   onSend: (

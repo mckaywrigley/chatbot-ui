@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
@@ -50,7 +50,6 @@ const Home = ({
   const { getModels } = useApiService();
   const storageService = useStorageService();
   const { getModelsError } = useErrorService();
-  const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -71,7 +70,7 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error, refetch } = useQuery(
+  const { data, error } = useQuery(
     ['GetModels', apiKey, serverSideApiKeyIsSet],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;

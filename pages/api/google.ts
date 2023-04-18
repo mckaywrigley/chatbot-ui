@@ -8,12 +8,10 @@ import { cleanSourceText } from '@/utils/server/webpage';
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
+import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
-import fs from 'node:fs';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   if (!(await ensureHasValidSession(req, res))) {

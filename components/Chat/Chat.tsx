@@ -12,14 +12,12 @@ import {
 import { useTranslation } from 'next-i18next';
 
 import { useChatModeRunner } from '@/hooks/chatmode/useChatModeRunner';
-import { useDirectMode } from '@/hooks/chatmode/useDirectMode';
-import { useGoogleMode } from '@/hooks/chatmode/useGoogleMode';
 
 import { throttle } from '@/utils/data/throttle';
 
 import { Plugin } from '@/types/agent';
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { ChatMode, ChatModeID } from '@/types/chatmode';
+import { ChatMode } from '@/types/chatmode';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -47,13 +45,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       apiKey,
       chatModeKeys: chatModeKeys,
       serverSideApiKeyIsSet,
-      messageIsStreaming,
       modelError,
       loading,
       prompts,
     },
     handleUpdateConversation,
-    dispatch: homeDispatch,
   } = useContext(HomeContext);
 
   const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -174,14 +170,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     }
   };
   const throttledScrollDown = throttle(scrollDown, 250);
-
-  // useEffect(() => {
-  //   console.log('currentMessage', currentMessage);
-  //   if (currentMessage) {
-  //     handleSend(currentMessage);
-  //     homeDispatch({ field: 'currentMessage', value: undefined });
-  //   }
-  // }, [currentMessage]);
 
   useEffect(() => {
     throttledScrollDown();
