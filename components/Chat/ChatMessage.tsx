@@ -135,6 +135,11 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex }) => {
   };
 
   useEffect(() => {
+    setMessageContent(message.content);
+  }, [message.content]);
+
+
+  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
