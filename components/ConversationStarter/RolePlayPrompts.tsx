@@ -27,7 +27,7 @@ export const RolePlayPrompts: FC<Props> = ({ roleOnClick }) => {
   const { t: roleContentT } = useTranslation('rolesContent');
 
   return (
-    <div className="mt-5 flex flex-col text-sm overflow-y-auto h-64">
+    <div className="mt-5 flex flex-col text-sm overflow-y-auto h-64 font-normal">
       {DEMO_ROLES.map((roleName, index) => (
         <div
           key={index}
