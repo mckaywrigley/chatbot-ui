@@ -11,7 +11,7 @@ export default withAuth({
         return false;
       } else {
         const pattern = process.env.NEXTAUTH_EMAIL_PATTERN || '';
-        if (!pattern || token?.email?.match(pattern)) {
+        if (!pattern || token?.email?.match('^' + pattern + '$')) {
           return true;
         }
         return false;
