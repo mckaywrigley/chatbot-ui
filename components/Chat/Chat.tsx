@@ -1,4 +1,4 @@
-import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -492,23 +492,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               setCurrentMessage(message);
               handleSend(message, 0, plugin);
             }}
+            onScrollDownClick={handleScrollDown}
             onRegenerate={() => {
               if (currentMessage) {
                 handleSend(currentMessage, 2, null);
               }
             }}
+            showScrollDownButton={showScrollDownButton}
           />
         </>
-      )}
-      {showScrollDownButton && (
-        <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
-          <button
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
-            onClick={handleScrollDown}
-          >
-            <IconArrowDown size={18} />
-          </button>
-        </div>
       )}
     </div>
   );
