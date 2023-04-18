@@ -49,6 +49,7 @@ export const ChatFolders = ({ searchTerm }: Props) => {
     <div className="flex w-full flex-col pt-2">
       {folders
         .filter((folder) => folder.type === 'chat')
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map((folder, index) => (
           <Folder
             key={index}
