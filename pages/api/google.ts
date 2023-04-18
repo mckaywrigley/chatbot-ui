@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { OPENAI_API_HOST } from '@/utils/app/const';
+import { ensureHasValidSession } from '@/utils/server/auth';
 import { getTiktokenEncoding } from '@/utils/server/tiktoken';
 import { cleanSourceText } from '@/utils/server/webpage';
 
@@ -15,6 +16,10 @@ import jsdom, { JSDOM } from 'jsdom';
 import fs from 'node:fs';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
+  if (!(await ensureHasValidSession(req, res))) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   let encoding: Tiktoken | null = null;
   try {
     const { messages, key, model, googleAPIKey, googleCSEId } =

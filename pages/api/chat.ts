@@ -1,28 +1,22 @@
+import { NextApiRequest, NextApiResponse } from 'next';
+
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { ensureHasValidSession } from '@/utils/server/auth';
+import { getTiktokenEncoding } from '@/utils/server/tiktoken';
 
 import { ChatBody, Message } from '@/types/chat';
 
-// @ts-expect-error
-import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (!(await ensureHasValidSession(req, res))) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
-
-export const config = {
-  runtime: 'edge',
-};
-
-const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { model, messages, key, prompt, temperature } =
+      (await req.body) as ChatBody;
 
-    await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str,
-    );
+    const encoding = await getTiktokenEncoding(model.id);
 
     let promptToSend = prompt;
     if (!promptToSend) {
@@ -52,15 +46,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
-
-    return new Response(stream);
+    const stream = await OpenAIStream(
+      model,
+      promptToSend,
+      temperatureToUse,
+      key,
+      messagesToSend,
+    );
+    res.status(200);
+    res.writeHead(200, {
+      Connection: 'keep-alive',
+      'Content-Encoding': 'none',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+    });
+    const decoder = new TextDecoder();
+    const reader = stream.getReader();
+    let closed = false;
+    while (!closed) {
+      await reader.read().then(({ done, value }) => {
+        if (done) {
+          closed = true;
+          res.end();
+        } else {
+          const text = decoder.decode(value);
+          console.log(text);
+          res.write(text);
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      res.status(500).json({ error: error.message });
     } else {
-      return new Response('Error', { status: 500 });
+      res.status(500).json({ error: 'Error' });
     }
   }
 };
