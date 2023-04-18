@@ -24,5 +24,6 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "පණිවිඩ සීමාව අකුරු {{maxLength}} කි. ඔබ අක්ෂර {{valueLength}} ඇතුළත් කර ඇත.।",
   "Please enter a message": "කරුණාකර පණිවිඩයක් ඇතුළු කරන්න",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI යනු ChatGPT හි අතුරු මුහුණත සහ ක්‍රියාකාරීත්වය අනුකරණය කිරීම අරමුණු කරගත් OpenAI හි චැට් මාදිලි සඳහා වන උසස් චැට්බෝට් කට්ටලයකි.",
-  "Are you sure you want to clear all messages?": "ඔබට සියලු පණිවිඩ හිස් කිරීමට අවශ්‍ය බව විශ්වාසද?"
+  "Are you sure you want to clear all messages?": "ඔබට සියලු පණිවිඩ හිස් කිරීමට අවශ්‍ය බව විශ්වාසද?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8 ආකෘතිය ඉහළට පිරිමිතුරු වර්ණයෙන් තිබේ විය යුතුය, නමුත් 0.2 ආකෘතිය අවම වශයෙන් එය විශේෂිත හා නිර්ණායක වනු ඇත."
 }

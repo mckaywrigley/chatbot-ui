@@ -24,5 +24,6 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "సందేశం పరిమితి {{maxLength}} అక్షరాలు. మీరు {{valueLength}} అక్షరాలు నమోదు చేసారు.",
   "Please enter a message": "దయచేసి ఒక సందేశం నమోదు చేయండి",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ఒక అభ్యంతర సంవిధానం మరియు కార్యాచరణ లక్ష్యం తీసుకున్న OpenAI ఛాట్ మోడల్లలో మార్పులు చేయడానికి ప్రయత్నిస్తుంది, ChatGPT ఇంటర్ఫేస్ మరియు కార్యాచరణను అనుకరించడానికి.",
-  "Are you sure you want to clear all messages?": "మీరు అన్ని సందేశాలను తొలగించాలా?"
+  "Are you sure you want to clear all messages?": "మీరు అన్ని సందేశాలను తొలగించాలా?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8 పైకి ఉన్న పెరిగిన విలువలు ఎక్కువగా విస్తరించినట్లుగా ఉంటాయి, మరియు 0.2 పైకి ఉన్న తక్కువ విలువలు కేంద్రీకృతం మరియు నిర్ణయాత్మకంగా మార్చవచ్చు."
 }

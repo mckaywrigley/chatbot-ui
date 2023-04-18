@@ -1,4 +1,4 @@
-import { Serper } from 'langchain/tools';
+import { BingSerpAPI } from 'langchain/tools';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { CallbackManager } from 'langchain/callbacks';
 import { AgentExecutor, ZeroShotAgent } from 'langchain/agents';
@@ -111,7 +111,7 @@ const handler = async (req: NextRequest, res: any) => {
     streaming: false,
   });
 
-  const tools = [new Serper(), calculator];
+  const tools = [new BingSerpAPI(), calculator];
 
   const prompt = ZeroShotAgent.createPrompt(tools, {
     prefix: `You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.

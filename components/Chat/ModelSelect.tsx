@@ -1,21 +1,30 @@
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { IconExternalLink } from '@tabler/icons-react';
+import { useContext } from 'react';
+
 import { useTranslation } from 'next-i18next';
-import { FC } from 'react';
 
-interface Props {
-  model: OpenAIModel;
-  models: OpenAIModel[];
-  defaultModelId: OpenAIModelID;
-  onModelChange: (model: OpenAIModel) => void;
-}
+import { OpenAIModel } from '@/types/openai';
 
-export const ModelSelect: FC<Props> = ({
-  model,
-  models,
-  defaultModelId,
-  onModelChange,
-}) => {
+import HomeContext from '@/pages/api/home/home.context';
+
+export const ModelSelect = () => {
   const { t } = useTranslation('chat');
+
+  const {
+    state: { selectedConversation, models, defaultModelId },
+    handleUpdateConversation,
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    selectedConversation &&
+      handleUpdateConversation(selectedConversation, {
+        key: 'model',
+        value: models.find(
+          (model) => model.id === e.target.value,
+        ) as OpenAIModel,
+      });
+  };
 
   return (
     <div className="flex flex-col">
@@ -26,14 +35,8 @@ export const ModelSelect: FC<Props> = ({
         <select
           className="w-full bg-transparent p-2"
           placeholder={t('Select a model') || ''}
-          value={model?.id || defaultModelId}
-          onChange={(e) => {
-            onModelChange(
-              models.find(
-                (model) => model.id === e.target.value,
-              ) as OpenAIModel,
-            );
-          }}
+          value={selectedConversation?.model?.id || defaultModelId}
+          onChange={handleChange}
         >
           {models.map((model) => (
             <option
@@ -47,6 +50,16 @@ export const ModelSelect: FC<Props> = ({
             </option>
           ))}
         </select>
+      </div>
+      <div className="w-full mt-3 text-left text-neutral-700 dark:text-neutral-400 flex items-center">
+        <a
+          href="https://platform.openai.com/account/usage"
+          target="_blank"
+          className="flex items-center"
+        >
+          <IconExternalLink size={18} className={'inline mr-1'} />
+          {t('View Account Usage')}
+        </a>
       </div>
     </div>
   );

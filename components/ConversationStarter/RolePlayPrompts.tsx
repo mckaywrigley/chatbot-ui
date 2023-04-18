@@ -1,9 +1,10 @@
 import { FC } from 'react';
+
 import { useTranslation } from 'next-i18next';
 
 const DEMO_ROLES = [
   'Accountant',
-  'Writing Tutor', 
+  'Writing Tutor',
   'Life Coach',
   'Psychologist',
   'Social Media Influencer',
@@ -14,7 +15,7 @@ const DEMO_ROLES = [
   'Automobile Mechanic',
   'Financial Analyst',
   'Dream Interpreter',
-  'IELTS Tester'
+  'IELTS Tester',
 ];
 
 type Props = {
@@ -26,14 +27,14 @@ export const RolePlayPrompts: FC<Props> = ({ roleOnClick }) => {
   const { t: roleContentT } = useTranslation('rolesContent');
 
   return (
-    <div className="mt-5 flex flex-col text-sm overflow-y-auto h-64">
+    <div className="mt-5 flex flex-col text-sm overflow-y-auto h-64 font-normal">
       {DEMO_ROLES.map((roleName, index) => (
         <div
           key={index}
           className="mb-2 cursor-pointer rounded-md border border-neutral-200 bg-transparent p-1 pr-2 text-neutral-400 dark:border-neutral-600 dark:text-white"
-          onClick={() =>
-            roleOnClick(roleNameT(roleName), roleContentT(roleName))
-          }
+          onClick={() => {
+            roleOnClick(roleNameT(roleName), roleContentT(roleName));
+          }}
         >
           {roleNameT(roleName)}
         </div>

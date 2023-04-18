@@ -27,6 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# yarn, we use npm only for this project
+yarn.lock
+
 # local env files
 .env
 
@@ -41,3 +44,4 @@ next-env.d.ts
 # Supabase
 supabase/.branches
 supabase/.temp
+pnpm-lock.yaml

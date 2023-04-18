@@ -1,7 +1,9 @@
-import { Conversation } from '@/types/chat';
 import { IconPlus } from '@tabler/icons-react';
 import { FC } from 'react';
-import { StoreConversationButton } from '../Global/StoreConversationButton';
+
+import { Conversation } from '@/types/chat';
+
+import { StoreConversationButton } from '../Spinner/StoreConversationButton';
 
 interface Props {
   selectedConversation: Conversation;
