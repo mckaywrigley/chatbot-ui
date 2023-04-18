@@ -32,7 +32,7 @@ interface Props {
     chatMode: ChatMode | null,
     plugins: Plugin[],
   ) => void;
-  onRegenerate: () => void;
+  onRegenerate: (chatMode: ChatMode | null, plugins: Plugin[]) => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
 }
@@ -55,7 +55,6 @@ type ChatControlPanelProps = {
   onStopConversation: () => void;
 };
 function ChatControlPanel({
-  chatMode,
   showStopButton,
   showRegenerateButton,
   onRegenerate,
@@ -165,11 +164,15 @@ export const ChatInput = ({
     }
   };
 
+  const handleRegenerate = () => {
+    onRegenerate(chatMode, selectedPlugins);
+  };
+
   const handleStopConversation = () => {
     stopConversationRef.current = true;
     setTimeout(() => {
       stopConversationRef.current = false;
-    }, 1000);
+    }, 30000);
   };
 
   const isMobile = () => {
@@ -327,7 +330,7 @@ export const ChatInput = ({
         chatMode={chatMode}
         showStopButton={showStopButton}
         showRegenerateButton={Boolean(showRegenerateButton)}
-        onRegenerate={onRegenerate}
+        onRegenerate={() => handleRegenerate()}
         onStopConversation={handleStopConversation}
       />
       {chatMode.id === ChatModeID.AGENT && (
@@ -357,7 +360,7 @@ export const ChatInput = ({
                   textareaRef.current?.focus();
                 }
               }}
-              onPluginChange={(plugin: ChatMode) => {
+              onChatModeChange={(plugin: ChatMode) => {
                 setChatMode(plugin);
                 setShowPluginSelect(false);
 

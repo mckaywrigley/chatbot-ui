@@ -6,13 +6,13 @@ import { ChatMode, ChatModeList } from '@/types/chatmode';
 
 interface Props {
   chatMode: ChatMode;
-  onPluginChange: (plugin: ChatMode) => void;
+  onChatModeChange: (chatMode: ChatMode) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
 }
 
 export const ChatModeSelect: FC<Props> = ({
   chatMode,
-  onPluginChange,
+  onChatModeChange,
   onKeyDown,
 }) => {
   const { t } = useTranslation('chat');
@@ -43,7 +43,7 @@ export const ChatModeSelect: FC<Props> = ({
         selectElement.dispatchEvent(new Event('change'));
       }
 
-      onPluginChange(
+      onChatModeChange(
         ChatModeList.find(
           (plugin) =>
             plugin.name === selectElement?.selectedOptions[0].innerText,
@@ -68,8 +68,15 @@ export const ChatModeSelect: FC<Props> = ({
           className="w-full cursor-pointer bg-transparent p-2"
           placeholder={t('Select a plugin') || ''}
           value={chatMode?.id || ''}
+          onBlur={(e) => {
+            onChatModeChange(
+              ChatModeList.find(
+                (plugin) => plugin.id === e.target.value,
+              ) as ChatMode,
+            );
+          }}
           onChange={(e) => {
-            onPluginChange(
+            onChatModeChange(
               ChatModeList.find(
                 (plugin) => plugin.id === e.target.value,
               ) as ChatMode,

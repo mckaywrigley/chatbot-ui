@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { MutableRefObject, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
@@ -17,7 +17,10 @@ import {
 
 import HomeContext from '@/pages/api/home/home.context';
 
-export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
+export function useAgentMode(
+  conversations: Conversation[],
+  stopConversationRef: MutableRefObject<boolean>,
+): ChatModeRunner {
   const { t } = useTranslation('chat');
 
   const {
@@ -34,7 +37,7 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
       while (true) {
         if (planningCount > 5) {
           // todo: handle this
-          return { type: 'answer', answer: 'No Result' };
+          return { type: 'answer', answer: t('No Result') };
         }
         const planningResponse: PlanningResponse = await apiService.planning({
           taskId,
@@ -49,9 +52,18 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
           planningCount++;
           const tool = result.plugin;
           if (tool.displayForUser) {
+            const isSearch =
+              tool.descriptionForHuman.toLowerCase().indexOf('search') !== -1;
+            const simpleQuery = result.pluginInput.length < 100;
+            let content = `${tool.nameForHuman} ${t('executing...')}`;
+            if (isSearch && simpleQuery) {
+              content = `${tool.nameForHuman} ${t('executing...')} - ${t(
+                'Query',
+              )}: ${result.pluginInput}`;
+            }
             params.conversation = updater.addMessage(params.conversation, {
               role: 'assistant',
-              content: `${tool.nameForHuman} ${t('executing...')}`,
+              content,
             });
           }
           const actinoResult = await apiService.runPlugin({
@@ -63,6 +75,10 @@ export function useAgentMode(conversations: Conversation[]): ChatModeRunner {
           toolActionResults.push(actinoResult);
         } else {
           return { type: 'answer', answer: result.answer };
+        }
+        if (stopConversationRef.current === true) {
+          stopConversationRef.current = false;
+          return { type: 'answer', answer: t('Conversation stopped') };
         }
       }
     },

@@ -13,7 +13,7 @@ export const useChatModeRunner = (
 ) => {
   const directMode = useDirectMode(conversations, stopConversationRef);
   const googleMode = useGoogleMode(conversations);
-  const agentMode = useAgentMode(conversations);
+  const agentMode = useAgentMode(conversations, stopConversationRef);
   return (plugin: ChatMode | null): ChatModeRunner => {
     if (!plugin) {
       return directMode;

@@ -355,9 +355,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               setCurrentMessage(message);
               handleSend(message, 0, chatMode, plugins);
             }}
-            onRegenerate={() => {
+            onRegenerate={(chatMode, plugins) => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, null, []);
+                handleSend(currentMessage, 2, chatMode, plugins);
               }
             }}
           />

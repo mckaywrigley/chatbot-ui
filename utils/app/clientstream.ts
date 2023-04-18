@@ -20,6 +20,7 @@ export const updateConversationFromStream = async (
   let text = '';
   while (!done) {
     if (stopConversationRef.current === true) {
+      stopConversationRef.current = false;
       controller.abort();
       done = true;
       break;
