@@ -2,11 +2,17 @@
 
 This repo is forked from [chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
 
+[DEMO](https://smart-chatbot-ui.vercel.app/)
+
+- do not input personal information. conversation history is stored in mongodb.
+- streaming response is not working in vercel environment.
+- plugins are not working in vercel environment.
+
 ## Additional Features
 
- - SSO Auth(Google, GitHub)
- - persitent storage 
- - ChatGPT compatible plugins
+- SSO Auth(Google, GitHub)
+- persitent storage
+- ChatGPT compatible plugins
 
 ![Chatbot UI](./docs/screenshot_2023-04-18.png)
 
@@ -150,8 +156,8 @@ You can control the tools you want to use with `internals` in `plugins.json`.
 
 ## Vercel
 
- - streaming response is not supported in vercel.
- - plugin executing fails because of the timeout limit is too short in free plan.
+- streaming response is not supported in vercel.
+- plugin executing fails because of the timeout limit is too short in free plan.
 
 ## Contact
 
