@@ -9,9 +9,6 @@ export const ensureHasValidSession = async (
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<boolean> => {
-  if (process.env.NEXTAUTH_ENABLED === 'false') {
-    return true;
-  }
   const session = await getServerSession(req, res, authOptions);
   return session !== null;
 };
