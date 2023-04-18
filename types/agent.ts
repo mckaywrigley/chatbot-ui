@@ -28,6 +28,7 @@ export interface PluginResult {
 export interface PlanningRequest {
   taskId?: string;
   model: OpenAIModel;
+  key?: string;
   messages: Message[];
   enabledToolNames: string[];
   pluginResults: PluginResult[];

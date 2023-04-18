@@ -18,6 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const {
       model,
+      key,
       messages,
       enabledToolNames,
       pluginResults: toolActionResults,
@@ -30,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const lastMessage = messages[messages.length - 1];
     const encoding = await getTiktokenEncoding(model?.id || 'gpt-3.5-turbo');
-    const context = createContext(req, encoding, model);
+    const context = createContext(req, encoding, model, key);
     const verbose = process.env.DEBUG_AGENT_LLM_LOGGING === 'true';
     try {
       const result = await executeNotConversationalReactAgent(

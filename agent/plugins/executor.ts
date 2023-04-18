@@ -15,12 +15,14 @@ export interface ToolExecutionContext {
   headers: Headers;
   model?: OpenAIModel;
   encoding: Tiktoken;
+  apiKey?: string;
 }
 
 export const createContext = (
   request: Request | NextApiRequest,
   encoding: Tiktoken,
   model: OpenAIModel,
+  key?: string,
 ): ToolExecutionContext => {
   const headers = extractHeaders(request);
   const locale = headers['accept-language']?.split(',')[0] || 'en';
@@ -29,6 +31,7 @@ export const createContext = (
     locale,
     encoding,
     model,
+    apiKey: key || process.env.OPENAI_API_KEY,
   };
 };
 

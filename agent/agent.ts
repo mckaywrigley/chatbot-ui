@@ -65,6 +65,7 @@ export const executeReactAgent = async (
     temperature: 0,
     verbose: true,
     callbackManager,
+    openAIApiKey: context.apiKey,
   });
   const prompt: PromptTemplate = PromptTemplate.fromTemplate(
     conversational.prefix +
@@ -155,6 +156,7 @@ export const executeNotConversationalReactAgent = async (
     temperature: 0,
     callbackManager,
     verbose,
+    openAIApiKey: context.apiKey,
   });
   const prompt: PromptTemplate = PromptTemplate.fromTemplate(
     notConversational.prefix +
