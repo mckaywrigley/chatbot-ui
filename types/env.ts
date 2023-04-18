@@ -6,6 +6,7 @@ export interface ProcessEnv {
   OPENAI_ORGANIZATION?: string;
   NEXT_PUBLIC_API_URL: string;
   MONGODB_URI: string;
+  MONGODB_DB: string;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;

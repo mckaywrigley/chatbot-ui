@@ -2,19 +2,20 @@ import { Conversation } from '@/types/chat';
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 
+import { MONGODB_DB } from '../app/const';
+
 import { Collection, Db, MongoClient } from 'mongodb';
 
 let _db: Db | null = null;
 export async function getDb(): Promise<Db> {
   if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI is not defined');
+    throw new Error('MONGODB_URI is not set');
   }
   if (_db !== null) {
     return _db;
   }
   const client = await MongoClient.connect(process.env.MONGODB_URI);
-
-  let db = client.db('example');
+  let db = client.db(MONGODB_DB);
   _db = db;
   return db;
 }
