@@ -23,6 +23,7 @@ import {
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -68,7 +69,7 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
-      temperature
+      temperature,
     },
     dispatch,
   } = contextValue;
@@ -250,9 +251,12 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
+    const settings = getSettings();
+    if (settings.theme) {
+      dispatch({
+        field: 'lightMode',
+        value: settings.theme,
+      });
     }
 
     const apiKey = localStorage.getItem('apiKey');
@@ -419,6 +423,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'sidebar',
         'markdown',
         'promptbar',
+        'settings',
       ])),
     },
   };
