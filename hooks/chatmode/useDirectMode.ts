@@ -1,5 +1,6 @@
 import { MutableRefObject, useContext } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
 
 import useApiService from '@/services/useApiService';
@@ -22,10 +23,9 @@ export function useDirectMode(
   conversations: Conversation[],
   stopConversationRef: MutableRefObject<boolean>,
 ): ChatModeRunner {
-  const {
-    state: { chatModeKeys: pluginKeys },
-    dispatch: homeDispatch,
-  } = useContext(HomeContext);
+  const { t: errT } = useTranslation('error');
+
+  const { dispatch: homeDispatch } = useContext(HomeContext);
   const apiService = useApiService();
   const storageService = useStorageService();
   const mutation = useMutation({
@@ -86,10 +86,16 @@ export function useDirectMode(
       await storageService.saveConversations(updatedConversations);
       homeDispatch({ field: 'messageIsStreaming', value: false });
     },
-    onError: (error) => {
+    onError: async (error) => {
+      console.log(error);
       homeDispatch({ field: 'loading', value: false });
       homeDispatch({ field: 'messageIsStreaming', value: false });
-      toast.error(error?.toString() || 'error');
+      if (error instanceof Response) {
+        const json = await error.json();
+        toast.error(errT(json.error || json.message || 'error'));
+      } else {
+        toast.error(error?.toString() || 'error');
+      }
     },
   });
   return {

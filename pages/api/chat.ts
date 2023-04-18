@@ -19,41 +19,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  const { model, messages, key, prompt, temperature } =
+    (await req.body) as ChatBody;
+  const encoding = await getTiktokenEncoding(model.id);
   try {
-    const { model, messages, key, prompt, temperature } =
-      (await req.body) as ChatBody;
-
-    const encoding = await getTiktokenEncoding(model.id);
-
-    let promptToSend = prompt;
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
+    let systemPromptToSend = prompt;
+    if (!systemPromptToSend) {
+      systemPromptToSend = DEFAULT_SYSTEM_PROMPT;
     }
 
-    const prompt_tokens = encoding.encode(promptToSend);
+    const systemPromptTokens = encoding.encode(systemPromptToSend);
 
-    let tokenCount = prompt_tokens.length;
+    let totalToken = systemPromptTokens.length;
     let messagesToSend: Message[] = [];
-
+    const reservedForAnswer = 1000;
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      const contentLength = encoding.encode(message.content).length;
+      if (totalToken + contentLength + reservedForAnswer > model.tokenLimit) {
         break;
       }
-      tokenCount += tokens.length;
+      totalToken += contentLength;
       messagesToSend = [message, ...messagesToSend];
     }
-
-    encoding.free();
-
+    if (messagesToSend.length === 0) {
+      throw new Error('message is too long');
+    }
+    const maxToken = model.tokenLimit - totalToken;
     const stream = await OpenAIStream(
       model,
-      promptToSend,
+      systemPromptToSend,
       temperature,
       key,
       messagesToSend,
+      maxToken,
     );
     res.status(200);
     res.writeHead(200, {
@@ -79,11 +78,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } catch (error) {
     console.error(error);
-    if (error instanceof OpenAIError) {
+    if (error instanceof Error) {
       res.status(500).json({ error: error.message });
     } else {
       res.status(500).json({ error: 'Error' });
     }
+  } finally {
+    encoding.free();
   }
 };
 
