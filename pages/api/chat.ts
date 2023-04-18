@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 import { ensureHasValidSession } from '@/utils/server/auth';
 import { getTiktokenEncoding } from '@/utils/server/tiktoken';
@@ -21,11 +21,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     let promptToSend = prompt;
     if (!promptToSend) {
       promptToSend = DEFAULT_SYSTEM_PROMPT;
-    }
-
-    let temperatureToUse = temperature;
-    if (temperatureToUse == null) {
-      temperatureToUse = DEFAULT_TEMPERATURE;
     }
 
     const prompt_tokens = encoding.encode(promptToSend);
@@ -49,7 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const stream = await OpenAIStream(
       model,
       promptToSend,
-      temperatureToUse,
+      temperature,
       key,
       messagesToSend,
     );

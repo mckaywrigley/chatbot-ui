@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { FC, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -10,6 +10,7 @@ import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { TemperatureSlider } from '../Chat/Temperature';
 import { Dialog } from '../Dialog/Dialog';
 
 interface Props {
@@ -24,36 +25,11 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
     initialState: settings,
   });
   const { dispatch: homeDispatch } = useContext(HomeContext);
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        window.addEventListener('mouseup', handleMouseUp);
-      }
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      window.removeEventListener('mouseup', handleMouseUp);
-      onClose();
-    };
-
-    window.addEventListener('mousedown', handleMouseDown);
-
-    return () => {
-      window.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [onClose]);
 
   const handleSave = () => {
     homeDispatch({ field: 'lightMode', value: state.theme });
     saveSettings(state);
   };
-
-  // Render nothing if the dialog is not open.
-  if (!open) {
-    return <></>;
-  }
 
   // Render the dialog.
   return (
@@ -76,6 +52,16 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
         <option value="dark">{t('Dark mode')}</option>
         <option value="light">{t('Light mode')}</option>
       </select>
+
+      <div className="text-sm font-bold mt-2 mb-2 text-black dark:text-neutral-200">
+        {t('Temperature')}
+      </div>
+
+      <TemperatureSlider
+        onChangeTemperature={(temperature) =>
+          dispatch({ field: 'defaultTemperature', value: temperature })
+        }
+      />
 
       <button
         type="button"

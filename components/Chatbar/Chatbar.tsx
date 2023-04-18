@@ -6,8 +6,9 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useStorageService from '@/services/useStorageService';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { exportData, importData } from '@/utils/app/importExport';
+import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
 import { ChatModeKey } from '@/types/chatmode';
@@ -122,6 +123,7 @@ export const Chatbar = () => {
     homeDispatch({ field: 'prompts', value: prompts });
   };
 
+  const settings = getSettings();
   const handleClearConversations = async () => {
     defaultModelId &&
       homeDispatch({
@@ -132,7 +134,7 @@ export const Chatbar = () => {
           messages: [],
           model: OpenAIModels[defaultModelId],
           prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
+          temperature: settings.defaultTemperature,
           folderId: null,
         },
       });
@@ -172,7 +174,7 @@ export const Chatbar = () => {
             messages: [],
             model: OpenAIModels[defaultModelId],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
+            temperature: settings.defaultTemperature,
             folderId: null,
           },
         });

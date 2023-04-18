@@ -16,7 +16,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
@@ -174,6 +174,7 @@ const Home = ({
 
   const handleNewConversation = async () => {
     const lastConversation = conversations[conversations.length - 1];
+    const settings = getSettings();
 
     const newConversation: Conversation = {
       id: uuidv4(),
@@ -186,7 +187,7 @@ const Home = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: settings.defaultTemperature,
       folderId: null,
     };
 
@@ -320,7 +321,7 @@ const Home = ({
           messages: [],
           model: OpenAIModels[defaultModelId],
           prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+          temperature: settings.defaultTemperature,
           folderId: null,
         },
       });
