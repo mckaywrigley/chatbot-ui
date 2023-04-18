@@ -1,32 +1,47 @@
-import { Message, Conversation } from '@/types/chat';
 import {
+  IconBrain,
   IconCheck,
   IconCopy,
   IconEdit,
-  IconUser,
   IconRobot,
-  IconBrain,
+  IconTrash,
+  IconUser,
 } from '@tabler/icons-react';
+import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
+
 import { useTranslation } from 'next-i18next';
-import { FC, memo, useEffect, useRef, useState } from 'react';
-import rehypeMathjax from 'rehype-mathjax';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
+import { event } from 'nextjs-google-analytics';
+
+import { updateConversation } from '@/utils/app/conversation';
+
+import { Conversation, Message } from '@/types/chat';
+
+import HomeContext from '@/pages/api/home/home.context';
+
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { FeedbackContainer } from './FeedbackContainer';
 
+import rehypeMathjax from 'rehype-mathjax';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+
 interface Props {
   message: Message;
   messageIndex: number;
-  onEditMessage: (message: Message, messageIndex: number) => void;
   displayFeedbackButton: boolean;
   conversation: Conversation;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage, displayFeedbackButton, conversation }) => {
+  ({ message, messageIndex, displayFeedbackButton, conversation }) => {
     const { t } = useTranslation('chat');
+
+    const {
+      state: { selectedConversation, conversations, currentMessage },
+      dispatch: homeDispatch,
+    } = useContext(HomeContext);
+
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
@@ -50,9 +65,67 @@ export const ChatMessage: FC<Props> = memo(
 
     const handleEditMessage = () => {
       if (message.content != messageContent) {
-        onEditMessage({ ...message, content: messageContent }, messageIndex);
+        if (selectedConversation) {
+          const updatedMessages = selectedConversation.messages
+            .map((m, i) => {
+              if (i < messageIndex) {
+                return m;
+              }
+            })
+            .filter((m) => m) as Message[];
+
+          const updatedConversation = {
+            ...selectedConversation,
+            messages: updatedMessages,
+          };
+
+          const { single, all } = updateConversation(
+            updatedConversation,
+            conversations,
+          );
+
+          homeDispatch({ field: 'selectedConversation', value: single });
+          homeDispatch({ field: 'conversations', value: all });
+          homeDispatch({
+            field: 'currentMessage',
+            value: { ...message, content: messageContent },
+          });
+        }
       }
       setIsEditing(false);
+      event('interaction', {
+        category: 'Conversation',
+        label: 'Edited message',
+      });
+    };
+
+    const handleDeleteMessage = () => {
+      if (!selectedConversation) return;
+
+      const { messages } = selectedConversation;
+      const findIndex = messages.findIndex((elm) => elm === message);
+
+      if (findIndex < 0) return;
+
+      if (
+        findIndex < messages.length - 1 &&
+        messages[findIndex + 1].role === 'assistant'
+      ) {
+        messages.splice(findIndex, 2);
+      } else {
+        messages.splice(findIndex, 1);
+      }
+      const updatedConversation = {
+        ...selectedConversation,
+        messages,
+      };
+
+      const { single, all } = updateConversation(
+        updatedConversation,
+        conversations,
+      );
+      homeDispatch({ field: 'selectedConversation', value: single });
+      homeDispatch({ field: 'conversations', value: all });
     };
 
     const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -115,6 +188,8 @@ export const ChatMessage: FC<Props> = memo(
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
                       onKeyUp={(e) => setIsTyping(e.nativeEvent.isComposing)}
+                      onCompositionStart={() => setIsTyping(true)}
+                      onCompositionEnd={() => setIsTyping(false)}
                       style={{
                         fontFamily: 'inherit',
                         fontSize: 'inherit',
@@ -151,17 +226,30 @@ export const ChatMessage: FC<Props> = memo(
                 )}
 
                 {(window.innerWidth < 640 || !isEditing) && (
-                  <button
-                    className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                      window.innerWidth < 640
-                        ? 'bottom-1 right-3'
-                        : 'right-0 top-[26px]'
-                    }
-                    `}
-                    onClick={toggleEditing}
-                  >
-                    <IconEdit size={20} />
-                  </button>
+                  <>
+                    <button
+                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                        window.innerWidth < 640
+                          ? 'bottom-1 right-3'
+                          : 'right-6 top-[26px]'
+                      }
+                      `}
+                      onClick={toggleEditing}
+                    >
+                      <IconEdit size={20} />
+                    </button>
+                    <button
+                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
+                        window.innerWidth < 640
+                          ? 'bottom-1 right-3'
+                          : 'right-0 top-[26px]'
+                      }
+                      `}
+                      onClick={handleDeleteMessage}
+                    >
+                      <IconTrash size={20} />
+                    </button>
+                  </>
                 )}
               </div>
             ) : (
@@ -234,9 +322,9 @@ export const ChatMessage: FC<Props> = memo(
                 >
                   {message.content}
                 </MemoizedReactMarkdown>
-                {
-                  displayFeedbackButton && <FeedbackContainer conversation={conversation}/>
-                }
+                {displayFeedbackButton && (
+                  <FeedbackContainer conversation={conversation} />
+                )}
               </>
             )}
           </div>

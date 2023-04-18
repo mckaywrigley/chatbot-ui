@@ -24,5 +24,6 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Лимит сообщения: {{maxLength}} символов. Вы ввели {{valueLength}} символов.",
   "Please enter a message": "Пожалуйста введите сообщение",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI - продвинутый интерфейс чатбота для чат-моделей OpenAI, имитирующий интерфейс ChatGPT",
-  "Are you sure you want to clear all messages?": "Вы уверены, что хотите удалить все сообщения?"
+  "Are you sure you want to clear all messages?": "Вы уверены, что хотите удалить все сообщения?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Более высокие значения, такие как 0,8, сделают вывод более случайным, в то время как более низкие значения, например, 0,2, сделают его более фокусированным и детерминированным."
 }

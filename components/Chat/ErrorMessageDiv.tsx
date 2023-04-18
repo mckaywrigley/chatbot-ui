@@ -1,6 +1,7 @@
-import { ErrorMessage } from '@/types/error';
 import { IconCircleX } from '@tabler/icons-react';
 import { FC } from 'react';
+
+import { ErrorMessage } from '@/types/error';
 
 interface Props {
   error: ErrorMessage;

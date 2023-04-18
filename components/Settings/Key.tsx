@@ -1,6 +1,8 @@
 import { IconCheck, IconKey, IconX } from '@tabler/icons-react';
-import { useTranslation } from 'next-i18next';
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+
+import { useTranslation } from 'next-i18next';
+
 import { SidebarButton } from '../Sidebar/SidebarButton';
 
 interface Props {
@@ -25,7 +27,7 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
     onApiKeyChange(newKey.trim());
     setIsChanging(false);
   };
-  
+
   useEffect(() => {
     if (isChanging) {
       inputRef.current?.focus();
