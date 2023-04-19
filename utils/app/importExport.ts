@@ -118,27 +118,47 @@ export const importData = (
   const oldConversationsParsed = oldConversations
     ? JSON.parse(oldConversations)
     : [];
-  const newHistory: Conversation[] = [...oldConversationsParsed, ...history];
-  localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
-  localStorage.setItem(
-    'selectedConversation',
-    JSON.stringify(newHistory[newHistory.length - 1]),
+
+  const newHistory: Conversation[] = [
+    ...oldConversationsParsed,
+    ...history,
+  ].filter(
+    (conversation, index, self) =>
+      index === self.findIndex((c) => c.id === conversation.id),
   );
+  localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
+  if (newHistory.length > 0) {
+    localStorage.setItem(
+      'selectedConversation',
+      JSON.stringify(newHistory[newHistory.length - 1]),
+    );
+  } else {
+    localStorage.removeItem('selectedConversation');
+  }
 
   const oldFolders = localStorage.getItem('folders');
   const oldFoldersParsed = oldFolders ? JSON.parse(oldFolders) : [];
-  const newFolders: FolderInterface[] = [...oldFoldersParsed, ...folders];
+  const newFolders: FolderInterface[] = [
+    ...oldFoldersParsed,
+    ...folders,
+  ].filter(
+    (folder, index, self) =>
+      index === self.findIndex((f) => f.id === folder.id),
+  );
   localStorage.setItem('folders', JSON.stringify(newFolders));
 
   const oldPrompts = localStorage.getItem('prompts');
   const oldPromptsParsed = oldPrompts ? JSON.parse(oldPrompts) : [];
-  const newPrompts: Prompt[] = [...oldPromptsParsed, ...prompts];
+  const newPrompts: Prompt[] = [...oldPromptsParsed, ...prompts].filter(
+    (prompt, index, self) =>
+      index === self.findIndex((p) => p.id === prompt.id),
+  );
   localStorage.setItem('prompts', JSON.stringify(newPrompts));
 
   return {
     version: 4,
-    history: newHistory.map((e, idx) => ({ ...e, id: `${idx}` })),
-    folders: newFolders.map((e, idx) => ({ ...e, id: `${idx}` })),
-    prompts: newPrompts.map((e, idx) => ({ ...e, id: `${idx}` })),
+    history: newHistory,
+    folders: newFolders,
+    prompts: newPrompts,
   };
 };
