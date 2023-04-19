@@ -10,7 +10,9 @@ RUN npm ci
 # ---- Build ----
 FROM dependencies AS build
 COPY . .
-RUN npm run build
+RUN env \
+  NEXT_PUBLIC_DEFAULT_TEMPERATURE=0.2 \
+  npm run build
 
 # ---- Production ----
 FROM node:19-alpine AS production
