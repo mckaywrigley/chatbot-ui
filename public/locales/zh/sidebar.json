@@ -1,11 +1,14 @@
 {
   "New folder": "新建文件夹",
   "New chat": "新建聊天",
+  "New Conversation": "新的聊天",
   "No conversations.": "无对话",
   "Search conversations...": "搜索对话...",
   "OpenAI API Key": "OpenAI API 密钥",
   "Import data": "导入对话",
   "Are you sure?": "确定吗？",
   "Clear conversations": "清空对话",
-  "Export data": "导出对话"
+  "Settings": "设置",
+  "Export data": "导出对话",
+  "Plugin Keys": "插件密钥"
 }
