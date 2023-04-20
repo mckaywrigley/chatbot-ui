@@ -8,6 +8,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   // added system prompt for each conversation (3/21/23)
   // added folders (3/23/23)
   // added prompts (3/26/23)
+  // added messages (4/16/23)
 
   let updatedConversation = conversation;
 
@@ -41,6 +42,13 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     };
   }
 
+  if (!updatedConversation.messages) {
+    updatedConversation = {
+      ...updatedConversation,
+      messages: updatedConversation.messages || [],
+    };
+  }
+
   return updatedConversation;
 };
 
@@ -49,6 +57,7 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
   // added system prompt for each conversation (3/21/23)
   // added folders (3/23/23)
   // added prompts (3/26/23)
+  // added messages (4/16/23)
 
   if (!Array.isArray(history)) {
     console.warn('history is not an array. Returning an empty array.');
@@ -71,6 +80,10 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
       if (!conversation.folderId) {
         conversation.folderId = null;
+      }
+
+      if (!conversation.messages) {
+        conversation.messages = [];
       }
 
       acc.push(conversation);
