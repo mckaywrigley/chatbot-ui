@@ -1,3 +1,4 @@
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery } from 'react-query';
@@ -34,6 +35,7 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
+import { AuthModel } from '@/components/Auth/AuthModel';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
@@ -63,6 +65,8 @@ const Home = ({
   const [initialRender, setInitialRender] = useState<boolean>(true);
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
+  const session = useSession();
+  const supabase = useSupabaseClient();
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -77,6 +81,7 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      showLoginSignUpModel,
     },
     dispatch,
   } = contextValue;
@@ -254,6 +259,27 @@ const Home = ({
       });
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
+  // USER AUTH ------------------------------------------
+  useEffect(() => {
+    if (session?.user) {
+      console.log('session', session);
+      dispatch({ field: 'showLoginSignUpModel', value: false });
+      dispatch({
+        field: 'user',
+        value: {
+          id: session.user.id,
+          email: session.user.email,
+        },
+      });
+    }
+  }, [session]);
+
+  const handleUserLogout = async () => {
+    await supabase.auth.signOut();
+    dispatch({ field: 'user', value: null });
+    toast.success(t('You have been logged out'));
+  };
+
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
@@ -373,6 +399,7 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
+        handleUserLogout
       }}
     >
       <Head>
@@ -405,7 +432,14 @@ const Home = ({
                 googleAdSenseId={googleAdSenseId}
               />
             </div>
-
+            {showLoginSignUpModel && (
+              <AuthModel
+                supabase={supabase}
+                onClose={() =>
+                  dispatch({ field: 'showLoginSignUpModel', value: false })
+                }
+              />
+            )}
             <Promptbar />
           </div>
         </main>
@@ -418,15 +452,8 @@ export default Home;
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const defaultModelId = fallbackModelID;
 
-  let serverSidePluginKeysSet = false;
-
-  const googleApiKey = process.env.GOOGLE_API_KEY;
-  const googleCSEId = process.env.GOOGLE_CSE_ID;
+  let serverSidePluginKeysSet = true;
   const googleAdSenseId = process.env.GOOGLE_ADSENSE_ID;
-
-  if (googleApiKey && googleCSEId) {
-    serverSidePluginKeysSet = true;
-  }
 
   return {
     props: {

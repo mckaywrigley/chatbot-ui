@@ -4,6 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { User } from '@/types/user';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -27,6 +28,10 @@ export interface HomeInitialState {
   defaultModelId: OpenAIModelID | undefined;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
+  
+  // User Auth
+  showLoginSignUpModel: boolean;
+  user: User | null;
 }
 
 export const initialState: HomeInitialState = {
@@ -51,4 +56,8 @@ export const initialState: HomeInitialState = {
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
+
+  // User Auth
+  showLoginSignUpModel: false,
+  user: null
 };

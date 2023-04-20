@@ -13,6 +13,10 @@
   "dependencies": {
     "@ctrl/react-adsense": "^1.6.2",
     "@dqbd/tiktoken": "^1.0.2",
+    "@headlessui/react": "^1.7.14",
+    "@supabase/auth-helpers-nextjs": "^0.6.1",
+    "@supabase/auth-helpers-react": "^0.3.1",
+    "@supabase/auth-ui-react": "^0.3.5",
     "@supabase/supabase-js": "^2.15.0",
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
