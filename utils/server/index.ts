@@ -26,6 +26,7 @@ export class OpenAIError extends Error {
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
+  temperature : number,
   key: string,
   messages: Message[],
 ) => {
@@ -57,7 +58,7 @@ export const OpenAIStream = async (
         ...messages,
       ],
       max_tokens: 1000,
-      temperature: 1,
+      temperature: temperature,
       stream: true,
     }),
   });
