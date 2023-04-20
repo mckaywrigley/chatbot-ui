@@ -1,0 +1,12 @@
+{
+  "New prompt": "Yeni prompt",
+  "New folder": "Yeni klasör",
+  "No prompts.": "Prompt yok.",
+  "Search prompts...": "Prompt'ları ara...",
+  "Name": "İsim",
+  "Description": "Açıklama",
+  "A description for your prompt.": "Prompt'unuz için bir açıklama.",
+  "Prompt": "Prompt",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt içeriği. Değişken belirtmek için {{}} kullanın. Örn: {{ad}} bir {{sıfat}} {{isim}}",
+  "Save": "Kaydet"
+}

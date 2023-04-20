@@ -15,16 +15,21 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, DATABASE_TYPE } from '@/utils/app/const';
 import {
-  saveSelectedConversation,
-  saveConversations,
-  updateConversation,
-  getSelectedConversation,
+  DATABASE_TYPE,
+  DEFAULT_SYSTEM_PROMPT,
+  DEFAULT_TEMPERATURE,
+} from '@/utils/app/const';
+import {
   getConversations,
+  getSelectedConversation,
+  saveConversations,
+  saveSelectedConversation,
+  updateConversation,
 } from '@/utils/app/conversation';
 import { getFolders, saveFolders } from '@/utils/app/folders';
 import { getPrompts, savePrompts } from '@/utils/app/prompts';
+import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -72,7 +77,7 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
-      temperature
+      temperature,
     },
     dispatch,
   } = contextValue;
@@ -240,8 +245,7 @@ const Home = ({
   useEffect(() => {
     defaultModelId &&
       dispatch({ field: 'defaultModelId', value: defaultModelId });
-    databaseType && 
-      dispatch({ field: 'databaseType', value: databaseType });
+    databaseType && dispatch({ field: 'databaseType', value: databaseType });
     serverSideApiKeyIsSet &&
       dispatch({
         field: 'serverSideApiKeyIsSet',
@@ -252,7 +256,12 @@ const Home = ({
         field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
-  }, [defaultModelId, databaseType, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
+  }, [
+    defaultModelId,
+    databaseType,
+    serverSideApiKeyIsSet,
+    serverSidePluginKeysSet,
+  ]);
 
   // ON LOAD --------------------------------------------
 
@@ -295,34 +304,28 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    getFolders(databaseType).then(
-        (folders) => {
-          if (folders) {
-            dispatch({ field: 'folders', value: folders });
-          }
-        },
-      );
+    getFolders(databaseType).then((folders) => {
+      if (folders) {
+        dispatch({ field: 'folders', value: folders });
+      }
+    });
 
-    getPrompts(databaseType).then(
-      (prompts) => {
-        if (prompts) {
-          dispatch({ field: 'prompts', value: prompts });
-        }
-      },
-    );
+    getPrompts(databaseType).then((prompts) => {
+      if (prompts) {
+        dispatch({ field: 'prompts', value: prompts });
+      }
+    });
 
-    getConversations(databaseType).then(
-      (conversationHistory) => {
-        if (conversationHistory) {
-          const parsedConversationHistory: Conversation[] = conversationHistory;
-          const cleanedConversationHistory = cleanConversationHistory(
-            parsedConversationHistory,
-          );
-    
-          dispatch({ field: 'conversations', value: cleanedConversationHistory });
-        }
-      },
-    );
+    getConversations(databaseType).then((conversationHistory) => {
+      if (conversationHistory) {
+        const parsedConversationHistory: Conversation[] = conversationHistory;
+        const cleanedConversationHistory = cleanConversationHistory(
+          parsedConversationHistory,
+        );
+
+        dispatch({ field: 'conversations', value: cleanedConversationHistory });
+      }
+    });
 
     const selectedConversation = getSelectedConversation();
     if (selectedConversation) {

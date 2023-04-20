@@ -1,8 +1,10 @@
-import { FC, useState } from 'react';
+import { FC, useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
 import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
+
+import HomeContext from '@/pages/api/home/home.context';
 
 interface Props {
   label: string;
@@ -13,7 +15,13 @@ export const TemperatureSlider: FC<Props> = ({
   label,
   onChangeTemperature,
 }) => {
-  const [temperature, setTemperature] = useState(DEFAULT_TEMPERATURE);
+  const {
+    state: { conversations },
+  } = useContext(HomeContext);
+  const lastConversation = conversations[conversations.length - 1];
+  const [temperature, setTemperature] = useState(
+    lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+  );
   const { t } = useTranslation('chat');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);
@@ -31,7 +39,9 @@ export const TemperatureSlider: FC<Props> = ({
           'Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.',
         )}
       </span>
-      <span className="mt-2 mb-1 text-center">{temperature.toFixed(1)}</span>
+      <span className="mt-2 mb-1 text-center text-neutral-900 dark:text-neutral-100">
+        {temperature.toFixed(1)}
+      </span>
       <input
         className="cursor-pointer"
         type="range"
@@ -41,14 +51,14 @@ export const TemperatureSlider: FC<Props> = ({
         value={temperature}
         onChange={handleChange}
       />
-      <ul className="w mt-2 pb-8 flex justify-between px-[24px]">
-        <li className="relative flex justify-center">
+      <ul className="w mt-2 pb-8 flex justify-between px-[24px] text-neutral-900 dark:text-neutral-100">
+        <li className="flex justify-center">
           <span className="absolute">{t('Precise')}</span>
         </li>
-        <li className="relative flex justify-center">
+        <li className="flex justify-center">
           <span className="absolute">{t('Neutral')}</span>
         </li>
-        <li className="relative flex justify-center">
+        <li className="flex justify-center">
           <span className="absolute">{t('Creative')}</span>
         </li>
       </ul>
