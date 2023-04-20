@@ -1,10 +1,10 @@
 import {
   IconBrandFacebook,
   IconFileExport,
+  IconLogin,
   IconMoon,
   IconSun,
-  IconLogin,
-  IconLogout
+  IconArticle
 } from '@tabler/icons-react';
 import { useContext } from 'react';
 
@@ -21,13 +21,8 @@ export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
 
   const {
-    state: {
-      lightMode,
-      conversations,
-      user
-    },
+    state: { lightMode, conversations, user },
     dispatch: homeDispatch,
-    handleUserLogout,
   } = useContext(HomeContext);
 
   const {
@@ -36,16 +31,19 @@ export const ChatbarSettings = () => {
     handleExportData,
   } = useContext(ChatbarContext);
 
-  const signInSignOutOnClick = () => {
-    if(user){
-      handleUserLogout();
-    }else{
+  const signInAccountOnClick = () => {
+    if (user) {
+      homeDispatch({
+        field: 'showProfileModel',
+        value: true,
+      });
+    } else {
       homeDispatch({
         field: 'showLoginSignUpModel',
         value: true,
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
@@ -74,11 +72,9 @@ export const ChatbarSettings = () => {
         }
       />
       <SidebarButton
-        text={user ? t('Sign out') : t('Sign in')}
-        icon={
-          user ? <IconLogin size={18} /> : <IconLogout size={18} />
-        }
-        onClick={signInSignOutOnClick}
+        text={user ? t('Account') : t('Sign in')}
+        icon={user ? <IconArticle size={18} /> : <IconLogin size={18} />}
+        onClick={signInAccountOnClick}
       />
       <SidebarButton
         text={t('Follow for updates!')}

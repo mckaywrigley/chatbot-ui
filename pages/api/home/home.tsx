@@ -35,11 +35,12 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
-import { AuthModel } from '@/components/Auth/AuthModel';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
+import { AuthModel } from '@/components/User/AuthModel';
+import { ProfileModel } from '@/components/User/ProfileModel';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -82,6 +83,7 @@ const Home = ({
       prompts,
       temperature,
       showLoginSignUpModel,
+      showProfileModel,
     },
     dispatch,
   } = contextValue;
@@ -399,7 +401,7 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
-        handleUserLogout
+        handleUserLogout,
       }}
     >
       <Head>
@@ -437,6 +439,14 @@ const Home = ({
                 supabase={supabase}
                 onClose={() =>
                   dispatch({ field: 'showLoginSignUpModel', value: false })
+                }
+              />
+            )}
+            {showProfileModel && session && (
+              <ProfileModel
+                session={session}
+                onClose={() =>
+                  dispatch({ field: 'showProfileModel', value: false })
                 }
               />
             )}

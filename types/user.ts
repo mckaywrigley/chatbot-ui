@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  subscriptionPlan: SubscriptionPlan;
+  plan: SubscriptionPlan;
 }
 
 export type SubscriptionPlan = 'free' | 'pro';
