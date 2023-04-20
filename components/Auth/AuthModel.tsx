@@ -13,7 +13,8 @@ type Props = {
 export const AuthModel: FC<Props> = ({ onClose, supabase }) => {
   return (
     <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose} open>
+      <Dialog as="div" className="relative z-50" onClose={onClose} open>
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -37,10 +38,12 @@ export const AuthModel: FC<Props> = ({ onClose, supabase }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800">
                 <Auth
                   supabaseClient={supabase}
                   appearance={{ theme: ThemeSupa }}
+                  providers={[]}
+                  theme='dark'
                 />
               </Dialog.Panel>
             </Transition.Child>
