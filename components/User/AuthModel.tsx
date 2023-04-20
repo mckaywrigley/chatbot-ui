@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const AuthModel: FC<Props> = ({ onClose, supabase }) => {
-  const { t } = useTranslation('models');
+  const { t } = useTranslation('model');
 
   return (
     <Transition appear show={true} as={Fragment}>

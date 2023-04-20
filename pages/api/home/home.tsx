@@ -475,6 +475,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'common',
         'chat',
         'sidebar',
+        'model',
         'markdown',
         'promptbar',
         'prompts',
