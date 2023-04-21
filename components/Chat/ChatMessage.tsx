@@ -133,7 +133,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
       }`}
       style={{ overflowWrap: 'anywhere' }}
     >
-      <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+      <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-full">
         <div className="min-w-[40px] text-right font-bold">
           {message.role === 'assistant' ? (
             <IconRobot size={30} />
