@@ -16,7 +16,7 @@
   "Error fetching models.": "モデルの取得中にエラーが発生しました。",
   "AI": "AI",
   "You": "あなた",
-  "Cancel": "Cancel",
+  "Cancel": "キャンセル",
   "Save & Submit": "Save & Submit",
   "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "OpenAIのAPIキーがサイドバーの左下に設定されていることを確認してください。",
   "If you completed this step, OpenAI may be experiencing issues.": "このステップを完了した場合、OpenAIに問題が発生している可能性があります。",
