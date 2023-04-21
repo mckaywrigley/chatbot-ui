@@ -1,6 +1,8 @@
 import {
+  IconArticle,
   IconBrandFacebook,
   IconFileExport,
+  IconLogin,
   IconMoon,
   IconSun,
 } from '@tabler/icons-react';
@@ -19,10 +21,7 @@ export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
 
   const {
-    state: {
-      lightMode,
-      conversations,
-    },
+    state: { lightMode, conversations, user },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
@@ -31,6 +30,20 @@ export const ChatbarSettings = () => {
     handleImportConversations,
     handleExportData,
   } = useContext(ChatbarContext);
+
+  const signInAccountOnClick = () => {
+    if (user) {
+      homeDispatch({
+        field: 'showProfileModel',
+        value: true,
+      });
+    } else {
+      homeDispatch({
+        field: 'showLoginSignUpModel',
+        value: true,
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
@@ -57,6 +70,18 @@ export const ChatbarSettings = () => {
             value: lightMode === 'light' ? 'dark' : 'light',
           })
         }
+      />
+      <SidebarButton
+        text={user ? t('Account') : t('Sign in')}
+        icon={user ? <IconArticle size={18} /> : <IconLogin size={18} />}
+        suffixIcon={
+          user ? undefined : (
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+              New
+            </span>
+          )
+        }
+        onClick={signInAccountOnClick}
       />
       <SidebarButton
         text={t('Follow for updates!')}
