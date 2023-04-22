@@ -1,4 +1,8 @@
 import { Conversation } from '@/types/chat';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { v4 as uuidv4 } from 'uuid';
+import { getCurrentUnixTime } from './chatRoomUtils';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 export const updateConversation = (
   updatedConversation: Conversation,
@@ -28,12 +32,6 @@ export const saveConversation = (conversation: Conversation) => {
 export const saveConversations = (conversations: Conversation[]) => {
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
 };
-
-
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { v4 as uuidv4 } from 'uuid';
-import { getCurrentUnixTime } from './chatRoomUtils';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 export const createNewConversation = (name: string, defaultModelId: OpenAIModelID, lastConversation?: Conversation) => {
   let id = uuidv4();
