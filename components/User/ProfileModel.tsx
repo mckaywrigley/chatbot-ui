@@ -46,7 +46,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-white">
                 <Dialog.Description>
                   {t(
-                    'Thank you for registering with us. We are currently working on the some exiting features. Please check back soon!',
+                    'Thank you for registering with us. We are currently working on the some exciting features. Please check back soon!',
                   )}
                 </Dialog.Description>
 
