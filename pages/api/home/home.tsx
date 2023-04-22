@@ -264,7 +264,6 @@ const Home = ({
   // USER AUTH ------------------------------------------
   useEffect(() => {
     if (session?.user) {
-      console.log('session', session);
       dispatch({ field: 'showLoginSignUpModel', value: false });
       dispatch({
         field: 'user',
