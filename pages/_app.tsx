@@ -6,6 +6,8 @@ import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 
 import LoginForm from '../components/Settings/LoginForm';
+import Cookies from 'js-cookie';
+
 import { useState, useEffect } from 'react';
 
 import '@/styles/globals.css';
@@ -20,7 +22,7 @@ function App({ Component, pageProps }: AppProps<{}>) {
 
   useEffect(() => {
     if (isBrowser) {
-      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setIsLoggedIn(Cookies.get('isLoggedIn') === 'true');
     }
   }, []);
 
