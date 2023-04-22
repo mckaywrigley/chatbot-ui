@@ -7,7 +7,15 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: '100%'
+          }
+        }
+      }
+    },
   },
   variants: {
     extend: {
