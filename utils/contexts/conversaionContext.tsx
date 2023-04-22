@@ -1,5 +1,7 @@
 // conversaionContext.tsx
-import React, { createContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useReducer, useEffect } from 'react';
+import HomeContext from '@/pages/api/home/home.context';
+
 import type { Conversation, ChatNode } from '@/types/chat';
 import {
   switchNode,
@@ -9,27 +11,27 @@ import {
 
 type Actions = {
   clickSwitchNode: (index: number, increment: number) => void;
-  setSelectedConversation: (conversation: Conversation) => void;
+  // setSelectedConversation: (conversation: Conversation) => void;
   addMessage: (newMessage: ChatNode, index?: number) => void;
   popCurrentMessageList: () => void;
 };
 
 interface CurrentUserContextType {
   currentMessageList: ChatNode[];
-  selectedConversation: Conversation | null;
-  setSelectedConversation: (conversation: Conversation) => void;
+  // selectedConversation: Conversation | null;
+  // setSelectedConversation: (conversation: Conversation) => void;
   modifiedMessage: (updateChatNode: ChatNode) => void;
   actions: Actions;
 }
 
 export const ConversationContext = createContext<CurrentUserContextType>({
   currentMessageList: [],
-  selectedConversation: null,
-  setSelectedConversation: () => {},
+  // selectedConversation: null,
+  // setSelectedConversation: () => {},
   modifiedMessage: (updateChatNode: ChatNode) => {},
   actions: {
     clickSwitchNode: (index: number, increment: number) => {},
-    setSelectedConversation: (conversation: Conversation) => {},
+    // setSelectedConversation: (conversation: Conversation) => {},
     addMessage: (newMessage: ChatNode, index?: number) => {},
     popCurrentMessageList: () => {},
   },
@@ -43,8 +45,15 @@ interface Props {
 export const ConversationProvider: React.FC<Props> = ({ children }) => {
   const [currentMessageList, setCurrentMessageList] = useState<ChatNode[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
-  const [selectedConversation, setSelectedConversation] =
-    useState<Conversation | null>(null);
+  // const [selectedConversation, setSelectedConversation] =
+  //   useState<Conversation | null>(null);
+  const {
+    state: {
+      selectedConversation,
+    },
+    // handleUpdateConversation,
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
 
   useEffect(() => {
     setSelectedId(selectedConversation?.id || '');
@@ -67,9 +76,12 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
       increment,
       selectedConversation,
     );
-    setSelectedConversation({
-      ...selectedConversation,
-      current_node,
+    homeDispatch({
+      field: 'selectedConversation',
+      value: {
+        ...selectedConversation,
+        current_node,
+      },
     });
   };
 
@@ -82,14 +94,18 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
       index,
     );
 
-    setSelectedConversation({
-      ...selectedConversation!,
-      current_node,
+    homeDispatch({
+      field: 'selectedConversation',
+      value: {
+        ...selectedConversation,
+        current_node,
+      },
     });
   };
 
   const modifiedMessage = (updateChatNode: ChatNode) => {
     if (selectedConversation) {
+      console.log("@modifiedMessage: update Node", updateChatNode)
       let nodeId = updateChatNode.id;
       let { mapping, ...others } = selectedConversation;
       let updatedConversation: Conversation = {
@@ -99,7 +115,10 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
           [nodeId]: updateChatNode,
         },
       };
-      setSelectedConversation(updatedConversation);
+      homeDispatch({
+        field: 'selectedConversation',
+        value: updatedConversation
+      });
     }
   };
 
@@ -107,25 +126,28 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
     if (selectedConversation) {
       // let updateCurrentMessageList = currentMessageList.slice(0, -1) // currently, I don't know why it cannot work.
       let lastNode = currentMessageList.pop();
-
-      setSelectedConversation({
-        ...selectedConversation,
-        current_node: lastNode?.parentMessageId!,
+      homeDispatch({
+        field: 'selectedConversation',
+        value: {
+          ...selectedConversation,
+          current_node: lastNode?.parentMessageId!,
+        }
       });
+     
       setCurrentMessageList([...currentMessageList]);
     }
   };
 
   const actions: Actions = {
     clickSwitchNode,
-    setSelectedConversation,
+    // setSelectedConversation,
     popCurrentMessageList,
     addMessage,
   };
   const contextValue = {
     currentMessageList,
     selectedConversation,
-    setSelectedConversation,
+    // setSelectedConversation,
     modifiedMessage,
     actions,
   };

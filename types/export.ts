@@ -1,5 +1,5 @@
 import { Conversation, Message, Role } from './chat';
-import { Folder } from './folder';
+import { FolderInterface } from './folder';
 import { OpenAIModel } from './openai';
 import { Prompt } from './prompt';
 
@@ -53,20 +53,29 @@ export interface ExportFormatV2 {
 ////////////////////////////////////////////////////////////////////////////////////////////
 export interface ExportFormatV3 {
   version: 3;
-  history: ConversationV4[];
-  folders: Folder[];
+// <<<<<<< HEAD
+  // history: ConversationV4[];
+  // folders: Folder[];
+// =======
+  history: Conversation[];
+  folders: FolderInterface[];
+// >>>>>>> upstream/main
 }
 
 export interface ExportFormatV4 {
   version: 4;
   history: ConversationV4[];
-  folders: Folder[];
+  folders: FolderInterface[];
   prompts: Prompt[];
 }
 
 export interface ExportFormatV5 {
   version: 5;
   history: Conversation[];
-  folders: Folder[];
+// <<<<<<< HEAD
+  // folders: Folder[];
+// =======
+  folders: FolderInterface[];
+// >>>>>>> upstream/main
   prompts: Prompt[];
 }

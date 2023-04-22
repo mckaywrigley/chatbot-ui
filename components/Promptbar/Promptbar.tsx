@@ -1,50 +1,85 @@
-import { Folder } from '@/types/folder';
-import { Prompt } from '@/types/prompt';
-import {
-  IconFolderPlus,
-  IconMistOff,
-  IconPlus,
-} from '@tabler/icons-react';
-import { FC, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PromptFolders } from '../Folders/Prompt/PromptFolders';
-import { Search } from '../Sidebar/Search';
-import { PromptbarSettings } from './PromptbarSettings';
-import { Prompts } from './Prompts';
 
-interface Props {
-  prompts: Prompt[];
-  folders: Folder[];
-  onCreateFolder: (name: string) => void;
-  onDeleteFolder: (folderId: string) => void;
-  onUpdateFolder: (folderId: string, name: string) => void;
-  onCreatePrompt: () => void;
-  onUpdatePrompt: (prompt: Prompt) => void;
-  onDeletePrompt: (prompt: Prompt) => void;
-}
+import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-export const Promptbar: FC<Props> = ({
-  folders,
-  prompts,
-  onCreateFolder,
-  onDeleteFolder,
-  onUpdateFolder,
-  onCreatePrompt,
-  onUpdatePrompt,
-  onDeletePrompt,
-}) => {
+import { savePrompts } from '@/utils/app/prompts';
+
+import { OpenAIModels } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
+
+import HomeContext from '@/pages/api/home/home.context';
+
+import { PromptFolders } from './components/PromptFolders';
+import { PromptbarSettings } from './components/PromptbarSettings';
+import { Prompts } from './components/Prompts';
+
+import Sidebar from '../Sidebar';
+import PromptbarContext from './PromptBar.context';
+import { PromptbarInitialState, initialState } from './Promptbar.state';
+
+import { v4 as uuidv4 } from 'uuid';
+
+const Promptbar = () => {
   const { t } = useTranslation('promptbar');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>(prompts);
 
-  const handleUpdatePrompt = (prompt: Prompt) => {
-    onUpdatePrompt(prompt);
-    setSearchTerm('');
+  const promptBarContextValue = useCreateReducer<PromptbarInitialState>({
+    initialState,
+  });
+
+  const {
+    state: { prompts, defaultModelId, showPromptbar },
+    dispatch: homeDispatch,
+    handleCreateFolder,
+  } = useContext(HomeContext);
+
+  const {
+    state: { searchTerm, filteredPrompts },
+    dispatch: promptDispatch,
+  } = promptBarContextValue;
+
+  const handleTogglePromptbar = () => {
+    homeDispatch({ field: 'showPromptbar', value: !showPromptbar });
+    localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
+  };
+
+  const handleCreatePrompt = () => {
+    if (defaultModelId) {
+      const newPrompt: Prompt = {
+        id: uuidv4(),
+        name: `Prompt ${prompts.length + 1}`,
+        description: '',
+        content: '',
+        model: OpenAIModels[defaultModelId],
+        folderId: null,
+      };
+
+      const updatedPrompts = [...prompts, newPrompt];
+
+      homeDispatch({ field: 'prompts', value: updatedPrompts });
+
+      savePrompts(updatedPrompts);
+    }
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    onDeletePrompt(prompt);
-    setSearchTerm('');
+    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
+
+    homeDispatch({ field: 'prompts', value: updatedPrompts });
+    savePrompts(updatedPrompts);
+  };
+
+  const handleUpdatePrompt = (prompt: Prompt) => {
+    const updatedPrompts = prompts.map((p) => {
+      if (p.id === prompt.id) {
+        return prompt;
+      }
+
+      return p;
+    });
+    homeDispatch({ field: 'prompts', value: updatedPrompts });
+
+    savePrompts(updatedPrompts);
   };
 
   const handleDrop = (e: any) => {
@@ -56,28 +91,17 @@ export const Promptbar: FC<Props> = ({
         folderId: e.target.dataset.folderId,
       };
 
-      onUpdatePrompt(updatedPrompt);
+      handleUpdatePrompt(updatedPrompt);
 
       e.target.style.background = 'none';
     }
   };
 
-  const allowDrop = (e: any) => {
-    e.preventDefault();
-  };
-
-  const highlightDrop = (e: any) => {
-    e.target.style.background = '#343541';
-  };
-
-  const removeHighlight = (e: any) => {
-    e.target.style.background = 'none';
-  };
-
   useEffect(() => {
     if (searchTerm) {
-      setFilteredPrompts(
-        prompts.filter((prompt) => {
+      promptDispatch({
+        field: 'filteredPrompts',
+        value: prompts.filter((prompt) => {
           const searchable =
             prompt.name.toLowerCase() +
             ' ' +
@@ -86,85 +110,43 @@ export const Promptbar: FC<Props> = ({
             prompt.content.toLowerCase();
           return searchable.includes(searchTerm.toLowerCase());
         }),
-      );
+      });
     } else {
-      setFilteredPrompts(prompts);
+      promptDispatch({ field: 'filteredPrompts', value: prompts });
     }
   }, [searchTerm, prompts]);
 
   return (
-    <div
-      className={`fixed top-0 right-0 z-50 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
+    <PromptbarContext.Provider
+      value={{
+        ...promptBarContextValue,
+        handleCreatePrompt,
+        handleDeletePrompt,
+        handleUpdatePrompt,
+      }}
     >
-      <div className="flex items-center">
-        <button
-          className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
-          onClick={() => {
-            onCreatePrompt();
-            setSearchTerm('');
-          }}
-        >
-          <IconPlus size={16} />
-          {t('New prompt')}
-        </button>
-
-        <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
-          onClick={() => onCreateFolder(t('New folder'))}
-        >
-          <IconFolderPlus size={16} />
-        </button>
-      </div>
-
-      {prompts.length > 1 && (
-        <Search
-          placeholder={t('Search prompts...') || ''}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      )}
-
-      <div className="flex-grow overflow-auto">
-        {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
-            <PromptFolders
-              searchTerm={searchTerm}
-              prompts={filteredPrompts}
-              folders={folders}
-              onUpdateFolder={onUpdateFolder}
-              onDeleteFolder={onDeleteFolder}
-              // prompt props
-              onDeletePrompt={handleDeletePrompt}
-              onUpdatePrompt={handleUpdatePrompt}
-            />
-          </div>
-        )}
-
-        {prompts.length > 0 ? (
-          <div
-            className="pt-2"
-            onDrop={(e) => handleDrop(e)}
-            onDragOver={allowDrop}
-            onDragEnter={highlightDrop}
-            onDragLeave={removeHighlight}
-          >
-            <Prompts
-              prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
-              onUpdatePrompt={handleUpdatePrompt}
-              onDeletePrompt={handleDeletePrompt}
-            />
-          </div>
-        ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
-            <IconMistOff className="mx-auto mb-3" />
-            <span className="text-[14px] leading-normal">
-              {t('No prompts.')}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <PromptbarSettings />
-    </div>
+      <Sidebar<Prompt>
+        side={'right'}
+        isOpen={showPromptbar}
+        addItemButtonTitle={t('New prompt')}
+        itemComponent={
+          <Prompts
+            prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
+          />
+        }
+        folderComponent={<PromptFolders />}
+        items={filteredPrompts}
+        searchTerm={searchTerm}
+        handleSearchTerm={(searchTerm: string) =>
+          promptDispatch({ field: 'searchTerm', value: searchTerm })
+        }
+        toggleOpen={handleTogglePromptbar}
+        handleCreateItem={handleCreatePrompt}
+        handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
+        handleDrop={handleDrop}
+      />
+    </PromptbarContext.Provider>
   );
 };
+
+export default Promptbar;

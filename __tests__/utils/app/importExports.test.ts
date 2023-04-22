@@ -1,14 +1,18 @@
+// <<<<<<< HEAD
 import {
-  ExportFormatV1,
-  ExportFormatV2,
-  ExportFormatV3,
-  ExportFormatV4,
+  // ExportFormatV1,
+  // ExportFormatV2,
+  // ExportFormatV3,
+  // ExportFormatV4,
   LatestExportFormat,
 } from '@/types/export';
-import { OpenAIModels, OpenAIModelID } from '@/types/openai';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { it, describe, expect } from 'vitest';
+// import { OpenAIModels, OpenAIModelID } from '@/types/openai';
+// import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+// import { it, describe, expect } from 'vitest';
 
+// =======
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+// >>>>>>> upstream/main
 import {
   cleanData,
   isExportFormatV1,
@@ -21,6 +25,11 @@ import {
 import { ChatNode } from '@/types/chat';
 import { getChatNodeIdFromMessage } from '@/utils/app/clean';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+
+import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '@/types/export';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+
+import { describe, expect, it } from 'vitest';
 
 describe('Export Format Functions', () => {
   describe('isExportFormatV1', () => {
@@ -124,6 +133,7 @@ describe('cleanData Functions', () => {
         folderId: null,
         create_time: currentTime,
         update_time: currentTime,
+        temperature: 1,
       },
     ],
     folders: [],
@@ -175,7 +185,33 @@ describe('cleanData Functions', () => {
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
-        ...latestFormatWithoutFoldersOrPrompts,
+// <<<<<<< HEAD
+//         ...latestFormatWithoutFoldersOrPrompts,
+// =======
+        version: 4,
+        history: [
+          {
+            id: 1,
+            name: 'conversation 1',
+            messages: [
+              {
+                role: 'user',
+                content: "what's up ?",
+              },
+              {
+                role: 'assistant',
+                content: 'Hi',
+              },
+            ],
+            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: DEFAULT_TEMPERATURE,
+            folderId: null,
+          },
+        ],
+        folders: [],
+        prompts: [],
+// >>>>>>> upstream/main
       });
     });
   });
@@ -232,6 +268,7 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         ],
@@ -269,6 +306,7 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         ],
@@ -290,9 +328,53 @@ describe('cleanData Functions', () => {
           },
         ],
       } as ExportFormatV4;
+// <<<<<<< HEAD
+//       expect(obj).toEqual(latestFormatWithFoldersAndPrompts);
+// =======
+
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
-      expect(obj).toEqual(latestFormatWithFoldersAndPrompts);
+      expect(obj).toEqual({
+        version: 4,
+        history: [
+          {
+            id: '1',
+            name: 'conversation 1',
+            messages: [
+              {
+                role: 'user',
+                content: "what's up ?",
+              },
+              {
+                role: 'assistant',
+                content: 'Hi',
+              },
+            ],
+            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: DEFAULT_TEMPERATURE,
+            folderId: null,
+          },
+        ],
+        folders: [
+          {
+            id: '1',
+            name: 'folder 1',
+            type: 'chat',
+          },
+        ],
+        prompts: [
+          {
+            id: '1',
+            name: 'prompt 1',
+            description: '',
+            content: '',
+            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            folderId: null,
+          },
+        ],
+      });
+// >>>>>>> upstream/main
     });
   });
 });

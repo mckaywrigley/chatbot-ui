@@ -18,6 +18,7 @@ export interface ChatBody {
   messages: SendMessage[];
   key: string;
   prompt: string;
+  temperature: number;
 }
 
 export interface ChatNode {
@@ -32,6 +33,7 @@ export interface Conversation {
   name: string;
   model: OpenAIModel;
   prompt: string;
+  temperature: number;
   folderId: string | null;
   mapping: Record<string, ChatNode>;
   current_node: string;
