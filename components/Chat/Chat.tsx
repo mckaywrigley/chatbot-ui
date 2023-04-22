@@ -40,8 +40,6 @@ import { TemperatureSlider } from './Temperature';
 
 import { v4 as uuidv4 } from 'uuid';
 
-// const { currentMessageList } = useContext(ConversationContext);
-
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
@@ -386,7 +384,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     throttledScrollDown();
     // selectedConversation &&
     //   setCurrentMessage(
-    //     selectedConversation.messages[selectedConversation.messages.length - 2],
+    //     currentMessageList[currentMessageList.length - 2],
     //   );
   }, [selectedConversation, throttledScrollDown]);
 

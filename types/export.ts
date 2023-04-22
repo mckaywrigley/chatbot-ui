@@ -53,13 +53,8 @@ export interface ExportFormatV2 {
 ////////////////////////////////////////////////////////////////////////////////////////////
 export interface ExportFormatV3 {
   version: 3;
-// <<<<<<< HEAD
-  // history: ConversationV4[];
-  // folders: Folder[];
-// =======
-  history: Conversation[];
+  history: ConversationV4[];
   folders: FolderInterface[];
-// >>>>>>> upstream/main
 }
 
 export interface ExportFormatV4 {
@@ -72,10 +67,6 @@ export interface ExportFormatV4 {
 export interface ExportFormatV5 {
   version: 5;
   history: Conversation[];
-// <<<<<<< HEAD
-  // folders: Folder[];
-// =======
   folders: FolderInterface[];
-// >>>>>>> upstream/main
   prompts: Prompt[];
 }
