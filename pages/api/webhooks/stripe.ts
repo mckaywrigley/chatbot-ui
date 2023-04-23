@@ -65,7 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         process.env.STRIPE_WEBHOOK_SECRET!,
       );
     } catch (err) {
-      console.error(`Webhook signature verification failed.`, err.message);
+      console.error(`Webhook signature verification failed.`, (err as any).message);
       return res.status(400).send(`Webhook signature verification failed.`);
     }
 
