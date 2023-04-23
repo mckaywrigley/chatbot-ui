@@ -43,7 +43,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
   const upgradeLink = () => {
     const paymentLink =
       process.env.NEXT_PUBLIC_ENV === 'production'
-        ? 'https://buy.stripe.com/fZedUP5PY90FgIo6op'
+        ? 'https://buy.stripe.com/7sI03Za6eekZ9fWbIK'
         : 'https://buy.stripe.com/test_4gw4hLcvq52Odt6fYY';
     const userEmail = user?.email;
     const userId = user?.id;
