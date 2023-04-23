@@ -1,47 +1,65 @@
-import { ChatNode } from '@/types/chat';
 import {
   IconCheck,
   IconCopy,
   IconEdit,
-  IconUser,
   IconRobot,
+  IconTrash,
+  IconUser,
 } from '@tabler/icons-react';
+import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
+
 import { useTranslation } from 'next-i18next';
-import {
-  FC,
-  memo,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import rehypeMathjax from 'rehype-mathjax';
-import { v4 as uuidv4 } from 'uuid';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
+
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import { updateConversation } from '@/utils/app/conversation';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
+
+import { ChatNode } from '@/types/chat';
+import { Message } from '@/types/chat';
+
+import HomeContext from '@/pages/api/home/home.context';
+
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
-import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+
 import { ChatSwitch } from './ChatSwitch';
 
-interface Props {
+import rehypeMathjax from 'rehype-mathjax';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import { v4 as uuidv4 } from 'uuid';
+
+export interface Props {
+  // message: Message;
   chatNode: ChatNode;
   messageIndex: number;
-  onEditMessage: (chatNode: ChatNode, messageIndex: number) => void;
+  onEdit?: (editedMessage: ChatNode) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ chatNode, messageIndex, onEditMessage }) => {
+  ({ chatNode, messageIndex, onEdit }) => {
     const { t } = useTranslation('chat');
+
+    const {
+      state: {
+        selectedConversation,
+        conversations,
+        currentMessage,
+        messageIsStreaming,
+      },
+      dispatch: homeDispatch,
+    } = useContext(HomeContext);
+    // >>>>>>> upstream/main
+
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
-    const [isHoverMessage, setIsHoverMessage] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(
       chatNode.message.content,
     );
+    const [isHoverMessage, setIsHoverMessage] = useState<boolean>(false);
     const [messagedCopied, setMessageCopied] = useState(false);
 
+    const { currentMessageList } = useContext(ConversationContext);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const toggleEditing = () => {
@@ -60,9 +78,9 @@ export const ChatMessage: FC<Props> = memo(
 
     const handleEditMessage = () => {
       if (chatNode.message.content != messageContent) {
-        const nodeId = uuidv4();
-        onEditMessage(
-          {
+        if (selectedConversation && onEdit) {
+          const nodeId = uuidv4();
+          onEdit({
             id: nodeId,
             message: {
               id: nodeId,
@@ -72,12 +90,40 @@ export const ChatMessage: FC<Props> = memo(
             },
             parentMessageId: chatNode.parentMessageId,
             children: [],
-          },
-          messageIndex,
-        );
+          });
+        }
       }
       setIsEditing(false);
     };
+
+    // const handleDeleteMessage = () => {
+    //   if (!selectedConversation) return;
+
+    //   const { messages } = selectedConversation;
+    //   const findIndex = messages.findIndex((elm) => elm === message);
+
+    //   if (findIndex < 0) return;
+
+    //   if (
+    //     findIndex < messages.length - 1 &&
+    //     messages[findIndex + 1].role === 'assistant'
+    //   ) {
+    //     messages.splice(findIndex, 2);
+    //   } else {
+    //     messages.splice(findIndex, 1);
+    //   }
+    //   const updatedConversation = {
+    //     ...selectedConversation,
+    //     messages,
+    //   };
+
+    //   const { single, all } = updateConversation(
+    //     updatedConversation,
+    //     conversations,
+    //   );
+    //   homeDispatch({ field: 'selectedConversation', value: single });
+    //   homeDispatch({ field: 'conversations', value: all });
+    // };
 
     const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
@@ -98,6 +144,10 @@ export const ChatMessage: FC<Props> = memo(
     };
 
     useEffect(() => {
+      setMessageContent(chatNode.message.content);
+    }, [chatNode.message.content]);
+
+    useEffect(() => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'inherit';
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -106,7 +156,7 @@ export const ChatMessage: FC<Props> = memo(
 
     return (
       <div
-        className={`group px-2 ${
+        className={`group md:px-4 ${
           chatNode.message.role === 'assistant'
             ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
@@ -115,7 +165,7 @@ export const ChatMessage: FC<Props> = memo(
         onMouseEnter={() => setIsHoverMessage(true)}
         onMouseLeave={() => setIsHoverMessage(false)}
       >
-        <div className="relative m-auto flex gap-4 p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
+        <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="flex min-w-[40px] text-right font-bold">
             <div className="absolute left-0 hidden self-center md:-ml-10 lg:-ml-16 lg:flex">
               <ChatSwitch
@@ -188,79 +238,108 @@ export const ChatMessage: FC<Props> = memo(
                           messageIndex={messageIndex}
                         />
                       </span>
-                      <>
-                        {(window.innerWidth < 640 || !isEditing) && (
-                          <button
-                            className={
-                              (isHoverMessage ? 'visible' : 'lg:invisible') +
-                              ' self-end justify-self-end text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 lg:self-start'
-                            }
-                            onClick={toggleEditing}
-                          >
-                            <IconEdit size={20} />
-                          </button>
-                        )}
-                      </>
                     </div>
+                  </div>
+                )}
+
+                {!isEditing && (
+                  <div className="md:-mr-8 ml-1 md:ml-0 flex flex-col md:flex-row gap-4 md:gap-1 items-center md:items-start justify-end md:justify-start">
+                    <button
+                      className="invisible group-hover:visible focus:visible text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                      onClick={toggleEditing}
+                    >
+                      <IconEdit size={20} />
+                    </button>
+                    {/* <button
+                      className="invisible group-hover:visible focus:visible text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                      onClick={handleDeleteMessage}
+                    >
+                      <IconTrash size={20} />
+                    </button> */}
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col lg:flex-row">
-                <MemoizedReactMarkdown
-                  className="prose w-full dark:prose-invert"
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeMathjax]}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || '');
+              <div className="flex w-full">
+                <div className="flex w-full flex-col content-around lg:flex-row">
+                  <MemoizedReactMarkdown
+                    className="prose dark:prose-invert lg:flex-grow"
+                    // className="prose dark:prose-invert flex-1"
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeMathjax]}
+                    components={{
+                      code({ node, inline, className, children, ...props }) {
+                        if (children.length) {
+                          if (children[0] == '▍') {
+                            return (
+                              <span className="animate-pulse cursor-default mt-1">
+                                ▍
+                              </span>
+                            );
+                          }
 
-                      return !inline ? (
-                        <CodeBlock
-                          key={Math.random()}
-                          language={(match && match[1]) || ''}
-                          value={String(children).replace(/\n$/, '')}
-                          {...props}
-                        />
-                      ) : (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
-                      );
-                    },
-                    table({ children }) {
-                      return (
-                        <table className="border-collapse border border-black px-3 py-1 dark:border-white">
-                          {children}
-                        </table>
-                      );
-                    },
-                    th({ children }) {
-                      return (
-                        <th className="break-words border border-black bg-gray-500 px-3 py-1 text-white dark:border-white">
-                          {children}
-                        </th>
-                      );
-                    },
-                    td({ children }) {
-                      return (
-                        <td className="break-words border border-black px-3 py-1 dark:border-white">
-                          {children}
-                        </td>
-                      );
-                    },
-                  }}
-                >
-                  {chatNode.message.content}
-                </MemoizedReactMarkdown>
-                <div
-                  // className={`absolute ${
-                  //   window.innerWidth < 640
-                  //     ? 'bottom-1 right-3'
-                  //     : 'right-0 top-[26px] m-0'
-                  // }`}
-                  className="self-end lg:self-start pt-3 lg:pt-0"
-                >
+                          children[0] = (children[0] as string).replace(
+                            '`▍`',
+                            '▍',
+                          );
+                        }
+
+                        const match = /language-(\w+)/.exec(className || '');
+
+                        return !inline ? (
+                          <CodeBlock
+                            key={Math.random()}
+                            language={(match && match[1]) || ''}
+                            value={String(children).replace(/\n$/, '')}
+                            {...props}
+                          />
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                      table({ children }) {
+                        return (
+                          <table className="border-collapse border border-black px-3 py-1 dark:border-white">
+                            {children}
+                          </table>
+                        );
+                      },
+                      th({ children }) {
+                        return (
+                          <th className="break-words border border-black bg-gray-500 px-3 py-1 text-white dark:border-white">
+                            {children}
+                          </th>
+                        );
+                      },
+                      td({ children }) {
+                        return (
+                          <td className="break-words border border-black px-3 py-1 dark:border-white">
+                            {children}
+                          </td>
+                        );
+                      },
+                    }}
+                  >
+                    {`${chatNode.message.content}${
+                      messageIsStreaming &&
+                      messageIndex == (currentMessageList?.length ?? 0) - 1
+                        ? '`▍`'
+                        : ''
+                    }`}
+                  </MemoizedReactMarkdown>
+                  <div className="flex justify-between pt-3 lg:pt-0">
+                    <span className="lg:hidden">
+                      <ChatSwitch
+                        key={chatNode.id}
+                        chatNode={chatNode}
+                        messageIndex={messageIndex}
+                      />
+                    </span>
+                  </div>
+                </div>
+                <div className="md:-mr-8 ml-1 md:ml-0 flex flex-col md:flex-row gap-4 md:gap-1 items-center md:items-start justify-end md:justify-start">
                   {messagedCopied ? (
                     <IconCheck
                       size={20}
@@ -268,11 +347,7 @@ export const ChatMessage: FC<Props> = memo(
                     />
                   ) : (
                     <button
-                      className={
-                        (isHoverMessage ? 'visible' : 'lg:invisible') +
-                        ' text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300'
-                      }
-                      // className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
+                      className="invisible group-hover:visible focus:visible text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                       onClick={copyOnClick}
                     >
                       <IconCopy size={20} />

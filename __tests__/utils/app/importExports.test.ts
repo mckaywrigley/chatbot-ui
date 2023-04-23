@@ -1,14 +1,6 @@
-import {
-  ExportFormatV1,
-  ExportFormatV2,
-  ExportFormatV3,
-  ExportFormatV4,
-  LatestExportFormat,
-} from '@/types/export';
-import { OpenAIModels, OpenAIModelID } from '@/types/openai';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { it, describe, expect } from 'vitest';
-
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import { getChatNodeIdFromMessage } from '@/utils/app/clean';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   cleanData,
   isExportFormatV1,
@@ -18,9 +10,18 @@ import {
   isExportFormatV5,
   isLatestExportFormat,
 } from '@/utils/app/importExport';
+
 import { ChatNode } from '@/types/chat';
-import { getChatNodeIdFromMessage } from '@/utils/app/clean';
-import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import {
+  ExportFormatV1,
+  ExportFormatV2,
+  ExportFormatV3,
+  ExportFormatV4,
+  LatestExportFormat,
+} from '@/types/export';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+
+import { describe, expect, it } from 'vitest';
 
 describe('Export Format Functions', () => {
   describe('isExportFormatV1', () => {
@@ -124,6 +125,7 @@ describe('cleanData Functions', () => {
         folderId: null,
         create_time: currentTime,
         update_time: currentTime,
+        temperature: DEFAULT_TEMPERATURE,
       },
     ],
     folders: [],
@@ -290,6 +292,7 @@ describe('cleanData Functions', () => {
           },
         ],
       } as ExportFormatV4;
+
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual(latestFormatWithFoldersAndPrompts);

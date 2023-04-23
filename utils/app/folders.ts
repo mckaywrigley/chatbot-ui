@@ -1,5 +1,5 @@
-import { Folder } from '@/types/folder';
+import { FolderInterface } from '@/types/folder';
 
-export const saveFolders = (folders: Folder[]) => {
+export const saveFolders = (folders: FolderInterface[]) => {
   localStorage.setItem('folders', JSON.stringify(folders));
 };
