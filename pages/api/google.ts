@@ -1,10 +1,7 @@
-// <<<<<<< HEAD
 import { ChatBody, SendMessage } from '@/types/chat';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
-// =======
 import { NextApiRequest, NextApiResponse } from 'next';
 
-// >>>>>>> upstream/main
 import { OPENAI_API_HOST } from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
 
@@ -14,7 +11,6 @@ import { GoogleBody, GoogleSource } from '@/types/google';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
-import { v4 as uuidv4 } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {

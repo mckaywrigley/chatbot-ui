@@ -15,15 +15,17 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
+
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import { createNewConversation } from '@/utils/app/conversation';
+
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
+import { createNewConversation } from '@/utils/app/conversation';
 import { ConversationProvider } from '@/utils/contexts/conversaionContext';
 
 import { Conversation } from '@/types/chat';

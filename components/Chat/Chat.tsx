@@ -14,17 +14,17 @@ import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
 import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
 import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { SendAction } from '@/types/conversation';
 import { throttle } from '@/utils/data/throttle';
 
-import { ChatNode } from '@/types/chat';
-import { ChatBody, Conversation, Message, SendMessage } from '@/types/chat';
-import { SendAction } from '@/types/conversation';
+import { ChatBody, Conversation, Message, SendMessage, ChatNode } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -569,8 +569,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             onSend={(message, plugin) => {
               setCurrentMessage(message);
               handleSend(message, SendAction.SEND, undefined, plugin);
-              // setCurrentMessage(message);
-              // handleSend(message, 0, plugin);
             }}
             onScrollDownClick={handleScrollDown}
             onRegenerate={() => {

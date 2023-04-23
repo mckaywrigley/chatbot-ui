@@ -82,29 +82,6 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
     return data as LatestExportFormat;
   }
 
-  // if (isExportFormatV2(data)) {
-  //   return {
-  //     version: 4,
-  //     history: cleanConversationHistory(data.history || []),
-  //     folders: (data.folders || []).map((chatFolder) => ({
-  //       id: chatFolder.id.toString(),
-  //       name: chatFolder.name,
-  //       type: 'chat',
-  //     })),
-  //     prompts: [],
-  //   };
-  // }
-
-  // if (isExportFormatV3(data)) {
-  //   return { ...data, version: 4, prompts: [] };
-  // }
-
-  // if (isExportFormatV4(data)) {
-  //   return data;
-  // }
-
-  // throw new Error('Unsupported data format');
-// >>>>>>> upstream/main
 }
 
 function currentDate() {
@@ -157,7 +134,6 @@ export const importData = (
 ): LatestExportFormat => {
   const cleanedData = cleanData(data);
   const { history, folders, prompts } = cleanedData;
-  // const { history, folders, prompts } = cleanData(data);
 
   const oldConversations = localStorage.getItem('conversationHistory');
   const oldConversationsParsed = oldConversations

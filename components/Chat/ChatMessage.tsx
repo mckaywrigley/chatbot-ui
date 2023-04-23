@@ -23,117 +23,104 @@ import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 
 import { ChatSwitch } from './ChatSwitch';
-
+import { v4 as uuidv4 } from 'uuid';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface Props {
-  // message: Message;
   chatNode: ChatNode;
   messageIndex: number;
-  onEdit?: (editedMessage: ChatNode) => void;
+  onEdit?: (editedMessage: ChatNode) => void
 }
 
-export const ChatMessage: FC<Props> = memo(
-  ({ chatNode, messageIndex, onEdit }) => {
-    const { t } = useTranslation('chat');
+export const ChatMessage: FC<Props> = memo(({ chatNode, messageIndex, onEdit }) => {
+  const { t } = useTranslation('chat');
 
-    const {
-      state: {
-        selectedConversation,
-        conversations,
-        currentMessage,
-        messageIsStreaming,
-      },
-      dispatch: homeDispatch,
-    } = useContext(HomeContext);
-    // >>>>>>> upstream/main
+  const {
+    state: { selectedConversation, conversations, currentMessage, messageIsStreaming },
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
 
-    const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [isTyping, setIsTyping] = useState<boolean>(false);
-    const [messageContent, setMessageContent] = useState(
-      chatNode.message.content,
-    );
-    const [isHoverMessage, setIsHoverMessage] = useState<boolean>(false);
-    const [messagedCopied, setMessageCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [messageContent, setMessageContent] = useState(chatNode.message.content);
+  const [messagedCopied, setMessageCopied] = useState(false);
 
-    const { currentMessageList } = useContext(ConversationContext);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const toggleEditing = () => {
-      setIsEditing(!isEditing);
-    };
+  const { currentMessageList } = useContext(ConversationContext);
 
-    const handleInputChange = (
-      event: React.ChangeEvent<HTMLTextAreaElement>,
-    ) => {
-      setMessageContent(event.target.value);
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'inherit';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
-    };
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+  };
 
-    const handleEditMessage = () => {
-      if (chatNode.message.content != messageContent) {
-        if (selectedConversation && onEdit) {
-          const nodeId = uuidv4();
-          onEdit({
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessageContent(event.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'inherit';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  const handleEditMessage = () => {
+    if (chatNode.message.content != messageContent) {
+      if (selectedConversation && onEdit) {
+        const nodeId = uuidv4();
+        onEdit({
+          id: nodeId,
+          message: {
             id: nodeId,
-            message: {
-              id: nodeId,
-              role: chatNode.message.role,
-              content: messageContent,
-              create_time: getCurrentUnixTime(),
-            },
-            parentMessageId: chatNode.parentMessageId,
-            children: [],
-          });
-        }
+            role: chatNode.message.role,
+            content: messageContent,
+            create_time: getCurrentUnixTime(),
+          },
+          parentMessageId: chatNode.parentMessageId,
+          children: [],
+        });
       }
-      setIsEditing(false);
-    };
+    }
+    setIsEditing(false);
+  };
 
-    // const handleDeleteMessage = () => {
-    //   if (!selectedConversation) return;
+  // const handleDeleteMessage = () => {
+  //   if (!selectedConversation) return;
 
-    //   const { messages } = selectedConversation;
-    //   const findIndex = messages.findIndex((elm) => elm === message);
+  //   const { messages } = selectedConversation;
+  //   const findIndex = messages.findIndex((elm) => elm === message);
 
-    //   if (findIndex < 0) return;
+  //   if (findIndex < 0) return;
 
-    //   if (
-    //     findIndex < messages.length - 1 &&
-    //     messages[findIndex + 1].role === 'assistant'
-    //   ) {
-    //     messages.splice(findIndex, 2);
-    //   } else {
-    //     messages.splice(findIndex, 1);
-    //   }
-    //   const updatedConversation = {
-    //     ...selectedConversation,
-    //     messages,
-    //   };
+  //   if (
+  //     findIndex < messages.length - 1 &&
+  //     messages[findIndex + 1].role === 'assistant'
+  //   ) {
+  //     messages.splice(findIndex, 2);
+  //   } else {
+  //     messages.splice(findIndex, 1);
+  //   }
+  //   const updatedConversation = {
+  //     ...selectedConversation,
+  //     messages,
+  //   };
 
-    //   const { single, all } = updateConversation(
-    //     updatedConversation,
-    //     conversations,
-    //   );
-    //   homeDispatch({ field: 'selectedConversation', value: single });
-    //   homeDispatch({ field: 'conversations', value: all });
-    // };
+  //   const { single, all } = updateConversation(
+  //     updatedConversation,
+  //     conversations,
+  //   );
+  //   homeDispatch({ field: 'selectedConversation', value: single });
+  //   homeDispatch({ field: 'conversations', value: all });
+  // };
 
-    const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
-        e.preventDefault();
-        handleEditMessage();
-      }
-    };
+  const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
+      e.preventDefault();
+      handleEditMessage();
+    }
+  };
 
-    const copyOnClick = () => {
-      if (!navigator.clipboard) return;
+  const copyOnClick = () => {
+    if (!navigator.clipboard) return;
 
       navigator.clipboard.writeText(chatNode.message.content).then(() => {
         setMessageCopied(true);
@@ -162,8 +149,6 @@ export const ChatMessage: FC<Props> = memo(
             : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
         }`}
         style={{ overflowWrap: 'anywhere' }}
-        onMouseEnter={() => setIsHoverMessage(true)}
-        onMouseLeave={() => setIsHoverMessage(false)}
       >
         <div className="relative m-auto flex p-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
           <div className="flex min-w-[40px] text-right font-bold">
@@ -359,7 +344,6 @@ export const ChatMessage: FC<Props> = memo(
           </div>
         </div>
       </div>
-    );
-  },
-);
+  );
+});
 ChatMessage.displayName = 'ChatMessage';
