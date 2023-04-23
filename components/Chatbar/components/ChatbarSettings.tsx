@@ -47,6 +47,28 @@ export const ChatbarSettings = () => {
     }
   };
 
+  const getAccountButtonSuffixBadge = () => {
+    if (user) {
+      if (user.plan === 'pro') {
+        return (
+          <span className="bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400">
+            Pro
+          </span>
+        );
+      } else {
+        return (
+          <span className="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400 border border-gray-500">
+            Free
+          </span>
+        );
+      }
+    } else {
+      <span className="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+        New
+      </span>;
+    }
+  };
+
   return (
     <>
       <CloudSyncStatusComponent />
@@ -82,13 +104,7 @@ export const ChatbarSettings = () => {
         <SidebarButton
           text={user ? t('Account') : t('Sign in')}
           icon={user ? <IconArticle size={18} /> : <IconLogin size={18} />}
-          suffixIcon={
-            user ? undefined : (
-              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
-                New
-              </span>
-            )
-          }
+          suffixIcon={getAccountButtonSuffixBadge()}
           onClick={signInAccountOnClick}
         />
         <SidebarButton
