@@ -110,7 +110,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           case SendAction.REGENERATE:
             // Perform the REGENERATE action
             actions.popCurrentMessageList();
-            console.log('click regenerate');
             sendMessages = currentMessageList.map((chatNode) => {
               let { id, create_time, ...message } = chatNode.message;
               return message;
