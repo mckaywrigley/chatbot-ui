@@ -102,7 +102,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               }
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={10}
+              rows={7}
             />
 
             <button
