@@ -35,6 +35,7 @@ import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
+import { UserProfile } from '@/types/user';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -332,12 +333,20 @@ const Home = ({
             dispatch({ field: 'isPaidUser', value: data[0].plan !== 'free' });
           }
 
+          if(!data || data.length === 0){
+            toast.error(t('Unable to load your information, please try again later.'));
+            return;
+          }
+
+          const userProfile = data[0] as UserProfile;
+
           dispatch({ field: 'showLoginSignUpModel', value: false });
           dispatch({
             field: 'user',
             value: {
               id: session.user.id,
               email: session.user.email,
+              plan: userProfile.plan || 'free',
             },
           });
         });

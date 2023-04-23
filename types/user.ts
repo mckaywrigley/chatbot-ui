@@ -14,3 +14,9 @@ export interface UserConversation {
   uid: string;
   conversations: ExportFormatV4
 }
+
+export interface UserProfile {
+  id: string;
+  plan: "free" | "pro";
+  name: string;
+}

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
+    "stripe-webhook": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -28,6 +29,7 @@
     "next-i18next": "^13.2.2",
     "nextjs-google-analytics": "^2.3.3",
     "openai": "^3.2.1",
+    "raw-body": "^2.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.0",
@@ -39,6 +41,7 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "stream": "^0.0.2",
+    "stripe": "^12.2.0",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },

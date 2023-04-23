@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
+import { IconCheck } from '@tabler/icons-react';
 import { FC, Fragment, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -6,8 +7,6 @@ import { useTranslation } from 'next-i18next';
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Session } from '@supabase/supabase-js';
-
-import { IconCheck } from '@tabler/icons-react';
 
 type Props = {
   onClose: () => void;
@@ -29,7 +28,7 @@ const PlanDetail = {
       'Priority response time',
       'Cloud sync',
       'Voice input (Coming)',
-      'GPT-4 integration (Coming)'
+      'GPT-4 integration (Coming)',
     ],
   },
 };
@@ -37,7 +36,7 @@ const PlanDetail = {
 const FeatureItem = ({ feature }: { feature: string }) => {
   return (
     <div className="flex flex-row items-center">
-      <IconCheck size={16} stroke={1} className="mr-1" color='lightgreen'/>
+      <IconCheck size={16} stroke={1} className="mr-1" color="lightgreen" />
       <span>{feature}</span>
     </div>
   );
@@ -45,7 +44,27 @@ const FeatureItem = ({ feature }: { feature: string }) => {
 
 export const ProfileModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation('model');
-  const { handleUserLogout } = useContext(HomeContext);
+  const {
+    state: { user },
+    handleUserLogout,
+  } = useContext(HomeContext);
+
+  const upgradeLink = () => {
+    const paymentLink =
+      process.env.NEXT_PUBLIC_ENV === 'production'
+        ? 'https://buy.stripe.com/fZedUP5PY90FgIo6op'
+        : 'https://buy.stripe.com/test_4gw4hLcvq52Odt6fYY';
+    const userEmail = user?.email;
+    const userId = user?.id;
+
+    return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
+  };
+
+  // 1159f9fe-0d53-48da-99d5-59b694c03282
+  const subscriptionManagementLink = () =>
+    process.env.NEXT_PUBLIC_ENV === 'production'
+      ? ''
+      : 'https://billing.stripe.com/p/login/test_28o4jFe6GaqK1UY5kk';
 
   return (
     <Transition appear show={true} as={Fragment}>
@@ -83,7 +102,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                       )}
                     </span>
                     <div className="flex flex-col md:flex-row justify-evenly mb-3">
-                      <div className="flex flex-col border rounded-2xl p-4 text-neutral-400 border-neutral-400">
+                      <div className="flex flex-col border rounded-2xl p-4 text-neutral-400 border-neutral-400 md:w-1/2">
                         <span className="text-2xl font-bold">Free</span>
                         <span className="text-sm mb-2">USD$0</span>
                         <div className="text-xs leading-5">
@@ -92,14 +111,24 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           ))}
                         </div>
                       </div>
-                      <div className="flex flex-col border rounded-2xl p-4 mt-4 md:mt-0 md:ml-2">
+                      <div className="flex flex-col border rounded-2xl p-4 mt-4 md:mt-0 md:ml-2 md:w-1/2">
                         <span className="text-2xl font-bold">Pro</span>
-                        <span className="text-sm mb-2">USD$9.99</span>
+                        <span className="text-sm mb-2">USD$9.99 per month</span>
                         <div className="text-xs leading-5">
                           {PlanDetail.pro.features.map((feature, index) => (
                             <FeatureItem key={index} feature={feature} />
                           ))}
                         </div>
+                        {user?.plan === 'free' && (
+                          <a
+                            href={upgradeLink()}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm"
+                          >
+                            {t('Upgrade')}
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
