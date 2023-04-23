@@ -13,11 +13,10 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
-import {
-  saveSelectedConversation,
-  saveConversations,
-  updateConversation,
-} from '@/utils/app/conversation';
+import { storageUpdateConversation } from '@/utils/app/storage/conversation';
+import { storageCreateMessage } from '@/utils/app/storage/message';
+import { storageDeleteMessages } from '@/utils/app/storage/messages';
+import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -29,10 +28,12 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
+
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -46,7 +47,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       selectedConversation,
       conversations,
       models,
-      databaseType,
+      storageType,
       apiKey,
       pluginKeys,
       serverSideApiKeyIsSet,
@@ -71,13 +72,35 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
+      console.log('handling send');
+      console.log(message);
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
+          console.log(`deleting ${deleteCount} messages`);
+          console.log(updatedMessages);
+          const conversationLength = selectedConversation.messages.length;
+          const messagesToBeDeleted: string[] = [];
           for (let i = 0; i < deleteCount; i++) {
+            const currentMessage =
+              selectedConversation.messages[conversationLength - 1 - i];
+            console.log(currentMessage);
+            messagesToBeDeleted.push(currentMessage.id);
             updatedMessages.pop();
           }
+
+          console.log('going to delete the following');
+          console.log(messagesToBeDeleted);
+
+          storageDeleteMessages(
+            storageType,
+            messagesToBeDeleted,
+            selectedConversation,
+            selectedConversation.messages,
+            conversations,
+          );
+
           updatedConversation = {
             ...selectedConversation,
             messages: [...updatedMessages, message],
@@ -146,6 +169,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               ...updatedConversation,
               name: customName,
             };
+
+            storageUpdateConversation(
+              storageType,
+              updatedConversation,
+              conversations,
+            );
           }
           homeDispatch({ field: 'loading', value: false });
           const reader = data.getReader();
@@ -153,6 +182,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           let done = false;
           let isFirst = true;
           let text = '';
+          const assistantMessageId = uuidv4();
           while (!done) {
             if (stopConversationRef.current === true) {
               controller.abort();
@@ -167,7 +197,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
+                {
+                  id: assistantMessageId,
+                  role: 'assistant',
+                  content: chunkValue,
+                },
               ];
               updatedConversation = {
                 ...updatedConversation,
@@ -211,13 +245,34 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             updatedConversations.push(updatedConversation);
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(databaseType, updatedConversations);
           homeDispatch({ field: 'messageIsStreaming', value: false });
+
+          // Saving the user message
+          await storageCreateMessage(
+            storageType,
+            selectedConversation.id,
+            message,
+            updatedConversations,
+          );
+
+          // Saving the ai response message
+          await storageCreateMessage(
+            storageType,
+            selectedConversation.id,
+            { id: assistantMessageId, role: 'assistant', content: text },
+            updatedConversations,
+          );
         } else {
           const { answer } = await response.json();
+          const pluginMessageId = uuidv4();
+          const pluginMessage: Message = {
+            id: pluginMessageId,
+            role: 'assistant',
+            content: answer,
+          };
           const updatedMessages: Message[] = [
             ...updatedConversation.messages,
-            { role: 'assistant', content: answer },
+            pluginMessage,
           ];
           updatedConversation = {
             ...updatedConversation,
@@ -225,7 +280,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           };
           homeDispatch({
             field: 'selectedConversation',
-            value: updateConversation,
+            value: updatedConversation,
           });
           saveSelectedConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -240,7 +295,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             updatedConversations.push(updatedConversation);
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(databaseType, updatedConversations);
+          storageCreateMessage(
+            storageType,
+            selectedConversation.id,
+            pluginMessage,
+            updatedConversations,
+          );
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
         }
@@ -249,9 +309,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     [
       apiKey,
       conversations,
+      homeDispatch,
       pluginKeys,
       selectedConversation,
       stopConversationRef,
+      storageType,
     ],
   );
 
@@ -470,8 +532,19 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     message={message}
                     messageIndex={index}
                     onEdit={(editedMessage) => {
+                      console.log('editing');
+                      console.log(selectedConversation?.messages);
+                      console.log(
+                        'current size: ',
+                        selectedConversation?.messages.length,
+                      );
+                      console.log(
+                        'new size: ',
+                        selectedConversation?.messages.length - index,
+                      );
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
+
                       handleSend(
                         editedMessage,
                         selectedConversation?.messages.length - index,
@@ -494,8 +567,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
             onSend={(message, plugin) => {
+              console.log('before send');
+              console.log(selectedConversation);
               setCurrentMessage(message);
               handleSend(message, 0, plugin);
+              console.log('after send');
+              console.log(selectedConversation);
             }}
             onScrollDownClick={handleScrollDown}
             onRegenerate={() => {

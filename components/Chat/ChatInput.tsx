@@ -28,6 +28,8 @@ import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
+import { v4 as uuidv4 } from 'uuid';
+
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
@@ -97,7 +99,8 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    const messageId = uuidv4();
+    onSend({ id: messageId, role: 'user', content }, plugin);
     setContent('');
     setPlugin(null);
 
@@ -237,7 +240,7 @@ export const ChatInput = ({
         textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
       }`;
     }
-  }, [content]);
+  }, [content, textareaRef]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {

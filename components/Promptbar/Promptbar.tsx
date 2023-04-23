@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { savePrompts } from '@/utils/app/prompts';
+import {
+  storageCreatePrompt,
+  storageDeletePrompts,
+  storageUpdatePrompt,
+} from '@/utils/app/storage/prompt';
 
 import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -28,7 +32,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, databaseType, showPromptbar },
+    state: { prompts, defaultModelId, storageType, showPromptbar },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -54,32 +58,29 @@ const Promptbar = () => {
         folderId: null,
       };
 
-      const updatedPrompts = [...prompts, newPrompt];
+      const updatedPrompts = storageCreatePrompt(
+        storageType,
+        newPrompt,
+        prompts,
+      );
 
       homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-      savePrompts(databaseType, updatedPrompts);
     }
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
-
+    const updatedPrompts = storageDeletePrompts(
+      storageType,
+      prompt.id,
+      prompts,
+    );
     homeDispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(databaseType, updatedPrompts);
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.map((p) => {
-      if (p.id === prompt.id) {
-        return prompt;
-      }
+    const updated = storageUpdatePrompt(storageType, prompt, prompts);
 
-      return p;
-    });
-    homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-    savePrompts(databaseType, updatedPrompts);
+    homeDispatch({ field: 'prompts', value: updated.all });
   };
 
   const handleDrop = (e: any) => {
@@ -114,7 +115,7 @@ const Promptbar = () => {
     } else {
       promptDispatch({ field: 'filteredPrompts', value: prompts });
     }
-  }, [searchTerm, prompts]);
+  }, [searchTerm, prompts, promptDispatch]);
 
   return (
     <PromptbarContext.Provider

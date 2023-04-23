@@ -9,15 +9,16 @@ import {
 } from '@/types/export';
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
+import { StorageType } from '@/types/storage';
 
 import { cleanConversationHistory } from './clean';
 import {
-  getConversations,
-  saveConversations,
-  saveSelectedConversation,
-} from './conversation';
-import { getFolders, saveFolders } from './folders';
-import { getPrompts, savePrompts } from './prompts';
+  storageGetConversations,
+  storageUpdateConversations,
+} from './storage/conversations';
+import { storageGetFolders, storageUpdateFolders } from './storage/folders';
+import { storageGetPrompts, storageUpdatePrompts } from './storage/prompts';
+import { saveSelectedConversation } from './storage/selectedConversation';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -78,10 +79,10 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = async (databaseType: string) => {
-  let history = await getConversations(databaseType);
-  let folders = await getFolders(databaseType);
-  let prompts = await getPrompts(databaseType);
+export const exportData = async (storageType: StorageType) => {
+  let history = await storageGetConversations(storageType);
+  let folders = await storageGetFolders(storageType);
+  let prompts = await storageGetPrompts(storageType);
 
   const data = {
     version: 4,
@@ -105,7 +106,7 @@ export const exportData = async (databaseType: string) => {
 };
 
 export const importData = (
-  databaseType: string,
+  storageType: StorageType,
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const { history, folders, prompts } = cleanData(data);
@@ -143,7 +144,7 @@ export const importData = (
   );
   localStorage.setItem('folders', JSON.stringify(newFolders));
   const conversations = history;
-  saveConversations(databaseType, conversations);
+  storageUpdateConversations(storageType, conversations);
   saveSelectedConversation(conversations[conversations.length - 1]);
 
   const oldPrompts = localStorage.getItem('prompts');
@@ -153,8 +154,8 @@ export const importData = (
       index === self.findIndex((p) => p.id === prompt.id),
   );
   localStorage.setItem('prompts', JSON.stringify(newPrompts));
-  saveFolders(databaseType, folders);
-  savePrompts(databaseType, prompts);
+  storageUpdateFolders(storageType, folders);
+  storageUpdatePrompts(storageType, prompts);
 
   return {
     version: 4,

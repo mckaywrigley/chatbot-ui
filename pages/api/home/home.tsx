@@ -16,26 +16,40 @@ import {
   cleanSelectedConversation,
 } from '@/utils/app/clean';
 import {
-  DATABASE_TYPE,
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_TEMPERATURE,
+  STORAGE_TYPE,
 } from '@/utils/app/const';
 import {
-  getConversations,
+  storageCreateConversation,
+  storageUpdateConversation,
+} from '@/utils/app/storage/conversation';
+import {
+  storageGetConversations,
+  storageUpdateConversations,
+} from '@/utils/app/storage/conversations';
+import {
+  storageCreateFolder,
+  storageDeleteFolder,
+  storageUpdateFolder,
+} from '@/utils/app/storage/folder';
+import { storageGetFolders } from '@/utils/app/storage/folders';
+import {
+  storageGetPrompts,
+  storageUpdatePrompts,
+} from '@/utils/app/storage/prompts';
+import {
   getSelectedConversation,
-  saveConversations,
   saveSelectedConversation,
-  updateConversation,
-} from '@/utils/app/conversation';
-import { getFolders, saveFolders } from '@/utils/app/folders';
-import { getPrompts, savePrompts } from '@/utils/app/prompts';
-import { getSettings } from '@/utils/app/settings';
+} from '@/utils/app/storage/selectedConversation';
+import { getSettings } from '@/utils/app/storage/settings';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
-import { FolderInterface, FolderType } from '@/types/folder';
+import { FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
+import { StorageType } from '@/types/storage';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -51,14 +65,14 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
-  databaseType: string;
+  storageType: StorageType;
 }
 
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
-  databaseType,
+  storageType,
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
@@ -120,23 +134,20 @@ const Home = ({
 
   // FOLDER OPERATIONS  --------------------------------------------
 
-  const handleCreateFolder = (name: string, type: FolderType) => {
-    const newFolder: FolderInterface = {
-      id: uuidv4(),
+  const handleCreateFolder = async (name: string, type: FolderType) => {
+    const updatedFolders = storageCreateFolder(
+      storageType,
       name,
       type,
-    };
-
-    const updatedFolders = [...folders, newFolder];
+      folders,
+    );
 
     dispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(databaseType, updatedFolders);
   };
 
-  const handleDeleteFolder = (folderId: string) => {
+  const handleDeleteFolder = async (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
     dispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(databaseType, updatedFolders);
 
     const updatedConversations: Conversation[] = conversations.map((c) => {
       if (c.folderId === folderId) {
@@ -150,7 +161,6 @@ const Home = ({
     });
 
     dispatch({ field: 'conversations', value: updatedConversations });
-    saveConversations(databaseType, updatedConversations);
 
     const updatedPrompts: Prompt[] = prompts.map((p) => {
       if (p.folderId === folderId) {
@@ -164,29 +174,26 @@ const Home = ({
     });
 
     dispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(databaseType, updatedPrompts);
+
+    await storageUpdateConversations(storageType, updatedConversations);
+    await storageUpdatePrompts(storageType, updatedPrompts);
+    storageDeleteFolder(storageType, folderId, folders);
   };
 
-  const handleUpdateFolder = (folderId: string, name: string) => {
-    const updatedFolders = folders.map((f) => {
-      if (f.id === folderId) {
-        return {
-          ...f,
-          name,
-        };
-      }
-
-      return f;
-    });
+  const handleUpdateFolder = async (folderId: string, name: string) => {
+    const updatedFolders = storageUpdateFolder(
+      storageType,
+      folderId,
+      name,
+      folders,
+    );
 
     dispatch({ field: 'folders', value: updatedFolders });
-
-    saveFolders(databaseType, updatedFolders);
   };
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
+  const handleNewConversation = async () => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -204,13 +211,15 @@ const Home = ({
       folderId: null,
     };
 
-    const updatedConversations = [...conversations, newConversation];
-
+    const updatedConversations = storageCreateConversation(
+      storageType,
+      newConversation,
+      conversations,
+    );
     dispatch({ field: 'selectedConversation', value: newConversation });
     dispatch({ field: 'conversations', value: updatedConversations });
 
     saveSelectedConversation(newConversation);
-    saveConversations(databaseType, updatedConversations);
 
     dispatch({ field: 'loading', value: false });
   };
@@ -224,8 +233,8 @@ const Home = ({
       [data.key]: data.value,
     };
 
-    const { single, all } = updateConversation(
-      databaseType,
+    const { single, all } = storageUpdateConversation(
+      storageType,
       updatedConversation,
       conversations,
     );
@@ -240,12 +249,12 @@ const Home = ({
     if (window.innerWidth < 640) {
       dispatch({ field: 'showChatbar', value: false });
     }
-  }, [selectedConversation]);
+  }, [dispatch, selectedConversation]);
 
   useEffect(() => {
     defaultModelId &&
       dispatch({ field: 'defaultModelId', value: defaultModelId });
-    databaseType && dispatch({ field: 'databaseType', value: databaseType });
+    storageType && dispatch({ field: 'storageType', value: storageType });
     serverSideApiKeyIsSet &&
       dispatch({
         field: 'serverSideApiKeyIsSet',
@@ -258,17 +267,21 @@ const Home = ({
       });
   }, [
     defaultModelId,
-    databaseType,
+    storageType,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
+    dispatch,
   ]);
 
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
+    const settings = getSettings();
+    if (settings.theme) {
+      dispatch({
+        field: 'lightMode',
+        value: settings.theme,
+      });
     }
 
     const apiKey = localStorage.getItem('apiKey');
@@ -304,19 +317,19 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    getFolders(databaseType).then((folders) => {
+    storageGetFolders(storageType).then((folders) => {
       if (folders) {
         dispatch({ field: 'folders', value: folders });
       }
     });
 
-    getPrompts(databaseType).then((prompts) => {
+    storageGetPrompts(storageType).then((prompts) => {
       if (prompts) {
         dispatch({ field: 'prompts', value: prompts });
       }
     });
 
-    getConversations(databaseType).then((conversationHistory) => {
+    storageGetConversations(storageType).then((conversationHistory) => {
       if (conversationHistory) {
         const parsedConversationHistory: Conversation[] = conversationHistory;
         const cleanedConversationHistory = cleanConversationHistory(
@@ -355,7 +368,7 @@ const Home = ({
     }
   }, [
     defaultModelId,
-    databaseType,
+    storageType,
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
@@ -418,7 +431,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
-  const databaseType = DATABASE_TYPE;
+  const storageType = STORAGE_TYPE;
 
   let serverSidePluginKeysSet = false;
 
@@ -433,7 +446,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
-      databaseType,
+      storageType,
       serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',

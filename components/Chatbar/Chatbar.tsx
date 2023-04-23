@@ -4,15 +4,21 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE  } from '@/utils/app/const';
-import { saveSelectedConversation, saveConversations, deleteConversations, deleteSelectedConversation } from '@/utils/app/conversation';
-import { saveFolders } from '@/utils/app/folders';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { exportData, importData } from '@/utils/app/importExport';
+import { storageDeleteConversation } from '@/utils/app/storage/conversation';
+import { storageDeleteConversations } from '@/utils/app/storage/conversations';
+import { storageUpdateFolders } from '@/utils/app/storage/folders';
+import {
+  deleteSelectedConversation,
+  saveSelectedConversation,
+} from '@/utils/app/storage/selectedConversation';
 
 import { Conversation } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
+import { StorageType } from '@/types/storage';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -34,7 +40,14 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, databaseType, folders, pluginKeys },
+    state: {
+      conversations,
+      showChatbar,
+      defaultModelId,
+      storageType,
+      folders,
+      pluginKeys,
+    },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -94,12 +107,15 @@ export const Chatbar = () => {
     localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
-  const handleExportData = (databaseType: string) => {
-    exportData(databaseType);
+  const handleExportData = (storageType: StorageType) => {
+    exportData(storageType);
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(databaseType, data);
+    const { history, folders, prompts }: LatestExportFormat = importData(
+      storageType,
+      data,
+    );
     homeDispatch({ field: 'conversations', value: history });
     homeDispatch({
       field: 'selectedConversation',
@@ -128,23 +144,24 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: [] });
 
-    deleteConversations(databaseType);
+    storageDeleteConversations(storageType);
     deleteSelectedConversation();
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
 
     homeDispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(databaseType, updatedFolders);
+    storageUpdateFolders(storageType, updatedFolders);
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
+    const updatedConversations = storageDeleteConversation(
+      storageType,
+      conversation.id,
+      conversations,
     );
 
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
-    saveConversations(databaseType, updatedConversations);
 
     if (updatedConversations.length > 0) {
       homeDispatch({
@@ -152,7 +169,9 @@ export const Chatbar = () => {
         value: updatedConversations[updatedConversations.length - 1],
       });
 
-      saveSelectedConversation(updatedConversations[updatedConversations.length - 1]);
+      saveSelectedConversation(
+        updatedConversations[updatedConversations.length - 1],
+      );
     } else {
       defaultModelId &&
         homeDispatch({
@@ -204,7 +223,7 @@ export const Chatbar = () => {
         value: conversations,
       });
     }
-  }, [searchTerm, conversations]);
+  }, [searchTerm, conversations, chatDispatch]);
 
   return (
     <ChatbarContext.Provider

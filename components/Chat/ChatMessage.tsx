@@ -10,7 +10,8 @@ import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { updateConversation } from '@/utils/app/conversation';
+import { storageUpdateConversation } from '@/utils/app/storage/conversation';
+import { storageDeleteMessages } from '@/utils/app/storage/messages';
 
 import { Message } from '@/types/chat';
 
@@ -39,7 +40,7 @@ export const ChatMessage: FC<Props> = memo(
         conversations,
         currentMessage,
         messageIsStreaming,
-        databaseType,
+        storageType,
       },
       dispatch: homeDispatch,
     } = useContext(HomeContext);
@@ -80,24 +81,28 @@ export const ChatMessage: FC<Props> = memo(
       const { messages } = selectedConversation;
       const findIndex = messages.findIndex((elm) => elm === message);
 
+      let messagesToBeDeleted = [];
       if (findIndex < 0) return;
 
       if (
         findIndex < messages.length - 1 &&
         messages[findIndex + 1].role === 'assistant'
       ) {
+        messagesToBeDeleted.push(
+          messages[findIndex].id,
+          messages[findIndex + 1].id,
+        );
         messages.splice(findIndex, 2);
       } else {
+        messagesToBeDeleted.push(messages[findIndex].id);
         messages.splice(findIndex, 1);
       }
-      const updatedConversation = {
-        ...selectedConversation,
-        messages,
-      };
 
-      const { single, all } = updateConversation(
-        databaseType,
-        updatedConversation,
+      const { single, all } = storageDeleteMessages(
+        storageType,
+        messagesToBeDeleted,
+        selectedConversation,
+        messages,
         conversations,
       );
       homeDispatch({ field: 'selectedConversation', value: single });

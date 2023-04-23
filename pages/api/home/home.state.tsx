@@ -4,6 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { StorageType } from '@/types/storage';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -25,7 +26,7 @@ export interface HomeInitialState {
   messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
-  databaseType: string | 'localStorage';
+  storageType: StorageType;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
 }
@@ -50,7 +51,7 @@ export const initialState: HomeInitialState = {
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
-  databaseType: 'localStorage',
+  storageType: StorageType.LOCAL,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
 };

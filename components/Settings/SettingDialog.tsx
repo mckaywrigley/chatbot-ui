@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { getSettings, saveSettings } from '@/utils/app/settings';
+import { getSettings, saveSettings } from '@/utils/app/storage/settings';
 
 import { Settings } from '@/types/settings';
 

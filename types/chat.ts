@@ -1,6 +1,7 @@
 import { OpenAIModel } from './openai';
 
 export interface Message {
+  id: string; // message id is required in relational databases
   role: Role;
   content: string;
 }

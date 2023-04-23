@@ -19,3 +19,10 @@ export interface LocalStorage {
   // added plugin keys (4/3/23)
   pluginKeys: PluginKey[];
 }
+
+export enum StorageType {
+  LOCAL = 'local',
+  COUCHDB = 'couchdb',
+  MONGODB = 'mongodb',
+  RDBMS = 'rdbms',
+}
