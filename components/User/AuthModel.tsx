@@ -51,6 +51,17 @@ export const AuthModel: FC<Props> = ({ onClose, supabase }) => {
                   providers={[]}
                   theme="dark"
                 />
+                <div className="text-sm text-neutral-400 text-center">
+                  {t('By signing up, you agree to our ')} 
+                  <a
+                    href="https://intro.chateverywhere.app/terms-of-service.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    {t('Terms of Service.')}
+                  </a>
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
