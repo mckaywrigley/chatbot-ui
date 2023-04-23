@@ -7,7 +7,7 @@ import HomeContext from '@/pages/api/home/home.context';
 import dayjs from 'dayjs';
 
 const CloudSyncComponent = () => {
-  const { t } = useTranslation('features');
+  const { t } = useTranslation('feature');
 
   const {
     state: {

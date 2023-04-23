@@ -43,7 +43,7 @@ export const AuthModel: FC<Props> = ({ onClose, supabase }) => {
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200">
                 <div>
-                  📣 {t('By signing up, you will be one of the first to know and try out the new features in the upcoming weeks!')}
+                  📣 {t('Sign up to get access to all the amazing features of Chat Everywhere!')}
                 </div>
                 <Auth
                   supabaseClient={supabase}

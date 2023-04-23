@@ -558,6 +558,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'prompts',
         'roles',
         'rolesContent',
+        'feature'
       ])),
     },
   };

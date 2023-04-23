@@ -1,9 +1,9 @@
 {
-  "By signing up, you will be one of the first to know and try out the new features in the upcoming weeks!": "註冊後，您將成為第一批了解和體驗即將推出新功能的人！",
+  "Sign up to get access to all the amazing features of Chat Everywhere!": "馬上註冊來體驗Chat Everywhere的最新功能吧!",
   "Sign Out": "登出",
   "Thank you for registering with us. We are currently working on the some exciting features. Please check back soon!": "非常感謝您的註冊和支持！我們即將推出最新的功能，請敬請期待！為您帶來更好的體驗是我們的首要任務。",
   "As an effort to reach sustainability for Chat Everywhere, we are introducing pro plan for our users to support us and this project, so we can continue to provide you with the best feature and experience.": "為了讓 Chat Everywhere 能夠健康發展下去，我們現正推出專業版方案。藉由您們的支持，我們將能持續為您提供最實用的優質的功能和體驗！",
-  "Okay": "好!",
+  "Okay": "好",
   "Enhance chat mode": "連網模式",
   "Folder manager": "資料夾",
   "Prompt manager": "提示語",
@@ -13,5 +13,8 @@
   "Priority response time": "優先回覆",
   "Cloud sync": "雲同步",
   "Voice input (Coming)": "語音輸入（即將推出）",
-  "GPT-4 integration (Coming)": "GPT-4 (即將推出)"
+  "GPT-4 integration (Coming)": "GPT-4 (即將推出)",
+  "Thank you for supporting us! If you want to cancel your subscription, please visit ": "感謝您的支持！如果您想取消訂閱，請到",
+  "here": "這裡",
+  " and cancel your subscription.": ""
 }
