@@ -35,6 +35,8 @@ export interface HomeInitialState {
   conversationLastSyncAt: number | null;
   conversationLastUpdatedAt: number | null;
   forceSyncConversation: boolean;
+  syncingConversation: boolean;
+  syncSuccess: boolean | null; // null = not yet synced
   
   // User Auth
   showLoginSignUpModel: boolean;
@@ -71,6 +73,8 @@ export const initialState: HomeInitialState = {
   conversationLastSyncAt: null,
   conversationLastUpdatedAt: null,
   forceSyncConversation: true, // Sync on first load
+  syncingConversation: false,
+  syncSuccess: null,
 
   // User Auth
   showLoginSignUpModel: false,

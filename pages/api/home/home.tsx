@@ -277,8 +277,12 @@ const Home = ({
     );
 
     const syncConversationsAction = async () => {
-      // If conversationLastUpdatedAt doesn't exist, we are syncing for the first time
-      await syncConversations(supabase, user, conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString());
+      await syncConversations(
+        supabase,
+        user,
+        // Subtract 1 year to force sync
+        conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
+      );
     };
 
     // Sync if we haven't sync for more than 5 minutes or it is the first time syncing upon loading
@@ -290,12 +294,29 @@ const Home = ({
     )
       return;
 
-    syncConversationsAction();
+    try {
+      dispatch({ field: 'syncingConversation', value: true });
+      syncConversationsAction();
+    } catch (e) {
+      dispatch({ field: 'syncSuccess', value: false });
+      console.log('error', e);
+    }
+
     dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
     if (forceSyncConversation) {
       dispatch({ field: 'forceSyncConversation', value: false });
     }
-  }, [conversations, user, supabase, dispatch]);
+    dispatch({ field: 'syncSuccess', value: true });
+    dispatch({ field: 'syncingConversation', value: true });
+  }, [
+    conversations,
+    user,
+    supabase,
+    dispatch,
+    isPaidUser,
+    forceSyncConversation,
+    conversationLastSyncAt,
+  ]);
 
   // USER AUTH ------------------------------------------
   useEffect(() => {
