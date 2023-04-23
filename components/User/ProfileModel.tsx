@@ -33,15 +33,6 @@ const PlanDetail = {
   },
 };
 
-const FeatureItem = ({ feature }: { feature: string }) => {
-  return (
-    <div className="flex flex-row items-center">
-      <IconCheck size={16} stroke={1} className="mr-1" color="lightgreen" />
-      <span>{feature}</span>
-    </div>
-  );
-};
-
 export const ProfileModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation('model');
   const {
@@ -60,12 +51,18 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
   };
 
-  // 1159f9fe-0d53-48da-99d5-59b694c03282
   const subscriptionManagementLink = () =>
     process.env.NEXT_PUBLIC_ENV === 'production'
-      ? ''
+      ? 'https://billing.stripe.com/p/login/5kAbMj0wt5VF6AwaEE'
       : 'https://billing.stripe.com/p/login/test_28o4jFe6GaqK1UY5kk';
 
+  const FeatureItem = ({ feature }: { feature: string }) => (
+    <div className="flex flex-row items-center">
+      <IconCheck size={16} stroke={1} className="mr-1" color="lightgreen" />
+      <span>{t(feature)}</span>
+    </div>
+  );
+  
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose} open>
@@ -130,6 +127,24 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           </a>
                         )}
                       </div>
+                    </div>
+                    <div>
+                      {user?.plan === 'pro' && (
+                        <p className="text-xs text-neutral-400">
+                          {t(
+                            'Thank you for supporting us! If you want to cancel your subscription, please visit ',
+                          )}
+                          <a
+                            href={subscriptionManagementLink()}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline cursor-pointer"
+                          >
+                            {t('here')}
+                          </a>
+                          {t(' and cancel your subscription.')}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </Dialog.Description>

@@ -12,26 +12,42 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const updateUserAccount = async (
-  userId: string,
+  userId: string | null,
   stripeSubscriptionId: string,
   upgrade: boolean,
 ) => {
   const supabase = createClient(supabaseUrl, supabaseServerRoleKey);
 
-  // Update user account
-  const { error: updatedUserError } = await supabase
-    .from('profiles')
-    .update({ 
-      plan: upgrade ? 'pro' : 'free',
-      stripe_subscription_id: stripeSubscriptionId,
-    })
-    .eq('id', userId);
+  let error = null;
 
-  if (updatedUserError) {
-    throw updatedUserError;
+  if (upgrade) {
+    // Update user account
+    const { error: updatedUserError } = await supabase
+      .from('profiles')
+      .update({
+        plan: 'pro',
+        stripe_subscription_id: stripeSubscriptionId,
+      })
+      .eq('id', userId);
+    error = updatedUserError;
+  } else {
+    // Downgrade user account
+    const { error: updatedUserError } = await supabase
+      .from('profiles')
+      .update({
+        plan: 'free',
+      })
+      .eq('stripe_subscription_id', stripeSubscriptionId);
+    error = updatedUserError;
   }
 
-  console.log(`User ${userId} updated to ${upgrade ? 'pro' : 'free'}`);
+  if (error) throw error;
+
+  if(upgrade){
+    console.log(`User ${userId} updated to pro`);
+  }else{
+    console.log(`User subscription ${stripeSubscriptionId} downgrade back to free`);
+  }
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -55,20 +71,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log(session);
-
-      // Upgrading a user's account
       const userId = session.client_reference_id;
       const stripeSubscriptionId = session.subscription as string;
 
       if (!userId || !stripeSubscriptionId) {
-        throw new Error('User id or subscription id not found from Stripe webhook');
+        throw new Error(
+          'User id or subscription id not found from Stripe webhook',
+        );
       }
 
       await updateUserAccount(userId, stripeSubscriptionId, true);
+    }
 
-      // Handle the successful payment event here
-      console.log(`💰 Payment was successful for session ID: ${session.id}`);
+    if (event.type === 'customer.subscription.deleted') {
+      const session = event.data.object as Stripe.Subscription;
+      const stripeSubscriptionId = session.id;
+
+      if (!stripeSubscriptionId) {
+        console.error(session);
+        throw new Error('Subscription id not found from Stripe webhook');
+      }
+
+      await updateUserAccount(null, stripeSubscriptionId, false);
     }
 
     // Return a response to acknowledge receipt of the event
