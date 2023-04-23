@@ -17,15 +17,15 @@ type Props = {
 const PlanDetail = {
   free: {
     features: [
-      '100 messages per week',
-      'Reduced response time',
+      'Enhance chat mode',
       'Share conversations',
+      'Folder manager',
+      'Prompt manager',
     ],
   },
   pro: {
     features: [
       'Everything in free plan',
-      'Unlimited messages',
       'Priority response time',
       'Cloud sync',
       'Voice input (Coming)',
