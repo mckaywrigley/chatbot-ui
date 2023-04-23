@@ -1,4 +1,4 @@
-import type { Conversation, ChatNode } from '@/types/chat';
+import type { ChatNode, Conversation } from '@/types/chat';
 import type { ConversationUpdate } from '@/types/conversation';
 
 export const getCurrentUnixTime = (): number => {
@@ -26,7 +26,8 @@ export const collectMessagesFromTail = (
 ): ChatNode[] => {
   const messageList: ChatNode[] = [];
   let currentNode = conversation.mapping[conversation.current_node];
-
+  
+  if (!currentNode) return [];
   while (currentNode.parentMessageId) {
     messageList.push(currentNode);
     currentNode = conversation.mapping[currentNode.parentMessageId];

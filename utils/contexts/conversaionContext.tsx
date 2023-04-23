@@ -105,7 +105,6 @@ export const ConversationProvider: React.FC<Props> = ({ children }) => {
 
   const modifiedMessage = (updateChatNode: ChatNode) => {
     if (selectedConversation) {
-      console.log("@modifiedMessage: update Node", updateChatNode)
       let nodeId = updateChatNode.id;
       let { mapping, ...others } = selectedConversation;
       let updatedConversation: Conversation = {

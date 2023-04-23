@@ -74,11 +74,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const {
-    currentMessageList,
-    modifiedMessage,
-    actions,
-  } = useContext(ConversationContext);
+  const { currentMessageList, modifiedMessage, actions } =
+    useContext(ConversationContext);
 
   const handleSend = useCallback(
     async (
@@ -113,7 +110,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           case SendAction.REGENERATE:
             // Perform the REGENERATE action
             actions.popCurrentMessageList();
-            console.log("click regenerate")
+            console.log('click regenerate');
             sendMessages = currentMessageList.map((chatNode) => {
               let { id, create_time, ...message } = chatNode.message;
               return message;
@@ -289,7 +286,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
           homeDispatch({
             field: 'selectedConversation',
-            value: updateConversation,
+            value: updatedConversation,
           });
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -358,10 +355,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       confirm(t<string>('Are you sure you want to clear all messages?')) &&
       selectedConversation
     ) {
-      handleUpdateConversation(selectedConversation, {
-        key: 'messages',
-        value: [],
+      let systemNode = selectedConversation.mapping[selectedConversation.id];
+      let updatedConversation = {
+        ...selectedConversation,
+      };
+      updatedConversation.current_node = systemNode.id;
+      updatedConversation.mapping = {
+        [systemNode.id]: {
+          ...systemNode,
+        },
+      };
+      homeDispatch({
+        field: 'selectedConversation',
+        value: updatedConversation,
       });
+      updateConversation(updatedConversation, conversations)
     }
   };
 
