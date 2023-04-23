@@ -93,7 +93,7 @@ export const syncConversations = async (
     .select('last_updated')
     .eq('uid', user.id);
 
-  const remoteTimestamp = dayjs(userConversations?.[0]?.last_updated);
+  const remoteTimestamp = userConversations?.[0] ? dayjs(userConversations?.[0]?.last_updated) : null;
   const exportableConversations = getExportableData();
 
   if (localLastUpdatedAt && remoteTimestamp) {
