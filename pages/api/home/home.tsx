@@ -285,11 +285,11 @@ const Home = ({
       );
     };
 
-    // Sync if we haven't sync for more than 5 minutes or it is the first time syncing upon loading
+    // Sync if we haven't sync for more than 2 minutes or it is the first time syncing upon loading
     if (
       !forceSyncConversation &&
       ((conversationLastSyncAt &&
-        dayjs().diff(conversationLastSyncAt, 'minutes') < 5) ||
+        dayjs().diff(conversationLastSyncAt, 'minutes') < 2) ||
         !conversationLastUpdatedAt)
     )
       return;

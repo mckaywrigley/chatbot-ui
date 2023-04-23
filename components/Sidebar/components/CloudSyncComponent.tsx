@@ -61,7 +61,7 @@ const CloudSyncComponent = () => {
 
   return (
     <div
-      className="flex w-full cursor-pointer select-none items-center gap-3py-3 px-3 text-[14px] leading-3 text-white"
+      className={`flex w-full cursor-pointer select-none items-center gap-3py-3 px-3 text-[14px] leading-3 ${!isCloudSyncEnabled ? "text-neutral-400" : "text-white"}`}
       onClick={cloudSyncBlockOnClick}
     >
       <div className="pr-3">
