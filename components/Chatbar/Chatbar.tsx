@@ -4,14 +4,16 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { collectMessagesFromTail } from '@/utils/app/chatRoomUtils';
+import { createNewConversation } from '@/utils/app/conversation';
+
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
 import { Conversation } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
-import { OpenAIModels } from '@/types/openai';
+
 import { PluginKey } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -23,8 +25,6 @@ import { Conversations } from './components/Conversations';
 import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
-
-import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');
@@ -115,15 +115,10 @@ export const Chatbar = () => {
     defaultModelId &&
       homeDispatch({
         field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
+        value: createNewConversation(
+          `${t('New Conversation')}`,
+          defaultModelId,
+        ),
       });
 
     homeDispatch({ field: 'conversations', value: [] });
@@ -157,15 +152,10 @@ export const Chatbar = () => {
       defaultModelId &&
         homeDispatch({
           field: 'selectedConversation',
-          value: {
-            id: uuidv4(),
-            name: t('New Conversation'),
-            messages: [],
-            model: OpenAIModels[defaultModelId],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
-            folderId: null,
-          },
+          value: createNewConversation(
+            `${t('New Conversation')}`,
+            defaultModelId,
+          ),
         });
 
       localStorage.removeItem('selectedConversation');
@@ -186,6 +176,12 @@ export const Chatbar = () => {
     }
   };
 
+  const getContent = (conversation: Conversation) => {
+    return collectMessagesFromTail(conversation)
+      .map((message) => message.message.content)
+      .join('');
+  };
+
   useEffect(() => {
     if (searchTerm) {
       chatDispatch({
@@ -194,7 +190,7 @@ export const Chatbar = () => {
           const searchable =
             conversation.name.toLocaleLowerCase() +
             ' ' +
-            conversation.messages.map((message) => message.content).join(' ');
+            getContent(conversation);
           return searchable.toLowerCase().includes(searchTerm.toLowerCase());
         }),
       });

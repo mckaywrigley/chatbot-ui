@@ -1,16 +1,33 @@
 import { Conversation } from '@/types/chat';
 import {
+  ConversationV1,
+  ConversationV4,
+  ConversationV5,
+  ExportFormatsV2AndUp,
   ExportFormatV1,
   ExportFormatV2,
   ExportFormatV3,
   ExportFormatV4,
+  ExportFormatV5,
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
+
+import {
+  cleanHistoryItem,
+  convertV1HistoryToV2History,
+  convertV1ToV2,
+  convertV2ToV3,
+  convertV3ToV4,
+  convertV4ToV5,
+  isHistoryFormatV1,
+} from './clean';
+
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 
 import { cleanConversationHistory } from './clean';
+
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -28,40 +45,43 @@ export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
   return obj.version === 4;
 }
 
-export const isLatestExportFormat = isExportFormatV4;
+export function isExportFormatV5(obj: any): obj is ExportFormatV5 {
+  return obj.version === 5;
+}
+
+export const isLatestExportFormat = isExportFormatV5;
 
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
-  if (isExportFormatV1(data)) {
-    return {
-      version: 4,
-      history: cleanConversationHistory(data),
-      folders: [],
-      prompts: [],
-    };
+  let originalDataFormat: string | null = null;
+
+  const convertData = (
+    versionNumber: string,
+    isData: (obj: any) => boolean,
+    convertData?: (obj: any) => any,
+  ) => {
+    if (isData(data)) {
+      if (!originalDataFormat) {
+        originalDataFormat = versionNumber;
+      }
+      if (convertData) {
+        data = convertData(data);
+      }
+    }
+  };
+
+  // Convert data between formats
+  convertData('1', isExportFormatV1, convertV1ToV2);
+  convertData('2', isExportFormatV2, convertV2ToV3);
+  convertData('3', isExportFormatV3, convertV3ToV4);
+  convertData('4', isExportFormatV4, convertV4ToV5);
+  convertData('5', isExportFormatV5);
+
+  if (!originalDataFormat) {
+    throw new Error('Unsupported data format');
+  } else {
+    return data as LatestExportFormat;
   }
 
-  if (isExportFormatV2(data)) {
-    return {
-      version: 4,
-      history: cleanConversationHistory(data.history || []),
-      folders: (data.folders || []).map((chatFolder) => ({
-        id: chatFolder.id.toString(),
-        name: chatFolder.name,
-        type: 'chat',
-      })),
-      prompts: [],
-    };
-  }
-
-  if (isExportFormatV3(data)) {
-    return { ...data, version: 4, prompts: [] };
-  }
-
-  if (isExportFormatV4(data)) {
-    return data;
-  }
-
-  throw new Error('Unsupported data format');
 }
 
 function currentDate() {
@@ -89,7 +109,7 @@ export const exportData = () => {
   }
 
   const data = {
-    version: 4,
+    version: 5,
     history: history || [],
     folders: folders || [],
     prompts: prompts || [],
@@ -112,7 +132,8 @@ export const exportData = () => {
 export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
-  const { history, folders, prompts } = cleanData(data);
+  const cleanedData = cleanData(data);
+  const { history, folders, prompts } = cleanedData;
 
   const oldConversations = localStorage.getItem('conversationHistory');
   const oldConversationsParsed = oldConversations
@@ -155,10 +176,5 @@ export const importData = (
   );
   localStorage.setItem('prompts', JSON.stringify(newPrompts));
 
-  return {
-    version: 4,
-    history: newHistory,
-    folders: newFolders,
-    prompts: newPrompts,
-  };
+  return cleanedData
 };

@@ -13,12 +13,12 @@ function App({ Component, pageProps }: AppProps<{}>) {
   const queryClient = new QueryClient();
 
   return (
-    <div className={inter.className}>
+    <main className={inter.className}>
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
       </QueryClientProvider>
-    </div>
+    </main>
   );
 }
 

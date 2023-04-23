@@ -1,3 +1,6 @@
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+import { getChatNodeIdFromMessage } from '@/utils/app/clean';
+
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   cleanData,
@@ -5,10 +8,18 @@ import {
   isExportFormatV2,
   isExportFormatV3,
   isExportFormatV4,
+  isExportFormatV5,
   isLatestExportFormat,
 } from '@/utils/app/importExport';
 
-import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '@/types/export';
+import { ChatNode } from '@/types/chat';
+import {
+  ExportFormatV1,
+  ExportFormatV2,
+  ExportFormatV3,
+  ExportFormatV4,
+  LatestExportFormat,
+} from '@/types/export';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 import { describe, expect, it } from 'vitest';
@@ -61,9 +72,91 @@ describe('Export Format Functions', () => {
       expect(isExportFormatV4(obj)).toBe(false);
     });
   });
+
+  describe('isExportFormatV5', () => {
+    it('should return true for v5 format', () => {
+      const obj = { version: 5, history: [], folders: [], prompts: [] };
+      expect(isExportFormatV5(obj)).toBe(true);
+    });
+
+    it('should return false for non-v5 formats', () => {
+      const obj = { version: 6, history: [], folders: [], prompts: [] };
+      expect(isExportFormatV5(obj)).toBe(false);
+    });
+  });
 });
 
 describe('cleanData Functions', () => {
+  const currentTime = getCurrentUnixTime();
+  const latestFormatNode1: ChatNode = {
+    id: getChatNodeIdFromMessage(0),
+    message: {
+      id: getChatNodeIdFromMessage(0),
+      role: 'user',
+      content: "what's up ?",
+      create_time: currentTime,
+    },
+    parentMessageId: undefined,
+    children: [getChatNodeIdFromMessage(1)],
+  };
+  const latestFormatNode2: ChatNode = {
+    id: getChatNodeIdFromMessage(1),
+    message: {
+      id: getChatNodeIdFromMessage(1),
+      role: 'assistant',
+      content: 'Hi',
+      create_time: currentTime,
+    },
+    parentMessageId: latestFormatNode1.id,
+    children: [],
+  };
+  const latestFormatWithoutFoldersOrPrompts: LatestExportFormat = {
+    version: 5,
+    history: [
+      {
+        id: '1',
+        name: 'conversation 1',
+        mapping: {
+          [latestFormatNode1.id]: latestFormatNode1,
+          [latestFormatNode2.id]: latestFormatNode2,
+        },
+        current_node: latestFormatNode2.id,
+        model: OpenAIModels[OpenAIModelID.GPT_3_5],
+        prompt: DEFAULT_SYSTEM_PROMPT,
+        folderId: null,
+        create_time: currentTime,
+        update_time: currentTime,
+        temperature: DEFAULT_TEMPERATURE,
+      },
+    ],
+    folders: [],
+    prompts: [],
+  };
+
+  const latestFormatWithFolders: LatestExportFormat = {
+    ...latestFormatWithoutFoldersOrPrompts,
+    folders: [
+      {
+        id: '1',
+        name: 'folder 1',
+        type: 'chat',
+      },
+    ],
+    prompts: [],
+  };
+  const latestFormatWithFoldersAndPrompts: LatestExportFormat = {
+    ...latestFormatWithFolders,
+    prompts: [
+      {
+        id: '1',
+        name: 'prompt 1',
+        description: '',
+        content: '',
+        model: OpenAIModels[OpenAIModelID.GPT_3_5],
+        folderId: null,
+      },
+    ],
+  };
   describe('cleaning v1 data', () => {
     it('should return the latest format', () => {
       const data = [
@@ -85,29 +178,7 @@ describe('cleanData Functions', () => {
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
       expect(obj).toEqual({
-        version: 4,
-        history: [
-          {
-            id: 1,
-            name: 'conversation 1',
-            messages: [
-              {
-                role: 'user',
-                content: "what's up ?",
-              },
-              {
-                role: 'assistant',
-                content: 'Hi',
-              },
-            ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
-            folderId: null,
-          },
-        ],
-        folders: [],
-        prompts: [],
+        ...latestFormatWithoutFoldersOrPrompts,
       });
     });
   });
@@ -140,8 +211,14 @@ describe('cleanData Functions', () => {
       } as ExportFormatV2;
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
-      expect(obj).toEqual({
-        version: 4,
+      expect(obj).toEqual(latestFormatWithFolders);
+    });
+  });
+
+  describe('cleaning v3 data', () => {
+    it('should return the latest format', () => {
+      const data = {
+        version: 3,
         history: [
           {
             id: '1',
@@ -158,7 +235,6 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         ],
@@ -169,8 +245,10 @@ describe('cleanData Functions', () => {
             type: 'chat',
           },
         ],
-        prompts: [],
-      });
+      } as ExportFormatV3;
+      const obj = cleanData(data);
+      expect(isLatestExportFormat(obj)).toBe(true);
+      expect(obj).toEqual(latestFormatWithFolders);
     });
   });
 
@@ -194,7 +272,6 @@ describe('cleanData Functions', () => {
             ],
             model: OpenAIModels[OpenAIModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         ],
@@ -219,46 +296,7 @@ describe('cleanData Functions', () => {
 
       const obj = cleanData(data);
       expect(isLatestExportFormat(obj)).toBe(true);
-      expect(obj).toEqual({
-        version: 4,
-        history: [
-          {
-            id: '1',
-            name: 'conversation 1',
-            messages: [
-              {
-                role: 'user',
-                content: "what's up ?",
-              },
-              {
-                role: 'assistant',
-                content: 'Hi',
-              },
-            ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
-            folderId: null,
-          },
-        ],
-        folders: [
-          {
-            id: '1',
-            name: 'folder 1',
-            type: 'chat',
-          },
-        ],
-        prompts: [
-          {
-            id: '1',
-            name: 'prompt 1',
-            description: '',
-            content: '',
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
-            folderId: null,
-          },
-        ],
-      });
+      expect(obj).toEqual(latestFormatWithFoldersAndPrompts);
     });
   });
 });

@@ -15,15 +15,18 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
+import { createNewConversation } from '@/utils/app/conversation';
+import { ConversationProvider } from '@/utils/contexts/conversaionContext';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -180,21 +183,11 @@ const Home = ({
 
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
-
-    const newConversation: Conversation = {
-      id: uuidv4(),
-      name: t('New Conversation'),
-      messages: [],
-      model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-      },
-      prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-      folderId: null,
-    };
+    const newConversation: Conversation = createNewConversation(
+      `${t('New Conversation')}`,
+      defaultModelId,
+      lastConversation,
+    );
 
     const updatedConversations = [...conversations, newConversation];
 
@@ -329,15 +322,11 @@ const Home = ({
       const lastConversation = conversations[conversations.length - 1];
       dispatch({
         field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
+        value: createNewConversation(
+          `${t('New Conversation')}`,
+          defaultModelId,
+          lastConversation,
+        ),
       });
     }
   }, [
@@ -359,37 +348,39 @@ const Home = ({
         handleUpdateConversation,
       }}
     >
-      <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
-        <meta
-          name="viewport"
-          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      {selectedConversation && (
-        <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
-        >
-          <div className="fixed top-0 w-full sm:hidden">
-            <Navbar
-              selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
-            />
-          </div>
-
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Chatbar />
-
-            <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
+      <ConversationProvider>
+        <Head>
+          <title>Chatbot UI</title>
+          <meta name="description" content="ChatGPT but better." />
+          <meta
+            name="viewport"
+            content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        {selectedConversation && (
+          <main
+            className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+          >
+            <div className="fixed top-0 w-full sm:hidden">
+              <Navbar
+                selectedConversation={selectedConversation}
+                onNewConversation={handleNewConversation}
+              />
             </div>
 
-            <Promptbar />
-          </div>
-        </main>
-      )}
+            <div className="flex h-full w-full pt-[48px] sm:pt-0">
+              <Chatbar />
+
+              <div className="flex flex-1">
+                <Chat stopConversationRef={stopConversationRef} />
+              </div>
+
+              <Promptbar />
+            </div>
+          </main>
+        )}
+      </ConversationProvider>
     </HomeContext.Provider>
   );
 };
