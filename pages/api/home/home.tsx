@@ -307,7 +307,7 @@ const Home = ({
       dispatch({ field: 'forceSyncConversation', value: false });
     }
     dispatch({ field: 'syncSuccess', value: true });
-    dispatch({ field: 'syncingConversation', value: true });
+    dispatch({ field: 'syncingConversation', value: false });
   }, [
     conversations,
     user,

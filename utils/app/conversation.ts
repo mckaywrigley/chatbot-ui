@@ -87,7 +87,7 @@ export const syncConversations = async (
 ) => {
   // We use simple syncing here, basically who has the most recent data wins
   const localLastUpdatedAt = dayjs(conversationLastUpdatedAt);
-
+  
   const { data: userConversations } = await supabase
     .from('user_conversations')
     .select('last_updated')
@@ -98,15 +98,20 @@ export const syncConversations = async (
 
   if (localLastUpdatedAt && remoteTimestamp) {
     if (localLastUpdatedAt > remoteTimestamp) {
+      console.log('Local data is newer, pushing to remote');
       await pushConversations(supabase, user, exportableConversations);
     } else {
+      console.log('Remote data is newer, pulling from remote');
       await pullConversations(supabase, user);
     }
   } else if (localLastUpdatedAt) {
+    console.log('Local data is newer, pushing to remote');
     await pushConversations(supabase, user, exportableConversations);
   } else if (remoteTimestamp) {
+    console.log('Remote data is newer, pulling from remote');
     await pullConversations(supabase, user);
   } else {
+    console.log('No data found, pushing to remote');
     await pushConversations(supabase, user, exportableConversations);
   }
 };
