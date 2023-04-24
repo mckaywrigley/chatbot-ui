@@ -9,5 +9,6 @@
   "A description for your prompt.": "提示词描述",
   "Prompt": "提示词",
   "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "提示内容。使用 {{}} 表示一个变量。例如：{{name}} 是一个 {{adjective}} {{noun}}",
-  "Save": "保存"
+  "Save": "保存",
+  "Search...": "搜索..."
 }
