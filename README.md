@@ -112,6 +112,12 @@ When deploying the application, the following environment variables can be set:
 | COUCHDB_USERNAME                  | `admin`                        | The username of the CouchDB instance                    |
 | COUCHDB_PASSWORD                  | `password`                     | The password of the CouchDB instance                    |
 | COUCHDB_DATABASE                  | `chatbot`                      | The database name of the CouchDB instance               |
+| RDBMS_DB_TYPE                     | `postgres`                     | The database type of the RDBMS instance                 |
+| RDBMS_HOST                        | `127.0.0.1`                    | The hostname of the RDBMS instance                      |
+| RDBMS_PORT                        | `5432`                         | The port of the RDBMS instance                          |
+| RDBMS_DB                          | `postgres`                     | The database name of the RDBMS instance                 |
+| RDBMS_USER                        | `postgres`                     | The username of the RDBMS instance                      |
+| RDBMS_PASS                        | `password`                     | The password of the RDBMS instance                      |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 
