@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
+import { IconCheck } from '@tabler/icons-react';
 import { FC, Fragment, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -12,10 +13,56 @@ type Props = {
   session: Session;
 };
 
+const PlanDetail = {
+  free: {
+    features: [
+      'Enhance chat mode',
+      'Share conversations',
+      'Folder manager',
+      'Prompt manager',
+    ],
+  },
+  pro: {
+    features: [
+      'Everything in free plan',
+      'Priority response time',
+      'Cloud sync',
+      'Voice input (Coming)',
+      'GPT-4 integration (Coming)',
+    ],
+  },
+};
+
 export const ProfileModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation('model');
-  const { handleUserLogout } = useContext(HomeContext);
+  const {
+    state: { user },
+    handleUserLogout,
+  } = useContext(HomeContext);
 
+  const upgradeLink = () => {
+    const paymentLink =
+      process.env.NEXT_PUBLIC_ENV === 'production'
+        ? 'https://buy.stripe.com/7sI03Za6eekZ9fWbIK'
+        : 'https://buy.stripe.com/test_4gw4hLcvq52Odt6fYY';
+    const userEmail = user?.email;
+    const userId = user?.id;
+
+    return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
+  };
+
+  const subscriptionManagementLink = () =>
+    process.env.NEXT_PUBLIC_ENV === 'production'
+      ? 'https://billing.stripe.com/p/login/5kAbMj0wt5VF6AwaEE'
+      : 'https://billing.stripe.com/p/login/test_28o4jFe6GaqK1UY5kk';
+
+  const FeatureItem = ({ feature }: { feature: string }) => (
+    <div className="flex flex-row items-center">
+      <IconCheck size={16} stroke={1} className="mr-1" color="lightgreen" />
+      <span>{t(feature)}</span>
+    </div>
+  );
+  
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose} open>
@@ -43,11 +90,63 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-white">
+              <Dialog.Panel className="w-full max-w-md md:max-w-lg transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-white">
                 <Dialog.Description>
-                  {t(
-                    'Thank you for registering with us. We are currently working on the some exiting features. Please check back soon!',
-                  )}
+                  <div className="rounded-2xl flex flex-col">
+                    <span className="text-sm mb-6">
+                      {t(
+                        'As an effort to reach sustainability for Chat Everywhere, we are introducing pro plan for our users to support us and this project, so we can continue to provide you with the best feature and experience.',
+                      )}
+                    </span>
+                    <div className="flex flex-col md:flex-row justify-evenly mb-3">
+                      <div className="flex flex-col border rounded-2xl p-4 text-neutral-400 border-neutral-400 md:w-1/2">
+                        <span className="text-2xl font-bold">Free</span>
+                        <span className="text-sm mb-2">USD$0</span>
+                        <div className="text-xs leading-5">
+                          {PlanDetail.free.features.map((feature, index) => (
+                            <FeatureItem key={index} feature={feature} />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex flex-col border rounded-2xl p-4 mt-4 md:mt-0 md:ml-2 md:w-1/2">
+                        <span className="text-2xl font-bold">Pro</span>
+                        <span className="text-sm mb-2">USD$9.99 per month</span>
+                        <div className="text-xs leading-5">
+                          {PlanDetail.pro.features.map((feature, index) => (
+                            <FeatureItem key={index} feature={feature} />
+                          ))}
+                        </div>
+                        {user?.plan === 'free' && (
+                          <a
+                            href={upgradeLink()}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm"
+                          >
+                            {t('Upgrade')}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      {user?.plan === 'pro' && (
+                        <p className="text-xs text-neutral-400">
+                          {t(
+                            'Thank you for supporting us! If you want to cancel your subscription, please visit ',
+                          )}
+                          <a
+                            href={subscriptionManagementLink()}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline cursor-pointer"
+                          >
+                            {t('here')}
+                          </a>
+                          {t(' and cancel your subscription.')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </Dialog.Description>
 
                 <div className="flex justify-between mt-4">
@@ -56,7 +155,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                     className="px-4 py-2 border rounded-lg shadow text-black bg-slate-200 hover:bg-slate-300 focus:outline-none"
                     onClick={onClose}
                   >
-                    {t('Okay!')}
+                    {t('Okay')}
                   </button>
 
                   <button

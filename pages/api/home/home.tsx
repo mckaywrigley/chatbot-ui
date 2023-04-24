@@ -26,6 +26,7 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+import { syncConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 
@@ -34,6 +35,7 @@ import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
+import { UserProfile } from '@/types/user';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -45,6 +47,7 @@ import { ProfileModel } from '@/components/User/ProfileModel';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
+import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -63,7 +66,6 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const [initialRender, setInitialRender] = useState<boolean>(true);
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
@@ -84,6 +86,10 @@ const Home = ({
       temperature,
       showLoginSignUpModel,
       showProfileModel,
+      user,
+      isPaidUser,
+      conversationLastSyncAt,
+      forceSyncConversation,
     },
     dispatch,
   } = contextValue;
@@ -261,18 +267,89 @@ const Home = ({
       });
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
+  // CLOUD SYNC ------------------------------------------
+
+  useEffect(() => {
+    if (!user) return;
+    if (!isPaidUser) return;
+
+    let conversationLastUpdatedAt = localStorage.getItem(
+      'conversationLastUpdatedAt',
+    );
+
+    const syncConversationsAction = async () => {
+      await syncConversations(
+        supabase,
+        user,
+        // Subtract 1 year to force sync
+        conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
+      );
+    };
+
+    // Sync if we haven't sync for more than 2 minutes or it is the first time syncing upon loading
+    if (
+      !forceSyncConversation &&
+      ((conversationLastSyncAt &&
+        dayjs().diff(conversationLastSyncAt, 'minutes') < 2) ||
+        !conversationLastUpdatedAt)
+    )
+      return;
+
+    try {
+      dispatch({ field: 'syncingConversation', value: true });
+      syncConversationsAction();
+    } catch (e) {
+      dispatch({ field: 'syncSuccess', value: false });
+      console.log('error', e);
+    }
+
+    dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
+    if (forceSyncConversation) {
+      dispatch({ field: 'forceSyncConversation', value: false });
+    }
+    dispatch({ field: 'syncSuccess', value: true });
+    dispatch({ field: 'syncingConversation', value: false });
+  }, [
+    conversations,
+    user,
+    supabase,
+    dispatch,
+    isPaidUser,
+    forceSyncConversation,
+    conversationLastSyncAt,
+  ]);
+
   // USER AUTH ------------------------------------------
   useEffect(() => {
     if (session?.user) {
-      console.log('session', session);
-      dispatch({ field: 'showLoginSignUpModel', value: false });
-      dispatch({
-        field: 'user',
-        value: {
-          id: session.user.id,
-          email: session.user.email,
-        },
-      });
+      supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', session.user.id)
+        .then(({ data, error }) => {
+          if (error) {
+            console.log('error', error);
+          } else {
+            dispatch({ field: 'isPaidUser', value: data[0].plan !== 'free' });
+          }
+
+          if(!data || data.length === 0){
+            toast.error(t('Unable to load your information, please try again later.'));
+            return;
+          }
+
+          const userProfile = data[0] as UserProfile;
+
+          dispatch({ field: 'showLoginSignUpModel', value: false });
+          dispatch({
+            field: 'user',
+            value: {
+              id: session.user.id,
+              email: session.user.email,
+              plan: userProfile.plan || 'free',
+            },
+          });
+        });
     }
   }, [session]);
 
@@ -481,6 +558,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'prompts',
         'roles',
         'rolesContent',
+        'feature'
       ])),
     },
   };
