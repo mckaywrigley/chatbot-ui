@@ -25,6 +25,20 @@ Host your own live version of Chatbot UI with Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
 
+**Docker Compose**
+
+Production _(<http://localhost:3000>)_:
+
+```shell
+docker-compose -f docker-compose.yml --env-file .env.local up -d
+```
+
+Development _(<http://localhost:3001> & <http://localhost:5984/_utils>)_:
+
+```shell
+docker-compose -f docker-compose.dev.yml --env-file .env.local up --build
+```
+
 **Docker**
 
 Build locally:
@@ -93,6 +107,12 @@ When deploying the application, the following environment variables can be set:
 | NEXT_PUBLIC_DEFAULT_TEMPERATURE   | 1                              | The default temperature to use on new conversations                                                                                       |
 | GOOGLE_API_KEY                    |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 | GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
+| STORAGE_TYPE                      | `local`                        | Options are `local`, `couchdb`, `mongodb` & `rdbms`     |
+| COUCHDB_HOST                      | `http://couchdb`               | The hostname of the CouchDB instance                    |
+| COUCHDB_PORT                      | `5984`                         | The port of the CouchDB instance                        |
+| COUCHDB_USERNAME                  | `admin`                        | The username of the CouchDB instance                    |
+| COUCHDB_PASSWORD                  | `password`                     | The password of the CouchDB instance                    |
+| COUCHDB_DATABASE                  | `chatbot`                      | The database name of the CouchDB instance               |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 

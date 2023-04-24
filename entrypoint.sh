@@ -1,7 +1,7 @@
 #!/bin/ash
 set -e
 
-if ( [ "${DATABASE_TYPE}" = "couchdb" ] ); then
+if ( [ "${STORAGE_TYPE}" = "couchdb" ] ); then
     if ( [ -z "${COUCHDB_USERNAME}" ] ); then
         export COUCHDB_USERNAME='admin'
     fi
