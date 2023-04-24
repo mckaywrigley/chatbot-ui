@@ -54,6 +54,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       pluginKeys,
       modelError,
       loading,
+      user
     },
     handleUpdateConversation,
     dispatch: homeDispatch,

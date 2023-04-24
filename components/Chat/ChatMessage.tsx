@@ -257,9 +257,15 @@ export const ChatMessage: FC<Props> = memo(
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeMathjax]}
                   components={{
+                    a({ node, children, href, ...props }) {
+                      return (
+                        <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
+                          {children}
+                        </a>
+                      );
+                    },
                     code({ node, inline, className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || '');
-
                       return !inline ? (
                         <CodeBlock
                           key={Math.random()}
