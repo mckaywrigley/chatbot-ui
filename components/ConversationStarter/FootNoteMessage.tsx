@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import { useTranslation } from 'next-i18next';
 import { IconBolt } from '@tabler/icons-react';
 
