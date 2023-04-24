@@ -62,7 +62,6 @@ export const storageDeleteConversation = (
   conversationId: string,
   allConversations: Conversation[],
 ) => {
-  console.log('deleting conversation: ', conversationId);
   const updatedConversations = allConversations.filter(
     (c) => c.id !== conversationId,
   );

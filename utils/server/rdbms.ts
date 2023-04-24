@@ -1,4 +1,12 @@
 import {
+  RDBMSConversation,
+  RDBMSFolder,
+  RDBMSMessage,
+  RDBMSPrompt,
+  RDBMSUser,
+} from '../../types/rdbms';
+
+import {
   RDBMS_COCKROACHDB_TIME_TRAVEL_QUERIES,
   RDBMS_DB,
   RDBMS_DB_TYPE,
@@ -11,15 +19,7 @@ import {
   RDBMS_SSL_HOST,
   RDBMS_SSL_KEY,
   RDBMS_USER,
-} from '../../../utils/app/const';
-
-import {
-  RDBMSConversation,
-  RDBMSFolder,
-  RDBMSMessage,
-  RDBMSPrompt,
-  RDBMSUser,
-} from '../../../types/rdbms';
+} from '../app/const';
 
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
@@ -128,4 +128,19 @@ export const getDataSource = async () => {
   } else {
     throw new Error('RDBMS type not supported');
   }
+};
+
+export const getUser = async (dataSource: DataSource, id: string) => {
+  // Try to fetch account from database
+  const userRepo = dataSource.getRepository(RDBMSUser);
+  let rdbmsUser = await userRepo.findOneBy({ id: id });
+
+  // If no user found, create a new one
+  if (!rdbmsUser) {
+    rdbmsUser = new RDBMSUser();
+    rdbmsUser.id = id.toLowerCase();
+  }
+
+  await userRepo.save(rdbmsUser);
+  return rdbmsUser;
 };

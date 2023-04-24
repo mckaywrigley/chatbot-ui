@@ -1,4 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+
+import { getDataSource, getUser } from '../../../utils/server/rdbms';
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import {
   RDBMSConversation,
@@ -10,22 +14,36 @@ import type { Role } from '@/types/chat';
 import { Conversation, Message } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
-import { getDataSource } from './dataSource';
+import { authOptions } from '../auth/[...nextauth]';
 
 import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // TODO get user from bearer token
+  let userId = '';
+  if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
+    const session = await getServerSession(req, res, authOptions);
 
-  const user = new RDBMSUser();
-  user.user_id = 'test_user';
+    if (!session) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user.email) {
+      return res
+        .status(401)
+        .json({ error: 'User does not have an email address' });
+    }
+    userId = session.user.email;
+  } else {
+    userId = 'test_user';
+  }
+
+  const dataSource = await getDataSource();
+  const user = await getUser(dataSource, userId);
 
   let body: any | null = null;
   if (req.body !== '') {
     body = JSON.parse(req.body);
   }
-
-  const dataSource = await getDataSource();
 
   if (req.method === 'POST') {
     return await rdbmsGetAllConversations(res, dataSource, user);
@@ -56,7 +74,9 @@ const rdbmsGetAllConversations = async (
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
   const messageRepo = dataSource.getRepository(RDBMSMessage);
   const rdbmsConversations = await conversationRepo.find({
-    where: { user: user },
+    where: {
+      user: { id: user.id },
+    },
     relations: ['folder'],
   });
 
@@ -69,7 +89,7 @@ const rdbmsGetAllConversations = async (
 
     const rdbmsMessages = await messageRepo.find({
       where: {
-        user: user,
+        user: { id: user.id },
         conversation: { id: rdbmsConversation.id },
       },
       order: { timestamp: { direction: 'ASC' } },
@@ -149,7 +169,7 @@ const rdbmsDeleteAllConversations = async (
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
 
   const deletedConversations = await conversationRepo.findBy({
-    user: user,
+    user: { id: user.id },
   });
 
   await conversationRepo.remove(deletedConversations);

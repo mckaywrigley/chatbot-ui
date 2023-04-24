@@ -10,10 +10,10 @@ import {
 @Entity()
 export class RDBMSUser {
   @PrimaryColumn()
-  user_id!: string;
+  id!: string;
 
-  @Column()
-  pass!: string;
+  @Column({ type: 'varchar', nullable: true })
+  pass!: string | null;
 }
 
 

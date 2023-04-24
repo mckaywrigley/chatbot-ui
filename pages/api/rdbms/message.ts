@@ -1,4 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+
+import { getDataSource, getUser } from '../../../utils/server/rdbms';
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import {
   RDBMSConversation,
@@ -6,23 +10,37 @@ import {
   RDBMSUser,
 } from '../../../types/rdbms';
 
-import { getDataSource } from './dataSource';
+import { authOptions } from '../auth/[...nextauth]';
 
 import { Message } from 'postcss';
 import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // TODO get user from bearer token
+  let userId = '';
+  if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
+    const session = await getServerSession(req, res, authOptions);
 
-  const user = new RDBMSUser();
-  user.user_id = 'test_user';
+    if (!session) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user.email) {
+      return res
+        .status(401)
+        .json({ error: 'User does not have an email address' });
+    }
+    userId = session.user.email;
+  } else {
+    userId = 'test_user';
+  }
+
+  const dataSource = await getDataSource();
+  const user = await getUser(dataSource, userId);
 
   let body: any | null = null;
   if (req.body !== '') {
     body = JSON.parse(req.body);
   }
-
-  const dataSource = await getDataSource();
 
   if (req.method === 'POST') {
     const newMessage = body['message'] as Message;
@@ -62,7 +80,7 @@ const rdbmsCreateMessage = async (
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
   const messageRepo = dataSource.getRepository(RDBMSMessage);
   const rdbmsConversation = await conversationRepo.findOneBy({
-    user: user,
+    user: { id: user.id },
     id: conversationId,
   });
 
@@ -94,7 +112,7 @@ const rdbmsDeleteMessage = async (
 ) => {
   const messageRepo = dataSource.getRepository(RDBMSMessage);
   const deletedMessage = await messageRepo.findOneBy({
-    user: user,
+    user: { id: user.id },
     id: messageId,
   });
 

@@ -8,6 +8,6 @@ export interface ProcessEnv {
   GITHUB_CLIENT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
-  NEXTAUTH_ENABLED: 'true' | 'false';
+  NEXT_PUBLIC_NEXTAUTH_ENABLED: 'true' | 'false';
   NEXTAUTH_EMAIL_PATTERN?: string;
 }

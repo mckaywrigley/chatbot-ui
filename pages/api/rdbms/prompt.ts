@@ -1,15 +1,37 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+
+import { getDataSource, getUser } from '../../../utils/server/rdbms';
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import { RDBMSFolder, RDBMSPrompt, RDBMSUser } from '../../../types/rdbms';
 import { Prompt } from '@/types/prompt';
 
-import { getDataSource } from './dataSource';
+import { authOptions } from '../auth/[...nextauth]';
+
+import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // TODO get user from bearer token
+  let userId = '';
+  if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
+    const session = await getServerSession(req, res, authOptions);
 
-  const user = new RDBMSUser();
-  user.user_id = 'test_user';
+    if (!session) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user.email) {
+      return res
+        .status(401)
+        .json({ error: 'User does not have an email address' });
+    }
+    userId = session.user.email;
+  } else {
+    userId = 'test_user';
+  }
+
+  const dataSource = await getDataSource();
+  const user = await getUser(dataSource, userId);
 
   let body;
   if (req.body !== '') {
@@ -18,23 +40,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (req.method === 'POST') {
     const newPrompt = body;
-    console.log(newPrompt);
     if (newPrompt !== null) {
-      return await rdbmsCreatePrompt(res, user, newPrompt);
+      return await rdbmsCreatePrompt(res, dataSource, user, newPrompt);
     } else {
       return res.status(400).json({ error: 'No prompt provided' });
     }
   } else if (req.method === 'PUT') {
     const updatedPrompt = body;
     if (updatedPrompt !== null) {
-      return await rdbmsUpdatePrompt(res, user, updatedPrompt);
+      return await rdbmsUpdatePrompt(res, dataSource, user, updatedPrompt);
     } else {
       return res.status(400).json({ error: 'No prompt provided' });
     }
   } else if (req.method === 'DELETE') {
     const promptId = body['prompt_id'];
     if (promptId !== undefined) {
-      return await rdbmsDeletePrompt(res, user, promptId);
+      return await rdbmsDeletePrompt(res, dataSource, user, promptId);
     } else {
       return res.status(400).json({ error: 'No prompt_id provided' });
     }
@@ -45,10 +66,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const rdbmsCreatePrompt = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   prompt: Prompt,
 ) => {
-  const dataSource = await getDataSource();
   const folderRepo = dataSource.getRepository(RDBMSFolder);
   const promptRepo = dataSource.getRepository(RDBMSPrompt);
 
@@ -82,10 +103,10 @@ const rdbmsCreatePrompt = async (
 
 const rdbmsUpdatePrompt = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   prompt: Prompt,
 ) => {
-  const dataSource = await getDataSource();
   const folderRepo = dataSource.getRepository(RDBMSFolder);
   const promptRepo = dataSource.getRepository(RDBMSPrompt);
 
@@ -119,13 +140,13 @@ const rdbmsUpdatePrompt = async (
 
 const rdbmsDeletePrompt = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   promptId: string,
 ) => {
-  const dataSource = await getDataSource();
   const promptRepo = dataSource.getRepository(RDBMSPrompt);
   const deletedPrompt = await promptRepo.findOneBy({
-    user: user,
+    user: { id: user.id },
     id: promptId,
   });
 

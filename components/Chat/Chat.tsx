@@ -72,27 +72,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
-      console.log('handling send');
-      console.log(message);
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
-          console.log(`deleting ${deleteCount} messages`);
-          console.log(updatedMessages);
           const conversationLength = selectedConversation.messages.length;
           const messagesToBeDeleted: string[] = [];
           for (let i = 0; i < deleteCount; i++) {
             const currentMessage =
               selectedConversation.messages[conversationLength - 1 - i];
-            console.log(currentMessage);
             messagesToBeDeleted.push(currentMessage.id);
             updatedMessages.pop();
           }
-
-          console.log('going to delete the following');
-          console.log(messagesToBeDeleted);
-
           storageDeleteMessages(
             storageType,
             messagesToBeDeleted,
@@ -532,16 +523,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     message={message}
                     messageIndex={index}
                     onEdit={(editedMessage) => {
-                      console.log('editing');
-                      console.log(selectedConversation?.messages);
-                      console.log(
-                        'current size: ',
-                        selectedConversation?.messages.length,
-                      );
-                      console.log(
-                        'new size: ',
-                        selectedConversation?.messages.length - index,
-                      );
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
 
@@ -567,12 +548,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
             onSend={(message, plugin) => {
-              console.log('before send');
-              console.log(selectedConversation);
               setCurrentMessage(message);
               handleSend(message, 0, plugin);
-              console.log('after send');
-              console.log(selectedConversation);
             }}
             onScrollDownClick={handleScrollDown}
             onRegenerate={() => {

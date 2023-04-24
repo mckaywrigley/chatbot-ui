@@ -1,7 +1,10 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconLogout, IconSettings } from '@tabler/icons-react';
+import { signOut } from 'next-auth/react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
+
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -56,6 +59,14 @@ export const ChatbarSettings = () => {
         icon={<IconSettings size={18} />}
         onClick={() => setIsSettingDialog(true)}
       />
+
+      {NEXT_PUBLIC_NEXTAUTH_ENABLED && (
+        <SidebarButton
+          text={t('Log Out')}
+          icon={<IconLogout size={18} />}
+          onClick={() => signOut()}
+        />
+      )}
 
       {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />

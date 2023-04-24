@@ -1,24 +1,42 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+
+import { getDataSource, getUser } from '../../../utils/server/rdbms';
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import { RDBMSFolder, RDBMSUser } from '../../../types/rdbms';
 import { FolderInterface, FolderType } from '@/types/folder';
 
-import { getDataSource } from './dataSource';
+import { authOptions } from '../auth/[...nextauth]';
 
 import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // TODO get user from bearer token
+  let userId = '';
+  if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
+    const session = await getServerSession(req, res, authOptions);
 
-  const user = new RDBMSUser();
-  user.user_id = 'test_user';
+    if (!session) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user.email) {
+      return res
+        .status(401)
+        .json({ error: 'User does not have an email address' });
+    }
+    userId = session.user.email;
+  } else {
+    userId = 'test_user';
+  }
+
+  const dataSource = await getDataSource();
+  const user = await getUser(dataSource, userId);
 
   let body: any | null = null;
   if (req.body !== '') {
     body = JSON.parse(req.body);
   }
-
-  const dataSource = await getDataSource();
 
   if (req.method === 'POST') {
     return await rdbmsGetAllFolders(res, dataSource, user);
@@ -42,7 +60,9 @@ const rdbmsGetAllFolders = async (
   user: RDBMSUser,
 ) => {
   const folderRepo = dataSource.getRepository(RDBMSFolder);
-  const rdbmsFolders = await folderRepo.findBy({ user: user });
+  const rdbmsFolders = await folderRepo.findBy({
+    user: { id: user.id },
+  });
 
   const folders: FolderInterface[] = [];
 
@@ -92,7 +112,7 @@ const rdbmsDeleteAllFolders = async (
   const folderRepo = dataSource.getRepository(RDBMSFolder);
 
   const deletedFolders = await folderRepo.findBy({
-    user: user,
+    user: { id: user.id },
   });
 
   await folderRepo.remove(deletedFolders);

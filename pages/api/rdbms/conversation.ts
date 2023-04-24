@@ -1,4 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
+
+import { getDataSource, getUser } from '../../../utils/server/rdbms';
+import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 
 import {
   RDBMSConversation,
@@ -7,13 +11,31 @@ import {
 } from '../../../types/rdbms';
 import { Conversation } from '@/types/chat';
 
-import { getDataSource } from './dataSource';
+import { authOptions } from './../auth/[...nextauth]';
+
+import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // TODO get user from bearer token
+  let userId = '';
+  if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
+    const session = await getServerSession(req, res, authOptions);
 
-  const user = new RDBMSUser();
-  user.user_id = 'test_user';
+    if (!session) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user) {
+      return res.status(401).json({ error: 'User is not authenticated' });
+    } else if (!session.user.email) {
+      return res
+        .status(401)
+        .json({ error: 'User does not have an email address' });
+    }
+    userId = session.user.email;
+  } else {
+    userId = 'test_user';
+  }
+
+  const dataSource = await getDataSource();
+  const user = await getUser(dataSource, userId);
 
   let body;
   if (req.body !== '') {
@@ -23,21 +45,36 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const newConversation = body;
     if (newConversation !== null) {
-      return await rdbmsCreateConversation(res, user, newConversation);
+      return await rdbmsCreateConversation(
+        res,
+        dataSource,
+        user,
+        newConversation,
+      );
     } else {
       return res.status(400).json({ error: 'No conversation provided' });
     }
   } else if (req.method === 'PUT') {
     const updatedConversation = body;
     if (updatedConversation !== null) {
-      return await rdbmsUpdateConversation(res, user, updatedConversation);
+      return await rdbmsUpdateConversation(
+        res,
+        dataSource,
+        user,
+        updatedConversation,
+      );
     } else {
       return res.status(400).json({ error: 'No conversation provided' });
     }
   } else if (req.method === 'DELETE') {
     const conversationId = body['conversation_id'];
     if (conversationId !== undefined) {
-      return await rdbmsDeleteConversation(res, user, conversationId);
+      return await rdbmsDeleteConversation(
+        res,
+        dataSource,
+        user,
+        conversationId,
+      );
     } else {
       return res.status(400).json({ error: 'No conversation_id provided' });
     }
@@ -48,10 +85,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const rdbmsCreateConversation = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   conversation: Conversation,
 ) => {
-  const dataSource = await getDataSource();
   const folderRepo = dataSource.getRepository(RDBMSFolder);
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
 
@@ -85,10 +122,10 @@ const rdbmsCreateConversation = async (
 
 const rdbmsUpdateConversation = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   conversation: Conversation,
 ) => {
-  const dataSource = await getDataSource();
   const folderRepo = dataSource.getRepository(RDBMSFolder);
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
 
@@ -122,13 +159,13 @@ const rdbmsUpdateConversation = async (
 
 const rdbmsDeleteConversation = async (
   res: NextApiResponse,
+  dataSource: DataSource,
   user: RDBMSUser,
   conversationId: string,
 ) => {
-  const dataSource = await getDataSource();
   const conversationRepo = dataSource.getRepository(RDBMSConversation);
   const deletedConversation = await conversationRepo.findOneBy({
-    user: user,
+    user: { id: user.id },
     id: conversationId,
   });
 
