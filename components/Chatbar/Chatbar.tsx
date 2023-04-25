@@ -186,6 +186,12 @@ export const Chatbar = () => {
     }
   };
 
+  const beforeCreate = () => {
+    const folderName = prompt(t('Enter folder name: ') || "",  t('New folder') || "")
+    if (folderName) 
+      handleCreateFolder(folderName, 'chat')
+  }
+
   useEffect(() => {
     if (searchTerm) {
       chatDispatch({
@@ -232,7 +238,7 @@ export const Chatbar = () => {
         }
         toggleOpen={handleToggleChatbar}
         handleCreateItem={handleNewConversation}
-        handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
+        handleCreateFolder={beforeCreate}
         handleDrop={handleDrop}
         footerComponent={<ChatbarSettings />}
       />

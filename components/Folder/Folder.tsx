@@ -11,6 +11,7 @@ import {
   ReactElement,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
@@ -33,12 +34,25 @@ const Folder = ({
   handleDrop,
   folderComponent,
 }: Props) => {
-  const { handleDeleteFolder, handleUpdateFolder } = useContext(HomeContext);
+  const {
+    handleDeleteFolder,
+    handleUpdateFolder,
+    dispatch: homeDispatch,
+    state: { selectedFolder },
+  } = useContext(HomeContext);
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+
+  const isFolderSelected = useMemo(() => currentFolder.id === selectedFolder?.id, [currentFolder, selectedFolder])
+
+  const handleSelect = () => {
+    setIsOpen(!isOpen);
+    const selectedFolder = isOpen ? undefined : currentFolder
+    homeDispatch({ field: 'selectedFolder', value: selectedFolder });
+  };
 
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
@@ -112,8 +126,8 @@ const Folder = ({
           </div>
         ) : (
           <button
-            className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
-            onClick={() => setIsOpen(!isOpen)}
+            className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90 ${isFolderSelected ? 'bg-[#343541]' : ''}`}
+            onClick={handleSelect}
             onDrop={(e) => dropHandler(e)}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
