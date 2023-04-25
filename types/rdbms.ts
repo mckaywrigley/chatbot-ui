@@ -12,10 +12,12 @@ import {ColumnType} from 'typeorm/driver/types/ColumnTypes'
 
 let textType = 'varchar' as ColumnType
 let timestampType = 'timestamptz' as ColumnType
+let floatType = 'real' as ColumnType
 
 if (["mysql", "mariadb"].includes(RDBMS_DB_TYPE)){
   textType = "longtext" as ColumnType
   timestampType = 'timestamp' as ColumnType
+  floatType = 'float' as ColumnType
 }
 
 @Entity()
@@ -63,7 +65,7 @@ export class RDBMSConversation {
   @Column({type: textType})
   prompt!: string | '';
 
-  @Column()
+  @Column({type: floatType})
   temperature!: number;
 
   @ManyToOne(() => RDBMSFolder, { onUpdate: "CASCADE" })
