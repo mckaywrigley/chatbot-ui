@@ -3,10 +3,10 @@ import { IconCheck } from '@tabler/icons-react';
 import { FC, Fragment, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
-
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Session } from '@supabase/supabase-js';
+import { event } from 'nextjs-google-analytics';
 
 type Props = {
   onClose: () => void;
@@ -47,6 +47,11 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
         : 'https://buy.stripe.com/test_4gw4hLcvq52Odt6fYY';
     const userEmail = user?.email;
     const userId = user?.id;
+
+    event('Upgrade button clicked', {
+      category: 'Engagement',
+      label: 'Upgrade',
+    });
 
     return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
   };
