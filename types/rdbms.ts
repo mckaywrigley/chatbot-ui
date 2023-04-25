@@ -1,3 +1,4 @@
+import { RDBMS_DB_TYPE } from "@/utils/app/const";
 import {
   Entity,
   Column,
@@ -7,12 +8,22 @@ import {
   ManyToOne,
 } from "typeorm"
 
+import {ColumnType} from 'typeorm/driver/types/ColumnTypes'
+
+let textType = 'varchar' as ColumnType
+let timestampType = 'timestamptz' as ColumnType
+
+if (["mysql", "mariadb"].includes(RDBMS_DB_TYPE)){
+  textType = "longtext" as ColumnType
+  timestampType = 'timestamp' as ColumnType
+}
+
 @Entity()
 export class RDBMSUser {
   @PrimaryColumn()
   id!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: textType, nullable: true })
   pass!: string | null;
 }
 
@@ -49,8 +60,8 @@ export class RDBMSConversation {
   @Column()
   model_id!: string;
 
-  @Column()
-  prompt!: string;
+  @Column({type: textType})
+  prompt!: string | '';
 
   @Column()
   temperature!: number;
@@ -78,10 +89,10 @@ export class RDBMSMessage {
   @Column()
   role!: string;
 
-  @Column()
+  @Column({type: textType})
   content!: string;
 
-  @Column({ type: 'timestamptz', default: () => 'NOW()' })
+  @Column({ type: timestampType, default: () => 'NOW()' })
   timestamp!: Date;
 }
 
@@ -97,11 +108,11 @@ export class RDBMSPrompt {
   @Column()
   name!: string;
 
-  @Column()
-  description!: string;
+  @Column({type: textType})
+  description!: string | '';
 
-  @Column()
-  content!: string;
+  @Column({type: textType})
+  content!: string | '';
 
   @Column()
   model_id!: string;
