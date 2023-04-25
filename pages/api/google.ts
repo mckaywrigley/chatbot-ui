@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { OPENAI_API_HOST } from '@/utils/app/const';
+import { OPENAI_API_HOST, OPENAI_ORGANIZATION } from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
 
 import { Message } from '@/types/chat';
@@ -111,8 +111,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
+    const answerMessageId = uuidv4();
     const answerMessage: Message = {
-      id: uuidv4(),
+      id: answerMessageId,
       role: 'user',
       content: answerPrompt,
     };
@@ -121,8 +122,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-        ...(process.env.OPENAI_ORGANIZATION && {
-          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
+        ...(OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
         }),
       },
       method: 'POST',
