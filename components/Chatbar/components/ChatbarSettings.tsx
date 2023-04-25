@@ -60,6 +60,12 @@ export const ChatbarSettings = () => {
         onClick={() => setIsSettingDialog(true)}
       />
 
+      {!serverSideApiKeyIsSet ? (
+        <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+      ) : null}
+
+      {!serverSidePluginKeysSet ? <PluginKeys /> : null}
+
       {NEXT_PUBLIC_NEXTAUTH_ENABLED && (
         <SidebarButton
           text={t('Log Out')}
@@ -67,12 +73,6 @@ export const ChatbarSettings = () => {
           onClick={() => signOut()}
         />
       )}
-
-      {!serverSideApiKeyIsSet ? (
-        <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-      ) : null}
-
-      {!serverSidePluginKeysSet ? <PluginKeys /> : null}
 
       <SettingDialog
         open={isSettingDialogOpen}

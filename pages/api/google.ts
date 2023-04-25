@@ -9,6 +9,7 @@ import { GoogleBody, GoogleSource } from '@/types/google';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
+import { v4 as uuidv4 } from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
@@ -110,7 +111,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
-    const answerMessage: Message = { role: 'user', content: answerPrompt };
+    const answerMessage: Message = {
+      id: uuidv4(),
+      role: 'user',
+      content: answerPrompt,
+    };
 
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
       headers: {
@@ -142,7 +147,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.status(200).json({ answer });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error'})
+    res.status(500).json({ error: 'Error' });
   }
 };
 
