@@ -13,6 +13,9 @@ export const config = {
   runtime: 'edge',
 };
 
+const COMPLETION_TOKEN_LIMIT = 1000;
+const TOKENIZER_BUFFER_FACTOR = 0.9; // Set a buffer of 10% to account for any discrepancies in token counting
+
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
@@ -43,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if (tokenCount + tokens.length + COMPLETION_TOKEN_LIMIT > model.tokenLimit * TOKENIZER_BUFFER_FACTOR) {
         break;
       }
       tokenCount += tokens.length;
