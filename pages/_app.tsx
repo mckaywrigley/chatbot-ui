@@ -19,8 +19,10 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
   const queryClient = new QueryClient();
   const [supabase] = useState(() => createBrowserSupabaseClient());
   
-  const visitor = ua('UA-215785877-2'); // To be removed once ads audit has passed or switch to other analytics
-  visitor.pageview("/");
+  if(process.env.NEXT_PUBLIC_ENV === 'production'){
+    const visitor = ua('UA-215785877-2'); // To be removed once ads audit has passed or switch to other analytics
+    visitor.pageview("/");
+  }
 
   return (
     <SessionContextProvider
