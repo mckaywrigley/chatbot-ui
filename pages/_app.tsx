@@ -8,6 +8,7 @@ import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { GoogleAnalytics } from 'nextjs-google-analytics';
+import ua from 'universal-analytics';
 
 import '@/styles/globals.css';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
@@ -17,6 +18,11 @@ const inter = Inter({ subsets: ['latin'] });
 function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
   const queryClient = new QueryClient();
   const [supabase] = useState(() => createBrowserSupabaseClient());
+  
+  if(process.env.NEXT_PUBLIC_ENV === 'production'){
+    const visitor = ua('UA-215785877-2'); // To be removed once ads audit has passed or switch to other analytics
+    visitor.pageview("/");
+  }
 
   return (
     <SessionContextProvider
@@ -27,7 +33,7 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
         <Toaster />
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
-          <GoogleAnalytics trackPageViews />
+          <GoogleAnalytics trackPageViews strategy="lazyOnload"/>
           {process.env.GOOGLE_ADSENSE_CLIENT && (
             <Script
               src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.GOOGLE_ADSENSE_CLIENT}`}

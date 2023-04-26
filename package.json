@@ -42,6 +42,7 @@
     "remark-math": "^5.1.1",
     "stream": "^0.0.2",
     "stripe": "^12.2.0",
+    "universal-analytics": "^0.5.3",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },
@@ -54,6 +55,7 @@
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
     "@types/react-syntax-highlighter": "^15.5.6",
+    "@types/universal-analytics": "^0.4.5",
     "@types/uuid": "^9.0.1",
     "@vitest/coverage-c8": "^0.29.7",
     "autoprefixer": "^10.4.14",
