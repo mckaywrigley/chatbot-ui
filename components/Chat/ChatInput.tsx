@@ -19,12 +19,15 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import useFocusHandler from '@/hooks/useFocusInputHandler';
+
 import { Message } from '@/types/chat';
 import { Plugin, PluginID, PluginList } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import EnhancedMenu from './EhnacedMenu';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
@@ -61,6 +64,8 @@ export const ChatInput = ({
   const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
+
+  const { isFocused, setIsFocused, menuRef } = useFocusHandler(textareaRef);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -340,6 +345,12 @@ export const ChatInput = ({
               />
             </div>
           )}
+
+          <EnhancedMenu
+            ref={menuRef}
+            isFocused={isFocused}
+            setIsFocused={setIsFocused}
+          />
 
           <textarea
             ref={textareaRef}
