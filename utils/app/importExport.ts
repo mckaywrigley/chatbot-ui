@@ -68,6 +68,28 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
+export const getExportableData = (): LatestExportFormat => {
+  const history = localStorage.getItem('conversationHistory');
+  const folders = localStorage.getItem('folders');
+  const prompts = localStorage.getItem('prompts');
+
+  if (history) {
+    return {
+      version: 4,
+      history: JSON.parse(history),
+      folders: folders ? JSON.parse(folders) : [],
+      prompts: prompts ? JSON.parse(prompts) : [],
+    };
+  }
+
+  return {
+    version: 4,
+    history: [],
+    folders: [],
+    prompts: [],
+  };
+};
+
 export const exportData = () => {
   let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');

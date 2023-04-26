@@ -35,6 +35,8 @@ import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
   googleAdSenseId: string;
@@ -52,6 +54,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       pluginKeys,
       modelError,
       loading,
+      user
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -110,16 +113,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           body = JSON.stringify({
             ...chatBody,
             messages: filteredChatBodyMessages,
-          });
-        } else if (plugin.id === 'google-search') {
-          body = JSON.stringify({
-            ...chatBody,
-            googleAPIKey: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-            googleCSEId: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
           });
         } else if (plugin.id === 'langchain-chat') {
           body = JSON.stringify(chatBody);
@@ -272,6 +265,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             label: 'Send chat message',
           });
         }
+        updateConversationLastUpdatedAtTimeStamp();
       }
     },
     [
