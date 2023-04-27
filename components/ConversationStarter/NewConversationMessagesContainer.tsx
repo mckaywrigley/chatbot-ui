@@ -43,6 +43,11 @@ export const NewConversationMessagesContainer: FC<Props> = ({
     }else {
       dispatch({ field: "showLoginSignUpModel", value: true});
     }
+
+    event('Support banner clicked', {
+      category: 'Engagement',
+      label: 'Banner',
+    });
   }
 
   return (

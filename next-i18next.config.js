@@ -25,6 +25,10 @@ module.exports = {
       "zh-Hant",
       "zh-Hans",
     ],
+    fallbackLng: {
+      'zh': ['zh-Hant'],
+      default: ['en'],
+    },
   },
   localePath:
     typeof window === 'undefined'
