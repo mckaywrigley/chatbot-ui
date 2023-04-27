@@ -344,8 +344,9 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                             content: prompt,
                             pluginId: null,
                           };
+                          
                           setCurrentMessage(message);
-                          handleSend(0);
+                          handleSend(0, message);
                           event('interaction', {
                             category: 'Prompt',
                             label: 'Click on sample prompt',

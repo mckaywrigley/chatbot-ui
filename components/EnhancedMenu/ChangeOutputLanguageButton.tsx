@@ -25,7 +25,7 @@ function ChangeOutputLanguageButton() {
   ];
 
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row items-center justify-between mt-2 md:justify-start md:mt-0">
       <label className="text-left text-sm text-neutral-700 dark:text-neutral-400 mr-2">
         {t('Language')}
       </label>

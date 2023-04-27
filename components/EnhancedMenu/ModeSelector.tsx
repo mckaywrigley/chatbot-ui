@@ -34,7 +34,7 @@ const ModeSelector = () => {
   const isPaidUser = user && user?.plan === 'pro';
 
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row items-center justify-between md:justify-start">
       <label className="text-left text-sm text-neutral-700 dark:text-neutral-400 mr-2">
         {t('Mode')}
       </label>
@@ -60,12 +60,13 @@ const ModeSelector = () => {
           >
             {t('Enhance mode')}
           </option>
-          <option
+          {/* Disable til ready */}
+          {/* <option
             value={PluginID.GPT4}
             className="dark:bg-[#343541] dark:text-white text-yellow-600"
           >
-            {t('GPT-4')} {isPaidUser ? '' : '(Pro only)'}
-          </option>
+            {t('GPT-4')} 
+          </option> */}
         </select>
       </div>
     </div>
