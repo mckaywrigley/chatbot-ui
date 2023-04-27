@@ -15,15 +15,21 @@ const ModeSelector = () => {
   } = useContext(HomeContext);
 
   const currentSelectedPluginId = useMemo(() => {
-    if(!currentMessage || currentMessage?.pluginId === null){
+    if (!currentMessage || currentMessage?.pluginId === null) {
       return 'default';
-    }else{
+    } else {
       return currentMessage.pluginId;
     }
   }, [currentMessage]);
 
   const pluginOnChange = (pluginId: string) => {
-    homeDispatch({ field: 'currentMessage', value: { ...currentMessage, pluginId: pluginId } });
+    homeDispatch({
+      field: 'currentMessage',
+      value: {
+        ...currentMessage,
+        pluginId: pluginId === 'default' ? null : pluginId,
+      },
+    });
   };
 
   const isPaidUser = user && user?.plan === 'pro';
