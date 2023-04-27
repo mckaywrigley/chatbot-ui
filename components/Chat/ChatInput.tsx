@@ -296,7 +296,7 @@ export const ChatInput = ({
         className={` ${
           enhancedMenuDisplayValue === 'none'
             ? 'mt-[1.5rem] md:mt-[3rem]'
-            : 'mt-[9rem] md:mt-[6.7rem]'
+            : 'mt-[8.2rem] md:mt-[6.7rem]'
         } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl`}
       >
         {messageIsStreaming && (

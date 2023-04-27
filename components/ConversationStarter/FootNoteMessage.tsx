@@ -29,16 +29,6 @@ export const FootNoteMessage: FC = () => {
         <br />
         {t('Where the forefront of AI technology meets universal access.')}
       </div>
-
-      {/* Promote enhance chat mode */}
-      <div className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
-        <span className="flex flex-row flex-wrap items-center justify-center leading-4">
-          {t(
-            'Try out the new internet-connected enhance chat mode by clicking the',
-          )}{' '}
-          <IconBolt size={17} stroke={2} /> {t('icon')}!
-        </span>
-      </div>
     </div>
   );
 };

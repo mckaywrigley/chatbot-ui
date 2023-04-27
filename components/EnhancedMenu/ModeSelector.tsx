@@ -6,7 +6,7 @@ import { PluginID } from '@/types/plugin';
 import HomeContext from '@/pages/api/home/home.context';
 
 const ModeSelector = () => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('model');
 
   const {
     state: { currentMessage, user },
@@ -58,7 +58,7 @@ const ModeSelector = () => {
             value={PluginID.LANGCHAIN_CHAT}
             className="dark:bg-[#343541] dark:text-white"
           >
-            {t('Enhance mode')}
+            {t('Online mode')}
           </option>
           {/* Disable til ready */}
           {/* <option
