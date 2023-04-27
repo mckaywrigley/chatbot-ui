@@ -1,7 +1,7 @@
 import { Plugin, PluginID } from '@/types/plugin';
 import { Conversation } from '@/types/chat';
 import { OpenAIModels } from '@/types/openai';
-import {DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import {DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 export const getEndpoint = (plugin: Plugin | null) => {
   if (!plugin) {
@@ -40,7 +40,7 @@ export async function fetchShareableConversation(accessibleId: string): Promise<
       name: title + ' (Shared)',
       messages: JSON.parse(prompts),
       model: OpenAIModels['gpt-3.5-turbo'],
-      prompt: "You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Always be aware of the current date and time, and make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format." + `The current date is ${new Date().toLocaleDateString()}.`,
+      prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
       temperature: DEFAULT_TEMPERATURE,
     };
