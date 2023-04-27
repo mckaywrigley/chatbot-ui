@@ -27,7 +27,7 @@ import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import EnhancedMenu from './EhnacedMenu';
+import EnhancedMenu from './EnhacedMenu';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
