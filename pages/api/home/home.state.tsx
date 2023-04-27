@@ -5,6 +5,7 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { User } from '@/types/user';
+
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export interface HomeInitialState {
@@ -29,6 +30,7 @@ export interface HomeInitialState {
   defaultModelId: OpenAIModelID | undefined;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
+  outputLanguage: string;
 
   // Supabase / Cloud Sync
   supabaseClient: SupabaseClient | null;
@@ -37,7 +39,7 @@ export interface HomeInitialState {
   forceSyncConversation: boolean;
   syncingConversation: boolean;
   syncSuccess: boolean | null; // null = not yet synced
-  
+
   // User Auth
   showLoginSignUpModel: boolean;
   showProfileModel: boolean;
@@ -67,6 +69,7 @@ export const initialState: HomeInitialState = {
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
+  outputLanguage: '',
 
   // Supabase / Cloud Sync
   supabaseClient: null,
@@ -80,5 +83,5 @@ export const initialState: HomeInitialState = {
   showLoginSignUpModel: false,
   showProfileModel: false,
   user: null,
-  isPaidUser: false
+  isPaidUser: false,
 };

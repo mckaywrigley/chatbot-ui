@@ -15,6 +15,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
+    const selectedOutputLanguage = req.headers.get('Output-Language') ? `{lang=${req.headers.get('Output-Language')}}` : '';
+
     const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
@@ -52,6 +54,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
+    if (selectedOutputLanguage){
+      messagesToSend[messagesToSend.length - 1].content = `${selectedOutputLanguage} ${messagesToSend[messagesToSend.length - 1].content}`;
+    }
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
 
     return new Response(stream);

@@ -333,8 +333,10 @@ const Home = ({
             dispatch({ field: 'isPaidUser', value: data[0].plan !== 'free' });
           }
 
-          if(!data || data.length === 0){
-            toast.error(t('Unable to load your information, please try again later.'));
+          if (!data || data.length === 0) {
+            toast.error(
+              t('Unable to load your information, please try again later.'),
+            );
             return;
           }
 
@@ -406,6 +408,11 @@ const Home = ({
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
+    }
+
+    const outputLanguage = localStorage.getItem('outputLanguage');
+    if (outputLanguage) {
+      dispatch({ field: 'outputLanguage', value: outputLanguage });
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
@@ -558,7 +565,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'prompts',
         'roles',
         'rolesContent',
-        'feature'
+        'feature',
       ])),
     },
   };

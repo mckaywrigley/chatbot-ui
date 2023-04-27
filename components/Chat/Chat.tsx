@@ -19,6 +19,7 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -34,8 +35,6 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-
-import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -54,7 +53,8 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       pluginKeys,
       modelError,
       loading,
-      user
+      user,
+      outputLanguage,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -122,6 +122,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Output-Language': outputLanguage,
           },
           signal: controller.signal,
           body,
@@ -274,6 +275,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       pluginKeys,
       selectedConversation,
       stopConversationRef,
+      outputLanguage,
     ],
   );
 
@@ -431,7 +433,10 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                       onEdit={(editedMessage) => {
                         setCurrentMessage(editedMessage);
                         // discard edited message and the ones that come after then resend
-                        handleSend(editedMessage, selectedConversation?.messages.length - index);
+                        handleSend(
+                          editedMessage,
+                          selectedConversation?.messages.length - index,
+                        );
                       }}
                       displayFeedbackButton={
                         selectedConversation.messages.length - 1 === index &&

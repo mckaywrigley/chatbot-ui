@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react';
 
+import ChangeOutputLanguageButton from './ChangeOutputLanguageButton';
+
 import PropTypes from 'prop-types';
 
 type EnhancedMenuProps = {
@@ -12,12 +14,12 @@ const EnhancedMenu = forwardRef<HTMLDivElement, EnhancedMenuProps>(
     return (
       <div
         ref={ref}
-        className="shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] absolute top-0 left-0 w-full h-full text-black dark:text-white z-10 rounded-sm -translate-y-[100%] border dark:border-gray-900/50"
+        className="shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] absolute min-h-[100px] top-0 left-0 w-full h-full text-black dark:text-white z-10 rounded-sm -translate-y-[100%] border dark:border-gray-900/50"
         style={{
           display: isFocused ? 'block' : 'none',
         }}
       >
-        <button> test focus button </button>I am a dot dot dot menu
+        <ChangeOutputLanguageButton />
       </div>
     );
   },
