@@ -34,6 +34,12 @@ import {
   storageUpdateFolder,
 } from '@/utils/app/storage/folder';
 import { storageGetFolders } from '@/utils/app/storage/folders';
+import { storageUpdateMessage } from '@/utils/app/storage/message';
+import {
+  storageCreateMessages,
+  storageDeleteMessages,
+  storageUpdateMessages,
+} from '@/utils/app/storage/messages';
 import {
   storageGetPrompts,
   storageUpdatePrompts,
@@ -44,7 +50,7 @@ import {
 } from '@/utils/app/storage/selectedConversation';
 import { getSettings } from '@/utils/app/storage/settings';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
@@ -233,14 +239,53 @@ const Home = ({
       [data.key]: data.value,
     };
 
-    const { single, all } = storageUpdateConversation(
-      storageType,
-      updatedConversation,
-      conversations,
-    );
+    let update: {
+      single: Conversation;
+      all: Conversation[];
+    };
 
-    dispatch({ field: 'selectedConversation', value: single });
-    dispatch({ field: 'conversations', value: all });
+    if (data.key === 'messages') {
+      const messages = conversation.messages;
+      const updatedMessageList = data.value as Message[];
+
+      const deletedMessages = messages.filter(
+        (m) => !updatedMessageList.includes(m),
+      );
+
+      const updatedMessages = messages.filter((m) =>
+        updatedMessageList.includes(m),
+      );
+
+      const deletedMessageIds = deletedMessages.map((m) => m.id);
+
+      const cleaned = storageDeleteMessages(
+        storageType,
+        deletedMessageIds,
+        conversation,
+        messages,
+        conversations,
+      );
+
+      const cleanConversation = cleaned.single;
+      const cleanConversations = cleaned.all;
+
+      update = storageUpdateMessages(
+        storageType,
+        cleanConversation,
+        updatedMessages,
+        cleanConversations,
+      );
+    } else {
+      update = storageUpdateConversation(
+        storageType,
+        updatedConversation,
+        conversations,
+      );
+    }
+
+    dispatch({ field: 'selectedConversation', value: update.single });
+    dispatch({ field: 'conversations', value: update.all });
+    saveSelectedConversation(update.single);
   };
 
   // EFFECTS  --------------------------------------------

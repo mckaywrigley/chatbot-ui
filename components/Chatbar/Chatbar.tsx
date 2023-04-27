@@ -8,7 +8,11 @@ import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { exportData, importData } from '@/utils/app/importExport';
 import { storageDeleteConversation } from '@/utils/app/storage/conversation';
 import { storageDeleteConversations } from '@/utils/app/storage/conversations';
-import { storageUpdateFolders } from '@/utils/app/storage/folders';
+import { storageDeleteFolder } from '@/utils/app/storage/folder';
+import {
+  storageDeleteFolders,
+  storageUpdateFolders,
+} from '@/utils/app/storage/folders';
 import {
   deleteSelectedConversation,
   saveSelectedConversation,
@@ -111,8 +115,8 @@ export const Chatbar = () => {
     exportData(storageType);
   };
 
-  const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(
+  const handleImportConversations = async (data: SupportedExportFormats) => {
+    const { history, folders, prompts }: LatestExportFormat = await importData(
       storageType,
       data,
     );
@@ -127,7 +131,7 @@ export const Chatbar = () => {
     window.location.reload();
   };
 
-  const handleClearConversations = () => {
+  const handleClearConversations = async () => {
     defaultModelId &&
       homeDispatch({
         field: 'selectedConversation',
@@ -144,7 +148,15 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: [] });
 
-    storageDeleteConversations(storageType);
+    const deletedFolders = folders.filter((f) => f.type === 'chat');
+
+    let deletedFolderIds: string[] = [];
+    for (const folder of deletedFolders) {
+      deletedFolderIds.push(folder.id);
+    }
+
+    await storageDeleteConversations(storageType);
+    storageDeleteFolders(storageType, deletedFolderIds, folders);
     deleteSelectedConversation();
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');

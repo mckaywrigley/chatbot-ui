@@ -15,7 +15,10 @@ import { useTranslation } from 'next-i18next';
 import { getEndpoint } from '@/utils/app/api';
 import { storageUpdateConversation } from '@/utils/app/storage/conversation';
 import { storageCreateMessage } from '@/utils/app/storage/message';
-import { storageDeleteMessages } from '@/utils/app/storage/messages';
+import {
+  storageCreateMessages,
+  storageDeleteMessages,
+} from '@/utils/app/storage/messages';
 import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
 import { throttle } from '@/utils/data/throttle';
 
@@ -161,7 +164,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               name: customName,
             };
 
-            storageUpdateConversation(
+            const { single, all } = storageUpdateConversation(
               storageType,
               updatedConversation,
               conversations,
@@ -238,19 +241,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'conversations', value: updatedConversations });
           homeDispatch({ field: 'messageIsStreaming', value: false });
 
-          // Saving the user message
-          await storageCreateMessage(
+          const assistantMessage: Message = {
+            id: assistantMessageId,
+            role: 'assistant',
+            content: text,
+          };
+          // Saving the messages and the new conversation name
+          storageCreateMessages(
             storageType,
-            selectedConversation.id,
-            message,
-            updatedConversations,
-          );
-
-          // Saving the ai response message
-          await storageCreateMessage(
-            storageType,
-            selectedConversation.id,
-            { id: assistantMessageId, role: 'assistant', content: text },
+            { ...selectedConversation, name: updatedConversation.name },
+            [message, assistantMessage],
             updatedConversations,
           );
         } else {

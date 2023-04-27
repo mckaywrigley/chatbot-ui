@@ -60,7 +60,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'DELETE') {
     const messageId: string = body['message_id'];
-    if (messageId !== undefined) {
+    if (messageId) {
       return await rdbmsDeleteMessage(res, dataSource, user, messageId);
     } else {
       return res.status(400).json({ error: 'No message_id provided' });

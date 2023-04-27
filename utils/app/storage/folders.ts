@@ -9,7 +9,11 @@ import {
   localGetFolders,
   localSaveFolders,
 } from './documentBased/local/folders';
-import { rdbmsGetFolders, rdbmsUpdateFolders } from './rdbms/folders';
+import {
+  rdbmsDeleteFolders,
+  rdbmsGetFolders,
+  rdbmsUpdateFolders,
+} from './rdbms/folders';
 
 export const storageGetFolders = async (storageType: StorageType) => {
   if (storageType === StorageType.COUCHDB) {
@@ -21,15 +25,33 @@ export const storageGetFolders = async (storageType: StorageType) => {
   }
 };
 
-export const storageUpdateFolders = (
+export const storageUpdateFolders = async (
   storageType: StorageType,
   folders: FolderInterface[],
 ) => {
   if (storageType === StorageType.COUCHDB) {
-    couchdbSaveFolders(folders);
+    await couchdbSaveFolders(folders);
   } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdateFolders(folders);
+    await rdbmsUpdateFolders(folders);
   } else {
     localSaveFolders(folders);
+  }
+};
+
+export const storageDeleteFolders = async (
+  storageType: StorageType,
+  folderIds: string[],
+  allFolders: FolderInterface[],
+) => {
+  const updatedFolders = allFolders.filter(
+    (folder) => !folderIds.includes(folder.id),
+  );
+
+  if (storageType === StorageType.COUCHDB) {
+    await couchdbSaveFolders(updatedFolders);
+  } else if (storageType === StorageType.RDBMS) {
+    await rdbmsDeleteFolders(folderIds);
+  } else {
+    localSaveFolders(updatedFolders);
   }
 };

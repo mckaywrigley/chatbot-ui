@@ -9,7 +9,7 @@ import { FolderInterface, FolderType } from '@/types/folder';
 
 import { authOptions } from '../auth/[...nextauth]';
 
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let userId = '';
@@ -39,22 +39,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (req.method === 'POST') {
-    return await rdbmsGetAllFolders(res, dataSource, user);
+    return await rdbmsGetFolders(res, dataSource, user);
   } else if (req.method === 'PUT') {
     const updatedFolders = body;
     if (updatedFolders !== null) {
-      return await rdbmsUpdateAllFolders(res, dataSource, user, updatedFolders);
+      return await rdbmsUpdateFolders(res, dataSource, user, updatedFolders);
     } else {
       return res.status(400).json({ error: 'No folders provided' });
     }
   } else if (req.method === 'DELETE') {
-    return await rdbmsDeleteAllFolders(res, dataSource, user);
+    const deletedFolderIds = body as string[];
+    return await rdbmsDeleteFolders(res, dataSource, user, deletedFolderIds);
   } else {
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
 
-const rdbmsGetAllFolders = async (
+const rdbmsGetFolders = async (
   res: NextApiResponse,
   dataSource: DataSource,
   user: RDBMSUser,
@@ -78,7 +79,7 @@ const rdbmsGetAllFolders = async (
   return res.status(200).json(folders);
 };
 
-const rdbmsUpdateAllFolders = async (
+const rdbmsUpdateFolders = async (
   res: NextApiResponse,
   dataSource: DataSource,
   user: RDBMSUser,
@@ -104,15 +105,17 @@ const rdbmsUpdateAllFolders = async (
   });
 };
 
-const rdbmsDeleteAllFolders = async (
+const rdbmsDeleteFolders = async (
   res: NextApiResponse,
   dataSource: DataSource,
   user: RDBMSUser,
+  deletedFolderIds: string[],
 ) => {
   const folderRepo = dataSource.getRepository(RDBMSFolder);
 
   const deletedFolders = await folderRepo.findBy({
     user: { id: user.id },
+    id: In(deletedFolderIds),
   });
 
   await folderRepo.remove(deletedFolders);

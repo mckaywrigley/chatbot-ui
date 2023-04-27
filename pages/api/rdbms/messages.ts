@@ -13,7 +13,7 @@ import { Message } from '@/types/chat';
 
 import { authOptions } from '../auth/[...nextauth]';
 
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let userId = '';
@@ -45,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const messages = body['messages'] as Message[];
     const conversationId: string = body['conversation_id'];
-    if (messages !== null) {
+    if (messages) {
       return await rdbmsCreateMessages(
         res,
         dataSource,
@@ -56,10 +56,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     } else {
       return res.status(400).json({ error: 'No messages provided' });
     }
+  } else if (req.method === 'PUT') {
+    if (body) {
+      const messages: Message[] = body;
+      if (messages) {
+        return await rdbmsUpdateMessages(res, dataSource, user, messages);
+      } else {
+        return res
+          .status(400)
+          .json({ error: 'No messages or conversation_id provided' });
+      }
+    }
   } else if (req.method === 'DELETE') {
-    const messageId: string[] = body['message_ids'];
-    if (messageId !== undefined) {
-      return await rdbmsDeleteMessages(res, dataSource, user, messageId);
+    const messageIds: string[] = body['message_ids'];
+    if (messageIds) {
+      return await rdbmsDeleteMessages(res, dataSource, user, messageIds);
     } else {
       return res.status(400).json({ error: 'No message_id provided' });
     }
@@ -108,6 +119,33 @@ const rdbmsCreateMessages = async (
   });
 };
 
+const rdbmsUpdateMessages = async (
+  res: NextApiResponse,
+  dataSource: DataSource,
+  user: RDBMSUser,
+  messages: Message[],
+) => {
+  const messageRepo = dataSource.getRepository(RDBMSMessage);
+
+  const updatedRdbmsMessages: RDBMSMessage[] = [];
+
+  for (const message of messages) {
+    const rdbmsMessage = new RDBMSMessage();
+
+    rdbmsMessage.user = user;
+    rdbmsMessage.id = message.id;
+    rdbmsMessage.role = message.role;
+    rdbmsMessage.content = message.content;
+
+    updatedRdbmsMessages.push(rdbmsMessage);
+  }
+
+  await messageRepo.save(updatedRdbmsMessages);
+  return res.status(200).json({
+    OK: true,
+  });
+};
+
 const rdbmsDeleteMessages = async (
   res: NextApiResponse,
   dataSource: DataSource,
@@ -115,17 +153,10 @@ const rdbmsDeleteMessages = async (
   messageIds: string[],
 ) => {
   const messageRepo = dataSource.getRepository(RDBMSMessage);
-
-  const deletedMessages: RDBMSMessage[] = [];
-  for (const messageId of messageIds) {
-    const deletedMessage = await messageRepo.findOneBy({
-      user: { id: user.id },
-      id: messageId,
-    });
-    if (deletedMessage !== null) {
-      deletedMessages.push(deletedMessage);
-    }
-  }
+  const deletedMessages = await messageRepo.findBy({
+    user: { id: user.id },
+    id: In(messageIds),
+  });
 
   if (deletedMessages.length > 0) {
     await messageRepo.remove(deletedMessages);

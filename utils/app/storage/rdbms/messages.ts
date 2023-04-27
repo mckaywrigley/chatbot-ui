@@ -13,16 +13,10 @@ export const rdbmsCreateMessages = async (
   });
 };
 
-export const rdbmsUpdateMessages = async (
-  conversationId: string,
-  updatedMessages: Message[],
-) => {
+export const rdbmsUpdateMessages = async (updatedMessages: Message[]) => {
   await fetch('api/rdbms/messages', {
     method: 'PUT',
-    body: JSON.stringify({
-      messages: updatedMessages,
-      conversation_id: conversationId,
-    }),
+    body: JSON.stringify(updatedMessages),
   });
 };
 
