@@ -14,7 +14,7 @@ export const getEndpoint = (plugin: Plugin | null) => {
   }
 
   if (plugin.id === PluginID.GPT4) {
-    return 'api/gpt-4';
+    return 'api/chat-gpt4';
   }
 
   return 'api/chat';

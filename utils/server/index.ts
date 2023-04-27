@@ -1,5 +1,5 @@
 import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
+import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
 import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
 
@@ -30,13 +30,12 @@ export const OpenAIStream = async (
   messages: Message[],
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
-  if (OPENAI_API_TYPE === 'azure') {
-    url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${OPENAI_API_VERSION}`;
-  }
+  const apiKey = model.id === OpenAIModelID.GPT_4 ? process.env.OPENAI_API_GPT_4_KEY : process.env.OPENAI_API_KEY;
+
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      'Authorization': `Bearer ${apiKey}`
     },
     method: 'POST',
     body: JSON.stringify({

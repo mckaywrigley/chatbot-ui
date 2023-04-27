@@ -1,7 +1,8 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextRequest, NextResponse } from 'next/server';
 import { ChatBody, Message } from '@/types/chat';
 
 // @ts-expect-error
@@ -14,8 +15,16 @@ export const config = {
   runtime: 'edge',
 };
 
-const handler = async (req: Request): Promise<Response> => {
+const handler = async (req: NextRequest, res: NextResponse): Promise<Response> => {
   try {
+    const supabaseSessionClient = createMiddlewareSupabaseClient({req, res});
+    
+    const {
+      data: { session },
+    } = await supabaseSessionClient.auth.getSession();
+
+    console.log(session);
+
     const selectedOutputLanguage = req.headers.get('Output-Language') ? `{lang=${req.headers.get('Output-Language')}}` : '';
 
     const { model, messages, prompt, temperature } = (await req.json()) as ChatBody;

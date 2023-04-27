@@ -5,7 +5,6 @@ import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-// To switch between default / enhance mode
 const ModeSelector = () => {
   const { t } = useTranslation('chat');
 
@@ -65,7 +64,7 @@ const ModeSelector = () => {
             value={PluginID.GPT4}
             className="dark:bg-[#343541] dark:text-white text-yellow-600"
           >
-            {t('GPT-4')}
+            {t('GPT-4')} {isPaidUser ? '' : '(Pro only)'}
           </option>
         </select>
       </div>
