@@ -74,15 +74,9 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const handleSend = useCallback(
     async (deleteCount = 0, overrideCurrentMessage?: Message) => {
       const message = overrideCurrentMessage || currentMessage;
-
-      console.log("To be send message", message);
       
       if(!message) return;
-
       const plugin = (message.pluginId && Plugins[message.pluginId]) || null;
-
-      console.log(message.pluginId);
-      console.log(plugin);
 
       if (selectedConversation) {
         let updatedConversation: Conversation;
