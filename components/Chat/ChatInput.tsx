@@ -19,6 +19,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
 import { Message } from '@/types/chat';
@@ -70,6 +71,8 @@ export const ChatInput = ({
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
+
+  const enhancedMenuDisplayValue = useDisplayAttribute(menuRef);
 
   const getPluginIcon = (plugin: Plugin | null) => {
     if (!plugin) {
@@ -281,7 +284,13 @@ export const ChatInput = ({
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
-      <div className="stretch mx-2 mt-4 mb-4 flex flex-row gap-3  md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+      <div
+        className={` ${
+          enhancedMenuDisplayValue === 'none'
+            ? 'mt-[3rem] md:mt-[4.2rem]'
+            : 'mt-[9rem] md:mt-[10.2rem]'
+        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3  md:mx-4  md:last:mb-6 lg:mx-auto lg:max-w-3xl`}
+      >
         {messageIsStreaming && (
           <button
             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
