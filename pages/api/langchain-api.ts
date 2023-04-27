@@ -46,7 +46,7 @@ const handler = async (req: NextRequest, res: any) => {
     handleChainStart: async () => {
       console.log('handleChainStart');
       await writer.ready;
-      await writeToStream('```Mindlog \n');
+      await writeToStream('```Enhance mode \n');
       await writeToStream('Thinking ... \n\n');
     },
     handleAgentAction: async (action) => {
