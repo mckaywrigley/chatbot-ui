@@ -15,16 +15,12 @@
   background-color: #aaa;
 }
 
-::-webkit-scrollbar-track:hover {
-  background-color: #f2f2f2;
-}
-
 ::-webkit-scrollbar-corner {
   background-color: transparent;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
   height: 6px;
 }
 
