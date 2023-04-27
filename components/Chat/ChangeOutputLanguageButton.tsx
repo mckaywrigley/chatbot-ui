@@ -14,10 +14,7 @@ function ChangeOutputLanguageButton() {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  const availableLocales = getAvailableLocales().map((locale) => ({
-    name: locale,
-    value: locale,
-  }));
+  const availableLocales = getAvailableLocales();
 
   const locales = [
     {
@@ -29,10 +26,10 @@ function ChangeOutputLanguageButton() {
 
   return (
     <div className="p-4 flex flex-col w-max">
-      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
+      <label className="mb-2 text-left text-sm text-neutral-700 dark:text-neutral-400">
         {t('Output Language')}
       </label>
-      <div className="rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+      <div className="rounded-lg border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white w-fit pr-1 focus:outline-none">
         <select
           className="w-max bg-transparent p-2"
           placeholder={t('Select a lang') || ''}
