@@ -4,7 +4,7 @@ import { PluginID } from './plugin';
 export interface Message {
   role: Role;
   content: string;
-  pluginId?: PluginID.LANGCHAIN_CHAT | PluginID.GOOGLE_SEARCH;
+  pluginId: PluginID.LANGCHAIN_CHAT | PluginID.GPT4 | null;
 }
 
 export type Role = 'assistant' | 'user';
@@ -12,7 +12,6 @@ export type Role = 'assistant' | 'user';
 export interface ChatBody {
   model: OpenAIModel;
   messages: Message[];
-  key: string;
   prompt: string;
   temperature: number;
 }

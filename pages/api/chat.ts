@@ -17,7 +17,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const selectedOutputLanguage = req.headers.get('Output-Language') ? `{lang=${req.headers.get('Output-Language')}}` : '';
 
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { model, messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (selectedOutputLanguage){
       messagesToSend[messagesToSend.length - 1].content = `${selectedOutputLanguage} ${messagesToSend[messagesToSend.length - 1].content}`;
     }
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

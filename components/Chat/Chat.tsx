@@ -16,14 +16,13 @@ import { event } from 'nextjs-google-analytics/dist/interactions';
 import { getEndpoint } from '@/utils/app/api';
 import {
   saveConversation,
-  saveConversations,
-  updateConversation,
+  saveConversations
 } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugins } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -49,18 +48,20 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       selectedConversation,
       conversations,
       models,
-      apiKey,
-      pluginKeys,
       modelError,
       loading,
       user,
       outputLanguage,
+      currentMessage
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  const [currentMessage, setCurrentMessage] = useState<Message>();
+  const setCurrentMessage = useCallback((message: Message) => {
+    homeDispatch({ field: 'currentMessage', value: message });
+  }, [homeDispatch]);
+
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
@@ -71,7 +72,18 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = useCallback(
-    async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
+    async (deleteCount = 0, overrideCurrentMessage?: Message) => {
+      const message = overrideCurrentMessage || currentMessage;
+
+      console.log("To be send message", message);
+      
+      if(!message) return;
+
+      const plugin = (message.pluginId && Plugins[message.pluginId]) || null;
+
+      console.log(message.pluginId);
+      console.log(plugin);
+
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
@@ -98,7 +110,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
-          key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
         };
@@ -139,143 +150,102 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin || plugin.id === 'langchain-chat') {
-          if (updatedConversation.messages.length === 1) {
-            const { content } = message;
-            const customName =
-              content.length > 30 ? content.substring(0, 30) + '...' : content;
-            updatedConversation = {
-              ...updatedConversation,
-              name: customName,
-            };
-          }
-          homeDispatch({ field: 'loading', value: false });
-          const reader = data.getReader();
-          const decoder = new TextDecoder();
-          let done = false;
-          let isFirst = true;
-          let text = '';
-          while (!done) {
-            if (stopConversationRef.current === true) {
-              controller.abort();
-              done = true;
-              break;
-            }
-            const { value, done: doneReading } = await reader.read();
-            done = doneReading;
-            const chunkValue = decoder.decode(value);
-            text += chunkValue;
-            if (text.includes('[DONE]')) {
-              text = text.replace('[DONE]', '');
-              done = true;
-            }
-            if (isFirst) {
-              isFirst = false;
-              const updatedMessages: Message[] = [
-                ...updatedConversation.messages,
-                {
-                  role: 'assistant',
-                  content: chunkValue,
-                  pluginId: plugin?.id,
-                },
-              ];
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            } else {
-              const updatedMessages: Message[] =
-                updatedConversation.messages.map((message, index) => {
-                  if (index === updatedConversation.messages.length - 1) {
-                    return {
-                      ...message,
-                      content: text,
-                    };
-                  }
-                  return message;
-                });
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            }
-          }
-          saveConversation(updatedConversation);
-          const updatedConversations: Conversation[] = conversations.map(
-            (conversation) => {
-              if (conversation.id === selectedConversation.id) {
-                return updatedConversation;
-              }
-              return conversation;
-            },
-          );
-          if (updatedConversations.length === 0) {
-            updatedConversations.push(updatedConversation);
-          }
-          homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-          homeDispatch({ field: 'messageIsStreaming', value: false });
-        } else {
-          const { answer } = await response.json();
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: answer },
-          ];
+
+        if (updatedConversation.messages.length === 1) {
+          const { content } = message;
+          const customName =
+            content.length > 30 ? content.substring(0, 30) + '...' : content;
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages,
+            name: customName,
           };
-          homeDispatch({
-            field: 'selectedConversation',
-            value: updateConversation,
-          });
-          saveConversation(updatedConversation);
-          const updatedConversations: Conversation[] = conversations.map(
-            (conversation) => {
-              if (conversation.id === selectedConversation.id) {
-                return updatedConversation;
-              }
-              return conversation;
-            },
-          );
-          if (updatedConversations.length === 0) {
-            updatedConversations.push(updatedConversation);
-          }
-          // push in new conversation if it doesn't exist
-          if (
-            updatedConversations.filter(
-              (conversation) => conversation.id === updatedConversation.id,
-            ).length === 0
-          ) {
-            updatedConversations.push(updatedConversation);
-          }
-          homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-          homeDispatch({ field: 'loading', value: false });
-          homeDispatch({ field: 'messageIsStreaming', value: false });
-          event('interaction', {
-            category: 'Chat',
-            label: 'Send chat message',
-          });
         }
+        homeDispatch({ field: 'loading', value: false });
+        const reader = data.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let isFirst = true;
+        let text = '';
+        while (!done) {
+          if (stopConversationRef.current === true) {
+            controller.abort();
+            done = true;
+            break;
+          }
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          const chunkValue = decoder.decode(value);
+          text += chunkValue;
+          if (text.includes('[DONE]')) {
+            text = text.replace('[DONE]', '');
+            done = true;
+          }
+          if (isFirst) {
+            isFirst = false;
+            const updatedMessages: Message[] = [
+              ...updatedConversation.messages,
+              {
+                role: 'assistant',
+                content: chunkValue,
+                pluginId: plugin?.id || null,
+              },
+            ];
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+            homeDispatch({
+              field: 'selectedConversation',
+              value: updatedConversation,
+            });
+          } else {
+            const updatedMessages: Message[] = updatedConversation.messages.map(
+              (message, index) => {
+                if (index === updatedConversation.messages.length - 1) {
+                  return {
+                    ...message,
+                    content: text,
+                  };
+                }
+                return message;
+              },
+            );
+            updatedConversation = {
+              ...updatedConversation,
+              messages: updatedMessages,
+            };
+            homeDispatch({
+              field: 'selectedConversation',
+              value: updatedConversation,
+            });
+          }
+        }
+        saveConversation(updatedConversation);
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+            return conversation;
+          },
+        );
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
+        }
+        homeDispatch({ field: 'conversations', value: updatedConversations });
+        saveConversations(updatedConversations);
+        homeDispatch({ field: 'messageIsStreaming', value: false });
+
         updateConversationLastUpdatedAtTimeStamp();
       }
     },
     [
-      apiKey,
       conversations,
-      pluginKeys,
       selectedConversation,
       stopConversationRef,
       outputLanguage,
+      currentMessage,
+      homeDispatch,
     ],
   );
 
@@ -327,10 +297,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
 
   useEffect(() => {
     throttledScrollDown();
-    selectedConversation &&
-      setCurrentMessage(
-        selectedConversation.messages[selectedConversation.messages.length - 2],
-      );
   }, [selectedConversation, throttledScrollDown]);
 
   useEffect(() => {
@@ -382,9 +348,10 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                           const message: Message = {
                             role: 'user',
                             content: prompt,
+                            pluginId: null,
                           };
                           setCurrentMessage(message);
-                          handleSend(message, 0, null);
+                          handleSend(0);
                           event('interaction', {
                             category: 'Prompt',
                             label: 'Click on sample prompt',
@@ -434,8 +401,8 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                         setCurrentMessage(editedMessage);
                         // discard edited message and the ones that come after then resend
                         handleSend(
-                          editedMessage,
                           selectedConversation?.messages.length - index,
+                          editedMessage
                         );
                       }}
                       displayFeedbackButton={
@@ -460,13 +427,12 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           <ChatInput
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
-            onSend={(message, plugin) => {
-              setCurrentMessage(message);
-              handleSend(message, 0, plugin);
+            onSend={() => {
+              handleSend(0);
             }}
-            onRegenerate={(plugin) => {
+            onRegenerate={() => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, plugin || null);
+                handleSend(2);
                 event('interaction', {
                   category: 'Chat',
                   label: 'Regenerate Message',
