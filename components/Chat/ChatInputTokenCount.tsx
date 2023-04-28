@@ -61,7 +61,7 @@ export function ChatInputTokenCount(props: { content: string | undefined }) {
   if (pricing == null || count == null) return null;
   return (
     <div className="bg-opacity-10 bg-neutral-300 rounded-full py-1 px-2 text-neutral-400">
-      {count} / ${pricing.multipliedBy(count).toFixed()}
+      {count} tokens / ${pricing.multipliedBy(count).toFixed()}
     </div>
   );
 }
