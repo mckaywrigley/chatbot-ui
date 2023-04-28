@@ -1,5 +1,6 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -15,7 +16,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const selectedOutputLanguage = req.headers.get('Output-Language') ? `{lang=${req.headers.get('Output-Language')}}` : '';
+    const { model, messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -52,7 +54,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    if (selectedOutputLanguage){
+      messagesToSend[messagesToSend.length - 1].content = `${selectedOutputLanguage} ${messagesToSend[messagesToSend.length - 1].content}`;
+    }
+
+    // Only allow GPT-3.5 on this endpoint
+    const stream = await OpenAIStream(OpenAIModels[OpenAIModelID.GPT_3_5], promptToSend, temperatureToUse, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

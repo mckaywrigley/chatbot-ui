@@ -1,7 +1,7 @@
 import {
   IconBolt,
   IconBrain,
-  IconBrandGoogle,
+  IconNumber4,
   IconPlayerStop,
   IconRepeat,
   IconSend,
@@ -12,26 +12,27 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { Message } from '@/types/chat';
-import { Plugin, PluginID, PluginList } from '@/types/plugin';
+import useDisplayAttribute from '@/hooks/useDisplayAttribute';
+import useFocusHandler from '@/hooks/useFocusInputHandler';
+
+import { PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { PluginSelect } from './PluginSelect';
+import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
-  onRegenerate: (plugin: Plugin | null) => void;
+  onSend: () => void;
+  onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
 }
@@ -45,7 +46,12 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
+    state: {
+      selectedConversation,
+      messageIsStreaming,
+      prompts,
+      currentMessage,
+    },
 
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -57,34 +63,30 @@ export const ChatInput = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [showPluginSelect, setShowPluginSelect] = useState(false);
-  const [plugin, setPlugin] = useState<Plugin | null>(null);
-
   const promptListRef = useRef<HTMLUListElement | null>(null);
+
+  const { isFocused, setIsFocused, menuRef } = useFocusHandler(textareaRef);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
 
-  const getPluginIcon = (plugin: Plugin | null) => {
-    if (!plugin) {
+  const enhancedMenuDisplayValue = useDisplayAttribute(menuRef);
+
+  const getPluginIcon = () => {
+    if (!currentMessage || currentMessage?.pluginId === null) {
       return <IconBolt size={20} />;
     }
 
-    switch (plugin.id) {
-      case PluginID.GOOGLE_SEARCH:
-        return <IconBrandGoogle size={20} />;
+    switch (currentMessage.pluginId) {
       case PluginID.LANGCHAIN_CHAT:
         return <IconBrain size={20} />;
+      case PluginID.GPT4:
+        return <IconNumber4 size={20} />;
       default:
         return <IconBolt size={20} />;
     }
   };
-
-  const selectedEnhanceChatMode = useMemo(
-    () => plugin === PluginList[1],
-    [plugin],
-  );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -114,7 +116,7 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    onSend();
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
@@ -184,7 +186,6 @@ export const ChatInput = ({
       handleSend();
     } else if (e.key === '/' && e.metaKey) {
       e.preventDefault();
-      setShowPluginSelect(!showPluginSelect);
     }
   };
 
@@ -254,10 +255,25 @@ export const ChatInput = ({
         textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
       }`;
     }
+
+    homeDispatch({
+      field: 'currentMessage',
+      value: {
+        ...currentMessage,
+        role: 'user',
+        content,
+      },
+    });
   }, [content]);
 
   useEffect(() => {
-    setPlugin(null);
+    homeDispatch({
+      field: 'currentMessage',
+      value: {
+        ...currentMessage,
+        pluginId: null,
+      },
+    });
     const handleOutsideClick = (e: MouseEvent) => {
       if (
         promptListRef.current &&
@@ -273,10 +289,16 @@ export const ChatInput = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
-
+  
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
-      <div className="stretch mx-2 mt-4 mb-4 flex flex-row gap-3  md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+      <div
+        className={` ${
+          enhancedMenuDisplayValue === 'none'
+            ? 'mt-[1.5rem] md:mt-[3rem]'
+            : 'mt-[8.2rem] md:mt-[6.7rem]'
+        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl`}
+      >
         {messageIsStreaming && (
           <button
             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
@@ -291,7 +313,7 @@ export const ChatInput = ({
           selectedConversation.messages.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-              onClick={() => onRegenerate(plugin || null)}
+              onClick={() => onRegenerate()}
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>
@@ -303,43 +325,24 @@ export const ChatInput = ({
             dark:bg-[#40414F] dark:text-white 
             dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 
             ${
-              selectedEnhanceChatMode
-                ? 'border-blue-800 dark:border-blue-700'
-                : 'border-black/10 dark:border-gray-900/50'
-            }`}
+              !currentMessage || currentMessage.pluginId === null
+                ? 'border-black/10 dark:border-gray-900/50'
+                : 'border-blue-800 dark:border-blue-700'
+            }
+          `}
         >
           <button
-            className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 focus:border-none hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            onClick={() =>
-              setPlugin(selectedEnhanceChatMode ? null : PluginList[1])
-            }
+            className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
             onKeyDown={(e) => {}}
           >
-            {getPluginIcon(plugin)}
+            {getPluginIcon()}
           </button>
 
-          {showPluginSelect && (
-            <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
-              <PluginSelect
-                plugin={plugin}
-                onKeyDown={(e: any) => {
-                  if (e.key === 'Escape') {
-                    e.preventDefault();
-                    setShowPluginSelect(false);
-                    textareaRef.current?.focus();
-                  }
-                }}
-                onPluginChange={(plugin: Plugin) => {
-                  setPlugin(plugin);
-                  setShowPluginSelect(false);
-
-                  if (textareaRef && textareaRef.current) {
-                    textareaRef.current.focus();
-                  }
-                }}
-              />
-            </div>
-          )}
+          <EnhancedMenu
+            ref={menuRef}
+            isFocused={isFocused}
+            setIsFocused={setIsFocused}
+          />
 
           <textarea
             ref={textareaRef}

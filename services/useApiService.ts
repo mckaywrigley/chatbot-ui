@@ -26,9 +26,9 @@ const useApiService = () => {
   // );
 
   const getModels = useCallback(
-    (params: GetModelsRequestProps, signal?: AbortSignal) => {
+    (signal?: AbortSignal) => {
       return fetchService.post<GetModelsRequestProps>(`/api/models`, {
-        body: { key: params.key },
+        body: { },
         headers: {
           'Content-Type': 'application/json',
         },

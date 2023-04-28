@@ -46,7 +46,7 @@ const handler = async (req: NextRequest, res: any) => {
     handleChainStart: async () => {
       console.log('handleChainStart');
       await writer.ready;
-      await writeToStream('```Mindlog \n');
+      await writeToStream('```Enhance mode \n');
       await writeToStream('Thinking ... \n\n');
     },
     handleAgentAction: async (action) => {
@@ -130,7 +130,16 @@ const handler = async (req: NextRequest, res: any) => {
       Make sure you include the reference links to the websites you used to answer the user's question in your response using Markdown syntax. You MUST use the following Markdown syntax to include a link in your response:
       [Link Text](https://www.example.com)
 
-      Use the following tools to help you answer the user's question:
+      Use the following format:
+
+      Question: the input question you must answer
+      Thought: you should always think about what to do
+      Action: the action to take, should be one of ['bing-search', 'calculator']
+      Action Input: the input to the action
+      Observation: the result of the action
+      ... (this Thought/Action/Action Input/Observation can repeat N times)
+      Thought: I now know the final answer
+      Final Answer: the final answer to the original input question
     `,
   });
 
@@ -141,7 +150,7 @@ const handler = async (req: NextRequest, res: any) => {
 
   const agent = new ZeroShotAgent({
     llmChain,
-    allowedTools: ['search', 'calculator'],
+    allowedTools: ['bing-search', 'calculator'],
   });
 
   const agentExecutor = AgentExecutor.fromAgentAndTools({

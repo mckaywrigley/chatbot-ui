@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
-import Script from 'next/script';
 import { GoogleAnalytics } from 'nextjs-google-analytics';
 import ua from 'universal-analytics';
 
@@ -34,12 +33,6 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
           <GoogleAnalytics trackPageViews strategy="lazyOnload"/>
-          {process.env.GOOGLE_ADSENSE_CLIENT && (
-            <Script
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.GOOGLE_ADSENSE_CLIENT}`}
-              async
-            />
-          )}
         </QueryClientProvider>
       </div>
     </SessionContextProvider>
