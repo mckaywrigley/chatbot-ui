@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { Tiktoken, encoding_for_model } from '@dqbd/tiktoken';
+import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json';
+import { Tiktoken } from '@dqbd/tiktoken/lite';
 import BigNumber from 'bignumber.js';
 
 const PRICING: Record<string, BigNumber> = {
@@ -19,26 +20,20 @@ export function ChatInputTokenCount(props: { content: string | undefined }) {
   const [tokenizer, setTokenizer] = useState<Tiktoken | null>(null);
 
   useEffect(() => {
-    const modelId = selectedConversation?.model.id;
-
-    let model: Tiktoken | null = null;
-    if (modelId?.startsWith('gpt-4')) {
-      model = encoding_for_model('gpt-4', {
+    let model: Tiktoken | null = new Tiktoken(
+      cl100k_base.bpe_ranks,
+      {
+        ...cl100k_base.special_tokens,
         '<|im_start|>': 100264,
         '<|im_end|>': 100265,
         '<|im_sep|>': 100266,
-      });
-    } else if (modelId?.startsWith('gpt-3.5-turbo')) {
-      model = encoding_for_model('gpt-3.5-turbo', {
-        '<|im_start|>': 100264,
-        '<|im_end|>': 100265,
-        '<|im_sep|>': 100266,
-      });
-    }
+      },
+      cl100k_base.pat_str,
+    );
 
     setTokenizer(model);
     return () => model?.free();
-  }, [selectedConversation?.model.id]);
+  }, []);
 
   const messages: Array<{ role: string; content: string }> = [
     { role: 'system', content: selectedConversation?.prompt ?? '' },
