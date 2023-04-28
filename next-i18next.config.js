@@ -23,6 +23,7 @@ module.exports = {
       "ar",
       "tr",
       "ca",
+      "fi",
     ],
   },
   localePath:

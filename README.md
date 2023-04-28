@@ -1,6 +1,6 @@
 # Chatbot UI
 
-Chatbot UI is an advanced chatbot kit for OpenAI's chat models built on top of [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) using Next.js, TypeScript, and Tailwind CSS.
+Chatbot UI is an open source chat UI for AI models.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
@@ -14,17 +14,8 @@ Expect frequent improvements.
 
 **Next up:**
 
-- [ ] Import/Export prompts
-- [ ] "Bots"
 - [ ] Sharing
-
-## Modifications
-
-Modify the chat interface in `components/Chat`.
-
-Modify the sidebar interface in `components/Sidebar`.
-
-Modify the system prompt in `utils/server/index.ts`.
+- [ ] "Bots"
 
 ## Deploy
 
@@ -33,10 +24,6 @@ Modify the system prompt in `utils/server/index.ts`.
 Host your own live version of Chatbot UI with Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
-
-**Replit**
-
-Fork Chatbot UI on Replit [here](https://replit.com/@MckayWrigley/chatbot-ui-pro?v=1).
 
 **Docker**
 
@@ -108,10 +95,11 @@ When deploying the application, the following environment variables can be set:
 | GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
+
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
 
 ## Contact
 
-If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/mckaywrigley).
+If you have any questions, feel free to reach out to Mckay on [Twitter](https://twitter.com/mckaywrigley).
 
 [GCSE]: https://developers.google.com/custom-search/v1/overview

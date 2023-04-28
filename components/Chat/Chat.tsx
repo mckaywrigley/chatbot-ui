@@ -28,11 +28,11 @@ import HomeContext from '@/pages/api/home/home.context';
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
-import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -398,7 +398,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
+                <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
                   <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
@@ -425,7 +425,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                       />
 
                       <TemperatureSlider
-                        label="Temperature"
+                        label={t('Temperature')}
                         onChangeTemperature={(temperature) =>
                           handleUpdateConversation(selectedConversation, {
                             key: 'temperature',
@@ -464,7 +464,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 )}
 
                 {selectedConversation?.messages.map((message, index) => (
-                  <ChatMessage
+                  <MemoizedChatMessage
                     key={index}
                     message={message}
                     messageIndex={index}

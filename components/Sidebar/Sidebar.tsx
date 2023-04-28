@@ -79,7 +79,7 @@ const Sidebar = <T,>({
           </button>
         </div>
         <Search
-          placeholder={t('Search prompts...') || ''}
+          placeholder={t('Search...') || ''}
           searchTerm={searchTerm}
           onSearch={handleSearchTerm}
         />
@@ -105,7 +105,7 @@ const Sidebar = <T,>({
             <div className="mt-8 select-none text-center text-white opacity-50">
               <IconMistOff className="mx-auto mb-3" />
               <span className="text-[14px] leading-normal">
-                {t('No prompts.')}
+                {t('No data.')}
               </span>
             </div>
           )}
