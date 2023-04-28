@@ -1,6 +1,8 @@
 import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { saveOutputLanguage } from '@/utils/app/outputLanguage';
+
 import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -44,7 +46,8 @@ const ModeSelector = () => {
           placeholder={t('Select a lang') || ''}
           value={currentSelectedPluginId}
           onChange={(e) => {
-            homeDispatch({ field: 'outputLanguage', value: e.target.value });
+            homeDispatch({ field: 'outputLanguage', value: 'default' });
+            saveOutputLanguage('default');
             pluginOnChange(e.target.value);
           }}
         >
