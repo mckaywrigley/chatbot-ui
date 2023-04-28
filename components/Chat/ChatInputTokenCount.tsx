@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -13,6 +14,7 @@ const PRICING: Record<string, BigNumber> = {
 };
 
 export function ChatInputTokenCount(props: { content: string | undefined }) {
+  const { t } = useTranslation('chat');
   const {
     state: { selectedConversation },
   } = useContext(HomeContext);
@@ -61,7 +63,10 @@ export function ChatInputTokenCount(props: { content: string | undefined }) {
   if (pricing == null || count == null) return null;
   return (
     <div className="bg-opacity-10 bg-neutral-300 rounded-full py-1 px-2 text-neutral-400 pointer-events-auto">
-      {count} tokens / ${pricing.multipliedBy(count).toFixed()}
+      {t('{{count}} tokens / ${{price}}', {
+        count,
+        price: pricing.multipliedBy(count).toFixed(),
+      })}
     </div>
   );
 }
