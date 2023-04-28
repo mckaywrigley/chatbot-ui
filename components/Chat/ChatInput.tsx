@@ -289,7 +289,7 @@ export const ChatInput = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
-  
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div
@@ -297,7 +297,7 @@ export const ChatInput = ({
           enhancedMenuDisplayValue === 'none'
             ? 'mt-[1.5rem] md:mt-[3rem]'
             : 'mt-[8.2rem] md:mt-[6.7rem]'
-        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl`}
+        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl transition-all ease-in-out`}
       >
         {messageIsStreaming && (
           <button
