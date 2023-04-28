@@ -82,9 +82,11 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
+          
           for (let i = 0; i < deleteCount; i++) {
             updatedMessages.pop();
           }
+
           updatedConversation = {
             ...selectedConversation,
             messages: [...updatedMessages, message],
@@ -426,13 +428,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
               handleSend(0);
             }}
             onRegenerate={() => {
-              if (currentMessage) {
-                handleSend(2);
-                event('interaction', {
-                  category: 'Chat',
-                  label: 'Regenerate Message',
-                });
-              }
+              handleSend(2, selectedConversation?.messages[selectedConversation?.messages.length - 2])
             }}
           />
         </>
