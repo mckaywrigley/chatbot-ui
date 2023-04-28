@@ -312,7 +312,7 @@ export const ChatInput = ({
             </div>
           )}
 
-          <div className="absolute bottom-full md:mb-4 mb-12 mx-auto flex w-full justify-center md:justify-end">
+          <div className="absolute bottom-full md:mb-4 mb-12 mx-auto flex w-full justify-center md:justify-end pointer-events-none">
             <ChatInputTokenCount content={content} />
           </div>
 
