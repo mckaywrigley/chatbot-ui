@@ -1,5 +1,5 @@
 import { IconFileImport } from '@tabler/icons-react';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -11,8 +11,49 @@ interface Props {
   onImport: (data: SupportedExportFormats) => void;
 }
 
+const isValidFile = (json: any): string[] => {
+  const errors = [];
+
+  if (!json || typeof json !== 'object') {
+    errors.push('Invalid JSON format');
+    return errors;
+  }
+
+  const { version, history, folders, prompts } = json;
+
+  if (typeof version !== 'number' || !Array.isArray(history) || !Array.isArray(folders) || !Array.isArray(prompts)) {
+    errors.push('Invalid file structure');
+    return errors;
+  }
+
+  for (const historyItem of history) {
+    if (
+      !historyItem.id ||
+      typeof historyItem.name !== 'string' ||
+      !Array.isArray(historyItem.messages) ||
+      typeof historyItem.model !== 'object' ||
+      typeof historyItem.prompt !== 'string' ||
+      typeof historyItem.temperature !== 'number'
+    ) {
+      errors.push('Invalid history item format');
+      break;
+    }
+
+    for (const message of historyItem.messages) {
+      if (!message.role || typeof message.content !== 'string') {
+        errors.push('Invalid message format in history item');
+        break;
+      }
+    }
+  }
+
+  return errors;
+};
+
 export const Import: FC<Props> = ({ onImport }) => {
   const { t } = useTranslation('sidebar');
+  const [errors, setErrors] = useState<string[]>([]);
+
   return (
     <>
       <input
@@ -27,8 +68,19 @@ export const Import: FC<Props> = ({ onImport }) => {
           const file = e.target.files[0];
           const reader = new FileReader();
           reader.onload = (e) => {
-            let json = JSON.parse(e.target?.result as string);
-            onImport(json);
+            try {
+              let json = JSON.parse(e.target?.result as string);
+              const validationResult = isValidFile(json);
+
+              if (validationResult.length === 0) {
+                onImport(json);
+                setErrors([]);
+              } else {
+                setErrors(validationResult);
+              }
+            } catch (error) {
+              setErrors(['Invalid JSON file']);
+            }
           };
           reader.readAsText(file);
         }}
@@ -46,6 +98,17 @@ export const Import: FC<Props> = ({ onImport }) => {
           }
         }}
       />
+
+      {/* Display the error messages */}
+      {errors.length > 0 && (
+        <div className="error-messages">
+          {errors.map((error, index) => (
+            <p key={index} className="error-message">
+              {error}
+            </p>
+          ))}
+        </div>
+      )}
     </>
   );
 };
