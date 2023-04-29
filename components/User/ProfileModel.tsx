@@ -51,6 +51,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     event('Upgrade button clicked', {
       category: 'Engagement',
       label: 'Upgrade',
+      userEmail: userEmail
     });
 
     return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
