@@ -37,7 +37,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     const prompt_tokens = encoding.encode(promptToSend);
 
-    let tokenCount = prompt_tokens.length;
+    let tokens_per_message = 0;
+    if (model.name == 'GPT-3.5') {
+      tokens_per_message = 5;
+    } else if (model.name == 'GPT-4' || model.name == 'GPT-4-32K') {
+      tokens_per_message = 4;
+    }
+
+    let tokenCount = prompt_tokens.length + tokens_per_message;
     let messagesToSend: any[] = [];
 
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -51,9 +58,12 @@ const handler = async (req: Request): Promise<Response> => {
       if (tokenCount + tokens.length > model.requestLimit) {
         break;
       }
-      tokenCount += tokens.length;
+      tokenCount += tokens.length + tokens_per_message;
       messagesToSend = [message, ...messagesToSend];
     }
+
+    // every reply is primed with <|start|>assistant<|message|>
+    tokenCount += 3;
 
     encoding.free();
 
