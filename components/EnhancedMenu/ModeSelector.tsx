@@ -63,13 +63,12 @@ const ModeSelector = () => {
           >
             {t('Online mode')}
           </option>
-          {/* Disable til ready */}
-          {/* <option
+          <option
             value={PluginID.GPT4}
             className="dark:bg-[#343541] dark:text-white text-yellow-600"
           >
             {t('GPT-4')} 
-          </option> */}
+          </option>
         </select>
       </div>
     </div>

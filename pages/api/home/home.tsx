@@ -345,6 +345,7 @@ const Home = ({
               id: session.user.id,
               email: session.user.email,
               plan: userProfile.plan || 'free',
+              token: session.access_token,
             },
           });
         });

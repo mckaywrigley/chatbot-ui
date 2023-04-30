@@ -130,6 +130,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           headers: {
             'Content-Type': 'application/json',
             'Output-Language': outputLanguage,
+            'user-token': user?.token || '',
           },
           signal: controller.signal,
           body,

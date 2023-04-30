@@ -30,6 +30,7 @@ export const OpenAIStream = async (
   messages: Message[],
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  // Ensure you have the OPENAI_API_GPT_4_KEY set in order to use the GPT-4 model
   const apiKey = model.id === OpenAIModelID.GPT_4 ? process.env.OPENAI_API_GPT_4_KEY : process.env.OPENAI_API_KEY;
 
   const res = await fetch(url, {
