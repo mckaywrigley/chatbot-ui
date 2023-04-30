@@ -44,7 +44,7 @@ export const RDBMS_USER = process.env.RDBMS_USER || 'postgres';
 export const RDBMS_PASS = process.env.RDBMS_PASS || 'password';
 
 export const RDBMS_SYNCHRONIZE =
-  process.env.RDBMS_SYNCHRONIZE == 'true' || false;
+  !(process.env.RDBMS_SYNCHRONIZE == 'false') || true;
 
 export const RDBMS_SSL_ENABLED =
   process.env.RDBMS_SSL_ENABLED == 'true' || false;
