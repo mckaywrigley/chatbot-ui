@@ -34,6 +34,8 @@ const handler = async (req: NextRequest, res: any) => {
   const latestUserPrompt =
     requestBody.messages[requestBody.messages.length - 1].content;
 
+  const selectedOutputLanguage = req.headers.get('Output-Language') ? `(lang=${req.headers.get('Output-Language')})` : '';
+
   const encoder = new TextEncoder();
   const stream = new TransformStream();
   const writer = stream.writable.getWriter();
@@ -160,9 +162,10 @@ const handler = async (req: NextRequest, res: any) => {
   });
 
   try {
-    agentExecutor
-      .call({
-        input: latestUserPrompt,
+    agentExecutor.verbose = true;
+
+    agentExecutor.call({
+        input:  `${selectedOutputLanguage} ${latestUserPrompt}`,
       })
 
     return new NextResponse(stream.readable, {
