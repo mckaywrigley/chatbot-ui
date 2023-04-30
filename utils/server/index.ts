@@ -1,7 +1,13 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {
+  AZURE_DEPLOYMENT_ID,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION,
+} from '../app/const';
 
 import {
   ParsedEvent,
@@ -23,30 +29,37 @@ export class OpenAIError extends Error {
   }
 }
 
+// Only keep role and content keys
+export const normalizeMessages = (messages: Message[]) =>
+  messages.map(({ role, content }) => ({ role, content }));
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   messages: Message[],
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
   // Ensure you have the OPENAI_API_GPT_4_KEY set in order to use the GPT-4 model
-  const apiKey = model.id === OpenAIModelID.GPT_4 ? process.env.OPENAI_API_GPT_4_KEY : process.env.OPENAI_API_KEY;
+  const apiKey =
+    model.id === OpenAIModelID.GPT_4
+      ? process.env.OPENAI_API_GPT_4_KEY
+      : process.env.OPENAI_API_KEY;
 
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey}`,
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',
           content: systemPrompt,
         },
-        ...messages,
+        ...normalizeMessages(messages),
       ],
       max_tokens: 1000,
       temperature: temperature,

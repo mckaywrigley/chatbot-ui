@@ -1,7 +1,4 @@
 import {
-  IconBolt,
-  IconBrain,
-  IconNumber4,
   IconPlayerStop,
   IconRepeat,
   IconSend,
@@ -21,7 +18,6 @@ import { useTranslation } from 'next-i18next';
 import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
-import { PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -29,6 +25,7 @@ import HomeContext from '@/pages/api/home/home.context';
 import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { getPluginIcon } from '@/utils/app/ui';
 
 interface Props {
   onSend: () => void;
@@ -72,21 +69,6 @@ export const ChatInput = ({
   );
 
   const enhancedMenuDisplayValue = useDisplayAttribute(menuRef);
-
-  const getPluginIcon = () => {
-    if (!currentMessage || currentMessage?.pluginId === null) {
-      return <IconBolt size={20} />;
-    }
-
-    switch (currentMessage.pluginId) {
-      case PluginID.LANGCHAIN_CHAT:
-        return <IconBrain size={20} />;
-      case PluginID.GPT4:
-        return <IconNumber4 size={20} />;
-      default:
-        return <IconBolt size={20} />;
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -335,7 +317,7 @@ export const ChatInput = ({
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
             onKeyDown={(e) => {}}
           >
-            {getPluginIcon()}
+            {getPluginIcon(currentMessage?.pluginId)}
           </button>
 
           <EnhancedMenu

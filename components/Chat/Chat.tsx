@@ -121,7 +121,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             ...chatBody,
             messages: filteredChatBodyMessages,
           });
-        } else if (plugin.id === 'langchain-chat') {
+        } else {
           body = JSON.stringify(chatBody);
         }
         const controller = new AbortController();
