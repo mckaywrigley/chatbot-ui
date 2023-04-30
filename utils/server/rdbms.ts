@@ -18,6 +18,7 @@ import {
   RDBMS_SSL_ENABLED,
   RDBMS_SSL_HOST,
   RDBMS_SSL_KEY,
+  RDBMS_SYNCHRONIZE,
   RDBMS_USER,
 } from '../app/const';
 
@@ -37,6 +38,7 @@ export const getDataSource = async () => {
   if (RDBMS_DB_TYPE === 'postgres') {
     dataSource = new DataSource({
       type: 'postgres',
+      applicationName: 'chatbot',
       host: RDBMS_HOST,
       port: RDBMS_PORT,
       username: RDBMS_USER,
@@ -49,13 +51,14 @@ export const getDataSource = async () => {
         RDBMSMessage,
         RDBMSPrompt,
       ],
-      synchronize: true,
+      synchronize: RDBMS_SYNCHRONIZE,
       logging: false,
       ssl: RDBMS_SSL_ENABLED ? tslOptions : undefined,
     });
   } else if (RDBMS_DB_TYPE === 'cockroachdb') {
     dataSource = new DataSource({
       type: 'cockroachdb',
+      applicationName: 'chatbot',
       host: RDBMS_HOST,
       port: RDBMS_PORT,
       username: RDBMS_USER,
@@ -68,7 +71,7 @@ export const getDataSource = async () => {
         RDBMSMessage,
         RDBMSPrompt,
       ],
-      synchronize: true,
+      synchronize: RDBMS_SYNCHRONIZE,
       logging: false,
       ssl: RDBMS_SSL_ENABLED ? tslOptions : undefined,
       timeTravelQueries: RDBMS_COCKROACHDB_TIME_TRAVEL_QUERIES,
@@ -76,6 +79,9 @@ export const getDataSource = async () => {
   } else if (RDBMS_DB_TYPE === 'mysql') {
     dataSource = new DataSource({
       type: 'mysql',
+      extra: {
+        program_name: 'chatbot',
+      },
       host: RDBMS_HOST,
       port: RDBMS_PORT,
       username: RDBMS_USER,
@@ -88,13 +94,16 @@ export const getDataSource = async () => {
         RDBMSMessage,
         RDBMSPrompt,
       ],
-      synchronize: true,
+      synchronize: RDBMS_SYNCHRONIZE,
       logging: false,
       ssl: RDBMS_SSL_ENABLED ? tslOptions : undefined,
     });
   } else if (RDBMS_DB_TYPE === 'mariadb') {
     dataSource = new DataSource({
       type: 'mariadb',
+      extra: {
+        program_name: 'chatbot',
+      },
       host: RDBMS_HOST,
       port: RDBMS_PORT,
       username: RDBMS_USER,
@@ -107,7 +116,7 @@ export const getDataSource = async () => {
         RDBMSMessage,
         RDBMSPrompt,
       ],
-      synchronize: true,
+      synchronize: RDBMS_SYNCHRONIZE,
       logging: false,
       ssl: RDBMS_SSL_ENABLED ? tslOptions : undefined,
     });

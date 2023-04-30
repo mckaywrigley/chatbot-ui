@@ -71,6 +71,9 @@ export class RDBMSConversation {
   @ManyToOne(() => RDBMSFolder, { onUpdate: "CASCADE" })
   @JoinColumn()
   folder!: RDBMSFolder | null
+
+  @Column({ type: timestampType, default: () => 'NOW()' })
+  creation_time!: Date;
 }
 
 

@@ -43,6 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (newPrompt !== null) {
       return await rdbmsCreatePrompt(res, dataSource, user, newPrompt);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No prompt provided' });
     }
   } else if (req.method === 'PUT') {
@@ -50,6 +51,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (updatedPrompt !== null) {
       return await rdbmsUpdatePrompt(res, dataSource, user, updatedPrompt);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No prompt provided' });
     }
   } else if (req.method === 'DELETE') {
@@ -57,9 +59,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (promptId !== undefined) {
       return await rdbmsDeletePrompt(res, dataSource, user, promptId);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No prompt_id provided' });
     }
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -96,6 +100,7 @@ const rdbmsCreatePrompt = async (
 
   await promptRepo.save(rdbmsPrompt);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -133,6 +138,7 @@ const rdbmsUpdatePrompt = async (
 
   await promptRepo.save(rdbmsPrompt);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -154,6 +160,7 @@ const rdbmsDeletePrompt = async (
     await promptRepo.remove(deletedPrompt);
   }
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });

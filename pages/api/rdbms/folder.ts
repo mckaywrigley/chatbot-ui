@@ -43,6 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (newFolder !== null) {
       return await rdbmsCreateFolder(res, dataSource, user, newFolder);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No name or folder_type provided' });
     }
   } else if (req.method === 'PUT') {
@@ -50,6 +51,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (updatedFolder !== null) {
       return await rdbmsUpdateFolder(res, dataSource, user, updatedFolder);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No name or folder_id provided' });
     }
   } else if (req.method === 'DELETE') {
@@ -57,9 +59,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (folderId !== undefined) {
       return await rdbmsDeleteFolder(res, dataSource, user, folderId);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No folder_id provided' });
     }
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -79,6 +83,7 @@ const rdbmsCreateFolder = async (
   rdbmsFolder.folder_type = newFolder.type.toString();
   await folderRepo.save(rdbmsFolder);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -100,11 +105,13 @@ const rdbmsUpdateFolder = async (
     rdbmsFolder.name = updatedFolder.name;
     await folderRepo.save(rdbmsFolder);
 
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({ error: 'Folder not found' });
 };
 
@@ -123,11 +130,13 @@ const rdbmsDeleteFolder = async (
   if (deletedFolder !== null) {
     await folderRepo.remove(deletedFolder);
 
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({ error: 'Folder not found' });
 };
 
