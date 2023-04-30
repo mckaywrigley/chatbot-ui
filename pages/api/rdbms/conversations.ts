@@ -57,11 +57,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         updatedConversations,
       );
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No conversations provided' });
     }
   } else if (req.method === 'DELETE') {
     return await rdbmsDeleteAllConversations(res, dataSource, user);
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -119,6 +121,8 @@ const rdbmsGetAllConversations = async (
 
     conversations.push(conversation);
   }
+
+  await dataSource.destroy();
   return res.status(200).json(conversations);
 };
 
@@ -157,6 +161,8 @@ const rdbmsUpdateConversations = async (
   }
 
   await dataSource.manager.save(rdbmsConversations);
+
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -175,6 +181,7 @@ const rdbmsDeleteAllConversations = async (
 
   await conversationRepo.remove(deletedConversations);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });

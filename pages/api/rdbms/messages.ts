@@ -54,6 +54,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         conversationId,
       );
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No messages provided' });
     }
   } else if (req.method === 'PUT') {
@@ -72,9 +73,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (messageIds) {
       return await rdbmsDeleteMessages(res, dataSource, user, messageIds);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No message_id provided' });
     }
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -109,11 +112,13 @@ const rdbmsCreateMessages = async (
     }
 
     await messageRepo.save(newRdbmsMessages);
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({
     error: 'Conversation not found',
   });
@@ -141,6 +146,7 @@ const rdbmsUpdateMessages = async (
   }
 
   await messageRepo.save(updatedRdbmsMessages);
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -161,11 +167,13 @@ const rdbmsDeleteMessages = async (
   if (deletedMessages.length > 0) {
     await messageRepo.remove(deletedMessages);
 
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({ error: 'Messages not found' });
 };
 

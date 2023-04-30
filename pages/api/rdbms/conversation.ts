@@ -52,6 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         newConversation,
       );
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No conversation provided' });
     }
   } else if (req.method === 'PUT') {
@@ -64,6 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         updatedConversation,
       );
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No conversation provided' });
     }
   } else if (req.method === 'DELETE') {
@@ -76,9 +78,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         conversationId,
       );
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No conversation_id provided' });
     }
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -115,6 +119,7 @@ const rdbmsCreateConversation = async (
 
   await conversationRepo.save(rdbmsConversation);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -152,6 +157,7 @@ const rdbmsUpdateConversation = async (
 
   await conversationRepo.save(rdbmsConversation);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -173,6 +179,7 @@ const rdbmsDeleteConversation = async (
     await conversationRepo.remove(deletedConversation);
   }
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
