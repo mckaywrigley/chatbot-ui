@@ -77,6 +77,7 @@ const rdbmsGetAllConversations = async (
     where: {
       user: { id: user.id },
     },
+    order: { creation_time: { direction: 'ASC' } },
     relations: ['folder'],
   });
 
