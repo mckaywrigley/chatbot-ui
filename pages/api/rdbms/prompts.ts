@@ -46,11 +46,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (body !== null) {
       return await rdbmsUpdateAllPrompts(res, dataSource, user, updatedPrompts);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No Prompts provided' });
     }
   } else if (req.method === 'DELETE') {
     return await rdbmsDeleteAllPrompts(res, dataSource, user);
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -86,6 +88,7 @@ const rdbmsGetAllPrompts = async (
 
     prompts.push(prompt);
   }
+  await dataSource.destroy();
   return res.status(200).json(prompts);
 };
 
@@ -125,6 +128,7 @@ const rdbmsUpdateAllPrompts = async (
   }
 
   await promptRepo.save(rdbmsPrompts);
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -143,6 +147,7 @@ const rdbmsDeleteAllPrompts = async (
 
   await promptRepo.remove(deletedPrompts);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });

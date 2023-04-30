@@ -94,45 +94,52 @@ You should be able to start chatting.
 
 When deploying the application, the following environment variables can be set:
 
-| Environment Variable                  | Default value                                       | Description                                                                                 |
-| ------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| OPENAI_API_KEY                        |                                                     | The default API key used for authentication with OpenAI                                     |
-| OPENAI_API_HOST                       | `https://api.openai.com`                            | The base url, for Azure use `https://<endpoint>.openai.azure.com`                           |
-| OPENAI_API_TYPE                       | `openai`                                            | The API type, options are `openai` or `azure`                                               |
-| OPENAI_API_VERSION                    | `2023-03-15-preview`                                | Only applicable for Azure OpenAI                                                            |
-| OPENAI_ORGANIZATION                   |                                                     | Your OpenAI organization ID                                                                 |
-| DEFAULT_MODEL                         | `gpt-3.5-turbo` _(OpenAI)_ `gpt-35-turbo` _(Azure)_ | The default model to use on new conversations                                               |
-| NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT     | [see here](utils/app/const.ts)                      | The default system prompt to use on new conversations                                       |
-| NEXT_PUBLIC_DEFAULT_TEMPERATURE       | 1                                                   | The default temperature to use on new conversations                                         |
-| GOOGLE_API_KEY                        |                                                     | See [Custom Search JSON API documentation][GCSE]                                            |
-| GOOGLE_CSE_ID                         |                                                     | See [Custom Search JSON API documentation][GCSE]                                            |
-| NEXT_PUBLIC_NEXTAUTH_ENABLED          | `false`                                             | Enable SSO authentication. set 'true' or 'false'                                            |
-| NEXTAUTH_EMAIL_PATTERN                |                                                     | The email regex pattern granted access to chatbot-ui                                        |
-| NEXTAUTH_URL                          | `http://localhost:3000`                             | NextAuth Settings. See [Official Document](https://next-auth.js.org/configuration/options)  |
-| NEXTAUTH_SECRET                       |                                                     | NextAuth Settings. See [Official Document](https://next-auth.js.org/configuration/options)  |
-| GITHUB_CLIENT_ID                      |                                                     | GitHub OAuth Client ID for NextAuth                                                         |
-| GITHUB_CLIENT_SECRET                  |                                                     | GitHub OAuth Client Secret for NextAuth                                                     |
-| GOOGLE_CLIENT_ID                      |                                                     | Google OAuth Client ID for NextAuth                                                         |
-| GOOGLE_CLIENT_SECRET                  |                                                     | Google OAuth Client Secret for NextAuth                                                     |
-| STORAGE_TYPE                          | `local`                                             | Options are `local`, `couchdb`, & `rdbms`                                                   |
-| COUCHDB_HOST                          | `http://couchdb`                                    | The hostname of the CouchDB instance                                                        |
-| COUCHDB_PORT                          | `5984`                                              | The port of the CouchDB instance                                                            |
-| COUCHDB_USERNAME                      | `admin`                                             | The username of the CouchDB instance                                                        |
-| COUCHDB_PASSWORD                      | `password`                                          | The password of the CouchDB instance                                                        |
-| COUCHDB_DATABASE                      | `chatbot`                                           | The database name of the CouchDB instance                                                   |
-| RDBMS_DB_TYPE                         | `postgres`                                          | The database type of the RDBMS instance                                                     |
-| RDBMS_HOST                            | `127.0.0.1`                                         | The hostname of the RDBMS instance                                                          |
-| RDBMS_PORT                            | `5432`                                              | The port of the RDBMS instance                                                              |
-| RDBMS_DB                              | `postgres`                                          | The database name of the RDBMS instance                                                     |
-| RDBMS_USER                            | `postgres`                                          | The username of the RDBMS instance                                                          |
-| RDBMS_PASS                            | `password`                                          | The password of the RDBMS instance                                                          |
-| RDBMS_COCKROACHDB_TIME_TRAVEL_QUERIES | `false`                                             | Wether to user time travel queries features in cockroachdb                                  |
+| Environment Variable                  | Default value                                       | Description                                                                                |
+| ------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| OPENAI_API_KEY                        |                                                     | The default API key used for authentication with OpenAI                                    |
+| OPENAI_API_HOST                       | `https://api.openai.com`                            | The base url, for Azure use `https://<endpoint>.openai.azure.com`                          |
+| OPENAI_API_TYPE                       | `openai`                                            | The API type, options are `openai` or `azure`                                              |
+| OPENAI_API_VERSION                    | `2023-03-15-preview`                                | Only applicable for Azure OpenAI                                                           |
+| OPENAI_ORGANIZATION                   |                                                     | Your OpenAI organization ID                                                                |
+| DEFAULT_MODEL                         | `gpt-3.5-turbo` _(OpenAI)_ `gpt-35-turbo` _(Azure)_ | The default model to use on new conversations                                              |
+| NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT     | [see here](utils/app/const.ts)                      | The default system prompt to use on new conversations                                      |
+| NEXT_PUBLIC_DEFAULT_TEMPERATURE       | 1                                                   | The default temperature to use on new conversations                                        |
+| GOOGLE_API_KEY                        |                                                     | See [Custom Search JSON API documentation][GCSE]                                           |
+| GOOGLE_CSE_ID                         |                                                     | See [Custom Search JSON API documentation][GCSE]                                           |
+| NEXT_PUBLIC_NEXTAUTH_ENABLED          | `false`                                             | Enable SSO authentication. set 'true' or 'false'                                           |
+| NEXTAUTH_EMAIL_PATTERN                |                                                     | The email regex pattern granted access to chatbot-ui                                       |
+| NEXTAUTH_URL                          | `http://localhost:3000`                             | NextAuth Settings. See [Official Document](https://next-auth.js.org/configuration/options) |
+| NEXTAUTH_SECRET                       |                                                     | NextAuth Settings. See [Official Document](https://next-auth.js.org/configuration/options) |
+| GITHUB_CLIENT_ID                      |                                                     | GitHub OAuth Client ID for NextAuth                                                        |
+| GITHUB_CLIENT_SECRET                  |                                                     | GitHub OAuth Client Secret for NextAuth                                                    |
+| GOOGLE_CLIENT_ID                      |                                                     | Google OAuth Client ID for NextAuth                                                        |
+| GOOGLE_CLIENT_SECRET                  |                                                     | Google OAuth Client Secret for NextAuth                                                    |
+| STORAGE_TYPE                          | `local`                                             | Options are `local`, `couchdb`, & `rdbms`                                                  |
+| COUCHDB_HOST                          | `http://couchdb`                                    | The hostname of the CouchDB instance                                                       |
+| COUCHDB_PORT                          | `5984`                                              | The port of the CouchDB instance                                                           |
+| COUCHDB_USERNAME                      | `admin`                                             | The username of the CouchDB instance                                                       |
+| COUCHDB_PASSWORD                      | `password`                                          | The password of the CouchDB instance                                                       |
+| COUCHDB_DATABASE                      | `chatbot`                                           | The database name of the CouchDB instance                                                  |
+| RDBMS_DB_TYPE                         | `postgres`                                          | The database type of the RDBMS instance                                                    |
+| RDBMS_HOST                            | `127.0.0.1`                                         | The hostname of the RDBMS instance                                                         |
+| RDBMS_PORT                            | `5432`                                              | The port of the RDBMS instance                                                             |
+| RDBMS_DB                              | `postgres`                                          | The database name of the RDBMS instance                                                    |
+| RDBMS_USER                            | `postgres`                                          | The username of the RDBMS instance                                                         |
+| RDBMS_PASS                            | `password`                                          | The password of the RDBMS instance                                                         |
+| RDBMS_SYNCHRONIZE                     | `true`                                              | Whether to create tables from entities. Should be `false` in production.                   |
+| RDBMS_SSL_ENABLED                     | `false`                                             | Whether to require SSL to connect to the database.                                         |
+| RDBMS_SSL_HOST                        |                                                     | The hostname of the database server you are connecting to. Google Cloud may require this.  |
+| RDBMS_SSL_CA                          |                                                     | The Server CA certificate used for SSL connections, in the form of a single line string.   |
+| RDBMS_SSL_CERT                        |                                                     | The Client certificate used for SSL connections, in the form of a single line string.      |
+| RDBMS_SSL_KEY                         |                                                     | The Client certificate key used for SSL connections, in the form of a single line string.  |
+| RDBMS_COCKROACHDB_TIME_TRAVEL_QUERIES | `false`                                             | Wether to user time travel queries features in CockroachDB                                 |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 
 If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
 
 ### Relational Database Support
+
 If you opt to use a relational database, you must also install the corresponding database driver.
 See the corresponding drivers [here](https://github.com/typeorm/typeorm#installation).
 

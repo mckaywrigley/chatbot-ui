@@ -63,9 +63,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (messageId) {
       return await rdbmsDeleteMessage(res, dataSource, user, messageId);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No message_id provided' });
     }
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -94,11 +96,13 @@ const rdbmsCreateMessage = async (
     rdbmsMessage.conversation = rdbmsConversation;
 
     await messageRepo.save(rdbmsMessage);
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({
     error: 'Conversation not found',
   });
@@ -119,11 +123,13 @@ const rdbmsDeleteMessage = async (
   if (deletedMessage !== null) {
     await messageRepo.remove(deletedMessage);
 
+    await dataSource.destroy();
     return res.status(200).json({
       OK: true,
     });
   }
 
+  await dataSource.destroy();
   return res.status(500).send({ error: 'Message not found' });
 };
 

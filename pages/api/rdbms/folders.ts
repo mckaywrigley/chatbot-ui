@@ -45,12 +45,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (updatedFolders !== null) {
       return await rdbmsUpdateFolders(res, dataSource, user, updatedFolders);
     } else {
+      await dataSource.destroy();
       return res.status(400).json({ error: 'No folders provided' });
     }
   } else if (req.method === 'DELETE') {
     const deletedFolderIds = body as string[];
     return await rdbmsDeleteFolders(res, dataSource, user, deletedFolderIds);
   } else {
+    await dataSource.destroy();
     return res.status(400).json({ error: 'Method not supported' });
   }
 };
@@ -76,6 +78,7 @@ const rdbmsGetFolders = async (
 
     folders.push(folder);
   }
+  await dataSource.destroy();
   return res.status(200).json(folders);
 };
 
@@ -100,6 +103,7 @@ const rdbmsUpdateFolders = async (
   }
 
   await folderRepo.save(rdbmsFolders);
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
@@ -120,6 +124,7 @@ const rdbmsDeleteFolders = async (
 
   await folderRepo.remove(deletedFolders);
 
+  await dataSource.destroy();
   return res.status(200).json({
     OK: true,
   });
