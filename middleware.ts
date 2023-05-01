@@ -13,8 +13,6 @@ const getSecret = () => {
 export default withAuth({
   callbacks: {
     async authorized({ token }) {
-      console.log('got token');
-      console.log(token);
       if (NEXT_PUBLIC_NEXTAUTH_ENABLED === false) {
         return true;
       }

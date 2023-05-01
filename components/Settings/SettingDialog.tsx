@@ -30,20 +30,6 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const defaultSystemPrompt = injectedSystemPrompts.filter(
-      (prompt) => prompt.id === defaultSystemPromptId,
-    )[0];
-
-    if (!defaultSystemPrompt) {
-      dispatch({
-        field: 'defaultSystemPromptId',
-        value: builtInSystemPrompt.id,
-      });
-      handleSave();
-    }
-  }, []);
-
-  useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
         window.addEventListener('mouseup', handleMouseUp);
