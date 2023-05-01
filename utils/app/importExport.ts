@@ -71,6 +71,9 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
+export const exportMarkdown = () => {
+}
+
 export const exportData = () => {
   let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
