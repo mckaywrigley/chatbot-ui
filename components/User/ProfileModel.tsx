@@ -27,8 +27,8 @@ const PlanDetail = {
       'Everything in free plan',
       'Priority response time',
       'Cloud sync',
+      'GPT-4 integration (limited availability)',
       'Voice input (Coming)',
-      'GPT-4 integration (Coming)',
     ],
   },
 };
