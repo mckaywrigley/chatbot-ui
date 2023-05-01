@@ -11,6 +11,10 @@ const nextConfig = {
       layers: true,
     };
 
+    // For packages that depend on `fs` module; fs doesn't exist in browser
+    // needed for adm-zip
+    config.resolve.fallback = { fs: false, 'original-fs': false };
+
     return config;
   },
 };

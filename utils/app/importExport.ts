@@ -1,4 +1,4 @@
-import * as JSZip from 'jszip';
+import * as Zip from 'adm-zip';
 
 import { Conversation } from '@/types/chat';
 import {
@@ -74,32 +74,21 @@ function currentDate() {
 }
 
 export const exportMarkdown = () => {
-  const history = localStorage.getItem('conversationHistory');
-  const zip = new JSZip();
+  const conversations = JSON.parse(localStorage.getItem('conversationHistory') || []);
+  const zip = new Zip();
 
-  for (const conversation of history) {
+  for (const conversation of conversations) {
     let markdownContent = '';
 
     for (const message of conversation.messages) {
       markdownContent += `## ${message.role.charAt(0).toUpperCase() + message.role.slice(1)}\n\n${message.content}\n\n`;
     }
 
-    zip.file(`${conversation.name}.md`, markdownContent);
+    zip.addFile(`${conversation.name}.md`, markdownContent);
   }
 
-  let zipBlob = '';
-  (async () => {
-    try {
-      const zip = new JSZip();
-
-      zipBlob = await zip.generateAsync({ type: 'blob' });
-
-      console.log('ZIP file generated:', zipBlob);
-    } catch (error) {
-      console.error('Error generating ZIP file:', error);
-    }
-  })();
-  const url = URL.createObjectURL(zipBlob);
+  const zipDownload = zip.toBuffer();
+  const url = URL.createObjectURL(new Blob([zipDownload]));
   const link = document.createElement('a');
   link.download = `chatbot_ui_history_${currentDate()}_markdown.zip`;
   link.href = url;
