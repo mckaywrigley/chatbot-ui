@@ -126,3 +126,19 @@ export class RDBMSPrompt {
   @JoinColumn()
   folder!: RDBMSFolder | null
 }
+
+@Entity()
+export class RDBMSSystemPrompt {
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
+
+  @ManyToOne(() => RDBMSUser, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @JoinColumn()
+  user!: RDBMSUser
+
+  @Column()
+  name!: string;
+
+  @Column({type: textType})
+  content!: string | '';
+}

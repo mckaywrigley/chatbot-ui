@@ -53,7 +53,7 @@ export const storageUpdatePrompt = (
   };
 };
 
-export const storageDeletePrompts = (
+export const storageDeletePrompt = (
   storageType: StorageType,
   promptId: string,
   allPrompts: Prompt[],

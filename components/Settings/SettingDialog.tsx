@@ -4,9 +4,11 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { getSettings, saveSettings } from '@/utils/app/storage/settings';
 
 import { Settings } from '@/types/settings';
+import { SystemPrompt } from '@/types/systemPrompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -21,8 +23,25 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const { state, dispatch } = useCreateReducer<Settings>({
     initialState: settings,
   });
-  const { dispatch: homeDispatch } = useContext(HomeContext);
+  const {
+    state: { systemPrompts, defaultSystemPromptId },
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const defaultSystemPrompt = injectedSystemPrompts.filter(
+      (prompt) => prompt.id === defaultSystemPromptId,
+    )[0];
+
+    if (!defaultSystemPrompt) {
+      dispatch({
+        field: 'defaultSystemPromptId',
+        value: builtInSystemPrompt.id,
+      });
+      handleSave();
+    }
+  }, []);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -45,8 +64,19 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
   const handleSave = () => {
     homeDispatch({ field: 'lightMode', value: state.theme });
+    homeDispatch({
+      field: 'defaultSystemPromptId',
+      value: state.defaultSystemPromptId,
+    });
     saveSettings(state);
   };
+
+  const builtInSystemPrompt: SystemPrompt = {
+    id: '0',
+    name: 'Built-in',
+    content: DEFAULT_SYSTEM_PROMPT,
+  };
+  const injectedSystemPrompts = [builtInSystemPrompt, ...systemPrompts];
 
   // Render nothing if the dialog is not open.
   if (!open) {
@@ -72,20 +102,57 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
               {t('Settings')}
             </div>
 
-            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
+            <label className="mb-2 text-left text-neutral-900 dark:text-neutral-200">
               {t('Theme')}
+            </label>
+            <div className="mb-2 w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+              <select
+                className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+                value={state.theme}
+                onChange={(event) =>
+                  dispatch({ field: 'theme', value: event.target.value })
+                }
+              >
+                <option
+                  value="dark"
+                  className="dark:bg-[#343541] dark:text-white"
+                >
+                  {t('Dark mode')}
+                </option>
+                <option
+                  value="light"
+                  className="dark:bg-[#343541] dark:text-white"
+                >
+                  {t('Light mode')}
+                </option>
+              </select>
             </div>
 
-            <select
-              className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
-              value={state.theme}
-              onChange={(event) =>
-                dispatch({ field: 'theme', value: event.target.value })
-              }
-            >
-              <option value="dark">{t('Dark mode')}</option>
-              <option value="light">{t('Light mode')}</option>
-            </select>
+            <label className="mb-2 text-left text-neutral-900 dark:text-neutral-200">
+              {t('Default System Prompt')}
+            </label>
+            <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+              <select
+                className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+                value={state.defaultSystemPromptId}
+                onChange={(event) =>
+                  dispatch({
+                    field: 'defaultSystemPromptId',
+                    value: event.target.value,
+                  })
+                }
+              >
+                {injectedSystemPrompts.map((systemPrompt) => (
+                  <option
+                    key={systemPrompt.id}
+                    value={systemPrompt.id}
+                    className="dark:bg-[#343541] dark:text-white"
+                  >
+                    {systemPrompt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <button
               type="button"

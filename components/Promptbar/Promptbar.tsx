@@ -5,7 +5,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import {
   storageCreatePrompt,
-  storageDeletePrompts,
+  storageDeletePrompt,
   storageUpdatePrompt,
 } from '@/utils/app/storage/prompt';
 
@@ -69,11 +69,7 @@ const Promptbar = () => {
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = storageDeletePrompts(
-      storageType,
-      prompt.id,
-      prompts,
-    );
+    const updatedPrompts = storageDeletePrompt(storageType, prompt.id, prompts);
     homeDispatch({ field: 'prompts', value: updatedPrompts });
   };
 
