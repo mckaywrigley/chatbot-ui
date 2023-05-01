@@ -43,6 +43,7 @@ export interface HomeInitialState {
   // User Auth
   showLoginSignUpModel: boolean;
   showProfileModel: boolean;
+  showUsageModel: boolean;
   user: User | null;
   isPaidUser: boolean;
 }
@@ -82,6 +83,7 @@ export const initialState: HomeInitialState = {
   // User Auth
   showLoginSignUpModel: false,
   showProfileModel: false,
+  showUsageModel: false,
   user: null,
   isPaidUser: false,
 };

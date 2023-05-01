@@ -5,6 +5,7 @@ import {
   IconLogin,
   IconMoon,
   IconSun,
+  IconCurrencyDollar
 } from '@tabler/icons-react';
 import { useContext } from 'react';
 
@@ -32,6 +33,8 @@ export const ChatbarSettings = () => {
     handleImportConversations,
     handleExportData,
   } = useContext(ChatbarContext);
+
+  const isPaidUser = user && user.plan === 'pro';
 
   const signInAccountOnClick = () => {
     if (user) {
@@ -107,6 +110,18 @@ export const ChatbarSettings = () => {
           suffixIcon={getAccountButtonSuffixBadge()}
           onClick={signInAccountOnClick}
         />
+        {isPaidUser && (
+          <SidebarButton
+            text={t('Usage & credit')}
+            icon={<IconCurrencyDollar size={18} />}
+            onClick={() => {
+              homeDispatch({
+                field: 'showUsageModel',
+                value: true,
+              });
+            }}
+          />
+        )}
         <SidebarButton
           text={t('Follow for updates!')}
           icon={<IconBrandFacebook size={18} />}
