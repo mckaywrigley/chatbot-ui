@@ -1,3 +1,5 @@
+import * as JSZip from 'jszip';
+
 import { Conversation } from '@/types/chat';
 import {
   ExportFormatV1,
@@ -72,7 +74,41 @@ function currentDate() {
 }
 
 export const exportMarkdown = () => {
-}
+  const history = localStorage.getItem('conversationHistory');
+  const zip = new JSZip();
+
+  for (const conversation of history) {
+    let markdownContent = '';
+
+    for (const message of conversation.messages) {
+      markdownContent += `## ${message.role.charAt(0).toUpperCase() + message.role.slice(1)}\n\n${message.content}\n\n`;
+    }
+
+    zip.file(`${conversation.name}.md`, markdownContent);
+  }
+
+  let zipBlob = '';
+  (async () => {
+    try {
+      const zip = new JSZip();
+
+      zipBlob = await zip.generateAsync({ type: 'blob' });
+
+      console.log('ZIP file generated:', zipBlob);
+    } catch (error) {
+      console.error('Error generating ZIP file:', error);
+    }
+  })();
+  const url = URL.createObjectURL(zipBlob);
+  const link = document.createElement('a');
+  link.download = `chatbot_ui_history_${currentDate()}_markdown.zip`;
+  link.href = url;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
 
 export const exportData = () => {
   let history = localStorage.getItem('conversationHistory');
