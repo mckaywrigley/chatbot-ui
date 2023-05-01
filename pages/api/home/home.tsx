@@ -533,7 +533,6 @@ const Home = ({
             )}
             {showUsageModel && session && (
               <UsageCreditModel
-                session={session}
                 onClose={() =>
                   dispatch({ field: 'showUsageModel', value: false })
                 }
