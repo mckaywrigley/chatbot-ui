@@ -23,5 +23,12 @@
   "Online mode": "連網模式",
   "Mode": "對話模式",
   "Language": "對話語言",
-  "Auto": "自動"
+  "Auto": "自動",
+  "Custom Mode": "模式",
+  "Monthly credit": "每月自動加值點數",
+  "Balance": "點數餘額",
+  "Buy": "購買",
+  "credit": "點數",
+  "As a Pro plan customer, you will receive the monthly credits on the 1st day of every month to use our custom modes.": "作為專業版客戶，您將在每月的第一天收到對應的加值點數",
+  "You will receive an email notification when your credits are ready. You can also check your credit balance in the dashboard.": "當您的點數準備好時，我們將會寄送電子郵件通知您"
 }

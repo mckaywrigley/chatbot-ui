@@ -15,6 +15,12 @@ type Props = {
   onClose: () => void;
 };
 
+const gpt4CreditPurchaseLinks = {
+  '50': 'https://buy.stripe.com/7sI9EzguC0u9ak0bIO',
+  '150': 'https://buy.stripe.com/7sI3gb3HQ2Chbo45kr',
+  '300': 'https://buy.stripe.com/eVa5oj7Y6b8Ncs814c',
+};
+
 export const UsageCreditModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation('model');
   const [gpt4Credit, setGpt4Credit] = useState<number | null>(null);
@@ -79,7 +85,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
               <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200">
                 <div className="mb-3">
                   {t(
-                    'As a Pro plan customer, you will receive credits every month to use our plugins.',
+                    'As a Pro plan customer, you will receive the monthly credits on the 1st day of every month to use our custom modes.',
                   )}
                 </div>
 
@@ -95,7 +101,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                           <th scope="col" className="px-6 py-3">
-                            {t('Plugin')}
+                            {t('Custom Mode')}
                           </th>
                           <th scope="col" className="px-6 py-3">
                             {t('Monthly credit')}
@@ -118,21 +124,31 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                             {DefaultMonthlyCredits[PluginID.GPT4]}
                           </td>
                           <td className="px-6 py-4">{gpt4Credit}</td>
-                          <td className="px-6 py-4">
-                            <a
-                              href="#"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                            >
-                              Buy more credit
-                            </a>
+                          <td className="px-6 py-4 flex flex-col text-left">
+                            {Object.entries(gpt4CreditPurchaseLinks).map(
+                              ([key, value]) => (
+                                <a
+                                  href={value}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline mb-1.5"
+                                  key={key}
+                                >
+                                  {t('Buy')} {key} {t('credit')}
+                                </a>
+                              ),
+                            )}
                           </td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 )}
+                <div className="mt-3 text-xs text-neutral-400 leading-4">
+                  {t(
+                    'You will receive an email notification when your credits are ready. You can also check your credit balance in the dashboard.',
+                  )}
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
