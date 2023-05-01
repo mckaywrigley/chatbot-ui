@@ -66,11 +66,12 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   throw new Error('Unsupported data format');
 }
 
-function currentDate() {
-  const date = new Date();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${month}-${day}`;
+function createFilename(kind: string, extension: string): string {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  return `chatbot_ui_export_${year}${month}${day}_${kind}.${extension}`;
 }
 
 export const exportMarkdown = () => {
@@ -90,7 +91,7 @@ export const exportMarkdown = () => {
   const zipDownload = zip.toBuffer();
   const url = URL.createObjectURL(new Blob([zipDownload]));
   const link = document.createElement('a');
-  link.download = `chatbot_ui_history_${currentDate()}_markdown.zip`;
+  link.download = createFilename('markdown', 'zip')
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);
@@ -128,7 +129,7 @@ export const exportData = () => {
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `chatbot_ui_history_${currentDate()}.json`;
+  link.download = createFilename('data', 'json')
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);
