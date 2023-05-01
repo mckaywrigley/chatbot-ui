@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconMarkdown, IconFileExport, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -53,7 +53,7 @@ export const ChatbarSettings = () => {
 
       <SidebarButton
         text={t('Export Markdown')}
-        icon={<IconFileExport size={18} />}
+        icon={<IconMarkdown size={18} />}
         onClick={() => handleExportMarkdown()}
       />
 
