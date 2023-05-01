@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const SystemPromptsMenu: FC<Props> = ({ systemPrompts, onClose }) => {
-  const { t } = useTranslation('systempromptbar');
+  const { t } = useTranslation('systemPrompt');
   const { handleCreateSystemPrompt } = useContext(HomeContext);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -80,7 +80,7 @@ export const SystemPromptsMenu: FC<Props> = ({ systemPrompts, onClose }) => {
               onClick={handleCreateSystemPrompt}
             >
               <IconPlus size={16} />
-              {'New System Prompt'}
+              {t('New System Prompt')}
             </button>
 
             <div className="dark:border-netural-400 inline-block max-h-[300px] overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom transition-all dark:bg-[#282a2c] sm:my-4 sm:max-h-[500px] sm:w-full sm:max-w-lg sm:p-2 sm:align-middle">
@@ -101,7 +101,7 @@ export const SystemPromptsMenu: FC<Props> = ({ systemPrompts, onClose }) => {
                 onClose();
               }}
             >
-              {'Continue'}
+              {t('Continue')}
             </button>
           </div>
         </div>

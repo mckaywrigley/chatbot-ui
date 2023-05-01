@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const SystemPromptSection: FC<Props> = ({ systemPrompts }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('systemPrompt');
 
   const [showModal, setShowModal] = useState(false);
 
@@ -52,7 +52,7 @@ export const SystemPromptSection: FC<Props> = ({ systemPrompts }) => {
   return (
     <div className="flex flex-col">
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
-        {t('System Prompt')}
+        {'System Prompt'}
       </label>
       <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
         <select
@@ -68,7 +68,7 @@ export const SystemPromptSection: FC<Props> = ({ systemPrompts }) => {
               className="dark:bg-[#343541] dark:text-white"
             >
               {systemPrompt.id === defaultSystemPromptId
-                ? `Default (${systemPrompt.name})`
+                ? `${t('Default')} (${systemPrompt.name})`
                 : systemPrompt.name}
             </option>
           ))}
@@ -82,7 +82,7 @@ export const SystemPromptSection: FC<Props> = ({ systemPrompts }) => {
         className="w-full mt-3 text-left text-neutral-700 dark:text-neutral-400 flex items-center"
       >
         <IconDeviceLaptop size={18} className={'inline mr-1'} />
-        {'Configure system prompts'}
+        {t('Configure System Prompts')}
       </button>
 
       {showModal && (

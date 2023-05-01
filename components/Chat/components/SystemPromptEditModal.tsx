@@ -20,7 +20,8 @@ interface Props {
 
 export const SystemPromptEditModal: FC<Props> = ({ systemPrompt, onClose }) => {
   const { handleUpdateSystemPrompt } = useContext(HomeContext);
-  const { t } = useTranslation('systempromptbar');
+  const { t } = useTranslation('systemPrompt');
+
   const [id, setId] = useState(systemPrompt.id);
   const [name, setName] = useState(systemPrompt.name);
   const [content, setContent] = useState(systemPrompt.content);
