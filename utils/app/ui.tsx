@@ -12,7 +12,7 @@ export const getPluginIcon = (pluginId: string | undefined | null) => {
 
   switch (pluginId) {
     case PluginID.LANGCHAIN_CHAT:
-      return <IconBrain size={20} />;
+      return <IconBrain size={26} />;
     case PluginID.GPT4:
       return <IconNumber4 size={20} />;
     default:
