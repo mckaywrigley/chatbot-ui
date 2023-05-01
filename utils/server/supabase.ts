@@ -50,13 +50,13 @@ export const getIntervalUsages = async (
 };
 
 export const addUsageEntry = async (
-  apiType: PluginID | undefined,
+  apiType: PluginID,
   userId: string,
 ): Promise<void> => {
   const supabase = getAdminSupabaseClient();
   const { error } = await supabase
     .from('api_usages')
-    .insert([{ api_type: apiType || 'gpt-3.5', user_id: userId }]);
+    .insert([{ api_type: apiType, user_id: userId }]);
 
   if (error) {
     throw error;

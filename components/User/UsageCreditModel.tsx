@@ -37,8 +37,6 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
     if (!userId || !supabaseClient) return;
 
     const fetchUserCredits = async () => {
-      console.log('Fetching user credits');
-
       const { data, error } = await supabaseClient
         .from('user_credits')
         .select('*')
@@ -47,7 +45,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
 
       if (error) {
         console.error(error);
-      } else {
+      } else if(data.length !== 0) {
         setGpt4Credit(data[0].balance);
       }
     };
@@ -89,61 +87,55 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                   )}
                 </div>
 
-                {gpt4Credit === null && (
-                  <div className="flex items-center justify-center">
-                    <div className="w-6 h-6 border-t-2 border-b-2 border-neutral-200 rounded-full animate-spin" />
-                  </div>
-                )}
+                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                  <table className="w-full text-sm text-gray-500 dark:text-gray-400 text-center">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <tr>
+                        <th scope="col" className="px-6 py-3">
+                          {t('Custom Mode')}
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          {t('Monthly credit')}
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          {t('Balance')}
+                        </th>
+                        <th scope="col" className="px-6 py-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                        <th
+                          scope="row"
+                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        >
+                          GPT-4
+                        </th>
+                        <td className="px-6 py-4">
+                          {DefaultMonthlyCredits[PluginID.GPT4]}
+                        </td>
+                        {/* TODO: Come up with a better mechanism to update this */}
+                        <td className="px-6 py-4">{gpt4Credit || DefaultMonthlyCredits[PluginID.GPT4]}</td>
+                        <td className="px-6 py-4 flex flex-col text-left">
+                          {Object.entries(gpt4CreditPurchaseLinks).map(
+                            ([key, value]) => (
+                              <a
+                                href={value}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="font-medium text-blue-600 dark:text-blue-500 hover:underline mb-1.5"
+                                key={key}
+                              >
+                                {t('Buy')} {key} {t('credit')}
+                              </a>
+                            ),
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
-                {gpt4Credit !== null && (
-                  <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                    <table className="w-full text-sm text-gray-500 dark:text-gray-400 text-center">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                          <th scope="col" className="px-6 py-3">
-                            {t('Custom Mode')}
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            {t('Monthly credit')}
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            {t('Balance')}
-                          </th>
-                          <th scope="col" className="px-6 py-3"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                          <th
-                            scope="row"
-                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                          >
-                            GPT-4
-                          </th>
-                          <td className="px-6 py-4">
-                            {DefaultMonthlyCredits[PluginID.GPT4]}
-                          </td>
-                          <td className="px-6 py-4">{gpt4Credit}</td>
-                          <td className="px-6 py-4 flex flex-col text-left">
-                            {Object.entries(gpt4CreditPurchaseLinks).map(
-                              ([key, value]) => (
-                                <a
-                                  href={value}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline mb-1.5"
-                                  key={key}
-                                >
-                                  {t('Buy')} {key} {t('credit')}
-                                </a>
-                              ),
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                )}
                 <div className="mt-3 text-xs text-neutral-400 leading-4">
                   {t(
                     'You will receive an email notification when your credits are ready. You can also check your credit balance in the dashboard.',
