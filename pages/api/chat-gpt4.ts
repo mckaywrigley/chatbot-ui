@@ -1,12 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
+import {
+  addUsageEntry,
+  getAdminSupabaseClient,
+  getUserProfile,
+  hasUserRunOutOfCredits,
+  subtractCredit,
+} from '@/utils/server/supabase';
 
 import { ChatBody, Message } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-
-import { getAdminSupabaseClient, getUserProfile } from '@/utils/server/supabase';
+import { PluginID } from '@/types/plugin';
 
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
@@ -20,22 +24,26 @@ export const config = {
   runtime: 'edge',
 };
 
-const unauthorizedResponse = new NextResponse('Unauthorized', { status: 401 });
+const unauthorizedResponse = new Response('Unauthorized', { status: 401 });
 
-const handler = async (req: NextRequest): Promise<Response> => {
-  
+const handler = async (req: Request): Promise<Response> => {
   const userToken = req.headers.get('user-token');
 
-  const { data, error } = await supabase.auth.getUser(userToken || "");
+  const { data, error } = await supabase.auth.getUser(userToken || '');
   if (!data || error) return unauthorizedResponse;
 
   const user = await getUserProfile(data.user.id);
   if (!user || user.plan === 'free') return unauthorizedResponse;
 
+  if (await hasUserRunOutOfCredits(data.user.id, PluginID.GPT4)) {
+    return new Response('Out of credits', { status: 402 });
+  }
+
   try {
     const selectedOutputLanguage = req.headers.get('Output-Language')
       ? `{lang=${req.headers.get('Output-Language')}}`
       : '';
+
     const { model, messages, prompt, temperature } =
       (await req.json()) as ChatBody;
 
@@ -82,9 +90,17 @@ const handler = async (req: NextRequest): Promise<Response> => {
       }`;
     }
 
-    // TODO: SWITCH THIS TO 4
+    addUsageEntry(PluginID.GPT4, data.user.id);
+    subtractCredit(data.user.id, PluginID.GPT4);
+
+    // Only enable GPT-4 in production
+    const modelToUse =
+      process.env.NEXT_PUBLIC_ENV === 'production'
+        ? OpenAIModels[OpenAIModelID.GPT_4]
+        : OpenAIModels[OpenAIModelID.GPT_3_5];
+
     const stream = await OpenAIStream(
-      OpenAIModels[OpenAIModelID.GPT_3_5],
+      modelToUse,
       promptToSend,
       temperatureToUse,
       messagesToSend,
