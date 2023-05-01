@@ -5,6 +5,7 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { StorageType } from '@/types/storage';
+import { SystemPrompt } from '@/types/systemPrompt';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -29,6 +30,8 @@ export interface HomeInitialState {
   storageType: StorageType;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
+  systemPrompts: SystemPrompt[];
+  defaultSystemPromptId: string;
 }
 
 export const initialState: HomeInitialState = {
@@ -54,4 +57,6 @@ export const initialState: HomeInitialState = {
   storageType: StorageType.LOCAL,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
+  systemPrompts: [],
+  defaultSystemPromptId: '0',
 };

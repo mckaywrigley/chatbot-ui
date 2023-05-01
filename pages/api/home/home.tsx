@@ -48,14 +48,22 @@ import {
   getSelectedConversation,
   saveSelectedConversation,
 } from '@/utils/app/storage/selectedConversation';
-import { getSettings } from '@/utils/app/storage/settings';
+import { getSettings, saveSettings } from '@/utils/app/storage/settings';
+import {
+  storageCreateSystemPrompt,
+  storageDeleteSystemPrompt,
+  storageUpdateSystemPrompt,
+} from '@/utils/app/storage/systemPrompt';
+import { storageGetSystemPrompts } from '@/utils/app/storage/systemPrompts';
 
 import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
+import { Settings } from '@/types/settings';
 import { StorageType } from '@/types/storage';
+import { SystemPrompt } from '@/types/systemPrompt';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -97,7 +105,8 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
-      temperature,
+      systemPrompts,
+      defaultSystemPromptId,
     },
     dispatch,
   } = contextValue;
@@ -202,6 +211,15 @@ const Home = ({
   const handleNewConversation = async () => {
     const lastConversation = conversations[conversations.length - 1];
 
+    const defaultSystemPrompt = systemPrompts.find(
+      (p) => p.id === defaultSystemPromptId,
+    );
+
+    let systemPrompt = DEFAULT_SYSTEM_PROMPT;
+    if (defaultSystemPrompt) {
+      systemPrompt = defaultSystemPrompt.content;
+    }
+
     const newConversation: Conversation = {
       id: uuidv4(),
       name: `${t('New Conversation')}`,
@@ -212,7 +230,7 @@ const Home = ({
         maxLength: OpenAIModels[defaultModelId].maxLength,
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
-      prompt: DEFAULT_SYSTEM_PROMPT,
+      prompt: systemPrompt,
       temperature: DEFAULT_TEMPERATURE,
       folderId: null,
     };
@@ -288,6 +306,55 @@ const Home = ({
     saveSelectedConversation(update.single);
   };
 
+  // SYSTEM PROMPT OPERATIONS  --------------------------------------------
+
+  const handleCreateSystemPrompt = async () => {
+    const newSystemPrompt: SystemPrompt = {
+      id: uuidv4(),
+      name: `${t('New System Prompt')}`,
+      content: DEFAULT_SYSTEM_PROMPT,
+    };
+
+    const updatedSystemPrompts = storageCreateSystemPrompt(
+      storageType,
+      newSystemPrompt,
+      systemPrompts,
+    );
+
+    dispatch({ field: 'systemPrompts', value: updatedSystemPrompts });
+  };
+
+  const handleUpdateSystemPrompt = (updatedSystemPrompt: SystemPrompt) => {
+    let update: {
+      single: SystemPrompt;
+      all: SystemPrompt[];
+    };
+
+    update = storageUpdateSystemPrompt(
+      storageType,
+      updatedSystemPrompt,
+      systemPrompts,
+    );
+
+    dispatch({ field: 'systemPrompts', value: update.all });
+  };
+
+  const handleDeleteSystemPrompt = (systemPromptId: string) => {
+    const updatedSystemPrompts = systemPrompts.filter(
+      (s) => s.id !== systemPromptId,
+    );
+
+    if (defaultSystemPromptId === systemPromptId) {
+      // Resetting default system prompt to built-in
+      const settings: Settings = getSettings();
+      saveSettings({ ...settings, defaultSystemPromptId: '0' });
+      dispatch({ field: 'defaultSystemPromptId', value: '0' });
+    }
+    dispatch({ field: 'systemPrompts', value: updatedSystemPrompts });
+
+    storageDeleteSystemPrompt(storageType, systemPromptId, systemPrompts);
+  };
+
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -326,6 +393,12 @@ const Home = ({
       dispatch({
         field: 'lightMode',
         value: settings.theme,
+      });
+    }
+    if (settings.defaultSystemPromptId) {
+      dispatch({
+        field: 'defaultSystemPromptId',
+        value: settings.defaultSystemPromptId,
       });
     }
 
@@ -371,6 +444,12 @@ const Home = ({
     storageGetPrompts(storageType).then((prompts) => {
       if (prompts) {
         dispatch({ field: 'prompts', value: prompts });
+      }
+    });
+
+    storageGetSystemPrompts(storageType).then((systemPrompts) => {
+      if (systemPrompts) {
+        dispatch({ field: 'systemPrompts', value: systemPrompts });
       }
     });
 
@@ -429,6 +508,9 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
+        handleCreateSystemPrompt,
+        handleUpdateSystemPrompt,
+        handleDeleteSystemPrompt,
       }}
     >
       <Head>

@@ -33,7 +33,7 @@ import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
+import { SystemPromptSection } from './SystemPromptSection';
 import { TemperatureSlider } from './Temperature';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -58,6 +58,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      systemPrompts,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -467,16 +468,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                       <ModelSelect />
 
-                      <SystemPrompt
-                        conversation={selectedConversation}
-                        prompts={prompts}
-                        onChangePrompt={(prompt) =>
-                          handleUpdateConversation(selectedConversation, {
-                            key: 'prompt',
-                            value: prompt,
-                          })
-                        }
-                      />
+                      <SystemPromptSection systemPrompts={systemPrompts} />
 
                       <TemperatureSlider
                         label={t('Temperature')}

@@ -8,6 +8,15 @@ if (process.env.GOOGLE_CLIENT_ID) {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
+      // Needed to be able to select a different google accounts each time.
+      authorization: {
+        params: {
+          prompt: 'login',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
     }),
   );
 }

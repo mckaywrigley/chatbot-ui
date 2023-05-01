@@ -13,6 +13,8 @@ const getSecret = () => {
 export default withAuth({
   callbacks: {
     async authorized({ token }) {
+      console.log('got token');
+      console.log(token);
       if (NEXT_PUBLIC_NEXTAUTH_ENABLED === false) {
         return true;
       }
@@ -20,9 +22,11 @@ export default withAuth({
         return false;
       } else {
         const pattern = process.env.NEXTAUTH_EMAIL_PATTERN || '';
-        if (!pattern || token?.email?.match('^' + pattern + '$')) {
+        const domain = token?.email?.split('@')[1];
+        if (!pattern || domain.match('^' + pattern + '$')) {
           return true;
         }
+
         return false;
       }
     },
