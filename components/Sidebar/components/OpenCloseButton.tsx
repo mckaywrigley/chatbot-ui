@@ -1,4 +1,5 @@
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   onClick: any;
@@ -6,14 +7,22 @@ interface Props {
 }
 
 export const CloseSidebarButton = ({ onClick, side }: Props) => {
+  const [showButtonAnimation, setShowButtonAnimation] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setShowButtonAnimation(true);
+    }, 200);
+  }, []);
   return (
     <>
       <button
-        className={`fixed top-5 ${
-          side === 'right' ? 'right-[270px]' : 'left-[270px]'
-        } z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5 sm:${
-          side === 'right' ? 'right-[270px]' : 'left-[270px]'
-        } sm:h-8 sm:w-8 sm:text-neutral-700`}
+        className={`fixed top-5 
+        ${side === 'right' && showButtonAnimation ? 'right-[270px]' : ''}
+        ${side === 'left' && showButtonAnimation ? 'left-[270px]' : ''}
+        ${side === 'right' && !showButtonAnimation ? 'right-0' : ''}
+        ${side === 'left' && !showButtonAnimation ? 'left-0' : ''}
+         z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5  transition-all ease-linear
+          sm:h-8 sm:w-8 sm:text-neutral-700`}
         onClick={onClick}
       >
         {side === 'right' ? <IconArrowBarRight /> : <IconArrowBarLeft />}
