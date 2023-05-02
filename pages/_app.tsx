@@ -33,7 +33,7 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
     });
 
     return () => subscription.unsubscribe();
-  }, [loading])
+  }, []);
 
   if (session) return (
     <div className={inter.className}>
