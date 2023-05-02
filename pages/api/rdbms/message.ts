@@ -9,10 +9,10 @@ import {
   RDBMSMessage,
   RDBMSUser,
 } from '../../../types/rdbms';
+import { Message } from '@/types/chat';
 
 import { authOptions } from '../auth/[...nextauth]';
 
-import { Message } from 'postcss';
 import { DataSource } from 'typeorm';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -58,6 +58,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .status(400)
         .json({ error: 'No message or conversationId provided' });
     }
+  }
+  if (req.method === 'PUT') {
+    const updatedMessage = body['message'] as Message;
+    const conversationId: string = body['conversation_id'];
+    if (updatedMessage && conversationId) {
+      return await rdbmsUpdateMessage(
+        res,
+        dataSource,
+        user,
+        updatedMessage,
+        conversationId,
+      );
+    } else {
+      return res
+        .status(400)
+        .json({ error: 'No message or conversationId provided' });
+    }
   } else if (req.method === 'DELETE') {
     const messageId: string = body['message_id'];
     if (messageId) {
@@ -95,6 +112,35 @@ const rdbmsCreateMessage = async (
     rdbmsMessage.content = newMessage.content;
     rdbmsMessage.conversation = rdbmsConversation;
 
+    await messageRepo.save(rdbmsMessage);
+    await dataSource.destroy();
+    return res.status(200).json({
+      OK: true,
+    });
+  }
+
+  await dataSource.destroy();
+  return res.status(500).send({
+    error: 'Conversation not found',
+  });
+};
+
+const rdbmsUpdateMessage = async (
+  res: NextApiResponse,
+  dataSource: DataSource,
+  user: RDBMSUser,
+  updatedMessage: Message,
+  conversationId: string,
+) => {
+  const messageRepo = dataSource.getRepository(RDBMSMessage);
+  const rdbmsMessage = await messageRepo.findOneBy({
+    user: { id: user.id },
+    id: updatedMessage.id,
+    conversation: { id: conversationId },
+  });
+
+  if (rdbmsMessage) {
+    rdbmsMessage.content = updatedMessage.content;
     await messageRepo.save(rdbmsMessage);
     await dataSource.destroy();
     return res.status(200).json({

@@ -18,7 +18,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Message } from '@/types/chat';
+import { Conversation, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -31,8 +31,12 @@ import { VariableModal } from './VariableModal';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
-  onRegenerate: () => void;
+  onSend: (
+    conversation: Conversation | undefined,
+    message: Message,
+    plugin: Plugin | null,
+  ) => void;
+  onRegenerate: (conversation: Conversation | undefined) => void;
   onScrollDownClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -100,13 +104,21 @@ export const ChatInput = ({
     }
 
     const messageId = uuidv4();
-    onSend({ id: messageId, role: 'user', content }, plugin);
+    onSend(
+      selectedConversation,
+      { id: messageId, role: 'user', content },
+      plugin,
+    );
     setContent('');
     setPlugin(null);
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
     }
+  };
+
+  const handleRegenerate = () => {
+    onRegenerate(selectedConversation);
   };
 
   const handleStopConversation = () => {
@@ -276,7 +288,7 @@ export const ChatInput = ({
           selectedConversation.messages.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-              onClick={onRegenerate}
+              onClick={handleRegenerate}
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>

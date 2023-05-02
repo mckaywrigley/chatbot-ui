@@ -9,34 +9,68 @@ import {
   rdbmsUpdateMessage,
 } from './rdbms/message';
 
-export const storageCreateMessage = async (
+export const storageCreateMessage = (
   storageType: StorageType,
-  conversationId: string,
-  message: Message,
-  updatedConversations: Conversation[],
+  selectedConversation: Conversation,
+  newMessage: Message,
+  allConversations: Conversation[],
 ) => {
+  const messages = selectedConversation.messages;
+  const updatedMessages = [...messages, newMessage];
+  const updatedConversation: Conversation = {
+    ...selectedConversation,
+    messages: updatedMessages,
+  };
+  const updatedConversations = allConversations.map((c) => {
+    if (c.id === updatedConversation.id) {
+      return updatedConversation;
+    }
+
+    return c;
+  });
+
   if (storageType === StorageType.COUCHDB) {
-    await couchdbSaveConversations(updatedConversations);
+    couchdbSaveConversations(updatedConversations);
   } else if (storageType === StorageType.RDBMS) {
-    await rdbmsCreateMessage(conversationId, message);
+    rdbmsCreateMessage(selectedConversation.id, newMessage);
   } else {
     localSaveConversations(updatedConversations);
   }
+
+  return { single: updatedConversation, all: updatedConversations };
 };
 
 export const storageUpdateMessage = (
   storageType: StorageType,
-  conversationId: string,
-  message: Message,
-  updatedConversations: Conversation[],
+  selectedConversation: Conversation,
+  updatedMessage: Message,
+  allConversations: Conversation[],
 ) => {
+  const messages = selectedConversation.messages;
+  const updatedMessages = messages.map((m) =>
+    m.id === updatedMessage.id ? updatedMessage : m,
+  );
+  const updatedConversation: Conversation = {
+    ...selectedConversation,
+    messages: updatedMessages,
+  };
+  const updatedConversations = allConversations.map((c) => {
+    if (c.id === updatedConversation.id) {
+      return updatedConversation;
+    }
+
+    return c;
+  });
+
   if (storageType === StorageType.COUCHDB) {
     couchdbSaveConversations(updatedConversations);
   } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdateMessage(conversationId, message);
+    rdbmsUpdateMessage(updatedConversation.id, updatedMessage);
   } else {
     localSaveConversations(updatedConversations);
   }
+
+  return { single: updatedConversation, all: updatedConversations };
 };
 
 export const storageDeleteMessage = (
