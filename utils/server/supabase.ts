@@ -50,7 +50,7 @@ export const getIntervalUsages = async (
 };
 
 export const addUsageEntry = async (
-  apiType: PluginID,
+  apiType: PluginID | "gpt-3.5",
   userId: string,
 ): Promise<void> => {
   const supabase = getAdminSupabaseClient();
