@@ -114,8 +114,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                         <td className="px-6 py-4">
                           {DefaultMonthlyCredits[PluginID.GPT4]}
                         </td>
-                        {/* TODO: Come up with a better mechanism to update this */}
-                        <td className="px-6 py-4">{gpt4Credit || DefaultMonthlyCredits[PluginID.GPT4]}</td>
+                        <td className={`px-6 py-4 ${gpt4Credit === 0 ? "text-red-400 font-semibold" : ""}`}>{gpt4Credit === null ? DefaultMonthlyCredits[PluginID.GPT4] : gpt4Credit}</td>
                         <td className="px-6 py-4 flex flex-col text-left">
                           {Object.entries(gpt4CreditPurchaseLinks).map(
                             ([key, value]) => (

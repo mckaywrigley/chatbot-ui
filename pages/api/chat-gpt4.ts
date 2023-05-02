@@ -36,7 +36,7 @@ const handler = async (req: Request): Promise<Response> => {
   if (!user || user.plan === 'free') return unauthorizedResponse;
 
   if (await hasUserRunOutOfCredits(data.user.id, PluginID.GPT4)) {
-    return new Response('Error', { status: 402, statusText: 'Run out of GPT-4 credit' });
+    return new Response('Error', { status: 402, statusText: 'Ran out of GPT-4 credit' });
   }
 
   try {
