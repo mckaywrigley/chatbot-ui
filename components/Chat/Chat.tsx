@@ -14,10 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics/dist/interactions';
 
 import { getEndpoint } from '@/utils/app/api';
-import {
-  saveConversation,
-  saveConversations
-} from '@/utils/app/conversation';
+import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
@@ -52,15 +49,18 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       loading,
       user,
       outputLanguage,
-      currentMessage
+      currentMessage,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  const setCurrentMessage = useCallback((message: Message) => {
-    homeDispatch({ field: 'currentMessage', value: message });
-  }, [homeDispatch]);
+  const setCurrentMessage = useCallback(
+    (message: Message) => {
+      homeDispatch({ field: 'currentMessage', value: message });
+    },
+    [homeDispatch],
+  );
 
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -74,15 +74,15 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const handleSend = useCallback(
     async (deleteCount = 0, overrideCurrentMessage?: Message) => {
       const message = overrideCurrentMessage || currentMessage;
-      
-      if(!message) return;
+
+      if (!message) return;
       const plugin = (message.pluginId && Plugins[message.pluginId]) || null;
 
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
-          
+
           for (let i = 0; i < deleteCount; i++) {
             updatedMessages.pop();
           }
@@ -121,7 +121,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             ...chatBody,
             messages: filteredChatBodyMessages,
           });
-        } else if (plugin.id === 'langchain-chat') {
+        } else {
           body = JSON.stringify(chatBody);
         }
         const controller = new AbortController();
@@ -130,6 +130,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           headers: {
             'Content-Type': 'application/json',
             'Output-Language': outputLanguage,
+            'user-token': user?.token || '',
           },
           signal: controller.signal,
           body,
@@ -138,6 +139,15 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
           toast.error(response.statusText);
+
+          // remove the last message from the conversation
+          homeDispatch({
+            field: 'selectedConversation',
+            value: {
+              ...selectedConversation,
+              messages: [...selectedConversation.messages],
+            },
+          });
           return;
         }
         const data = response.body;
@@ -346,7 +356,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                             content: prompt,
                             pluginId: null,
                           };
-                          
+
                           setCurrentMessage(message);
                           handleSend(0, message);
                           event('interaction', {
@@ -399,7 +409,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                         // discard edited message and the ones that come after then resend
                         handleSend(
                           selectedConversation?.messages.length - index,
-                          editedMessage
+                          editedMessage,
                         );
                       }}
                       displayFeedbackButton={
@@ -428,7 +438,12 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
               handleSend(0);
             }}
             onRegenerate={() => {
-              handleSend(2, selectedConversation?.messages[selectedConversation?.messages.length - 2])
+              handleSend(
+                2,
+                selectedConversation?.messages[
+                  selectedConversation?.messages.length - 2
+                ],
+              );
             }}
           />
         </>

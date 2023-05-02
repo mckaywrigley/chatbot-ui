@@ -13,6 +13,7 @@ import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics';
 
 import { updateConversation } from '@/utils/app/conversation';
+import { getPluginIcon } from '@/utils/app/ui';
 
 import { Conversation, Message } from '@/types/chat';
 
@@ -35,7 +36,7 @@ interface Props {
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, displayFeedbackButton, conversation, onEdit }) => {
+  ({ message, displayFeedbackButton, conversation, onEdit }) => {
     const { t } = useTranslation('chat');
 
     const {
@@ -140,12 +141,12 @@ export const ChatMessage: FC<Props> = memo(
         style={{ overflowWrap: 'anywhere' }}
       >
         <div className="relative m-auto flex gap-4 py-4 text-base md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
-          <div className="min-w-[40px] text-right font-bold">
+          <div className="min-w-[40px] text-center font-bold flex justify-center">
             {message.role === 'assistant' ? (
               message.pluginId ? (
-                <IconBrain size={30} />
+                getPluginIcon(message.pluginId, 28)
               ) : (
-                <IconRobot size={30} />
+                <IconRobot size={28} />
               )
             ) : (
               <IconUser size={30} />

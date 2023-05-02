@@ -43,6 +43,7 @@ import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
 import { ProfileModel } from '@/components/User/ProfileModel';
+import { UsageCreditModel } from '@/components/User/UsageCreditModel';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -85,6 +86,7 @@ const Home = ({
       temperature,
       showLoginSignUpModel,
       showProfileModel,
+      showUsageModel,
       user,
       isPaidUser,
       conversationLastSyncAt,
@@ -100,9 +102,7 @@ const Home = ({
     ({ signal }) => {
       if (!serverSideApiKeyIsSet) return null;
 
-      return getModels(
-        signal,
-      );
+      return getModels(signal);
     },
     { enabled: true, refetchOnMount: false },
   );
@@ -345,6 +345,7 @@ const Home = ({
               id: session.user.id,
               email: session.user.email,
               plan: userProfile.plan || 'free',
+              token: session.access_token,
             },
           });
         });
@@ -527,6 +528,13 @@ const Home = ({
                 session={session}
                 onClose={() =>
                   dispatch({ field: 'showProfileModel', value: false })
+                }
+              />
+            )}
+            {showUsageModel && session && (
+              <UsageCreditModel
+                onClose={() =>
+                  dispatch({ field: 'showUsageModel', value: false })
                 }
               />
             )}

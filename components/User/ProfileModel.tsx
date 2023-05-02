@@ -3,10 +3,11 @@ import { IconCheck } from '@tabler/icons-react';
 import { FC, Fragment, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
+import { event } from 'nextjs-google-analytics';
+
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Session } from '@supabase/supabase-js';
-import { event } from 'nextjs-google-analytics';
 
 type Props = {
   onClose: () => void;
@@ -27,8 +28,9 @@ const PlanDetail = {
       'Everything in free plan',
       'Priority response time',
       'Cloud sync',
+      'GPT-4 integration (Credit system)',
+      'AI image generation (Coming)',
       'Voice input (Coming)',
-      'GPT-4 integration (Coming)',
     ],
   },
 };
@@ -40,7 +42,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     handleUserLogout,
   } = useContext(HomeContext);
 
-  const upgradeLink = () => {
+  const upgradeLinkOnClick = () => {
     const paymentLink =
       process.env.NEXT_PUBLIC_ENV === 'production'
         ? 'https://buy.stripe.com/8wM8Av2DM0u99fWfZ1'
@@ -51,10 +53,33 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     event('Upgrade button clicked', {
       category: 'Engagement',
       label: 'Upgrade',
-      userEmail: userEmail
+      userEmail: userEmail || 'N/A',
     });
 
-    return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
+    window.open(
+      `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`,
+      '_blank',
+    );
+  };
+
+  const upgradeForOneMonthLinkOnClick = () => {
+    const paymentLink =
+      process.env.NEXT_PUBLIC_ENV === 'production'
+        ? 'https://buy.stripe.com/3csbMH7Y62Ch77O005'
+        : 'https://buy.stripe.com/test_bIY6pTcvq52O60E4gh';
+    const userEmail = user?.email;
+    const userId = user?.id;
+
+    event('One month upgrade button clicked', {
+      category: 'Engagement',
+      label: 'Upgrade',
+      userEmail: userEmail || 'N/A',
+    });
+
+    window.open(
+      `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`,
+      '_blank',
+    );
   };
 
   const subscriptionManagementLink = () =>
@@ -68,7 +93,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
       <span>{t(feature)}</span>
     </div>
   );
-  
+
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose} open>
@@ -123,14 +148,24 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           ))}
                         </div>
                         {user?.plan === 'free' && (
-                          <a
-                            href={upgradeLink()}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm"
-                          >
-                            {t('Upgrade')}
-                          </a>
+                          <div className="flex flex-col">
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => upgradeLinkOnClick()}
+                              className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm cursor-pointer"
+                            >
+                              {t('Upgrade')}
+                            </a>
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => upgradeForOneMonthLinkOnClick()}
+                              className="px-4 py-2 border rounded-lg bg-neutral-300 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-2 text-center text-sm cursor-pointer"
+                            >
+                              {t('Upgrade for one month')}
+                            </a>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -151,6 +186,18 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           {t(' and cancel your subscription.')}
                         </p>
                       )}
+
+                      <p className="text-xs text-neutral-400 mt-2">
+                        {t('If you have any questions, please contact us at ')}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline cursor-pointer"
+                          href="mailto:jack@exploratorlabs.com"
+                        >
+                          jack@exploratorlabs.com
+                        </a>
+                      </p>
                     </div>
                   </div>
                 </Dialog.Description>
