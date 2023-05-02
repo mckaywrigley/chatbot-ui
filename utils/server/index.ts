@@ -43,6 +43,8 @@ export const OpenAIStream = async (
       ? process.env.OPENAI_API_GPT_4_KEY
       : process.env.OPENAI_API_KEY;
 
+  const isGPT4Model = model.id === OpenAIModelID.GPT_4;
+
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -58,7 +60,7 @@ export const OpenAIStream = async (
         },
         ...normalizeMessages(messages),
       ],
-      max_tokens: 1000,
+      max_tokens: isGPT4Model ? 2000 : 800,
       temperature: temperature,
       stream: true,
     }),
