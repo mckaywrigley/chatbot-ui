@@ -3,10 +3,11 @@ import { IconCheck } from '@tabler/icons-react';
 import { FC, Fragment, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
+import { event } from 'nextjs-google-analytics';
+
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Session } from '@supabase/supabase-js';
-import { event } from 'nextjs-google-analytics';
 
 type Props = {
   onClose: () => void;
@@ -51,7 +52,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     event('Upgrade button clicked', {
       category: 'Engagement',
       label: 'Upgrade',
-      userEmail: userEmail || "N/A"
+      userEmail: userEmail || 'N/A',
     });
 
     window.open(
@@ -71,7 +72,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
       <span>{t(feature)}</span>
     </div>
   );
-  
+
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose} open>
@@ -154,6 +155,18 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           {t(' and cancel your subscription.')}
                         </p>
                       )}
+
+                      <p className="text-xs text-neutral-400 mt-2">
+                        {t('If you have any questions, please contact us at ')}
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline cursor-pointer"
+                          href="mailto:jack@exploratorlabs.com"
+                        >
+                          jack@exploratorlabs.com
+                        </a>
+                      </p>
                     </div>
                   </div>
                 </Dialog.Description>
