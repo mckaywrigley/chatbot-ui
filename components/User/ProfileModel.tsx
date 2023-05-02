@@ -40,7 +40,7 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     handleUserLogout,
   } = useContext(HomeContext);
 
-  const upgradeLink = () => {
+  const upgradeLinkOnClick = () => {
     const paymentLink =
       process.env.NEXT_PUBLIC_ENV === 'production'
         ? 'https://buy.stripe.com/8wM8Av2DM0u99fWfZ1'
@@ -51,10 +51,13 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     event('Upgrade button clicked', {
       category: 'Engagement',
       label: 'Upgrade',
-      userEmail: userEmail
+      userEmail: userEmail || "N/A"
     });
 
-    return `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`;
+    window.open(
+      `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`,
+      '_blank',
+    );
   };
 
   const subscriptionManagementLink = () =>
@@ -124,10 +127,10 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                         </div>
                         {user?.plan === 'free' && (
                           <a
-                            href={upgradeLink()}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm"
+                            onClick={() => upgradeLinkOnClick()}
+                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm cursor-pointer"
                           >
                             {t('Upgrade')}
                           </a>
