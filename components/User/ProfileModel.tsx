@@ -62,6 +62,26 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
     );
   };
 
+  const upgradeForOneMonthLinkOnClick = () => {
+    const paymentLink =
+      process.env.NEXT_PUBLIC_ENV === 'production'
+        ? 'https://buy.stripe.com/3csbMH7Y62Ch77O005'
+        : 'https://buy.stripe.com/test_bIY6pTcvq52O60E4gh';
+    const userEmail = user?.email;
+    const userId = user?.id;
+
+    event('One month upgrade button clicked', {
+      category: 'Engagement',
+      label: 'Upgrade',
+      userEmail: userEmail || 'N/A',
+    });
+
+    window.open(
+      `${paymentLink}?prefilled_email=${userEmail}&client_reference_id=${userId}`,
+      '_blank',
+    );
+  };
+
   const subscriptionManagementLink = () =>
     process.env.NEXT_PUBLIC_ENV === 'production'
       ? 'https://billing.stripe.com/p/login/5kAbMj0wt5VF6AwaEE'
@@ -128,14 +148,24 @@ export const ProfileModel: FC<Props> = ({ onClose }) => {
                           ))}
                         </div>
                         {user?.plan === 'free' && (
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={() => upgradeLinkOnClick()}
-                            className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm cursor-pointer"
-                          >
-                            {t('Upgrade')}
-                          </a>
+                          <div className="flex flex-col">
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => upgradeLinkOnClick()}
+                              className="px-4 py-2 border rounded-lg bg-neutral-100 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-4 text-center text-sm cursor-pointer"
+                            >
+                              {t('Upgrade')}
+                            </a>
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => upgradeForOneMonthLinkOnClick()}
+                              className="px-4 py-2 border rounded-lg bg-neutral-300 shadow border-neutral-500 text-neutral-700 hover:bg-white focus:outline-none mt-2 text-center text-sm cursor-pointer"
+                            >
+                              {t('Upgrade for one month')}
+                            </a>
+                          </div>
                         )}
                       </div>
                     </div>
