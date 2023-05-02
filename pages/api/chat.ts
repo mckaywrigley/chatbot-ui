@@ -1,15 +1,10 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { shortenMessagesBaseOnTokenLimit } from '@/utils/server/api';
 import { retrieveUserSessionAndLogUsages } from '@/utils/server/usagesTracking';
 
-import { ChatBody, Message } from '@/types/chat';
-
-// @ts-expect-error
-import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
-
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
+import { ChatBody } from '@/types/chat';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 export const config = {
   runtime: 'edge',
@@ -19,15 +14,11 @@ const handler = async (req: Request): Promise<Response> => {
   retrieveUserSessionAndLogUsages(req);
 
   try {
-    const selectedOutputLanguage = req.headers.get('Output-Language') ? `{lang=${req.headers.get('Output-Language')}}` : '';
-    const { model, messages, prompt, temperature } = (await req.json()) as ChatBody;
-
-    await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str,
-    );
+    const selectedOutputLanguage = req.headers.get('Output-Language')
+      ? `{lang=${req.headers.get('Output-Language')}}`
+      : '';
+    const { model, messages, prompt, temperature } =
+      (await req.json()) as ChatBody;
 
     let promptToSend = prompt;
     if (!promptToSend) {
@@ -39,30 +30,26 @@ const handler = async (req: Request): Promise<Response> => {
       temperatureToUse = DEFAULT_TEMPERATURE;
     }
 
-    const prompt_tokens = encoding.encode(promptToSend);
+    const messagesToSend = await shortenMessagesBaseOnTokenLimit(
+      prompt,
+      messages,
+      model.tokenLimit,
+    );
 
-    let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
-
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
-        break;
-      }
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
+    if (selectedOutputLanguage) {
+      messagesToSend[
+        messagesToSend.length - 1
+      ].content = `${selectedOutputLanguage} ${
+        messagesToSend[messagesToSend.length - 1].content
+      }`;
     }
 
-    encoding.free();
-
-    if (selectedOutputLanguage){
-      messagesToSend[messagesToSend.length - 1].content = `${selectedOutputLanguage} ${messagesToSend[messagesToSend.length - 1].content}`;
-    }
-
-    // Only allow GPT-3.5 on this endpoint
-    const stream = await OpenAIStream(OpenAIModels[OpenAIModelID.GPT_3_5], promptToSend, temperatureToUse, messagesToSend);
+    const stream = await OpenAIStream(
+      OpenAIModels[OpenAIModelID.GPT_3_5],
+      promptToSend,
+      temperatureToUse,
+      messagesToSend,
+    );
 
     return new Response(stream);
   } catch (error) {

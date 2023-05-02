@@ -1,5 +1,6 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { shortenMessagesBaseOnTokenLimit } from '@/utils/server/api';
 import {
   addUsageEntry,
   getAdminSupabaseClient,
@@ -8,15 +9,9 @@ import {
   subtractCredit,
 } from '@/utils/server/supabase';
 
-import { ChatBody, Message } from '@/types/chat';
+import { ChatBody } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { PluginID } from '@/types/plugin';
-
-// @ts-expect-error
-import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
-
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 
 const supabase = getAdminSupabaseClient();
 
@@ -36,7 +31,10 @@ const handler = async (req: Request): Promise<Response> => {
   if (!user || user.plan === 'free') return unauthorizedResponse;
 
   if (await hasUserRunOutOfCredits(data.user.id, PluginID.GPT4)) {
-    return new Response('Error', { status: 402, statusText: 'Ran out of GPT-4 credit' });
+    return new Response('Error', {
+      status: 402,
+      statusText: 'Ran out of GPT-4 credit',
+    });
   }
 
   try {
@@ -44,43 +42,23 @@ const handler = async (req: Request): Promise<Response> => {
       ? `{lang=${req.headers.get('Output-Language')}}`
       : '';
 
-    const { model, messages, prompt, temperature } =
-      (await req.json()) as ChatBody;
-
-    await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str,
-    );
+    const { messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     let promptToSend = prompt;
     if (!promptToSend) {
       promptToSend = DEFAULT_SYSTEM_PROMPT;
     }
-
+    
     let temperatureToUse = temperature;
     if (temperatureToUse == null) {
       temperatureToUse = DEFAULT_TEMPERATURE;
     }
 
-    const prompt_tokens = encoding.encode(promptToSend);
-
-    let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
-
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
-        break;
-      }
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
-    }
-
-    encoding.free();
+    const messagesToSend = await shortenMessagesBaseOnTokenLimit(
+      prompt,
+      messages,
+      OpenAIModels['gpt-4'].tokenLimit,
+    );
 
     if (selectedOutputLanguage) {
       messagesToSend[
