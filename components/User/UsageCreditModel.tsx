@@ -83,7 +83,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
               <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200">
                 <div className="mb-3">
                   {t(
-                    'As a Pro plan customer, you will receive the monthly credits on the 1st day of every month to use our custom modes.',
+                    'As a Pro plan customer, you will receive the monthly credits on the 1st day of every month to use our custom modes. If you need more credits, you can purchase them below.',
                   )}
                 </div>
 
