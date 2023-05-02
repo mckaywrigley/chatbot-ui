@@ -111,13 +111,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
-    const answerMessageId = uuidv4();
-    const answerMessage: Message = {
-      id: answerMessageId,
-      role: 'user',
-      content: answerPrompt,
-    };
-
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +127,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             role: 'system',
             content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link), etc, as you use them. Maximum 4 sentences.`,
           },
-          answerMessage,
+          {
+            role: 'user',
+            content: answerPrompt,
+          },
         ],
         max_tokens: 1000,
         temperature: 1,
