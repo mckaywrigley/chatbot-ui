@@ -48,7 +48,7 @@ const handler = async (req: NextRequest, res: any) => {
     handleChainStart: async () => {
       console.log('handleChainStart');
       await writer.ready;
-      await writeToStream('```Enhance mode \n');
+      await writeToStream('```Online \n');
       await writeToStream('Thinking ... \n\n');
     },
     handleAgentAction: async (action) => {
@@ -186,7 +186,7 @@ const handler = async (req: NextRequest, res: any) => {
 };
 
 const normalizeTextAnswer = (text: string) => {
-  const mindlogRegex = /```Mindlog \n(.|\n)*```/g;
+  const mindlogRegex = /```Online \n(.|\n)*```/g;
   return text.replace(mindlogRegex, '');
 };
 
