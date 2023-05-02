@@ -118,3 +118,6 @@ export const OpenAIStream = async (
 
   return stream;
 };
+
+// Truncate log message to 4000 characters
+export const truncateLogMessage = (message: string) => message.length > 4000 ? `${message.slice(0, 4000)}...` : message;
