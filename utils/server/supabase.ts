@@ -83,7 +83,7 @@ export const getUserCredits = async (
     return data[0];
   } else {
     await addUserCreditsEntry(userId, apiType);
-    return await getUserCredits(userId, apiType);
+    return DefaultMonthlyCredits[apiType];
   }
 };
 
@@ -94,17 +94,18 @@ export const updateUserCredits = async (
   newBalance: number,
 ): Promise<void> => {
   const supabase = getAdminSupabaseClient();
-  const { count, error } = await supabase
+  const { data: userCreditEntries, error } = await supabase
     .from('user_credits')
     .update({ balance: newBalance, last_updated: new Date().toISOString() })
     .eq('user_id', userId)
-    .eq('api_type', apiType);
+    .eq('api_type', apiType)
+    .select();
 
   if (error) {
     throw error;
   }
-
-  if (!count || count === 0) {
+  
+  if (!userCreditEntries || userCreditEntries.length === 0) {
     await addUserCreditsEntry(userId, apiType);
   }
 };
