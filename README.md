@@ -23,7 +23,7 @@ Expect frequent improvements.
 
 Host your own live version of Chatbot UI with Vercel.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?demo-title=Chatbot%20UI&demo-description=A%20ChatGPT%20clone%20for%20running%20locally%20in%20your%20browser.&demo-url=https%3A%2F%2Fwww.chatbotui.com%2F&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F6FJ1C5sx0tkDYhbeDapiu9%2Fe0798762841a872412950aea43369c7c%2Fscreenshot.png&project-name=Chatbot%20UI&repository-name=chatbot-ui&repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui&from=templates&skippable-integrations=1&env=OPENAI_API_KEY&envDescription=Get%20your%20OpenAI%20API%20key%3A&envLink=https%3A%2F%2Fplatform.openai.com%2Faccount%2Fapi-keys)
 
 **Docker**
 
