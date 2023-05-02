@@ -235,9 +235,16 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             return conversation;
           },
         );
+
+        // If the conversation is new, add it to the list of conversations
+        if(!updatedConversations.find((conversation) => conversation.id === updatedConversation.id)) {
+          updatedConversations.push(updatedConversation);
+        }
+        
         if (updatedConversations.length === 0) {
           updatedConversations.push(updatedConversation);
         }
+        
         homeDispatch({ field: 'conversations', value: updatedConversations });
         saveConversations(updatedConversations);
         homeDispatch({ field: 'messageIsStreaming', value: false });

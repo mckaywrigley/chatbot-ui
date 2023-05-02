@@ -9,6 +9,7 @@ import { DynamicTool } from 'langchain/tools';
 import { create, all } from 'mathjs';
 import { retrieveUserSessionAndLogUsages } from '@/utils/server/usagesTracking';
 import { PluginID } from '@/types/plugin';
+import { truncateLogMessage } from '@/utils/server';
 
 export const config = {
   runtime: 'edge',
@@ -99,14 +100,12 @@ const handler = async (req: NextRequest, res: any) => {
         await writeToStream(
           `Sorry, I am not able to answer your question. \n\n`,
         );
-        console.log('Chain Error: ', err.message);
-        console.error(err, verbose);
+        console.log('Chain Error: ', truncateLogMessage(err.message));
       }
       await writer.abort(err);
     },
     handleToolError: async (err, verbose) => {
-      console.log('Tool Error: ', err.message);
-      console.error(err, verbose);
+      console.log('Tool Error: ', truncateLogMessage(err.message));
     },
   });
 
