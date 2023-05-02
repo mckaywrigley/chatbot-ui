@@ -16,9 +16,9 @@ type Props = {
 };
 
 const gpt4CreditPurchaseLinks = {
-  '50': 'https://buy.stripe.com/7sI9EzguC0u9ak0bIO',
-  '150': 'https://buy.stripe.com/7sI3gb3HQ2Chbo45kr',
-  '300': 'https://buy.stripe.com/eVa5oj7Y6b8Ncs814c',
+  '50': 'https://buy.stripe.com/28o03Z0vE3Glak09AJ',
+  '150': 'https://buy.stripe.com/cN2dUP6U2dgV0JqcMW',
+  '300': 'https://buy.stripe.com/dR6g2Xemu5Otcs83cn',
 };
 
 export const UsageCreditModel: FC<Props> = ({ onClose }) => {
@@ -32,6 +32,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
   const supabaseClient = useMemo(() => createBrowserSupabaseClient(), []);
 
   const userId = user?.id;
+  const userEmail = user?.email;
 
   useEffect(() => {
     if (!userId || !supabaseClient) return;
@@ -119,7 +120,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                           {Object.entries(gpt4CreditPurchaseLinks).map(
                             ([key, value]) => (
                               <a
-                                href={value}
+                                href={`${value}?prefilled_email=${userEmail}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="font-medium text-blue-600 dark:text-blue-500 hover:underline mb-1.5"
