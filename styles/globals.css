@@ -41,3 +41,7 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+.auth-sign-in {
+  background-color: whitesmoke;
+}
