@@ -5,17 +5,18 @@ import {
 } from '@tabler/icons-react';
 import { PluginID } from '@/types/plugin';
 
-export const getPluginIcon = (pluginId: string | undefined | null) => {
+export const getPluginIcon = (pluginId: string | undefined | null, iconSize?: number) => {
+  const size = iconSize || 20;
   if (!pluginId) {
     return <IconBolt size={20} />;
   }
 
   switch (pluginId) {
     case PluginID.LANGCHAIN_CHAT:
-      return <IconBrain size={26} />;
+      return <IconBrain size={size} />;
     case PluginID.GPT4:
-      return <IconNumber4 size={20} />;
+      return <IconNumber4 size={size} />;
     default:
-      return <IconBolt size={20} />;
+      return <IconBolt size={size} />;
   }
 };
