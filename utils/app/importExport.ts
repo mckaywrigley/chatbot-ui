@@ -76,16 +76,30 @@ function createFilename(kind: string, extension: string): string {
 
 export const exportMarkdown = () => {
   const conversations = JSON.parse(localStorage.getItem('conversationHistory') || []);
+  const folders = JSON.parse(localStorage.getItem('folders') || []);
   const zip = new Zip();
 
+  // add folders as directories
+  for (const folder of folders) {
+    zip.addFile(`${folder.name}/`, null);
+  }
+
+  // Filter "chat" type folders and create an object with ids as keys and names as values
+  const chatFolderNames: { [id: string]: string } = folders
+    .filter((folder) => folder.type === "chat")
+    .reduce((accumulator, folder) => {
+      accumulator[folder.id] = folder.name;
+      return accumulator;
+    }, {});
+
+  // add conversations as Markdown files
   for (const conversation of conversations) {
     let markdownContent = '';
-
     for (const message of conversation.messages) {
       markdownContent += `## ${message.role.charAt(0).toUpperCase() + message.role.slice(1)}\n\n${message.content}\n\n`;
     }
-
-    zip.addFile(`${conversation.name}.md`, markdownContent);
+    const directory = conversation.folderId in chatFolderNames ? chatFolderNames[conversation.folderId] + '/' : '';
+    zip.addFile(`${directory}${conversation.name}.md`, markdownContent);
   }
 
   const zipDownload = zip.toBuffer();
