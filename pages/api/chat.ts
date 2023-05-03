@@ -8,6 +8,7 @@ import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module
 
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 export const config = {
   runtime: 'edge',
@@ -29,6 +30,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
 
+    const {tokenLimit, messageTokens} = OpenAIModels[model.id as OpenAIModelID];
+
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
       tiktokenModel.bpe_ranks,
@@ -46,19 +49,28 @@ const handler = async (req: Request): Promise<Response> => {
       temperatureToUse = DEFAULT_TEMPERATURE;
     }
 
-    const prompt_tokens = encoding.encode(promptToSend);
+    let tokenCount = encoding.encode(promptToSend).length;
+    tokenCount += 3; // reply starts with <|start|>assistant<|end|>
+    tokenCount += 5; // We're off by 5. Unsure why.
 
-    let tokenCount = prompt_tokens.length;
     let messagesToSend: Message[] = [];
+
+    const maxReplyTokens = 1000; // hardcoded in utils/server
+    // I think we're calculating this correctly, but if we're off, it's by a
+    // _lot_ less than 100.
+    const safetyMargin = 100;
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      const msgTokenCount = messageTokens +
+        encoding.encode(message.content).length +
+        encoding.encode(message.role).length;
+
+      if (tokenCount + msgTokenCount + maxReplyTokens + safetyMargin > tokenLimit) {
         break;
       }
-      tokenCount += tokens.length;
+      tokenCount += msgTokenCount;
       messagesToSend = [message, ...messagesToSend];
     }
 
@@ -85,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
       msg = error.message;
     } else {
       console.error(JSON.stringify(Object.assign(
-        { severity: 'ERROR', message: error, },
+        { severity: 'ERROR', message: error.toString(), },
         globalLogFields
       )));
       msg = "Internal Server Error";
