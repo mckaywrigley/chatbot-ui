@@ -45,3 +45,5 @@ pre:has(div.codeblock) {
 .auth-sign-in {
   background-color: whitesmoke;
 }
+
+@import "./_app.css";

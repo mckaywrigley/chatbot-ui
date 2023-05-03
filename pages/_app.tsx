@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { appWithTranslation } from 'next-i18next';
+import { appWithTranslation, useTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import { Session, createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -45,16 +45,18 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
       </QueryClientProvider>
     </div>
   );
-
   return (
-    <Auth
-      appearance={{ theme: ThemeSupa, style: { container: { backgroundColor: "whitesmoke" } } }}
-      magicLink={true}
-      redirectTo={process.env.NEXT_PUBLIC_SUPABASE_REDIRECT!}
-      showLinks={false}
-      supabaseClient={supabaseClient}
-      view='magic_link'
-    />
+    <div
+      className="app__auth">
+      <Auth
+        appearance={{ theme: ThemeSupa }}
+        magicLink={true}
+        redirectTo={process.env.NEXT_PUBLIC_SUPABASE_REDIRECT!}
+        showLinks={false}
+        supabaseClient={supabaseClient}
+        view='magic_link'
+      />
+      </div>
   );
 }
 

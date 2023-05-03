@@ -1,0 +1,32 @@
+.app__auth {
+  width: 100%;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 16px;
+}
+.app__auth h1 {
+  font-size: 1.5rem;
+  color: aliceblue;
+  text-align: left;
+  width: 100%;
+  max-width: 500px;
+}
+
+.app__auth div {
+  width: 100%;
+  max-width: 500px;
+}
+.app__auth .supabase-auth-ui_ui-container .supabase-auth-ui_ui-label {
+  color: rgba(240, 248, 255, 0.881);
+}
+.app__auth .supabase-auth-ui_ui-container input {
+  color: aliceblue;
+}
+
+.app__auth .supabase-auth-ui_ui-container .supabase-auth-ui_ui-message {
+  color: aliceblue;
+}
