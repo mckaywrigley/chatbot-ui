@@ -21,6 +21,10 @@ export class OpenAIError extends Error {
     this.param = param;
     this.code = code;
   }
+
+  toString() {
+    return `${this.name}: ${this.message} (type: ${this.type}, param: ${this.param}, code: ${this.code})`;
+  }
 }
 
 export const OpenAIStream = async (

@@ -56,11 +56,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(stream);
   } catch (error) {
-    console.error(error);
     let msg = null;
     if (error instanceof OpenAIError) {
+      console.error(error.toString());
       msg = error.message;
     } else {
+      console.error(error);
       msg = "Internal Server Error";
     }
     return new Response(
