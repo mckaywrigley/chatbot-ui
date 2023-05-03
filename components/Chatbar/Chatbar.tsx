@@ -137,6 +137,11 @@ export const Chatbar = () => {
     saveFolders(updatedFolders);
   };
 
+  const handleLogOut = () => {
+    localStorage.clear();
+    window.location.reload();
+  }
+
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = conversations.filter(
       (c) => c.id !== conversation.id,
@@ -217,6 +222,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handleLogOut,
       }}
     >
       <Sidebar<Conversation>

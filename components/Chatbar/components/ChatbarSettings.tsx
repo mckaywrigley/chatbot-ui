@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconSettings, IconLogout } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -34,6 +34,7 @@ export const ChatbarSettings = () => {
     handleImportConversations,
     handleExportData,
     handleApiKeyChange,
+    handleLogOut
   } = useContext(ChatbarContext);
 
   return (
@@ -54,6 +55,12 @@ export const ChatbarSettings = () => {
         text={t('Settings')}
         icon={<IconSettings size={18} />}
         onClick={() => setIsSettingDialog(true)}
+      />
+
+      <SidebarButton
+        text={t('Logout')}
+        icon={<IconLogout size={18} />}
+        onClick={() => handleLogOut()}
       />
 
       {!serverSideApiKeyIsSet ? (
