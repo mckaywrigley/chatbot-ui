@@ -97,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
       msg = error.message;
     } else {
       console.error(JSON.stringify(Object.assign(
-        { severity: 'ERROR', message: error.toString(), },
+        { severity: 'ERROR', message: String(error), },
         globalLogFields
       )));
       msg = "Internal Server Error";
