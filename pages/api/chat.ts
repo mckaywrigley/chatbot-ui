@@ -1,68 +1,60 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError } from '@/utils/server';
+import { ChatBody } from '@/types/chat';
+import { pinecone } from '@/utils/pinecone/pinecone-client';
+import { PINECONE_INDEX_NAME } from '@/utils/pinecone/pinecone';
+import { PineconeStore } from 'langchain/vectorstores/pinecone';
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { makeChain } from '@/utils/pinecone/makechain';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { ChatBody, Message } from '@/types/chat';
-
-// @ts-expect-error
-import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
-
-import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
-import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
-
-export const config = {
-  runtime: 'edge',
-};
-
-const handler = async (req: Request): Promise<Response> => {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { messages, model, namespace, prompt, temperature } = req.body as ChatBody;
 
-    await init((imports) => WebAssembly.instantiate(wasm, imports));
-    const encoding = new Tiktoken(
-      tiktokenModel.bpe_ranks,
-      tiktokenModel.special_tokens,
-      tiktokenModel.pat_str,
-    );
+    // OpenAI recommends replacing newlines with spaces for best results
+    const sanitizedMessages = messages.map(message => ({
+      ...message,
+      content: message.content.trim().replaceAll(`\n`, ` `),
+    }));
 
-    let promptToSend = prompt;
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
+    try {
+      const index = pinecone.Index(PINECONE_INDEX_NAME);
+
+      /* create vectorstore*/
+      const vectorStore = await PineconeStore.fromExistingIndex(
+        new OpenAIEmbeddings({}),
+        {
+          pineconeIndex: index,
+          textKey: 'text',
+          namespace
+        },
+      );
+
+      //create chain
+      const chain = makeChain({
+        modelName: model.id,
+        prompt,
+        temperature,
+        vectorStore
+      });
+
+      //Ask a question using chat history
+      const response = await chain.call({
+        question: sanitizedMessages[sanitizedMessages.length - 1].content,
+        chat_history: sanitizedMessages.map(message => message.content),
+      });
+
+      return res.status(200).send(response.text);
+    } catch (error: any) {
+      console.log({ error });
+      return res.status(500).statusMessage = error.message || 'Something went wrong';
     }
-
-    let temperatureToUse = temperature;
-    if (temperatureToUse == null) {
-      temperatureToUse = DEFAULT_TEMPERATURE;
-    }
-
-    const prompt_tokens = encoding.encode(promptToSend);
-
-    let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
-
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
-        break;
-      }
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
-    }
-
-    encoding.free();
-
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
-
-    return new Response(stream);
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      return res.status(500).statusMessage = error.message;
     } else {
-      return new Response('Error', { status: 500 });
+      return res.status(500).statusMessage = 'Error';
     }
   }
 };
-
-export default handler;
