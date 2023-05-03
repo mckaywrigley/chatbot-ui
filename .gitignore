@@ -38,5 +38,3 @@ yarn-error.log*
 next-env.d.ts
 .idea
 pnpm-lock.yaml
-
-.vscode
