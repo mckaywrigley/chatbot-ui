@@ -361,12 +361,13 @@ const Home = ({
     >
       <Head>
         <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
+        <meta name="description" content="Coara Chat powered by GPT." />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
         />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
       </Head>
       {selectedConversation && (
         <main
