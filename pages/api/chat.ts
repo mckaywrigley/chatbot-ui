@@ -14,6 +14,18 @@ export const config = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  const globalLogFields: Record<string, string> = {};
+
+  if (typeof req !== 'undefined') {
+    const traceHeader = req.headers.get('X-Cloud-Trace-Context');
+      if (traceHeader && Boolean(process.env.GCP_PROJECT)) {
+      const [trace] = traceHeader.split('/');
+      globalLogFields[
+        'logging.googleapis.com/trace'
+      ] = `projects/${process.env.GCP_PROJECT}/traces/${trace}`;
+    }
+  }
+
   try {
     const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
 
@@ -57,13 +69,28 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(stream);
   } catch (error) {
     let msg = null;
+
     if (error instanceof OpenAIError) {
-      console.error(error.toString());
+      console.error(JSON.stringify(Object.assign(
+        {
+          severity: 'ERROR',
+          message: error.message,
+          name: error.name,
+          type: error.type,
+          param: error.param,
+          code: error.code,
+        },
+        globalLogFields
+      )));
       msg = error.message;
     } else {
-      console.error(error);
+      console.error(JSON.stringify(Object.assign(
+        { severity: 'ERROR', message: error, },
+        globalLogFields
+      )));
       msg = "Internal Server Error";
     }
+
     return new Response(
       JSON.stringify({ error: msg }),
       { status: 500, headers: { 'Content-Type': 'application/json' }},
