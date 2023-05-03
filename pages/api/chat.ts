@@ -57,11 +57,16 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(stream);
   } catch (error) {
     console.error(error);
+    let msg = null;
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      msg = error.message;
     } else {
-      return new Response('Error', { status: 500 });
+      msg = "Internal Server Error";
     }
+    return new Response(
+      JSON.stringify({ error: msg }),
+      { status: 500, headers: { 'Content-Type': 'application/json' }},
+    );
   }
 };
 

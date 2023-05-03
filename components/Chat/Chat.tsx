@@ -127,7 +127,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          const errorJson = await response.json();
+          const errorMessage = errorJson.error || 'An unexpected error occurred';
+          toast.error(errorMessage);
           return;
         }
         const data = response.body;
