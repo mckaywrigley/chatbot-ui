@@ -6,6 +6,7 @@ import HomeContext from '@/pages/api/home/home.context';
 import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken } from '@dqbd/tiktoken/lite';
 import BigNumber from 'bignumber.js';
+import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
 const PRICING: Record<string, BigNumber> = {
   'gpt-4': BigNumber('0.03').div(1000),
@@ -60,12 +61,17 @@ export function ChatInputTokenCount(props: { content: string | undefined }) {
   const pricing: BigNumber | undefined =
     PRICING[selectedConversation?.model.id || 'gpt-3.5-turbo'];
 
+
   if (pricing == null || count == null) return null;
+
+  const {tokenLimit} = OpenAIModels[selectedConversation?.model.id as OpenAIModelID];
+  const cappedCount = count > (tokenLimit || 0) ? tokenLimit : count;
+
   return (
     <div className="bg-opacity-10 bg-neutral-300 rounded-full py-1 px-2 text-neutral-400 pointer-events-auto">
       {t('{{count}} tokens / ${{price}}', {
-        count,
-        price: pricing.multipliedBy(count).toFixed(),
+        count: cappedCount,
+        price: pricing.multipliedBy(cappedCount).toFixed(),
       })}
     </div>
   );
