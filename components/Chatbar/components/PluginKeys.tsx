@@ -52,11 +52,7 @@ export const PluginKeys = () => {
 
   return (
     <>
-      <SidebarButton
-        text={t('Plugin Keys')}
-        icon={<IconKey size={18} />}
-        onClick={() => setIsChanging(true)}
-      />
+
 
       {isChanging && (
         <div
