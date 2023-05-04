@@ -59,59 +59,62 @@ export const OpenAIStream = async (
       ],
       max_tokens: 1000,
       temperature: temperature,
-      stream: true,
     }),
   });
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
+  return res.json();
 
-  if (res.status !== 200) {
-    const result = await res.json();
-    if (result.error) {
-      throw new OpenAIError(
-        result.error.message,
-        result.error.type,
-        result.error.param,
-        result.error.code,
-      );
-    } else {
-      throw new Error(
-        `OpenAI API returned an error: ${
-          decoder.decode(result?.value) || result.statusText
-        }`,
-      );
-    }
-  }
+  // TODO: add back streaming when the python server is ready to send streaming events
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === 'event') {
-          const data = event.data;
+  // const encoder = new TextEncoder();
+  // const decoder = new TextDecoder();
 
-          try {
-            const json = JSON.parse(data);
-            if (json.choices[0].finish_reason != null) {
-              controller.close();
-              return;
-            }
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
-        }
-      };
+  // if (res.status !== 200) {
+  //   const result = await res.json();
+  //   if (result.error) {
+  //     throw new OpenAIError(
+  //       result.error.message,
+  //       result.error.type,
+  //       result.error.param,
+  //       result.error.code,
+  //     );
+  //   } else {
+  //     throw new Error(
+  //       `OpenAI API returned an error: ${
+  //         decoder.decode(result?.value) || result.statusText
+  //       }`,
+  //     );
+  //   }
+  // }
 
-      const parser = createParser(onParse);
+  // const stream = new ReadableStream({
+  //   async start(controller) {
+  //     const onParse = (event: ParsedEvent | ReconnectInterval) => {
+  //       if (event.type === 'event') {
+  //         const data = event.data;
 
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
-      }
-    },
-  });
+  //         try {
+  //           const json = JSON.parse(data);
+  //           if (json.choices[0].finish_reason != null) {
+  //             controller.close();
+  //             return;
+  //           }
+  //           const text = json.choices[0].delta.content;
+  //           const queue = encoder.encode(text);
+  //           controller.enqueue(queue);
+  //         } catch (e) {
+  //           controller.error(e);
+  //         }
+  //       }
+  //     };
 
-  return stream;
+  //     const parser = createParser(onParse);
+
+  //     for await (const chunk of res.body as any) {
+  //       parser.feed(decoder.decode(chunk));
+  //     }
+  //   },
+  // });
+
+  // return stream;
 };
