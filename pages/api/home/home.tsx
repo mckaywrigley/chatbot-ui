@@ -104,6 +104,7 @@ const Home = ({
   // FETCH MODELS ----------------------------------------------
 
   const handleSelectConversation = (conversation: Conversation) => {
+    setShowUploadUI(false);
     dispatch({
       field: 'selectedConversation',
       value: conversation,
