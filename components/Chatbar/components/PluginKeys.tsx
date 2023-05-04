@@ -35,7 +35,6 @@ export const PluginKeys = () => {
 
   useEffect(() => {
     if (pluginKeys) {
-      console.log(pluginKeys);
       // Google plugin keys
       const googleSearchPluginKey = pluginKeys.find(
         (p) => p.pluginId === PluginID.GOOGLE_SEARCH,

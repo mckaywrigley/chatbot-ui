@@ -417,7 +417,6 @@ const Home = ({
     const pluginKeys: PluginKey[] = pluginKeysRaw
       ? JSON.parse(pluginKeysRaw)
       : null;
-    console.log('pluginKeys', pluginKeys);
     if (serverSidePluginKeysSet) {
       dispatch({ field: 'pluginKeys', value: [] });
       localStorage.removeItem('pluginKeys');
