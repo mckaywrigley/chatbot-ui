@@ -183,7 +183,7 @@ const Home = ({
 
   const handleNewConversation = () => setShowUploadUI(true);
 
-  const onNewConversationCreated = ({ duplicate, namespace }: NewConversationArgs) => {
+  const onNewConversationCreated = ({ duplicate, name, namespace }: NewConversationArgs) => {
     if (duplicate) {
       toast.error(
         `You have already uploaded this content before, initiating a new conversation with that context`
@@ -194,7 +194,7 @@ const Home = ({
 
     const newConversation: Conversation = {
       id: uuidv4(),
-      name: t(`Conversation #${conversations.length + 1}`),
+      name: name || t(`Conversation #${conversations.length + 1}`),
       namespace,
       messages: [],
       model: lastConversation?.model || {

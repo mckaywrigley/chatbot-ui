@@ -29,5 +29,6 @@ export interface Conversation {
 
 export type NewConversationArgs = {
   duplicate: boolean;
+  name: string;
   namespace: string;
 }

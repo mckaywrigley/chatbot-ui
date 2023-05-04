@@ -9,6 +9,7 @@ interface IUploadForm extends HTMLFormElement {
 }
 
 interface IUploadFormControlsCollection extends HTMLFormControlsCollection {
+  name: HTMLTextAreaElement;
   links: HTMLTextAreaElement;
   pdfs: HTMLInputElement;
 }
@@ -19,6 +20,7 @@ type UploadProps = {
 };
 
 export function Upload({ onUploadComplete }: UploadProps) {
+  const nameInputId = useId();
   const linkInputId = useId();
   const linkInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -42,6 +44,7 @@ export function Upload({ onUploadComplete }: UploadProps) {
     event.preventDefault();
 
     event.currentTarget.elements.links.value = links.join(`,`);
+    const name = event.currentTarget.elements.name.value;
 
     await fetch(`/api/upload`, {
       body: new FormData(event.currentTarget),
@@ -56,6 +59,7 @@ export function Upload({ onUploadComplete }: UploadProps) {
 
         return {
           duplicate,
+          name,
           namespace,
         };
       })
@@ -92,14 +96,22 @@ export function Upload({ onUploadComplete }: UploadProps) {
     <div className="bg-white dark:bg-[#343541] flex-1 self-center min-h-screen flex justify-center items-center">
       <div className="h-full w-fit flex flex-col gap-8 items-center">
         <div className="flex flex-col gap-8 items-stretch">
-          <p className="text-lg">{t('Provide links and/or pdfs to parse')}</p>
+          <p className="text-center text-lg">{t('Provide links and/or pdfs to parse')}</p>
           {error && <p className="text-center text-red-500">{error}</p>}
           <form className="flex flex-col gap-12" onSubmit={handleSubmitAsync}>
             <fieldset className="flex flex-col items-stretch gap-6" disabled={uploading}>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
+                  <label className="text-center">{t('Name this conversation')}</label>
+                  <input
+                    className="flex-1 bg-transparent dark:bg-transparent rounded-md border border-neutral-600 bg-[#202123] px-2.5 py-2 text-[14px] leading-3 text-white"
+                    id={nameInputId}
+                    name="name"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
                   <label className="text-center" htmlFor={linkInputId}>
-                    {t('Enter links')}
+                    {t('Add links')}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -148,7 +160,7 @@ export function Upload({ onUploadComplete }: UploadProps) {
               </div>
               <div className="flex flex-col items-stretch gap-4">
                 <button
-                  className="cursor-pointer select-none items-center gap-3 rounded-md border-2 border-white/20 border-dashed p-20 text-white transition-colors duration-200 hover:bg-gray-500/10 disabled:opacity-50"
+                  className="cursor-pointer select-none items-center gap-3 rounded-md border-2 border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10 disabled:opacity-50"
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                 >
