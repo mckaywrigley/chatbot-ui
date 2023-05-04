@@ -203,12 +203,12 @@ export const ChatMessage: FC<Props> = memo(
                 )}
 
                 {!isEditing && (
-                  <div className="flex flex-row">
+                  <div className="flex flex-row mt-2 md:mt-0">
                     <button
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit mr-1`}
                       onClick={toggleEditing}
                     >
-                      <IconEdit size={18} />
+                      <IconEdit size={18} fill="none"/>
                     </button>
                     <button
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit`}
@@ -220,85 +220,85 @@ export const ChatMessage: FC<Props> = memo(
                 )}
               </div>
             ) : (
-              <>
-                <div
-                  className={`absolute ${
-                    window.innerWidth < 640
-                      ? 'bottom-1 right-3'
-                      : 'right-0 top-[26px] m-0'
-                  }`}
-                >
-                  {messagedCopied ? (
-                    <IconCheck
-                      size={20}
-                      className="text-green-500 dark:text-green-400"
-                    />
-                  ) : (
-                    <button
-                      className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
-                      onClick={copyOnClick}
-                    >
-                      <IconCopy size={20} />
-                    </button>
-                  )}
+              <div className="flex w-full flex-col md:flex-col md:justify-between">
+                <div className="flex flex-row">
+                  <MemoizedReactMarkdown
+                    className="prose dark:prose-invert"
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeMathjax]}
+                    components={{
+                      a({ node, children, href, ...props }) {
+                        return (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            {...props}
+                          >
+                            {children}
+                          </a>
+                        );
+                      },
+                      code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || '');
+                        return !inline ? (
+                          <CodeBlock
+                            key={Math.random()}
+                            language={(match && match[1]) || ''}
+                            value={String(children).replace(/\n$/, '')}
+                            {...props}
+                          />
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                      table({ children }) {
+                        return (
+                          <table className="border-collapse border border-black px-3 py-1 dark:border-white">
+                            {children}
+                          </table>
+                        );
+                      },
+                      th({ children }) {
+                        return (
+                          <th className="break-words border border-black bg-gray-500 px-3 py-1 text-white dark:border-white">
+                            {children}
+                          </th>
+                        );
+                      },
+                      td({ children }) {
+                        return (
+                          <td className="break-words border border-black px-3 py-1 dark:border-white">
+                            {children}
+                          </td>
+                        );
+                      },
+                    }}
+                  >
+                    {message.content}
+                  </MemoizedReactMarkdown>
+                  <div className="flex">
+                    {messagedCopied ? (
+                      <IconCheck
+                        size={20}
+                        className="text-green-500 dark:text-green-400 h-fit"
+                      />
+                    ) : (
+                      <button
+                        className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit"
+                        onClick={copyOnClick}
+                      >
+                        <IconCopy size={20} />
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <MemoizedReactMarkdown
-                  className="prose dark:prose-invert"
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeMathjax]}
-                  components={{
-                    a({ node, children, href, ...props }) {
-                      return (
-                        <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
-                          {children}
-                        </a>
-                      );
-                    },
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || '');
-                      return !inline ? (
-                        <CodeBlock
-                          key={Math.random()}
-                          language={(match && match[1]) || ''}
-                          value={String(children).replace(/\n$/, '')}
-                          {...props}
-                        />
-                      ) : (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
-                      );
-                    },
-                    table({ children }) {
-                      return (
-                        <table className="border-collapse border border-black px-3 py-1 dark:border-white">
-                          {children}
-                        </table>
-                      );
-                    },
-                    th({ children }) {
-                      return (
-                        <th className="break-words border border-black bg-gray-500 px-3 py-1 text-white dark:border-white">
-                          {children}
-                        </th>
-                      );
-                    },
-                    td({ children }) {
-                      return (
-                        <td className="break-words border border-black px-3 py-1 dark:border-white">
-                          {children}
-                        </td>
-                      );
-                    },
-                  }}
-                >
-                  {message.content}
-                </MemoizedReactMarkdown>
                 {displayFeedbackButton && (
                   <FeedbackContainer conversation={conversation} />
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>

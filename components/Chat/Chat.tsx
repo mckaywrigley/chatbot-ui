@@ -50,6 +50,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       user,
       outputLanguage,
       currentMessage,
+      messageIsStreaming
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -457,7 +458,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                       }}
                       displayFeedbackButton={
                         selectedConversation.messages.length - 1 === index &&
-                        !loading
+                        !messageIsStreaming
                       }
                       conversation={selectedConversation}
                     />
