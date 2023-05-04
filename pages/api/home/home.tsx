@@ -6,7 +6,6 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
@@ -181,15 +180,7 @@ const Home = ({
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => setShowUploadUI(true);
-
-  const onNewConversationCreated = ({ duplicate, name, namespace }: NewConversationArgs) => {
-    if (duplicate) {
-      toast.error(
-        `You have already uploaded this content before, initiating a new conversation with that context`
-      );
-    }
-
+  const createNewConversation = (name?: string, namespace?: string) => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -204,7 +195,7 @@ const Home = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: namespace ? DEFAULT_TEMPERATURE : lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
@@ -219,6 +210,23 @@ const Home = ({
     saveConversations(updatedConversations);
 
     dispatch({ field: 'loading', value: false });
+  }
+
+  const handleNewConversation = (forTargetedChat: boolean) => {
+    if (forTargetedChat) {
+      setShowUploadUI(true);
+    } else {
+      createNewConversation();
+    }
+  }
+
+  const onNewConversationCreated = ({ duplicate, namespace, name }: NewConversationArgs) => {
+    if (duplicate) {
+      toast.error(
+        `You have already uploaded this content before, initiating a new conversation with that context`
+      );
+    }
+    createNewConversation(name, namespace);
     setShowUploadUI(false);
   };
 
@@ -375,7 +383,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>Chatty Help</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
@@ -398,7 +406,7 @@ const Home = ({
             <Chatbar />
 
             <div className="flex flex-1">
-              {showUploadUI 
+              {showUploadUI
                 ? <Upload
                     newConversationName={t(`Conversation #${conversations.length + 1}`)}
                     onUploadComplete={onNewConversationCreated}
