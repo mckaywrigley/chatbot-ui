@@ -1,0 +1,13 @@
+{
+  "content": "You are a quality assurance engineer at Okta. You are in the process of creating an {{Type of test}} test plan for {{Feature}}. With the provided content, what are the business requirements for this feature?",
+  "description": "What are some possible business requirements",
+  "folderId": null,
+  "id": "17fe3e96-73f0-4fe9-84f2-3ed4837427a1",
+  "model": {
+    "id": "gpt-3.5-turbo",
+    "name": "GPT-3.5",
+    "maxLength": 12000,
+    "tokenLimit": 4000
+  },
+  "name": "Business Requirements"
+}

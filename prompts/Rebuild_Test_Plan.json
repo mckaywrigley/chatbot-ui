@@ -1,0 +1,13 @@
+{
+  "id": "52909371-f8e8-4d15-8344-d6a006a64df7",
+  "name": "Rebuild Test Plan",
+  "description": "Test",
+  "content": "I am ready to rebuild the test plan with the changes i've asked for. Before doing so, provide a numbered list of all the changes. Then ask if the list contains all the requested changes. Only after confirming the list contains all the requested changes, rebuild the test.",
+  "model": {
+    "id": "gpt-3.5-turbo",
+    "name": "GPT-3.5",
+    "maxLength": 12000,
+    "tokenLimit": 4000
+  },
+  "folderId": null
+}

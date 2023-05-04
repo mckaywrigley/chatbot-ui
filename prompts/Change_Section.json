@@ -1,0 +1,13 @@
+{
+  "id": "dd88d9c0-c7e4-4522-9bdf-26c0dec70bde",
+  "name": "Change Section",
+  "description": "",
+  "content": "Can you {{action}} {{section}} section. Ask me to confirm before you perform the action. Also, ask if I want to regenerate the entire test plan.",
+  "model": {
+    "id": "gpt-3.5-turbo",
+    "name": "GPT-3.5",
+    "maxLength": 12000,
+    "tokenLimit": 4000
+  },
+  "folderId": null
+}

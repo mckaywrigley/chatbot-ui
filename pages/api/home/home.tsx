@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { useQuery } from 'react-query';
 import toast from 'react-hot-toast';
+import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
@@ -41,6 +42,11 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+
+import createTestPlanPrompt = require('prompts/Create_Test_Plan.json');
+import businessRequirementsPrompt = require('prompts/Business_Requirements.json');
+import changeSectionPrompt = require('prompts/Change_Section.json');
+import rebuildTestPlanPrompt = require('prompts/Rebuild_Test_Plan.json');
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -196,7 +202,9 @@ const Home = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: namespace ? DEFAULT_TEMPERATURE : lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: namespace
+        ? DEFAULT_TEMPERATURE
+        : lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
@@ -211,7 +219,7 @@ const Home = ({
     saveConversations(updatedConversations);
 
     dispatch({ field: 'loading', value: false });
-  }
+  };
 
   const handleNewConversation = (forTargetedChat: boolean) => {
     if (forTargetedChat) {
@@ -219,12 +227,16 @@ const Home = ({
     } else {
       createNewConversation();
     }
-  }
+  };
 
-  const onNewConversationCreated = ({ duplicate, namespace, name }: NewConversationArgs) => {
+  const onNewConversationCreated = ({
+    duplicate,
+    namespace,
+    name,
+  }: NewConversationArgs) => {
     if (duplicate) {
       toast.error(
-        `You have already uploaded this content before, initiating a new conversation with that context`
+        `You have already uploaded this content before, initiating a new conversation with that context`,
       );
     }
     createNewConversation(name, namespace);
@@ -324,6 +336,13 @@ const Home = ({
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
+    } else {
+      let promptsJson = [];
+      promptsJson.push(createTestPlanPrompt);
+      promptsJson.push(businessRequirementsPrompt);
+      promptsJson.push(changeSectionPrompt);
+      promptsJson.push(rebuildTestPlanPrompt);
+      dispatch({ field: 'prompts', value: promptsJson });
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');
@@ -407,13 +426,16 @@ const Home = ({
             <Chatbar />
 
             <div className="flex flex-1">
-              {showUploadUI
-                ? <Upload
-                    newConversationName={t(`Conversation #${conversations.length + 1}`)}
-                    onUploadComplete={onNewConversationCreated}
-                  />
-                : <Chat stopConversationRef={stopConversationRef} />
-              }
+              {showUploadUI ? (
+                <Upload
+                  newConversationName={t(
+                    `Conversation #${conversations.length + 1}`,
+                  )}
+                  onUploadComplete={onNewConversationCreated}
+                />
+              ) : (
+                <Chat stopConversationRef={stopConversationRef} />
+              )}
             </div>
 
             <Promptbar />
