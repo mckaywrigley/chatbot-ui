@@ -60,6 +60,7 @@ import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
+import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { Settings } from '@/types/settings';
 import { StorageType } from '@/types/storage';
@@ -412,7 +413,11 @@ const Home = ({
       dispatch({ field: 'apiKey', value: apiKey });
     }
 
-    const pluginKeys = localStorage.getItem('pluginKeys');
+    const pluginKeysRaw = localStorage.getItem('pluginKeys');
+    const pluginKeys: PluginKey[] = pluginKeysRaw
+      ? JSON.parse(pluginKeysRaw)
+      : null;
+    console.log('pluginKeys', pluginKeys);
     if (serverSidePluginKeysSet) {
       dispatch({ field: 'pluginKeys', value: [] });
       localStorage.removeItem('pluginKeys');

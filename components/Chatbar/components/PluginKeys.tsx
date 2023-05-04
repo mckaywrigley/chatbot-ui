@@ -21,6 +21,8 @@ export const PluginKeys = () => {
     useContext(ChatbarContext);
 
   const [isChanging, setIsChanging] = useState(false);
+  const [googleApiKey, setGoogleApiKey] = useState('');
+  const [googleCseId, setGoogleCseId] = useState('');
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +32,34 @@ export const PluginKeys = () => {
       setIsChanging(false);
     }
   };
+
+  useEffect(() => {
+    if (pluginKeys) {
+      console.log(pluginKeys);
+      // Google plugin keys
+      const googleSearchPluginKey = pluginKeys.find(
+        (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
+      );
+
+      if (googleSearchPluginKey) {
+        const googleApiKey = googleSearchPluginKey.requiredKeys.find(
+          (k) => k.key === 'GOOGLE_API_KEY',
+        )?.value;
+
+        const googleCseId = googleSearchPluginKey.requiredKeys.find(
+          (k) => k.key === 'GOOGLE_CSE_ID',
+        )?.value;
+
+        if (googleApiKey) {
+          setGoogleApiKey(googleApiKey);
+        }
+
+        if (googleCseId) {
+          setGoogleCseId(googleCseId);
+        }
+      }
+    }
+  }, [pluginKeys]);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -90,12 +120,7 @@ export const PluginKeys = () => {
                   <input
                     className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
                     type="password"
-                    value={
-                      pluginKeys
-                        .find((p) => p.pluginId === PluginID.GOOGLE_SEARCH)
-                        ?.requiredKeys.find((k) => k.key === 'GOOGLE_API_KEY')
-                        ?.value
-                    }
+                    value={googleApiKey}
                     onChange={(e) => {
                       const pluginKey = pluginKeys.find(
                         (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
@@ -149,12 +174,7 @@ export const PluginKeys = () => {
                   <input
                     className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
                     type="password"
-                    value={
-                      pluginKeys
-                        .find((p) => p.pluginId === PluginID.GOOGLE_SEARCH)
-                        ?.requiredKeys.find((k) => k.key === 'GOOGLE_CSE_ID')
-                        ?.value
-                    }
+                    value={googleCseId}
                     onChange={(e) => {
                       const pluginKey = pluginKeys.find(
                         (p) => p.pluginId === PluginID.GOOGLE_SEARCH,
