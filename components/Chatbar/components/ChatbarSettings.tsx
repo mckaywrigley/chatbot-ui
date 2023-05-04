@@ -5,6 +5,11 @@ import { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
+import { localDeleteConversations } from '@/utils/app/storage/documentBased/local/conversations';
+import { localDeleteFolders } from '@/utils/app/storage/documentBased/local/folders';
+import { localDeletePrompts } from '@/utils/app/storage/documentBased/local/prompts';
+import { localDeleteSystemPrompts } from '@/utils/app/storage/documentBased/local/systemPrompts';
+import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -32,6 +37,17 @@ export const ChatbarSettings = () => {
     },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
+
+  const handleSignOut = () => {
+    localDeleteConversations();
+    localDeleteFolders();
+    localDeletePrompts();
+    localDeleteSystemPrompts();
+    deleteSelectedConversation();
+    localStorage.removeItem('apiKey');
+    localStorage.removeItem('pluginKeys');
+    signOut();
+  };
 
   const {
     handleClearConversations,
@@ -70,7 +86,7 @@ export const ChatbarSettings = () => {
         <SidebarButton
           text={t('Log Out')}
           icon={<IconLogout size={18} />}
-          onClick={() => signOut()}
+          onClick={handleSignOut}
         />
       )}
 

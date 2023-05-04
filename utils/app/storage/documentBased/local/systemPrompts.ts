@@ -11,3 +11,7 @@ export const localSaveSystemPrompts = (
 ) => {
   localStorage.setItem('system_prompts', JSON.stringify(updatedSystemPrompts));
 };
+
+export const localDeleteSystemPrompts = () => {
+  localStorage.removeItem('system_prompts');
+};

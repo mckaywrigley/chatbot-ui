@@ -7,3 +7,7 @@ export const localGetPrompts = () => {
 export const localSavePrompts = (updatedPrompts: Prompt[]) => {
   localStorage.setItem('prompts', JSON.stringify(updatedPrompts));
 };
+
+export const localDeletePrompts = () => {
+  localStorage.removeItem('prompts');
+};

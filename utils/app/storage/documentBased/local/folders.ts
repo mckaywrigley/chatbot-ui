@@ -9,3 +9,7 @@ export const localGetFolders = () => {
 export const localSaveFolders = (folders: FolderInterface[]) => {
   localStorage.setItem('folders', JSON.stringify(folders));
 };
+
+export const localDeleteFolders = () => {
+  localStorage.removeItem('folders');
+};
