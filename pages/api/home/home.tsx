@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
+import toast from 'react-hot-toast';
 
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
-
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
@@ -25,7 +25,7 @@ import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, NewConversationArgs } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
@@ -35,6 +35,7 @@ import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
+import { Upload } from '@/components/Upload';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -56,6 +57,7 @@ const Home = ({
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
+  const [showUploadUI, setShowUploadUI] = useState<boolean>(false);
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -102,6 +104,7 @@ const Home = ({
   // FETCH MODELS ----------------------------------------------
 
   const handleSelectConversation = (conversation: Conversation) => {
+    setShowUploadUI(false);
     dispatch({
       field: 'selectedConversation',
       value: conversation,
@@ -178,12 +181,13 @@ const Home = ({
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
+  const createNewConversation = (name?: string, namespace?: string) => {
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
       id: uuidv4(),
-      name: t('New Conversation'),
+      name: name || t(`Conversation #${conversations.length + 1}`),
+      namespace,
       messages: [],
       model: lastConversation?.model || {
         id: OpenAIModels[defaultModelId].id,
@@ -192,11 +196,13 @@ const Home = ({
         tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: namespace ? DEFAULT_TEMPERATURE : lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
     const updatedConversations = [...conversations, newConversation];
+
+    saveConversations(updatedConversations);
 
     dispatch({ field: 'selectedConversation', value: newConversation });
     dispatch({ field: 'conversations', value: updatedConversations });
@@ -205,6 +211,24 @@ const Home = ({
     saveConversations(updatedConversations);
 
     dispatch({ field: 'loading', value: false });
+  }
+
+  const handleNewConversation = (forTargetedChat: boolean) => {
+    if (forTargetedChat) {
+      setShowUploadUI(true);
+    } else {
+      createNewConversation();
+    }
+  }
+
+  const onNewConversationCreated = ({ duplicate, namespace, name }: NewConversationArgs) => {
+    if (duplicate) {
+      toast.error(
+        `You have already uploaded this content before, initiating a new conversation with that context`
+      );
+    }
+    createNewConversation(name, namespace);
+    setShowUploadUI(false);
   };
 
   const handleUpdateConversation = (
@@ -360,7 +384,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>Chatty Help</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
@@ -383,7 +407,13 @@ const Home = ({
             <Chatbar />
 
             <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
+              {showUploadUI
+                ? <Upload
+                    newConversationName={t(`Conversation #${conversations.length + 1}`)}
+                    onUploadComplete={onNewConversationCreated}
+                  />
+                : <Chat stopConversationRef={stopConversationRef} />
+              }
             </div>
 
             <Promptbar />
