@@ -374,9 +374,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     {models.length === 0 ? (
                       <div>
                         <Spinner size="16px" className="mx-auto" />
-                      </div> /** TODO: we may want to change this name based on the namespace somehow? */
+                      </div> /** TODO: we may want to change this name based on the namespace/file somehow? */
                     ) : (
-                      'Contextual Chat'
+                      selectedConversation?.namespace? 'Targeted Chat': 'Chatty McChatty Face'
                     )}
                   </div>
                   {models.length > 0 && !selectedConversation?.namespace && (
