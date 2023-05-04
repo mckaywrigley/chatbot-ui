@@ -155,7 +155,7 @@ export const ChatMessage: FC<Props> = memo(
 
           <div className="prose mt-[-2px] w-full dark:prose-invert">
             {message.role === 'user' ? (
-              <div className="flex w-full">
+              <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {isEditing ? (
                   <div className="flex w-full flex-col">
                     <textarea
@@ -202,31 +202,21 @@ export const ChatMessage: FC<Props> = memo(
                   </div>
                 )}
 
-                {(window.innerWidth < 640 || !isEditing) && (
-                  <>
+                {!isEditing && (
+                  <div className="flex flex-row">
                     <button
-                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                        window.innerWidth < 640
-                          ? 'bottom-1 right-3'
-                          : 'right-6 top-[26px]'
-                      }
-                      `}
+                      className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit mr-1`}
                       onClick={toggleEditing}
                     >
-                      <IconEdit size={20} />
+                      <IconEdit size={18} />
                     </button>
                     <button
-                      className={`absolute translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 ${
-                        window.innerWidth < 640
-                          ? 'bottom-1 right-3'
-                          : 'right-0 top-[26px]'
-                      }
-                      `}
+                      className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit`}
                       onClick={handleDeleteMessage}
                     >
-                      <IconTrash size={20} />
+                      <IconTrash size={18} />
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             ) : (
