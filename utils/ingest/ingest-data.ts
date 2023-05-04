@@ -3,7 +3,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { PineconeStore } from 'langchain/vectorstores/pinecone';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { pinecone } from '@/utils/pinecone/pinecone-client';
-import { PINECONE_INDEX_NAME, PINECONE_NAME_SPACE } from '@/utils/pinecone/pinecone';
+import { PINECONE_INDEX_NAME } from '@/utils/pinecone/pinecone';
 import { CustomHTMLLoader, CustomPDFLoader } from './dataLoader';
 
 /* Name of directory to retrieve your files from */
@@ -14,7 +14,7 @@ type RunIngestDataResponse = {
   namespace: string;
 }
 
-export const runIngestData = async (namespace = PINECONE_NAME_SPACE): Promise<RunIngestDataResponse> => {
+export const runIngestData = async (namespace: string): Promise<RunIngestDataResponse> => {
   try {
     const index = pinecone.Index(PINECONE_INDEX_NAME); //change to your own index name
 

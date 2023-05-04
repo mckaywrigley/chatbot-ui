@@ -10,7 +10,7 @@ export type Role = 'assistant' | 'user';
 export interface ChatBody {
   model: OpenAIModel;
   messages: Message[];
-  namespace: string;
+  namespace?: string;
   key: string;
   prompt: string;
   temperature: number;
@@ -19,7 +19,7 @@ export interface ChatBody {
 export interface Conversation {
   id: string;
   name: string;
-  namespace: string;
+  namespace?: string;
   messages: Message[];
   model: OpenAIModel;
   prompt: string;

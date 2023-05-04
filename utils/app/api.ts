@@ -1,6 +1,9 @@
 import { Plugin, PluginID } from '@/types/plugin';
 
-export const getEndpoint = (plugin: Plugin | null) => {
+export const getEndpoint = (plugin: Plugin | null, namespace?: string) => {
+  if (namespace) {
+    return 'api/namespace-chat';
+  }
   if (!plugin) {
     return 'api/chat';
   }
