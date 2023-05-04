@@ -2,6 +2,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { NewConversationArgs } from '@/types/chat';
 import { useTranslation } from 'react-i18next';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 
 interface IUploadForm extends HTMLFormElement {
   elements: IUploadFormControlsCollection;
@@ -19,8 +20,10 @@ type UploadProps = {
 
 export function Upload({ onUploadComplete }: UploadProps) {
   const linkInputId = useId();
+  const linkInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [links, setLinks] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -37,6 +40,8 @@ export function Upload({ onUploadComplete }: UploadProps) {
     setUploading(true);
 
     event.preventDefault();
+
+    event.currentTarget.elements.links.value = links.join(`,`);
 
     await fetch(`/api/upload`, {
       body: new FormData(event.currentTarget),
@@ -59,6 +64,26 @@ export function Upload({ onUploadComplete }: UploadProps) {
       .finally(() => setUploading(false));
   }
 
+  function handleAddLink() {
+    const linkInput = linkInputRef.current;
+    if (linkInput) {
+      const { value } = linkInput;
+      if (!value) {
+        return;
+      }
+      setLinks(currentLinks => Array.from(new Set([...currentLinks, value.trim()])));
+      linkInput.value = ``;
+    }
+  }
+
+  function handleDeleteLink(link: string) {
+    return () => {
+      setLinks(
+        currentLinks => currentLinks.filter(currentLink => currentLink !== link)
+      );
+    }
+  }
+
   function handleFileInputChange(event: ChangeEvent<HTMLInputElement>) {
     setFiles(Array.from(event.currentTarget.files ?? []));
   }
@@ -71,20 +96,59 @@ export function Upload({ onUploadComplete }: UploadProps) {
           {error && <p className="text-center text-red-500">{error}</p>}
           <form className="flex flex-col gap-12" onSubmit={handleSubmitAsync}>
             <fieldset className="flex flex-col items-stretch gap-6" disabled={uploading}>
-              <div className="flex flex-col gap-2">
-                <label className="text-center" htmlFor={linkInputId}>
-                  {t('Enter comma separated links')}
-                </label>
-                <textarea
-                  className="bg-transparent dark:bg-transparent resize-none rounded-md border border-neutral-600 bg-[#202123] px-2.5 py-2 text-[14px] leading-3 text-white"
-                  id={linkInputId}
-                  name="links"
-                  rows={10}
-                />
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-center" htmlFor={linkInputId}>
+                    {t('Enter links')}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 bg-transparent dark:bg-transparent rounded-md border border-neutral-600 bg-[#202123] px-2.5 py-2 text-[14px] leading-3 text-white"
+                      id={linkInputId}
+                      name="links"
+                      ref={linkInputRef}
+                      onKeyDown={event => {
+                        if (event.key === `Enter`) {
+                          event.preventDefault();
+                          handleAddLink();
+                        }
+                      }}
+                    />
+                    <button
+                      aria-label={t<string>('Add link')}
+                      className="cursor-pointer select-none items-center gap-3 rounded-md border-2 border-white/20 p-2 text-white transition-colors duration-200 hover:bg-gray-500/10 disabled:opacity-50"
+                      type="button"
+                      onClick={handleAddLink}
+                    >
+                      <IconPlus size={16} />
+                    </button>
+                  </div>
+                </div>
+                  {links.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                      <p className="font-bold">{t('Added link(s)')}</p>
+                      <div className="flex flex-col gap-2">
+                        {links.map(link => (
+                          <span
+                            key={link}
+                            className="flex items-center justify-between gap-2 p-2 border border-white/20 rounded-sm"
+                          >
+                            <span className="max-w-[258px] truncate">{link}</span>
+                            <button
+                              aria-label={t<string>(`Delete link: ${link}`)}
+                              onClick={handleDeleteLink(link)}
+                            >
+                              <IconTrash size={16} />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
               <div className="flex flex-col items-stretch gap-4">
                 <button
-                  className="cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10 disabled:opacity-50"
+                  className="cursor-pointer select-none items-center gap-3 rounded-md border-2 border-white/20 border-dashed p-20 text-white transition-colors duration-200 hover:bg-gray-500/10 disabled:opacity-50"
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                 >
@@ -92,14 +156,16 @@ export function Upload({ onUploadComplete }: UploadProps) {
                 </button>
                 {files.length > 0 && (
                   <div className="flex flex-col gap-4">
-                    <p className="font-bold">{t('Uploaded PDFs')}</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <p className="font-bold">{t('Uploaded PDF(s)')}</p>
+                    <div className="flex flex-col gap-2">
                       {Array.from(files).map(file => (
                         <span
                           key={file.name}
-                          className="flex items-center justify-center gap-2 p-2 border border-white/20 rounded-sm"
+                          className="flex p-2 border border-white/20 rounded-sm"
                         >
-                          {file.name}
+                          <span className="max-w-[258px] truncate">
+                            {file.name}
+                          </span>
                         </span>
                       ))}
                     </div>
