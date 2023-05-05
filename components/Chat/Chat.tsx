@@ -71,7 +71,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
       if (selectedConversation) {
-        console.log('FIRST selectedConversation', selectedConversation);
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
@@ -117,7 +116,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           });
         }
         const controller = new AbortController();
-        console.log('endpoint', endpoint);
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -246,14 +244,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
         }
         const hallucination_response = await fetch('/api/hallucination', {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            question: 'random',
+            answer: 'whatever',
+          }),
         });
-        console.log('hallucination_response', hallucination_response);
         const hallucination = await hallucination_response.json();
-        console.log('hallucination', hallucination);
         const updatedMessages: Message[] = [
           ...updatedConversation.messages,
           { role: 'assistant', content: hallucination.message },

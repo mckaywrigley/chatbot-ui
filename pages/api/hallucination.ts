@@ -10,8 +10,20 @@ const delay = async (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    await delay(500)
-    return new Response(JSON.stringify({'id': 'halu1', 'message': 'this is hallucination'}), { status: 200 });
+    const reqJSON = await req.json();
+    const question = reqJSON.question ?? '';
+    const answer = reqJSON.answer ?? '';
+    const url = `${OPENAI_API_HOST}/v1/check/hallucination`;
+    const res = await fetch(url, {
+      headers: {'Content-Type': 'application/json'},
+      method: 'POST',
+      body: JSON.stringify({question, answer})
+    })
+    const json = await res.json();
+    if (!json.message) {
+      return new Response(JSON.stringify({'message': 'no hallucination result'}), { status: 200 });
+    }
+    return new Response(JSON.stringify(json), { status: 200 });
   } catch (error) {
     console.error(error);
     return new Response('Error', { status: 500 });
