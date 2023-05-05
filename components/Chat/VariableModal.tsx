@@ -1,10 +1,11 @@
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import { Prompt } from '@/types/prompt';
+import { Variable, VariableInstance } from '@/types/variable';
 
 interface Props {
   prompt: Prompt;
-  variables: string[];
+  variables: Variable[];
   onSubmit: (updatedVariables: string[]) => void;
   onClose: () => void;
 }
@@ -15,14 +16,13 @@ export const VariableModal: FC<Props> = ({
   onSubmit,
   onClose,
 }) => {
-  const [updatedVariables, setUpdatedVariables] = useState<
-    { key: string; value: string }[]
-  >(
+  const [updatedVariables, setUpdatedVariables] = useState<VariableInstance[]>(
     variables
-      .map((variable) => ({ key: variable, value: '' }))
+      .map((variable) => ({ variable: variable, value: '' }))
       .filter(
         (item, index, array) =>
-          array.findIndex((t) => t.key === item.key) === index,
+          array.findIndex((t) => t.variable.name === item.variable.name) ===
+          index,
       ),
   );
 
@@ -76,6 +76,35 @@ export const VariableModal: FC<Props> = ({
     }
   }, []);
 
+  const renderInput = (variableInstance: VariableInstance, index: number) => {
+    if (variableInstance.variable.options.length !== 0)
+      return (
+        <select
+          className="mt-1 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+          value={variableInstance.value}
+          onChange={(e) => handleChange(index, e.target.value)}
+        >
+          <option value="">Select an option...</option>
+          {variableInstance.variable.options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      );
+    return (
+      <textarea
+        ref={index === 0 ? nameInputRef : undefined}
+        className="mt-1 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+        style={{ resize: 'none' }}
+        placeholder={`Enter a value for ${variableInstance.variable.name}...`}
+        value={variableInstance.value}
+        onChange={(e) => handleChange(index, e.target.value)}
+        rows={3}
+      />
+    );
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
@@ -94,21 +123,12 @@ export const VariableModal: FC<Props> = ({
           {prompt.description}
         </div>
 
-        {updatedVariables.map((variable, index) => (
+        {updatedVariables.map((variableInstance, index) => (
           <div className="mb-4" key={index}>
             <div className="mb-2 text-sm font-bold text-neutral-200">
-              {variable.key}
+              {variableInstance.variable.name}
             </div>
-
-            <textarea
-              ref={index === 0 ? nameInputRef : undefined}
-              className="mt-1 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
-              style={{ resize: 'none' }}
-              placeholder={`Enter a value for ${variable.key}...`}
-              value={variable.value}
-              onChange={(e) => handleChange(index, e.target.value)}
-              rows={3}
-            />
+            {renderInput(variableInstance, index)}
           </div>
         ))}
 

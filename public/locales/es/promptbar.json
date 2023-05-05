@@ -7,6 +7,6 @@
   "Description": "Descripción",
   "A description for your prompt.": "Descripción de su prompt.",
   "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Contenido del prompt. Utilice {{}} para indicar una variable. Ej: {{nombre}} es un {{adjetivo}} {{nombre}}",
+  "Prompt content. Use {{}} to denote a variable. Use : after variable name appended by csv values to enable selecting from a list. Ex: {{name}} is a {{adjective:happy,sad}} {{noun}}": "Contenido del prompt. Utilice {{}} para indicar una variable. Ej: {{nombre}} es un {{adjetivo}} {{nombre}}",
   "Save": "Guardar"
 }

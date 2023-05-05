@@ -13,6 +13,7 @@ import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 
 import { Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
+import { Variable } from '@/types/variable';
 
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
@@ -34,7 +35,7 @@ export const SystemPrompt: FC<Props> = ({
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [showPromptList, setShowPromptList] = useState(false);
   const [promptInputValue, setPromptInputValue] = useState('');
-  const [variables, setVariables] = useState<string[]>([]);
+  const [variables, setVariables] = useState<Variable[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -76,13 +77,24 @@ export const SystemPrompt: FC<Props> = ({
     setShowPromptList(false);
   };
 
-  const parseVariables = (content: string) => {
+  const parseVariables = (content: string): Variable[] => {
     const regex = /{{(.*?)}}/g;
-    const foundVariables = [];
+    const foundVariables: Variable[] = [];
     let match;
 
     while ((match = regex.exec(content)) !== null) {
-      foundVariables.push(match[1]);
+      let variable: Variable = {
+        name: match[1],
+        options: [],
+      };
+
+      if (match[1].includes(':'))
+        variable = {
+          name: match[1].split(':')[0],
+          options: match[1].split(':')[1].split(','),
+        };
+
+      foundVariables.push(variable);
     }
 
     return foundVariables;
@@ -117,8 +129,11 @@ export const SystemPrompt: FC<Props> = ({
   };
 
   const handleSubmit = (updatedVariables: string[]) => {
-    const newContent = value?.replace(/{{(.*?)}}/g, (match, variable) => {
-      const index = variables.indexOf(variable);
+    const newContent = value?.replace(/{{(.*?)}}/g, (match, variableName) => {
+      if (variableName.includes(':')) variableName = variableName.split(':')[0];
+      const index = variables.findIndex(
+        (variable) => variable.name === variableName,
+      );
       return updatedVariables[index];
     });
 

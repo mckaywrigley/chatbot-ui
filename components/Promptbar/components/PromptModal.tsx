@@ -97,7 +97,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
               style={{ resize: 'none' }}
               placeholder={
                 t(
-                  'Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}',
+                  'Prompt content. Use {{}} to denote a variable. Use : after variable name appended by csv values to enable user to select from a list. Ex: {{name}} is a {{adjective:happy,sad}} {{noun}}',
                 ) || ''
               }
               value={content}
