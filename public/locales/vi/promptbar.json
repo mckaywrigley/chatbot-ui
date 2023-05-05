@@ -7,6 +7,6 @@
   "Description": "Mô tả",
   "A description for your prompt.": "Một mô tả cho Prompt của bạn.",
   "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Nội dung Prompt. Sử dụng {{}} để biểu thị một biến. Ví dụ: {{name}} là một {{adjective}} {{noun}}",
+  "Prompt content. Use {{}} to denote a variable. Use : after variable name appended by csv values to enable selecting from a list. Ex: {{name}} is a {{adjective:happy,sad}} {{noun}}": "Nội dung Prompt. Sử dụng {{}} để biểu thị một biến. Ví dụ: {{name}} là một {{adjective}} {{noun}}",
   "Save": "Lưu"
 }

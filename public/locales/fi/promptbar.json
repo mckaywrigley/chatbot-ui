@@ -7,6 +7,6 @@
   "Description": "Kuvaus",
   "A description for your prompt.": "Promptisi kuvaus.",
   "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Promptin sisältö. Käytä {{}} muuttujien merkitsemiseen. Esim: {{nimi}} on {{adjektiivi}} {{substantiivi}}",
+  "Prompt content. Use {{}} to denote a variable. Use : after variable name appended by csv values to enable selecting from a list. Ex: {{name}} is a {{adjective:happy,sad}} {{noun}}": "Promptin sisältö. Käytä {{}} muuttujien merkitsemiseen. Esim: {{nimi}} on {{adjektiivi}} {{substantiivi}}",
   "Save": "Tallenna"
 }

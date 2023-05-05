@@ -7,6 +7,6 @@
   "Description": "الوصف",
   "A description for your prompt.": "وصف لمطلبك",
   "Prompt": "مطلب",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "محتوى المطلب. استخدم {{}} للإشارة إلى متغير. مثال: {{الاسم}} هي {{صفة}} {{اسم}}",
+  "Prompt content. Use {{}} to denote a variable. Use : after variable name appended by csv values to enable selecting from a list. Ex: {{name}} is a {{adjective:happy,sad}} {{noun}}": "محتوى المطلب. استخدم {{}} للإشارة إلى متغير. مثال: {{الاسم}} هي {{صفة}} {{اسم}}",
   "Save": "حفظ"
 }
