@@ -11,6 +11,8 @@ import { localDeletePrompts } from '@/utils/app/storage/documentBased/local/prom
 import { localDeleteSystemPrompts } from '@/utils/app/storage/documentBased/local/systemPrompts';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
 
+import { StorageType } from '@/types/storage';
+
 import HomeContext from '@/pages/api/home/home.context';
 
 import { SettingDialog } from '@/components/Settings/SettingDialog';
@@ -30,7 +32,7 @@ export const ChatbarSettings = () => {
     state: {
       apiKey,
       lightMode,
-      storageType: databaseType,
+      storageType,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
@@ -39,13 +41,16 @@ export const ChatbarSettings = () => {
   } = useContext(HomeContext);
 
   const handleSignOut = () => {
-    localDeleteConversations();
-    localDeleteFolders();
-    localDeletePrompts();
-    localDeleteSystemPrompts();
-    deleteSelectedConversation();
-    localStorage.removeItem('apiKey');
-    localStorage.removeItem('pluginKeys');
+    if (storageType !== StorageType.LOCAL) {
+      localDeleteConversations();
+      localDeleteFolders();
+      localDeletePrompts();
+      localDeleteSystemPrompts();
+      deleteSelectedConversation();
+      localStorage.removeItem('apiKey');
+      localStorage.removeItem('pluginKeys');
+    }
+
     signOut();
   };
 
@@ -67,7 +72,7 @@ export const ChatbarSettings = () => {
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData(databaseType || 'localStorage')}
+        onClick={() => handleExportData(storageType || 'localStorage')}
       />
 
       <SidebarButton
