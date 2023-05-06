@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { savePrompts } from '@/utils/app/prompts';
+import {
+    storageCreatePrompt,
+    storageDeletePrompts,
+    storageUpdatePrompt,
+} from '@/utils/app/storage/prompt';
 
 import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -28,9 +32,9 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
-    dispatch: homeDispatch,
-    handleCreateFolder,
+      state: {prompts, defaultModelId, storageType, showPromptbar},
+      dispatch: homeDispatch,
+      handleCreateFolder,
   } = useContext(HomeContext);
 
   const {
@@ -45,41 +49,38 @@ const Promptbar = () => {
 
   const handleCreatePrompt = () => {
     if (defaultModelId) {
-      const newPrompt: Prompt = {
-        id: uuidv4(),
-        name: `Prompt ${prompts.length + 1}`,
-        description: '',
-        content: '',
-        model: OpenAIModels[defaultModelId],
-        folderId: null,
-      };
+        const newPrompt: Prompt = {
+            id: uuidv4(),
+            name: `Prompt ${prompts.length + 1}`,
+            description: '',
+            content: '',
+            model: OpenAIModels[defaultModelId],
+            folderId: null,
+        };
 
-      const updatedPrompts = [...prompts, newPrompt];
+        const updatedPrompts = storageCreatePrompt(
+            storageType,
+            newPrompt,
+            prompts,
+        );
 
-      homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-      savePrompts(updatedPrompts);
+        homeDispatch({field: 'prompts', value: updatedPrompts});
     }
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
-
-    homeDispatch({ field: 'prompts', value: updatedPrompts });
-    savePrompts(updatedPrompts);
+      const updatedPrompts = storageDeletePrompts(
+          storageType,
+          prompt.id,
+          prompts,
+      );
+      homeDispatch({field: 'prompts', value: updatedPrompts});
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.map((p) => {
-      if (p.id === prompt.id) {
-        return prompt;
-      }
+      const updated = storageUpdatePrompt(storageType, prompt, prompts);
 
-      return p;
-    });
-    homeDispatch({ field: 'prompts', value: updatedPrompts });
-
-    savePrompts(updatedPrompts);
+      homeDispatch({field: 'prompts', value: updated.all});
   };
 
   const handleDrop = (e: any) => {
@@ -104,17 +105,17 @@ const Promptbar = () => {
         value: prompts.filter((prompt) => {
           const searchable =
             prompt.name.toLowerCase() +
-            ' ' +
-            prompt.description.toLowerCase() +
-            ' ' +
-            prompt.content.toLowerCase();
-          return searchable.includes(searchTerm.toLowerCase());
+              ' ' +
+              prompt.description.toLowerCase() +
+              ' ' +
+              prompt.content.toLowerCase();
+            return searchable.includes(searchTerm.toLowerCase());
         }),
       });
     } else {
-      promptDispatch({ field: 'filteredPrompts', value: prompts });
+        promptDispatch({field: 'filteredPrompts', value: prompts});
     }
-  }, [searchTerm, prompts]);
+  }, [searchTerm, prompts, promptDispatch]);
 
   return (
     <PromptbarContext.Provider

@@ -2,22 +2,33 @@ import { Conversation } from '@/types/chat';
 import {
   ExportFormatV1,
   ExportFormatV2,
-  ExportFormatV3,
-  ExportFormatV4,
-  LatestExportFormat,
-  SupportedExportFormats,
+    ExportFormatV3,
+    ExportFormatV4,
+    LatestExportFormat,
+    SupportedExportFormats,
 } from '@/types/export';
-import { FolderInterface } from '@/types/folder';
-import { Prompt } from '@/types/prompt';
+import {FolderInterface} from '@/types/folder';
+import {Prompt} from '@/types/prompt';
+import {StorageType} from '@/types/storage';
 
-import { cleanConversationHistory } from './clean';
+import {cleanConversationHistory} from './clean';
+import {
+    storageGetConversations,
+    storageUpdateConversations,
+} from './storage/conversations';
+import {storageGetFolders, storageUpdateFolders} from './storage/folders';
+import {storageCreateMessage, storageUpdateMessage} from './storage/message';
+import {storageCreateMessages} from './storage/messages';
+import {storageGetPrompts, storageUpdatePrompts} from './storage/prompts';
+import {saveSelectedConversation} from './storage/selectedConversation';
+import {deleteSelectedConversation} from './storage/selectedConversation';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
-  return Array.isArray(obj);
+    return Array.isArray(obj);
 }
 
 export function isExportFormatV2(obj: any): obj is ExportFormatV2 {
-  return !('version' in obj) && 'folders' in obj && 'history' in obj;
+    return !('version' in obj) && 'folders' in obj && 'history' in obj;
 }
 
 export function isExportFormatV3(obj: any): obj is ExportFormatV3 {
@@ -71,32 +82,20 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
+export const exportData = async (storageType: StorageType) => {
+    let history = await storageGetConversations(storageType);
+    let folders = await storageGetFolders(storageType);
+    let prompts = await storageGetPrompts(storageType);
 
-  if (history) {
-    history = JSON.parse(history);
-  }
+    const data = {
+        version: 4,
+        history: history || [],
+        folders: folders || [],
+        prompts: prompts || [],
+    } as LatestExportFormat;
 
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
-
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
-
-  const data = {
-    version: 4,
-    history: history || [],
-    folders: folders || [],
-    prompts: prompts || [],
-  } as LatestExportFormat;
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json',
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -109,56 +108,61 @@ export const exportData = () => {
   URL.revokeObjectURL(url);
 };
 
-export const importData = (
-  data: SupportedExportFormats,
-): LatestExportFormat => {
-  const { history, folders, prompts } = cleanData(data);
+export const importData = async (
+    storageType: StorageType,
+    data: SupportedExportFormats,
+): Promise<LatestExportFormat> => {
+    const {history, folders, prompts} = cleanData(data);
 
-  const oldConversations = localStorage.getItem('conversationHistory');
-  const oldConversationsParsed = oldConversations
-    ? JSON.parse(oldConversations)
-    : [];
-
-  const newHistory: Conversation[] = [
-    ...oldConversationsParsed,
-    ...history,
-  ].filter(
-    (conversation, index, self) =>
-      index === self.findIndex((c) => c.id === conversation.id),
-  );
-  localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
-  if (newHistory.length > 0) {
-    localStorage.setItem(
-      'selectedConversation',
-      JSON.stringify(newHistory[newHistory.length - 1]),
+    // Updating folders
+    const oldFolders = await storageGetFolders(storageType);
+    const newFolders: FolderInterface[] = [...oldFolders, ...folders].filter(
+        (folder, index, self) =>
+            index === self.findIndex((f) => f.id === folder.id),
     );
-  } else {
-    localStorage.removeItem('selectedConversation');
-  }
 
-  const oldFolders = localStorage.getItem('folders');
-  const oldFoldersParsed = oldFolders ? JSON.parse(oldFolders) : [];
-  const newFolders: FolderInterface[] = [
-    ...oldFoldersParsed,
-    ...folders,
-  ].filter(
-    (folder, index, self) =>
-      index === self.findIndex((f) => f.id === folder.id),
-  );
-  localStorage.setItem('folders', JSON.stringify(newFolders));
+    await storageUpdateFolders(storageType, newFolders);
 
-  const oldPrompts = localStorage.getItem('prompts');
-  const oldPromptsParsed = oldPrompts ? JSON.parse(oldPrompts) : [];
-  const newPrompts: Prompt[] = [...oldPromptsParsed, ...prompts].filter(
-    (prompt, index, self) =>
-      index === self.findIndex((p) => p.id === prompt.id),
-  );
-  localStorage.setItem('prompts', JSON.stringify(newPrompts));
+    // Updating conversations
+    const oldConversations = await storageGetConversations(storageType);
+    const newHistory: Conversation[] = [...oldConversations, ...history].filter(
+        (conversation, index, self) =>
+            index === self.findIndex((c) => c.id === conversation.id),
+    );
 
-  return {
-    version: 4,
-    history: newHistory,
-    folders: newFolders,
-    prompts: newPrompts,
-  };
+    await storageUpdateConversations(storageType, newHistory);
+
+    if (storageType === StorageType.RDBMS) {
+        for (const conversation of history) {
+            if (conversation.messages.length > 0) {
+                storageCreateMessages(
+                    storageType,
+                    conversation,
+                    conversation.messages,
+                    newHistory,
+                );
+            }
+        }
+    }
+    if (newHistory.length > 0) {
+        saveSelectedConversation(newHistory[newHistory.length - 1]);
+    } else {
+        deleteSelectedConversation();
+    }
+
+    // Updating prompts
+    const oldPrompts = await storageGetPrompts(storageType);
+    const newPrompts: Prompt[] = [...oldPrompts, ...prompts].filter(
+        (prompt, index, self) =>
+            index === self.findIndex((p) => p.id === prompt.id),
+    );
+
+    storageUpdatePrompts(storageType, prompts);
+
+    return {
+        version: 4,
+        history: newHistory,
+        folders: newFolders,
+        prompts: newPrompts,
+    };
 };

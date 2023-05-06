@@ -14,6 +14,7 @@ RUN npm run build
 
 # ---- Production ----
 FROM node:19-alpine AS production
+RUN apk update && apk add --no-cache curl
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -17,6 +17,7 @@
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",
+    "next-auth": "^4.22.0",
     "next-i18next": "^13.2.2",
     "openai": "^3.2.1",
     "react": "18.2.0",
@@ -26,9 +27,11 @@
     "react-markdown": "^8.0.5",
     "react-query": "^3.39.3",
     "react-syntax-highlighter": "^15.5.0",
+    "reflect-metadata": "^0.1.13",
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "typeorm": "^0.3.15",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -36,7 +39,7 @@
     "@tailwindcss/typography": "^0.5.9",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/jsdom": "^21.1.1",
-    "@types/node": "18.15.0",
+    "@types/node": "^18.15.11",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
     "@types/react-syntax-highlighter": "^15.5.6",

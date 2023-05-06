@@ -18,23 +18,25 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
+import {Message} from '@/types/chat';
+import {Plugin} from '@/types/plugin';
+import {Prompt} from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { PluginSelect } from './PluginSelect';
-import { PromptList } from './PromptList';
-import { VariableModal } from './VariableModal';
+import {PluginSelect} from './PluginSelect';
+import {PromptList} from './PromptList';
+import {VariableModal} from './VariableModal';
+
+import {v4 as uuidv4} from 'uuid';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
-  onRegenerate: () => void;
-  onScrollDownClick: () => void;
-  stopConversationRef: MutableRefObject<boolean>;
-  textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
-  showScrollDownButton: boolean;
+    onSend: (message: Message, plugin: Plugin | null) => void;
+    onRegenerate: () => void;
+    onScrollDownClick: () => void;
+    stopConversationRef: MutableRefObject<boolean>;
+    textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
+    showScrollDownButton: boolean;
 }
 
 export const ChatInput = ({
@@ -88,22 +90,23 @@ export const ChatInput = ({
   };
 
   const handleSend = () => {
-    if (messageIsStreaming) {
-      return;
-    }
+      if (messageIsStreaming) {
+          return;
+      }
 
-    if (!content) {
-      alert(t('Please enter a message'));
-      return;
-    }
+      if (!content) {
+          alert(t('Please enter a message'));
+          return;
+      }
 
-    onSend({ role: 'user', content }, plugin);
-    setContent('');
-    setPlugin(null);
+      const messageId = uuidv4();
+      onSend({id: messageId, role: 'user', content}, plugin);
+      setContent('');
+      setPlugin(null);
 
-    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
-      textareaRef.current.blur();
-    }
+      if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
+          textareaRef.current.blur();
+      }
   };
 
   const handleStopConversation = () => {
@@ -229,15 +232,15 @@ export const ChatInput = ({
     }
   }, [activePromptIndex]);
 
-  useEffect(() => {
-    if (textareaRef && textareaRef.current) {
-      textareaRef.current.style.height = 'inherit';
-      textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
-    }
-  }, [content]);
+    useEffect(() => {
+        if (textareaRef && textareaRef.current) {
+            textareaRef.current.style.height = 'inherit';
+            textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
+            textareaRef.current.style.overflow = `${
+                textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+            }`;
+        }
+    }, [content, textareaRef]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {

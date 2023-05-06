@@ -1,17 +1,20 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
-import { useContext, useState } from 'react';
+import {IconFileExport, IconLogout, IconSettings} from '@tabler/icons-react';
+import {signOut} from 'next-auth/react';
+import {useContext, useState} from 'react';
 
-import { useTranslation } from 'next-i18next';
+import {useTranslation} from 'next-i18next';
+
+import {NEXT_PUBLIC_NEXTAUTH_ENABLED} from '@/utils/app/const';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { SettingDialog } from '@/components/Settings/SettingDialog';
+import {SettingDialog} from '@/components/Settings/SettingDialog';
 
-import { Import } from '../../Settings/Import';
-import { Key } from '../../Settings/Key';
-import { SidebarButton } from '../../Sidebar/SidebarButton';
+import {Import} from '../../Settings/Import';
+import {Key} from '../../Settings/Key';
+import {SidebarButton} from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
-import { ClearConversations } from './ClearConversations';
+import {ClearConversations} from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
 
 export const ChatbarSettings = () => {
@@ -20,11 +23,12 @@ export const ChatbarSettings = () => {
 
   const {
     state: {
-      apiKey,
-      lightMode,
-      serverSideApiKeyIsSet,
-      serverSidePluginKeysSet,
-      conversations,
+        apiKey,
+        lightMode,
+        storageType: databaseType,
+        serverSideApiKeyIsSet,
+        serverSidePluginKeysSet,
+        conversations,
     },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -45,29 +49,37 @@ export const ChatbarSettings = () => {
       <Import onImport={handleImportConversations} />
 
       <SidebarButton
-        text={t('Export data')}
-        icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData()}
+          text={t('Export data')}
+          icon={<IconFileExport size={18}/>}
+          onClick={() => handleExportData(databaseType || 'localStorage')}
       />
 
       <SidebarButton
-        text={t('Settings')}
-        icon={<IconSettings size={18} />}
-        onClick={() => setIsSettingDialog(true)}
+          text={t('Settings')}
+          icon={<IconSettings size={18}/>}
+          onClick={() => setIsSettingDialog(true)}
       />
 
-      {!serverSideApiKeyIsSet ? (
-        <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-      ) : null}
+        {!serverSideApiKeyIsSet ? (
+            <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange}/>
+        ) : null}
 
-      {!serverSidePluginKeysSet ? <PluginKeys /> : null}
+        {!serverSidePluginKeysSet ? <PluginKeys/> : null}
 
-      <SettingDialog
-        open={isSettingDialogOpen}
-        onClose={() => {
-          setIsSettingDialog(false);
-        }}
-      />
+        {NEXT_PUBLIC_NEXTAUTH_ENABLED && (
+            <SidebarButton
+                text={t('Log Out')}
+                icon={<IconLogout size={18}/>}
+                onClick={() => signOut()}
+            />
+        )}
+
+        <SettingDialog
+            open={isSettingDialogOpen}
+            onClose={() => {
+                setIsSettingDialog(false);
+            }}
+        />
     </div>
   );
 };

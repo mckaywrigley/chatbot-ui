@@ -1,22 +1,32 @@
-import { useCallback, useContext, useEffect } from 'react';
+import {useCallback, useContext, useEffect} from 'react';
 
-import { useTranslation } from 'next-i18next';
+import {useTranslation} from 'next-i18next';
 
-import { useCreateReducer } from '@/hooks/useCreateReducer';
+import {useCreateReducer} from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
-import { saveFolders } from '@/utils/app/folders';
-import { exportData, importData } from '@/utils/app/importExport';
+import {DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE} from '@/utils/app/const';
+import {exportData, importData} from '@/utils/app/importExport';
+import {storageDeleteConversation} from '@/utils/app/storage/conversation';
+import {storageDeleteConversations} from '@/utils/app/storage/conversations';
+import {storageDeleteFolder} from '@/utils/app/storage/folder';
+import {
+    storageDeleteFolders,
+    storageUpdateFolders,
+} from '@/utils/app/storage/folders';
+import {
+    deleteSelectedConversation,
+    saveSelectedConversation,
+} from '@/utils/app/storage/selectedConversation';
 
-import { Conversation } from '@/types/chat';
-import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
-import { OpenAIModels } from '@/types/openai';
-import { PluginKey } from '@/types/plugin';
+import {Conversation} from '@/types/chat';
+import {LatestExportFormat, SupportedExportFormats} from '@/types/export';
+import {OpenAIModels} from '@/types/openai';
+import {PluginKey} from '@/types/plugin';
+import {StorageType} from '@/types/storage';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { ChatFolders } from './components/ChatFolders';
+import {ChatFolders} from './components/ChatFolders';
 import { ChatbarSettings } from './components/ChatbarSettings';
 import { Conversations } from './components/Conversations';
 
@@ -34,11 +44,18 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
-    dispatch: homeDispatch,
-    handleCreateFolder,
-    handleNewConversation,
-    handleUpdateConversation,
+      state: {
+          conversations,
+          showChatbar,
+          defaultModelId,
+          storageType,
+          folders,
+          pluginKeys,
+      },
+      dispatch: homeDispatch,
+      handleCreateFolder,
+      handleNewConversation,
+      handleUpdateConversation,
   } = useContext(HomeContext);
 
   const {
@@ -84,76 +101,90 @@ export const Chatbar = () => {
     );
 
     if (updatedPluginKeys.length === 0) {
-      homeDispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
-      return;
+        homeDispatch({field: 'pluginKeys', value: []});
+        localStorage.removeItem('pluginKeys');
+        return;
     }
 
-    homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
+      homeDispatch({field: 'pluginKeys', value: updatedPluginKeys});
 
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
-  const handleExportData = () => {
-    exportData();
-  };
+    const handleExportData = (storageType: StorageType) => {
+        exportData(storageType);
+    };
 
-  const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
-    homeDispatch({ field: 'conversations', value: history });
-    homeDispatch({
-      field: 'selectedConversation',
-      value: history[history.length - 1],
-    });
-    homeDispatch({ field: 'folders', value: folders });
-    homeDispatch({ field: 'prompts', value: prompts });
+    const handleImportConversations = async (data: SupportedExportFormats) => {
+        const {history, folders, prompts}: LatestExportFormat = await importData(
+            storageType,
+            data,
+        );
+        homeDispatch({field: 'conversations', value: history});
+        homeDispatch({
+            field: 'selectedConversation',
+            value: history[history.length - 1],
+        });
+        homeDispatch({field: 'folders', value: folders});
+        homeDispatch({field: 'prompts', value: prompts});
 
-    window.location.reload();
-  };
+        window.location.reload();
+    };
 
-  const handleClearConversations = () => {
-    defaultModelId &&
-      homeDispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
+    const handleClearConversations = async () => {
+        defaultModelId &&
+        homeDispatch({
+            field: 'selectedConversation',
+            value: {
+                id: uuidv4(),
+                name: t('New Conversation'),
+                messages: [],
+                model: OpenAIModels[defaultModelId],
+                prompt: DEFAULT_SYSTEM_PROMPT,
+                temperature: DEFAULT_TEMPERATURE,
+                folderId: null,
+            },
+        });
 
-    homeDispatch({ field: 'conversations', value: [] });
+        homeDispatch({field: 'conversations', value: []});
 
-    localStorage.removeItem('conversationHistory');
-    localStorage.removeItem('selectedConversation');
+        const deletedFolders = folders.filter((f) => f.type === 'chat');
 
-    const updatedFolders = folders.filter((f) => f.type !== 'chat');
+        let deletedFolderIds: string[] = [];
+        for (const folder of deletedFolders) {
+            deletedFolderIds.push(folder.id);
+        }
 
-    homeDispatch({ field: 'folders', value: updatedFolders });
-    saveFolders(updatedFolders);
-  };
+        await storageDeleteConversations(storageType);
+        storageDeleteFolders(storageType, deletedFolderIds, folders);
+        deleteSelectedConversation();
+
+        const updatedFolders = folders.filter((f) => f.type !== 'chat');
+
+        homeDispatch({field: 'folders', value: updatedFolders});
+        storageUpdateFolders(storageType, updatedFolders);
+    };
 
   const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
-    );
+      const updatedConversations = storageDeleteConversation(
+          storageType,
+          conversation.id,
+          conversations,
+      );
 
-    homeDispatch({ field: 'conversations', value: updatedConversations });
-    chatDispatch({ field: 'searchTerm', value: '' });
-    saveConversations(updatedConversations);
+      homeDispatch({field: 'conversations', value: updatedConversations});
+      chatDispatch({field: 'searchTerm', value: ''});
 
-    if (updatedConversations.length > 0) {
-      homeDispatch({
-        field: 'selectedConversation',
-        value: updatedConversations[updatedConversations.length - 1],
-      });
+      if (updatedConversations.length > 0) {
+          homeDispatch({
+              field: 'selectedConversation',
+              value: updatedConversations[updatedConversations.length - 1],
+          });
 
-      saveConversation(updatedConversations[updatedConversations.length - 1]);
-    } else {
+          saveSelectedConversation(
+              updatedConversations[updatedConversations.length - 1],
+          );
+      } else {
       defaultModelId &&
         homeDispatch({
           field: 'selectedConversation',
@@ -168,7 +199,7 @@ export const Chatbar = () => {
           },
         });
 
-      localStorage.removeItem('selectedConversation');
+          deleteSelectedConversation();
     }
   };
 
@@ -194,17 +225,17 @@ export const Chatbar = () => {
           const searchable =
             conversation.name.toLocaleLowerCase() +
             ' ' +
-            conversation.messages.map((message) => message.content).join(' ');
-          return searchable.toLowerCase().includes(searchTerm.toLowerCase());
+              conversation.messages.map((message) => message.content).join(' ');
+            return searchable.toLowerCase().includes(searchTerm.toLowerCase());
         }),
       });
     } else {
-      chatDispatch({
-        field: 'filteredConversations',
-        value: conversations,
-      });
+        chatDispatch({
+            field: 'filteredConversations',
+            value: conversations,
+        });
     }
-  }, [searchTerm, conversations]);
+  }, [searchTerm, conversations, chatDispatch]);
 
   return (
     <ChatbarContext.Provider

@@ -1,14 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { OPENAI_API_HOST } from '@/utils/app/const';
-import { cleanSourceText } from '@/utils/server/google';
+import {OPENAI_API_HOST, OPENAI_ORGANIZATION} from '@/utils/app/const';
+import {cleanSourceText} from '@/utils/server/google';
 
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
-import jsdom, { JSDOM } from 'jsdom';
+import jsdom, {JSDOM} from 'jsdom';
+import {v4 as uuidv4} from 'uuid';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
@@ -101,7 +102,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     Sources:
     ${filteredSources.map((source) => {
-      return endent`
+        return endent`
       ${source.title} (${source.link}):
       ${source.text}
       `;
@@ -110,17 +111,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     Response:
     `;
 
-    const answerMessage: Message = { role: 'user', content: answerPrompt };
+      const answerMessageId = uuidv4();
+      const answerMessage: Message = {
+          id: answerMessageId,
+          role: 'user',
+          content: answerPrompt,
+      };
 
-    const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-        ...(process.env.OPENAI_ORGANIZATION && {
-          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-        }),
-      },
-      method: 'POST',
+      const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+              ...(OPENAI_ORGANIZATION && {
+                  'OpenAI-Organization': OPENAI_ORGANIZATION,
+              }),
+          },
+          method: 'POST',
       body: JSON.stringify({
         model: model.id,
         messages: [
@@ -141,8 +147,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     res.status(200).json({ answer });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error'})
+      console.error(error);
+      res.status(500).json({error: 'Error'});
   }
 };
 
