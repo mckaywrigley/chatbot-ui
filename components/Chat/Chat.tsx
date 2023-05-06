@@ -89,8 +89,8 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
 
         let eventPayload = {
           category: 'Usages',
-          label: messageType,
           userEmail: user?.email || 'N/A',
+          messageType: messageType,
         } as any;
 
         if (messageLength) {
