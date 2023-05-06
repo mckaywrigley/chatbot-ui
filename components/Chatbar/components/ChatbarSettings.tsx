@@ -5,8 +5,10 @@ import { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
+import { localDeleteAPIKey } from '@/utils/app/storage/documentBased/local/apiKey';
 import { localDeleteConversations } from '@/utils/app/storage/documentBased/local/conversations';
 import { localDeleteFolders } from '@/utils/app/storage/documentBased/local/folders';
+import { localDeletePluginKeys } from '@/utils/app/storage/documentBased/local/pluginKeys';
 import { localDeletePrompts } from '@/utils/app/storage/documentBased/local/prompts';
 import { localDeleteSystemPrompts } from '@/utils/app/storage/documentBased/local/systemPrompts';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
@@ -31,24 +33,24 @@ export const ChatbarSettings = () => {
   const {
     state: {
       apiKey,
-      lightMode,
       storageType,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
+      user,
     },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
   const handleSignOut = () => {
     if (storageType !== StorageType.LOCAL) {
-      localDeleteConversations();
-      localDeleteFolders();
-      localDeletePrompts();
-      localDeleteSystemPrompts();
-      deleteSelectedConversation();
-      localStorage.removeItem('apiKey');
-      localStorage.removeItem('pluginKeys');
+      localDeleteConversations(user);
+      localDeleteFolders(user);
+      localDeletePrompts(user);
+      localDeleteSystemPrompts(user);
+      deleteSelectedConversation(user);
+      localDeleteAPIKey(user);
+      localDeletePluginKeys(user);
     }
 
     signOut();
@@ -72,7 +74,7 @@ export const ChatbarSettings = () => {
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData(storageType || 'localStorage')}
+        onClick={() => handleExportData(storageType)}
       />
 
       <SidebarButton

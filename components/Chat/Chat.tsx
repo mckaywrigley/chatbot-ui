@@ -48,6 +48,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       systemPrompts,
+      user,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -299,6 +300,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
                       handleEdit(
+                        user,
                         editedMessage,
                         index,
                         null,
@@ -330,6 +332,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             onSend={(conversation, message, plugin) => {
               setCurrentMessage(message);
               handleSend(
+                user,
                 message,
                 plugin,
                 stopConversationRef,
@@ -345,6 +348,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             onRegenerate={(conversation) => {
               if (currentMessage) {
                 handleRegenerate(
+                  user,
                   currentMessage,
                   null,
                   stopConversationRef,

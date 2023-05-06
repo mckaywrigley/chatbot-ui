@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { Prompt } from '@/types/prompt';
 import { StorageType } from '@/types/storage';
 
@@ -11,18 +12,22 @@ import {
 } from './documentBased/local/prompts';
 import { rdbmsGetPrompts, rdbmsUpdatePrompts } from './rdbms/prompts';
 
-export const storageGetPrompts = async (storageType: StorageType) => {
+export const storageGetPrompts = async (
+  storageType: StorageType,
+  user: User,
+) => {
   if (storageType === StorageType.COUCHDB) {
     return await couchdbGetPrompts();
   } else if (storageType === StorageType.RDBMS) {
     return await rdbmsGetPrompts();
   } else {
-    return localGetPrompts();
+    return localGetPrompts(user);
   }
 };
 
 export const storageUpdatePrompts = async (
   storageType: StorageType,
+  user: User,
   updatedPrompts: Prompt[],
 ) => {
   if (storageType === StorageType.COUCHDB) {
@@ -30,6 +35,6 @@ export const storageUpdatePrompts = async (
   } else if (storageType === StorageType.RDBMS) {
     await rdbmsUpdatePrompts(updatedPrompts);
   } else {
-    localSavePrompts(updatedPrompts);
+    localSavePrompts(user, updatedPrompts);
   }
 };

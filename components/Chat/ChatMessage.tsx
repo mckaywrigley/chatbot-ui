@@ -39,6 +39,7 @@ export const ChatMessage: FC<Props> = memo(
         conversations,
         messageIsStreaming,
         storageType,
+        user,
       },
       dispatch: homeDispatch,
     } = useContext(HomeContext);
@@ -98,6 +99,7 @@ export const ChatMessage: FC<Props> = memo(
 
       const { single, all } = storageDeleteMessages(
         storageType,
+        user,
         messagesToBeDeleted,
         selectedConversation,
         messages,

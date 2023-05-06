@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { Conversation } from '@/types/chat';
 import {
   ExportFormatV1,
@@ -82,10 +83,10 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = async (storageType: StorageType) => {
-  let history = await storageGetConversations(storageType);
-  let folders = await storageGetFolders(storageType);
-  let prompts = await storageGetPrompts(storageType);
+export const exportData = async (storageType: StorageType, user: User) => {
+  let history = await storageGetConversations(storageType, user);
+  let folders = await storageGetFolders(storageType, user);
+  let prompts = await storageGetPrompts(storageType, user);
 
   const data = {
     version: 4,
@@ -110,33 +111,35 @@ export const exportData = async (storageType: StorageType) => {
 
 export const importData = async (
   storageType: StorageType,
+  user: User,
   data: SupportedExportFormats,
 ): Promise<LatestExportFormat> => {
   const { history, folders, prompts } = cleanData(data);
 
   // Updating folders
-  const oldFolders = await storageGetFolders(storageType);
+  const oldFolders = await storageGetFolders(storageType, user);
   const newFolders: FolderInterface[] = [...oldFolders, ...folders].filter(
     (folder, index, self) =>
       index === self.findIndex((f) => f.id === folder.id),
   );
 
-  await storageUpdateFolders(storageType, newFolders);
+  await storageUpdateFolders(storageType, user, newFolders);
 
   // Updating conversations
-  const oldConversations = await storageGetConversations(storageType);
+  const oldConversations = await storageGetConversations(storageType, user);
   const newHistory: Conversation[] = [...oldConversations, ...history].filter(
     (conversation, index, self) =>
       index === self.findIndex((c) => c.id === conversation.id),
   );
 
-  await storageUpdateConversations(storageType, newHistory);
+  await storageUpdateConversations(storageType, user, newHistory);
 
   if (storageType === StorageType.RDBMS) {
     for (const conversation of history) {
       if (conversation.messages.length > 0) {
         storageCreateMessages(
           storageType,
+          user,
           conversation,
           conversation.messages,
           newHistory,
@@ -145,19 +148,19 @@ export const importData = async (
     }
   }
   if (newHistory.length > 0) {
-    saveSelectedConversation(newHistory[newHistory.length - 1]);
+    saveSelectedConversation(user, newHistory[newHistory.length - 1]);
   } else {
-    deleteSelectedConversation();
+    deleteSelectedConversation(user);
   }
 
   // Updating prompts
-  const oldPrompts = await storageGetPrompts(storageType);
+  const oldPrompts = await storageGetPrompts(storageType, user);
   const newPrompts: Prompt[] = [...oldPrompts, ...prompts].filter(
     (prompt, index, self) =>
       index === self.findIndex((p) => p.id === prompt.id),
   );
 
-  storageUpdatePrompts(storageType, prompts);
+  storageUpdatePrompts(storageType, user, prompts);
 
   return {
     version: 4,

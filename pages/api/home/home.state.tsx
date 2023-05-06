@@ -1,3 +1,6 @@
+import { getClientSideUser } from '@/utils/app/auth/session';
+
+import { User } from '@/types/auth';
 import { Conversation, Message } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
@@ -32,6 +35,7 @@ export interface HomeInitialState {
   serverSidePluginKeysSet: boolean;
   systemPrompts: SystemPrompt[];
   defaultSystemPromptId: string;
+  user: User;
 }
 
 export const initialState: HomeInitialState = {
@@ -59,4 +63,5 @@ export const initialState: HomeInitialState = {
   serverSidePluginKeysSet: false,
   systemPrompts: [],
   defaultSystemPromptId: '0',
+  user: await getClientSideUser(),
 };

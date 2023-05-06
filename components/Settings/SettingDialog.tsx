@@ -20,16 +20,16 @@ interface Props {
 export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('settings');
 
-  const settings: Settings = getSettings();
-  const { state, dispatch } = useCreateReducer<Settings>({
-    initialState: settings,
-  });
   const {
-    state: { systemPrompts, defaultSystemPromptId },
+    state: { systemPrompts, user },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const settings: Settings = getSettings(user);
+  const { state, dispatch } = useCreateReducer<Settings>({
+    initialState: settings,
+  });
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -55,7 +55,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
       field: 'defaultSystemPromptId',
       value: state.defaultSystemPromptId,
     });
-    saveSettings(state);
+    saveSettings(user, state);
   };
 
   const builtInSystemPrompt: SystemPrompt = {

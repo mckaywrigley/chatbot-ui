@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { FolderInterface } from '@/types/folder';
 import { StorageType } from '@/types/storage';
 
@@ -15,18 +16,22 @@ import {
   rdbmsUpdateFolders,
 } from './rdbms/folders';
 
-export const storageGetFolders = async (storageType: StorageType) => {
+export const storageGetFolders = async (
+  storageType: StorageType,
+  user: User,
+) => {
   if (storageType === StorageType.COUCHDB) {
     return await couchdbGetFolders();
   } else if (storageType === StorageType.RDBMS) {
     return await rdbmsGetFolders();
   } else {
-    return localGetFolders();
+    return localGetFolders(user);
   }
 };
 
 export const storageUpdateFolders = async (
   storageType: StorageType,
+  user: User,
   folders: FolderInterface[],
 ) => {
   if (storageType === StorageType.COUCHDB) {
@@ -34,12 +39,13 @@ export const storageUpdateFolders = async (
   } else if (storageType === StorageType.RDBMS) {
     await rdbmsUpdateFolders(folders);
   } else {
-    localSaveFolders(folders);
+    localSaveFolders(user, folders);
   }
 };
 
 export const storageDeleteFolders = async (
   storageType: StorageType,
+  user: User,
   folderIds: string[],
   allFolders: FolderInterface[],
 ) => {
@@ -52,6 +58,6 @@ export const storageDeleteFolders = async (
   } else if (storageType === StorageType.RDBMS) {
     await rdbmsDeleteFolders(folderIds);
   } else {
-    localSaveFolders(updatedFolders);
+    localSaveFolders(user, updatedFolders);
   }
 };

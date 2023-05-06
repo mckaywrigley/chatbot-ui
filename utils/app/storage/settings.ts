@@ -1,13 +1,15 @@
+import { User } from '@/types/auth';
 import { Settings } from '@/types/settings';
 
 const STORAGE_KEY = 'settings';
 
-export const getSettings = (): Settings => {
+export const getSettings = (user: User): Settings => {
   let settings: Settings = {
     theme: 'dark',
     defaultSystemPromptId: '0',
   };
-  const settingsJson = localStorage.getItem(STORAGE_KEY);
+  const itemName = `${STORAGE_KEY}-${user.id}`;
+  const settingsJson = localStorage.getItem(itemName);
   if (settingsJson) {
     try {
       let savedSettings = JSON.parse(settingsJson) as Settings;
@@ -19,6 +21,7 @@ export const getSettings = (): Settings => {
   return settings;
 };
 
-export const saveSettings = (settings: Settings) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+export const saveSettings = (user: User, settings: Settings) => {
+  const itemName = `${STORAGE_KEY}-${user.id}`;
+  localStorage.setItem(itemName, JSON.stringify(settings));
 };

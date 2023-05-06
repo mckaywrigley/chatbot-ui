@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { StorageType } from '@/types/storage';
 import { SystemPrompt } from '@/types/systemPrompt';
 
@@ -11,6 +12,7 @@ import {
 
 export const storageCreateSystemPrompt = (
   storageType: StorageType,
+  user: User,
   newSystemPrompt: SystemPrompt,
   allSystemPrompts: SystemPrompt[],
 ) => {
@@ -21,7 +23,7 @@ export const storageCreateSystemPrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsCreateSystemPrompt(newSystemPrompt);
   } else {
-    localSaveSystemPrompts(updatedSystemPrompts);
+    localSaveSystemPrompts(user, updatedSystemPrompts);
   }
 
   return updatedSystemPrompts;
@@ -29,6 +31,7 @@ export const storageCreateSystemPrompt = (
 
 export const storageUpdateSystemPrompt = (
   storageType: StorageType,
+  user: User,
   updatedSystemPrompt: SystemPrompt,
   allPrompts: SystemPrompt[],
 ) => {
@@ -45,7 +48,7 @@ export const storageUpdateSystemPrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsUpdateSystemPrompt(updatedSystemPrompt);
   } else {
-    localSaveSystemPrompts(updatedSystemPrompts);
+    localSaveSystemPrompts(user, updatedSystemPrompts);
   }
   return {
     single: updatedSystemPrompt,
@@ -55,6 +58,7 @@ export const storageUpdateSystemPrompt = (
 
 export const storageDeleteSystemPrompt = (
   storageType: StorageType,
+  user: User,
   promptId: string,
   allPrompts: SystemPrompt[],
 ) => {
@@ -65,7 +69,7 @@ export const storageDeleteSystemPrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsDeleteSystemPrompt(promptId);
   } else {
-    localSaveSystemPrompts(updatedSystemPrompts);
+    localSaveSystemPrompts(user, updatedSystemPrompts);
   }
 
   return updatedSystemPrompts;

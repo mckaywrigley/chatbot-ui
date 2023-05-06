@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
+import { localSaveShowPromptBar } from '@/utils/app/storage/documentBased/local/uiState';
 import {
   storageCreatePrompt,
   storageDeletePrompt,
@@ -32,7 +33,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, storageType, showPromptbar },
+    state: { prompts, defaultModelId, storageType, showPromptbar, user },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -44,7 +45,7 @@ const Promptbar = () => {
 
   const handleTogglePromptbar = () => {
     homeDispatch({ field: 'showPromptbar', value: !showPromptbar });
-    localStorage.setItem('showPromptbar', JSON.stringify(!showPromptbar));
+    localSaveShowPromptBar(user, !showPromptbar);
   };
 
   const handleCreatePrompt = () => {
@@ -60,6 +61,7 @@ const Promptbar = () => {
 
       const updatedPrompts = storageCreatePrompt(
         storageType,
+        user,
         newPrompt,
         prompts,
       );
@@ -69,12 +71,17 @@ const Promptbar = () => {
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = storageDeletePrompt(storageType, prompt.id, prompts);
+    const updatedPrompts = storageDeletePrompt(
+      storageType,
+      user,
+      prompt.id,
+      prompts,
+    );
     homeDispatch({ field: 'prompts', value: updatedPrompts });
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
-    const updated = storageUpdatePrompt(storageType, prompt, prompts);
+    const updated = storageUpdatePrompt(storageType, user, prompt, prompts);
 
     homeDispatch({ field: 'prompts', value: updated.all });
   };

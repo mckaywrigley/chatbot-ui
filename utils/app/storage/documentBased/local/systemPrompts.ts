@@ -1,17 +1,20 @@
+import { User } from '@/types/auth';
 import { SystemPrompt } from '@/types/systemPrompt';
 
-export const localGetSystemPrompts = () => {
-  return JSON.parse(
-    localStorage.getItem('system_prompts') || '[]',
-  ) as SystemPrompt[];
+export const localGetSystemPrompts = (user: User) => {
+  const itemName = `system_prompts-${user.id}`;
+  return JSON.parse(localStorage.getItem(itemName) || '[]') as SystemPrompt[];
 };
 
 export const localSaveSystemPrompts = (
+  user: User,
   updatedSystemPrompts: SystemPrompt[],
 ) => {
-  localStorage.setItem('system_prompts', JSON.stringify(updatedSystemPrompts));
+  const itemName = `system_prompts-${user.id}`;
+  localStorage.setItem(itemName, JSON.stringify(updatedSystemPrompts));
 };
 
-export const localDeleteSystemPrompts = () => {
-  localStorage.removeItem('system_prompts');
+export const localDeleteSystemPrompts = (user: User) => {
+  const itemName = `system_prompts-${user.id}`;
+  localStorage.removeItem(itemName);
 };

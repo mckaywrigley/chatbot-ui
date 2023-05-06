@@ -5,6 +5,7 @@ import { storageUpdateConversation } from '@/utils/app/storage/conversation';
 import { storageCreateMessage } from '@/utils/app/storage/message';
 import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
 
+import { User } from '@/types/auth';
 import { Conversation, Message } from '@/types/chat';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { StorageType } from '@/types/storage';
@@ -14,6 +15,7 @@ import { sendChatRequest } from '../chat';
 import { v4 as uuidv4 } from 'uuid';
 
 export const sendHandlerFunction = async (
+  user: User,
   message: Message,
   plugin: Plugin | null = null,
   stopConversationRef: MutableRefObject<boolean>,
@@ -43,6 +45,7 @@ export const sendHandlerFunction = async (
     // Saving the user message
     storageCreateMessage(
       storageType,
+      user,
       selectedConversation,
       message,
       conversations,
@@ -87,6 +90,7 @@ export const sendHandlerFunction = async (
         // Saving the conversation name
         storageUpdateConversation(
           storageType,
+          user,
           { ...selectedConversation, name: updatedConversation.name },
           conversations,
         );
@@ -130,6 +134,7 @@ export const sendHandlerFunction = async (
     // Saving the response message
     const { single, all } = storageCreateMessage(
       storageType,
+      user,
       updatedConversation,
       responseMessage,
       conversations,
@@ -141,6 +146,6 @@ export const sendHandlerFunction = async (
     });
 
     homeDispatch({ field: 'conversations', value: all });
-    saveSelectedConversation(single);
+    saveSelectedConversation(user, single);
   }
 };

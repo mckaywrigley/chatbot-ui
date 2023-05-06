@@ -1,15 +1,20 @@
+import { User } from '@/types/auth';
 import { Conversation } from '@/types/chat';
 
-export const localGetConversations = () => {
-  return JSON.parse(
-    localStorage.getItem('conversationHistory') || '[]',
-  ) as Conversation[];
+export const localGetConversations = (user: User) => {
+  const itemName = `conversationHistory-${user.id}`;
+  return JSON.parse(localStorage.getItem(itemName) || '[]') as Conversation[];
 };
 
-export const localSaveConversations = (conversations: Conversation[]) => {
-  localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+export const localSaveConversations = (
+  user: User,
+  conversations: Conversation[],
+) => {
+  const itemName = `conversationHistory-${user.id}`;
+  localStorage.setItem(itemName, JSON.stringify(conversations));
 };
 
-export const localDeleteConversations = () => {
-  localStorage.removeItem('conversationHistory');
+export const localDeleteConversations = (user: User) => {
+  const itemName = `conversationHistory-${user.id}`;
+  localStorage.removeItem(itemName);
 };

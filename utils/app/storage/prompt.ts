@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { Prompt } from '@/types/prompt';
 import { StorageType } from '@/types/storage';
 
@@ -11,6 +12,7 @@ import {
 
 export const storageCreatePrompt = (
   storageType: StorageType,
+  user: User,
   newPrompt: Prompt,
   allPrompts: Prompt[],
 ) => {
@@ -21,7 +23,7 @@ export const storageCreatePrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsCreatePrompt(newPrompt);
   } else {
-    localSavePrompts(updatedPrompts);
+    localSavePrompts(user, updatedPrompts);
   }
 
   return updatedPrompts;
@@ -29,6 +31,7 @@ export const storageCreatePrompt = (
 
 export const storageUpdatePrompt = (
   storageType: StorageType,
+  user: User,
   updatedPrompt: Prompt,
   allPrompts: Prompt[],
 ) => {
@@ -45,7 +48,7 @@ export const storageUpdatePrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsUpdatePrompt(updatedPrompt);
   } else {
-    localSavePrompts(updatedPrompts);
+    localSavePrompts(user, updatedPrompts);
   }
   return {
     single: updatedPrompt,
@@ -55,6 +58,7 @@ export const storageUpdatePrompt = (
 
 export const storageDeletePrompt = (
   storageType: StorageType,
+  user: User,
   promptId: string,
   allPrompts: Prompt[],
 ) => {
@@ -65,7 +69,7 @@ export const storageDeletePrompt = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsDeletePrompt(promptId);
   } else {
-    localSavePrompts(updatedPrompts);
+    localSavePrompts(user, updatedPrompts);
   }
 
   return updatedPrompts;

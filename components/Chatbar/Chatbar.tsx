@@ -8,6 +8,12 @@ import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { exportData, importData } from '@/utils/app/importExport';
 import { storageDeleteConversation } from '@/utils/app/storage/conversation';
 import { storageDeleteConversations } from '@/utils/app/storage/conversations';
+import { localSaveAPIKey } from '@/utils/app/storage/documentBased/local/apiKey';
+import {
+  localDeletePluginKeys,
+  localSavePluginKeys,
+} from '@/utils/app/storage/documentBased/local/pluginKeys';
+import { localSaveShowChatBar } from '@/utils/app/storage/documentBased/local/uiState';
 import { storageDeleteFolder } from '@/utils/app/storage/folder';
 import {
   storageDeleteFolders,
@@ -51,6 +57,7 @@ export const Chatbar = () => {
       storageType,
       folders,
       pluginKeys,
+      user,
     },
     dispatch: homeDispatch,
     handleCreateFolder,
@@ -67,7 +74,7 @@ export const Chatbar = () => {
     (apiKey: string) => {
       homeDispatch({ field: 'apiKey', value: apiKey });
 
-      localStorage.setItem('apiKey', apiKey);
+      localSaveAPIKey(user, apiKey);
     },
     [homeDispatch],
   );
@@ -84,14 +91,11 @@ export const Chatbar = () => {
 
       homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
 
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+      localSavePluginKeys(user, updatedPluginKeys);
     } else {
       homeDispatch({ field: 'pluginKeys', value: [...pluginKeys, pluginKey] });
 
-      localStorage.setItem(
-        'pluginKeys',
-        JSON.stringify([...pluginKeys, pluginKey]),
-      );
+      localSavePluginKeys(user, [...pluginKeys, pluginKey]);
     }
   };
 
@@ -102,22 +106,22 @@ export const Chatbar = () => {
 
     if (updatedPluginKeys.length === 0) {
       homeDispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
+      localDeletePluginKeys(user);
       return;
     }
 
     homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
-
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+    localSavePluginKeys(user, updatedPluginKeys);
   };
 
   const handleExportData = (storageType: StorageType) => {
-    exportData(storageType);
+    exportData(storageType, user);
   };
 
   const handleImportConversations = async (data: SupportedExportFormats) => {
     const { history, folders, prompts }: LatestExportFormat = await importData(
       storageType,
+      user,
       data,
     );
     homeDispatch({ field: 'conversations', value: history });
@@ -155,19 +159,20 @@ export const Chatbar = () => {
       deletedFolderIds.push(folder.id);
     }
 
-    await storageDeleteConversations(storageType);
-    storageDeleteFolders(storageType, deletedFolderIds, folders);
-    deleteSelectedConversation();
+    await storageDeleteConversations(storageType, user);
+    storageDeleteFolders(storageType, user, deletedFolderIds, folders);
+    deleteSelectedConversation(user);
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
 
     homeDispatch({ field: 'folders', value: updatedFolders });
-    storageUpdateFolders(storageType, updatedFolders);
+    storageUpdateFolders(storageType, user, updatedFolders);
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = storageDeleteConversation(
       storageType,
+      user,
       conversation.id,
       conversations,
     );
@@ -182,6 +187,7 @@ export const Chatbar = () => {
       });
 
       saveSelectedConversation(
+        user,
         updatedConversations[updatedConversations.length - 1],
       );
     } else {
@@ -199,13 +205,13 @@ export const Chatbar = () => {
           },
         });
 
-      deleteSelectedConversation();
+      deleteSelectedConversation(user);
     }
   };
 
   const handleToggleChatbar = () => {
     homeDispatch({ field: 'showChatbar', value: !showChatbar });
-    localStorage.setItem('showChatbar', JSON.stringify(!showChatbar));
+    localSaveShowChatBar(user, showChatbar);
   };
 
   const handleDrop = (e: any) => {

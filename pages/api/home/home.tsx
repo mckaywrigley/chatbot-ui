@@ -11,6 +11,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 
+import { getClientSideUser } from '@/utils/app/auth/session';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -28,6 +29,15 @@ import {
   storageGetConversations,
   storageUpdateConversations,
 } from '@/utils/app/storage/conversations';
+import {
+  localDeleteAPIKey,
+  localGetAPIKey,
+} from '@/utils/app/storage/documentBased/local/apiKey';
+import { localGetPluginKeys } from '@/utils/app/storage/documentBased/local/pluginKeys';
+import {
+  localGetShowChatBar,
+  localGetShowPromptBar,
+} from '@/utils/app/storage/documentBased/local/uiState';
 import {
   storageCreateFolder,
   storageDeleteFolder,
@@ -108,6 +118,7 @@ const Home = ({
       prompts,
       systemPrompts,
       defaultSystemPromptId,
+      user,
     },
     dispatch,
   } = contextValue;
@@ -145,7 +156,7 @@ const Home = ({
       value: conversation,
     });
 
-    saveSelectedConversation(conversation);
+    saveSelectedConversation(user, conversation);
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
@@ -153,6 +164,7 @@ const Home = ({
   const handleCreateFolder = async (name: string, type: FolderType) => {
     const updatedFolders = storageCreateFolder(
       storageType,
+      user,
       name,
       type,
       folders,
@@ -191,14 +203,15 @@ const Home = ({
 
     dispatch({ field: 'prompts', value: updatedPrompts });
 
-    await storageUpdateConversations(storageType, updatedConversations);
-    await storageUpdatePrompts(storageType, updatedPrompts);
-    storageDeleteFolder(storageType, folderId, folders);
+    await storageUpdateConversations(storageType, user, updatedConversations);
+    await storageUpdatePrompts(storageType, user, updatedPrompts);
+    storageDeleteFolder(storageType, user, folderId, folders);
   };
 
   const handleUpdateFolder = async (folderId: string, name: string) => {
     const updatedFolders = storageUpdateFolder(
       storageType,
+      user,
       folderId,
       name,
       folders,
@@ -238,13 +251,14 @@ const Home = ({
 
     const updatedConversations = storageCreateConversation(
       storageType,
+      user,
       newConversation,
       conversations,
     );
     dispatch({ field: 'selectedConversation', value: newConversation });
     dispatch({ field: 'conversations', value: updatedConversations });
 
-    saveSelectedConversation(newConversation);
+    saveSelectedConversation(user, newConversation);
 
     dispatch({ field: 'loading', value: false });
   };
@@ -279,6 +293,7 @@ const Home = ({
 
       const cleaned = storageDeleteMessages(
         storageType,
+        user,
         deletedMessageIds,
         conversation,
         messages,
@@ -290,6 +305,7 @@ const Home = ({
 
       update = storageUpdateMessages(
         storageType,
+        user,
         cleanConversation,
         updatedMessages,
         cleanConversations,
@@ -297,6 +313,7 @@ const Home = ({
     } else {
       update = storageUpdateConversation(
         storageType,
+        user,
         updatedConversation,
         conversations,
       );
@@ -304,7 +321,7 @@ const Home = ({
 
     dispatch({ field: 'selectedConversation', value: update.single });
     dispatch({ field: 'conversations', value: update.all });
-    saveSelectedConversation(update.single);
+    saveSelectedConversation(user, update.single);
   };
 
   // SYSTEM PROMPT OPERATIONS  --------------------------------------------
@@ -318,6 +335,7 @@ const Home = ({
 
     const updatedSystemPrompts = storageCreateSystemPrompt(
       storageType,
+      user,
       newSystemPrompt,
       systemPrompts,
     );
@@ -333,6 +351,7 @@ const Home = ({
 
     update = storageUpdateSystemPrompt(
       storageType,
+      user,
       updatedSystemPrompt,
       systemPrompts,
     );
@@ -347,13 +366,13 @@ const Home = ({
 
     if (defaultSystemPromptId === systemPromptId) {
       // Resetting default system prompt to built-in
-      const settings: Settings = getSettings();
-      saveSettings({ ...settings, defaultSystemPromptId: '0' });
+      const settings: Settings = getSettings(user);
+      saveSettings(user, { ...settings, defaultSystemPromptId: '0' });
       dispatch({ field: 'defaultSystemPromptId', value: '0' });
     }
     dispatch({ field: 'systemPrompts', value: updatedSystemPrompts });
 
-    storageDeleteSystemPrompt(storageType, systemPromptId, systemPrompts);
+    storageDeleteSystemPrompt(storageType, user, systemPromptId, systemPrompts);
   };
 
   // EFFECTS  --------------------------------------------
@@ -389,7 +408,7 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    const settings = getSettings();
+    const settings = getSettings(user);
     if (settings.theme) {
       dispatch({
         field: 'lightMode',
@@ -403,23 +422,21 @@ const Home = ({
       });
     }
 
-    const apiKey = localStorage.getItem('apiKey');
+    const apiKey = localGetAPIKey(user);
 
     if (serverSideApiKeyIsSet) {
       dispatch({ field: 'apiKey', value: '' });
 
-      localStorage.removeItem('apiKey');
+      localDeleteAPIKey(user);
     } else if (apiKey) {
       dispatch({ field: 'apiKey', value: apiKey });
     }
 
-    const pluginKeysRaw = localStorage.getItem('pluginKeys');
-    const pluginKeys: PluginKey[] = pluginKeysRaw
-      ? JSON.parse(pluginKeysRaw)
-      : null;
+    const pluginKeys = localGetPluginKeys(user);
+
     if (serverSidePluginKeysSet) {
       dispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
+      localDeleteAPIKey(user);
     } else if (pluginKeys) {
       dispatch({ field: 'pluginKeys', value: pluginKeys });
     }
@@ -429,35 +446,35 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: false });
     }
 
-    const showChatbar = localStorage.getItem('showChatbar');
+    const showChatbar = localGetShowChatBar(user);
     if (showChatbar) {
-      dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
+      dispatch({ field: 'showChatbar', value: showChatbar });
     }
 
-    const showPromptbar = localStorage.getItem('showPromptbar');
+    const showPromptbar = localGetShowPromptBar(user);
     if (showPromptbar) {
-      dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
+      dispatch({ field: 'showPromptbar', value: showPromptbar });
     }
 
-    storageGetFolders(storageType).then((folders) => {
+    storageGetFolders(storageType, user).then((folders) => {
       if (folders) {
         dispatch({ field: 'folders', value: folders });
       }
     });
 
-    storageGetPrompts(storageType).then((prompts) => {
+    storageGetPrompts(storageType, user).then((prompts) => {
       if (prompts) {
         dispatch({ field: 'prompts', value: prompts });
       }
     });
 
-    storageGetSystemPrompts(storageType).then((systemPrompts) => {
+    storageGetSystemPrompts(storageType, user).then((systemPrompts) => {
       if (systemPrompts) {
         dispatch({ field: 'systemPrompts', value: systemPrompts });
       }
     });
 
-    storageGetConversations(storageType).then((conversationHistory) => {
+    storageGetConversations(storageType, user).then((conversationHistory) => {
       if (conversationHistory) {
         const parsedConversationHistory: Conversation[] = conversationHistory;
         const cleanedConversationHistory = cleanConversationHistory(
@@ -468,7 +485,7 @@ const Home = ({
       }
     });
 
-    const selectedConversation = getSelectedConversation();
+    const selectedConversation = getSelectedConversation(user);
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation =
         JSON.parse(selectedConversation);

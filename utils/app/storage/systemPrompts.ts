@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { StorageType } from '@/types/storage';
 import { SystemPrompt } from '@/types/systemPrompt';
 
@@ -14,18 +15,22 @@ import {
   rdbmsUpdateSystemPrompts,
 } from './rdbms/systemPrompts';
 
-export const storageGetSystemPrompts = async (storageType: StorageType) => {
+export const storageGetSystemPrompts = async (
+  storageType: StorageType,
+  user: User,
+) => {
   if (storageType === StorageType.COUCHDB) {
     return await couchdbGetSystemPrompts();
   } else if (storageType === StorageType.RDBMS) {
     return await rdbmsGetSystemPrompts();
   } else {
-    return localGetSystemPrompts();
+    return localGetSystemPrompts(user);
   }
 };
 
 export const storageUpdateSystemPrompts = async (
   storageType: StorageType,
+  user: User,
   updatedSystemPrompts: SystemPrompt[],
 ) => {
   if (storageType === StorageType.COUCHDB) {
@@ -33,6 +38,6 @@ export const storageUpdateSystemPrompts = async (
   } else if (storageType === StorageType.RDBMS) {
     await rdbmsUpdateSystemPrompts(updatedSystemPrompts);
   } else {
-    localSaveSystemPrompts(updatedSystemPrompts);
+    localSaveSystemPrompts(user, updatedSystemPrompts);
   }
 };

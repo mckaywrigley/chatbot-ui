@@ -8,6 +8,7 @@ import {
 } from '@/utils/app/storage/message';
 import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
 
+import { User } from '@/types/auth';
 import { Conversation, Message } from '@/types/chat';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { StorageType } from '@/types/storage';
@@ -18,6 +19,7 @@ import { storageDeleteMessages } from '../storage/messages';
 import { v4 as uuidv4 } from 'uuid';
 
 export const editMessageHandler = async (
+  user: User,
   message: Message,
   index: number,
   plugin: Plugin | null = null,
@@ -45,6 +47,7 @@ export const editMessageHandler = async (
       }
       const deleteUpdate = storageDeleteMessages(
         storageType,
+        user,
         messagesToBeDeleted,
         selectedConversation,
         selectedConversation.messages,
@@ -59,6 +62,7 @@ export const editMessageHandler = async (
     // Update the user message
     const update1 = storageUpdateMessage(
       storageType,
+      user,
       updatedConversation,
       message,
       conversations,
@@ -113,6 +117,7 @@ export const editMessageHandler = async (
         // Saving the conversation name
         storageUpdateConversation(
           storageType,
+          user,
           { ...selectedConversation, name: updatedConversation.name },
           conversations,
         );
@@ -156,6 +161,7 @@ export const editMessageHandler = async (
     // Saving the response message
     const { single, all } = storageCreateMessage(
       storageType,
+      user,
       updatedConversation,
       responseMessage,
       conversations,
@@ -167,6 +173,6 @@ export const editMessageHandler = async (
     });
 
     homeDispatch({ field: 'conversations', value: all });
-    saveSelectedConversation(single);
+    saveSelectedConversation(user, single);
   }
 };

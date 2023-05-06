@@ -1,13 +1,17 @@
+import { User } from '@/types/auth';
 import { Prompt } from '@/types/prompt';
 
-export const localGetPrompts = () => {
-  return JSON.parse(localStorage.getItem('prompts') || '[]') as Prompt[];
+export const localGetPrompts = (user: User) => {
+  const itemName = `prompts-${user.id}`;
+  return JSON.parse(localStorage.getItem(itemName) || '[]') as Prompt[];
 };
 
-export const localSavePrompts = (updatedPrompts: Prompt[]) => {
-  localStorage.setItem('prompts', JSON.stringify(updatedPrompts));
+export const localSavePrompts = (user: User, updatedPrompts: Prompt[]) => {
+  const itemName = `prompts-${user.id}`;
+  localStorage.setItem(itemName, JSON.stringify(updatedPrompts));
 };
 
-export const localDeletePrompts = () => {
-  localStorage.removeItem('prompts');
+export const localDeletePrompts = (user: User) => {
+  const itemName = `prompts-${user.id}`;
+  localStorage.removeItem(itemName);
 };

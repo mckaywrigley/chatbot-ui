@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { StorageType } from '@/types/storage';
 
@@ -13,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const storageCreateFolder = (
   storageType: StorageType,
+  user: User,
   name: string,
   folderType: FolderType,
   allFolders: FolderInterface[],
@@ -30,7 +32,7 @@ export const storageCreateFolder = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsCreateFolder(newFolder);
   } else {
-    localSaveFolders(updatedFolders);
+    localSaveFolders(user, updatedFolders);
   }
 
   return updatedFolders;
@@ -38,6 +40,7 @@ export const storageCreateFolder = (
 
 export const storageUpdateFolder = (
   storageType: StorageType,
+  user: User,
   folderId: string,
   name: string,
   allFolders: FolderInterface[],
@@ -63,7 +66,7 @@ export const storageUpdateFolder = (
       rdbmsUpdateFolder(updatedFolder);
     }
   } else {
-    localSaveFolders(updatedFolders);
+    localSaveFolders(user, updatedFolders);
   }
 
   return updatedFolders;
@@ -71,6 +74,7 @@ export const storageUpdateFolder = (
 
 export const storageDeleteFolder = (
   storageType: StorageType,
+  user: User,
   folderId: string,
   allFolders: FolderInterface[],
 ) => {
@@ -80,7 +84,7 @@ export const storageDeleteFolder = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsDeleteFolder(folderId);
   } else {
-    localSaveFolders(updatedFolders);
+    localSaveFolders(user, updatedFolders);
   }
 
   return updatedFolders;

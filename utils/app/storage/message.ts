@@ -1,3 +1,4 @@
+import { User } from '@/types/auth';
 import { Conversation, Message } from '@/types/chat';
 import { StorageType } from '@/types/storage';
 
@@ -11,6 +12,7 @@ import {
 
 export const storageCreateMessage = (
   storageType: StorageType,
+  user: User,
   selectedConversation: Conversation,
   newMessage: Message,
   allConversations: Conversation[],
@@ -34,7 +36,7 @@ export const storageCreateMessage = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsCreateMessage(selectedConversation.id, newMessage);
   } else {
-    localSaveConversations(updatedConversations);
+    localSaveConversations(user, updatedConversations);
   }
 
   return { single: updatedConversation, all: updatedConversations };
@@ -42,6 +44,7 @@ export const storageCreateMessage = (
 
 export const storageUpdateMessage = (
   storageType: StorageType,
+  user: User,
   selectedConversation: Conversation,
   updatedMessage: Message,
   allConversations: Conversation[],
@@ -67,7 +70,7 @@ export const storageUpdateMessage = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsUpdateMessage(updatedConversation.id, updatedMessage);
   } else {
-    localSaveConversations(updatedConversations);
+    localSaveConversations(user, updatedConversations);
   }
 
   return { single: updatedConversation, all: updatedConversations };
@@ -75,6 +78,7 @@ export const storageUpdateMessage = (
 
 export const storageDeleteMessage = (
   storageType: StorageType,
+  user: User,
   messageId: string,
   updatedConversations: Conversation[],
 ) => {
@@ -83,6 +87,6 @@ export const storageDeleteMessage = (
   } else if (storageType === StorageType.RDBMS) {
     rdbmsDeleteMessage(messageId);
   } else {
-    localSaveConversations(updatedConversations);
+    localSaveConversations(user, updatedConversations);
   }
 };
