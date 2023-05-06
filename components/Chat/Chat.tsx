@@ -31,6 +31,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -91,6 +92,8 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           category: 'Usages',
           userEmail: user?.email || 'N/A',
           messageType: messageType,
+          user_type: user ? user?.plan : 'no-login',
+          user_id: user ? user?.email : getOrGenerateUserId(),
         } as any;
 
         if (messageLength) {
