@@ -5,12 +5,11 @@ import { User } from '@/types/auth';
 export const getClientSideUser = async () => {
   const session = await getSession();
 
-  console.log('session', session);
-
+  if (!session?.user?.email) {
+    return 'default_user';
+  }
   const user: User = {
-    id: session?.user?.email!,
+    id: session?.user?.email,
   };
-
-  console.log('user', user);
   return user;
 };
