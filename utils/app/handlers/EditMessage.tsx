@@ -34,9 +34,7 @@ export const editMessageHandler = async (
   if (selectedConversation) {
     const deleteCount = selectedConversation?.messages.length - index - 1;
     let updatedConversation: Conversation;
-    console.log('deleteCount', deleteCount);
     if (deleteCount) {
-      console.log(selectedConversation.messages);
       const conversationLength = selectedConversation.messages.length;
       const messagesToBeDeleted: string[] = [];
 
