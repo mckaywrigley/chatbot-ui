@@ -503,6 +503,7 @@ const Home = ({
       });
     }
   }, [
+    user,
     defaultModelId,
     database,
     dispatch,

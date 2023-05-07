@@ -75,7 +75,7 @@ export const Chatbar = () => {
 
       localSaveAPIKey(user, apiKey);
     },
-    [homeDispatch],
+    [homeDispatch, user],
   );
 
   const handlePluginKeyChange = (pluginKey: PluginKey) => {

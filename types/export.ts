@@ -1,6 +1,6 @@
-import { Conversation, Message } from '@/chatbot-ui-core/types/chat';
-import { FolderInterface } from '@/chatbot-ui-core/types/folder';
-import { Prompt } from '@/chatbot-ui-core/types/prompt';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
+import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 export type SupportedExportFormats =
   | ExportFormatV1
