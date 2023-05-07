@@ -71,7 +71,7 @@ export const storageUpdateMessages = (
     return c;
   });
 
-  database.updateMessages(user, updatedMessages);
+  database.updateMessages(user, selectedConversation.id, updatedMessages);
 
   return {
     single: updatedConversation,
@@ -105,7 +105,7 @@ export const storageDeleteMessages = (
     return c;
   });
 
-  database.deleteMessages(user, messageIds);
+  database.deleteMessages(user, selectedConversation.id, messageIds);
 
   return {
     single: updatedConversation,

@@ -1,5 +1,5 @@
-import { User } from '@/chatbot-ui-core/types/auth';
-import { SystemPrompt } from '@/chatbot-ui-core/types/systemPrompt';
+import { User } from 'chatbot-ui-core/types/auth';
+import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
 
 import { Database } from 'chatbot-ui-core';
 

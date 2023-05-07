@@ -14,6 +14,8 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
+    "chatbot-ui-core": "^1.0.10",
+    "chatbot-ui-local-storage": "^1.0.9",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",

@@ -24,8 +24,6 @@ export const storageCreateMessage = (
     return c;
   });
 
-  console.log('newMessage', newMessage);
-
   database
     .createMessage(user, selectedConversation.id, newMessage)
     .then((success) => {
