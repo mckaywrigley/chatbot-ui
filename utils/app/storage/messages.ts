@@ -1,17 +1,18 @@
-import { User } from '@/types/auth';
-import { Conversation, Message } from '@/types/chat';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 
-import { couchdbSaveConversations } from './documentBased/couchdb/conversations';
-import { localSaveConversations } from './documentBased/local/conversations';
-import {
-  rdbmsCreateMessages,
-  rdbmsDeleteMessages,
-  rdbmsUpdateMessages,
-} from './rdbms/messages';
+import { Database } from 'chatbot-ui-core';
+
+export const storageGetMessages = async (
+  database: Database,
+  user: User,
+  selectedConversation: Conversation,
+) => {
+  return await database.getMessages(user, selectedConversation.id);
+};
 
 export const storageCreateMessages = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   selectedConversation: Conversation,
   newMessages: Message[],
@@ -33,13 +34,7 @@ export const storageCreateMessages = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsCreateMessages(selectedConversation.id, newMessages);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  database.createMessages(user, selectedConversation.id, newMessages);
 
   return {
     single: updatedConversation,
@@ -48,7 +43,7 @@ export const storageCreateMessages = (
 };
 
 export const storageUpdateMessages = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   selectedConversation: Conversation,
   updatedMessages: Message[],
@@ -76,13 +71,7 @@ export const storageUpdateMessages = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdateMessages(updatedMessages);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  database.updateMessages(user, updatedMessages);
 
   return {
     single: updatedConversation,
@@ -91,7 +80,7 @@ export const storageUpdateMessages = (
 };
 
 export const storageDeleteMessages = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   messageIds: string[],
   selectedConversation: Conversation,
@@ -116,13 +105,7 @@ export const storageDeleteMessages = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsDeleteMessages(messageIds);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  database.deleteMessages(user, messageIds);
 
   return {
     single: updatedConversation,

@@ -114,7 +114,6 @@ When deploying the application, the following environment variables can be set:
 | GITHUB_CLIENT_SECRET                  |                                                     | GitHub OAuth Client Secret for NextAuth                                                    |
 | GOOGLE_CLIENT_ID                      |                                                     | Google OAuth Client ID for NextAuth                                                        |
 | GOOGLE_CLIENT_SECRET                  |                                                     | Google OAuth Client Secret for NextAuth                                                    |
-| STORAGE_TYPE                          | `local`                                             | Options are `local`, `couchdb`, & `rdbms`                                                  |
 | COUCHDB_HOST                          | `http://couchdb`                                    | The hostname of the CouchDB instance                                                       |
 | COUCHDB_PORT                          | `5984`                                              | The port of the CouchDB instance                                                           |
 | COUCHDB_USERNAME                      | `admin`                                             | The username of the CouchDB instance                                                       |

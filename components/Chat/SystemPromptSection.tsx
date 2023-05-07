@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 
-import { SystemPrompt } from '@/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 

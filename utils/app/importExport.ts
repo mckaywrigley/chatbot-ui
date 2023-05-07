@@ -1,5 +1,3 @@
-import { User } from '@/types/auth';
-import { Conversation } from '@/types/chat';
 import {
   ExportFormatV1,
   ExportFormatV2,
@@ -8,9 +6,10 @@ import {
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
-import { FolderInterface } from '@/types/folder';
-import { Prompt } from '@/types/prompt';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { Conversation } from 'chatbot-ui-core/types/chat';
+import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 import { cleanConversationHistory } from './clean';
 import {
@@ -18,11 +17,12 @@ import {
   storageUpdateConversations,
 } from './storage/conversations';
 import { storageGetFolders, storageUpdateFolders } from './storage/folders';
-import { storageCreateMessage, storageUpdateMessage } from './storage/message';
 import { storageCreateMessages } from './storage/messages';
 import { storageGetPrompts, storageUpdatePrompts } from './storage/prompts';
 import { saveSelectedConversation } from './storage/selectedConversation';
 import { deleteSelectedConversation } from './storage/selectedConversation';
+
+import { Database } from 'chatbot-ui-core';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -83,10 +83,10 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = async (storageType: StorageType, user: User) => {
-  let history = await storageGetConversations(storageType, user);
-  let folders = await storageGetFolders(storageType, user);
-  let prompts = await storageGetPrompts(storageType, user);
+export const exportData = async (database: Database, user: User) => {
+  let history = await storageGetConversations(database, user);
+  let folders = await storageGetFolders(database, user);
+  let prompts = await storageGetPrompts(database, user);
 
   const data = {
     version: 4,
@@ -110,35 +110,35 @@ export const exportData = async (storageType: StorageType, user: User) => {
 };
 
 export const importData = async (
-  storageType: StorageType,
+  database: Database,
   user: User,
   data: SupportedExportFormats,
 ): Promise<LatestExportFormat> => {
   const { history, folders, prompts } = cleanData(data);
 
   // Updating folders
-  const oldFolders = await storageGetFolders(storageType, user);
+  const oldFolders = await storageGetFolders(database, user);
   const newFolders: FolderInterface[] = [...oldFolders, ...folders].filter(
     (folder, index, self) =>
       index === self.findIndex((f) => f.id === folder.id),
   );
 
-  await storageUpdateFolders(storageType, user, newFolders);
+  await storageUpdateFolders(database, user, newFolders);
 
   // Updating conversations
-  const oldConversations = await storageGetConversations(storageType, user);
+  const oldConversations = await storageGetConversations(database, user);
   const newHistory: Conversation[] = [...oldConversations, ...history].filter(
     (conversation, index, self) =>
       index === self.findIndex((c) => c.id === conversation.id),
   );
 
-  await storageUpdateConversations(storageType, user, newHistory);
+  await storageUpdateConversations(database, user, newHistory);
 
-  if (storageType === StorageType.RDBMS) {
+  if (database.name === 'RDBMS') {
     for (const conversation of history) {
       if (conversation.messages.length > 0) {
         storageCreateMessages(
-          storageType,
+          database,
           user,
           conversation,
           conversation.messages,
@@ -154,13 +154,13 @@ export const importData = async (
   }
 
   // Updating prompts
-  const oldPrompts = await storageGetPrompts(storageType, user);
+  const oldPrompts = await storageGetPrompts(database, user);
   const newPrompts: Prompt[] = [...oldPrompts, ...prompts].filter(
     (prompt, index, self) =>
       index === self.findIndex((p) => p.id === prompt.id),
   );
 
-  storageUpdatePrompts(storageType, user, prompts);
+  storageUpdatePrompts(database, user, prompts);
 
   return {
     version: 4,

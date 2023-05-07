@@ -1,5 +1,6 @@
-import { Prompt } from '@/types/prompt';
 import { getRequest, putRequest } from '../../utils/server/couchdb';
+
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 export const config = {
   runtime: 'edge',
@@ -17,7 +18,17 @@ const get = async (req: Request): Promise<Response> => {
   try {
     const response = await getRequest('prompts');
     const json = await response.json();
-    const prompts: Prompt[] = json?.data?.map(({id, name, description, content, model, folderId}: Prompt) => ({id, name, description, content, model, folderId})) || [];
+    const prompts: Prompt[] =
+      json?.data?.map(
+        ({ id, name, description, content, model, folderId }: Prompt) => ({
+          id,
+          name,
+          description,
+          content,
+          model,
+          folderId,
+        }),
+      ) || [];
 
     return new Response(JSON.stringify(prompts), { status: 200 });
   } catch (error) {
@@ -34,13 +45,18 @@ const post = async (req: Request): Promise<Response> => {
     const getFolders = await getRequest('prompts');
     ({ _rev: rev } = await getFolders.json());
 
-    const response = await putRequest('prompts', JSON.stringify({ _id: 'prompts', _rev: rev, data }));
+    const response = await putRequest(
+      'prompts',
+      JSON.stringify({ _id: 'prompts', _rev: rev, data }),
+    );
 
     if (response.ok) {
-      return new Response(JSON.stringify({"ok": true}), { status: 200 });
+      return new Response(JSON.stringify({ ok: true }), { status: 200 });
     } else {
       console.log(await response.json());
-      throw new Error(`Failed to update record ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to update record ${response.status} ${response.statusText}`,
+      );
     }
   } catch (error) {
     console.error(error);

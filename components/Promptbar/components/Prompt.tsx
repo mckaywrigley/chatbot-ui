@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 
-import { Prompt } from '@/types/prompt';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 

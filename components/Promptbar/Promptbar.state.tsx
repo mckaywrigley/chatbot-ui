@@ -1,4 +1,4 @@
-import { Prompt } from '@/types/prompt';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 export interface PromptbarInitialState {
   searchTerm: string;

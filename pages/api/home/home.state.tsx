@@ -1,17 +1,21 @@
-import { getClientSideUser } from '@/utils/app/auth/session';
+import { User } from 'next-auth';
 
-import { User } from '@/types/auth';
-import { Conversation, Message } from '@/types/chat';
+import { getClientSideUser } from '@/utils/app/auth/session';
+import { getDatabase } from '@/utils/app/storage/database';
+
 import { ErrorMessage } from '@/types/error';
-import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
-import { StorageType } from '@/types/storage';
-import { SystemPrompt } from '@/types/systemPrompt';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
+import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+
+import { Database } from 'chatbot-ui-core';
 
 export interface HomeInitialState {
   apiKey: string;
+  database: Database;
   pluginKeys: PluginKey[];
   loading: boolean;
   lightMode: 'light' | 'dark';
@@ -30,7 +34,6 @@ export interface HomeInitialState {
   messageError: boolean;
   searchTerm: string;
   defaultModelId: OpenAIModelID | undefined;
-  storageType: StorageType;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   systemPrompts: SystemPrompt[];
@@ -40,6 +43,7 @@ export interface HomeInitialState {
 
 export const initialState: HomeInitialState = {
   apiKey: '',
+  database: await getDatabase(),
   loading: false,
   pluginKeys: [],
   lightMode: 'dark',
@@ -58,7 +62,6 @@ export const initialState: HomeInitialState = {
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
-  storageType: StorageType.LOCAL,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
   systemPrompts: [],

@@ -16,7 +16,7 @@ import { regenerateMessageHandler } from '@/utils/app/handlers/RegenerateMessage
 import { sendHandlerFunction } from '@/utils/app/handlers/SendMessage';
 import { throttle } from '@/utils/data/throttle';
 
-import { Message } from '@/types/chat';
+import { Message } from 'chatbot-ui-core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -41,7 +41,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       selectedConversation,
       conversations,
       models,
-      storageType,
+      database,
       apiKey,
       pluginKeys,
       serverSideApiKeyIsSet,
@@ -71,7 +71,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     pluginKeys,
     selectedConversation,
     stopConversationRef,
-    storageType,
+    database,
   ]);
 
   const handleEdit = useCallback(editMessageHandler, [
@@ -81,7 +81,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     pluginKeys,
     selectedConversation,
     stopConversationRef,
-    storageType,
+    database,
   ]);
 
   const handleRegenerate = useCallback(regenerateMessageHandler, [
@@ -91,7 +91,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     pluginKeys,
     selectedConversation,
     stopConversationRef,
-    storageType,
+    database,
   ]);
 
   const scrollToBottom = useCallback(() => {
@@ -307,7 +307,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         stopConversationRef,
                         conversation,
                         conversations,
-                        storageType,
+                        database,
                         apiKey,
                         pluginKeys,
                         homeDispatch,
@@ -338,7 +338,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 stopConversationRef,
                 conversation,
                 conversations,
-                storageType,
+                database,
                 apiKey,
                 pluginKeys,
                 homeDispatch,
@@ -354,7 +354,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   stopConversationRef,
                   conversation,
                   conversations,
-                  storageType,
+                  database,
                   apiKey,
                   pluginKeys,
                   homeDispatch,

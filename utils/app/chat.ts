@@ -1,5 +1,5 @@
-import { ChatBody, Conversation } from '@/types/chat';
 import { Plugin, PluginKey } from '@/types/plugin';
+import { ChatBody, Conversation } from 'chatbot-ui-core/types/chat';
 
 import { getEndpoint } from './api';
 

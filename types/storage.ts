@@ -1,7 +1,8 @@
-import { Conversation } from './chat';
-import { FolderInterface } from './folder';
+import { Conversation } from 'chatbot-ui-core/types/chat';
+import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
+
 import { PluginKey } from './plugin';
-import { Prompt } from './prompt';
 
 // keep track of local storage schema
 export interface LocalStorage {
@@ -18,11 +19,4 @@ export interface LocalStorage {
   showPromptbar: boolean;
   // added plugin keys (4/3/23)
   pluginKeys: PluginKey[];
-}
-
-export enum StorageType {
-  LOCAL = 'local',
-  COUCHDB = 'couchdb',
-  MONGODB = 'mongodb',
-  RDBMS = 'rdbms',
 }

@@ -5,15 +5,9 @@ import { useContext, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 
 import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
-import { localDeleteAPIKey } from '@/utils/app/storage/documentBased/local/apiKey';
-import { localDeleteConversations } from '@/utils/app/storage/documentBased/local/conversations';
-import { localDeleteFolders } from '@/utils/app/storage/documentBased/local/folders';
-import { localDeletePluginKeys } from '@/utils/app/storage/documentBased/local/pluginKeys';
-import { localDeletePrompts } from '@/utils/app/storage/documentBased/local/prompts';
-import { localDeleteSystemPrompts } from '@/utils/app/storage/documentBased/local/systemPrompts';
+import { localDeleteAPIKey } from '@/utils/app/storage/local/apiKey';
+import { localDeletePluginKeys } from '@/utils/app/storage/local/pluginKeys';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
-
-import { StorageType } from '@/types/storage';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -33,7 +27,7 @@ export const ChatbarSettings = () => {
   const {
     state: {
       apiKey,
-      storageType,
+      database,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
@@ -43,11 +37,7 @@ export const ChatbarSettings = () => {
   } = useContext(HomeContext);
 
   const handleSignOut = () => {
-    if (storageType !== StorageType.LOCAL) {
-      localDeleteConversations(user);
-      localDeleteFolders(user);
-      localDeletePrompts(user);
-      localDeleteSystemPrompts(user);
+    if (database.name !== 'local') {
       deleteSelectedConversation(user);
       localDeleteAPIKey(user);
       localDeletePluginKeys(user);
@@ -74,7 +64,7 @@ export const ChatbarSettings = () => {
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData(storageType)}
+        onClick={() => handleExportData(database)}
       />
 
       <SidebarButton

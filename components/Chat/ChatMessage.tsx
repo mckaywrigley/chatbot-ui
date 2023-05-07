@@ -12,7 +12,7 @@ import { useTranslation } from 'next-i18next';
 
 import { storageDeleteMessages } from '@/utils/app/storage/messages';
 
-import { Conversation, Message } from '@/types/chat';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -38,7 +38,7 @@ export const ChatMessage: FC<Props> = memo(
         selectedConversation,
         conversations,
         messageIsStreaming,
-        storageType,
+        database,
         user,
       },
       dispatch: homeDispatch,
@@ -98,7 +98,7 @@ export const ChatMessage: FC<Props> = memo(
       }
 
       const { single, all } = storageDeleteMessages(
-        storageType,
+        database,
         user,
         messagesToBeDeleted,
         selectedConversation,

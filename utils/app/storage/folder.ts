@@ -1,19 +1,11 @@
-import { User } from '@/types/auth';
-import { FolderInterface, FolderType } from '@/types/folder';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { FolderInterface, FolderType } from 'chatbot-ui-core/types/folder';
 
-import { couchdbSaveFolders } from './documentBased/couchdb/folders';
-import { localSaveFolders } from './documentBased/local/folders';
-import {
-  rdbmsCreateFolder,
-  rdbmsDeleteFolder,
-  rdbmsUpdateFolder,
-} from './rdbms/folder';
-
+import { Database } from 'chatbot-ui-core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const storageCreateFolder = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   name: string,
   folderType: FolderType,
@@ -27,19 +19,13 @@ export const storageCreateFolder = (
 
   const updatedFolders = [...allFolders, newFolder];
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveFolders(updatedFolders);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsCreateFolder(newFolder);
-  } else {
-    localSaveFolders(user, updatedFolders);
-  }
+  database.createFolder(user, newFolder);
 
   return updatedFolders;
 };
 
 export const storageUpdateFolder = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   folderId: string,
   name: string,
@@ -59,33 +45,20 @@ export const storageUpdateFolder = (
     return f;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveFolders(updatedFolders);
-  } else if (storageType === StorageType.RDBMS) {
-    if (updatedFolder !== null) {
-      rdbmsUpdateFolder(updatedFolder);
-    }
-  } else {
-    localSaveFolders(user, updatedFolders);
-  }
+  database.updateFolder(user, updatedFolder!);
 
   return updatedFolders;
 };
 
 export const storageDeleteFolder = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   folderId: string,
   allFolders: FolderInterface[],
 ) => {
   const updatedFolders = allFolders.filter((f) => f.id !== folderId);
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveFolders(updatedFolders);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsDeleteFolder(folderId);
-  } else {
-    localSaveFolders(user, updatedFolders);
-  }
+
+  database.deleteFolder(user, folderId);
 
   return updatedFolders;
 };

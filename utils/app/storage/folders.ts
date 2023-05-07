@@ -1,63 +1,24 @@
-import { User } from '@/types/auth';
-import { FolderInterface } from '@/types/folder';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { FolderInterface } from 'chatbot-ui-core/types/folder';
 
-import {
-  couchdbGetFolders,
-  couchdbSaveFolders,
-} from './documentBased/couchdb/folders';
-import {
-  localGetFolders,
-  localSaveFolders,
-} from './documentBased/local/folders';
-import {
-  rdbmsDeleteFolders,
-  rdbmsGetFolders,
-  rdbmsUpdateFolders,
-} from './rdbms/folders';
+import { Database } from 'chatbot-ui-core';
 
-export const storageGetFolders = async (
-  storageType: StorageType,
-  user: User,
-) => {
-  if (storageType === StorageType.COUCHDB) {
-    return await couchdbGetFolders();
-  } else if (storageType === StorageType.RDBMS) {
-    return await rdbmsGetFolders();
-  } else {
-    return localGetFolders(user);
-  }
+export const storageGetFolders = async (database: Database, user: User) => {
+  return await database.getFolders(user);
 };
 
 export const storageUpdateFolders = async (
-  storageType: StorageType,
+  database: Database,
   user: User,
   folders: FolderInterface[],
 ) => {
-  if (storageType === StorageType.COUCHDB) {
-    await couchdbSaveFolders(folders);
-  } else if (storageType === StorageType.RDBMS) {
-    await rdbmsUpdateFolders(folders);
-  } else {
-    localSaveFolders(user, folders);
-  }
+  await database.updateFolders(user, folders);
 };
 
 export const storageDeleteFolders = async (
-  storageType: StorageType,
+  database: Database,
   user: User,
   folderIds: string[],
-  allFolders: FolderInterface[],
 ) => {
-  const updatedFolders = allFolders.filter(
-    (folder) => !folderIds.includes(folder.id),
-  );
-
-  if (storageType === StorageType.COUCHDB) {
-    await couchdbSaveFolders(updatedFolders);
-  } else if (storageType === StorageType.RDBMS) {
-    await rdbmsDeleteFolders(folderIds);
-  } else {
-    localSaveFolders(user, updatedFolders);
-  }
+  await database.deleteFolders(user, folderIds);
 };

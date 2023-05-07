@@ -1,7 +1,12 @@
-import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
+import { Message } from 'chatbot-ui-core/types/chat';
 
-import { OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION,
+} from '../app/const';
 
 import {
   ParsedEvent,
@@ -26,7 +31,7 @@ export class OpenAIError extends Error {
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   key: string,
   messages: Message[],
   tokenCount: number,
@@ -39,18 +44,19 @@ export const OpenAIStream = async (
     headers: {
       'Content-Type': 'application/json',
       ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
       }),
       ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`,
       }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
+      ...(OPENAI_API_TYPE === 'openai' &&
+        OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',
@@ -58,7 +64,7 @@ export const OpenAIStream = async (
         },
         ...messages,
       ],
-      max_tokens: (model.tokenLimit - tokenCount),
+      max_tokens: model.tokenLimit - tokenCount,
       temperature: temperature,
       stream: true,
     }),

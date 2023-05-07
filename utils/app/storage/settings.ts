@@ -1,5 +1,5 @@
-import { User } from '@/types/auth';
 import { Settings } from '@/types/settings';
+import { User } from 'chatbot-ui-core/types/auth';
 
 const STORAGE_KEY = 'settings';
 

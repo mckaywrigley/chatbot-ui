@@ -1,43 +1,19 @@
-import { User } from '@/types/auth';
-import { StorageType } from '@/types/storage';
-import { SystemPrompt } from '@/types/systemPrompt';
+import { User } from '@/chatbot-ui-core/types/auth';
+import { SystemPrompt } from '@/chatbot-ui-core/types/systemPrompt';
 
-import {
-  couchdbGetSystemPrompts,
-  couchdbSaveSystemPrompts,
-} from './documentBased/couchdb/systemPrompts';
-import {
-  localGetSystemPrompts,
-  localSaveSystemPrompts,
-} from './documentBased/local/systemPrompts';
-import {
-  rdbmsGetSystemPrompts,
-  rdbmsUpdateSystemPrompts,
-} from './rdbms/systemPrompts';
+import { Database } from 'chatbot-ui-core';
 
 export const storageGetSystemPrompts = async (
-  storageType: StorageType,
+  database: Database,
   user: User,
 ) => {
-  if (storageType === StorageType.COUCHDB) {
-    return await couchdbGetSystemPrompts();
-  } else if (storageType === StorageType.RDBMS) {
-    return await rdbmsGetSystemPrompts();
-  } else {
-    return localGetSystemPrompts(user);
-  }
+  return await database.getSystemPrompts(user);
 };
 
 export const storageUpdateSystemPrompts = async (
-  storageType: StorageType,
+  database: Database,
   user: User,
   updatedSystemPrompts: SystemPrompt[],
 ) => {
-  if (storageType === StorageType.COUCHDB) {
-    await couchdbSaveSystemPrompts(updatedSystemPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    await rdbmsUpdateSystemPrompts(updatedSystemPrompts);
-  } else {
-    localSaveSystemPrompts(user, updatedSystemPrompts);
-  }
+  database.updateSystemPrompts(user, updatedSystemPrompts);
 };

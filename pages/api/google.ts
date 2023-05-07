@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { OPENAI_API_HOST, OPENAI_ORGANIZATION } from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
 
-import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
 import { Readability } from '@mozilla/readability';

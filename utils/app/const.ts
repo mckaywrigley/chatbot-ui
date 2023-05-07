@@ -1,6 +1,3 @@
-import { StorageType } from '@/types/storage';
-
-
 export const DEFAULT_SYSTEM_PROMPT =
   process.env.NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT ||
   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.";
@@ -19,9 +16,6 @@ export const OPENAI_API_VERSION =
 
 export const OPENAI_ORGANIZATION =
   process.env.OPENAI_ORGANIZATION || '';
-
-export const STORAGE_TYPE =
-  (process.env.STORAGE_TYPE || 'local') as StorageType;
 
 export const COUCHDB_USER =
   process.env.COUCHDB_USER || 'admin';

@@ -1,17 +1,10 @@
-import { User } from '@/types/auth';
-import { Conversation, Message } from '@/types/chat';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 
-import { couchdbSaveConversations } from './documentBased/couchdb/conversations';
-import { localSaveConversations } from './documentBased/local/conversations';
-import {
-  rdbmsCreateMessage,
-  rdbmsDeleteMessage,
-  rdbmsUpdateMessage,
-} from './rdbms/message';
+import { Database } from 'chatbot-ui-core';
 
 export const storageCreateMessage = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   selectedConversation: Conversation,
   newMessage: Message,
@@ -31,19 +24,21 @@ export const storageCreateMessage = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsCreateMessage(selectedConversation.id, newMessage);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  console.log('newMessage', newMessage);
+
+  database
+    .createMessage(user, selectedConversation.id, newMessage)
+    .then((success) => {
+      if (!success) {
+        console.log('Failed to create message');
+      }
+    });
 
   return { single: updatedConversation, all: updatedConversations };
 };
 
 export const storageUpdateMessage = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   selectedConversation: Conversation,
   updatedMessage: Message,
@@ -65,28 +60,28 @@ export const storageUpdateMessage = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdateMessage(updatedConversation.id, updatedMessage);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  database
+    .updateMessage(user, selectedConversation.id, updatedMessage)
+    .then((success) => {
+      if (!success) {
+        console.log('Failed to update message');
+      }
+    });
 
   return { single: updatedConversation, all: updatedConversations };
 };
 
 export const storageDeleteMessage = (
-  storageType: StorageType,
+  database: Database,
   user: User,
+  selectedConversation: Conversation,
   messageId: string,
-  updatedConversations: Conversation[],
 ) => {
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveConversations(updatedConversations);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsDeleteMessage(messageId);
-  } else {
-    localSaveConversations(user, updatedConversations);
-  }
+  database
+    .deleteMessage(user, selectedConversation.id, messageId)
+    .then((success) => {
+      if (!success) {
+        console.log('Failed to delete message');
+      }
+    });
 };

@@ -8,14 +8,14 @@ import {
 } from '@/utils/app/storage/message';
 import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
 
-import { User } from '@/types/auth';
-import { Conversation, Message } from '@/types/chat';
 import { Plugin, PluginKey } from '@/types/plugin';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 
 import { sendChatRequest } from '../chat';
 import { storageDeleteMessages } from '../storage/messages';
 
+import { Database } from 'chatbot-ui-core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const editMessageHandler = async (
@@ -26,7 +26,7 @@ export const editMessageHandler = async (
   stopConversationRef: MutableRefObject<boolean>,
   selectedConversation: Conversation | undefined,
   conversations: Conversation[],
-  storageType: StorageType,
+  database: Database,
   apiKey: string,
   pluginKeys: PluginKey[],
   homeDispatch: React.Dispatch<any>,
@@ -44,7 +44,7 @@ export const editMessageHandler = async (
         messagesToBeDeleted.push(currentMessage.id);
       }
       const deleteUpdate = storageDeleteMessages(
-        storageType,
+        database,
         user,
         messagesToBeDeleted,
         selectedConversation,
@@ -59,7 +59,7 @@ export const editMessageHandler = async (
 
     // Update the user message
     const update1 = storageUpdateMessage(
-      storageType,
+      database,
       user,
       updatedConversation,
       message,
@@ -114,7 +114,7 @@ export const editMessageHandler = async (
 
         // Saving the conversation name
         storageUpdateConversation(
-          storageType,
+          database,
           user,
           { ...selectedConversation, name: updatedConversation.name },
           conversations,
@@ -158,7 +158,7 @@ export const editMessageHandler = async (
 
     // Saving the response message
     const { single, all } = storageCreateMessage(
-      storageType,
+      database,
       user,
       updatedConversation,
       responseMessage,

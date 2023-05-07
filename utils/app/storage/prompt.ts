@@ -1,36 +1,23 @@
-import { User } from '@/types/auth';
-import { Prompt } from '@/types/prompt';
-import { StorageType } from '@/types/storage';
+import { User } from 'chatbot-ui-core/types/auth';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
-import { couchdbSavePrompts } from './documentBased/couchdb/prompts';
-import { localSavePrompts } from './documentBased/local/prompts';
-import {
-  rdbmsCreatePrompt,
-  rdbmsDeletePrompt,
-  rdbmsUpdatePrompt,
-} from './rdbms/prompt';
+import { Database } from 'chatbot-ui-core';
 
 export const storageCreatePrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   newPrompt: Prompt,
   allPrompts: Prompt[],
 ) => {
   const updatedPrompts = [...allPrompts, newPrompt];
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSavePrompts(updatedPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsCreatePrompt(newPrompt);
-  } else {
-    localSavePrompts(user, updatedPrompts);
-  }
+  database.createPrompt(user, newPrompt);
 
   return updatedPrompts;
 };
 
 export const storageUpdatePrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   updatedPrompt: Prompt,
   allPrompts: Prompt[],
@@ -43,13 +30,8 @@ export const storageUpdatePrompt = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSavePrompts(updatedPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdatePrompt(updatedPrompt);
-  } else {
-    localSavePrompts(user, updatedPrompts);
-  }
+  database.updatePrompt(user, updatedPrompt);
+
   return {
     single: updatedPrompt,
     all: updatedPrompts,
@@ -57,20 +39,14 @@ export const storageUpdatePrompt = (
 };
 
 export const storageDeletePrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   promptId: string,
   allPrompts: Prompt[],
 ) => {
   const updatedPrompts = allPrompts.filter((p) => p.id !== promptId);
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSavePrompts(updatedPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsDeletePrompt(promptId);
-  } else {
-    localSavePrompts(user, updatedPrompts);
-  }
+  database.deletePrompt(user, promptId);
 
   return updatedPrompts;
 };

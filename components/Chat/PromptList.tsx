@@ -1,6 +1,6 @@
 import { FC, MutableRefObject } from 'react';
 
-import { Prompt } from '@/types/prompt';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 interface Props {
   prompts: Prompt[];

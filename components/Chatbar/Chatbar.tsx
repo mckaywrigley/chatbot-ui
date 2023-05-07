@@ -8,27 +8,25 @@ import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { exportData, importData } from '@/utils/app/importExport';
 import { storageDeleteConversation } from '@/utils/app/storage/conversation';
 import { storageDeleteConversations } from '@/utils/app/storage/conversations';
-import { localSaveAPIKey } from '@/utils/app/storage/documentBased/local/apiKey';
-import {
-  localDeletePluginKeys,
-  localSavePluginKeys,
-} from '@/utils/app/storage/documentBased/local/pluginKeys';
-import { localSaveShowChatBar } from '@/utils/app/storage/documentBased/local/uiState';
-import { storageDeleteFolder } from '@/utils/app/storage/folder';
 import {
   storageDeleteFolders,
   storageUpdateFolders,
 } from '@/utils/app/storage/folders';
+import { localSaveAPIKey } from '@/utils/app/storage/local/apiKey';
+import {
+  localDeletePluginKeys,
+  localSavePluginKeys,
+} from '@/utils/app/storage/local/pluginKeys';
+import { localSaveShowChatBar } from '@/utils/app/storage/local/uiState';
 import {
   deleteSelectedConversation,
   saveSelectedConversation,
 } from '@/utils/app/storage/selectedConversation';
 
-import { Conversation } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
-import { StorageType } from '@/types/storage';
+import { Conversation } from 'chatbot-ui-core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -40,6 +38,7 @@ import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
+import { Database } from 'chatbot-ui-core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
@@ -54,7 +53,7 @@ export const Chatbar = () => {
       conversations,
       showChatbar,
       defaultModelId,
-      storageType,
+      database,
       folders,
       pluginKeys,
       user,
@@ -114,13 +113,13 @@ export const Chatbar = () => {
     localSavePluginKeys(user, updatedPluginKeys);
   };
 
-  const handleExportData = (storageType: StorageType) => {
-    exportData(storageType, user);
+  const handleExportData = (database: Database) => {
+    exportData(database, user);
   };
 
   const handleImportConversations = async (data: SupportedExportFormats) => {
     const { history, folders, prompts }: LatestExportFormat = await importData(
-      storageType,
+      database,
       user,
       data,
     );
@@ -159,19 +158,19 @@ export const Chatbar = () => {
       deletedFolderIds.push(folder.id);
     }
 
-    await storageDeleteConversations(storageType, user);
-    storageDeleteFolders(storageType, user, deletedFolderIds, folders);
+    await storageDeleteConversations(database, user);
+    storageDeleteFolders(database, user, deletedFolderIds);
     deleteSelectedConversation(user);
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
 
     homeDispatch({ field: 'folders', value: updatedFolders });
-    storageUpdateFolders(storageType, user, updatedFolders);
+    storageUpdateFolders(database, user, updatedFolders);
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
     const updatedConversations = storageDeleteConversation(
-      storageType,
+      database,
       user,
       conversation.id,
       conversations,

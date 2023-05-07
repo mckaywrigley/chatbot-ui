@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { MouseEventHandler, useContext, useState } from 'react';
 
-import { SystemPrompt } from '@/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 

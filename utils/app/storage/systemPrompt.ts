@@ -1,36 +1,23 @@
-import { User } from '@/types/auth';
-import { StorageType } from '@/types/storage';
-import { SystemPrompt } from '@/types/systemPrompt';
+import { SystemPrompt } from '@/chatbot-ui-core/types/systemPrompt';
+import { User } from 'chatbot-ui-core/types/auth';
 
-import { couchdbSaveSystemPrompts } from './documentBased/couchdb/systemPrompts';
-import { localSaveSystemPrompts } from './documentBased/local/systemPrompts';
-import {
-  rdbmsCreateSystemPrompt,
-  rdbmsDeleteSystemPrompt,
-  rdbmsUpdateSystemPrompt,
-} from './rdbms/systemPrompt';
+import { Database } from 'chatbot-ui-core';
 
 export const storageCreateSystemPrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   newSystemPrompt: SystemPrompt,
   allSystemPrompts: SystemPrompt[],
 ) => {
   const updatedSystemPrompts = [...allSystemPrompts, newSystemPrompt];
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveSystemPrompts(updatedSystemPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsCreateSystemPrompt(newSystemPrompt);
-  } else {
-    localSaveSystemPrompts(user, updatedSystemPrompts);
-  }
+  database.createSystemPrompt(user, newSystemPrompt);
 
   return updatedSystemPrompts;
 };
 
 export const storageUpdateSystemPrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   updatedSystemPrompt: SystemPrompt,
   allPrompts: SystemPrompt[],
@@ -43,13 +30,8 @@ export const storageUpdateSystemPrompt = (
     return c;
   });
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveSystemPrompts(updatedSystemPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsUpdateSystemPrompt(updatedSystemPrompt);
-  } else {
-    localSaveSystemPrompts(user, updatedSystemPrompts);
-  }
+  database.updateSystemPrompt(user, updatedSystemPrompt);
+
   return {
     single: updatedSystemPrompt,
     all: updatedSystemPrompts,
@@ -57,20 +39,14 @@ export const storageUpdateSystemPrompt = (
 };
 
 export const storageDeleteSystemPrompt = (
-  storageType: StorageType,
+  database: Database,
   user: User,
   promptId: string,
   allPrompts: SystemPrompt[],
 ) => {
   const updatedSystemPrompts = allPrompts.filter((p) => p.id !== promptId);
 
-  if (storageType === StorageType.COUCHDB) {
-    couchdbSaveSystemPrompts(updatedSystemPrompts);
-  } else if (storageType === StorageType.RDBMS) {
-    rdbmsDeleteSystemPrompt(promptId);
-  } else {
-    localSaveSystemPrompts(user, updatedSystemPrompts);
-  }
+  database.deleteSystemPrompt(user, promptId);
 
   return updatedSystemPrompts;
 };

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { localSaveShowPromptBar } from '@/utils/app/storage/documentBased/local/uiState';
+import { localSaveShowPromptBar } from '@/utils/app/storage/local/uiState';
 import {
   storageCreatePrompt,
   storageDeletePrompt,
@@ -11,12 +11,11 @@ import {
 } from '@/utils/app/storage/prompt';
 
 import { OpenAIModels } from '@/types/openai';
-import { Prompt } from '@/types/prompt';
+import { Prompt } from 'chatbot-ui-core/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 import { PromptFolders } from './components/PromptFolders';
-import { PromptbarSettings } from './components/PromptbarSettings';
 import { Prompts } from './components/Prompts';
 
 import Sidebar from '../Sidebar';
@@ -33,7 +32,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, storageType, showPromptbar, user },
+    state: { prompts, defaultModelId, database, showPromptbar, user },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -60,7 +59,7 @@ const Promptbar = () => {
       };
 
       const updatedPrompts = storageCreatePrompt(
-        storageType,
+        database,
         user,
         newPrompt,
         prompts,
@@ -72,7 +71,7 @@ const Promptbar = () => {
 
   const handleDeletePrompt = (prompt: Prompt) => {
     const updatedPrompts = storageDeletePrompt(
-      storageType,
+      database,
       user,
       prompt.id,
       prompts,
@@ -81,7 +80,7 @@ const Promptbar = () => {
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
-    const updated = storageUpdatePrompt(storageType, user, prompt, prompts);
+    const updated = storageUpdatePrompt(database, user, prompt, prompts);
 
     homeDispatch({ field: 'prompts', value: updated.all });
   };

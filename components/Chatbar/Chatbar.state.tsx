@@ -1,4 +1,4 @@
-import { Conversation } from '@/types/chat';
+import { Conversation } from 'chatbot-ui-core/types/chat';
 
 export interface ChatbarInitialState {
   searchTerm: string;

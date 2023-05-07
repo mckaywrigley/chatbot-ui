@@ -14,6 +14,8 @@ const inter = Inter({ subsets: ['latin'] });
 function App({ Component, pageProps }: AppProps<{ session: Session }>) {
   const queryClient = new QueryClient();
 
+  console.log('in _app.tsx');
+
   return (
     <SessionProvider session={pageProps.session}>
       <div className={inter.className}>

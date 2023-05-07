@@ -8,10 +8,10 @@ import { saveSelectedConversation } from '@/utils/app/storage/selectedConversati
 import { User } from '@/types/auth';
 import { Conversation, Message } from '@/types/chat';
 import { Plugin, PluginKey } from '@/types/plugin';
-import { StorageType } from '@/types/storage';
 
 import { sendChatRequest } from '../chat';
 
+import { Database } from '@/chatbot-ui-core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const sendHandlerFunction = async (
@@ -21,7 +21,7 @@ export const sendHandlerFunction = async (
   stopConversationRef: MutableRefObject<boolean>,
   selectedConversation: Conversation | undefined,
   conversations: Conversation[],
-  storageType: StorageType,
+  database: Database,
   apiKey: string,
   pluginKeys: PluginKey[],
   homeDispatch: React.Dispatch<any>,
@@ -44,7 +44,7 @@ export const sendHandlerFunction = async (
 
     // Saving the user message
     storageCreateMessage(
-      storageType,
+      database,
       user,
       selectedConversation,
       message,
@@ -89,7 +89,7 @@ export const sendHandlerFunction = async (
 
         // Saving the conversation name
         storageUpdateConversation(
-          storageType,
+          database,
           user,
           { ...selectedConversation, name: updatedConversation.name },
           conversations,
@@ -133,7 +133,7 @@ export const sendHandlerFunction = async (
 
     // Saving the response message
     const { single, all } = storageCreateMessage(
-      storageType,
+      database,
       user,
       updatedConversation,
       responseMessage,

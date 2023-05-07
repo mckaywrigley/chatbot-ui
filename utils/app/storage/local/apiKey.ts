@@ -1,5 +1,4 @@
-import { User } from '@/types/auth';
-import { Prompt } from '@/types/prompt';
+import { User } from 'chatbot-ui-core/types/auth';
 
 export const localGetAPIKey = (user: User) => {
   const itemName = `apiKey-${user.id}`;

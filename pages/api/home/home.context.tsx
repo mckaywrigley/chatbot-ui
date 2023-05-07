@@ -2,10 +2,10 @@ import { Dispatch, createContext } from 'react';
 
 import { ActionType } from '@/hooks/useCreateReducer';
 
-import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
-import { FolderType } from '@/types/folder';
-import { SystemPrompt } from '@/types/systemPrompt';
+import { Conversation } from 'chatbot-ui-core/types/chat';
+import { FolderType } from 'chatbot-ui-core/types/folder';
+import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
 
 import { HomeInitialState } from './home.state';
 
