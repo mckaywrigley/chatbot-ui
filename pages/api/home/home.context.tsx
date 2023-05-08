@@ -21,6 +21,8 @@ export interface HomeContextProps {
     data: KeyValuePair,
   ) => void;
   handleUserLogout: () => void;
+  playMessage: (message: string, speechId: string) => void;
+  stopPlaying: () => void;
 }
 
 const HomeContext = createContext<HomeContextProps>(undefined!);

@@ -51,6 +51,8 @@ export interface HomeInitialState {
   currentSpeechId: null | string;
   speechToken: null | string;
   speechRegion: null | string;
+  isPlaying: boolean;
+  isLoading: boolean;
 }
 
 export const initialState: HomeInitialState = {
@@ -96,4 +98,6 @@ export const initialState: HomeInitialState = {
   currentSpeechId: null,
   speechToken: null,
   speechRegion: null,
+  isPlaying: false,
+  isLoading: false,
 };
