@@ -28,8 +28,7 @@ export const SpeechButton: React.FC<Props> = ({ inputText }) => {
   } = useContext(HomeContext);
 
   useEffect(() => {
-    const newId = v4();
-    setComponentSpeechId(newId);
+    setComponentSpeechId(v4());
   }, []);
 
   const isComponentCurrentlyBeingPlayed = useMemo(() => {

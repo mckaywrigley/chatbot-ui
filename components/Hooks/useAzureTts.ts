@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
+import {
+  AudioConfig,
+  SpeakerAudioDestination,
+  SpeechConfig,
+  SpeechSynthesizer,
+} from 'microsoft-cognitiveservices-speech-sdk';
 
 export const useAzureTts = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -9,7 +14,7 @@ export const useAzureTts = () => {
   const [currentSpeechId, setCurrentSpeechId] = useState<string | null>(null);
   const token = useRef();
   const region = useRef();
-  const player = useRef(new sdk.SpeakerAudioDestination());
+  const player = useRef(new SpeakerAudioDestination());
 
   player.current.onAudioStart = () => {
     setIsPlaying(true);
@@ -42,7 +47,7 @@ export const useAzureTts = () => {
   const stopPlaying = () => {
     player.current.pause();
     player.current.close();
-    player.current = new sdk.SpeakerAudioDestination();
+    player.current = new SpeakerAudioDestination();
     setIsPlaying(false);
   };
 
@@ -68,15 +73,15 @@ export const useAzureTts = () => {
         return;
       }
 
-      const audioConfig = sdk.AudioConfig.fromSpeakerOutput(player.current);
-      const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(
+      const audioConfig = AudioConfig.fromSpeakerOutput(player.current);
+      const speechConfig = SpeechConfig.fromAuthorizationToken(
         toUseToken,
         toUseRegion,
       );
 
       // Default to use Mandarin voice, since it can also handle English fairly well
       speechConfig.speechSynthesisVoiceName = 'zh-TW-HsiaoChenNeural';
-      const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+      const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
 
       synthesizer.speakTextAsync(
         text,
