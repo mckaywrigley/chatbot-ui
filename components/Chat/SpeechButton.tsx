@@ -1,46 +1,55 @@
 import {
+  IconDeviceSpeaker,
   IconLoader,
   IconPlayerStop,
-  IconDeviceSpeaker
 } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import HomeContext from '@/pages/api/home/home.context';
 
 import { useAzureTts } from '@/components/Hooks/useAzureTts';
+import { useLogger } from '@/components/Hooks/useLogger';
+
+import { v4 } from 'uuid';
 
 type Props = {
   inputText: string;
 };
 
 export const SpeechButton: React.FC<Props> = ({ inputText }) => {
-  const [text, setText] = useState('');
-  const [token, setToken] = useState('');
-  const [region, setRegion] = useState('');
+  // This id is needed to track current playing speech across the entire app
+  const [componentSpeechId, setComponentSpeechId] = useState('');
+
   const { isLoading, isPlaying, speak, stopPlaying } = useAzureTts();
+  const { logGeneralEvent } = useLogger();
+
+  const {
+    state: { currentSpeechId },
+  } = useContext(HomeContext);
 
   useEffect(() => {
-    setText(inputText);
-    async function fetchToken() {
-      try {
-        const response = await fetch('/api/getSpeechToken');
-        const responseJson = await response.json();
-        setToken(responseJson.token);
-        setRegion(responseJson.region);
-      } catch (error) {
-        console.error('Error fetching token:', error);
-      }
-    }
+    const newId = v4();
+    console.log('newId', newId);
 
-    fetchToken();
+    setComponentSpeechId(newId);
   }, []);
 
-  const playStopOnClick = () => {
+  useEffect(() => {
+    console.log('currentSpeechId changed to ' + currentSpeechId);
+    console.log('isLoading changed to ' + isLoading);
+    console.log('isPlaying changed to ' + isPlaying);
+  }, [
+    isLoading,
+    isPlaying,
+    currentSpeechId,
+  ])
+
+  const playStopOnClick = async () => {
     if (isPlaying) {
       stopPlaying();
     } else {
-      if (token && region) {
-        console.log(text);
-        speak(text, token, region);
-      }
+      await speak(inputText, componentSpeechId);
+      logGeneralEvent('speech');
     }
   };
 
@@ -48,7 +57,7 @@ export const SpeechButton: React.FC<Props> = ({ inputText }) => {
     if (isLoading) {
       return <IconLoader fill="none" size={18} />;
     } else {
-      if (isPlaying) {
+      if (isPlaying && currentSpeechId === componentSpeechId) {
         return (
           <IconPlayerStop onClick={playStopOnClick} fill="none" size={18} />
         );
@@ -60,5 +69,14 @@ export const SpeechButton: React.FC<Props> = ({ inputText }) => {
     }
   };
 
-  return <div className="cursor-pointer text-gray-500 hover:text-gray-300 mr-2">{getPlayerIcon()}</div>;
+  return (
+    <div
+      className={`cursor-pointer text-gray-500 hover:text-gray-300 mr-2 ${
+        currentSpeechId === componentSpeechId ? 'text-green-500' : ''
+      }`}
+    >
+      {getPlayerIcon()}
+      <div className="text-xs">{componentSpeechId}</div>
+    </div>
+  );
 };

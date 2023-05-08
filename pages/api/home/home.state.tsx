@@ -46,6 +46,11 @@ export interface HomeInitialState {
   showUsageModel: boolean;
   user: User | null;
   isPaidUser: boolean;
+
+  // Text to Speech
+  currentSpeechId: null | string;
+  speechToken: null | string;
+  speechRegion: null | string;
 }
 
 export const initialState: HomeInitialState = {
@@ -86,4 +91,9 @@ export const initialState: HomeInitialState = {
   showUsageModel: false,
   user: null,
   isPaidUser: false,
+
+  // Text to Speech
+  currentSpeechId: null,
+  speechToken: null,
+  speechRegion: null,
 };
