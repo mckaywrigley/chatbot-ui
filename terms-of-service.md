@@ -31,3 +31,5 @@ We may use session and/or a cookies to temporarily store information such as you
 We reserve the right to modify these terms of service at any time. It is your responsibility to regularly review these terms to stay informed of any changes or updates.
 
 Thank you for reviewing the revised Terms of Service for Chat Everywhere. By using Chat Everywhere, you agree to these terms.
+
+*This Site is affiliated with Monumetric (dba for The Blogger Network, LLC) for the purposes of placing advertising on the Site, and Monumetric will collect and use certain data for advertising purposes. To learn more about Monumetric's data usage, click here: <a href='http://www.monumetric.com/publisher-advertising-privacy'>Publisher Advertising Privacy</a>*
