@@ -28,7 +28,7 @@ const PlanDetail = {
       'Everything in free plan',
       'Priority response time',
       'Cloud sync',
-      'Real life reader',
+      'Real life speech',
       'GPT-4 integration (Credit system)',
       'AI image generation (Coming)',
     ],
