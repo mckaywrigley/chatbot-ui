@@ -15,7 +15,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
 }) => {
   const { t } = useTranslation("chat");
   const {
-    state: { user },
+    state: { user, isSurveyFilled },
     dispatch,
   } = useContext(HomeContext);
 
@@ -64,16 +64,22 @@ export const NewConversationMessagesContainer: FC<Props> = ({
     <div className="font-normal">
       <span className="font-semibold">Chat Everywhere</span>
       {/* Survey for user information */}
-      {user && user?.name === "" && (
-        <div
-          className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 bg-gray-500 cursor-pointer"
-          onClick={surveyOnClick}
-        >
-          <span className="flex flex-row flex-wrap items-center justify-center leading-4 text-sm">
-            {t("Help us serve you better. Take our survey now!")}
-          </span>
-        </div>
-      )}
+      {user &&
+        !isSurveyFilled &&
+        localStorage.getItem(user?.id + "-isSurveyFilled") != "true" && (
+          <div
+            className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 bg-stone-500 cursor-pointer"
+            onClick={surveyOnClick}
+          >
+            <span className="flex flex-row flex-wrap items-center justify-center leading-4 text-sm">
+              {t("Help us serve you better. Take our survey now!")}
+            </span>{" "}
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium ml-2 mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-800 dark:text-yellow-300">
+              {" "}
+              New{" "}
+            </span>
+          </div>
+        )}
 
       {/* Ask for support banner */}
       {(!user || user?.plan === "free") && (

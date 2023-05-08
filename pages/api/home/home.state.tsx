@@ -1,18 +1,17 @@
-import { Conversation, Message } from '@/types/chat';
-import { ErrorMessage } from '@/types/error';
-import { FolderInterface } from '@/types/folder';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
-import { PluginKey } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
-import { User } from '@/types/user';
-
-import { SupabaseClient } from '@supabase/supabase-js';
+import { Conversation, Message } from "@/types/chat";
+import { ErrorMessage } from "@/types/error";
+import { FolderInterface } from "@/types/folder";
+import { OpenAIModel, OpenAIModelID } from "@/types/openai";
+import { PluginKey } from "@/types/plugin";
+import { Prompt } from "@/types/prompt";
+import { User } from "@/types/user";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface HomeInitialState {
   apiKey: string;
   pluginKeys: PluginKey[];
   loading: boolean;
-  lightMode: 'light' | 'dark';
+  lightMode: "light" | "dark";
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   models: OpenAIModel[];
@@ -47,13 +46,14 @@ export interface HomeInitialState {
   showSurveyModel: boolean;
   user: User | null;
   isPaidUser: boolean;
+  isSurveyFilled: boolean;
 }
 
 export const initialState: HomeInitialState = {
-  apiKey: '',
+  apiKey: "",
   loading: false,
   pluginKeys: [],
-  lightMode: 'dark',
+  lightMode: "dark",
   messageIsStreaming: false,
   modelError: null,
   models: [],
@@ -67,11 +67,11 @@ export const initialState: HomeInitialState = {
   showChatbar: true,
   currentFolder: undefined,
   messageError: false,
-  searchTerm: '',
+  searchTerm: "",
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
-  outputLanguage: '',
+  outputLanguage: "",
 
   // Supabase / Cloud Sync
   supabaseClient: null,
@@ -88,4 +88,5 @@ export const initialState: HomeInitialState = {
   showSurveyModel: false,
   user: null,
   isPaidUser: false,
+  isSurveyFilled: false,
 };

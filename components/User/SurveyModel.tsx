@@ -17,7 +17,7 @@ interface Options {
 }
 
 export const SurveyModel: FC<Props> = ({ onClose }) => {
-  const { t } = useTranslation("model");
+  const { t } = useTranslation("survey");
   const {
     state: { user },
   } = useContext(HomeContext);
@@ -87,6 +87,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
   const [selectedUseCases, setSelectedUseCases] = useState<Options[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<Options[]>([]);
   const [selectedPreferred, setSelectedPreferred] = useState<Options[]>([]);
+  const [comment, setComment] = useState("");
 
   const handleCheckboxChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -141,19 +142,18 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
     }
     //Supabase query
     try {
-      const { error } = await supabaseClient
-        .from("profiles")
-        .update({
-          name: name,
-          occupation:
-            selectedOccupation === "other_occupation"
-              ? otherOccupation
-              : selectedOccupation,
-          use_case: selectedUseCases,
-          value_features: selectedFeatures,
-          preferred_choice: selectedPreferred,
-        })
-        .eq("id", user?.id);
+      const { error } = await supabaseClient.from("user_survey").insert({
+        id: user?.id,
+        name: name,
+        occupation:
+          selectedOccupation === "other_occupation"
+            ? otherOccupation
+            : selectedOccupation,
+        use_case: selectedUseCases,
+        value_features: selectedFeatures,
+        preferred_choice: selectedPreferred,
+        comments: comment,
+      });
       if (error) {
         toast.error(t("Something went wrong. Please try again."));
         return;
@@ -161,11 +161,16 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
       toast.success(t("Thanks for completing the survey!"), {
         duration: 5000,
       });
+      localStorage.setItem(user?.id + "-isSurveyFilled", "true");
       onClose();
     } catch (err) {
       toast.error(t("Something went wrong. Please try again."));
     }
   };
+
+  const OptionLabels = ({ option }: { option: string }) => (
+    <span>{t(option)}</span>
+  );
 
   return (
     <Transition appear show={true} as={Fragment}>
@@ -208,18 +213,18 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="name"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          Name (required)
+                          {t("Name(required)")}
                         </label>
                         <label
                           id="error-name"
                           className="block text-sm text-rose-500 mb-1 hidden"
                         >
-                          Please enter name
+                          {t("Please enter name")}
                         </label>
                         <input
                           type="text"
                           id="name"
-                          placeholder="John Smith"
+                          placeholder={t("John Smith") || "John Smith"}
                           className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-6 leading-tight focus:outline-none focus:border-2"
                           maxLength={50}
                           onChange={(event) => setName(event.target.value)}
@@ -232,13 +237,13 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="occupation"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          Occupation (required)
+                          {t("Occupation (required)")}
                         </label>
                         <label
                           id="error-occupation"
                           className="block text-sm text-rose-500 mb-1 hidden"
                         >
-                          Please select your occupation
+                          {t("Please select your occupation")}
                         </label>
                         <select
                           id="occupation"
@@ -248,10 +253,13 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                             setSelectedOccupation(event.target.value)
                           }
                         >
-                          <option value="">Select an occupation</option>
+                          <option value="">{t("Select an occupation")}</option>
                           {occupationOptions.map((option) => (
                             <option key={option.value} value={option.value}>
-                              {option.label}
+                              <OptionLabels
+                                key={option.value}
+                                option={option.label}
+                              />
                             </option>
                           ))}
                         </select>
@@ -260,7 +268,9 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                             type="text"
                             id="otherOccupation"
                             className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-3 leading-tight focus:outline-none focus:border-2"
-                            placeholder="Please specify"
+                            placeholder={
+                              t("Please specify") || "Please specify"
+                            }
                             maxLength={100}
                             onChange={(event) =>
                               setOtherOccupation(event.target.value)
@@ -275,7 +285,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="useCase"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          What Do You Use Chat Everywhere For?
+                          {t("What Do You Use Chat Everywhere For?")}
                         </label>
                         {useCaseOptions.map((option) => (
                           <div key={option.value}>
@@ -295,7 +305,10 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                               htmlFor={option.value}
                               className="text-sm px-2"
                             >
-                              {option.label}
+                              <OptionLabels
+                                key={option.value}
+                                option={option.label}
+                              />
                             </label>
                             {option.value === "other_usecase" &&
                               selectedUseCases[
@@ -305,8 +318,10 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                                   type="text"
                                   id="otherUseCase"
                                   className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-3 mt-1 leading-tight focus:outline-none focus:border-2"
-                                  placeholder="Please specify"
-                                  maxLength={200}
+                                  placeholder={
+                                    t("Please specify") || "Please specify"
+                                  }
+                                  maxLength={100}
                                   onChange={(event) =>
                                     setSelectedUseCases((prev: any) => ({
                                       ...prev,
@@ -325,7 +340,9 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="features"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          Which Chat Everywhere features appeal to you the most?
+                          {t(
+                            "Which Chat Everywhere features appeal to you the most?"
+                          )}
                         </label>
                         {featuresOptions.map((option) => (
                           <div key={option.value}>
@@ -345,7 +362,10 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                               htmlFor={option.value}
                               className="text-sm px-2"
                             >
-                              {option.label}
+                              <OptionLabels
+                                key={option.value}
+                                option={option.label}
+                              />
                             </label>
 
                             {option.value === "other_feature" &&
@@ -356,8 +376,10 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                                   type="text"
                                   id="otherFeature"
                                   className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-3 mt-1 leading-tight focus:outline-none focus:border-2"
-                                  placeholder="Please specify"
-                                  maxLength={200}
+                                  placeholder={
+                                    t("Please specify") || "Please specify"
+                                  }
+                                  maxLength={100}
                                   onChange={(event) =>
                                     setSelectedFeatures((prev: any) => ({
                                       ...prev,
@@ -376,8 +398,9 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="preferred"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          What makes Chat Everywhere your preferred choice over
-                          ChatGPT?
+                          {t(
+                            "What makes Chat Everywhere your preferred choice over official ChatGPT?"
+                          )}
                         </label>
                         {preferredOptions.map((option) => (
                           <div key={option.value}>
@@ -397,7 +420,10 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                               htmlFor={option.value}
                               className="text-sm px-2"
                             >
-                              {option.label}
+                              <OptionLabels
+                                key={option.value}
+                                option={option.label}
+                              />
                             </label>
                             {option.value === "other_preferred" &&
                               selectedPreferred[
@@ -407,7 +433,9 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                                   type="text"
                                   id="otherPreferred"
                                   className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-3 mt-1 leading-tight focus:outline-none focus:border-2"
-                                  placeholder="Please specify"
+                                  placeholder={
+                                    t("Please specify") || "Please specify"
+                                  }
                                   maxLength={200}
                                   onChange={(event) =>
                                     setSelectedPreferred((prev: any) => ({
@@ -419,6 +447,31 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                               )}
                           </div>
                         ))}
+                      </div>
+                      {/* 5. Comments */}
+                      <div className="mb-4">
+                        <label
+                          htmlFor="comment"
+                          className="block text-base text-stone-400 mb-2"
+                        >
+                          {t(
+                            "Is there anything you'd like to tell us? (Optional)"
+                          )}
+                        </label>
+
+                        <input
+                          type="text"
+                          id="comment"
+                          placeholder={
+                            t(
+                              "Any comments, feedback or suggestions are welcome!"
+                            ) ||
+                            "Any comments, feedback or suggestions are welcome!"
+                          }
+                          className="block w-11/12 bg-inherit text-sm border border-dark rounded py-2 px-4 mb-6 leading-tight focus:outline-none focus:border-2"
+                          maxLength={450}
+                          onChange={(event) => setComment(event.target.value)}
+                        />
                       </div>
                     </div>
                   </div>

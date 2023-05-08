@@ -85,6 +85,7 @@ const Home = ({
       isPaidUser,
       conversationLastSyncAt,
       forceSyncConversation,
+      isSurveyFilled,
     },
     dispatch,
   } = contextValue;
@@ -314,7 +315,7 @@ const Home = ({
     if (session?.user) {
       supabase
         .from("profiles")
-        .select("plan, name")
+        .select("plan")
         .eq("id", session.user.id)
         .then(({ data, error }) => {
           if (error) {
@@ -337,12 +338,24 @@ const Home = ({
             field: "user",
             value: {
               id: session.user.id,
-              name: userProfile.name || "",
               email: session.user.email,
               plan: userProfile.plan || "free",
               token: session.access_token,
             },
           });
+        });
+
+      //Check if survey is filled by logged in user
+      supabase
+        .from("user_survey")
+        .select("name")
+        .eq("id", session.user.id)
+        .then(({ data }) => {
+          if (!data || data.length === 0) {
+            dispatch({ field: "isSurveyFilled", value: false });
+          } else {
+            dispatch({ field: "isSurveyFilled", value: true });
+          }
         });
     }
   }, [session]);
@@ -533,7 +546,7 @@ const Home = ({
                 }
               />
             )}
-            {showSurveyModel && session && (
+            {showSurveyModel && session && !isSurveyFilled && (
               <SurveyModel
                 session={session}
                 onClose={() =>
