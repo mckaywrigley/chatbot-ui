@@ -16,10 +16,7 @@ import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 
 import { fetchShareableConversation } from '@/utils/app/api';
-import {
-  cleanConversationHistory,
-  cleanSelectedConversation,
-} from '@/utils/app/clean';
+import { cleanConversationHistory } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
@@ -39,6 +36,7 @@ import { UserProfile } from '@/types/user';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { useAzureTts } from '@/components/Hooks/useAzureTts';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
@@ -67,14 +65,13 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } = useAzureTts();
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
   const supabase = useSupabaseClient();
 
-  const contextValue = useCreateReducer<HomeInitialState>({
-    initialState,
-  });
+  const contextValue = useCreateReducer<HomeInitialState>({ initialState });
 
   const {
     state: {
@@ -472,6 +469,20 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+  // SPEECH TO TEXT -------------------------------------
+  useEffect(() => {
+    dispatch({ field: 'isPlaying', value: isPlaying });
+  }, [isPlaying]);
+
+  useEffect(() => {
+    dispatch({ field: 'isLoading', value: isLoading });
+  }, [isLoading]);
+
+  useEffect(() => {
+    dispatch({ field: 'currentSpeechId', value: currentSpeechId });
+  }, [currentSpeechId]);
+
+
   return (
     <HomeContext.Provider
       value={{
@@ -483,6 +494,12 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
+        playMessage: (text, speechId) => speak(
+          text,
+          speechId,
+          user?.token || ""
+        ),
+        stopPlaying,
       }}
     >
       <Head>

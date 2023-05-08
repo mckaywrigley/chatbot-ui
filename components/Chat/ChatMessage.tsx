@@ -1,5 +1,4 @@
 import {
-  IconBrain,
   IconCheck,
   IconCopy,
   IconEdit,
@@ -16,12 +15,14 @@ import { updateConversation } from '@/utils/app/conversation';
 import { getPluginIcon } from '@/utils/app/ui';
 
 import { Conversation, Message } from '@/types/chat';
+import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { FeedbackContainer } from './FeedbackContainer';
+import { SpeechButton } from './SpeechButton';
 
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
@@ -208,7 +209,7 @@ export const ChatMessage: FC<Props> = memo(
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit mr-1`}
                       onClick={toggleEditing}
                     >
-                      <IconEdit size={18} fill="none"/>
+                      <IconEdit size={18} fill="none" />
                     </button>
                     <button
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit`}
@@ -295,9 +296,14 @@ export const ChatMessage: FC<Props> = memo(
                     )}
                   </div>
                 </div>
-                {displayFeedbackButton && (
-                  <FeedbackContainer conversation={conversation} />
-                )}
+                <div className="flex flex-row items-center mt-3">
+                  {message.pluginId !== PluginID.LANGCHAIN_CHAT && (
+                    <SpeechButton inputText={message.content} />
+                  )}
+                  {displayFeedbackButton && (
+                    <FeedbackContainer conversation={conversation} />
+                  )}
+                </div>
               </div>
             )}
           </div>

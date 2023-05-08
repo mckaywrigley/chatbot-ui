@@ -83,7 +83,7 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
   };
 
   return (
-    <div className="mt-3 flex flex-row">
+    <div className="flex flex-row">
       <button
         className={`cursor-pointer text-gray-500 hover:text-gray-300 ${
           isThumbsUp === true ? 'text-transparent hover:text-transparent' : ''
