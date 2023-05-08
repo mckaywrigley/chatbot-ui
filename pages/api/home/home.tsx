@@ -494,8 +494,12 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
-        playMessage: speak,
-        stopPlaying
+        playMessage: (text, speechId) => speak(
+          text,
+          speechId,
+          user?.token || ""
+        ),
+        stopPlaying,
       }}
     >
       <Head>

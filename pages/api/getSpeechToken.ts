@@ -1,10 +1,25 @@
-import type { NextApiRequest } from 'next';
+import {
+  getAdminSupabaseClient,
+  getUserProfile,
+} from '@/utils/server/supabase';
+
+const supabase = getAdminSupabaseClient();
 
 export const config = {
   runtime: 'edge',
 };
 
-const handler = async (req: NextApiRequest): Promise<Response> => {
+const unauthorizedResponse = new Response('Unauthorized', { status: 401 });
+
+const handler = async (req: Request): Promise<Response> => {
+  const userToken = req.headers.get('user-token');
+
+  const { data, error } = await supabase.auth.getUser(userToken || '');
+  if (!data || error) return unauthorizedResponse;
+
+  const user = await getUserProfile(data.user.id);
+  if (!user || user.plan === 'free') return unauthorizedResponse;
+
   const res = new Response();
   res.headers.set('Content-Type', 'application/json');
   const speechKey = process.env.AZURE_SPEECH_KEY;
