@@ -22,7 +22,7 @@ export const SpeechButton: React.FC<Props> = ({ inputText }) => {
   const { logGeneralEvent } = useLogger();
 
   const {
-    state: { currentSpeechId, isLoading, isPlaying },
+    state: { currentSpeechId, isLoading, isPlaying, user },
     playMessage,
     stopPlaying,
   } = useContext(HomeContext);
@@ -60,6 +60,9 @@ export const SpeechButton: React.FC<Props> = ({ inputText }) => {
       <IconDeviceSpeaker onClick={playStopOnClick} fill="none" size={18} />
     );
   };
+
+  // Only enable for Pro plan users
+  if(!user || user?.plan !== 'pro') return <></>;
 
   return (
     <div className={`cursor-pointer text-gray-500 hover:text-gray-300 mr-2`}>
