@@ -1,14 +1,12 @@
 import HomeContext from "@/pages/api/home/home.context";
 import { Dialog, Transition } from "@headlessui/react";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { Session } from "@supabase/supabase-js";
 import { useTranslation } from "next-i18next";
 import { FC, Fragment, useContext, useState, useMemo } from "react";
 import { toast } from "react-hot-toast";
 
 type Props = {
   onClose: () => void;
-  session: Session;
 };
 
 interface Options {
@@ -20,6 +18,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation("survey");
   const {
     state: { user },
+    dispatch: homeDispatch,
   } = useContext(HomeContext);
   const supabaseClient = useMemo(() => createBrowserSupabaseClient(), []);
 
@@ -161,7 +160,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
       toast.success(t("Thanks for completing the survey!"), {
         duration: 5000,
       });
-      localStorage.setItem(user?.id + "-isSurveyFilled", "true");
+      homeDispatch({ field: 'isSurveyFilled', value: true });
       onClose();
     } catch (err) {
       toast.error(t("Something went wrong. Please try again."));

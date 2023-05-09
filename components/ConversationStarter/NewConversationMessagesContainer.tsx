@@ -65,8 +65,7 @@ export const NewConversationMessagesContainer: FC<Props> = ({
       <span className="font-semibold">Chat Everywhere</span>
       {/* Survey for user information */}
       {user &&
-        !isSurveyFilled &&
-        localStorage.getItem(user?.id + "-isSurveyFilled") != "true" && (
+        !isSurveyFilled && (
           <div
             className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 bg-stone-500 cursor-pointer"
             onClick={surveyOnClick}

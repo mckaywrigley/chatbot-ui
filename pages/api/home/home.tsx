@@ -568,9 +568,8 @@ const Home = ({
                 }
               />
             )}
-            {showSurveyModel && session && !isSurveyFilled && (
+            {showSurveyModel &&  (
               <SurveyModel
-                session={session}
                 onClose={() =>
                   dispatch({ field: 'showSurveyModel', value: false })
                 }
