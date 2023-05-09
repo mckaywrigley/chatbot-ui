@@ -42,7 +42,7 @@
     "Online Mode": "在线模式",
     "Cloud Sync (Pro Plan)": "云同步（专业版）",
     "GPT-4 integration (Pro Plan)": "GPT-4整合（专业版）",
-    "AI Speech": "AI朗读",
+    "AI Speech (Pro Plan)": "AI朗读 （专业版）",
     "AI image generation (Coming)": "AI图像生成（即将推出）",
     "Not A Preferred Choice Yet": "尚未成为首选",
     "ChatGPT Is Restricted In Your Region": "您所在的地区限制了ChatGPT",
@@ -51,5 +51,7 @@
     "No Login / Sign up Required": "无需登录/注册",
     "I'm Not Entirely Certain": "我不确定",
     "Is there anything you'd like to tell us? (Optional)": "您有什么想对我们说的吗？（可选）",
-    "Any comments, feedback or suggestions are welcome!": "欢迎提供任何评论，反馈或建议！"
+    "Any comments, feedback or suggestions are welcome!": "欢迎提供任何评论，反馈或建议！",
+    "Close": "关闭",
+    "Submit": "提交"
 }

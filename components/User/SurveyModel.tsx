@@ -64,7 +64,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
     { value: "online", label: "Online Mode" },
     { value: "cloud_sync", label: "Cloud Sync (Pro Plan)" },
     { value: "gpt_4", label: "GPT-4 integration (Pro Plan)" },
-    { value: "ai_speech", label: "AI Speech" },
+    { value: "ai_speech", label: "AI Speech (Pro Plan)" },
     { value: "image", label: "AI image generation (Coming)" },
     { value: "other_feature", label: "Other" },
   ];
