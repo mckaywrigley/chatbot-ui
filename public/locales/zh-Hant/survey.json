@@ -6,6 +6,7 @@
     "Please enter name": "請輸入姓名",
     "John Smith": "趙子龍",
     "Occupation (required)": "職業（必填）",
+    "Email (optional if you would like to be contacted)": "電子信箱（非必填，若您需要聯繫可填寫）",
     "Please select your occupation": "請選擇您的職業",
     "Select an occupation": "選擇職業",
     "What Do You Use Chat Everywhere For?": "您使用 Chat Everywhere 的用途是什麼？",
