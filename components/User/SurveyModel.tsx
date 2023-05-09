@@ -62,7 +62,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
     { value: "online", label: "Online Mode" },
     { value: "cloud_sync", label: "Cloud Sync (Pro Plan)" },
     { value: "gpt_4", label: "GPT-4 integration (Pro Plan)" },
-    { value: "voice", label: "Voice input (Coming)" },
+    { value: "ai_speech", label: "AI Speech" },
     { value: "image", label: "AI image generation (Coming)" },
     { value: "other_feature", label: "Other" },
   ];
@@ -202,7 +202,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                 <Dialog.Description>
                   <div className="rounded-2xl flex flex-col">
                     <span className="text-lg mb-6">
-                      {t("Help us serve you better. Take our survey now!")}
+                      {t("We value your opinion. Take our survey now!")}
                     </span>
 
                     <div className="w-full h-96 overflow-y-scroll">
