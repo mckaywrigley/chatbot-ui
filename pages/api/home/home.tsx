@@ -1,48 +1,55 @@
-import HomeContext from "./home.context";
-import { HomeInitialState, initialState } from "./home.state";
-import { Chat } from "@/components/Chat/Chat";
-import { Chatbar } from "@/components/Chatbar/Chatbar";
-import { Navbar } from "@/components/Mobile/Navbar";
-import Promptbar from "@/components/Promptbar";
-import { AuthModel } from "@/components/User/AuthModel";
-import { ProfileModel } from "@/components/User/ProfileModel";
-import { SurveyModel } from "@/components/User/SurveyModel";
-import { UsageCreditModel } from "@/components/User/UsageCreditModel";
-import { useCreateReducer } from "@/hooks/useCreateReducer";
-import useErrorService from "@/services/errorService";
-import useApiService from "@/services/useApiService";
-import { Conversation } from "@/types/chat";
-import { KeyValuePair } from "@/types/data";
-import { FolderInterface, FolderType } from "@/types/folder";
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from "@/types/openai";
-import { Prompt } from "@/types/prompt";
-import { UserProfile } from "@/types/user";
-import { fetchShareableConversation } from "@/utils/app/api";
-import {
-  cleanConversationHistory,
-  cleanSelectedConversation,
-} from "@/utils/app/clean";
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from "@/utils/app/const";
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useQuery } from 'react-query';
+
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { event } from 'nextjs-google-analytics';
+
+import { useCreateReducer } from '@/hooks/useCreateReducer';
+
+import useErrorService from '@/services/errorService';
+import useApiService from '@/services/useApiService';
+
+import { fetchShareableConversation } from '@/utils/app/api';
+import { cleanConversationHistory } from '@/utils/app/clean';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
   updateConversation,
-} from "@/utils/app/conversation";
-import { syncConversations } from "@/utils/app/conversation";
-import { saveFolders } from "@/utils/app/folders";
-import { savePrompts } from "@/utils/app/prompts";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import dayjs from "dayjs";
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { event } from "nextjs-google-analytics";
-import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { useQuery } from "react-query";
-import { v4 as uuidv4 } from "uuid";
+} from '@/utils/app/conversation';
+import { syncConversations } from '@/utils/app/conversation';
+import { saveFolders } from '@/utils/app/folders';
+import { savePrompts } from '@/utils/app/prompts';
+
+import { Conversation } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
+import { FolderInterface, FolderType } from '@/types/folder';
+import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
+import { Prompt } from '@/types/prompt';
+import { UserProfile } from '@/types/user';
+
+import { Chat } from '@/components/Chat/Chat';
+import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { Navbar } from '@/components/Mobile/Navbar';
+import Promptbar from '@/components/Promptbar';
+import { AuthModel } from '@/components/User/AuthModel';
+import { ProfileModel } from '@/components/User/ProfileModel';
+import { SurveyModel } from '@/components/User/SurveyModel';
+import { UsageCreditModel } from '@/components/User/UsageCreditModel';
+
+import { useAzureTts } from "@/components/Hooks/useAzureTts"
+
+import HomeContext from './home.context';
+import { HomeInitialState, initialState } from './home.state';
+
+import dayjs from 'dayjs';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -57,17 +64,16 @@ const Home = ({
   defaultModelId,
   googleAdSenseId,
 }: Props) => {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const [containerHeight, setContainerHeight] = useState("100vh");
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } = useAzureTts();
+  const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
   const supabase = useSupabaseClient();
 
-  const contextValue = useCreateReducer<HomeInitialState>({
-    initialState,
-  });
+  const contextValue = useCreateReducer<HomeInitialState>({ initialState });
 
   const {
     state: {
@@ -93,28 +99,28 @@ const Home = ({
   const stopConversationRef = useRef<boolean>(false);
 
   const { data, error } = useQuery(
-    ["GetModels", serverSideApiKeyIsSet],
+    ['GetModels', serverSideApiKeyIsSet],
     ({ signal }) => {
       if (!serverSideApiKeyIsSet) return null;
 
       return getModels(signal);
     },
-    { enabled: true, refetchOnMount: false }
+    { enabled: true, refetchOnMount: false },
   );
 
   useEffect(() => {
-    if (data) dispatch({ field: "models", value: data });
+    if (data) dispatch({ field: 'models', value: data });
   }, [data, dispatch]);
 
   useEffect(() => {
-    dispatch({ field: "modelError", value: getModelsError(error) });
+    dispatch({ field: 'modelError', value: getModelsError(error) });
   }, [dispatch, error, getModelsError]);
 
   // FETCH MODELS ----------------------------------------------
 
   const handleSelectConversation = (conversation: Conversation) => {
     dispatch({
-      field: "selectedConversation",
+      field: 'selectedConversation',
       value: conversation,
     });
 
@@ -132,13 +138,13 @@ const Home = ({
 
     const updatedFolders = [...folders, newFolder];
 
-    dispatch({ field: "folders", value: updatedFolders });
+    dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
   };
 
   const handleDeleteFolder = (folderId: string) => {
     const updatedFolders = folders.filter((f) => f.id !== folderId);
-    dispatch({ field: "folders", value: updatedFolders });
+    dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
 
     const updatedConversations: Conversation[] = conversations.map((c) => {
@@ -152,7 +158,7 @@ const Home = ({
       return c;
     });
 
-    dispatch({ field: "conversations", value: updatedConversations });
+    dispatch({ field: 'conversations', value: updatedConversations });
     saveConversations(updatedConversations);
 
     const updatedPrompts: Prompt[] = prompts.map((p) => {
@@ -166,7 +172,7 @@ const Home = ({
       return p;
     });
 
-    dispatch({ field: "prompts", value: updatedPrompts });
+    dispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
   };
 
@@ -182,7 +188,7 @@ const Home = ({
       return f;
     });
 
-    dispatch({ field: "folders", value: updatedFolders });
+    dispatch({ field: 'folders', value: updatedFolders });
 
     saveFolders(updatedFolders);
   };
@@ -194,7 +200,7 @@ const Home = ({
 
     const newConversation: Conversation = {
       id: uuidv4(),
-      name: `${t("New Conversation")}`,
+      name: `${t('New Conversation')}`,
       messages: [],
       model: lastConversation?.model || {
         id: OpenAIModels[defaultModelId].id,
@@ -209,18 +215,18 @@ const Home = ({
 
     const updatedConversations = [...conversations, newConversation];
 
-    dispatch({ field: "selectedConversation", value: newConversation });
-    dispatch({ field: "conversations", value: updatedConversations });
+    dispatch({ field: 'selectedConversation', value: newConversation });
+    dispatch({ field: 'conversations', value: updatedConversations });
 
     saveConversation(newConversation);
     saveConversations(updatedConversations);
 
-    dispatch({ field: "loading", value: false });
+    dispatch({ field: 'loading', value: false });
   };
 
   const handleUpdateConversation = (
     conversation: Conversation,
-    data: KeyValuePair
+    data: KeyValuePair,
   ) => {
     const updatedConversation = {
       ...conversation,
@@ -229,15 +235,15 @@ const Home = ({
 
     const { single, all } = updateConversation(
       updatedConversation,
-      conversations
+      conversations,
     );
 
-    dispatch({ field: "selectedConversation", value: single });
-    dispatch({ field: "conversations", value: all });
+    dispatch({ field: 'selectedConversation', value: single });
+    dispatch({ field: 'conversations', value: all });
 
-    event("interaction", {
-      category: "Conversation",
-      label: "Create New Conversation",
+    event('interaction', {
+      category: 'Conversation',
+      label: 'Create New Conversation',
     });
   };
 
@@ -245,15 +251,15 @@ const Home = ({
 
   useEffect(() => {
     defaultModelId &&
-      dispatch({ field: "defaultModelId", value: defaultModelId });
+      dispatch({ field: 'defaultModelId', value: defaultModelId });
     serverSideApiKeyIsSet &&
       dispatch({
-        field: "serverSideApiKeyIsSet",
+        field: 'serverSideApiKeyIsSet',
         value: serverSideApiKeyIsSet,
       });
     serverSidePluginKeysSet &&
       dispatch({
-        field: "serverSidePluginKeysSet",
+        field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
@@ -265,7 +271,7 @@ const Home = ({
     if (!isPaidUser) return;
 
     let conversationLastUpdatedAt = localStorage.getItem(
-      "conversationLastUpdatedAt"
+      'conversationLastUpdatedAt',
     );
 
     const syncConversationsAction = async () => {
@@ -273,7 +279,7 @@ const Home = ({
         supabase,
         user,
         // Subtract 1 year to force sync
-        conversationLastUpdatedAt || dayjs().subtract(1, "year").toString()
+        conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
       );
     };
 
@@ -281,25 +287,25 @@ const Home = ({
     if (
       !forceSyncConversation &&
       ((conversationLastSyncAt &&
-        dayjs().diff(conversationLastSyncAt, "minutes") < 2) ||
+        dayjs().diff(conversationLastSyncAt, 'minutes') < 2) ||
         !conversationLastUpdatedAt)
     )
       return;
 
     try {
-      dispatch({ field: "syncingConversation", value: true });
+      dispatch({ field: 'syncingConversation', value: true });
       syncConversationsAction();
     } catch (e) {
-      dispatch({ field: "syncSuccess", value: false });
-      console.log("error", e);
+      dispatch({ field: 'syncSuccess', value: false });
+      console.log('error', e);
     }
 
-    dispatch({ field: "conversationLastSyncAt", value: dayjs().toString() });
+    dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
     if (forceSyncConversation) {
-      dispatch({ field: "forceSyncConversation", value: false });
+      dispatch({ field: 'forceSyncConversation', value: false });
     }
-    dispatch({ field: "syncSuccess", value: true });
-    dispatch({ field: "syncingConversation", value: false });
+    dispatch({ field: 'syncSuccess', value: true });
+    dispatch({ field: 'syncingConversation', value: false });
   }, [
     conversations,
     user,
@@ -314,32 +320,32 @@ const Home = ({
   useEffect(() => {
     if (session?.user) {
       supabase
-        .from("profiles")
-        .select("plan")
-        .eq("id", session.user.id)
+        .from('profiles')
+        .select('plan')
+        .eq('id', session.user.id)
         .then(({ data, error }) => {
           if (error) {
-            console.log("error", error);
+            console.log('error', error);
           } else {
-            dispatch({ field: "isPaidUser", value: data[0].plan !== "free" });
+            dispatch({ field: 'isPaidUser', value: data[0].plan !== 'free' });
           }
 
           if (!data || data.length === 0) {
             toast.error(
-              t("Unable to load your information, please try again later.")
+              t('Unable to load your information, please try again later.'),
             );
             return;
           }
 
           const userProfile = data[0] as UserProfile;
 
-          dispatch({ field: "showLoginSignUpModel", value: false });
+          dispatch({ field: 'showLoginSignUpModel', value: false });
           dispatch({
-            field: "user",
+            field: 'user',
             value: {
               id: session.user.id,
               email: session.user.email,
-              plan: userProfile.plan || "free",
+              plan: userProfile.plan || 'free',
               token: session.access_token,
             },
           });
@@ -347,14 +353,14 @@ const Home = ({
 
       //Check if survey is filled by logged in user
       supabase
-        .from("user_survey")
-        .select("name")
-        .eq("id", session.user.id)
+        .from('user_survey')
+        .select('name')
+        .eq('id', session.user.id)
         .then(({ data }) => {
           if (!data || data.length === 0) {
-            dispatch({ field: "isSurveyFilled", value: false });
+            dispatch({ field: 'isSurveyFilled', value: false });
           } else {
-            dispatch({ field: "isSurveyFilled", value: true });
+            dispatch({ field: 'isSurveyFilled', value: true });
           }
         });
     }
@@ -362,8 +368,8 @@ const Home = ({
 
   const handleUserLogout = async () => {
     await supabase.auth.signOut();
-    dispatch({ field: "user", value: null });
-    toast.success(t("You have been logged out"));
+    dispatch({ field: 'user', value: null });
+    toast.success(t('You have been logged out'));
   };
 
   // ON LOAD --------------------------------------------
@@ -371,71 +377,71 @@ const Home = ({
   useEffect(() => {
     const updateHeight = () => {
       const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
 
       // If you want to set the height directly in the state
       setContainerHeight(`${window.innerHeight}px`);
     };
 
     updateHeight();
-    window.addEventListener("resize", updateHeight);
+    window.addEventListener('resize', updateHeight);
     return () => {
-      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener('resize', updateHeight);
     };
   }, []);
 
   useEffect(() => {
-    const theme = localStorage.getItem("theme");
+    const theme = localStorage.getItem('theme');
     if (theme) {
-      dispatch({ field: "lightMode", value: theme as "dark" | "light" });
+      dispatch({ field: 'lightMode', value: theme as 'dark' | 'light' });
     }
 
     if (window.innerWidth < 640) {
-      dispatch({ field: "showChatbar", value: false });
-      dispatch({ field: "showPromptbar", value: false });
+      dispatch({ field: 'showChatbar', value: false });
+      dispatch({ field: 'showPromptbar', value: false });
     }
 
-    const showChatbar = localStorage.getItem("showChatbar");
+    const showChatbar = localStorage.getItem('showChatbar');
     if (showChatbar) {
-      dispatch({ field: "showChatbar", value: showChatbar === "true" });
+      dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
     }
 
-    const showPromptbar = localStorage.getItem("showPromptbar");
+    const showPromptbar = localStorage.getItem('showPromptbar');
     if (showPromptbar) {
-      dispatch({ field: "showPromptbar", value: showPromptbar === "true" });
+      dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    const folders = localStorage.getItem("folders");
+    const folders = localStorage.getItem('folders');
     if (folders) {
-      dispatch({ field: "folders", value: JSON.parse(folders) });
+      dispatch({ field: 'folders', value: JSON.parse(folders) });
     }
 
-    const prompts = localStorage.getItem("prompts");
+    const prompts = localStorage.getItem('prompts');
     if (prompts) {
-      dispatch({ field: "prompts", value: JSON.parse(prompts) });
+      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
 
-    const outputLanguage = localStorage.getItem("outputLanguage");
+    const outputLanguage = localStorage.getItem('outputLanguage');
     if (outputLanguage) {
-      dispatch({ field: "outputLanguage", value: outputLanguage });
+      dispatch({ field: 'outputLanguage', value: outputLanguage });
     }
 
-    const conversationHistory = localStorage.getItem("conversationHistory");
+    const conversationHistory = localStorage.getItem('conversationHistory');
     let cleanedConversationHistory: Conversation[] = [];
     if (conversationHistory) {
       const parsedConversationHistory: Conversation[] =
         JSON.parse(conversationHistory);
       cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory
+        parsedConversationHistory,
       );
-      dispatch({ field: "conversations", value: cleanedConversationHistory });
+      dispatch({ field: 'conversations', value: cleanedConversationHistory });
     }
 
     dispatch({
-      field: "selectedConversation",
+      field: 'selectedConversation',
       value: {
         id: uuidv4(),
-        name: "New conversation",
+        name: 'New conversation',
         messages: [],
         model: OpenAIModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
@@ -450,7 +456,7 @@ const Home = ({
 
     if (!accessibleConversationId) return;
 
-    dispatch({ field: "loading", value: true });
+    dispatch({ field: 'loading', value: true });
     fetchShareableConversation(accessibleConversationId as string)
       .then((conversation) => {
         if (conversation) {
@@ -459,19 +465,19 @@ const Home = ({
             conversation,
           ];
 
-          dispatch({ field: "selectedConversation", value: conversation });
-          dispatch({ field: "conversations", value: updatedConversations });
+          dispatch({ field: 'selectedConversation', value: conversation });
+          dispatch({ field: 'conversations', value: updatedConversations });
           saveConversations(updatedConversations);
 
-          toast.success(t("Conversation loaded successfully."));
+          toast.success(t('Conversation loaded successfully.'));
           router.replace(router.pathname, router.pathname, { shallow: true });
         }
       })
       .catch(() => {
-        toast.error(t("Sorry, we could not find this shared conversation."));
+        toast.error(t('Sorry, we could not find this shared conversation.'));
       })
       .finally(() => {
-        dispatch({ field: "loading", value: false });
+        dispatch({ field: 'loading', value: false });
       });
   }, [
     defaultModelId,
@@ -479,6 +485,19 @@ const Home = ({
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
   ]);
+
+  // SPEECH TO TEXT -------------------------------------
+  useEffect(() => {
+    dispatch({ field: 'isPlaying', value: isPlaying });
+  }, [isPlaying]);
+
+  useEffect(() => {
+    dispatch({ field: 'isLoading', value: isLoading });
+  }, [isLoading]);
+
+  useEffect(() => {
+    dispatch({ field: 'currentSpeechId', value: currentSpeechId });
+  }, [currentSpeechId]);
 
   return (
     <HomeContext.Provider
@@ -491,6 +510,9 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
+        playMessage: (text, speechId) =>
+          speak(text, speechId, user?.token || ''),
+        stopPlaying,
       }}
     >
       <Head>
@@ -527,7 +549,7 @@ const Home = ({
               <AuthModel
                 supabase={supabase}
                 onClose={() =>
-                  dispatch({ field: "showLoginSignUpModel", value: false })
+                  dispatch({ field: 'showLoginSignUpModel', value: false })
                 }
               />
             )}
@@ -535,14 +557,14 @@ const Home = ({
               <ProfileModel
                 session={session}
                 onClose={() =>
-                  dispatch({ field: "showProfileModel", value: false })
+                  dispatch({ field: 'showProfileModel', value: false })
                 }
               />
             )}
             {showUsageModel && session && (
               <UsageCreditModel
                 onClose={() =>
-                  dispatch({ field: "showUsageModel", value: false })
+                  dispatch({ field: 'showUsageModel', value: false })
                 }
               />
             )}
@@ -550,7 +572,7 @@ const Home = ({
               <SurveyModel
                 session={session}
                 onClose={() =>
-                  dispatch({ field: "showSurveyModel", value: false })
+                  dispatch({ field: 'showSurveyModel', value: false })
                 }
               />
             )}
@@ -575,17 +597,17 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       defaultModelId,
       serverSidePluginKeysSet,
       googleAdSenseId,
-      ...(await serverSideTranslations(locale ?? "en", [
-        "common",
-        "chat",
-        "sidebar",
-        "model",
-        "markdown",
-        "promptbar",
-        "prompts",
-        "roles",
-        "rolesContent",
-        "feature",
+      ...(await serverSideTranslations(locale ?? 'en', [
+        'common',
+        'chat',
+        'sidebar',
+        'model',
+        'markdown',
+        'promptbar',
+        'prompts',
+        'roles',
+        'rolesContent',
+        'feature',
       ])),
     },
   };

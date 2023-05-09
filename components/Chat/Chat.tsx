@@ -31,6 +31,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -50,6 +51,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       user,
       outputLanguage,
       currentMessage,
+      messageIsStreaming
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -70,6 +72,39 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const logGaEvent = useCallback(
+    (messageLength?: number) => {
+      // Fail silently to avoid impacting user experience
+      try {
+        const messageType = currentMessage?.pluginId || 'gpt-3.5';
+        let eventName = 'Send Message (no-login)';
+
+        if (user) {
+          if (user.plan !== 'free') {
+            eventName = 'Send Message (paid account)';
+          } else {
+            eventName = 'Send Message (free account)';
+          }
+        }
+
+        let eventPayload = {
+          category: 'Usages',
+          userEmail: user?.email || 'N/A',
+          messageType: messageType,
+          user_type: user ? user?.plan : 'no-login',
+          user_id: user ? user?.email : getOrGenerateUserId(),
+        } as any;
+
+        if (messageLength) {
+          eventPayload.length = messageLength;
+        }
+
+        event(eventName, eventPayload);
+      } catch (e) {}
+    },
+    [user, currentMessage],
+  );
 
   const handleSend = useCallback(
     async (deleteCount = 0, overrideCurrentMessage?: Message) => {
@@ -237,19 +272,24 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         );
 
         // If the conversation is new, add it to the list of conversations
-        if(!updatedConversations.find((conversation) => conversation.id === updatedConversation.id)) {
+        if (
+          !updatedConversations.find(
+            (conversation) => conversation.id === updatedConversation.id,
+          )
+        ) {
           updatedConversations.push(updatedConversation);
         }
-        
+
         if (updatedConversations.length === 0) {
           updatedConversations.push(updatedConversation);
         }
-        
+
         homeDispatch({ field: 'conversations', value: updatedConversations });
         saveConversations(updatedConversations);
         homeDispatch({ field: 'messageIsStreaming', value: false });
 
         updateConversationLastUpdatedAtTimeStamp();
+        logGaEvent(text.length);
       }
     },
     [
@@ -421,7 +461,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                       }}
                       displayFeedbackButton={
                         selectedConversation.messages.length - 1 === index &&
-                        !loading
+                        !messageIsStreaming
                       }
                       conversation={selectedConversation}
                     />

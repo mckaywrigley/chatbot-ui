@@ -25,6 +25,7 @@
     "i18next": "^22.4.13",
     "langchain": "^0.0.64",
     "mathjs": "^11.8.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.28.0",
     "next": "13.2.4",
     "next-i18next": "^13.2.2",
     "nextjs-google-analytics": "^2.3.3",
