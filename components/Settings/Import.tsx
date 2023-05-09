@@ -31,6 +31,7 @@ export const Import: FC<Props> = ({ onImport }) => {
             onImport(json);
           };
           reader.readAsText(file);
+          e.target.value = '';
         }}
       />
 
