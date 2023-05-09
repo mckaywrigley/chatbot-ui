@@ -14,7 +14,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   const supabase = getAdminSupabaseClient();
   const { data: user, error } = await supabase
     .from('profiles')
-    .select('id, name, plan')
+    .select('id, plan')
     .eq('id', userId)
     .single();
 
