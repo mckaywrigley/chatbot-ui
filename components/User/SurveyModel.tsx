@@ -206,7 +206,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                 <Dialog.Description>
                   <div className="rounded-2xl flex flex-col">
                     <span className="text-lg mb-6">
-                      {t("We value your opinion. Take our survey now!")}
+                      {t("Please share your thoughts by completing a brief survey.")}
                     </span>
 
                     <div className="w-full h-96 overflow-y-scroll">
