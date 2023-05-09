@@ -137,6 +137,13 @@ export const ChatInput = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Fix Safari trigger unnessaray 'Enter' with 229 when using CJK IME input
+    // Safari on OS X may send a keydown of 229 after compositionend
+    // https://www.stum.de/2016/06/24/handling-ime-events-in-javascript/
+    if (e.key === 'Enter' && e.which === 229) {
+      return;
+    }
+    
     if (showPromptList) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
