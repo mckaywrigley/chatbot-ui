@@ -26,6 +26,7 @@ import {
 import { syncConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -41,6 +42,7 @@ import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
 import { ProfileModel } from '@/components/User/ProfileModel';
+import { SurveyModel } from '@/components/User/SurveyModel';
 import { UsageCreditModel } from '@/components/User/UsageCreditModel';
 
 import HomeContext from './home.context';
@@ -65,7 +67,8 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } = useAzureTts();
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } =
+    useAzureTts();
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
@@ -84,6 +87,7 @@ const Home = ({
       showLoginSignUpModel,
       showProfileModel,
       showUsageModel,
+      showSurveyModel,
       user,
       isPaidUser,
       conversationLastSyncAt,
@@ -346,6 +350,24 @@ const Home = ({
             },
           });
         });
+
+      //Check if survey is filled by logged in user
+      supabase
+        .from('user_survey')
+        .select('name')
+        .eq('uid', session.user.id)
+        .then(({ data }) => {
+          if (!data || data.length === 0) {
+            dispatch({ field: 'isSurveyFilled', value: false });
+          } else {
+            dispatch({ field: 'isSurveyFilled', value: true });
+          }
+        });
+    } else {
+      dispatch({
+        field: 'isSurveyFilled',
+        value: getIsSurveyFilledFromLocalStorage(),
+      });
     }
   }, [session]);
 
@@ -482,7 +504,6 @@ const Home = ({
     dispatch({ field: 'currentSpeechId', value: currentSpeechId });
   }, [currentSpeechId]);
 
-
   return (
     <HomeContext.Provider
       value={{
@@ -494,11 +515,8 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
-        playMessage: (text, speechId) => speak(
-          text,
-          speechId,
-          user?.token || ""
-        ),
+        playMessage: (text, speechId) =>
+          speak(text, speechId, user?.token || ''),
         stopPlaying,
       }}
     >
@@ -555,6 +573,13 @@ const Home = ({
                 }
               />
             )}
+            {showSurveyModel && (
+              <SurveyModel
+                onClose={() =>
+                  dispatch({ field: 'showSurveyModel', value: false })
+                }
+              />
+            )}
             <Promptbar />
           </div>
         </main>
@@ -587,6 +612,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'roles',
         'rolesContent',
         'feature',
+        'survey',
       ])),
     },
   };

@@ -44,8 +44,10 @@ export interface HomeInitialState {
   showLoginSignUpModel: boolean;
   showProfileModel: boolean;
   showUsageModel: boolean;
+  showSurveyModel: boolean;
   user: User | null;
   isPaidUser: boolean;
+  isSurveyFilled: boolean;
 
   // Text to Speech
   currentSpeechId: null | string;
@@ -91,8 +93,10 @@ export const initialState: HomeInitialState = {
   showLoginSignUpModel: false,
   showProfileModel: false,
   showUsageModel: false,
+  showSurveyModel: false,
   user: null,
   isPaidUser: false,
+  isSurveyFilled: false,
 
   // Text to Speech
   currentSpeechId: null,
