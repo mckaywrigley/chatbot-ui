@@ -1,5 +1,10 @@
-import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
-import { ReactNode } from 'react';
+import {
+  IconFolderPlus,
+  IconMistOff,
+  IconPlus,
+  IconRotateClockwise,
+} from '@tabler/icons-react';
+import { ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -14,6 +19,7 @@ interface Props<T> {
   addItemButtonTitle: string;
   side: 'left' | 'right';
   items: T[];
+  itemsIsImporting?: boolean;
   itemComponent: ReactNode;
   folderComponent: ReactNode;
   footerComponent?: ReactNode;
@@ -30,6 +36,7 @@ const Sidebar = <T,>({
   addItemButtonTitle,
   side,
   items,
+  itemsIsImporting = false,
   itemComponent,
   folderComponent,
   footerComponent,
@@ -56,6 +63,7 @@ const Sidebar = <T,>({
 
   return isOpen ? (
     <div>
+      {/* <div>{JSON.stringify(state.isImportingData)}</div> */}
       <div
         className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
       >
@@ -93,7 +101,7 @@ const Sidebar = <T,>({
             </div>
           )}
 
-          {items?.length > 0 ? (
+          {!itemsIsImporting && items?.length > 0 && (
             <div
               className="pt-2"
               onDrop={handleDrop}
@@ -103,11 +111,20 @@ const Sidebar = <T,>({
             >
               {itemComponent}
             </div>
-          ) : (
+          )}
+          {!itemsIsImporting && items?.length == 0 && (
             <div className="mt-8 select-none text-center text-white opacity-50">
               <IconMistOff className="mx-auto mb-3" />
               <span className="text-[14px] leading-normal">
                 {t('No prompts.')}
+              </span>
+            </div>
+          )}
+          {itemsIsImporting && (
+            <div className="mt-8 select-none text-center text-white opacity-50">
+              <IconRotateClockwise className="mx-auto mb-3 animate-spin" />
+              <span className="text-[14px] leading-normal">
+                {t('Loading...')}
               </span>
             </div>
           )}
