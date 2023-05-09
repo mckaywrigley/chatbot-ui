@@ -1,6 +1,6 @@
 create table "public"."user_survey" (
-    "id" uuid not null,
-    "uid" uuid not null references auth.users on delete cascade,
+    "id" uuid primary key default gen_random_uuid(),
+    "uid" uuid references auth.users on delete cascade,
     "non_login_uid" uuid,
     "created_at" timestamp with time zone default now(),
     "name" text,
@@ -15,11 +15,15 @@ create table "public"."user_survey" (
 -- Enable row level security
 alter table "public"."user_survey" enable row level security;
 
--- Create a policy to allow everyone to insert into this table
 create policy "Enable insert for everyone" 
 on "public"."user_survey"
 for insert
 with check (true);
+
+create policy "Allow access to user's own survey" 
+on "public"."user_survey"
+for select
+using (uid = auth.uid());
 
 -- Drop the specified columns from the profiles table
 alter table "public"."profiles" drop column "name";

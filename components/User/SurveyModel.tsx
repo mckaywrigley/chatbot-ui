@@ -4,6 +4,8 @@ import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useTranslation } from "next-i18next";
 import { FC, Fragment, useContext, useState, useMemo } from "react";
 import { toast } from "react-hot-toast";
+import { markSurveyIsFilledInLocalStorage } from "@/utils/app/ui";
+import { getOrGenerateUserId } from "@/utils/data/taggingHelper";
 
 type Props = {
   onClose: () => void;
@@ -142,7 +144,8 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
     //Supabase query
     try {
       const { error } = await supabaseClient.from("user_survey").insert({
-        id: user?.id,
+        uid: user?.id,
+        non_login_uid: getOrGenerateUserId(),
         name: name,
         occupation:
           selectedOccupation === "other_occupation"
@@ -160,6 +163,7 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
       toast.success(t("Thanks for completing the survey!"), {
         duration: 5000,
       });
+      markSurveyIsFilledInLocalStorage();
       homeDispatch({ field: 'isSurveyFilled', value: true });
       onClose();
     } catch (err) {
@@ -212,11 +216,11 @@ export const SurveyModel: FC<Props> = ({ onClose }) => {
                           htmlFor="name"
                           className="block text-base text-stone-400 mb-2"
                         >
-                          {t("Name(required)")}
+                          {t("Name (required)")}
                         </label>
                         <label
                           id="error-name"
-                          className="block text-sm text-rose-500 mb-1 hidden"
+                          className="text-sm text-rose-500 mb-1 hidden"
                         >
                           {t("Please enter name")}
                         </label>

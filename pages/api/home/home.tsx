@@ -26,6 +26,7 @@ import {
 import { syncConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -36,14 +37,13 @@ import { UserProfile } from '@/types/user';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { useAzureTts } from '@/components/Hooks/useAzureTts';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
 import { ProfileModel } from '@/components/User/ProfileModel';
 import { SurveyModel } from '@/components/User/SurveyModel';
 import { UsageCreditModel } from '@/components/User/UsageCreditModel';
-
-import { useAzureTts } from "@/components/Hooks/useAzureTts"
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -67,7 +67,8 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } = useAzureTts();
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } =
+    useAzureTts();
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
@@ -91,7 +92,6 @@ const Home = ({
       isPaidUser,
       conversationLastSyncAt,
       forceSyncConversation,
-      isSurveyFilled,
     },
     dispatch,
   } = contextValue;
@@ -355,7 +355,7 @@ const Home = ({
       supabase
         .from('user_survey')
         .select('name')
-        .eq('id', session.user.id)
+        .eq('uid', session.user.id)
         .then(({ data }) => {
           if (!data || data.length === 0) {
             dispatch({ field: 'isSurveyFilled', value: false });
@@ -363,6 +363,11 @@ const Home = ({
             dispatch({ field: 'isSurveyFilled', value: true });
           }
         });
+    } else {
+      dispatch({
+        field: 'isSurveyFilled',
+        value: getIsSurveyFilledFromLocalStorage(),
+      });
     }
   }, [session]);
 
@@ -568,7 +573,7 @@ const Home = ({
                 }
               />
             )}
-            {showSurveyModel &&  (
+            {showSurveyModel && (
               <SurveyModel
                 onClose={() =>
                   dispatch({ field: 'showSurveyModel', value: false })
@@ -607,7 +612,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'roles',
         'rolesContent',
         'feature',
-        'survey'
+        'survey',
       ])),
     },
   };

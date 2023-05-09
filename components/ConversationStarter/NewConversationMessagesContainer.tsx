@@ -1,10 +1,13 @@
-import { FootNoteMessage } from "./FootNoteMessage";
-import { RolePlayPrompts } from "./RolePlayPrompts";
-import { SamplePrompts } from "./SamplePrompts";
-import HomeContext from "@/pages/api/home/home.context";
-import { useTranslation } from "next-i18next";
-import { event } from "nextjs-google-analytics";
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useState } from 'react';
+
+import { useTranslation } from 'next-i18next';
+import { event } from 'nextjs-google-analytics';
+
+import HomeContext from '@/pages/api/home/home.context';
+
+import { FootNoteMessage } from './FootNoteMessage';
+import { RolePlayPrompts } from './RolePlayPrompts';
+import { SamplePrompts } from './SamplePrompts';
 
 type Props = {
   promptOnClick: (prompt: string) => void;
@@ -13,7 +16,7 @@ type Props = {
 export const NewConversationMessagesContainer: FC<Props> = ({
   promptOnClick,
 }) => {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation('chat');
   const {
     state: { user, isSurveyFilled },
     dispatch,
@@ -28,72 +31,67 @@ export const NewConversationMessagesContainer: FC<Props> = ({
   const roleOnClick = (roleName: string, roleContent: string) => {
     promptOnClick(roleContent);
 
-    event("interaction", {
-      category: "New Conversation",
+    event('interaction', {
+      category: 'New Conversation',
       label: roleName,
     });
   };
 
   const bannerOnClick = () => {
     if (user) {
-      dispatch({ field: "showProfileModel", value: true });
+      dispatch({ field: 'showProfileModel', value: true });
     } else {
-      dispatch({ field: "showLoginSignUpModel", value: true });
+      dispatch({ field: 'showLoginSignUpModel', value: true });
     }
 
-    event("Support banner clicked", {
-      category: "Engagement",
-      label: "Banner",
+    event('Support banner clicked', {
+      category: 'Engagement',
+      label: 'Banner',
     });
   };
 
   const surveyOnClick = () => {
-    if (user) {
-      dispatch({ field: "showSurveyModel", value: true });
-    } else {
-      dispatch({ field: "showLoginSignUpModel", value: true });
-    }
+    dispatch({ field: 'showSurveyModel', value: true });
 
-    event("Survey banner clicked", {
-      category: "Engagement",
-      label: "survey_banner",
+    event('Survey banner clicked', {
+      category: 'Engagement',
+      label: 'survey_banner',
     });
   };
 
   return (
     <div className="font-normal">
       <span className="font-semibold">Chat Everywhere</span>
-      
+
       {/* Ask for support banner */}
-      {(!user || user?.plan === "free") && (
+      {(!user || user?.plan === 'free') && (
         <div
           className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 bg-gradient-to-r from-[#ff80b5] to-[#9089fc] cursor-pointer"
           onClick={bannerOnClick}
         >
           <span className="flex flex-row flex-wrap items-center justify-center leading-4 text-sm">
             {t(
-              "If you like this project, please support us by subscripting to our Pro plan!"
+              'If you like this project, please support us by subscripting to our Pro plan!',
             )}
           </span>
         </div>
       )}
 
       {/* Survey for user information */}
-      {user &&
-        !isSurveyFilled && (
-          <div
-            className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 dark:bg-none cursor-pointer"
-            onClick={surveyOnClick}
-          >
-            <span className="flex flex-row flex-wrap items-center justify-center leading-4 text-sm">
-              {t("We value your opinion. Take our survey now!")}
-            </span>{" "}
-            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium ml-2 mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-800 dark:text-yellow-300">
-              {" "}
-              New{" "}
-            </span>
-          </div>
-        )}
+      {!isSurveyFilled && (
+        <div
+          className="mt-4 flex items-center justify-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600 dark:bg-none cursor-pointer"
+          onClick={surveyOnClick}
+        >
+          <span className="flex flex-row flex-wrap items-center justify-center leading-4 text-sm">
+            {t('We value your opinion. Take our survey now!')}
+          </span>{' '}
+          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium ml-2 mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-800 dark:text-yellow-300">
+            {' '}
+            New{' '}
+          </span>
+        </div>
+      )}
 
       {rolePlayMode ? (
         <RolePlayPrompts roleOnClick={roleOnClick} />
@@ -105,8 +103,8 @@ export const NewConversationMessagesContainer: FC<Props> = ({
         onClick={switchButtonOnClick}
       >
         {rolePlayMode
-          ? t("Switch to Sample Prompts")
-          : t("Switch to Role Play")}
+          ? t('Switch to Sample Prompts')
+          : t('Switch to Role Play')}
       </button>
       <FootNoteMessage />
     </div>
