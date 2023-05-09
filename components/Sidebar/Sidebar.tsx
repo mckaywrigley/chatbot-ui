@@ -99,25 +99,6 @@ const Sidebar = <T,>({
             </div>
           )}
 
-          {!itemsIsImporting && items?.length > 0 && (
-            <div
-              className="pt-2"
-              onDrop={handleDrop}
-              onDragOver={allowDrop}
-              onDragEnter={highlightDrop}
-              onDragLeave={removeHighlight}
-            >
-              {itemComponent}
-            </div>
-          )}
-          {!itemsIsImporting && items?.length == 0 && (
-            <div className="mt-8 select-none text-center text-white opacity-50">
-              <IconMistOff className="mx-auto mb-3" />
-              <span className="text-[14px] leading-normal">
-                {t('No prompts.')}
-              </span>
-            </div>
-          )}
           {itemsIsImporting && (
             <div className="mt-8 select-none text-center text-white opacity-50">
               <IconRotateClockwise className="mx-auto mb-3 animate-spin" />
@@ -126,6 +107,28 @@ const Sidebar = <T,>({
               </span>
             </div>
           )}
+
+          {items?.length == 0 && (
+            <div className="mt-8 select-none text-center text-white opacity-50">
+              <IconMistOff className="mx-auto mb-3" />
+              <span className="text-[14px] leading-normal">
+                {t('No prompts.')}
+              </span>
+            </div>
+          )}
+          <div
+            className={`pt-2 transition-all duration-500 ${
+              !itemsIsImporting && items?.length > 0
+                ? 'visible opacity-100'
+                : 'invisible opacity-0'
+            }`}
+            onDrop={handleDrop}
+            onDragOver={allowDrop}
+            onDragEnter={highlightDrop}
+            onDragLeave={removeHighlight}
+          >
+            {itemComponent}
+          </div>
         </div>
         {footerComponent}
       </div>
