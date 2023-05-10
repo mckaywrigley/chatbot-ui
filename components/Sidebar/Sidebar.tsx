@@ -58,13 +58,15 @@ const Sidebar = <T,>({
   return (
     <div
       className={`${
-        isOpen ? 'w-[260px]' : 'w-0'
-      } transition-all ease-linear relative`}
+        isOpen ? 'w-[260px] mobile:w-[70vw]' : 'w-0'
+      } transition-all  ease-linear relative box-content`}
     >
       <div
         className={`${isOpen && side === 'right' ? '!right-0' : ''} ${
           isOpen && side === 'left' ? '!left-0' : ''
-        } fixed top-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all ease-linear sm:relative sm:top-0`}
+        } ${
+          isOpen ? 'w-[260px] mobile:w-[70vw] px-2' : 'w-0 px-0'
+        } fixed top-0 z-40 flex h-full flex-none flex-col py-2 space-y-2 bg-[#202123]  text-[14px] transition-all ease-linear`}
         style={side === 'left' ? { left: '-260px' } : { right: '0' }}
       >
         <div className="flex items-center">
@@ -113,7 +115,7 @@ const Sidebar = <T,>({
             </div>
           ) : (
             <div className="mt-8 select-none text-center text-white opacity-50">
-              <IconMistOff className="mx-auto mb-3" />
+              <IconMistOff className="sm:hidden mx-auto mb-3" />
               <span className="text-[14px] leading-normal">
                 {t('No prompts.')}
               </span>
@@ -123,7 +125,11 @@ const Sidebar = <T,>({
         {footerComponent}
       </div>
 
-      <SidebarToggleButton onClick={toggleOpen} side={side} />
+      <SidebarToggleButton
+        onClick={toggleOpen}
+        side={side}
+        className={isOpen ? 'sm-hidden' : ''}
+      />
     </div>
   );
 };

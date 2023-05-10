@@ -7,7 +7,14 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      screens:{
+        mobile: 
+        {
+          'raw': '(max-width: 640px)',
+        }
+      }
+    },
   },
   variants: {
     extend: {
