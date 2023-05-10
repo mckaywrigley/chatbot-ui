@@ -443,7 +443,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         toast.custom(
           <div className="bg-indigo-800 p-5 rounded-xl shadow-lg flex flex-col items-center space-y-4 transition-all duration-300 ease-in-out hover:shadow-xl">
             <p className="text-lg font-semibold text-indigo-200">
-              Install the window.ai chrome extension.
+              Install the window.ai extension.
             </p>
             <a
               href="https://windowai.io"
