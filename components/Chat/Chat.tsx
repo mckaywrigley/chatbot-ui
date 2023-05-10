@@ -391,12 +391,38 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     // Fired for errors
     Error = "error"
   }
-  useEffect(() => {
-    if((window as any).ai){
-      toast.success("window.ai detected")
-      homeDispatch({ field: 'windowai', value: (window as any).ai });
+  const waitForAI = async (): Promise<boolean> => {
+    let timeoutCounter = 0;
+  
+    while (!(window as any).ai) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      timeoutCounter += 100;
+  
+      if (timeoutCounter >= 1000) {
+        return false;
+      }
     }
-  }, [window, windowaiEnabled])
+  
+    return true;
+  };
+  useEffect(() => {
+    const checkForAI = async () => {
+      const aiDetected = await waitForAI();
+
+      if (aiDetected) {
+        toast.success("window.ai detected")
+        homeDispatch({ field: 'windowai', value: (window as any).ai });
+      } else {
+        // You can replace this with the toast.custom call or any other desired action
+        console.log(
+          `Please visit https://windowai.io to install window.ai`
+        );
+      }
+    };
+
+    checkForAI();
+  }, [windowaiEnabled]);
+
 
   useEffect(() => {
     const handleEvent = (event: EventType, data: unknown) => {
