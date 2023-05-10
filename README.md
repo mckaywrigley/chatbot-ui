@@ -54,7 +54,7 @@ az acr create --resource-group $RES_GROUP --name $ACR_NAME --sku Standard --loca
 az acr build --registry $ACR_NAME --image <image-name> --file Dockerfile ./src
 ```
 
-**Docker**
+## Docker
 
 Build locally:
 
