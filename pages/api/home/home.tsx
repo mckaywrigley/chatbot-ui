@@ -450,7 +450,7 @@ const Home = ({
             saveConversations(updatedConversations);
 
             toast.success(t('Conversation loaded successfully.'));
-            // router.replace(router.pathname, router.pathname, { shallow: true });
+            router.replace(router.pathname, router.pathname, { shallow: true });
           }
         })
         .catch((error) => {
