@@ -92,12 +92,14 @@ const Home = ({
         }
         )
       }
-      return getModels(
-        {
-          key: apiKey,
-        },
-        signal,
-      );
+      else{
+        return getModels(
+          {
+            key: apiKey,
+          },
+          signal,
+        );
+      }
     },
     { enabled: true, refetchOnMount: false },
   );
