@@ -25,6 +25,35 @@ Host your own live version of Chatbot UI with Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
 
+## Build and Deploy to Azure
+
+**1. Clone Repo**
+
+```bash
+git clone https://github.com/mckaywrigley/chatbot-ui.git
+```
+
+**2. Create Azure container registry**
+
+Replace "registry-name" with a unique name for your new container registry. The registry name must be unique within Azure, contain only lower case letters, and contain 5-50 alphanumeric characters.
+
+```bash
+ACR_NAME=<registry-name>
+```
+
+```bash
+RES_GROUP=$ACR_NAME # Resource Group name
+
+az group create --resource-group $RES_GROUP --location eastus
+az acr create --resource-group $RES_GROUP --name $ACR_NAME --sku Standard --location eastus
+```
+
+**3. Build and push to registry**
+
+```bash
+az acr build --registry $ACR_NAME --image <image-name> --file Dockerfile ./src
+```
+
 **Docker**
 
 Build locally:
