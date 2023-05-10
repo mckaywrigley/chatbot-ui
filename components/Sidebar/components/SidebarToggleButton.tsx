@@ -1,5 +1,4 @@
-import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { IconArrowBarRight, IconMenu2 } from '@tabler/icons-react';
 
 interface Props {
   onClick: any;
@@ -18,11 +17,7 @@ export const SidebarToggleButton = ({ onClick, side }: Props) => {
           sm:h-8 sm:w-8 sm:text-neutral-700`}
         onClick={onClick}
       >
-        {side === 'right' ? (
-          <IconArrowBarRight className="w-full" />
-        ) : (
-          <IconArrowBarLeft className="w-full" />
-        )}
+        <IconMenu2 className="w-full" />
       </button>
       <div
         onClick={onClick}

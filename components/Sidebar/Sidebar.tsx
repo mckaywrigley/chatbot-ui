@@ -62,11 +62,10 @@ const Sidebar = <T,>({
       } transition-all ease-linear relative`}
     >
       <div
-        className={`
-        ${isOpen && side === 'right' ? '!right-0' : ''} 
-        ${isOpen && side === 'left' ? '!left-0' : ''}
-           fixed top-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all ease-linear sm:relative sm:top-0`}
-        style={side === 'left' ? { left: '-260px' } : { right: '-260px' }}
+        className={`${isOpen && side === 'right' ? '!right-0' : ''} ${
+          isOpen && side === 'left' ? '!left-0' : ''
+        } fixed top-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all ease-linear sm:relative sm:top-0`}
+        style={side === 'left' ? { left: '-260px' } : { right: '0' }}
       >
         <div className="flex items-center">
           <button

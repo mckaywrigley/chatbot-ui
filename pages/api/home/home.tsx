@@ -503,7 +503,7 @@ const Home = ({
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
             <Chatbar />
 
             <div className="flex flex-1">
