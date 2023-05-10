@@ -11,20 +11,18 @@ interface Props {
 
 export const Conversations = ({ conversations }: Props) => {
   return (
-    <>
-      <TransitionGroup className="flex w-full gap-1 flex-col-reverse">
-        {conversations
-          .filter((conversation) => !conversation.folderId)
-          .map((conversation) => (
-            <CSSTransition
-              key={`transition-${conversation.id}`}
-              timeout={400}
-              classNames="item"
-            >
-              <ConversationComponent conversation={conversation} />
-            </CSSTransition>
-          ))}
-      </TransitionGroup>
-    </>
+    <TransitionGroup className="flex w-full gap-1 flex-col-reverse">
+      {conversations
+        .filter((conversation) => !conversation.folderId)
+        .map((conversation) => (
+          <CSSTransition
+            key={`transition-${conversation.id}`}
+            timeout={500}
+            classNames="item"
+          >
+            <ConversationComponent conversation={conversation} />
+          </CSSTransition>
+        ))}
+    </TransitionGroup>
   );
 };
