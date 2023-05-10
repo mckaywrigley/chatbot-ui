@@ -21,6 +21,12 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
+import {
+  OpenAIModel,
+  OpenAIModels,
+  WindowAIModelID,
+  WindowAIModels,
+} from '@/types/openai';
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -29,11 +35,10 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
-import { OpenAIModel, OpenAIModels, WindowAIModelID, WindowAIModels } from '@/types/openai';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -55,7 +60,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       loading,
       prompts,
       windowaiEnabled,
-      windowai
+      windowai,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -122,37 +127,48 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           async start(controller: any) {
             let timeoutId: any;
             let controllerClosed = false;
-        
-            await windowai.generateText(
-              {
-                messages: chatBody.messages,
-              },
-              {
-                temperature: chatBody.temperature,
-                maxTokens: 1000,
-                onStreamResult: (res: any) => {
-                  if (controllerClosed) {
-                    return;
-                  }
-        
-                  controller.enqueue(new TextEncoder().encode(res.message.content));
-                  clearTimeout(timeoutId);
-                  timeoutId = setTimeout(() => {
-                    controller.close();
-                    controllerClosed = true;
-                  }, 1000);
+            try {
+              await windowai.generateText(
+                {
+                  messages: chatBody.messages,
                 },
-              }
-            );
+                {
+                  temperature: chatBody.temperature,
+                  maxTokens: 1000,
+                  onStreamResult: (res: any) => {
+                    if (controllerClosed) {
+                      return;
+                    }
+                    if(!res){
+                      return;
+                    }
+
+                    controller.enqueue(
+                      new TextEncoder().encode(res.message.content),
+                    );
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                      controller.close();
+                      controllerClosed = true;
+                    }, 1000);
+                  },
+                },
+              );
+            } catch (error) {
+              console.error('Error during text generation:', error);
+              homeDispatch({ field: 'loading', value: false });
+              homeDispatch({ field: 'messageIsStreaming', value: false });
+              toast.error('An error occurred during text generation.');
+              return;
+            }
           },
         });
         let response;
-        if(windowaiEnabled){
-          console.log("using window.ai")
+        if (windowaiEnabled) {
+          console.log('using window.ai');
           response = new Response(readerController);
-        }
-        else{
-          console.log("using openai")
+        } else {
+          console.log('using openai');
           response = await fetch(endpoint, {
             method: 'POST',
             headers: {
@@ -387,83 +403,83 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   enum EventType {
     // Fired when the user's model is changed.
-    ModelChanged = "model_changed",
+    ModelChanged = 'model_changed',
     // Fired for errors
-    Error = "error"
+    Error = 'error',
   }
   const waitForAI = async (): Promise<boolean> => {
     let timeoutCounter = 0;
-  
+
     while (!(window as any).ai) {
       await new Promise((resolve) => setTimeout(resolve, 100));
       timeoutCounter += 100;
-  
+
       if (timeoutCounter >= 1000) {
         return false;
       }
     }
-  
+
     return true;
   };
   useEffect(() => {
-    if(!windowaiEnabled){
-      console.log("windowai not enabled")
-      toast.dismiss("window-ai-detected");
-      toast.dismiss("window-ai-not-detected");
+    if (!windowaiEnabled) {
+      console.log('windowai not enabled');
+      toast.dismiss('window-ai-detected');
+      toast.dismiss('window-ai-not-detected');
       return;
     }
     const checkForAI = async () => {
-      if(!windowaiEnabled){
+      if (!windowaiEnabled) {
         return;
       }
       const aiDetected = await waitForAI();
       if (aiDetected) {
-        toast.success("window.ai detected", {
-          id: "window-ai-detected",
-        })
         homeDispatch({ field: 'windowai', value: (window as any).ai });
+        toast.success('window.ai detected', {
+          id: 'window-ai-detected',
+        });
       } else {
         // You can replace this with the toast.custom call or any other desired action
         toast.custom(
           <div className="bg-indigo-800 p-5 rounded-xl shadow-lg flex flex-col items-center space-y-4 transition-all duration-300 ease-in-out hover:shadow-xl">
-  <p className="text-lg font-semibold text-indigo-200">Install the window.ai chrome extension.</p>
-  <a
-    href="https://windowai.io"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-block bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-400 transition-colors duration-300 ease-in-out"
-  >
-    Visit windowai.io
-  </a>
-</div>
-, {
+            <p className="text-lg font-semibold text-indigo-200">
+              Install the window.ai chrome extension.
+            </p>
+            <a
+              href="https://windowai.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-400 transition-colors duration-300 ease-in-out"
+            >
+              Visit windowai.io
+            </a>
+          </div>,
+          {
             id: 'window-ai-not-detected',
             duration: 100000,
-          }
+          },
         );
       }
     };
 
     checkForAI();
-  }, [windowaiEnabled]);
-
+  }, [windowaiEnabled, homeDispatch]);
 
   useEffect(() => {
     const handleEvent = (event: EventType, data: unknown) => {
-      if(event === EventType.ModelChanged){
-        let models = windowai.getCurrentModel().then(
-          (modelID: WindowAIModelID) => {
-            console.log(modelID)
-              return [  
-                  WindowAIModels[modelID ? modelID : 'local'],
-              ];
-        });
+      if (event === EventType.ModelChanged) {
+        let models = windowai
+          .getCurrentModel()
+          .then((modelID: WindowAIModelID) => {
+            console.log(modelID);
+            return [WindowAIModels[modelID ? modelID : 'local']];
+          });
         models.then((models: OpenAIModel[]) => {
           homeDispatch({ field: 'models', value: models });
         });
       }
     };
-    if(windowai){
+    if (windowai) {
       windowai.addEventListener(handleEvent);
     }
   }, [windowai]);
