@@ -47,7 +47,13 @@ export const VariableModal: FC<Props> = ({
     onClose();
   };
 
+  const [isComposing, setIsComposing] = useState(false);
+
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (isComposing) {
+      return;
+    }
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -107,6 +113,8 @@ export const VariableModal: FC<Props> = ({
               placeholder={`Enter a value for ${variable.key}...`}
               value={variable.value}
               onChange={(e) => handleChange(index, e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
               rows={3}
             />
           </div>
