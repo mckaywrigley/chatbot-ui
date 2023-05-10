@@ -393,7 +393,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }
   useEffect(() => {
     if((window as any).ai){
-      console.log("window.ai detected")
+      toast.success("window.ai detected")
       homeDispatch({ field: 'windowai', value: (window as any).ai });
     }
   }, [window, windowaiEnabled])
