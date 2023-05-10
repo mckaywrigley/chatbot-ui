@@ -83,7 +83,6 @@ const Home = ({
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet && !windowaiEnabled) return null;
       if(windowaiEnabled && windowai) {
-        
         return windowai.getCurrentModel().then(
           (modelID: WindowAIModelID) => {
               return [
