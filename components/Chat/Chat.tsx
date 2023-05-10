@@ -406,18 +406,40 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     return true;
   };
   useEffect(() => {
+    if(!windowaiEnabled){
+      console.log("windowai not enabled")
+      toast.dismiss("window-ai-detected");
+      toast.dismiss("window-ai-not-detected");
+      return;
+    }
     const checkForAI = async () => {
+      if(!windowaiEnabled){
+        return;
+      }
       const aiDetected = await waitForAI();
-
-      if (aiDetected && windowaiEnabled) {
+      if (aiDetected) {
         toast.success("window.ai detected", {
-          id: "windowai-detected",
+          id: "window-ai-detected",
         })
         homeDispatch({ field: 'windowai', value: (window as any).ai });
       } else {
         // You can replace this with the toast.custom call or any other desired action
-        console.log(
-          `Please visit https://windowai.io to install window.ai`
+        toast.custom(
+          <div className="bg-indigo-800 p-5 rounded-xl shadow-lg flex flex-col items-center space-y-4 transition-all duration-300 ease-in-out hover:shadow-xl">
+  <p className="text-lg font-semibold text-indigo-200">Install the window.ai chrome extension.</p>
+  <a
+    href="https://windowai.io"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-400 transition-colors duration-300 ease-in-out"
+  >
+    Visit windowai.io
+  </a>
+</div>
+, {
+            id: 'window-ai-not-detected',
+            duration: 100000,
+          }
         );
       }
     };
