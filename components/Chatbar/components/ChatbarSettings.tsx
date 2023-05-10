@@ -57,7 +57,7 @@ export const ChatbarSettings = () => {
         onClick={() => setIsSettingDialog(true)}
       />
       <SidebarButton
-        text={'Window AI ' + (windowaiEnabled ? 'Enabled' : 'Disabled')}
+        text={(windowaiEnabled ? 'Disable' : 'Enable') + ' Window AI'}
         icon={<IconBrandWindows size={18} />}
         onClick={() => {
           homeDispatch({

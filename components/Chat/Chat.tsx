@@ -409,7 +409,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     const checkForAI = async () => {
       const aiDetected = await waitForAI();
 
-      if (aiDetected) {
+      if (aiDetected && windowaiEnabled) {
         toast.success("window.ai detected", {
           id: "windowai-detected",
         })
@@ -471,8 +471,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             </div>
             <div className="mb-2">
               {t(
-                'Please set your OpenAI API key in the bottom left of the sidebar.',
+                'Please set your OpenAI API key in the bottom left of the sidebar or use ',
               )}
+              {/*  windowai.io link */}
+              <a
+                href="https://windowai.io"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                window.ai
+              </a>
+              .
             </div>
             <div>
               {t("If you don't have an OpenAI API key, you can get one here: ")}
