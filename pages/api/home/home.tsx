@@ -65,7 +65,8 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } = useAzureTts();
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } =
+    useAzureTts();
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
@@ -420,48 +421,54 @@ const Home = ({
       dispatch({ field: 'conversations', value: cleanedConversationHistory });
     }
 
-    dispatch({
-      field: 'selectedConversation',
-      value: {
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        temperature: DEFAULT_TEMPERATURE,
-        folderId: null,
-      },
-    });
+    const newConversation = {
+      id: uuidv4(),
+      name: 'New conversation',
+      messages: [],
+      model: OpenAIModels[defaultModelId],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      temperature: DEFAULT_TEMPERATURE,
+      folderId: null,
+    };
 
     // Load shareable conversations
     const { shareable_conversation_id: accessibleConversationId } =
       router.query;
 
-    if (!accessibleConversationId) return;
+    if (accessibleConversationId) {
+      dispatch({ field: 'loading', value: true });
+      fetchShareableConversation(accessibleConversationId as string)
+        .then((conversation) => {
+          if (conversation) {
+            const updatedConversations = [
+              ...cleanedConversationHistory,
+              conversation,
+            ];
 
-    dispatch({ field: 'loading', value: true });
-    fetchShareableConversation(accessibleConversationId as string)
-      .then((conversation) => {
-        if (conversation) {
-          const updatedConversations = [
-            ...cleanedConversationHistory,
-            conversation,
-          ];
+            dispatch({ field: 'selectedConversation', value: conversation });
+            dispatch({ field: 'conversations', value: updatedConversations });
+            saveConversations(updatedConversations);
 
-          dispatch({ field: 'selectedConversation', value: conversation });
-          dispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-
-          toast.success(t('Conversation loaded successfully.'));
-          router.replace(router.pathname, router.pathname, { shallow: true });
-        }
-      })
-      .catch(() => {
-        toast.error(t('Sorry, we could not find this shared conversation.'));
-      })
-      .finally(() => {
-        dispatch({ field: 'loading', value: false });
+            toast.success(t('Conversation loaded successfully.'));
+            // router.replace(router.pathname, router.pathname, { shallow: true });
+          }
+        })
+        .catch((error) => {
+          toast.error(t('Sorry, we could not find this shared conversation.'));
+          dispatch({
+            field: 'selectedConversation',
+            value: newConversation,
+          });
+        })
+        .finally(() => {
+          dispatch({ field: 'loading', value: false });
+        });
+    } else {
+      dispatch({
+        field: 'selectedConversation',
+        value: newConversation,
       });
+    }
   }, [
     defaultModelId,
     dispatch,
@@ -482,7 +489,6 @@ const Home = ({
     dispatch({ field: 'currentSpeechId', value: currentSpeechId });
   }, [currentSpeechId]);
 
-
   return (
     <HomeContext.Provider
       value={{
@@ -494,11 +500,8 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
-        playMessage: (text, speechId) => speak(
-          text,
-          speechId,
-          user?.token || ""
-        ),
+        playMessage: (text, speechId) =>
+          speak(text, speechId, user?.token || ''),
         stopPlaying,
       }}
     >
