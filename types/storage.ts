@@ -18,4 +18,6 @@ export interface LocalStorage {
   showPromptbar: boolean;
   // added plugin keys (4/3/23)
   pluginKeys: PluginKey[];
+  // added WindowAI (5/10/23)
+  windowAI: boolean;
 }

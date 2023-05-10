@@ -33,6 +33,7 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { OpenAIModel, OpenAIModels, WindowAIModelID, WindowAIModels } from '@/types/openai';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -53,6 +54,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      windowaiEnabled,
+      windowai
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -63,7 +66,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -116,14 +118,50 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           });
         }
         const controller = new AbortController();
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const readerController = new ReadableStream({
+          async start(controller: any) {
+            let timeoutId: any;
+            let controllerClosed = false;
+        
+            await windowai.generateText(
+              {
+                messages: chatBody.messages,
+              },
+              {
+                temperature: chatBody.temperature,
+                maxTokens: 1000,
+                onStreamResult: (res: any) => {
+                  if (controllerClosed) {
+                    return;
+                  }
+        
+                  controller.enqueue(new TextEncoder().encode(res.message.content));
+                  clearTimeout(timeoutId);
+                  timeoutId = setTimeout(() => {
+                    controller.close();
+                    controllerClosed = true;
+                  }, 1000);
+                },
+              }
+            );
           },
-          signal: controller.signal,
-          body,
         });
+        let response;
+        if(windowaiEnabled){
+          console.log("using window.ai")
+          response = new Response(readerController);
+        }
+        else{
+          console.log("using openai")
+          response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+            body,
+          });
+        }
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -347,9 +385,42 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     };
   }, [messagesEndRef]);
 
+  enum EventType {
+    // Fired when the user's model is changed.
+    ModelChanged = "model_changed",
+    // Fired for errors
+    Error = "error"
+  }
+  useEffect(() => {
+    if((window as any).ai){
+      console.log("window.ai detected")
+      homeDispatch({ field: 'windowai', value: (window as any).ai });
+    }
+  }, [window, windowaiEnabled])
+
+  useEffect(() => {
+    const handleEvent = (event: EventType, data: unknown) => {
+      if(event === EventType.ModelChanged){
+        let models = windowai.getCurrentModel().then(
+          (modelID: WindowAIModelID) => {
+            console.log(modelID)
+              return [  
+                  WindowAIModels[modelID ? modelID : 'local'],
+              ];
+        });
+        models.then((models: OpenAIModel[]) => {
+          homeDispatch({ field: 'models', value: models });
+        });
+      }
+    };
+    if(windowai){
+      windowai.addEventListener(handleEvent);
+    }
+  }, [windowai]);
+
   return (
     <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
-      {!(apiKey || serverSideApiKeyIsSet) ? (
+      {!(apiKey || serverSideApiKeyIsSet || windowaiEnabled) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
           <div className="text-center text-4xl font-bold text-black dark:text-white">
             Welcome to Chatbot UI

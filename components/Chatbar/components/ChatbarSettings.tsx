@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconSettings, IconBrandWindows } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -25,6 +25,7 @@ export const ChatbarSettings = () => {
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
+      windowaiEnabled
     },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -55,9 +56,21 @@ export const ChatbarSettings = () => {
         icon={<IconSettings size={18} />}
         onClick={() => setIsSettingDialog(true)}
       />
-
-      {!serverSideApiKeyIsSet ? (
-        <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+      <SidebarButton
+        text={'Window AI ' + (windowaiEnabled ? 'Enabled' : 'Disabled')}
+        icon={<IconBrandWindows size={18} />}
+        onClick={() => {
+          homeDispatch({
+            field: 'windowaiEnabled',
+            value: !windowaiEnabled,
+          });
+          localStorage.setItem('windowaiEnabled', (!windowaiEnabled).toString());
+        }}
+      />
+      {!windowaiEnabled ? (
+        !serverSideApiKeyIsSet ? (
+          <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+        ) : null
       ) : null}
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}
@@ -68,6 +81,7 @@ export const ChatbarSettings = () => {
           setIsSettingDialog(false);
         }}
       />
+      
     </div>
   );
 };

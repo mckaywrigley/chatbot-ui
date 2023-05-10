@@ -28,7 +28,7 @@ import { getSettings } from '@/utils/app/settings';
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
+import { OpenAIModelID, OpenAIModels, WindowAIModelID, WindowAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
 import { Chat } from '@/components/Chat/Chat';
@@ -70,6 +70,8 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      windowaiEnabled,
+      windowai,
     },
     dispatch,
   } = contextValue;
@@ -77,10 +79,19 @@ const Home = ({
   const stopConversationRef = useRef<boolean>(false);
 
   const { data, error, refetch } = useQuery(
-    ['GetModels', apiKey, serverSideApiKeyIsSet],
+    ['GetModels', apiKey, serverSideApiKeyIsSet, windowai, windowaiEnabled],
     ({ signal }) => {
-      if (!apiKey && !serverSideApiKeyIsSet) return null;
-
+      if (!apiKey && !serverSideApiKeyIsSet && !windowaiEnabled) return null;
+      if(windowaiEnabled && windowai) {
+        
+        return windowai.getCurrentModel().then(
+          (modelID: WindowAIModelID) => {
+              return [
+                  WindowAIModels[modelID ? modelID : "local"],
+              ]
+        }
+        )
+      }
       return getModels(
         {
           key: apiKey,
@@ -258,7 +269,13 @@ const Home = ({
         value: settings.theme,
       });
     }
-
+    const windowaiEnabled = localStorage.getItem('windowaiEnabled');
+    if (windowaiEnabled) {
+      dispatch({
+        field: 'windowaiEnabled',
+        value: windowaiEnabled === 'true',
+      });
+    }
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {

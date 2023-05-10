@@ -1,9 +1,9 @@
 import { IconExternalLink } from '@tabler/icons-react';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { OpenAIModel } from '@/types/openai';
+import { OpenAIModel, WindowAIModels} from '@/types/openai';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -15,7 +15,7 @@ export const ModelSelect = () => {
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
-
+  console.log(models)
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     selectedConversation &&
       handleUpdateConversation(selectedConversation, {
@@ -25,6 +25,16 @@ export const ModelSelect = () => {
         ) as OpenAIModel,
       });
   };
+
+  useEffect(() => {
+    if (models.length === 1) {
+      handleChange({
+        target: {
+          value: models[0].id,
+          },
+          } as React.ChangeEvent<HTMLSelectElement>,)
+    }
+  }, [models]);
 
   return (
     <div className="flex flex-col">

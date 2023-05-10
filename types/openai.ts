@@ -14,6 +14,14 @@ export enum OpenAIModelID {
   GPT_4_32K = 'gpt-4-32k',
 }
 
+export enum WindowAIModelID {
+  GPT3 = "openai/gpt3.5",
+  GPT4 = "openai/gpt4",
+  GPTNeo = "together/gpt-neoxt-20B",
+  Cohere = "cohere/xlarge",
+  Local = "local"
+}
+
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
 export const fallbackModelID = OpenAIModelID.GPT_3_5;
 
@@ -41,5 +49,38 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     name: 'GPT-4-32K',
     maxLength: 96000,
     tokenLimit: 32000,
+  },
+};
+
+export const WindowAIModels: Record<WindowAIModelID, OpenAIModel> = {
+  [WindowAIModelID.GPT3]: {
+    id: WindowAIModelID.GPT3,
+    name: 'GPT-3.5',
+    maxLength: 12000,
+    tokenLimit: 4000,
+  },
+  [WindowAIModelID.GPT4]: { 
+    id: WindowAIModelID.GPT4,
+    name: 'GPT-4',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [WindowAIModelID.GPTNeo]: {
+    id: WindowAIModelID.GPTNeo,
+    name: 'GPT-Neo',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [WindowAIModelID.Cohere]: {
+    id: WindowAIModelID.Cohere,
+    name: 'Cohere',
+    maxLength: 24000,
+    tokenLimit: 8000,
+  },
+  [WindowAIModelID.Local]: {
+    id: WindowAIModelID.Local,
+    name: 'Local',
+    maxLength: 24000,
+    tokenLimit: 8000,
   },
 };

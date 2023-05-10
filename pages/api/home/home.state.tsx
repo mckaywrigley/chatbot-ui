@@ -9,6 +9,8 @@ export interface HomeInitialState {
   apiKey: string;
   pluginKeys: PluginKey[];
   loading: boolean;
+  windowaiEnabled: boolean;
+  windowai: any;
   lightMode: 'light' | 'dark';
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
@@ -32,6 +34,8 @@ export interface HomeInitialState {
 export const initialState: HomeInitialState = {
   apiKey: '',
   loading: false,
+  windowaiEnabled: false,
+  windowai: null,
   pluginKeys: [],
   lightMode: 'dark',
   messageIsStreaming: false,
