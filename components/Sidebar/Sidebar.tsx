@@ -6,6 +6,7 @@ import {
   CloseSidebarButton,
   OpenSidebarButton,
 } from './components/OpenCloseButton';
+import { SidebarToggleButton } from './components/SidebarToggleButton';
 
 import Search from '../Search';
 
@@ -54,34 +55,16 @@ const Sidebar = <T,>({
     e.target.style.background = 'none';
   };
 
-  const [showMenu, setShowMenu] = useState(false);
-  const [showMenuAnimation, setShowMenuAnimation] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowMenu(true);
-      setTimeout(() => {
-        setShowMenuAnimation(true);
-      }, 200);
-    } else {
-      setShowMenuAnimation(false);
-      setTimeout(() => {
-        setShowMenu(false);
-      }, 200);
-    }
-  }, [isOpen]);
-
   return (
     <div
       className={`${
-        showMenuAnimation ? 'w-[260px]' : 'w-0'
-      } transition-all ease-linear `}
+        isOpen ? 'w-[260px]' : 'w-0'
+      } transition-all ease-linear relative`}
     >
       <div
         className={`
-        ${!isOpen ? 'hidden' : ''}
-        ${showMenuAnimation && side === 'right' ? '!right-0' : ''} 
-        ${showMenuAnimation && side === 'left' ? '!left-0' : ''}
+        ${isOpen && side === 'right' ? '!right-0' : ''} 
+        ${isOpen && side === 'left' ? '!left-0' : ''}
            fixed top-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all ease-linear sm:relative sm:top-0`}
         style={side === 'left' ? { left: '-260px' } : { right: '-260px' }}
       >
@@ -141,8 +124,7 @@ const Sidebar = <T,>({
         {footerComponent}
       </div>
 
-      {isOpen && <CloseSidebarButton onClick={toggleOpen} side={side} />}
-      {!isOpen && <OpenSidebarButton onClick={toggleOpen} side={side} />}
+      <SidebarToggleButton onClick={toggleOpen} side={side} />
     </div>
   );
 };

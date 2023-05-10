@@ -100,9 +100,7 @@ const Home = ({
     ({ signal }) => {
       if (!serverSideApiKeyIsSet) return null;
 
-      return getModels(
-        signal,
-      );
+      return getModels(signal);
     },
     { enabled: true, refetchOnMount: false },
   );
