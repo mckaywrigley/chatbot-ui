@@ -152,7 +152,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     timeoutId = setTimeout(() => {
                       controller.close();
                       controllerClosed = true;
-                    }, 2000);
+                    }, 1500);
                   },
                 },
               );
