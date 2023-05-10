@@ -130,7 +130,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             try {
               await windowai.generateText(
                 {
-                  messages: chatBody.messages,
+                  messages: [
+                    {role: "system", content: chatBody.prompt},
+                    ...chatBody.messages,]
                 },
                 {
                   temperature: chatBody.temperature,
@@ -150,7 +152,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     timeoutId = setTimeout(() => {
                       controller.close();
                       controllerClosed = true;
-                    }, 1000);
+                    }, 2000);
                   },
                 },
               );
@@ -553,7 +555,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'Chatbot UI x Window AI'
+                      `Chatbot UI${windowaiEnabled ? 'x window.ai' : ''}`
                     )}
                   </div>
 
