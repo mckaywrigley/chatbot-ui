@@ -410,7 +410,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       const aiDetected = await waitForAI();
 
       if (aiDetected) {
-        toast.success("window.ai detected")
+        toast.success("window.ai detected", {
+          id: "windowai-detected",
+        })
         homeDispatch({ field: 'windowai', value: (window as any).ai });
       } else {
         // You can replace this with the toast.custom call or any other desired action
