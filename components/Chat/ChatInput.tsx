@@ -78,6 +78,7 @@ export const ChatInput = ({
     // TODO: update token usage ( use lightweight version of get_token_usage)
     // getTokenUsage(value);
 
+    // TODO: remove this
     if (maxLength && value.length > maxLength) {
       alert(
         t(
@@ -334,7 +335,7 @@ export const ChatInput = ({
             ref={textareaRef}
             className={`m-0 w-full transition-all resize-none border-0 bg-transparent pt-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none`}
             style={{
-              paddingBottom: isFocused ? '3rem' : '0.75rem',
+              marginBottom: `${isFocused ? '2.2' : '0.75'}rem `,
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
