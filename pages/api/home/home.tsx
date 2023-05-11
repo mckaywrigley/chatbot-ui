@@ -26,6 +26,7 @@ import {
 import { syncConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -37,10 +38,12 @@ import { UserProfile } from '@/types/user';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { useAzureTts } from '@/components/Hooks/useAzureTts';
+import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
 import { ProfileModel } from '@/components/User/ProfileModel';
+import { SurveyModel } from '@/components/User/SurveyModel';
 import { UsageCreditModel } from '@/components/User/UsageCreditModel';
 
 import HomeContext from './home.context';
@@ -74,6 +77,8 @@ const Home = ({
 
   const contextValue = useCreateReducer<HomeInitialState>({ initialState });
 
+  const { fetchAndUpdateCreditUsage, creditUsage } = useFetchCreditUsage();
+
   const {
     state: {
       lightMode,
@@ -85,6 +90,7 @@ const Home = ({
       showLoginSignUpModel,
       showProfileModel,
       showUsageModel,
+      showSurveyModel,
       user,
       isPaidUser,
       conversationLastSyncAt,
@@ -347,8 +353,31 @@ const Home = ({
             },
           });
         });
+
+      //Check if survey is filled by logged in user
+      supabase
+        .from('user_survey')
+        .select('name')
+        .eq('uid', session.user.id)
+        .then(({ data }) => {
+          if (!data || data.length === 0) {
+            dispatch({ field: 'isSurveyFilled', value: false });
+          } else {
+            dispatch({ field: 'isSurveyFilled', value: true });
+          }
+        });
+    } else {
+      dispatch({
+        field: 'isSurveyFilled',
+        value: getIsSurveyFilledFromLocalStorage(),
+      });
     }
   }, [session]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchAndUpdateCreditUsage(user.id, isPaidUser);
+  }, [user, isPaidUser, conversations]);
 
   const handleUserLogout = async () => {
     await supabase.auth.signOut();
@@ -476,7 +505,7 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
-  // SPEECH TO TEXT -------------------------------------
+  // APPLY HOOKS VALUE TO CONTEXT -------------------------------------
   useEffect(() => {
     dispatch({ field: 'isPlaying', value: isPlaying });
   }, [isPlaying]);
@@ -488,6 +517,10 @@ const Home = ({
   useEffect(() => {
     dispatch({ field: 'currentSpeechId', value: currentSpeechId });
   }, [currentSpeechId]);
+
+  useEffect(() => {
+    dispatch({ field: 'creditUsage', value: creditUsage });
+  }, [creditUsage]);
 
   return (
     <HomeContext.Provider
@@ -558,6 +591,13 @@ const Home = ({
                 }
               />
             )}
+            {showSurveyModel && (
+              <SurveyModel
+                onClose={() =>
+                  dispatch({ field: 'showSurveyModel', value: false })
+                }
+              />
+            )}
             <Promptbar />
           </div>
         </main>
@@ -590,6 +630,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'roles',
         'rolesContent',
         'feature',
+        'survey',
       ])),
     },
   };

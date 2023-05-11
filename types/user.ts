@@ -1,4 +1,5 @@
 import { ExportFormatV4 } from "./export";
+import { PluginID } from "./plugin";
 
 export interface User {
   id: string;
@@ -20,4 +21,10 @@ export interface UserProfile {
   id: string;
   plan: "free" | "pro";
   name: string;
+}
+
+export interface CreditUsage {
+  [PluginID.GPT4]: {
+    remainingCredits: number;
+  }
 }

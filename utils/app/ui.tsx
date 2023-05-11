@@ -1,11 +1,11 @@
-import {
-  IconBolt,
-  IconBrain,
-  IconNumber4
-} from '@tabler/icons-react';
+import { IconBolt, IconBrain, IconNumber4 } from '@tabler/icons-react';
+
 import { PluginID } from '@/types/plugin';
 
-export const getPluginIcon = (pluginId: string | undefined | null, iconSize?: number) => {
+export const getPluginIcon = (
+  pluginId: string | undefined | null,
+  iconSize?: number,
+) => {
   const size = iconSize || 20;
   if (!pluginId) {
     return <IconBolt size={20} />;
@@ -20,3 +20,9 @@ export const getPluginIcon = (pluginId: string | undefined | null, iconSize?: nu
       return <IconBolt size={size} />;
   }
 };
+
+export const markSurveyIsFilledInLocalStorage = () =>
+  localStorage.setItem('surveyIsFilled', 'true');
+
+export const getIsSurveyFilledFromLocalStorage = () =>
+  localStorage.getItem('surveyIsFilled') === 'true';
