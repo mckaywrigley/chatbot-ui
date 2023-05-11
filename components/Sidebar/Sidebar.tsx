@@ -2,10 +2,6 @@ import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  CloseSidebarButton,
-  OpenSidebarButton,
-} from './components/OpenCloseButton';
 import { SidebarToggleButton } from './components/SidebarToggleButton';
 
 import Search from '../Search';
@@ -24,6 +20,7 @@ interface Props<T> {
   handleCreateItem: () => void;
   handleCreateFolder: () => void;
   handleDrop: (e: any) => void;
+  showMobileButton?: boolean;
 }
 
 const Sidebar = <T,>({
@@ -40,6 +37,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
+  showMobileButton = true,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -130,7 +128,11 @@ const Sidebar = <T,>({
         {footerComponent}
       </div>
 
-      <SidebarToggleButton onClick={toggleOpen} side={side} />
+      <SidebarToggleButton
+        onClick={toggleOpen}
+        side={side}
+        className={`${showMobileButton ? '' : 'mobile:hidden'}`}
+      />
     </div>
   );
 };
