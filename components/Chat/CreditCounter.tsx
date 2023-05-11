@@ -7,24 +7,28 @@ import { PluginID } from '@/types/plugin';
 import HomeContext from '@/pages/api/home/home.context';
 
 type Props = {
-  pluginId: PluginID.GPT4 | null;
+  pluginId: PluginID | null;
 };
 
 export const CreditCounter: React.FC<Props> = ({ pluginId }) => {
   const { t } = useTranslation('chat');
+
   const {
-    state: { pluginUsage },
+    state: { creditUsage },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  if (!pluginUsage) return <></>;
+  if (!creditUsage || pluginId !== PluginID.GPT4) return <></>;
 
-  const remainingCredits = pluginId && pluginUsage[pluginId].remainingCredits;
+  const remainingCredits = pluginId && creditUsage[pluginId].remainingCredits;
 
   if (!remainingCredits) return <></>;
 
   return (
-    <div className="flex items-center justify-center">
+    <div 
+      className="flex items-center justify-center cursor-pointer text-gray-500 hover:text-gray-300 text-xs ml-3"
+      onClick={ () => homeDispatch({field: "showUsageModel", value: true })}
+      >
       {t('Remaining Credits')}: {remainingCredits}
     </div>
   );

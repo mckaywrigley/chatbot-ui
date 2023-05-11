@@ -38,6 +38,7 @@ import { UserProfile } from '@/types/user';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { useAzureTts } from '@/components/Hooks/useAzureTts';
+import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
@@ -75,6 +76,8 @@ const Home = ({
   const supabase = useSupabaseClient();
 
   const contextValue = useCreateReducer<HomeInitialState>({ initialState });
+
+  const { fetchAndUpdateCreditUsage, creditUsage } = useFetchCreditUsage();
 
   const {
     state: {
@@ -371,6 +374,11 @@ const Home = ({
     }
   }, [session]);
 
+  useEffect(() => {
+    if (!user) return;
+    fetchAndUpdateCreditUsage(user.id, isPaidUser);
+  }, [user, isPaidUser, conversations]);
+
   const handleUserLogout = async () => {
     await supabase.auth.signOut();
     dispatch({ field: 'user', value: null });
@@ -491,7 +499,7 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
-  // SPEECH TO TEXT -------------------------------------
+  // APPLY HOOKS VALUE TO CONTEXT -------------------------------------
   useEffect(() => {
     dispatch({ field: 'isPlaying', value: isPlaying });
   }, [isPlaying]);
@@ -503,6 +511,10 @@ const Home = ({
   useEffect(() => {
     dispatch({ field: 'currentSpeechId', value: currentSpeechId });
   }, [currentSpeechId]);
+
+  useEffect(() => {
+    dispatch({ field: 'creditUsage', value: creditUsage });
+  }, [creditUsage]);
 
   return (
     <HomeContext.Provider

@@ -50,7 +50,7 @@ export interface HomeInitialState {
   isSurveyFilled: boolean;
 
   // Plugins Utils
-  pluginUsage: CreditUsage | null;
+  creditUsage: CreditUsage | null;
 
   // Text to Speech
   currentSpeechId: null | string;
@@ -102,7 +102,7 @@ export const initialState: HomeInitialState = {
   isSurveyFilled: false,
 
   // Plugins Utils
-  pluginUsage: null,
+  creditUsage: null,
 
   // Text to Speech
   currentSpeechId: null,

@@ -33,6 +33,8 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
+import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
+
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
   googleAdSenseId: string;
@@ -49,6 +51,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       modelError,
       loading,
       user,
+      isPaidUser,
       outputLanguage,
       currentMessage,
       messageIsStreaming
@@ -72,6 +75,8 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const { fetchAndUpdateCreditUsage } = useFetchCreditUsage();
 
   const logGaEvent = useCallback(
     (messageLength?: number) => {
@@ -325,10 +330,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
     });
   };
 
-  const handleSettings = () => {
-    setShowSettings(!showSettings);
-  };
-
   const onClearAll = () => {
     if (
       confirm(t<string>('Are you sure you want to clear all messages?')) &&
@@ -459,7 +460,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                           editedMessage,
                         );
                       }}
-                      displayFeedbackButton={
+                      displayFooterButtons={
                         selectedConversation.messages.length - 1 === index &&
                         !messageIsStreaming
                       }

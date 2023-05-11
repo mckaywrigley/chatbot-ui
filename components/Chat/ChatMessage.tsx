@@ -21,6 +21,7 @@ import HomeContext from '@/pages/api/home/home.context';
 
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import { CreditCounter } from './CreditCounter';
 import { FeedbackContainer } from './FeedbackContainer';
 import { SpeechButton } from './SpeechButton';
 
@@ -31,17 +32,17 @@ import remarkMath from 'remark-math';
 interface Props {
   message: Message;
   messageIndex: number;
-  displayFeedbackButton: boolean;
+  displayFooterButtons: boolean;
   conversation: Conversation;
   onEdit?: (editedMessage: Message) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, displayFeedbackButton, conversation, onEdit }) => {
+  ({ message, displayFooterButtons, conversation, onEdit }) => {
     const { t } = useTranslation('chat');
 
     const {
-      state: { selectedConversation, conversations, currentMessage },
+      state: { selectedConversation, conversations, messageIsStreaming },
       dispatch: homeDispatch,
     } = useContext(HomeContext);
 
@@ -296,14 +297,17 @@ export const ChatMessage: FC<Props> = memo(
                     )}
                   </div>
                 </div>
-                <div className="flex flex-row items-center mt-3">
-                  {message.pluginId !== PluginID.LANGCHAIN_CHAT && (
-                    <SpeechButton inputText={message.content} />
-                  )}
-                  {displayFeedbackButton && (
-                    <FeedbackContainer conversation={conversation} />
-                  )}
-                </div>
+                {displayFooterButtons && (
+                  <div className="flex flex-row items-center mt-3 w-full justify-between">
+                    <div className="flex flex-row">
+                      {message.pluginId !== PluginID.LANGCHAIN_CHAT && (
+                        <SpeechButton inputText={message.content} />
+                      )}
+                      <FeedbackContainer conversation={conversation} />
+                    </div>
+                    <CreditCounter pluginId={message.pluginId} />
+                  </div>
+                )}
               </div>
             )}
           </div>
