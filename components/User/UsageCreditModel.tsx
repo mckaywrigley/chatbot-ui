@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { FC, Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, Fragment, useContext, useEffect } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -8,8 +8,6 @@ import { DefaultMonthlyCredits } from '@/utils/config';
 import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
-
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
 type Props = {
   onClose: () => void;
@@ -23,36 +21,14 @@ const gpt4CreditPurchaseLinks = {
 
 export const UsageCreditModel: FC<Props> = ({ onClose }) => {
   const { t } = useTranslation('model');
-  const [gpt4Credit, setGpt4Credit] = useState<number | null>(null);
 
   const {
-    state: { user },
+    state: { user, creditUsage },
   } = useContext(HomeContext);
 
-  const supabaseClient = useMemo(() => createBrowserSupabaseClient(), []);
+  const gpt4Credit = creditUsage && creditUsage[PluginID.GPT4].remainingCredits;
 
-  const userId = user?.id;
   const userEmail = user?.email;
-
-  useEffect(() => {
-    if (!userId || !supabaseClient) return;
-
-    const fetchUserCredits = async () => {
-      const { data, error } = await supabaseClient
-        .from('user_credits')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('api_type', PluginID.GPT4);
-
-      if (error) {
-        console.error(error);
-      } else if(data.length !== 0) {
-        setGpt4Credit(data[0].balance);
-      }
-    };
-
-    fetchUserCredits();
-  }, []);
 
   return (
     <Transition appear show={true} as={Fragment}>
@@ -115,7 +91,15 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                         <td className="px-6 py-4">
                           {DefaultMonthlyCredits[PluginID.GPT4]}
                         </td>
-                        <td className={`px-6 py-4 ${gpt4Credit === 0 ? "text-red-400 font-semibold" : ""}`}>{gpt4Credit === null ? DefaultMonthlyCredits[PluginID.GPT4] : gpt4Credit}</td>
+                        <td
+                          className={`px-6 py-4 ${
+                            gpt4Credit === 0 ? 'text-red-400 font-semibold' : ''
+                          }`}
+                        >
+                          {gpt4Credit === null
+                            ? DefaultMonthlyCredits[PluginID.GPT4]
+                            : gpt4Credit}
+                        </td>
                         <td className="px-6 py-4 flex flex-col text-left">
                           {Object.entries(gpt4CreditPurchaseLinks).map(
                             ([key, value]) => (
