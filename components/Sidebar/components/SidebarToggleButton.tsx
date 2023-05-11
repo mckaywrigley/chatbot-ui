@@ -1,4 +1,8 @@
-import { IconArrowBarRight, IconMenu2 } from '@tabler/icons-react';
+import {
+  IconLayoutSidebarLeftExpand,
+  IconLayoutSidebarRightExpand,
+  IconMenu2,
+} from '@tabler/icons-react';
 
 interface Props {
   onClick: any;
@@ -24,10 +28,14 @@ export const SidebarToggleButton = ({
         <IconMenu2 className="w-full" />
       </button>
       <button
-        className={`absolute top-[50%] ${side}-0 -translate-y-[50%] h-7 w-7 dark:text-white transition-all ease-linear opacity-50 ${className}`}
+        className={`absolute top-[50%] ${side}-0 -translate-y-[50%] h-10 w-10 dark:text-white transition-all ease-linear opacity-25 ${className} sm:hidden`}
         onClick={onClick}
       >
-        <IconMenu2 className="w-full" />
+        {side == 'right' ? (
+          <IconLayoutSidebarRightExpand className="w-full" strokeWidth={1.5} />
+        ) : (
+          <IconLayoutSidebarLeftExpand className="w-full" strokeWidth={1.5} />
+        )}
       </button>
     </>
   );
