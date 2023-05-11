@@ -14,10 +14,7 @@ import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics/dist/interactions';
 
 import { getEndpoint } from '@/utils/app/api';
-import {
-  saveConversation,
-  saveConversations
-} from '@/utils/app/conversation';
+import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
@@ -52,15 +49,18 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       loading,
       user,
       outputLanguage,
-      currentMessage
+      currentMessage,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  const setCurrentMessage = useCallback((message: Message) => {
-    homeDispatch({ field: 'currentMessage', value: message });
-  }, [homeDispatch]);
+  const setCurrentMessage = useCallback(
+    (message: Message) => {
+      homeDispatch({ field: 'currentMessage', value: message });
+    },
+    [homeDispatch],
+  );
 
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -74,15 +74,15 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const handleSend = useCallback(
     async (deleteCount = 0, overrideCurrentMessage?: Message) => {
       const message = overrideCurrentMessage || currentMessage;
-      
-      if(!message) return;
+
+      if (!message) return;
       const plugin = (message.pluginId && Plugins[message.pluginId]) || null;
 
       if (selectedConversation) {
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
-          
+
           for (let i = 0; i < deleteCount; i++) {
             updatedMessages.pop();
           }
@@ -332,7 +332,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
+                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 px-1 sm:px-4 sm:max-w-[600px]">
                   <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
@@ -346,7 +346,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                             content: prompt,
                             pluginId: null,
                           };
-                          
+
                           setCurrentMessage(message);
                           handleSend(0, message);
                           event('interaction', {
@@ -399,7 +399,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                         // discard edited message and the ones that come after then resend
                         handleSend(
                           selectedConversation?.messages.length - index,
-                          editedMessage
+                          editedMessage,
                         );
                       }}
                       displayFeedbackButton={
@@ -428,7 +428,12 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
               handleSend(0);
             }}
             onRegenerate={() => {
-              handleSend(2, selectedConversation?.messages[selectedConversation?.messages.length - 2])
+              handleSend(
+                2,
+                selectedConversation?.messages[
+                  selectedConversation?.messages.length - 2
+                ],
+              );
             }}
           />
         </>

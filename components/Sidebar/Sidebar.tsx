@@ -61,7 +61,7 @@ const Sidebar = <T,>({
     >
       <div
         className={`${
-          isOpen ? 'mobile:visible bg-[#202123]/90' : ''
+          isOpen ? 'mobile:visible !bg-[#202123]/90' : ''
         } fixed invisible left-0 w-full h-full bg-transparent transition-all ease-linear`}
         onClick={toggleOpen}
       ></div>

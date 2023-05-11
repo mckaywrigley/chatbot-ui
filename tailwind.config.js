@@ -12,8 +12,14 @@ module.exports = {
         mobile: 
         {
           'raw': '(max-width: 640px)',
+        },
+        tablet: 
+        {
+          'raw': '(max-width: 768px)',
         }
+
       }
+
     },
   },
   variants: {
