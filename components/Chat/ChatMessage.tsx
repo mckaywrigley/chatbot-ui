@@ -42,7 +42,7 @@ export const ChatMessage: FC<Props> = memo(
     const { t } = useTranslation('chat');
 
     const {
-      state: { selectedConversation, conversations, messageIsStreaming },
+      state: { selectedConversation, conversations },
       dispatch: homeDispatch,
     } = useContext(HomeContext);
 

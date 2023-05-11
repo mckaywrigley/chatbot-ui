@@ -18,11 +18,9 @@ export const CreditCounter: React.FC<Props> = ({ pluginId }) => {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  if (!creditUsage || pluginId !== PluginID.GPT4) return <></>;
+  if (creditUsage === null || pluginId !== PluginID.GPT4) return <></>;
 
   const remainingCredits = pluginId && creditUsage[pluginId].remainingCredits;
-
-  if (!remainingCredits) return <></>;
 
   return (
     <div 
