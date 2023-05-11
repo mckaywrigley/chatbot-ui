@@ -4,7 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-import { User } from '@/types/user';
+import { User, CreditUsage } from '@/types/user';
 
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -48,6 +48,9 @@ export interface HomeInitialState {
   user: User | null;
   isPaidUser: boolean;
   isSurveyFilled: boolean;
+
+  // Plugins Utils
+  pluginUsage: CreditUsage | null;
 
   // Text to Speech
   currentSpeechId: null | string;
@@ -97,6 +100,9 @@ export const initialState: HomeInitialState = {
   user: null,
   isPaidUser: false,
   isSurveyFilled: false,
+
+  // Plugins Utils
+  pluginUsage: null,
 
   // Text to Speech
   currentSpeechId: null,
