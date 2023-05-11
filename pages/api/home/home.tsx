@@ -131,6 +131,15 @@ const Home = ({
     saveConversation(conversation);
   };
 
+  // SWITCH LAYOUT SHOULD CLOSE ALL SIDEBAR --------------------
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+      dispatch({ field: 'showPromptbar', value: false });
+    }
+  }, [isMobileLayout]);
+
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
