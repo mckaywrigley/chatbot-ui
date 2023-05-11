@@ -1,8 +1,4 @@
-import {
-  IconPlayerStop,
-  IconRepeat,
-  IconSend,
-} from '@tabler/icons-react';
+import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
 import {
   KeyboardEvent,
   MutableRefObject,
@@ -18,14 +14,19 @@ import { useTranslation } from 'next-i18next';
 import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
+import { getPluginIcon } from '@/utils/app/ui';
+
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import TokenCounter from './components/TokenCounter';
+
 import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
-import { getPluginIcon } from '@/utils/app/ui';
+
+import { get_encoding } from '@dqbd/tiktoken';
 
 interface Props {
   onSend: () => void;
@@ -73,6 +74,9 @@ export const ChatInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const maxLength = selectedConversation?.model.maxLength;
+
+    // TODO: update token usage ( use lightweight version of get_token_usage)
+    // getTokenUsage(value);
 
     if (maxLength && value.length > maxLength) {
       alert(
@@ -328,8 +332,9 @@ export const ChatInput = ({
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent py-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none"
+            className={`m-0 w-full transition-all resize-none border-0 bg-transparent pt-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none`}
             style={{
+              paddingBottom: isFocused ? '3rem' : '0.75rem',
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
@@ -346,6 +351,13 @@ export const ChatInput = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
+
+          <TokenCounter
+            className={`${
+              isFocused ? 'visible' : 'invisible'
+            } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
+            value={content}
+          ></TokenCounter>
 
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
@@ -383,3 +395,11 @@ export const ChatInput = ({
     </div>
   );
 };
+
+function getTokenUsage(value: string) {
+  const enc = get_encoding('cl100k_base');
+  const tokenIntegers = enc.encode(value);
+  const numTokens = tokenIntegers.length;
+
+  enc.free();
+}

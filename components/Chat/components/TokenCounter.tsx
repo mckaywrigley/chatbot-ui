@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 
 interface Props {
-  inputValue?: string;
+  value?: string;
+  className?: string;
 }
-function TokenCounter({ inputValue = '' }: Props) {
+function TokenCounter({ value = '', className = '' }: Props) {
   const maxToken = 1000;
   const [currentTokenUsage, setCurrentTokenUsage] = useState(0);
 
   useEffect(() => {
-    setCurrentTokenUsage(inputValue.length);
-  }, [inputValue]);
+    setCurrentTokenUsage(value.length);
+  }, [value]);
 
   return (
-    <div>
+    <div className={className}>
       {currentTokenUsage} / {maxToken}
     </div>
   );
