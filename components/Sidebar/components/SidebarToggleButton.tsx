@@ -6,7 +6,11 @@ interface Props {
   className?: string;
 }
 
-export const SidebarToggleButton = ({ onClick, side, className }: Props) => {
+export const SidebarToggleButton = ({
+  onClick,
+  side,
+  className = '',
+}: Props) => {
   return (
     <>
       <button
@@ -14,15 +18,17 @@ export const SidebarToggleButton = ({ onClick, side, className }: Props) => {
           side === 'right'
             ? 'left-0 translate-x-[-100%]'
             : 'right-0 translate-x-[100%]'
-        } z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5  transition-all ease-linear sm:h-8 sm:w-8 sm:text-neutral-700 ${className}`}
+        } z-50 h-7 w-7 hover:text-gray-400 dark:text-white dark:hover:text-gray-300 sm:top-0.5  transition-all ease-linear sm:h-8 sm:w-8 sm:text-neutral-700 mobile:hidden ${className}`}
         onClick={onClick}
       >
         <IconMenu2 className="w-full" />
       </button>
-      <div
+      <button
+        className={`absolute top-[50%] ${side}-0 -translate-y-[50%] h-7 w-7 dark:text-white transition-all ease-linear opacity-50 ${className}`}
         onClick={onClick}
-        className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-70 sm:hidden"
-      ></div>
+      >
+        <IconMenu2 className="w-full" />
+      </button>
     </>
   );
 };

@@ -57,17 +57,22 @@ const Sidebar = <T,>({
 
   return (
     <div
-      className={`${
-        isOpen ? 'w-[260px] mobile:w-[70vw]' : 'w-0'
-      } transition-all  ease-linear relative box-content`}
+      className={`${isOpen ? 'w-[260px]' : 'w-0'} ${
+        side === 'left' ? 'mobile:left-0' : 'mobile:right-0'
+      } transition-all h-full ease-linear relative box-content mobile:fixed mobile:z-10`}
     >
       <div
-        className={`${isOpen && side === 'right' ? '!right-0' : ''} ${
-          isOpen && side === 'left' ? '!left-0' : ''
-        } ${
-          isOpen ? 'w-[260px] mobile:w-[70vw] px-2' : 'w-0 px-0'
-        } fixed top-0 z-40 flex h-full flex-none flex-col py-2 space-y-2 bg-[#202123]  text-[14px] transition-all ease-linear`}
-        style={side === 'left' ? { left: '-260px' } : { right: '0' }}
+        className={`${
+          isOpen ? 'mobile:visible bg-[#202123]/90' : ''
+        } fixed invisible left-0 w-full h-full bg-transparent transition-all ease-linear`}
+        onClick={toggleOpen}
+      ></div>
+      <div
+        className={`${side === 'left' && !isOpen ? '-translate-x-full' : ''} ${
+          side === 'right' && !isOpen ? 'translate-x-full' : ''
+        } absolute z-10 top-0 ${
+          side === 'left' ? 'right' : 'left'
+        }-0 flex transition-all ease-linear w-[260px] h-full flex-none flex-col p-2 space-y-2 bg-[#202123] text-[14px]`}
       >
         <div className="flex items-center">
           <button
@@ -125,11 +130,7 @@ const Sidebar = <T,>({
         {footerComponent}
       </div>
 
-      <SidebarToggleButton
-        onClick={toggleOpen}
-        side={side}
-        className={isOpen ? 'sm-hidden' : ''}
-      />
+      <SidebarToggleButton onClick={toggleOpen} side={side} />
     </div>
   );
 };
