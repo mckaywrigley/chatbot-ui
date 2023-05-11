@@ -332,7 +332,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 px-1 sm:px-4 sm:max-w-[600px]">
+                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 sm:px-4 sm:max-w-[600px]">
                   <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>

@@ -28,7 +28,7 @@ export const SidebarToggleButton = ({
         <IconMenu2 className="w-full" />
       </button>
       <button
-        className={`absolute top-[50%] ${side}-0 -translate-y-[50%] h-10 w-10 dark:text-white transition-all ease-linear opacity-25 ${className} sm:hidden`}
+        className={`absolute top-[50%] ${side}-0 -translate-y-[50%] h-10 w-10 text-black dark:text-white transition-all ease-linear opacity-25 ${className} sm:hidden`}
         onClick={onClick}
       >
         {side == 'right' ? (

@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { event } from 'nextjs-google-analytics';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
@@ -115,7 +116,13 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
+  const isMobileLayout = useMediaQuery('(max-width: 640px)');
   const handleSelectConversation = (conversation: Conversation) => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     dispatch({
       field: 'selectedConversation',
       value: conversation,
