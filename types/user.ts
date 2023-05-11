@@ -5,6 +5,7 @@ export interface User {
   email: string;
   name: string;
   plan: SubscriptionPlan;
+  token: string;
 }
 
 export type SubscriptionPlan = 'free' | 'pro';

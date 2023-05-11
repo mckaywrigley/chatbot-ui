@@ -12,8 +12,8 @@
   "Unlimited messages": "無限訊息",
   "Priority response time": "優先回覆",
   "Cloud sync": "雲同步",
-  "Voice input (Coming)": "語音輸入（即將推出）",
-  "GPT-4 integration (Coming)": "GPT-4 (即將推出)",
+  "AI speech": "AI朗讀",
+  "GPT-4 integration (Credit system)": "GPT-4 (點數制)",
   "Thank you for supporting us! If you want to cancel your subscription, please visit ": "感謝您的支持！如果您想取消訂閱，請到",
   "here": "這裡",
   " and cancel your subscription.": "",
@@ -23,5 +23,16 @@
   "Online mode": "連網模式",
   "Mode": "對話模式",
   "Language": "對話語言",
-  "Auto": "自動"
+  "Auto": "自動",
+  "Custom Mode": "模式",
+  "Monthly credit": "每月自動加值點數",
+  "Balance": "點數餘額",
+  "Buy": "購買",
+  "credit": "點數",
+  "As a Pro plan customer, you will receive the monthly credits on the 1st day of every month to use our custom modes. If you need more credits, you can purchase them below.": "作為專業版客戶，您的點數將在每月的第一天自動加值到您的帳戶中。如果您需要更多的點數，您可以在下方購買。",
+  "You will receive an email notification when your credits are ready. You can also check your credit balance in the dashboard.": "當您的點數準備好時，我們將會寄送電子郵件通知您",
+  "If you have any questions, please contact us at ": "如果您有任何問題，歡迎用以下的電郵地址來聯繫我們 ",
+  "AI image generation (Coming)": "AI圖片生成 (即將推出)",
+  "Upgrade": "升級為專業版",
+  "Upgrade for one month": "只購買一個月"
 }

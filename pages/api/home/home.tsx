@@ -17,10 +17,7 @@ import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 
 import { fetchShareableConversation } from '@/utils/app/api';
-import {
-  cleanConversationHistory,
-  cleanSelectedConversation,
-} from '@/utils/app/clean';
+import { cleanConversationHistory } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
@@ -30,6 +27,7 @@ import {
 import { syncConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -40,10 +38,13 @@ import { UserProfile } from '@/types/user';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
+import { useAzureTts } from '@/components/Hooks/useAzureTts';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
 import { AuthModel } from '@/components/User/AuthModel';
 import { ProfileModel } from '@/components/User/ProfileModel';
+import { SurveyModel } from '@/components/User/SurveyModel';
+import { UsageCreditModel } from '@/components/User/UsageCreditModel';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
@@ -67,14 +68,14 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
+  const { isLoading, isPlaying, currentSpeechId, speak, stopPlaying } =
+    useAzureTts();
   const [containerHeight, setContainerHeight] = useState('100vh');
   const router = useRouter();
   const session = useSession();
   const supabase = useSupabaseClient();
 
-  const contextValue = useCreateReducer<HomeInitialState>({
-    initialState,
-  });
+  const contextValue = useCreateReducer<HomeInitialState>({ initialState });
 
   const {
     state: {
@@ -86,6 +87,8 @@ const Home = ({
       temperature,
       showLoginSignUpModel,
       showProfileModel,
+      showUsageModel,
+      showSurveyModel,
       user,
       isPaidUser,
       conversationLastSyncAt,
@@ -359,9 +362,28 @@ const Home = ({
               id: session.user.id,
               email: session.user.email,
               plan: userProfile.plan || 'free',
+              token: session.access_token,
             },
           });
         });
+
+      //Check if survey is filled by logged in user
+      supabase
+        .from('user_survey')
+        .select('name')
+        .eq('uid', session.user.id)
+        .then(({ data }) => {
+          if (!data || data.length === 0) {
+            dispatch({ field: 'isSurveyFilled', value: false });
+          } else {
+            dispatch({ field: 'isSurveyFilled', value: true });
+          }
+        });
+    } else {
+      dispatch({
+        field: 'isSurveyFilled',
+        value: getIsSurveyFilledFromLocalStorage(),
+      });
     }
   }, [session]);
 
@@ -485,6 +507,19 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+  // SPEECH TO TEXT -------------------------------------
+  useEffect(() => {
+    dispatch({ field: 'isPlaying', value: isPlaying });
+  }, [isPlaying]);
+
+  useEffect(() => {
+    dispatch({ field: 'isLoading', value: isLoading });
+  }, [isLoading]);
+
+  useEffect(() => {
+    dispatch({ field: 'currentSpeechId', value: currentSpeechId });
+  }, [currentSpeechId]);
+
   return (
     <HomeContext.Provider
       value={{
@@ -496,6 +531,9 @@ const Home = ({
         handleSelectConversation,
         handleUpdateConversation,
         handleUserLogout,
+        playMessage: (text, speechId) =>
+          speak(text, speechId, user?.token || ''),
+        stopPlaying,
       }}
     >
       <Head>
@@ -544,6 +582,20 @@ const Home = ({
                 }
               />
             )}
+            {showUsageModel && session && (
+              <UsageCreditModel
+                onClose={() =>
+                  dispatch({ field: 'showUsageModel', value: false })
+                }
+              />
+            )}
+            {showSurveyModel && (
+              <SurveyModel
+                onClose={() =>
+                  dispatch({ field: 'showSurveyModel', value: false })
+                }
+              />
+            )}
             <Promptbar />
           </div>
         </main>
@@ -576,6 +628,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'roles',
         'rolesContent',
         'feature',
+        'survey',
       ])),
     },
   };

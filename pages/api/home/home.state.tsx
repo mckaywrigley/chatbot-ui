@@ -43,8 +43,18 @@ export interface HomeInitialState {
   // User Auth
   showLoginSignUpModel: boolean;
   showProfileModel: boolean;
+  showUsageModel: boolean;
+  showSurveyModel: boolean;
   user: User | null;
   isPaidUser: boolean;
+  isSurveyFilled: boolean;
+
+  // Text to Speech
+  currentSpeechId: null | string;
+  speechToken: null | string;
+  speechRegion: null | string;
+  isPlaying: boolean;
+  isLoading: boolean;
 }
 
 export const initialState: HomeInitialState = {
@@ -82,6 +92,16 @@ export const initialState: HomeInitialState = {
   // User Auth
   showLoginSignUpModel: false,
   showProfileModel: false,
+  showUsageModel: false,
+  showSurveyModel: false,
   user: null,
   isPaidUser: false,
+  isSurveyFilled: false,
+
+  // Text to Speech
+  currentSpeechId: null,
+  speechToken: null,
+  speechRegion: null,
+  isPlaying: false,
+  isLoading: false,
 };

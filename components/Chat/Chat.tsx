@@ -16,6 +16,7 @@ import { event } from 'nextjs-google-analytics/dist/interactions';
 import { getEndpoint } from '@/utils/app/api';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -50,6 +51,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       user,
       outputLanguage,
       currentMessage,
+      messageIsStreaming,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -70,6 +72,39 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const logGaEvent = useCallback(
+    (messageLength?: number) => {
+      // Fail silently to avoid impacting user experience
+      try {
+        const messageType = currentMessage?.pluginId || 'gpt-3.5';
+        let eventName = 'Send Message (no-login)';
+
+        if (user) {
+          if (user.plan !== 'free') {
+            eventName = 'Send Message (paid account)';
+          } else {
+            eventName = 'Send Message (free account)';
+          }
+        }
+
+        let eventPayload = {
+          category: 'Usages',
+          userEmail: user?.email || 'N/A',
+          messageType: messageType,
+          user_type: user ? user?.plan : 'no-login',
+          user_id: user ? user?.email : getOrGenerateUserId(),
+        } as any;
+
+        if (messageLength) {
+          eventPayload.length = messageLength;
+        }
+
+        event(eventName, eventPayload);
+      } catch (e) {}
+    },
+    [user, currentMessage],
+  );
 
   const handleSend = useCallback(
     async (deleteCount = 0, overrideCurrentMessage?: Message) => {
@@ -121,7 +156,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             ...chatBody,
             messages: filteredChatBodyMessages,
           });
-        } else if (plugin.id === 'langchain-chat') {
+        } else {
           body = JSON.stringify(chatBody);
         }
         const controller = new AbortController();
@@ -130,6 +165,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           headers: {
             'Content-Type': 'application/json',
             'Output-Language': outputLanguage,
+            'user-token': user?.token || '',
           },
           signal: controller.signal,
           body,
@@ -138,6 +174,15 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
           toast.error(response.statusText);
+
+          // remove the last message from the conversation
+          homeDispatch({
+            field: 'selectedConversation',
+            value: {
+              ...selectedConversation,
+              messages: [...selectedConversation.messages],
+            },
+          });
           return;
         }
         const data = response.body;
@@ -225,14 +270,26 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             return conversation;
           },
         );
+
+        // If the conversation is new, add it to the list of conversations
+        if (
+          !updatedConversations.find(
+            (conversation) => conversation.id === updatedConversation.id,
+          )
+        ) {
+          updatedConversations.push(updatedConversation);
+        }
+
         if (updatedConversations.length === 0) {
           updatedConversations.push(updatedConversation);
         }
+
         homeDispatch({ field: 'conversations', value: updatedConversations });
         saveConversations(updatedConversations);
         homeDispatch({ field: 'messageIsStreaming', value: false });
 
         updateConversationLastUpdatedAtTimeStamp();
+        logGaEvent(text.length);
       }
     },
     [
@@ -404,7 +461,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                       }}
                       displayFeedbackButton={
                         selectedConversation.messages.length - 1 === index &&
-                        !loading
+                        !messageIsStreaming
                       }
                       conversation={selectedConversation}
                     />

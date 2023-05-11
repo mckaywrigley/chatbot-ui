@@ -7,6 +7,9 @@ import { ChatBody } from '@/types/chat';
 import { NextRequest, NextResponse } from 'next/server';
 import { DynamicTool } from 'langchain/tools';
 import { create, all } from 'mathjs';
+import { retrieveUserSessionAndLogUsages } from '@/utils/server/usagesTracking';
+import { PluginID } from '@/types/plugin';
+import { truncateLogMessage } from '@/utils/server';
 
 export const config = {
   runtime: 'edge',
@@ -29,10 +32,14 @@ const calculator = new DynamicTool({
 });
 
 const handler = async (req: NextRequest, res: any) => {
+  retrieveUserSessionAndLogUsages(req, PluginID.LANGCHAIN_CHAT);
+
   const requestBody = (await req.json()) as ChatBody;
 
   const latestUserPrompt =
     requestBody.messages[requestBody.messages.length - 1].content;
+
+  const selectedOutputLanguage = req.headers.get('Output-Language') ? `(lang=${req.headers.get('Output-Language')})` : '';
 
   const encoder = new TextEncoder();
   const stream = new TransformStream();
@@ -46,7 +53,7 @@ const handler = async (req: NextRequest, res: any) => {
     handleChainStart: async () => {
       console.log('handleChainStart');
       await writer.ready;
-      await writeToStream('```Enhance mode \n');
+      await writeToStream('```Online \n');
       await writeToStream('Thinking ... \n\n');
     },
     handleAgentAction: async (action) => {
@@ -93,14 +100,12 @@ const handler = async (req: NextRequest, res: any) => {
         await writeToStream(
           `Sorry, I am not able to answer your question. \n\n`,
         );
-        console.log('Chain Error: ', err.message);
-        console.error(err, verbose);
+        console.log('Chain Error: ', truncateLogMessage(err.message));
       }
       await writer.abort(err);
     },
     handleToolError: async (err, verbose) => {
-      console.log('Tool Error: ', err.message);
-      console.error(err, verbose);
+      console.log('Tool Error: ', truncateLogMessage(err.message));
     },
   });
 
@@ -112,7 +117,8 @@ const handler = async (req: NextRequest, res: any) => {
   });
 
   const tools = [new BingSerpAPI(), calculator];
-
+  const toolNames = tools.map((tool) => tool.name);
+  
   const prompt = ZeroShotAgent.createPrompt(tools, {
     prefix: `You are an AI language model named Chat Everywhere, designed to answer user questions as accurately and helpfully as possible. Make sure to generate responses in the exact same language as the user's query. Adapt your responses to match the user's input language and context, maintaining an informative and supportive communication style. Additionally, format all responses using Markdown syntax, regardless of the input format.
       
@@ -134,14 +140,14 @@ const handler = async (req: NextRequest, res: any) => {
 
       Question: the input question you must answer
       Thought: you should always think about what to do
-      Action: the action to take, should be one of ['bing-search', 'calculator']
+      Action: the action to take, should be one of ${toolNames}
       Action Input: the input to the action
       Observation: the result of the action
       ... (this Thought/Action/Action Input/Observation can repeat N times)
       Thought: I now know the final answer
       Final Answer: the final answer to the original input question
     `,
-  });
+  });  
 
   const llmChain = new LLMChain({
     llm: model,
@@ -160,9 +166,10 @@ const handler = async (req: NextRequest, res: any) => {
   });
 
   try {
-    agentExecutor
-      .call({
-        input: latestUserPrompt,
+    agentExecutor.verbose = true;
+
+    agentExecutor.call({
+        input:  `${selectedOutputLanguage} ${latestUserPrompt}`,
       })
 
     return new NextResponse(stream.readable, {
@@ -183,8 +190,8 @@ const handler = async (req: NextRequest, res: any) => {
 };
 
 const normalizeTextAnswer = (text: string) => {
-  const mindlogRegex = /```Mindlog \n(.|\n)*```/g;
-  return text.replace(mindlogRegex, '');
+  const mindlogRegex = /```Online \n(.|\n)*```/g;
+  return text.replace(mindlogRegex, '').replace("{", "{{").replace("}", "}}");
 };
 
 export default handler;

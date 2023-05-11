@@ -1,7 +1,4 @@
 import {
-  IconBolt,
-  IconBrain,
-  IconNumber4,
   IconPlayerStop,
   IconRepeat,
   IconSend,
@@ -21,7 +18,6 @@ import { useTranslation } from 'next-i18next';
 import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
-import { PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -29,6 +25,7 @@ import HomeContext from '@/pages/api/home/home.context';
 import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { getPluginIcon } from '@/utils/app/ui';
 
 interface Props {
   onSend: () => void;
@@ -72,21 +69,6 @@ export const ChatInput = ({
   );
 
   const enhancedMenuDisplayValue = useDisplayAttribute(menuRef);
-
-  const getPluginIcon = () => {
-    if (!currentMessage || currentMessage?.pluginId === null) {
-      return <IconBolt size={20} />;
-    }
-
-    switch (currentMessage.pluginId) {
-      case PluginID.LANGCHAIN_CHAT:
-        return <IconBrain size={20} />;
-      case PluginID.GPT4:
-        return <IconNumber4 size={20} />;
-      default:
-        return <IconBolt size={20} />;
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -289,7 +271,7 @@ export const ChatInput = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
-  
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div
@@ -297,7 +279,7 @@ export const ChatInput = ({
           enhancedMenuDisplayValue === 'none'
             ? 'mt-[1.5rem] md:mt-[3rem]'
             : 'mt-[8.2rem] md:mt-[6.7rem]'
-        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl`}
+        } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl transition-all ease-in-out`}
       >
         {messageIsStreaming && (
           <button
@@ -335,7 +317,7 @@ export const ChatInput = ({
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 dark:bg-opacity-50 dark:text-neutral-100 cursor-default"
             onKeyDown={(e) => {}}
           >
-            {getPluginIcon()}
+            {getPluginIcon(currentMessage?.pluginId)}
           </button>
 
           <EnhancedMenu
@@ -377,7 +359,7 @@ export const ChatInput = ({
           </button>
 
           {showPromptList && filteredPrompts.length > 0 && (
-            <div className="absolute bottom-12 w-full">
+            <div className="absolute bottom-12 w-full z-20">
               <PromptList
                 activePromptIndex={activePromptIndex}
                 prompts={filteredPrompts}

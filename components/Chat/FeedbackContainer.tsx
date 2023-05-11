@@ -1,8 +1,10 @@
+import { IconThumbDown, IconThumbUp } from '@tabler/icons-react';
 import React, { useState } from 'react';
-import { IconThumbUp, IconThumbDown } from '@tabler/icons-react';
 import { toast } from 'react-hot-toast';
-import { Conversation } from '@/types/chat';
+
 import { TFunction, useTranslation } from 'next-i18next';
+
+import { Conversation } from '@/types/chat';
 
 type FeedbackContainerProps = {
   conversation: Conversation;
@@ -24,11 +26,11 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
       body: JSON.stringify({
         conversation,
         positive: isPositiveFeedback,
-        opinion: opinionRef.current?.value || "",
+        opinion: opinionRef.current?.value || '',
       }),
     });
 
-    if(!response.ok) {
+    if (!response.ok) {
       toast.error(t('Something went wrong. Please try again later.'));
       return;
     }
@@ -37,7 +39,7 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
     toast.success(t('Thank you for your feedback!'), { duration: 3000 });
   };
 
-  const thumbButtonOnClick = (t: TFunction, isPositiveFeedback: boolean) => {    
+  const thumbButtonOnClick = (t: TFunction, isPositiveFeedback: boolean) => {
     toast.custom(
       () => (
         <div
@@ -45,7 +47,9 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
         >
           <div className="flex flex-col p-4 text-sm">
             <p>
-              {t('Thank you for your feedback! Can we upload your current conversation to our server for product improvement purposes? We will never share your data with anyone.')}
+              {t(
+                'Thank you for your feedback! Can we upload your current conversation to our server for product improvement purposes? We will never share your data with anyone.',
+              )}
             </p>
             <label className="mt-3">{t('Feedback (Optional)')}</label>
             <textarea
@@ -79,39 +83,35 @@ export const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
   };
 
   return (
-    <>
-      <div className="mt-3 flex flex-row">
-        <button
-          className={`cursor-pointer text-gray-500 hover:text-gray-300 ${
-            isThumbsUp === true ? 'text-transparent hover:text-transparent' : ''
-          }`}
-          onClick={() => {
-            setIsThumbsUp(true);
-            thumbButtonOnClick(t, true);
-          }}
-        >
-          <IconThumbUp
-            size={18}
-            fill={isThumbsUp === true ? 'lightgray' : 'none'}
-          />
-        </button>
-        <button
-          className={`ml-2 cursor-pointer text-gray-500 hover:text-gray-300 ${
-            isThumbsUp === false
-              ? 'text-transparent hover:text-transparent'
-              : ''
-          }`}
-          onClick={() => {
-            setIsThumbsUp(false);
-            thumbButtonOnClick(t, false);
-          }}
-        >
-          <IconThumbDown
-            size={18}
-            fill={isThumbsUp === false ? 'lightgray' : 'none'}
-          />
-        </button>
-      </div>
-    </>
+    <div className="flex flex-row">
+      <button
+        className={`cursor-pointer text-gray-500 hover:text-gray-300 ${
+          isThumbsUp === true ? 'text-transparent hover:text-transparent' : ''
+        }`}
+        onClick={() => {
+          setIsThumbsUp(true);
+          thumbButtonOnClick(t, true);
+        }}
+      >
+        <IconThumbUp
+          size={18}
+          fill={isThumbsUp === true ? 'lightgray' : 'none'}
+        />
+      </button>
+      <button
+        className={`ml-2 cursor-pointer text-gray-500 hover:text-gray-300 ${
+          isThumbsUp === false ? 'text-transparent hover:text-transparent' : ''
+        }`}
+        onClick={() => {
+          setIsThumbsUp(false);
+          thumbButtonOnClick(t, false);
+        }}
+      >
+        <IconThumbDown
+          size={18}
+          fill={isThumbsUp === false ? 'lightgray' : 'none'}
+        />
+      </button>
+    </div>
   );
 };
