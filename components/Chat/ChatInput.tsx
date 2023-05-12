@@ -54,7 +54,6 @@ export const ChatInput = ({
   } = useContext(HomeContext);
 
   const [content, setContent] = useState<string>();
-  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [promptInputValue, setPromptInputValue] = useState('');
@@ -64,6 +63,7 @@ export const ChatInput = ({
   const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
+  const compositionStartRef = useRef<boolean>(false);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -162,7 +162,7 @@ export const ChatInput = ({
       } else {
         setActivePromptIndex(0);
       }
-    } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
+    } else if (e.key === 'Enter' && !compositionStartRef.current && !isMobile() && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     } else if (e.key === '/' && e.metaKey) {
@@ -235,7 +235,7 @@ export const ChatInput = ({
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
       textareaRef.current.style.overflow = `${
         textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+        }`;
     }
   }, [content]);
 
@@ -283,7 +283,7 @@ export const ChatInput = ({
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
-            onKeyDown={(e) => {}}
+            onKeyDown={(e) => { }}
           >
             {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
           </button>
@@ -320,17 +320,17 @@ export const ChatInput = ({
               maxHeight: '400px',
               overflow: `${
                 textareaRef.current && textareaRef.current.scrollHeight > 400
-                  ? 'auto'
-                  : 'hidden'
-              }`,
+                ? 'auto'
+                : 'hidden'
+                }`,
             }}
             placeholder={
               t('Type a message or type "/" to select a prompt...') || ''
             }
             value={content}
             rows={1}
-            onCompositionStart={() => setIsTyping(true)}
-            onCompositionEnd={() => setIsTyping(false)}
+            onCompositionStart={() => compositionStartRef.current = true}
+            onCompositionEnd={() => compositionStartRef.current = false}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
