@@ -26,8 +26,6 @@ import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
-import { get_encoding } from '@dqbd/tiktoken';
-
 interface Props {
   onSend: () => void;
   onRegenerate: () => void;
@@ -64,6 +62,7 @@ export const ChatInput = ({
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
   const { isFocused, setIsFocused, menuRef } = useFocusHandler(textareaRef);
+  const [isOverLimit, setIsOverLimit] = useState(false);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -74,20 +73,6 @@ export const ChatInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const maxLength = selectedConversation?.model.maxLength;
-
-    // TODO: update token usage ( use lightweight version of get_token_usage)
-    // getTokenUsage(value);
-
-    // TODO: remove this
-    if (maxLength && value.length > maxLength) {
-      alert(
-        t(
-          `Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
-          { maxLength, valueLength: value.length },
-        ),
-      );
-      return;
-    }
 
     setContent(value);
     updatePromptListVisibility(value);
@@ -100,6 +85,10 @@ export const ChatInput = ({
 
     if (!content) {
       alert(t('Please enter a message'));
+      return;
+    }
+
+    if (isOverLimit) {
       return;
     }
 
@@ -311,6 +300,7 @@ export const ChatInput = ({
             border bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] 
             dark:bg-[#40414F] dark:text-white 
             dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 
+            ${isOverLimit ? '!border-red-500 dark:!border-red-600' : ''}
             ${
               !currentMessage || currentMessage.pluginId === null
                 ? 'border-black/10 dark:border-gray-900/50'
@@ -335,7 +325,7 @@ export const ChatInput = ({
             ref={textareaRef}
             className={`m-0 w-full transition-all resize-none border-0 bg-transparent pt-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none`}
             style={{
-              marginBottom: `${isFocused ? '2.2' : '0.75'}rem `,
+              marginBottom: `${isFocused || isOverLimit ? '2.2' : '0.75'}rem `,
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
@@ -354,10 +344,16 @@ export const ChatInput = ({
           />
 
           <TokenCounter
-            className={`${
-              isFocused ? 'visible' : 'invisible'
+            className={` ${
+              isOverLimit ? '!text-red-500 dark:text-red-600' : ''
+            } ${
+              isFocused || isOverLimit ? 'visible' : 'invisible'
             } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
             value={content}
+            setIsOverLimit={(value) => {
+              console.log(value);
+              setIsOverLimit(value);
+            }}
           ></TokenCounter>
 
           <button
@@ -396,11 +392,3 @@ export const ChatInput = ({
     </div>
   );
 };
-
-function getTokenUsage(value: string) {
-  const enc = get_encoding('cl100k_base');
-  const tokenIntegers = enc.encode(value);
-  const numTokens = tokenIntegers.length;
-
-  enc.free();
-}
