@@ -15,7 +15,7 @@ export const SidebarToggleButton = ({
   return (
     <>
       <button
-        className={`absolute top-5 ${
+        className={`absolute ${
           side === 'right'
             ? 'left-0 translate-x-[-100%] mobile:!right-0 mobile:left-[unset]'
             : 'right-0 translate-x-[100%] mobile:!left-0 mobile:right-[unset]'
