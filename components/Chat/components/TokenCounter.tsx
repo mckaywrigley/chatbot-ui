@@ -16,11 +16,17 @@ interface Props {
   value?: string;
   className?: string;
   setIsOverLimit: (isOverLimit: boolean) => void;
+  setIsCloseToLimit: (isCloseToLimit: boolean) => void;
 }
 
 const promptTokensLength = getTokenLength(DEFAULT_SYSTEM_PROMPT);
 
-function TokenCounter({ value = '', className = '', setIsOverLimit }: Props) {
+function TokenCounter({
+  value = '',
+  className = '',
+  setIsOverLimit,
+  setIsCloseToLimit,
+}: Props) {
   const [currentTokenUsage, setCurrentTokenUsage] = useState(0);
   const debouncedValue = useDebounce<string>(value, 500);
 
@@ -45,10 +51,10 @@ function TokenCounter({ value = '', className = '', setIsOverLimit }: Props) {
     setCurrentTokenUsage(debouncedValue ? getTokenLength(debouncedValue) : 0);
   }, [debouncedValue]);
 
-  // const isOverLimit = currentTokenUsage > maxToken;
   useEffect(() => {
     setIsOverLimit(currentTokenUsage > maxToken);
-  }, [currentTokenUsage, maxToken, setIsOverLimit]);
+    setIsCloseToLimit(currentTokenUsage + 500 >= maxToken);
+  }, [currentTokenUsage, maxToken, setIsCloseToLimit, setIsOverLimit]);
 
   return (
     <div className={`${className} flex items-center`}>

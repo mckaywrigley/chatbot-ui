@@ -62,7 +62,8 @@ export const ChatInput = ({
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
   const { isFocused, setIsFocused, menuRef } = useFocusHandler(textareaRef);
-  const [isOverLimit, setIsOverLimit] = useState(false);
+  const [isOverTokenLimit, setIsOverTokenLimit] = useState(false);
+  const [isCloseToTokenLimit, setIsCloseToTokenLimit] = useState(false);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -88,7 +89,7 @@ export const ChatInput = ({
       return;
     }
 
-    if (isOverLimit) {
+    if (isOverTokenLimit) {
       return;
     }
 
@@ -300,7 +301,7 @@ export const ChatInput = ({
             border bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] 
             dark:bg-[#40414F] dark:text-white 
             dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 
-            ${isOverLimit ? '!border-red-500 dark:!border-red-600' : ''}
+            ${isOverTokenLimit ? '!border-red-500 dark:!border-red-600' : ''}
             ${
               !currentMessage || currentMessage.pluginId === null
                 ? 'border-black/10 dark:border-gray-900/50'
@@ -325,7 +326,9 @@ export const ChatInput = ({
             ref={textareaRef}
             className={`m-0 w-full transition-all resize-none border-0 bg-transparent pt-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none`}
             style={{
-              marginBottom: `${isFocused || isOverLimit ? '2.2' : '0.75'}rem `,
+              marginBottom: `${
+                isCloseToTokenLimit || isOverTokenLimit ? '2.2' : '0.75'
+              }rem `,
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
@@ -345,15 +348,14 @@ export const ChatInput = ({
 
           <TokenCounter
             className={` ${
-              isOverLimit ? '!text-red-500 dark:text-red-600' : ''
+              isOverTokenLimit ? '!text-red-500 dark:text-red-600' : ''
             } ${
-              isFocused || isOverLimit ? 'visible' : 'invisible'
+              isCloseToTokenLimit || isOverTokenLimit ? 'visible' : 'invisible'
             } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
             value={content}
-            setIsOverLimit={(value) => {
-              setIsOverLimit(value);
-            }}
-          ></TokenCounter>
+            setIsOverLimit={setIsOverTokenLimit}
+            setIsCloseToLimit={setIsCloseToTokenLimit}
+          />
 
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
