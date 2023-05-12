@@ -23,7 +23,7 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import { syncConversations } from '@/utils/app/conversation';
+import { syncConversations, updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
@@ -51,6 +51,7 @@ import { HomeInitialState, initialState } from './home.state';
 
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
+import { LatestExportFormat } from '@/types/export';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -143,6 +144,7 @@ const Home = ({
 
     dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleDeleteFolder = (folderId: string) => {
@@ -177,6 +179,7 @@ const Home = ({
 
     dispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleUpdateFolder = (folderId: string, name: string) => {
@@ -194,6 +197,8 @@ const Home = ({
     dispatch({ field: 'folders', value: updatedFolders });
 
     saveFolders(updatedFolders);
+
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   // CONVERSATION OPERATIONS  --------------------------------------------
@@ -243,7 +248,7 @@ const Home = ({
 
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
-
+    updateConversationLastUpdatedAtTimeStamp();
     event('interaction', {
       category: 'Conversation',
       label: 'Create New Conversation',
@@ -273,44 +278,59 @@ const Home = ({
     if (!user) return;
     if (!isPaidUser) return;
 
-    let conversationLastUpdatedAt = localStorage.getItem(
+    const conversationLastUpdatedAt = localStorage.getItem(
       'conversationLastUpdatedAt',
     );
 
     const syncConversationsAction = async () => {
-      await syncConversations(
-        supabase,
-        user,
-        // Subtract 1 year to force sync
-        conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
-      );
+      try {
+        dispatch({ field: 'syncingConversation', value: true });
+
+        const syncResult: LatestExportFormat | null = await syncConversations(
+          supabase,
+          user,
+          // Subtract 1 year to force sync
+          conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
+        );
+
+        if(syncResult !== null){
+          const { history, folders, prompts } = syncResult;
+          dispatch({ field: 'conversations', value: history });
+          dispatch({
+            field: 'selectedConversation',
+            value: history[history.length - 1],
+          });
+          dispatch({ field: 'folders', value: folders });
+          dispatch({ field: 'prompts', value: prompts });
+        }
+
+      } catch (e) {
+        dispatch({ field: 'syncSuccess', value: false });
+        console.log('error', e);
+      }
+
+      dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
+      if (forceSyncConversation) {
+        dispatch({ field: 'forceSyncConversation', value: false });
+      }
+      dispatch({ field: 'syncSuccess', value: true });
+      dispatch({ field: 'syncingConversation', value: false });
     };
 
-    // Sync if we haven't sync for more than 2 minutes or it is the first time syncing upon loading
+    // Sync if we haven't sync for more than 10 seconds or it is the first time syncing upon loading
     if (
       !forceSyncConversation &&
       ((conversationLastSyncAt &&
-        dayjs().diff(conversationLastSyncAt, 'minutes') < 2) ||
+        dayjs().diff(conversationLastSyncAt, 'seconds') < 10) ||
         !conversationLastUpdatedAt)
     )
       return;
 
-    try {
-      dispatch({ field: 'syncingConversation', value: true });
-      syncConversationsAction();
-    } catch (e) {
-      dispatch({ field: 'syncSuccess', value: false });
-      console.log('error', e);
-    }
-
-    dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
-    if (forceSyncConversation) {
-      dispatch({ field: 'forceSyncConversation', value: false });
-    }
-    dispatch({ field: 'syncSuccess', value: true });
-    dispatch({ field: 'syncingConversation', value: false });
+    syncConversationsAction();
   }, [
     conversations,
+    prompts,
+    folders,
     user,
     supabase,
     dispatch,

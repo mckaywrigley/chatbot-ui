@@ -1,5 +1,6 @@
 import { Conversation } from '@/types/chat';
 import { ExportFormatV4 } from '@/types/export';
+import { LatestExportFormat } from '@/types/export';
 import { User, UserConversation } from '@/types/user';
 
 import { getExportableData, importData } from './importExport';
@@ -41,7 +42,7 @@ const pushConversations = async (
     operationError = error;
   }
 
-  if(operationError) {
+  if (operationError) {
     throw new Error(operationError.message);
   }
 };
@@ -67,7 +68,7 @@ export const updateConversation = (
   };
 };
 
-const pullConversations = async (supabase: SupabaseClient, user: User) => {
+const pullConversations = async (supabase: SupabaseClient, user: User): Promise<LatestExportFormat | null> => {
   const { data: userConversations } = await supabase
     .from('user_conversations')
     .select('*')
@@ -77,42 +78,59 @@ const pullConversations = async (supabase: SupabaseClient, user: User) => {
     const storedConversationPackage = (userConversations[0] as UserConversation)
       .conversations;
     importData(storedConversationPackage);
+
+    const { history, folders, prompts } = importData(
+      storedConversationPackage,
+    );
+
+    return {
+      history,
+      folders,
+      prompts,
+    } as LatestExportFormat;
   }
+
+  return null;
 };
 
 export const syncConversations = async (
   supabase: SupabaseClient,
   user: User,
   conversationLastUpdatedAt: string,
-) => {
+): Promise<LatestExportFormat | null> => {
   // We use simple syncing here, basically who has the most recent data wins
   const localLastUpdatedAt = dayjs(conversationLastUpdatedAt);
-  
+
   const { data: userConversations } = await supabase
     .from('user_conversations')
     .select('last_updated')
     .eq('uid', user.id);
 
-  const remoteTimestamp = userConversations?.[0] ? dayjs(userConversations?.[0]?.last_updated) : null;
+  const remoteTimestamp = userConversations?.[0]
+    ? dayjs(userConversations?.[0]?.last_updated)
+    : null;
   const exportableConversations = getExportableData();
 
   if (localLastUpdatedAt && remoteTimestamp) {
     if (localLastUpdatedAt > remoteTimestamp) {
       console.log('Local data is newer, pushing to remote');
       await pushConversations(supabase, user, exportableConversations);
+      return null;
     } else {
       console.log('Remote data is newer, pulling from remote');
-      await pullConversations(supabase, user);
+      return await pullConversations(supabase, user);
     }
   } else if (localLastUpdatedAt) {
     console.log('Local data is newer, pushing to remote');
     await pushConversations(supabase, user, exportableConversations);
+    return null
   } else if (remoteTimestamp) {
     console.log('Remote data is newer, pulling from remote');
-    await pullConversations(supabase, user);
+    return await pullConversations(supabase, user);
   } else {
     console.log('No data found, pushing to remote');
     await pushConversations(supabase, user, exportableConversations);
+    return null;
   }
 };
 

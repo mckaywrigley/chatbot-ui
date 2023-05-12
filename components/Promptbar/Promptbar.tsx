@@ -18,6 +18,8 @@ import Sidebar from '../Sidebar';
 import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+
 import { v4 as uuidv4 } from 'uuid';
 
 const Promptbar = () => {
@@ -59,6 +61,8 @@ const Promptbar = () => {
       homeDispatch({ field: 'prompts', value: updatedPrompts });
 
       savePrompts(updatedPrompts);
+
+      updateConversationLastUpdatedAtTimeStamp();
     }
   };
 
@@ -67,6 +71,7 @@ const Promptbar = () => {
 
     homeDispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleUpdatePrompt = (prompt: Prompt) => {
@@ -80,6 +85,8 @@ const Promptbar = () => {
     homeDispatch({ field: 'prompts', value: updatedPrompts });
 
     savePrompts(updatedPrompts);
+
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleDrop = (e: any) => {

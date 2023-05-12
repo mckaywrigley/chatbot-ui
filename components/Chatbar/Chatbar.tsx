@@ -27,6 +27,8 @@ import { ChatbarInitialState, initialState } from './Chatbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');
 
@@ -134,6 +136,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
+    updateConversationLastUpdatedAtTimeStamp();
     event('interaction', {
       category: 'Conversation',
       label: 'Clear conversations',
@@ -173,6 +176,7 @@ export const Chatbar = () => {
 
       localStorage.removeItem('selectedConversation');
     }
+    updateConversationLastUpdatedAtTimeStamp();
     event('interaction', {
       category: 'Conversation',
       label: 'Delete Conversation',
