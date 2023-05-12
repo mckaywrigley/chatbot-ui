@@ -37,7 +37,7 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys, selectedConversation },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -104,10 +104,19 @@ export const Chatbar = () => {
   const handleImportConversations = (data: SupportedExportFormats) => {
     const { history, folders, prompts }: LatestExportFormat = importData(data);
     homeDispatch({ field: 'conversations', value: history });
-    homeDispatch({
-      field: 'selectedConversation',
-      value: history[history.length - 1],
-    });
+    // skip if selected conversation is already in history
+    if (
+      selectedConversation &&
+      !history.some(
+        (conversation) =>
+          conversation.id === selectedConversation.id,
+      )
+    ) {
+      homeDispatch({
+        field: 'selectedConversation',
+        value: history[history.length - 1],
+      });
+    }
     homeDispatch({ field: 'folders', value: folders });
     homeDispatch({ field: 'prompts', value: prompts });
   };
