@@ -1,5 +1,5 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SidebarToggleButton } from './components/SidebarToggleButton';
@@ -130,6 +130,7 @@ const Sidebar = <T,>({
 
       <SidebarToggleButton
         onClick={toggleOpen}
+        isOpen={isOpen}
         side={side}
         className={`${showMobileButton ? '' : 'mobile:hidden'}`}
       />
