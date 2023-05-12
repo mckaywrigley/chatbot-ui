@@ -351,7 +351,6 @@ export const ChatInput = ({
             } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
             value={content}
             setIsOverLimit={(value) => {
-              console.log(value);
               setIsOverLimit(value);
             }}
           ></TokenCounter>

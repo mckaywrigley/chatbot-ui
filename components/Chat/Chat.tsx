@@ -16,6 +16,7 @@ import { event } from 'nextjs-google-analytics/dist/interactions';
 import { getEndpoint } from '@/utils/app/api';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -31,7 +32,6 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -51,7 +51,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       user,
       outputLanguage,
       currentMessage,
-      messageIsStreaming
+      messageIsStreaming,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -431,7 +431,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                     <IconClearAll size={18} />
                   </button>
 
-                  {/* // TODO: to be tested */}
                   {selectedConversation && (
                     <StoreConversationButton
                       conversation={selectedConversation}
