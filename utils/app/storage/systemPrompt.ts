@@ -1,5 +1,5 @@
 import { User } from 'chatbot-ui-core/types/auth';
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import { Database } from 'chatbot-ui-core';
 
@@ -11,7 +11,11 @@ export const storageCreateSystemPrompt = (
 ) => {
   const updatedSystemPrompts = [...allSystemPrompts, newSystemPrompt];
 
-  database.createSystemPrompt(user, newSystemPrompt);
+  database.createSystemPrompt(user, newSystemPrompt).then((success) => {
+    if (!success) {
+      console.log('Failed to create system prompt');
+    }
+  });
 
   return updatedSystemPrompts;
 };
@@ -30,7 +34,11 @@ export const storageUpdateSystemPrompt = (
     return c;
   });
 
-  database.updateSystemPrompt(user, updatedSystemPrompt);
+  database.updateSystemPrompt(user, updatedSystemPrompt).then((success) => {
+    if (!success) {
+      console.log('Failed to update system prompt');
+    }
+  });
 
   return {
     single: updatedSystemPrompt,
@@ -46,7 +54,11 @@ export const storageDeleteSystemPrompt = (
 ) => {
   const updatedSystemPrompts = allPrompts.filter((p) => p.id !== promptId);
 
-  database.deleteSystemPrompt(user, promptId);
+  database.deleteSystemPrompt(user, promptId).then((success) => {
+    if (!success) {
+      console.log('Failed to delete system prompt');
+    }
+  });
 
   return updatedSystemPrompts;
 };

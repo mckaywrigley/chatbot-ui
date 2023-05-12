@@ -66,7 +66,7 @@ import { Settings } from '@/types/settings';
 import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 import { FolderType } from 'chatbot-ui-core/types/folder';
 import { Prompt } from 'chatbot-ui-core/types/prompt';
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';

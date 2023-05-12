@@ -1,13 +1,12 @@
 import { IconFileExport, IconLogout, IconSettings } from '@tabler/icons-react';
-import { signOut } from 'next-auth/react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
 import { localDeleteAPIKey } from '@/utils/app/storage/local/apiKey';
 import { localDeletePluginKeys } from '@/utils/app/storage/local/pluginKeys';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
+import { AUTH_ENABLED } from 'chatbot-ui-core/utils/const';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -19,6 +18,8 @@ import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
+
+import { signOut } from 'chatbot-ui-authjs';
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
@@ -79,7 +80,7 @@ export const ChatbarSettings = () => {
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}
 
-      {NEXT_PUBLIC_NEXTAUTH_ENABLED && (
+      {AUTH_ENABLED && (
         <SidebarButton
           text={t('Log Out')}
           icon={<IconLogout size={18} />}

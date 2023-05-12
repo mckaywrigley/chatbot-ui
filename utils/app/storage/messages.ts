@@ -34,7 +34,13 @@ export const storageCreateMessages = (
     return c;
   });
 
-  database.createMessages(user, selectedConversation.id, newMessages);
+  database
+    .createMessages(user, selectedConversation.id, newMessages)
+    .then((success) => {
+      if (!success) {
+        console.log('Failed to create messages');
+      }
+    });
 
   return {
     single: updatedConversation,

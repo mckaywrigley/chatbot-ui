@@ -1,15 +1,14 @@
-import { User } from 'next-auth';
-
 import { getClientSideUser } from '@/utils/app/auth/session';
 import { getDatabase } from '@/utils/app/storage/database';
 
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
+import { User } from 'chatbot-ui-core/types/auth';
 import { Conversation, Message } from 'chatbot-ui-core/types/chat';
 import { FolderInterface } from 'chatbot-ui-core/types/folder';
 import { Prompt } from 'chatbot-ui-core/types/prompt';
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import { Database } from 'chatbot-ui-core';
 

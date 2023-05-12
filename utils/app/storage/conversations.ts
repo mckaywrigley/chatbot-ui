@@ -15,12 +15,20 @@ export const storageUpdateConversations = async (
   user: User,
   conversations: Conversation[],
 ) => {
-  await database.updateConversations(user, conversations);
+  await database.updateConversations(user, conversations).then((success) => {
+    if (!success) {
+      console.log('Failed to update conversations');
+    }
+  });
 };
 
 export const storageDeleteConversations = async (
   database: Database,
   user: User,
 ) => {
-  database.deleteConversations(user);
+  database.deleteConversations(user).then((success) => {
+    if (!success) {
+      console.log('Failed to delete conversations');
+    }
+  });
 };

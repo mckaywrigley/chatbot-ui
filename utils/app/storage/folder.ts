@@ -19,7 +19,11 @@ export const storageCreateFolder = (
 
   const updatedFolders = [...allFolders, newFolder];
 
-  database.createFolder(user, newFolder);
+  database.createFolder(user, newFolder).then((success) => {
+    if (!success) {
+      console.log('Failed to create folder');
+    }
+  });
 
   return updatedFolders;
 };
@@ -45,7 +49,11 @@ export const storageUpdateFolder = (
     return f;
   });
 
-  database.updateFolder(user, updatedFolder!);
+  database.updateFolder(user, updatedFolder!).then((success) => {
+    if (!success) {
+      console.log('Failed to update folder');
+    }
+  });
 
   return updatedFolders;
 };
@@ -58,7 +66,11 @@ export const storageDeleteFolder = (
 ) => {
   const updatedFolders = allFolders.filter((f) => f.id !== folderId);
 
-  database.deleteFolder(user, folderId);
+  database.deleteFolder(user, folderId).then((success) => {
+    if (!success) {
+      console.log('Failed to delete folder');
+    }
+  });
 
   return updatedFolders;
 };

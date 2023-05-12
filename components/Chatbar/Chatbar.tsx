@@ -216,7 +216,7 @@ export const Chatbar = () => {
   const handleDrop = (e: any) => {
     if (e.dataTransfer) {
       const conversation = JSON.parse(e.dataTransfer.getData('conversation'));
-      handleUpdateConversation(conversation, { key: 'folderId', value: 0 });
+      handleUpdateConversation(conversation, { key: 'folderId', value: null });
       chatDispatch({ field: 'searchTerm', value: '' });
       e.target.style.background = 'none';
     }

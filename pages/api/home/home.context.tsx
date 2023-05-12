@@ -5,7 +5,7 @@ import { ActionType } from '@/hooks/useCreateReducer';
 import { KeyValuePair } from '@/types/data';
 import { Conversation } from 'chatbot-ui-core/types/chat';
 import { FolderType } from 'chatbot-ui-core/types/folder';
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import { HomeInitialState } from './home.state';
 

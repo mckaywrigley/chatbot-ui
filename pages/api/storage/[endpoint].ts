@@ -1,52 +1,54 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getServerSession } from 'next-auth';
+// import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { NEXT_PUBLIC_NEXTAUTH_ENABLED } from '@/utils/app/const';
+// import { AUTH_ENABLED } from '@/utils/app/const';
 
-import { User } from 'chatbot-ui-core/types/auth';
+// import { User } from 'chatbot-ui-core/types/auth';
 
-import { authOptions } from '../auth/[...nextauth]';
+// import { getServerSession } from 'chatbot-ui-authjs/server-session';
+// import { ServerDatabase } from 'chatbot-ui-core';
+// import { ServerSideDatabase } from 'chatbot-ui-rdbms/server-side';
 
-import { ServerDatabase } from 'chatbot-ui-core';
-import { ServerSideDatabase } from 'chatbot-ui-rdbms/ServerSideDatabase';
-
-export default async function proxy(req: NextApiRequest, res: NextApiResponse) {
-  const database: ServerDatabase = new ServerSideDatabase();
-  try {
-    const { endpoint } = req.query;
-    if (!endpoint) {
-      res.status(404).json({ error: 'Endpoint not found' });
-      return;
-    }
-    const path = database.paths.find((path) => path.endpoint === endpoint);
-    if (!path) {
-      res.status(404).json({ error: 'Endpoint not found' });
-      return;
-    }
-    let user: User | null = null;
-    if (NEXT_PUBLIC_NEXTAUTH_ENABLED) {
-      const session = await getServerSession(req, res, authOptions);
-      if (!session) {
-        return res.status(401).json({ error: 'User is not authenticated' });
-      } else if (!session.user) {
-        return res.status(401).json({ error: 'User is not authenticated' });
-      } else if (!session.user.email) {
-        return res
-          .status(401)
-          .json({ error: 'User does not have an email address' });
-      }
-      user = {
-        id: session.user.email,
-      };
-    } else {
-      user = {
-        id: 'test_user',
-      };
-    }
-    // Forward the request and response objects to the handler
-    return path.handler(req, res, user);
-  } catch (error) {
-    console.error('Error in proxy:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-}
+// export default async function proxy(req: NextApiRequest, res: NextApiResponse) {
+//   const database: ServerDatabase = new ServerSideDatabase();
+//   try {
+//     const { endpoint } = req.query;
+//     if (!endpoint) {
+//       res.status(404).json({ error: 'Endpoint not found' });
+//       return;
+//     }
+//     const path = database.paths.find((path) => path.endpoint === endpoint);
+//     if (!path) {
+//       res.status(404).json({ error: 'Endpoint not found' });
+//       return;
+//     }
+//     let user: User | null = null;
+//     if (AUTH_ENABLED) {
+//       const session = await getServerSession(req, res, null);
+//       if (!session) {
+//         return res.status(401).json({ error: 'User is not authenticated' });
+//       } else if (!session.user) {
+//         return res.status(401).json({ error: 'User is not authenticated' });
+//       } else if (!session.user.email) {
+//         return res
+//           .status(401)
+//           .json({ error: 'User does not have an email address' });
+//       }
+//       user = {
+//         email: session.user.email,
+//         image: session.user.image,
+//         name: session.user.name,
+//       };
+//     } else {
+//       user = {
+//         email: 'default_user',
+//         image: null,
+//         name: 'Default User',
+//       };
+//     }
+//     // Forward the request and response objects to the handler
+//     return path.handler(req, res, user);
+//   } catch (error) {
+//     console.error('Error in proxy:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// }

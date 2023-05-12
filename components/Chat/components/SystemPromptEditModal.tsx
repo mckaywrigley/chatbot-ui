@@ -9,7 +9,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 

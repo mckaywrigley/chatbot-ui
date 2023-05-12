@@ -12,7 +12,11 @@ export const storageUpdateFolders = async (
   user: User,
   folders: FolderInterface[],
 ) => {
-  await database.updateFolders(user, folders);
+  await database.updateFolders(user, folders).then((success) => {
+    if (!success) {
+      console.log('Failed to update folders');
+    }
+  });
 };
 
 export const storageDeleteFolders = async (
@@ -20,5 +24,9 @@ export const storageDeleteFolders = async (
   user: User,
   folderIds: string[],
 ) => {
-  await database.deleteFolders(user, folderIds);
+  await database.deleteFolders(user, folderIds).then((success) => {
+    if (!success) {
+      console.log('Failed to delete folders');
+    }
+  });
 };

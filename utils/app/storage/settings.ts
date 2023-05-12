@@ -8,7 +8,7 @@ export const getSettings = (user: User): Settings => {
     theme: 'dark',
     defaultSystemPromptId: '0',
   };
-  const itemName = `${STORAGE_KEY}-${user.id}`;
+  const itemName = `${STORAGE_KEY}-${user.email}`;
   const settingsJson = localStorage.getItem(itemName);
   if (settingsJson) {
     try {
@@ -22,6 +22,6 @@ export const getSettings = (user: User): Settings => {
 };
 
 export const saveSettings = (user: User, settings: Settings) => {
-  const itemName = `${STORAGE_KEY}-${user.id}`;
+  const itemName = `${STORAGE_KEY}-${user.email}`;
   localStorage.setItem(itemName, JSON.stringify(settings));
 };

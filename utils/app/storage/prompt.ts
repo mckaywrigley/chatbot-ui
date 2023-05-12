@@ -11,7 +11,11 @@ export const storageCreatePrompt = (
 ) => {
   const updatedPrompts = [...allPrompts, newPrompt];
 
-  database.createPrompt(user, newPrompt);
+  database.createPrompt(user, newPrompt).then((success) => {
+    if (!success) {
+      console.log('Failed to create prompt');
+    }
+  });
 
   return updatedPrompts;
 };
@@ -30,7 +34,11 @@ export const storageUpdatePrompt = (
     return c;
   });
 
-  database.updatePrompt(user, updatedPrompt);
+  database.updatePrompt(user, updatedPrompt).then((success) => {
+    if (!success) {
+      console.log('Failed to update prompt');
+    }
+  });
 
   return {
     single: updatedPrompt,
@@ -46,7 +54,11 @@ export const storageDeletePrompt = (
 ) => {
   const updatedPrompts = allPrompts.filter((p) => p.id !== promptId);
 
-  database.deletePrompt(user, promptId);
+  database.deletePrompt(user, promptId).then((success) => {
+    if (!success) {
+      console.log('Failed to delete prompt');
+    }
+  });
 
   return updatedPrompts;
 };

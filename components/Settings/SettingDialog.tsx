@@ -8,7 +8,7 @@ import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { getSettings, saveSettings } from '@/utils/app/storage/settings';
 
 import { Settings } from '@/types/settings';
-import { SystemPrompt } from 'chatbot-ui-core/types/systemPrompt';
+import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 

@@ -13,7 +13,11 @@ export const storageCreateConversation = (
 ) => {
   const updatedConversations = [...allConversations, newConversation];
 
-  database.createConversation(user, newConversation);
+  database.createConversation(user, newConversation).then((success) => {
+    if (!success) {
+      console.log('Failed to create conversation');
+    }
+  });
 
   return updatedConversations;
 };
@@ -34,7 +38,11 @@ export const storageUpdateConversation = (
 
   saveSelectedConversation(user, updatedConversation);
 
-  database.updateConversation(user, updatedConversation);
+  database.updateConversation(user, updatedConversation).then((success) => {
+    if (!success) {
+      console.log('Failed to update conversation');
+    }
+  });
 
   return {
     single: updatedConversation,
@@ -52,7 +60,11 @@ export const storageDeleteConversation = (
     (c) => c.id !== conversationId,
   );
 
-  database.deleteConversation(user, conversationId);
+  database.deleteConversation(user, conversationId).then((success) => {
+    if (!success) {
+      console.log('Failed to delete conversation');
+    }
+  });
 
   return updatedConversations;
 };
