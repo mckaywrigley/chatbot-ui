@@ -212,6 +212,11 @@ const Home = ({
   // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
