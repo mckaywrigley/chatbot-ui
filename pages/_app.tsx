@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
@@ -15,14 +16,17 @@ function App({ Component, pageProps }: AppProps<{ session: Session }>) {
   const queryClient = new QueryClient();
 
   return (
-    <AuthProvider session={pageProps.session}>
-      <div className={inter.className}>
-        <Toaster />
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
-        </QueryClientProvider>
-      </div>
-    </AuthProvider>
+    <>
+      <AuthProvider session={pageProps.session}>
+        <div className={inter.className}>
+          <Toaster />
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+          </QueryClientProvider>
+        </div>
+      </AuthProvider>
+      <Analytics />
+    </>
   );
 }
 
