@@ -6,7 +6,6 @@ Chatbot UI is an open source chat UI for AI models.
   <img src="https://discordapp.com/api/guilds/1103099861215232010/widget.png?style=banner2" alt="Discord Banner"/>
 </a>
 
-
 ![Chatbot UI](./public/screenshots/main_screenshot.png)
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
@@ -38,7 +37,7 @@ Host your own live version of Chatbot UI with Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjorge-menjivar%2Fchatbot-ui)
 
-## Running Locally
+## Usage
 
 ### Step 1. Clone Repo
 
@@ -65,8 +64,17 @@ Enable extensions by following the instructions in the README files of the exten
 
 ### Step 4. Run App
 
-```bash
+Run Locally:
+
+```sh
 npm run dev
+```
+
+Or run with Docker:
+
+```sh
+docker build -t chatbot-ui . --rm
+docker run --env-file=.env.local -p 3000:3000 --name chatbot chatbot-ui
 ```
 
 ### (Optional) Step 5. Provide OpenAI API Key
