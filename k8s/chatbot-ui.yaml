@@ -1,37 +1,32 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: chatbot-ui
----
-apiVersion: v1
 kind: Secret
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: default
+  name: chatgpt-ui
 type: Opaque
 data:
-  OPENAI_API_KEY: <base64 encoded key>
+  OPENAI_API_KEY: <GPT API KEY> 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: default
+  name: chatgpt-ui
   labels:
-    app: chatbot-ui
+    app: chatgpt-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chatbot-ui
+      app: chatgpt-ui
   template:
     metadata:
       labels:
-        app: chatbot-ui
+        app: chatgpt-ui
     spec:
       containers:
-        - name: chatbot-ui
-          image: <docker user>/chatbot-ui:latest
+        - name: chatgpt-ui
+          image: registry.digitalocean.com/francisco/chatgpt-ui:202304300116
           resources: {}
           ports:
             - containerPort: 3000
@@ -39,16 +34,16 @@ spec:
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: chatbot-ui
+                  name: chatgpt-ui
                   key: OPENAI_API_KEY
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
+  namespace: default
+  name: chatgpt-ui
   labels:
-    app: chatbot-ui
+    app: chatgpt-ui
 spec:
   ports:
     - name: http
@@ -56,5 +51,24 @@ spec:
       port: 80
       targetPort: 3000
   selector:
-    app: chatbot-ui
+    app: chatgpt-ui
   type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatgpt-ui-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ai.sakurain.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chatgpt-ui
+            port:
+              number: 80
