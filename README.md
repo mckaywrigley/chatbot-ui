@@ -2,9 +2,14 @@
 
 Chatbot UI is an open source chat UI for AI models.
 
-See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
+<a href="https://discord.gg/q9AQP2w6gK">
+  <img src="https://discordapp.com/api/guilds/1103099861215232010/widget.png?style=banner2" alt="Discord Banner"/>
+</a>
+
 
 ![Chatbot UI](./public/screenshots/main_screenshot.png)
+
+See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
 ## Updates
 
