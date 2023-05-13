@@ -1,12 +1,14 @@
 import { Conversation, Message } from './chat';
-import { Folder } from './folder';
+import { FolderInterface } from './folder';
 import { OpenAIModel } from './openai';
+import { Prompt } from './prompt';
 
 export type SupportedExportFormats =
   | ExportFormatV1
   | ExportFormatV2
-  | ExportFormatV3;
-export type LatestExportFormat = ExportFormatV3;
+  | ExportFormatV3
+  | ExportFormatV4;
+export type LatestExportFormat = ExportFormatV4;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 interface ConversationV1 {
@@ -32,5 +34,12 @@ export interface ExportFormatV2 {
 export interface ExportFormatV3 {
   version: 3;
   history: Conversation[];
-  folders: Folder[];
+  folders: FolderInterface[];
+}
+
+export interface ExportFormatV4 {
+  version: 4;
+  history: Conversation[];
+  folders: FolderInterface[];
+  prompts: Prompt[];
 }
