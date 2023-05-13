@@ -19,8 +19,6 @@ import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
 
-import { signOut } from 'chatbot-ui-authjs';
-
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
   const [isSettingDialogOpen, setIsSettingDialog] = useState<boolean>(false);
@@ -32,6 +30,7 @@ export const ChatbarSettings = () => {
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
+      auth,
       user,
     },
     dispatch: homeDispatch,
@@ -44,7 +43,7 @@ export const ChatbarSettings = () => {
       localDeletePluginKeys(user);
     }
 
-    signOut();
+    auth.signOut();
   };
 
   const {

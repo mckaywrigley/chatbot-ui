@@ -6,25 +6,27 @@ import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 
+import { getAuth } from '@/utils/app/extensions/auth';
+
 import '@/styles/globals.css';
-import { AuthProvider } from 'chatbot-ui-authjs';
-import { Session } from 'chatbot-ui-authjs';
+import { Auth } from 'chatbot-ui-core';
 
 const inter = Inter({ subsets: ['latin'] });
 
-function App({ Component, pageProps }: AppProps<{ session: Session }>) {
+function App({ Component, pageProps }: AppProps<{ session: any }>) {
+  const auth: Auth = getAuth();
   const queryClient = new QueryClient();
 
   return (
     <>
-      <AuthProvider session={pageProps.session}>
+      <auth.AuthProvider session={pageProps.session}>
         <div className={inter.className}>
           <Toaster />
           <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
           </QueryClientProvider>
         </div>
-      </AuthProvider>
+      </auth.AuthProvider>
       <Analytics />
     </>
   );

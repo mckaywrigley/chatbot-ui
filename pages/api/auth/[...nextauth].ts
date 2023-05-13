@@ -1,3 +1,5 @@
-import AuthApiHandler from 'chatbot-ui-authjs/api-handler';
+import { getServerAuth } from '@/utils/server/extensions/auth';
 
-export default AuthApiHandler;
+const auth = getServerAuth();
+
+export default auth.apiHandler;

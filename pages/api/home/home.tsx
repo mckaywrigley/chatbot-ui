@@ -24,7 +24,6 @@ import {
   storageGetConversations,
   storageUpdateConversations,
 } from '@/utils/app/storage/conversations';
-import { getDatabase } from '@/utils/app/storage/database';
 import {
   storageCreateFolder,
   storageDeleteFolder,
@@ -109,6 +108,7 @@ const Home = ({
       prompts,
       systemPrompts,
       defaultSystemPromptId,
+      auth,
       user,
     },
     dispatch,

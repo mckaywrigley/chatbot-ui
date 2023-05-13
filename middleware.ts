@@ -1,5 +1,7 @@
-import Middleware from 'chatbot-ui-authjs/middleware';
+import { getAuth } from './utils/app/extensions/auth';
 
-export default Middleware;
+const auth = getAuth();
+
+export default auth.middleware;
 
 export const config = { matcher: ['/'] };
