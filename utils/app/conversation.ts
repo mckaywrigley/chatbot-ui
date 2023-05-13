@@ -1,4 +1,5 @@
 import { Conversation } from '@/types/chat';
+import { setData } from '../data/persist';
 
 export const updateConversation = (
   updatedConversation: Conversation,
@@ -22,9 +23,9 @@ export const updateConversation = (
 };
 
 export const saveConversation = (conversation: Conversation) => {
-  localStorage.setItem('selectedConversation', JSON.stringify(conversation));
+  setData('selectedConversation', JSON.stringify(conversation));
 };
 
 export const saveConversations = (conversations: Conversation[]) => {
-  localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+  setData('conversationHistory', JSON.stringify(conversations));
 };

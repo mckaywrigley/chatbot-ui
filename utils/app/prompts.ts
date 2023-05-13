@@ -1,4 +1,5 @@
 import { Prompt } from '@/types/prompt';
+import { setData } from '../data/persist';
 
 export const updatePrompt = (updatedPrompt: Prompt, allPrompts: Prompt[]) => {
   const updatedPrompts = allPrompts.map((c) => {
@@ -18,5 +19,5 @@ export const updatePrompt = (updatedPrompt: Prompt, allPrompts: Prompt[]) => {
 };
 
 export const savePrompts = (prompts: Prompt[]) => {
-  localStorage.setItem('prompts', JSON.stringify(prompts));
+  setData('prompts', JSON.stringify(prompts));
 };

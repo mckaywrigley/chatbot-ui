@@ -25,6 +25,7 @@ import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { setData } from '@/utils/data/persist';
 
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');
@@ -50,7 +51,7 @@ export const Chatbar = () => {
     (apiKey: string) => {
       homeDispatch({ field: 'apiKey', value: apiKey });
 
-      localStorage.setItem('apiKey', apiKey);
+      setData('apiKey', apiKey);
     },
     [homeDispatch],
   );
@@ -67,11 +68,11 @@ export const Chatbar = () => {
 
       homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
 
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+      setData('pluginKeys', JSON.stringify(updatedPluginKeys));
     } else {
       homeDispatch({ field: 'pluginKeys', value: [...pluginKeys, pluginKey] });
 
-      localStorage.setItem(
+      setData(
         'pluginKeys',
         JSON.stringify([...pluginKeys, pluginKey]),
       );
@@ -91,7 +92,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'pluginKeys', value: updatedPluginKeys });
 
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
+    setData('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
   const handleExportData = () => {
@@ -174,7 +175,7 @@ export const Chatbar = () => {
 
   const handleToggleChatbar = () => {
     homeDispatch({ field: 'showChatbar', value: !showChatbar });
-    localStorage.setItem('showChatbar', JSON.stringify(!showChatbar));
+    setData('showChatbar', JSON.stringify(!showChatbar));
   };
 
   const handleDrop = (e: any) => {

@@ -1,5 +1,6 @@
 import { FolderInterface } from '@/types/folder';
+import { setData } from '../data/persist';
 
 export const saveFolders = (folders: FolderInterface[]) => {
-  localStorage.setItem('folders', JSON.stringify(folders));
+  setData('folders', JSON.stringify(folders));
 };

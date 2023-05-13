@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -7,7 +7,9 @@ import HomeContext from '@/pages/api/home/home.context';
 
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 
-import { Import } from '../../Settings/Import';
+import { syncKvToLocal, syncLocalToKv } from '@/utils/data/persist';
+import { IconCloudDownload, IconCloudUpload } from '@tabler/icons-react';
+import { toast } from 'react-hot-toast';
 import { Key } from '../../Settings/Key';
 import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
@@ -36,18 +38,51 @@ export const ChatbarSettings = () => {
     handleApiKeyChange,
   } = useContext(ChatbarContext);
 
+
+  const uploadLsToRedis = async () => {
+    // confirm cloud data overwrite
+    const confirm = window.confirm(
+      'This will overwrite your cloud data. Are you sure?',
+    );
+    if (!confirm) return;
+    await syncLocalToKv();
+    // toast
+    toast.success('Successfully uploaded to Redis');
+  };
+  const downloadRedisToLs = async () => {
+    // confirm, warn data loss
+    const confirm = window.confirm(
+      'This will overwrite your local data. Are you sure?',
+    );
+    if (!confirm) return;
+    await syncKvToLocal();
+    window.location.reload();
+  };
+
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
       {conversations.length > 0 ? (
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
 
-      <Import onImport={handleImportConversations} />
+      {/* <Import onImport={handleImportConversations} />
 
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => handleExportData()}
+      /> */}
+
+      <SidebarButton
+        text={t('Download From Redis')}
+        icon={<IconCloudDownload size={18} />}
+        onClick={() => downloadRedisToLs()}
+      />
+
+      <SidebarButton
+        text={t('Upload To Redis')}
+        icon={<IconCloudUpload size={18} />}
+        onClick={() => uploadLsToRedis()}
       />
 
       <SidebarButton

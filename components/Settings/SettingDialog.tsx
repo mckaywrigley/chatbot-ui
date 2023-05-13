@@ -1,10 +1,12 @@
 import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import { getSettings, saveSettings } from '@/utils/app/settings';
+import { syncKvToLocal, syncLocalToKv } from '@/utils/data/persist';
 
 import { Settings } from '@/types/settings';
 

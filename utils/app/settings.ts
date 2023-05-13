@@ -1,4 +1,5 @@
 import { Settings } from '@/types/settings';
+import { getData, setData } from '../data/persist';
 
 const STORAGE_KEY = 'settings';
 
@@ -6,7 +7,7 @@ export const getSettings = (): Settings => {
   let settings: Settings = {
     theme: 'dark',
   };
-  const settingsJson = localStorage.getItem(STORAGE_KEY);
+  const settingsJson = getData(STORAGE_KEY);
   if (settingsJson) {
     try {
       let savedSettings = JSON.parse(settingsJson) as Settings;
@@ -19,5 +20,5 @@ export const getSettings = (): Settings => {
 };
 
 export const saveSettings = (settings: Settings) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  setData(STORAGE_KEY, JSON.stringify(settings));
 };
