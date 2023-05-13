@@ -15,7 +15,7 @@
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
     "@vercel/analytics": "^1.0.1",
-    "chatbot-ui-authjs": "^1.0.11",
+    "chatbot-ui-authjs": "^1.0.12",
     "chatbot-ui-core": "^1.0.21",
     "chatbot-ui-rdbms": "^1.0.16",
     "eventsource-parser": "^0.1.0",
