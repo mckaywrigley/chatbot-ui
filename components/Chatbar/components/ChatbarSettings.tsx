@@ -1,8 +1,10 @@
 import { IconFileExport, IconLogout, IconSettings } from '@tabler/icons-react';
+import { signOut } from 'next-auth/react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
+import { getClientSession } from '@/utils/app/auth';
 import { localDeleteAPIKey } from '@/utils/app/storage/local/apiKey';
 import { localDeletePluginKeys } from '@/utils/app/storage/local/pluginKeys';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
@@ -30,7 +32,6 @@ export const ChatbarSettings = () => {
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
-      auth,
       user,
     },
     dispatch: homeDispatch,
@@ -43,7 +44,7 @@ export const ChatbarSettings = () => {
       localDeletePluginKeys(user);
     }
 
-    auth.signOut();
+    signOut();
   };
 
   const {

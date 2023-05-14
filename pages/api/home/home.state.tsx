@@ -1,4 +1,4 @@
-import { getAuth, getUser } from '@/utils/app/extensions/auth';
+import { getUser } from '@/utils/app/auth';
 import { getDatabase } from '@/utils/app/extensions/database';
 
 import { User } from '@/../chatbot-ui-core/types/auth';
@@ -10,7 +10,7 @@ import { FolderInterface } from 'chatbot-ui-core/types/folder';
 import { Prompt } from 'chatbot-ui-core/types/prompt';
 import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
 
-import { Auth, Database } from 'chatbot-ui-core';
+import { Database } from 'chatbot-ui-core';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -37,7 +37,6 @@ export interface HomeInitialState {
   serverSidePluginKeysSet: boolean;
   systemPrompts: SystemPrompt[];
   defaultSystemPromptId: string;
-  auth: Auth;
   user: User;
 }
 
@@ -66,6 +65,5 @@ export const initialState: HomeInitialState = {
   serverSidePluginKeysSet: false,
   systemPrompts: [],
   defaultSystemPromptId: '0',
-  auth: await getAuth(),
   user: await getUser(),
 };

@@ -1,16 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { getServerAuth } from '@/utils/server/extensions/auth';
+import { getServerSession } from '@/utils/server/auth';
 import { getServerDatabase } from '@/utils/server/extensions/database';
 import { AUTH_ENABLED } from 'chatbot-ui-core/utils/const';
 
 import { User } from 'chatbot-ui-core/types/auth';
 
-import { ServerAuth, ServerDatabase } from 'chatbot-ui-core';
+import { ServerDatabase } from 'chatbot-ui-core';
 
 export default async function proxy(req: NextApiRequest, res: NextApiResponse) {
   const database: ServerDatabase = await getServerDatabase();
-  const auth: ServerAuth = getServerAuth();
   try {
     const { endpoint } = req.query;
     if (!endpoint) {
@@ -24,7 +23,7 @@ export default async function proxy(req: NextApiRequest, res: NextApiResponse) {
     }
     let user: User | null = null;
     if (AUTH_ENABLED) {
-      const session = await auth.session(req, res, null);
+      const session = await getServerSession(req, res);
       if (!session) {
         return res.status(401).json({ error: 'User is not authenticated' });
       } else if (!session.user) {

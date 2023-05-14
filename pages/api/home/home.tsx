@@ -108,7 +108,6 @@ const Home = ({
       prompts,
       systemPrompts,
       defaultSystemPromptId,
-      auth,
       user,
     },
     dispatch,

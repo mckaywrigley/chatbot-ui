@@ -1,0 +1,17 @@
+export type AuthProvider =
+  | 'apple'
+  | 'auth0'
+  | 'azure'
+  | 'cognito'
+  | 'discord'
+  | 'facebook'
+  | 'github'
+  | 'gitlab'
+  | 'google'
+  | 'okta'
+  | 'reddit'
+  | 'salesforce'
+  | 'slack'
+  | 'spotify'
+  | 'twitch'
+  | 'twitter';
