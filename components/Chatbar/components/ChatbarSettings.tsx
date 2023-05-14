@@ -4,7 +4,6 @@ import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { getClientSession } from '@/utils/app/auth';
 import { localDeleteAPIKey } from '@/utils/app/storage/local/apiKey';
 import { localDeletePluginKeys } from '@/utils/app/storage/local/pluginKeys';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';

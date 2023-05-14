@@ -1,4 +1,4 @@
-import { getUser } from '@/utils/app/auth';
+import { getUser } from '@/utils/app/auth/helpers';
 import { getDatabase } from '@/utils/app/extensions/database';
 
 import { User } from '@/../chatbot-ui-core/types/auth';
