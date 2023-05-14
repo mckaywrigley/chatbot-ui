@@ -474,7 +474,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           .getCurrentModel()
           .then((modelID: WindowAIModelID) => {
             console.log(modelID);
-            return [WindowAIModels[modelID ? modelID : 'local']];
+            return [WindowAIModels[modelID ? modelID : 'unknown']];
           });
         models.then((models: OpenAIModel[]) => {
           homeDispatch({ field: 'models', value: models });

@@ -87,7 +87,7 @@ const Home = ({
         return windowai.getCurrentModel().then(
           (modelID: WindowAIModelID) => {
               return [
-                  WindowAIModels[modelID ? modelID : "local"],
+                  WindowAIModels[modelID ? modelID : "unknown"],
               ]
         }
         )
