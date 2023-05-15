@@ -49,6 +49,6 @@ export async function fetchShareableConversation(
     };
   } catch (error) {
     console.error(error);
-    return null;
+    throw new Error('Failed to fetch the conversation');
   }
 }
