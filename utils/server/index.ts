@@ -30,7 +30,7 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  let url = `https://ai.sakurain.io/v1/openai/chat/completions`
+  let url = `http://asgard-gateway-svc:8080/v1/openai/chat/completions`
   const res = await fetch(url, {
     headers: {
       'Accept': 'text/event-stream',
