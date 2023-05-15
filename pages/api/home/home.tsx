@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { event } from 'nextjs-google-analytics';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
@@ -121,7 +122,13 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
+  const isMobileLayout = useMediaQuery('(max-width: 640px)');
   const handleSelectConversation = (conversation: Conversation) => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     dispatch({
       field: 'selectedConversation',
       value: conversation,
@@ -129,6 +136,15 @@ const Home = ({
 
     saveConversation(conversation);
   };
+
+  // SWITCH LAYOUT SHOULD CLOSE ALL SIDEBAR --------------------
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+      dispatch({ field: 'showPromptbar', value: false });
+    }
+  }, [isMobileLayout]);
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -199,6 +215,11 @@ const Home = ({
   // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -450,48 +471,54 @@ const Home = ({
       dispatch({ field: 'conversations', value: cleanedConversationHistory });
     }
 
-    dispatch({
-      field: 'selectedConversation',
-      value: {
-        id: uuidv4(),
-        name: 'New conversation',
-        messages: [],
-        model: OpenAIModels[defaultModelId],
-        prompt: DEFAULT_SYSTEM_PROMPT,
-        temperature: DEFAULT_TEMPERATURE,
-        folderId: null,
-      },
-    });
+    const newConversation = {
+      id: uuidv4(),
+      name: 'New conversation',
+      messages: [],
+      model: OpenAIModels[defaultModelId],
+      prompt: DEFAULT_SYSTEM_PROMPT,
+      temperature: DEFAULT_TEMPERATURE,
+      folderId: null,
+    };
 
     // Load shareable conversations
     const { shareable_conversation_id: accessibleConversationId } =
       router.query;
 
-    if (!accessibleConversationId) return;
+    if (accessibleConversationId) {
+      dispatch({ field: 'loading', value: true });
+      fetchShareableConversation(accessibleConversationId as string)
+        .then((conversation) => {
+          if (conversation) {
+            const updatedConversations = [
+              ...cleanedConversationHistory,
+              conversation,
+            ];
 
-    dispatch({ field: 'loading', value: true });
-    fetchShareableConversation(accessibleConversationId as string)
-      .then((conversation) => {
-        if (conversation) {
-          const updatedConversations = [
-            ...cleanedConversationHistory,
-            conversation,
-          ];
+            dispatch({ field: 'selectedConversation', value: conversation });
+            dispatch({ field: 'conversations', value: updatedConversations });
+            saveConversations(updatedConversations);
 
-          dispatch({ field: 'selectedConversation', value: conversation });
-          dispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-
-          toast.success(t('Conversation loaded successfully.'));
-          router.replace(router.pathname, router.pathname, { shallow: true });
-        }
-      })
-      .catch(() => {
-        toast.error(t('Sorry, we could not find this shared conversation.'));
-      })
-      .finally(() => {
-        dispatch({ field: 'loading', value: false });
+            toast.success(t('Conversation loaded successfully.'));
+            router.replace(router.pathname, router.pathname, { shallow: true });
+          }
+        })
+        .catch((error) => {
+          toast.error(t('Sorry, we could not find this shared conversation.'));
+          dispatch({
+            field: 'selectedConversation',
+            value: newConversation,
+          });
+        })
+        .finally(() => {
+          dispatch({ field: 'loading', value: false });
+        });
+    } else {
+      dispatch({
+        field: 'selectedConversation',
+        value: newConversation,
       });
+    }
   }, [
     defaultModelId,
     dispatch,
@@ -553,7 +580,7 @@ const Home = ({
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
             <Chatbar />
 
             <div className="flex flex-1">

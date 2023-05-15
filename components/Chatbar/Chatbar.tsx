@@ -1,9 +1,10 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
@@ -35,17 +36,32 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: {
+      conversations,
+      showChatbar,
+      showPromptbar,
+      defaultModelId,
+      folders,
+      pluginKeys,
+    },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
     handleUpdateConversation,
   } = useContext(HomeContext);
 
+  const isMobileLayout = useMediaQuery('(max-width: 640px)');
+
+  const showMobileButtons = useMemo(() => {
+    return isMobileLayout && !showPromptbar;
+  }, [isMobileLayout, showPromptbar]);
+
   const {
     state: { searchTerm, filteredConversations },
     dispatch: chatDispatch,
   } = chatBarContextValue;
+
+  const [isImportingData, setIsImportingData] = useState(false);
 
   const handleApiKeyChange = useCallback(
     (apiKey: string) => {
@@ -100,14 +116,24 @@ export const Chatbar = () => {
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
-    homeDispatch({ field: 'conversations', value: history });
-    homeDispatch({
-      field: 'selectedConversation',
-      value: history[history.length - 1],
-    });
-    homeDispatch({ field: 'folders', value: folders });
-    homeDispatch({ field: 'prompts', value: prompts });
+    setIsImportingData(true);
+    try {
+      const { history, folders, prompts }: LatestExportFormat =
+        importData(data);
+      homeDispatch({ field: 'conversations', value: history });
+      homeDispatch({
+        field: 'selectedConversation',
+        value: history[history.length - 1],
+      });
+      homeDispatch({ field: 'folders', value: folders });
+      homeDispatch({ field: 'prompts', value: prompts });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setTimeout(() => {
+        setIsImportingData(false);
+      }, 500);
+    }
   };
 
   const handleClearConversations = () => {
@@ -231,6 +257,7 @@ export const Chatbar = () => {
         isOpen={showChatbar}
         addItemButtonTitle={t('New chat')}
         itemComponent={<Conversations conversations={filteredConversations} />}
+        itemsIsImporting={isImportingData}
         folderComponent={<ChatFolders searchTerm={searchTerm} />}
         items={filteredConversations}
         searchTerm={searchTerm}
@@ -242,6 +269,7 @@ export const Chatbar = () => {
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
         handleDrop={handleDrop}
         footerComponent={<ChatbarSettings />}
+        showMobileButton={showMobileButtons}
       />
     </ChatbarContext.Provider>
   );
