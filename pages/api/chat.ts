@@ -1,6 +1,9 @@
+import absoluteUrl from 'next-absolute-url';
+
+import { findRelevantSections } from '@/services/embeddings';
+
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
-import { readEmbeddingsFromCSV } from '@/utils/server/embeddingsCsv';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -9,49 +12,44 @@ import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module
 
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
-// @ts-expect-error
-import cosineSimilarity from 'compute-cosine-similarity';
-import { Configuration, OpenAIApi } from 'openai';
 
 export const config = {
   runtime: 'edge',
 };
 
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  }),
-);
+type Doc = { title: string; content: string };
 
-async function getEmbedding(input: string) {
-  const embedding = await openai.createEmbedding({
-    model: 'text-embedding-ada-002',
-    input,
-  });
+async function expandPromptWithContext(
+  prompt: string,
+  messages: Message[],
+  req: Request,
+): Promise<string> {
+  // @ts-expect-error
+  const { origin } = absoluteUrl(req, 'localhost:3000');
 
-  return embedding.data.data[0].embedding;
-}
+  const context: Doc[] = await fetch(`${origin}/api/documentContext`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(messages),
+  }).then((res) => res.json());
 
-async function findRelevantSections(question: string) {
-  const questionEmbedding = await getEmbedding(question);
-  // similarity key gets rewritten
-  const haystack = await readEmbeddingsFromCSV();
+  let additions: string[] = [
+    'The following are some relevant documents to use in your answer',
+  ];
 
-  for (const item of haystack) {
-    item.similarity = cosineSimilarity(questionEmbedding, item.embedding);
+  for (const { title, content } of context) {
+    additions.push(`Title: ${title}; Content: ${content}`);
   }
 
-  haystack.sort((a, b) => b.similarity - a.similarity);
-
-  return haystack.slice(0, 10);
+  return prompt + '\n' + additions.join('\n');
 }
 
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { model, messages, key, prompt, temperature } =
       (await req.json()) as ChatBody;
-
-    console.log({ model, messages, key, prompt, temperature });
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -60,17 +58,13 @@ const handler = async (req: Request): Promise<Response> => {
       tiktokenModel.pat_str,
     );
 
-    let promptToSend = prompt;
-    if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
-    }
+    let promptToSend = DEFAULT_SYSTEM_PROMPT;
+    // if (!promptToSend) {
+    //   promptToSend = DEFAULT_SYSTEM_PROMPT;
+    // }
 
-    const userQuestion = messages.find((m) => m.role == 'user');
-    if (userQuestion) {
-      const relevantSections = await findRelevantSections(userQuestion.content);
-
-      console.log(relevantSections);
-    }
+    promptToSend = await expandPromptWithContext(promptToSend, messages, req);
+    console.log(promptToSend);
 
     let temperatureToUse = temperature;
     if (temperatureToUse == null) {
