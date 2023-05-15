@@ -2,10 +2,7 @@ import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  CloseSidebarButton,
-  OpenSidebarButton,
-} from './components/OpenCloseButton';
+import { SidebarToggleButton } from './components/SidebarToggleButton';
 
 import Search from '../Search';
 
@@ -23,6 +20,7 @@ interface Props<T> {
   handleCreateItem: () => void;
   handleCreateFolder: () => void;
   handleDrop: (e: any) => void;
+  showMobileButton?: boolean;
 }
 
 const Sidebar = <T,>({
@@ -39,6 +37,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
+  showMobileButton = true,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -54,10 +53,24 @@ const Sidebar = <T,>({
     e.target.style.background = 'none';
   };
 
-  return isOpen ? (
-    <div>
+  return (
+    <div
+      className={`${isOpen ? 'w-[260px]' : 'w-0'} ${
+        side === 'left' ? 'mobile:left-0' : 'mobile:right-0'
+      } transition-all h-full ease-linear relative box-content mobile:fixed mobile:z-10`}
+    >
       <div
-        className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
+        className={`${
+          isOpen ? 'mobile:visible !bg-[#202123]/90' : ''
+        } fixed invisible left-0 w-full h-full bg-transparent transition-all ease-linear`}
+        onClick={toggleOpen}
+      ></div>
+      <div
+        className={`${side === 'left' && !isOpen ? '-translate-x-full' : ''} ${
+          side === 'right' && !isOpen ? 'translate-x-full' : ''
+        } absolute z-10 top-0 ${
+          side === 'left' ? 'right' : 'left'
+        }-0 flex transition-all ease-linear w-[260px] h-full flex-none flex-col p-2 space-y-2 bg-[#202123] text-[14px]`}
       >
         <div className="flex items-center">
           <button
@@ -103,7 +116,7 @@ const Sidebar = <T,>({
             </div>
           ) : (
             <div className="mt-8 select-none text-center text-white opacity-50">
-              <IconMistOff className="mx-auto mb-3" />
+              <IconMistOff className="sm:hidden mx-auto mb-3" />
               <span className="text-[14px] leading-normal">
                 {t('No prompts.')}
               </span>
@@ -113,10 +126,13 @@ const Sidebar = <T,>({
         {footerComponent}
       </div>
 
-      <CloseSidebarButton onClick={toggleOpen} side={side} />
+      <SidebarToggleButton
+        onClick={toggleOpen}
+        isOpen={isOpen}
+        side={side}
+        className={`${showMobileButton ? '' : 'mobile:hidden'}`}
+      />
     </div>
-  ) : (
-    <OpenSidebarButton onClick={toggleOpen} side={side} />
   );
 };
 

@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { event } from 'nextjs-google-analytics';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
@@ -121,7 +122,13 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
+  const isMobileLayout = useMediaQuery('(max-width: 640px)');
   const handleSelectConversation = (conversation: Conversation) => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     dispatch({
       field: 'selectedConversation',
       value: conversation,
@@ -129,6 +136,15 @@ const Home = ({
 
     saveConversation(conversation);
   };
+
+  // SWITCH LAYOUT SHOULD CLOSE ALL SIDEBAR --------------------
+
+  useEffect(() => {
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+      dispatch({ field: 'showPromptbar', value: false });
+    }
+  }, [isMobileLayout]);
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -199,6 +215,11 @@ const Home = ({
   // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
+    //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
+    if (isMobileLayout) {
+      dispatch({ field: 'showChatbar', value: false });
+    }
+
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -553,7 +574,7 @@ const Home = ({
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+          <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
             <Chatbar />
 
             <div className="flex flex-1">

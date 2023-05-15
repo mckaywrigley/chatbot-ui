@@ -16,6 +16,7 @@ import { event } from 'nextjs-google-analytics/dist/interactions';
 import { getEndpoint } from '@/utils/app/api';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -31,7 +32,6 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
 import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
 
@@ -54,7 +54,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       isPaidUser,
       outputLanguage,
       currentMessage,
-      messageIsStreaming
+      messageIsStreaming,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -390,7 +390,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex w-[350px] flex-col space-y-10 pt-12 sm:w-[600px]">
+                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 sm:px-4 sm:max-w-[600px]">
                   <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
