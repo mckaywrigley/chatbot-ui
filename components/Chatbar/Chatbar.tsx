@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics';
@@ -61,6 +61,8 @@ export const Chatbar = () => {
     dispatch: chatDispatch,
   } = chatBarContextValue;
 
+  const [isImportingData, setIsImportingData] = useState(false);
+
   const handleApiKeyChange = useCallback(
     (apiKey: string) => {
       homeDispatch({ field: 'apiKey', value: apiKey });
@@ -114,14 +116,24 @@ export const Chatbar = () => {
   };
 
   const handleImportConversations = (data: SupportedExportFormats) => {
-    const { history, folders, prompts }: LatestExportFormat = importData(data);
-    homeDispatch({ field: 'conversations', value: history });
-    homeDispatch({
-      field: 'selectedConversation',
-      value: history[history.length - 1],
-    });
-    homeDispatch({ field: 'folders', value: folders });
-    homeDispatch({ field: 'prompts', value: prompts });
+    setIsImportingData(true);
+    try {
+      const { history, folders, prompts }: LatestExportFormat =
+        importData(data);
+      homeDispatch({ field: 'conversations', value: history });
+      homeDispatch({
+        field: 'selectedConversation',
+        value: history[history.length - 1],
+      });
+      homeDispatch({ field: 'folders', value: folders });
+      homeDispatch({ field: 'prompts', value: prompts });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setTimeout(() => {
+        setIsImportingData(false);
+      }, 500);
+    }
   };
 
   const handleClearConversations = () => {
@@ -245,6 +257,7 @@ export const Chatbar = () => {
         isOpen={showChatbar}
         addItemButtonTitle={t('New chat')}
         itemComponent={<Conversations conversations={filteredConversations} />}
+        itemsIsImporting={isImportingData}
         folderComponent={<ChatFolders searchTerm={searchTerm} />}
         items={filteredConversations}
         searchTerm={searchTerm}

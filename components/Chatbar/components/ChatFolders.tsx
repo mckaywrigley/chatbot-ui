@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { FolderInterface } from '@/types/folder';
 
@@ -32,32 +33,36 @@ export const ChatFolders = ({ searchTerm }: Props) => {
     return (
       conversations &&
       conversations
-        .filter((conversation) => conversation.folderId)
-        .map((conversation, index) => {
-          if (conversation.folderId === currentFolder.id) {
-            return (
-              <div key={index} className="ml-5 gap-2 border-l pl-2">
-                <ConversationComponent conversation={conversation} />
-              </div>
-            );
-          }
-        })
+        .filter(
+          (conversation) =>
+            conversation.folderId && conversation.folderId === currentFolder.id,
+        )
+        .map((conversation, index) => (
+          <div key={conversation.id} className="ml-5 gap-2 border-l pl-2 item">
+            <ConversationComponent
+              key={conversation.id}
+              conversation={conversation}
+            />
+          </div>
+        ))
     );
   };
 
   return (
-    <div className="flex w-full flex-col pt-2">
+    <TransitionGroup className="flex w-full flex-col pt-2">
       {folders
         .filter((folder) => folder.type === 'chat')
-        .map((folder, index) => (
-          <Folder
-            key={index}
-            searchTerm={searchTerm}
-            currentFolder={folder}
-            handleDrop={handleDrop}
-            folderComponent={ChatFolders(folder)}
-          />
+        .map((folder) => (
+          <CSSTransition key={folder.id} timeout={500} classNames="item">
+            <Folder
+              key={folder.id}
+              searchTerm={searchTerm}
+              currentFolder={folder}
+              handleDrop={handleDrop}
+              folderComponent={ChatFolders(folder)}
+            />
+          </CSSTransition>
         ))}
-    </div>
+    </TransitionGroup>
   );
 };

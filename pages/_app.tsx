@@ -7,20 +7,21 @@ import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from 'nextjs-google-analytics';
-import ua from 'universal-analytics';
 
 import '@/styles/globals.css';
+import '@/styles/transitionGroup.css';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import ua from 'universal-analytics';
 
 const inter = Inter({ subsets: ['latin'] });
 
 function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
   const queryClient = new QueryClient();
   const [supabase] = useState(() => createBrowserSupabaseClient());
-  
-  if(process.env.NEXT_PUBLIC_ENV === 'production'){
+
+  if (process.env.NEXT_PUBLIC_ENV === 'production') {
     const visitor = ua('UA-215785877-2'); // To be removed once ads audit has passed or switch to other analytics
-    visitor.pageview("/");
+    visitor.pageview('/');
   }
 
   return (
@@ -32,7 +33,7 @@ function App({ Component, pageProps }: AppProps<{ initialSession: Session }>) {
         <Toaster />
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
-          <GoogleAnalytics trackPageViews strategy="lazyOnload"/>
+          <GoogleAnalytics trackPageViews strategy="lazyOnload" />
         </QueryClientProvider>
       </div>
     </SessionContextProvider>
