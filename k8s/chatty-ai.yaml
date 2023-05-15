@@ -2,31 +2,31 @@ apiVersion: v1
 kind: Secret
 metadata:
   namespace: default
-  name: chatgpt-ui
+  name: chatty-ai
 type: Opaque
 data:
-  OPENAI_API_KEY: <GPT API KEY> 
+  OPENAI_API_KEY: <YOUR BASE64 OPENAI API KEY>
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: default
-  name: chatgpt-ui
+  name: chatty-ai
   labels:
-    app: chatgpt-ui
+    app: chatty-ai
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: chatgpt-ui
+      app: chatty-ai
   template:
     metadata:
       labels:
-        app: chatgpt-ui
+        app: chatty-ai
     spec:
       containers:
-        - name: chatgpt-ui
-          image: registry.digitalocean.com/francisco/chatgpt-ui:202304300116
+        - name: chatty-ai
+          image: registry.digitalocean.com/francisco/chatty-ai:20230515233357
           resources: {}
           ports:
             - containerPort: 3000
@@ -34,16 +34,16 @@ spec:
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: chatgpt-ui
+                  name: chatty-ai
                   key: OPENAI_API_KEY
 ---
 kind: Service
 apiVersion: v1
 metadata:
   namespace: default
-  name: chatgpt-ui-svc
+  name: chatty-ai-svc
   labels:
-    app: chatgpt-ui
+    app: chatty-ai
 spec:
   ports:
     - name: http
@@ -51,24 +51,24 @@ spec:
       port: 80
       targetPort: 3000
   selector:
-    app: chatgpt-ui
+    app: chatty-ai
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: chatgpt-ui-ingress
+  name: chatty-ai-ingress
   namespace: default
 spec:
   ingressClassName: nginx
   rules:
-  - host: ai.sakurain.io
+  - host: app.chattyai.io
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: chatgpt-ui-svc
+            name: chatty-ai-svc
             port:
               number: 80
