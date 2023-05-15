@@ -41,7 +41,7 @@ kind: Service
 apiVersion: v1
 metadata:
   namespace: default
-  name: chatgpt-ui
+  name: chatgpt-ui-svc
   labels:
     app: chatgpt-ui
 spec:
@@ -69,6 +69,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: chatgpt-ui
+            name: chatgpt-ui-svc
             port:
               number: 80
