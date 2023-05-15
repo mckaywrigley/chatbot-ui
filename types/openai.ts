@@ -19,8 +19,7 @@ export enum WindowAIModelID {
   GPT4 = "openai/gpt4",
   GPTNeo = "together/gpt-neoxt-20B",
   Cohere = "cohere/xlarge",
-  Local = "local",
-  Unknown = "unknown",
+  CustomOrLocal = "customOrLocal",
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -78,15 +77,9 @@ export const WindowAIModels: Record<WindowAIModelID, OpenAIModel> = {
     maxLength: 24000,
     tokenLimit: 8000,
   },
-  [WindowAIModelID.Local]: {
-    id: WindowAIModelID.Local,
+  [WindowAIModelID.CustomOrLocal]: {
+    id: WindowAIModelID.CustomOrLocal,
     name: 'Local',
-    maxLength: 24000,
-    tokenLimit: 8000,
-  },
-  [WindowAIModelID.Unknown]: {
-    id: WindowAIModelID.Unknown,
-    name: 'Unkown',
     maxLength: 24000,
     tokenLimit: 8000,
   },

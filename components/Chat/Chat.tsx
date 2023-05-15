@@ -160,7 +160,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               console.error('Error during text generation:', error);
               homeDispatch({ field: 'loading', value: false });
               homeDispatch({ field: 'messageIsStreaming', value: false });
-              toast.error('An error occurred during text generation.');
+              toast.error('An error occurred during window.ai text generation.', {
+                id: 'error-during-text-generation',
+              });
               return;
             }
           },
@@ -474,7 +476,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           .getCurrentModel()
           .then((modelID: WindowAIModelID) => {
             console.log(modelID);
-            return [WindowAIModels[modelID ? modelID : 'unknown']];
+            return [WindowAIModels[modelID ? modelID : 'customOrLocal']];
           });
         models.then((models: OpenAIModel[]) => {
           homeDispatch({ field: 'models', value: models });
