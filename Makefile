@@ -3,16 +3,16 @@ include .env
 .PHONY: all
 
 build:
-	docker build -t chatbot-ui .
+	docker build -t chatty-ai .
 
 run:
 	export $(cat .env | xargs)
-	docker stop chatbot-ui || true && docker rm chatbot-ui || true
-	docker run --name chatbot-ui --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 3000:3000 chatbot-ui
+	docker stop chatty-ai || true && docker rm chatty-ai || true
+	docker run --name chatty-ai --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 3000:3000 chatty-ai
 
 logs:
-	docker logs -f chatbot-ui
+	docker logs -f chatty-ai
 
 push:
-	docker tag chatbot-ui:latest ${DOCKER_USER}/chatbot-ui:${DOCKER_TAG}
-	docker push ${DOCKER_USER}/chatbot-ui:${DOCKER_TAG}
+	docker tag chatty-ai:latest ${DOCKER_USER}/chatty-ai:${DOCKER_TAG}
+	docker push ${DOCKER_USER}/chatty-ai:${DOCKER_TAG}
