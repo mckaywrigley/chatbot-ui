@@ -1,8 +1,4 @@
-import {
-  IconPlayerStop,
-  IconRepeat,
-  IconSend,
-} from '@tabler/icons-react';
+import { IconPlayerStop, IconRepeat, IconSend } from '@tabler/icons-react';
 import {
   KeyboardEvent,
   MutableRefObject,
@@ -18,14 +14,17 @@ import { useTranslation } from 'next-i18next';
 import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
+import { getPluginIcon } from '@/utils/app/ui';
+
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import TokenCounter from './components/TokenCounter';
+
 import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
-import { getPluginIcon } from '@/utils/app/ui';
 
 interface Props {
   onSend: () => void;
@@ -63,6 +62,8 @@ export const ChatInput = ({
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
   const { isFocused, setIsFocused, menuRef } = useFocusHandler(textareaRef);
+  const [isOverTokenLimit, setIsOverTokenLimit] = useState(false);
+  const [isCloseToTokenLimit, setIsCloseToTokenLimit] = useState(false);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -73,16 +74,6 @@ export const ChatInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const maxLength = selectedConversation?.model.maxLength;
-
-    if (maxLength && value.length > maxLength) {
-      alert(
-        t(
-          `Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
-          { maxLength, valueLength: value.length },
-        ),
-      );
-      return;
-    }
 
     setContent(value);
     updatePromptListVisibility(value);
@@ -95,6 +86,10 @@ export const ChatInput = ({
 
     if (!content) {
       alert(t('Please enter a message'));
+      return;
+    }
+
+    if (isOverTokenLimit) {
       return;
     }
 
@@ -306,6 +301,7 @@ export const ChatInput = ({
             border bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] 
             dark:bg-[#40414F] dark:text-white 
             dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 
+            ${isOverTokenLimit ? '!border-red-500 dark:!border-red-600' : ''}
             ${
               !currentMessage || currentMessage.pluginId === null
                 ? 'border-black/10 dark:border-gray-900/50'
@@ -328,8 +324,11 @@ export const ChatInput = ({
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent py-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none"
+            className={`m-0 w-full transition-all resize-none border-0 bg-transparent pt-3 pr-8 pl-10 text-black dark:bg-transparent dark:text-white outline-none`}
             style={{
+              marginBottom: `${
+                isCloseToTokenLimit || isOverTokenLimit ? '2.2' : '0.75'
+              }rem `,
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
@@ -345,6 +344,17 @@ export const ChatInput = ({
             onKeyUp={(e) => setIsTyping(e.nativeEvent.isComposing)}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+          />
+
+          <TokenCounter
+            className={` ${
+              isOverTokenLimit ? '!text-red-500 dark:text-red-600' : ''
+            } ${
+              isCloseToTokenLimit || isOverTokenLimit ? 'visible' : 'invisible'
+            } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
+            value={content}
+            setIsOverLimit={setIsOverTokenLimit}
+            setIsCloseToLimit={setIsCloseToTokenLimit}
           />
 
           <button

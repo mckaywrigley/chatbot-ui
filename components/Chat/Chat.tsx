@@ -32,7 +32,6 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-
 import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
 
 interface Props {
@@ -432,7 +431,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
                     <IconClearAll size={18} />
                   </button>
 
-                  {/* // TODO: to be tested */}
                   {selectedConversation && (
                     <StoreConversationButton
                       conversation={selectedConversation}
