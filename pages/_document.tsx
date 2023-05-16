@@ -25,6 +25,20 @@ export default function Document(props: Props) {
       <body>
         <Main />
         <NextScript />
+        {/* Ad Verification tag for Infolinks*/}
+        {process.env.NEXT_PUBLIC_ENV === 'production' && (
+        <>
+        <script type="text/javascript"
+            dangerouslySetInnerHTML={{
+              __html: `
+                var infolinks_pid = 3395445;
+                var infolinks_wsid = 0;
+              `
+            }}
+          />
+        <script type="text/javascript" src="http://resources.infolinks.com/js/infolinks_main.js"/>
+        </>
+        )}
       </body>
     </Html>
   );
