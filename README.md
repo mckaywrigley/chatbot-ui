@@ -12,22 +12,22 @@ See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=
 
 ## Updates
 
-Chatbot UI will be updated over time.
+**Work Completed:**
 
 - [x] Relational database support
 - [x] Multiple accounts support
 - [x] SSO Authentication support
 - [x] Customizable build-time extensions system
-- [x] chatbot-ui-local-storage extension
-- [x] chatbot-ui-authjs extension
-- [x] chatbot-ui-rdbms extension
+- [x] [@chatbot-ui/core](https://github.com/jorge-menjivar/chatbot-ui-core)
+- [x] [@chatbot-ui/local-storage](https://github.com/jorge-menjivar/chatbot-ui-local-storage) extension
+- [x] [@chatbot-ui/rdbms](https://github.com/jorge-menjivar/chatbot-ui-rdbms) extension
+- [x] [@chatbot-ui/supabase](https://github.com/jorge-menjivar/chatbot-ui-supabase) extension
 
-**Next up:**
+**Up Next:**
 
-- [ ] chatbot-ui-couchdb extension
-- [ ] chatbot-ui-mongodb extension
-- [ ] chatbot-ui-supabase extension
 - [ ] In-app plugin system
+- [ ] @chatbot-ui/couchdb extension
+- [ ] @chatbot-ui/mongodb extension
 
 ## Deploy
 
@@ -55,12 +55,11 @@ npm i
 
 Enable extensions by following the instructions in the README files of the extensions you want to use:
 
-- [chatbot-ui-local-storage](https://github.com/jorge-menjivar/chatbot-ui-local-storage) [pre-installed]
-- [chatbot-ui-authjs](https://github.com/jorge-menjivar/chatbot-ui-authjs) [pre-installed][turned off by default]
-- [chatbot-ui-rdbms](https://github.com/jorge-menjivar/chatbot-ui-rdbms)
-- chatbot-ui-couchdb [coming soon]
-- chatbot-ui-mongodb [coming soon]
-- chatbot-ui-supabase [coming soon]
+- [@chatbot-ui/local-storage](https://github.com/jorge-menjivar/chatbot-ui-local-storage) [pre-installed]
+- [@chatbot-ui/rdbms](https://github.com/jorge-menjivar/chatbot-ui-rdbms)
+- [@chatbot-ui/supabase](https://github.com/jorge-menjivar/chatbot-ui-supabase)
+- @chatbot-ui/couchdb [coming soon]
+- @chatbot-ui/mongodb [coming soon]
 
 ### Step 4. Run App
 
