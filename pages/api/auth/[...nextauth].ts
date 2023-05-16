@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           email: token.email,
           role: 'authenticated',
         };
-        session.supabaseAccessToken = jwt.sign(payload, signingSecret);
+        session.customAccessToken = jwt.sign(payload, signingSecret);
       }
       return session;
     },
