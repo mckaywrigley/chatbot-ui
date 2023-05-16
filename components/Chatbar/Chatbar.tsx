@@ -6,7 +6,12 @@ import { event } from 'nextjs-google-analytics';
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
+import {
+  getNonDeletedConversations,
+  saveConversation,
+  saveConversations,
+} from '@/utils/app/conversation';
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
@@ -27,8 +32,6 @@ import { ChatbarInitialState, initialState } from './Chatbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
-
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');
 
@@ -37,7 +40,14 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys, selectedConversation },
+    state: {
+      conversations,
+      showChatbar,
+      defaultModelId,
+      folders,
+      pluginKeys,
+      selectedConversation,
+    },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -108,8 +118,7 @@ export const Chatbar = () => {
     if (
       selectedConversation &&
       !history.some(
-        (conversation) =>
-          conversation.id === selectedConversation.id,
+        (conversation) => conversation.id === selectedConversation.id,
       )
     ) {
       homeDispatch({
@@ -153,9 +162,15 @@ export const Chatbar = () => {
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
-    );
+    const updatedConversations = conversations.map((c) => {
+      if (c.id === conversation.id) {
+        return {
+          ...c,
+          deleted: true,
+        };
+      }
+      return c;
+    });
 
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
@@ -185,7 +200,7 @@ export const Chatbar = () => {
 
       localStorage.removeItem('selectedConversation');
     }
-    updateConversationLastUpdatedAtTimeStamp();
+
     event('interaction', {
       category: 'Conversation',
       label: 'Delete Conversation',
@@ -210,18 +225,20 @@ export const Chatbar = () => {
     if (searchTerm) {
       chatDispatch({
         field: 'filteredConversations',
-        value: conversations.filter((conversation) => {
-          const searchable =
-            conversation.name.toLocaleLowerCase() +
-            ' ' +
-            conversation.messages.map((message) => message.content).join(' ');
-          return searchable.toLowerCase().includes(searchTerm.toLowerCase());
-        }),
+        value: getNonDeletedConversations(
+          conversations.filter((conversation) => {
+            const searchable =
+              conversation.name.toLocaleLowerCase() +
+              ' ' +
+              conversation.messages.map((message) => message.content).join(' ');
+            return searchable.toLowerCase().includes(searchTerm.toLowerCase());
+          }),
+        ),
       });
     } else {
       chatDispatch({
         field: 'filteredConversations',
-        value: conversations,
+        value: getNonDeletedConversations(conversations),
       });
     }
   }, [searchTerm, conversations]);

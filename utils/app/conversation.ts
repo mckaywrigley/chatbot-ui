@@ -3,48 +3,32 @@ import { ExportFormatV4 } from '@/types/export';
 import { LatestExportFormat } from '@/types/export';
 import { User, UserConversation } from '@/types/user';
 
-import { getExportableData, importData } from './importExport';
+import { cleanConversationHistory } from './clean';
+import { getExportableData, cleanData } from './importExport';
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import dayjs from 'dayjs';
 
-const pushConversations = async (
-  supabase: SupabaseClient,
-  user: User,
-  conversationPackage: ExportFormatV4,
-) => {
-  let storedConversations: UserConversation[] = [];
-  let operationError = null;
+export const getNonDeletedConversations = (
+  conversations: Conversation[],
+): Conversation[] => conversations.filter((c) => !c.deleted);
 
-  const { data: userConversations } = await supabase
-    .from('user_conversations')
-    .select('id')
-    .eq('uid', user.id);
+type ConversationCollectionHash = {
+  [id: string]: Conversation;
+};
 
-  if (userConversations && userConversations.length > 0) {
-    const userConversationsId = userConversations[0].id;
-    const { data, error } = await supabase
-      .from('user_conversations')
-      .update({
-        conversations: conversationPackage,
-        last_updated: dayjs().toString(),
-      })
-      .match({ id: userConversationsId });
-    storedConversations = data || [];
-    operationError = error;
-  } else {
-    const { data, error } = await supabase.from('user_conversations').insert({
-      uid: user.id,
-      conversations: conversationPackage,
-      last_updated: dayjs().toString(),
-    });
-    storedConversations = data || [];
-    operationError = error;
-  }
+// This function conversations to conversationHash in order to optimize run time
+const convertToConversationCollectionHash = (
+  conversations: Conversation[],
+): ConversationCollectionHash => {
+  const conversationHash: ConversationCollectionHash = {};
 
-  if (operationError) {
-    throw new Error(operationError.message);
-  }
+  conversations.forEach((conversation) => {
+    if (!conversation.id) return;
+    conversationHash[conversation.id] = { ...conversation };
+  });
+
+  return conversationHash;
 };
 
 export const updateConversation = (
@@ -68,7 +52,10 @@ export const updateConversation = (
   };
 };
 
-const pullConversations = async (supabase: SupabaseClient, user: User): Promise<LatestExportFormat | null> => {
+const getUserRemoteConversations = async (
+  supabase: SupabaseClient,
+  user: User,
+): Promise<LatestExportFormat | null> => {
   const { data: userConversations } = await supabase
     .from('user_conversations')
     .select('*')
@@ -77,11 +64,8 @@ const pullConversations = async (supabase: SupabaseClient, user: User): Promise<
   if (userConversations && userConversations.length > 0) {
     const storedConversationPackage = (userConversations[0] as UserConversation)
       .conversations;
-    importData(storedConversationPackage);
 
-    const { history, folders, prompts } = importData(
-      storedConversationPackage,
-    );
+    const { history, folders, prompts } = cleanData(storedConversationPackage);
 
     return {
       history,
@@ -93,49 +77,144 @@ const pullConversations = async (supabase: SupabaseClient, user: User): Promise<
   return null;
 };
 
+const updateUserRemoteConversations = async (
+  supabase: SupabaseClient,
+  user: User,
+  conversationPackage: LatestExportFormat,
+) => {
+  const { data: userConversations } = await supabase
+    .from('user_conversations')
+    .select('id')
+    .eq('uid', user.id);
+
+  if (userConversations && userConversations.length > 0) {
+    const userConversationsId = userConversations[0].id;
+    const { error } = await supabase
+      .from('user_conversations')
+      .update({
+        conversations: conversationPackage,
+      })
+      .match({ id: userConversationsId });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  } else {
+    const { data, error } = await supabase.from('user_conversations').insert({
+      uid: user.id,
+      conversations: conversationPackage,
+    });
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+};
+
+const mergeTwoConversations = (
+  localConversation: Conversation | null,
+  remoteConversation: Conversation | null,
+): Conversation | null => {
+  let mergedConversation: Conversation;
+
+  if (localConversation !== null && remoteConversation !== null) {
+    // Deleted attribute has the highest precedence
+    if (localConversation.deleted || remoteConversation.deleted) {
+      mergedConversation = { ...localConversation };
+      mergedConversation.messages = [];
+      mergedConversation.prompt = '';
+    } else {
+      // If both conversations are not deleted, then we compare the lastUpdateAtUTC
+      mergedConversation =
+        remoteConversation.lastUpdateAtUTC > localConversation.lastUpdateAtUTC
+          ? { ...remoteConversation }
+          : { ...localConversation };
+    }
+    return mergedConversation;
+  }
+
+  return localConversation !== null ? localConversation : remoteConversation;
+};
+
 export const syncConversations = async (
   supabase: SupabaseClient,
   user: User,
-  conversationLastUpdatedAt: string,
 ): Promise<LatestExportFormat | null> => {
-  // We use simple syncing here, basically who has the most recent data wins
-  const localLastUpdatedAt = dayjs(conversationLastUpdatedAt);
+  // TODO: Implement the same syncing mechanism for prompts
 
-  const { data: userConversations } = await supabase
-    .from('user_conversations')
-    .select('last_updated')
-    .eq('uid', user.id);
+  const remoteConversationObject = await getUserRemoteConversations(
+    supabase,
+    user,
+  );
+  let localConversationObject = getExportableData();
 
-  const remoteTimestamp = userConversations?.[0]
-    ? dayjs(userConversations?.[0]?.last_updated)
-    : null;
-  const exportableConversations = getExportableData();
+  let remoteConversations: Conversation[] = [];
+  let localConversations = cleanConversationHistory(
+    localConversationObject.history,
+  );
 
-  if (localLastUpdatedAt && remoteTimestamp) {
-    if (localLastUpdatedAt > remoteTimestamp) {
-      console.log('Local data is newer, pushing to remote');
-      await pushConversations(supabase, user, exportableConversations);
-      return null;
-    } else {
-      console.log('Remote data is newer, pulling from remote');
-      return await pullConversations(supabase, user);
+  if (remoteConversationObject) {
+    remoteConversations = cleanConversationHistory(
+      remoteConversationObject.history,
+    );
+  }
+
+  const localConversationHashes =
+    localConversations.length === 0
+      ? {}
+      : convertToConversationCollectionHash(localConversations);
+  const remoteConversationHashes =
+    remoteConversations.length === 0
+      ? {}
+      : convertToConversationCollectionHash(remoteConversations);
+
+  // Merge both remoteConversations and remoteConversations
+  let mergedConversationCollectionHash: ConversationCollectionHash = {};
+
+  remoteConversations.forEach((remoteConversation) => {
+    const mergedConversation = mergeTwoConversations(
+      localConversationHashes[remoteConversation.id] || null,
+      remoteConversation,
+    );
+    if (mergedConversation) {
+      mergedConversationCollectionHash[mergedConversation.id] =
+        mergedConversation;
     }
-  } else if (localLastUpdatedAt) {
-    console.log('Local data is newer, pushing to remote');
-    await pushConversations(supabase, user, exportableConversations);
-    return null
-  } else if (remoteTimestamp) {
-    console.log('Remote data is newer, pulling from remote');
-    return await pullConversations(supabase, user);
-  } else {
-    console.log('No data found, pushing to remote');
-    await pushConversations(supabase, user, exportableConversations);
+  });
+
+  localConversations.forEach((localConversation) => {
+    const mergedConversation = mergeTwoConversations(
+      localConversation,
+      remoteConversationHashes[localConversation.id] || null,
+    );
+    if (mergedConversation) {
+      mergedConversationCollectionHash[mergedConversation.id] =
+        mergedConversation;
+    }
+  });
+
+  const storableConversationExport: LatestExportFormat = {
+    history: Object.values(mergedConversationCollectionHash),
+    folders: localConversationObject.folders,
+    prompts: localConversationObject.prompts,
+    version: localConversationObject.version,
+  };
+
+  try {
+    await updateUserRemoteConversations(
+      supabase,
+      user,
+      storableConversationExport,
+    );
+
+    return storableConversationExport;
+  } catch (e) {
+    console.error(e);
     return null;
   }
 };
 
 export const updateConversationLastUpdatedAtTimeStamp = () => {
-  localStorage.setItem('conversationLastUpdatedAt', dayjs().toString());
+  localStorage.setItem('conversationLastUpdatedAt', dayjs().valueOf().toString());
 };
 
 export const saveConversation = (conversation: Conversation) => {

@@ -23,13 +23,17 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import { syncConversations, updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import {
+  syncConversations,
+  updateConversationLastUpdatedAtTimeStamp,
+} from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
+import { LatestExportFormat } from '@/types/export';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -51,7 +55,6 @@ import { HomeInitialState, initialState } from './home.state';
 
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
-import { LatestExportFormat } from '@/types/export';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -241,6 +244,10 @@ const Home = ({
       [data.key]: data.value,
     };
 
+    if (!updatedConversation.lastUpdateAtUTC) {
+      updatedConversation.lastUpdateAtUTC = dayjs().valueOf();
+    }
+
     const { single, all } = updateConversation(
       updatedConversation,
       conversations,
@@ -293,7 +300,7 @@ const Home = ({
           conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
         );
 
-        if(syncResult !== null){
+        if (syncResult !== null) {
           const { history, folders, prompts } = syncResult;
           dispatch({ field: 'conversations', value: history });
           dispatch({
@@ -303,7 +310,6 @@ const Home = ({
           dispatch({ field: 'folders', value: folders });
           dispatch({ field: 'prompts', value: prompts });
         }
-
       } catch (e) {
         dispatch({ field: 'syncSuccess', value: false });
         console.log('error', e);

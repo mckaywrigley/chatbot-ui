@@ -24,4 +24,6 @@ export interface Conversation {
   prompt: string;
   temperature: number;
   folderId: string | null;
+  lastUpdateAtUTC: number; // timestamp in UTC in milliseconds
+  deleted?: boolean;
 }

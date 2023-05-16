@@ -33,7 +33,7 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 
-import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
+import dayjs from 'dayjs';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -51,7 +51,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       modelError,
       loading,
       user,
-      isPaidUser,
       outputLanguage,
       currentMessage,
       messageIsStreaming
@@ -68,15 +67,12 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   );
 
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const { fetchAndUpdateCreditUsage } = useFetchCreditUsage();
 
   const logGaEvent = useCallback(
     (messageLength?: number) => {
@@ -239,6 +235,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             updatedConversation = {
               ...updatedConversation,
               messages: updatedMessages,
+              lastUpdateAtUTC: dayjs().valueOf(),
             };
             homeDispatch({
               field: 'selectedConversation',
@@ -259,6 +256,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             updatedConversation = {
               ...updatedConversation,
               messages: updatedMessages,
+              lastUpdateAtUTC: dayjs().valueOf(),
             };
             homeDispatch({
               field: 'selectedConversation',
@@ -266,6 +264,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             });
           }
         }
+        
         saveConversation(updatedConversation);
         const updatedConversations: Conversation[] = conversations.map(
           (conversation) => {
