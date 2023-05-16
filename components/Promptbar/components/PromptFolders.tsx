@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { FolderInterface } from '@chatbot-ui/core/types/folder';
 
 import HomeContext from '@/pages/api/home/home.context';
 

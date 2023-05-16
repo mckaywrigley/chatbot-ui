@@ -1,5 +1,5 @@
 import { PluginKey } from '@/types/plugin';
-import { User } from 'chatbot-ui-core/types/auth';
+import { User } from '@chatbot-ui/core/types/auth';
 
 export const localGetPluginKeys = (user: User) => {
   const itemName = `pluginKeys-${user.email}`;

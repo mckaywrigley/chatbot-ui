@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession as authjsServerSession } from 'next-auth';
 
-import { User } from 'chatbot-ui-core/types/auth';
-import { Session } from 'chatbot-ui-core/types/auth';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Session } from '@chatbot-ui/core/types/auth';
 
 import { authOptions } from '@/pages/api/auth/[...nextauth]';
 

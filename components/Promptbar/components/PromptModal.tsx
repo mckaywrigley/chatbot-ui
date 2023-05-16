@@ -2,7 +2,7 @@ import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 interface Props {
   prompt: Prompt;

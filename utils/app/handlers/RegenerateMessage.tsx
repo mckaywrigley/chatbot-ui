@@ -3,20 +3,20 @@ import toast from 'react-hot-toast';
 
 import { storageCreateMessage } from '@/utils/app/storage/message';
 import { saveSelectedConversation } from '@/utils/app/storage/selectedConversation';
+import { getTimestampWithTimezoneOffset } from '@chatbot-ui/core/utils/time';
 
 import { Plugin, PluginKey } from '@/types/plugin';
-import { User } from 'chatbot-ui-core/types/auth';
-import { Conversation, Message } from 'chatbot-ui-core/types/chat';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation, Message } from '@chatbot-ui/core/types/chat';
 
 import { sendChatRequest } from '../chat';
 import { storageDeleteMessages } from '../storage/messages';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const regenerateMessageHandler = async (
   user: User,
-  message: Message,
   plugin: Plugin | null = null,
   stopConversationRef: MutableRefObject<boolean>,
   selectedConversation: Conversation | undefined,
@@ -82,6 +82,7 @@ export const regenerateMessageHandler = async (
       id: assistantMessageId,
       role: 'assistant',
       content: '',
+      timestamp: getTimestampWithTimezoneOffset(),
     };
     if (!plugin) {
       homeDispatch({ field: 'loading', value: false });

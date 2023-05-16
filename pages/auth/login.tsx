@@ -4,7 +4,7 @@
 
 // import { getAuth } from '@/utils/app/extensions/auth';
 
-// import { Session } from 'chatbot-ui-core/types/auth';
+// import { Session } from '@chatbot-ui/core/types/auth';
 
 // import Header from '@/components/Auth/Header';
 

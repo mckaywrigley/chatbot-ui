@@ -1,4 +1,4 @@
-import { ChatBody, Message } from 'chatbot-ui-core/types/chat';
+import { ChatBody, Message } from '@chatbot-ui/core/types/chat';
 
 export interface GoogleBody extends ChatBody {
   googleAPIKey: string;

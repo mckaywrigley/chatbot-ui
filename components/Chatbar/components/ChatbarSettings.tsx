@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { localDeleteAPIKey } from '@/utils/app/storage/local/apiKey';
 import { localDeletePluginKeys } from '@/utils/app/storage/local/pluginKeys';
 import { deleteSelectedConversation } from '@/utils/app/storage/selectedConversation';
-import { AUTH_ENABLED } from 'chatbot-ui-core/utils/const';
+import { AUTH_ENABLED } from '@chatbot-ui/core/utils/const';
 
 import HomeContext from '@/pages/api/home/home.context';
 

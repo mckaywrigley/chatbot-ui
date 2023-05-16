@@ -3,9 +3,9 @@ import { Dispatch, createContext } from 'react';
 import { ActionType } from '@/hooks/useCreateReducer';
 
 import { KeyValuePair } from '@/types/data';
-import { Conversation } from 'chatbot-ui-core/types/chat';
-import { FolderType } from 'chatbot-ui-core/types/folder';
-import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
+import { Conversation } from '@chatbot-ui/core/types/chat';
+import { FolderType } from '@chatbot-ui/core/types/folder';
+import { SystemPrompt } from '@chatbot-ui/core/types/system-prompt';
 
 import { HomeInitialState } from './home.state';
 

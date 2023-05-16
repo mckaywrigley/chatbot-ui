@@ -1,7 +1,7 @@
-import { User } from 'chatbot-ui-core/types/auth';
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export const storageGetConversations = async (
   database: Database,

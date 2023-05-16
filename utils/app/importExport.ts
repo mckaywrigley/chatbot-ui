@@ -6,10 +6,10 @@ import {
   LatestExportFormat,
   SupportedExportFormats,
 } from '@/types/export';
-import { User } from 'chatbot-ui-core/types/auth';
-import { Conversation } from 'chatbot-ui-core/types/chat';
-import { FolderInterface } from 'chatbot-ui-core/types/folder';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation } from '@chatbot-ui/core/types/chat';
+import { FolderInterface } from '@chatbot-ui/core/types/folder';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import { cleanConversationHistory } from './clean';
 import {
@@ -17,12 +17,12 @@ import {
   storageUpdateConversations,
 } from './storage/conversations';
 import { storageGetFolders, storageUpdateFolders } from './storage/folders';
-import { storageCreateMessages } from './storage/messages';
+import { storageUpdateMessages } from './storage/messages';
 import { storageGetPrompts, storageUpdatePrompts } from './storage/prompts';
 import { saveSelectedConversation } from './storage/selectedConversation';
 import { deleteSelectedConversation } from './storage/selectedConversation';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -134,17 +134,15 @@ export const importData = async (
 
   await storageUpdateConversations(database, user, newHistory);
 
-  if (database.name === 'RDBMS') {
-    for (const conversation of history) {
-      if (conversation.messages.length > 0) {
-        storageCreateMessages(
-          database,
-          user,
-          conversation,
-          conversation.messages,
-          newHistory,
-        );
-      }
+  for (const conversation of history) {
+    if (conversation.messages.length > 0) {
+      storageUpdateMessages(
+        database,
+        user,
+        conversation,
+        conversation.messages,
+        newHistory,
+      );
     }
   }
   if (newHistory.length > 0) {

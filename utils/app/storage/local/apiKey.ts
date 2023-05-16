@@ -1,4 +1,4 @@
-import { User } from 'chatbot-ui-core/types/auth';
+import { User } from '@chatbot-ui/core/types/auth';
 
 export const localGetAPIKey = (user: User) => {
   const itemName = `apiKey-${user.email}`;

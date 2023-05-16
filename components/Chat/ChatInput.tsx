@@ -18,9 +18,11 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import { getTimestampWithTimezoneOffset } from '@chatbot-ui/core/utils/time';
+
 import { Plugin } from '@/types/plugin';
-import { Conversation, Message } from 'chatbot-ui-core/types/chat';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Conversation, Message } from '@chatbot-ui/core/types/chat';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -106,7 +108,12 @@ export const ChatInput = ({
     const messageId = uuidv4();
     onSend(
       selectedConversation,
-      { id: messageId, role: 'user', content },
+      {
+        id: messageId,
+        role: 'user',
+        content: content.trim(),
+        timestamp: getTimestampWithTimezoneOffset(),
+      },
       plugin,
     );
     setContent('');

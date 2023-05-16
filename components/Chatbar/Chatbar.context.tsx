@@ -4,11 +4,11 @@ import { ActionType } from '@/hooks/useCreateReducer';
 
 import { SupportedExportFormats } from '@/types/export';
 import { PluginKey } from '@/types/plugin';
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
 import { ChatbarInitialState } from './Chatbar.state';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export interface ChatbarContextProps {
   state: ChatbarInitialState;

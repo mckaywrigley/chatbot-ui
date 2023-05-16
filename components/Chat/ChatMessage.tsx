@@ -12,7 +12,7 @@ import { useTranslation } from 'next-i18next';
 
 import { storageDeleteMessages } from '@/utils/app/storage/messages';
 
-import { Conversation, Message } from 'chatbot-ui-core/types/chat';
+import { Conversation, Message } from '@chatbot-ui/core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 

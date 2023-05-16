@@ -58,14 +58,15 @@ import {
   storageUpdateSystemPrompt,
 } from '@/utils/app/storage/systemPrompt';
 import { storageGetSystemPrompts } from '@/utils/app/storage/systemPrompts';
+import { getTimestampWithTimezoneOffset } from '@chatbot-ui/core/utils/time';
 
 import { KeyValuePair } from '@/types/data';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Settings } from '@/types/settings';
-import { Conversation, Message } from 'chatbot-ui-core/types/chat';
-import { FolderType } from 'chatbot-ui-core/types/folder';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
-import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
+import { Conversation, Message } from '@chatbot-ui/core/types/chat';
+import { FolderType } from '@chatbot-ui/core/types/folder';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
+import { SystemPrompt } from '@chatbot-ui/core/types/system-prompt';
 
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
@@ -237,6 +238,7 @@ const Home = ({
       prompt: systemPrompt,
       temperature: DEFAULT_TEMPERATURE,
       folderId: null,
+      timestamp: getTimestampWithTimezoneOffset(),
     };
 
     const updatedConversations = storageCreateConversation(

@@ -1,6 +1,6 @@
-import { Conversation } from 'chatbot-ui-core/types/chat';
-import { FolderInterface } from 'chatbot-ui-core/types/folder';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Conversation } from '@chatbot-ui/core/types/chat';
+import { FolderInterface } from '@chatbot-ui/core/types/folder';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import { PluginKey } from './plugin';
 

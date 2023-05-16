@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import { PromptComponent } from './Prompt';
 

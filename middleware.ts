@@ -1,7 +1,7 @@
 import { withAuth } from 'next-auth/middleware';
 
-import { AUTH_ENABLED } from 'chatbot-ui-core/utils/const';
-import { dockerEnvVarFix } from 'chatbot-ui-core/utils/docker';
+import { AUTH_ENABLED } from '@chatbot-ui/core/utils/const';
+import { dockerEnvVarFix } from '@chatbot-ui/core/utils/docker';
 
 const getSecret = () => {
   if (!AUTH_ENABLED) {
@@ -14,6 +14,7 @@ const getSecret = () => {
 export default withAuth({
   callbacks: {
     async authorized({ token }) {
+      console.log('authorized', token);
       if (AUTH_ENABLED === false) {
         return true;
       }

@@ -1,5 +1,5 @@
 import { OpenAIModel } from '@/types/openai';
-import { Message } from 'chatbot-ui-core/types/chat';
+import { Message } from '@chatbot-ui/core/types/chat';
 
 import {
   OPENAI_API_HOST,

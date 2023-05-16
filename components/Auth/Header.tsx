@@ -2,7 +2,7 @@
 
 // import { getAuth } from '@/utils/app/extensions/auth';
 
-// import { Session } from 'chatbot-ui-core/types/auth';
+// import { Session } from '@chatbot-ui/core/types/auth';
 
 // // The approach used in this component shows how to build a sign in and sign out
 // // component that works on pages which support both client and server side

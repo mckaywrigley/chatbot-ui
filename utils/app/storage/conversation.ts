@@ -1,9 +1,9 @@
-import { User } from 'chatbot-ui-core/types/auth';
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
 import { saveSelectedConversation } from './selectedConversation';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export const storageCreateConversation = (
   database: Database,

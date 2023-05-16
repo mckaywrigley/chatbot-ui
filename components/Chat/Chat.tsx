@@ -16,7 +16,7 @@ import { regenerateMessageHandler } from '@/utils/app/handlers/RegenerateMessage
 import { sendHandlerFunction } from '@/utils/app/handlers/SendMessage';
 import { throttle } from '@/utils/data/throttle';
 
-import { Message } from 'chatbot-ui-core/types/chat';
+import { Message } from '@chatbot-ui/core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -344,7 +344,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               if (currentMessage) {
                 handleRegenerate(
                   user,
-                  currentMessage,
                   null,
                   stopConversationRef,
                   conversation,

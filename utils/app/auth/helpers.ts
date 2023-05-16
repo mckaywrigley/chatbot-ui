@@ -1,6 +1,6 @@
 import { getSession } from 'next-auth/react';
 
-import { Session, User } from 'chatbot-ui-core/types/auth';
+import { Session, User } from '@chatbot-ui/core/types/auth';
 
 export const getClientSession = async () => {
   const authjsSession = await getSession();

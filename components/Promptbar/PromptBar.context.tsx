@@ -2,7 +2,7 @@ import { Dispatch, createContext } from 'react';
 
 import { ActionType } from '@/hooks/useCreateReducer';
 
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import { PromptbarInitialState } from './Promptbar.state';
 

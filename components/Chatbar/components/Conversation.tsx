@@ -14,7 +14,7 @@ import {
   useState,
 } from 'react';
 
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 

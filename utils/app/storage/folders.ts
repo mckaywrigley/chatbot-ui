@@ -1,7 +1,7 @@
-import { User } from 'chatbot-ui-core/types/auth';
-import { FolderInterface } from 'chatbot-ui-core/types/folder';
+import { User } from '@chatbot-ui/core/types/auth';
+import { FolderInterface } from '@chatbot-ui/core/types/folder';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export const storageGetFolders = async (database: Database, user: User) => {
   return await database.getFolders(user);

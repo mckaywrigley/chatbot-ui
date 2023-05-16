@@ -1,5 +1,5 @@
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
 import {
   DEFAULT_SYSTEM_PROMPT,

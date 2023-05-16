@@ -1,5 +1,5 @@
-import { User } from 'chatbot-ui-core/types/auth';
-import { Conversation } from 'chatbot-ui-core/types/chat';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation } from '@chatbot-ui/core/types/chat';
 
 export const getSelectedConversation = (user: User) => {
   const itemName = `selectedConversation-${user.email}`;

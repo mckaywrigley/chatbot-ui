@@ -11,7 +11,7 @@ import {
 } from '@/utils/app/storage/prompt';
 
 import { OpenAIModels } from '@/types/openai';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 

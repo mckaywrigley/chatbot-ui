@@ -1,4 +1,4 @@
-import { User } from 'chatbot-ui-core/types/auth';
+import { User } from '@chatbot-ui/core/types/auth';
 
 export const localGetShowPromptBar = (user: User) => {
   const itemName = `showPromptbar-${user.email}`;

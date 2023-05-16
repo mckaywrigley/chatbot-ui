@@ -1,16 +1,16 @@
 import { getUser } from '@/utils/app/auth/helpers';
 import { getDatabase } from '@/utils/app/extensions/database';
 
-import { User } from '@/../chatbot-ui-core/types/auth';
 import { ErrorMessage } from '@/types/error';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
-import { Conversation, Message } from 'chatbot-ui-core/types/chat';
-import { FolderInterface } from 'chatbot-ui-core/types/folder';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
-import { SystemPrompt } from 'chatbot-ui-core/types/system-prompt';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Conversation, Message } from '@chatbot-ui/core/types/chat';
+import { FolderInterface } from '@chatbot-ui/core/types/folder';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
+import { SystemPrompt } from '@chatbot-ui/core/types/system-prompt';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export interface HomeInitialState {
   apiKey: string;

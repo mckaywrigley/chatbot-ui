@@ -1,7 +1,7 @@
-import { User } from 'chatbot-ui-core/types/auth';
-import { Prompt } from 'chatbot-ui-core/types/prompt';
+import { User } from '@chatbot-ui/core/types/auth';
+import { Prompt } from '@chatbot-ui/core/types/prompt';
 
-import { Database } from 'chatbot-ui-core';
+import { Database } from '@chatbot-ui/core';
 
 export const storageGetPrompts = async (database: Database, user: User) => {
   return await database.getPrompts(user);
