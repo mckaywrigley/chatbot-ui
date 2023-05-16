@@ -125,7 +125,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         const controller = new AbortController();
         const readerController = new ReadableStream({
           async start(controller: any) {
-            let timeoutId: any;
             let controllerClosed = false;
             try {
               await windowai.generateText(
@@ -144,18 +143,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     if(!res){
                       return;
                     }
-
                     controller.enqueue(
                       new TextEncoder().encode(res.message.content),
                     );
-                    clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => {
-                      controller.close();
-                      controllerClosed = true;
-                    }, 1500);
                   },
                 },
               );
+              controller.close()
             } catch (error) {
               console.error('Error during text generation:', error);
               homeDispatch({ field: 'loading', value: false });

@@ -79,7 +79,7 @@ export const WindowAIModels: Record<WindowAIModelID, OpenAIModel> = {
   },
   [WindowAIModelID.CustomOrLocal]: {
     id: WindowAIModelID.CustomOrLocal,
-    name: 'Local',
+    name: 'Custom / Local',
     maxLength: 24000,
     tokenLimit: 8000,
   },
