@@ -36,7 +36,7 @@ export default function Document(props: Props) {
               `
             }}
           />
-        <script type="text/javascript" src="http://resources.infolinks.com/js/infolinks_main.js"/>
+        <script type="text/javascript" async src="http://resources.infolinks.com/js/infolinks_main.js"/>
         </>
         )}
       </body>
