@@ -243,6 +243,7 @@ const Home = ({
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: DEFAULT_TEMPERATURE,
       folderId: null,
+      lastUpdateAtUTC: dayjs().valueOf(),
     };
 
     const updatedConversations = [...conversations, newConversation];
