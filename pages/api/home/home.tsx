@@ -317,17 +317,23 @@ const Home = ({
         const syncResult: LatestExportFormat | null = await syncConversations(
           supabase,
           user,
-          // Subtract 1 year to force sync
-          conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
         );
 
         if (syncResult !== null) {
           const { history, folders, prompts } = syncResult;
           dispatch({ field: 'conversations', value: history });
-          dispatch({
-            field: 'selectedConversation',
-            value: history[history.length - 1],
-          });
+          // skip if selected conversation is already in history
+          if (
+            selectedConversation &&
+            !history.some(
+              (conversation) => conversation.id === selectedConversation.id,
+            )
+          ) {
+            dispatch({
+              field: 'selectedConversation',
+              value: history[history.length - 1],
+            });
+          }
           dispatch({ field: 'folders', value: folders });
           dispatch({ field: 'prompts', value: prompts });
         }
