@@ -3,6 +3,7 @@ import {
   APPLE_CLIENT_SECRET,
   AUTH0_CLIENT_ID,
   AUTH0_CLIENT_SECRET,
+  AUTH0_ISSUER,
   COGNITO_CLIENT_ID,
   COGNITO_CLIENT_SECRET,
   DISCORD_CLIENT_ID,
@@ -60,6 +61,7 @@ export async function getProviders() {
       Auth0Provider({
         clientId: AUTH0_CLIENT_ID!,
         clientSecret: AUTH0_CLIENT_SECRET!,
+        issuer: AUTH0_ISSUER,
         authorization: authorization,
         allowDangerousEmailAccountLinking: true,
       }),
