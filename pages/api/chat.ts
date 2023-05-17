@@ -1,4 +1,4 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, LOG_INCOMING_MESSAGES, LOG_TRIM_MESSAGES } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
@@ -15,7 +15,15 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    let body = await req.json();
+    const { model, messages, key, prompt, temperature } = body as ChatBody;
+    if (LOG_INCOMING_MESSAGES === true) {
+      let chatBody = body as ChatBody;
+      if (LOG_TRIM_MESSAGES === true) {
+        chatBody.messages = chatBody.messages.slice(-1);
+      }
+      console.log('data', JSON.stringify(chatBody), 'user', req.headers.get('x-forwarded-user'));
+    }
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
