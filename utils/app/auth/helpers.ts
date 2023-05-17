@@ -18,6 +18,7 @@ export const getClientSession = async () => {
     const session: Session = {
       user: user,
       expires: authjsSession.expires,
+      customAccessToken: authjsSession.customAccessToken,
     };
 
     return session;

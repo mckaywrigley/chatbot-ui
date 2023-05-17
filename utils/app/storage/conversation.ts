@@ -11,6 +11,7 @@ export const storageCreateConversation = (
   newConversation: Conversation,
   allConversations: Conversation[],
 ) => {
+  console.log('user', user);
   const updatedConversations = [...allConversations, newConversation];
 
   database.createConversation(user, newConversation).then((success) => {
