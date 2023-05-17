@@ -63,12 +63,12 @@ const Sidebar = <T,>({
   return (
     <div
       className={`${isOpen ? 'w-[260px]' : 'w-0'} ${
-        side === 'left' ? 'mobile:left-0' : 'mobile:right-0'
-      } transition-all h-full ease-linear relative box-content mobile:fixed mobile:z-10`}
+        side === 'left' ? 'tablet:left-0' : 'tablet:right-0'
+      } transition-all h-full ease-linear relative box-content tablet:fixed tablet:z-10`}
     >
       <div
         className={`${
-          isOpen ? 'mobile:visible !bg-[#202123]/90' : ''
+          isOpen ? 'tablet:visible !bg-[#202123]/90' : ''
         } fixed invisible left-0 w-full h-full bg-transparent transition-all ease-linear`}
         onClick={toggleOpen}
       ></div>
@@ -149,7 +149,7 @@ const Sidebar = <T,>({
         onClick={toggleOpen}
         isOpen={isOpen}
         side={side}
-        className={`${showMobileButton ? '' : 'mobile:hidden'}`}
+        className={`${showMobileButton ? '' : ''}`}
       />
     </div>
   );
