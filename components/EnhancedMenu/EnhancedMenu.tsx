@@ -37,12 +37,12 @@ const EnhancedMenu = forwardRef<HTMLDivElement, EnhancedMenuProps>(
         setShowMenuDisplay(true);
         setTimeout(() => {
           setShowMenuAnimation(true);
-        }, 200);
+        }, 1);
       } else {
         setShowMenuAnimation(false);
         setTimeout(() => {
           setShowMenuDisplay(false);
-        }, 200);
+        }, 1);
       }
     }, [shouldShow]);
 

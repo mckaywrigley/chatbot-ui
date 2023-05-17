@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { savePrompts } from '@/utils/app/prompts';
 
@@ -30,10 +31,16 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
+    state: { prompts, defaultModelId, showChatbar, showPromptbar },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
+
+  const isMobileLayout = useMediaQuery('(max-width: 640px)');
+
+  const showMobileButtons = useMemo(() => {
+    return isMobileLayout && !showChatbar;
+  }, [isMobileLayout, showChatbar]);
 
   const {
     state: { searchTerm, filteredPrompts },
@@ -151,6 +158,7 @@ const Promptbar = () => {
         handleCreateItem={handleCreatePrompt}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
+        showMobileButton={showMobileButtons}
       />
     </PromptbarContext.Provider>
   );

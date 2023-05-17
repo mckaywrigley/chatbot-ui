@@ -37,3 +37,9 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+@media (max-width: 640px) {
+  .sm-hidden {
+    display: none;
+  }
+}
