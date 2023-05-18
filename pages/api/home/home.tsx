@@ -126,10 +126,10 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
-  const isMobileLayout = useMediaQuery('(max-width: 640px)');
+  const isTabletLayout = useMediaQuery('(max-width: 768px)');
   const handleSelectConversation = (conversation: Conversation) => {
     //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
     }
 
@@ -144,11 +144,11 @@ const Home = ({
   // SWITCH LAYOUT SHOULD CLOSE ALL SIDEBAR --------------------
 
   useEffect(() => {
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
       dispatch({ field: 'showPromptbar', value: false });
     }
-  }, [isMobileLayout]);
+  }, [isTabletLayout]);
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -224,7 +224,7 @@ const Home = ({
 
   const handleNewConversation = () => {
     //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
     }
 
@@ -606,14 +606,14 @@ const Home = ({
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
           style={{ height: containerHeight }}
         >
-          <div className="fixed top-0 w-full sm:hidden">
+          <div className="fixed top-0 w-full md:hidden">
             <Navbar
               selectedConversation={selectedConversation}
               onNewConversation={handleNewConversation}
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
+          <div className="flex h-full w-full pt-[48px] md:pt-0 overflow-x-hidden">
             <Chatbar />
 
             <div className="flex flex-1">
