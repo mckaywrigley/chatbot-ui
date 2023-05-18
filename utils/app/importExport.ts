@@ -8,6 +8,7 @@ import {
 } from '@/types/export';
 
 import { cleanConversationHistory } from './clean';
+import dayjs from 'dayjs';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
@@ -45,6 +46,7 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
         id: chatFolder.id.toString(),
         name: chatFolder.name,
         type: 'chat',
+        lastUpdateAtUTC: dayjs().valueOf(),
       })),
       prompts: [],
     };
