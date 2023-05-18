@@ -7,7 +7,12 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { saveConversation, saveConversations } from '@/utils/app/conversation';
+import {
+  getNonDeletedCollection,
+  saveConversation,
+  saveConversations,
+} from '@/utils/app/conversation';
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
@@ -39,10 +44,11 @@ export const Chatbar = () => {
     state: {
       conversations,
       showChatbar,
-      showPromptbar,
       defaultModelId,
       folders,
       pluginKeys,
+      showPromptbar,
+      selectedConversation,
     },
     dispatch: homeDispatch,
     handleCreateFolder,
@@ -121,10 +127,18 @@ export const Chatbar = () => {
       const { history, folders, prompts }: LatestExportFormat =
         importData(data);
       homeDispatch({ field: 'conversations', value: history });
-      homeDispatch({
-        field: 'selectedConversation',
-        value: history[history.length - 1],
-      });
+      // skip if selected conversation is already in history
+      if (
+        selectedConversation &&
+        !history.some(
+          (conversation) => conversation.id === selectedConversation.id,
+        )
+      ) {
+        homeDispatch({
+          field: 'selectedConversation',
+          value: history[history.length - 1],
+        });
+      }
       homeDispatch({ field: 'folders', value: folders });
       homeDispatch({ field: 'prompts', value: prompts });
     } catch (err) {
@@ -160,6 +174,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
+    updateConversationLastUpdatedAtTimeStamp();
     event('interaction', {
       category: 'Conversation',
       label: 'Clear conversations',
@@ -167,9 +182,15 @@ export const Chatbar = () => {
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter(
-      (c) => c.id !== conversation.id,
-    );
+    const updatedConversations = conversations.map((c) => {
+      if (c.id === conversation.id) {
+        return {
+          ...c,
+          deleted: true,
+        };
+      }
+      return c;
+    });
 
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
@@ -199,6 +220,7 @@ export const Chatbar = () => {
 
       localStorage.removeItem('selectedConversation');
     }
+
     event('interaction', {
       category: 'Conversation',
       label: 'Delete Conversation',
@@ -223,18 +245,20 @@ export const Chatbar = () => {
     if (searchTerm) {
       chatDispatch({
         field: 'filteredConversations',
-        value: conversations.filter((conversation) => {
-          const searchable =
-            conversation.name.toLocaleLowerCase() +
-            ' ' +
-            conversation.messages.map((message) => message.content).join(' ');
-          return searchable.toLowerCase().includes(searchTerm.toLowerCase());
-        }),
+        value: getNonDeletedCollection(
+          conversations.filter((conversation) => {
+            const searchable =
+              conversation.name.toLocaleLowerCase() +
+              ' ' +
+              conversation.messages.map((message) => message.content).join(' ');
+            return searchable.toLowerCase().includes(searchTerm.toLowerCase());
+          }),
+        ),
       });
     } else {
       chatDispatch({
         field: 'filteredConversations',
-        value: conversations,
+        value: getNonDeletedCollection(conversations),
       });
     }
   }, [searchTerm, conversations]);
