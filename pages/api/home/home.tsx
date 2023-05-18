@@ -25,9 +25,11 @@ import {
   updateConversation,
 } from '@/utils/app/conversation';
 import {
-  syncConversations,
   updateConversationLastUpdatedAtTimeStamp,
 } from '@/utils/app/conversation';
+import {
+  syncData
+} from '@/utils/app/sync';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
@@ -157,6 +159,7 @@ const Home = ({
       id: uuidv4(),
       name,
       type,
+      lastUpdateAtUTC: dayjs().valueOf(),
     };
 
     const updatedFolders = [...folders, newFolder];
@@ -315,7 +318,7 @@ const Home = ({
       try {
         dispatch({ field: 'syncingConversation', value: true });
 
-        const syncResult: LatestExportFormat | null = await syncConversations(
+        const syncResult: LatestExportFormat | null = await syncData(
           supabase,
           user,
         );
