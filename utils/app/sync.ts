@@ -218,8 +218,6 @@ export const syncData = async (
     version: localDataObject.version,
   };
 
-  console.log(storableConversationExport);
-
   try {
     await updateUserRemoteData(supabase, user, storableConversationExport);
 
