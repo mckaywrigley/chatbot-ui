@@ -19,7 +19,7 @@ export const SidebarToggleButton = ({
           side === 'right'
             ? 'left-0 translate-x-[-100%] tablet:!right-0 tablet:left-[unset]'
             : 'right-0 translate-x-[100%] tablet:!left-0 tablet:right-[unset]'
-        } z-50 top-0.5 transition-all ease-linear h-10 w-10  text-neutral-700 ${className} 
+        } z-50 top-0 transition-all ease-linear h-9 tablet:h-10 w-10  text-neutral-700 ${className} 
           tablet:fixed tablet:top-1 tablet:!translate-x-0 flex justify-center items-center 
         `}
         onClick={onClick}
