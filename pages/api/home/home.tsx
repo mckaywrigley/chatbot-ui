@@ -333,15 +333,16 @@ const Home = ({
           const { history, folders, prompts } = syncResult;
           dispatch({ field: 'conversations', value: history });
           // skip if selected conversation is already in history
+          const selectedConversationFromRemote = history.find(
+            (remoteConversation) => remoteConversation.id === selectedConversation?.id,
+          );
           if (
             selectedConversation &&
-            !history.some(
-              (conversation) => conversation.id === selectedConversation.id,
-            )
+            selectedConversationFromRemote
           ) {
             dispatch({
               field: 'selectedConversation',
-              value: history[history.length - 1],
+              value: selectedConversationFromRemote,
             });
           }
           dispatch({ field: 'folders', value: folders });
@@ -360,11 +361,11 @@ const Home = ({
       dispatch({ field: 'syncingConversation', value: false });
     };
 
-    // Sync if we haven't sync for more than 10 seconds or it is the first time syncing upon loading
+    // Sync if we haven't sync for more than 5 seconds or it is the first time syncing upon loading
     if (
       !forceSyncConversation &&
       ((conversationLastSyncAt &&
-        dayjs().diff(conversationLastSyncAt, 'seconds') < 10) ||
+        dayjs().diff(conversationLastSyncAt, 'seconds') < 5) ||
         !conversationLastUpdatedAt)
     )
       return;
