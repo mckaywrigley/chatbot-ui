@@ -2,9 +2,8 @@ import { Conversation } from '@/types/chat';
 
 import dayjs from 'dayjs';
 
-export const getNonDeletedConversations = (
-  conversations: Conversation[],
-): Conversation[] => conversations.filter((c) => !c.deleted);
+export const getNonDeletedCollection = (collection: any[]): any[] =>
+  collection.filter((c) => !c.deleted);
 
 export const updateConversation = (
   updatedConversation: Conversation,

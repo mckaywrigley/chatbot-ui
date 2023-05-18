@@ -1,6 +1,8 @@
 import { useContext } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
+import { getNonDeletedCollection } from '@/utils/app/conversation';
+
 import { FolderInterface } from '@/types/folder';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -50,7 +52,7 @@ export const ChatFolders = ({ searchTerm }: Props) => {
 
   return (
     <TransitionGroup className="flex w-full flex-col pt-2">
-      {folders
+      {getNonDeletedCollection(folders)
         .filter((folder) => folder.type === 'chat')
         .map((folder) => (
           <CSSTransition key={folder.id} timeout={500} classNames="item">

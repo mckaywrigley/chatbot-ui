@@ -169,7 +169,7 @@ export const syncData = async (
 
   let mergedHistory: Conversation[] = [];
   let mergedFolders: FolderInterface[] = [];
-  let mergedPrompt: Prompt[] = [];
+  let mergedPrompts: Prompt[] = [];
 
   const remoteDataObject = await getUserRemoteData(supabase, user);
   let localDataObject = getExportableData();
@@ -208,15 +208,15 @@ export const syncData = async (
     remotePrompts = remoteDataObject.prompts;
   }
 
-  mergedPrompt = mergeTwoMergeableCollections(
+  mergedPrompts = mergeTwoMergeableCollections(
     localPrompts,
     remotePrompts,
   ) as Prompt[];
 
   const storableConversationExport: LatestExportFormat = {
     history: mergedHistory,
-    folders: localDataObject.folders,
-    prompts: localDataObject.prompts,
+    folders: mergedFolders,
+    prompts: mergedPrompts,
     version: localDataObject.version,
   };
 

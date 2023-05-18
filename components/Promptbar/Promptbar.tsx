@@ -12,16 +12,16 @@ import { Prompt } from '@/types/prompt';
 import HomeContext from '@/pages/api/home/home.context';
 
 import { PromptFolders } from './components/PromptFolders';
-import { PromptbarSettings } from './components/PromptbarSettings';
 import { Prompts } from './components/Prompts';
 
 import Sidebar from '../Sidebar';
 import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
-import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import { updateConversationLastUpdatedAtTimeStamp, getNonDeletedCollection } from '@/utils/app/conversation';
 
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
@@ -61,6 +61,7 @@ const Promptbar = () => {
         content: '',
         model: OpenAIModels[defaultModelId],
         folderId: null,
+        lastUpdateAtUTC: dayjs().valueOf(),
       };
 
       const updatedPrompts = [...prompts, newPrompt];
@@ -74,7 +75,16 @@ const Promptbar = () => {
   };
 
   const handleDeletePrompt = (prompt: Prompt) => {
-    const updatedPrompts = prompts.filter((p) => p.id !== prompt.id);
+    const updatedPrompts = prompts.map((p) => {
+      if (p.id === prompt.id) {
+        return {
+          ...prompt,
+          deleted: true,
+        };
+      }
+      
+      return p;
+    });
 
     homeDispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
@@ -84,7 +94,10 @@ const Promptbar = () => {
   const handleUpdatePrompt = (prompt: Prompt) => {
     const updatedPrompts = prompts.map((p) => {
       if (p.id === prompt.id) {
-        return prompt;
+        return {
+          ...prompt,
+          lastUpdateAtUTC: dayjs().valueOf(),
+        };
       }
 
       return p;
@@ -115,7 +128,7 @@ const Promptbar = () => {
     if (searchTerm) {
       promptDispatch({
         field: 'filteredPrompts',
-        value: prompts.filter((prompt) => {
+        value: getNonDeletedCollection(prompts.filter((prompt) => {
           const searchable =
             prompt.name.toLowerCase() +
             ' ' +
@@ -123,10 +136,10 @@ const Promptbar = () => {
             ' ' +
             prompt.content.toLowerCase();
           return searchable.includes(searchTerm.toLowerCase());
-        }),
+        })),
       });
     } else {
-      promptDispatch({ field: 'filteredPrompts', value: prompts });
+      promptDispatch({ field: 'filteredPrompts', value: getNonDeletedCollection(prompts) });
     }
   }, [searchTerm, prompts]);
 

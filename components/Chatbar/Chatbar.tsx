@@ -8,7 +8,7 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
-  getNonDeletedConversations,
+  getNonDeletedCollection,
   saveConversation,
   saveConversations,
 } from '@/utils/app/conversation';
@@ -245,7 +245,7 @@ export const Chatbar = () => {
     if (searchTerm) {
       chatDispatch({
         field: 'filteredConversations',
-        value: getNonDeletedConversations(
+        value: getNonDeletedCollection(
           conversations.filter((conversation) => {
             const searchable =
               conversation.name.toLocaleLowerCase() +
@@ -258,7 +258,7 @@ export const Chatbar = () => {
     } else {
       chatDispatch({
         field: 'filteredConversations',
-        value: getNonDeletedConversations(conversations),
+        value: getNonDeletedCollection(conversations),
       });
     }
   }, [searchTerm, conversations]);

@@ -24,14 +24,10 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import {
-  updateConversationLastUpdatedAtTimeStamp,
-} from '@/utils/app/conversation';
-import {
-  syncData
-} from '@/utils/app/sync';
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { syncData } from '@/utils/app/sync';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
@@ -170,7 +166,16 @@ const Home = ({
   };
 
   const handleDeleteFolder = (folderId: string) => {
-    const updatedFolders = folders.filter((f) => f.id !== folderId);
+    const updatedFolders = folders.map((folder) => {
+      if (folder.id === folderId) {
+        return {
+          ...folder,
+          deleted: true,
+        };
+      }
+
+      return folder;
+    });
     dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
 
@@ -210,6 +215,7 @@ const Home = ({
         return {
           ...f,
           name,
+          lastUpdateAtUTC: dayjs().valueOf(),
         };
       }
 
