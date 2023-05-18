@@ -272,12 +272,8 @@ const Home = ({
   ) => {
     const updatedConversation = {
       ...conversation,
-      [data.key]: data.value,
+      [data.key]: data.value
     };
-
-    if (!updatedConversation.lastUpdateAtUTC) {
-      updatedConversation.lastUpdateAtUTC = dayjs().valueOf();
-    }
 
     const { single, all } = updateConversation(
       updatedConversation,
@@ -332,6 +328,12 @@ const Home = ({
         if (syncResult !== null) {
           const { history, folders, prompts } = syncResult;
           dispatch({ field: 'conversations', value: history });
+          dispatch({ field: 'folders', value: folders });
+          dispatch({ field: 'prompts', value: prompts });
+          saveConversations(history);
+          saveFolders(folders);
+          savePrompts(prompts);
+
           // skip if selected conversation is already in history
           const selectedConversationFromRemote = history.find(
             (remoteConversation) => remoteConversation.id === selectedConversation?.id,
@@ -345,8 +347,6 @@ const Home = ({
               value: selectedConversationFromRemote,
             });
           }
-          dispatch({ field: 'folders', value: folders });
-          dispatch({ field: 'prompts', value: prompts });
         }
       } catch (e) {
         dispatch({ field: 'syncSuccess', value: false });

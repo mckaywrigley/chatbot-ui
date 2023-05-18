@@ -11,7 +11,10 @@ export const updateConversation = (
 ) => {
   const updatedConversations = allConversations.map((c) => {
     if (c.id === updatedConversation.id) {
-      return updatedConversation;
+      return {
+        ...updatedConversation,
+        lastUpdateAtUTC: dayjs().valueOf(),
+      };
     }
 
     return c;

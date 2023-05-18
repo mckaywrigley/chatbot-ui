@@ -102,18 +102,18 @@ const mergeTwoObjects = (
   let mergedObject: MergeableObject;
 
   if (localObject !== null && remoteObject !== null) {
-    // Deleted attribute has the highest precedence
-    if (localObject.deleted || remoteObject.deleted) {
-      mergedObject = { ...localObject };
+
+    // If both conversations are not deleted, then we compare the lastUpdateAtUTC
+    mergedObject =
+      (remoteObject.lastUpdateAtUTC || 0) > (localObject.lastUpdateAtUTC || 0)
+        ? { ...remoteObject }
+        : { ...localObject };
+
+    if (localObject?.deleted === true || remoteObject?.deleted === true) {
+      mergedObject.deleted = true;
       if (cleanUpFunction) {
         mergedObject = cleanUpFunction(mergedObject);
       }
-    } else {
-      // If both conversations are not deleted, then we compare the lastUpdateAtUTC
-      mergedObject =
-        remoteObject.lastUpdateAtUTC > localObject.lastUpdateAtUTC
-          ? { ...remoteObject }
-          : { ...localObject };
     }
     return mergedObject;
   }
@@ -165,8 +165,6 @@ export const syncData = async (
   supabase: SupabaseClient,
   user: User,
 ): Promise<LatestExportFormat | null> => {
-  // TODO: Implement the same syncing mechanism for prompts
-
   let mergedHistory: Conversation[] = [];
   let mergedFolders: FolderInterface[] = [];
   let mergedPrompts: Prompt[] = [];
@@ -219,6 +217,8 @@ export const syncData = async (
     prompts: mergedPrompts,
     version: localDataObject.version,
   };
+
+  console.log(storableConversationExport);
 
   try {
     await updateUserRemoteData(supabase, user, storableConversationExport);
