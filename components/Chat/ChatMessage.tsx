@@ -205,7 +205,7 @@ export const ChatMessage: FC<Props> = memo(
                 )}
 
                 {!isEditing && (
-                  <div className="flex flex-row mt-2 md:mt-0">
+                  <div className="flex flex-row m-1">
                     <button
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit mr-1`}
                       onClick={toggleEditing}
@@ -281,7 +281,7 @@ export const ChatMessage: FC<Props> = memo(
                   >
                     {message.content}
                   </MemoizedReactMarkdown>
-                  <div className="flex">
+                  <div className="flex m-1">
                     {messagedCopied ? (
                       <IconCheck
                         size={20}
