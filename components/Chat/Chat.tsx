@@ -162,6 +162,20 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             done = doneReading;
             const chunkValue = decoder.decode(value);
             text += chunkValue;
+
+            // Extract code blocks from chunkValue
+            const codeBlocks = extractCodeBlocks(chunkValue);
+
+            // For each code block, send a request to your server
+            for (const codeBlock of codeBlocks) {
+              await fetch('/api/save-code', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'text/plain',
+                },
+                body: codeBlock,
+              });
+            }
             if (isFirst) {
               isFirst = false;
               const updatedMessages: Message[] = [
