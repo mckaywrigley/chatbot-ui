@@ -223,7 +223,7 @@ export const ChatMessage: FC<Props> = memo(
               </div>
             ) : (
               <div className="flex w-full flex-col md:flex-col md:justify-between">
-                <div className="flex flex-row">
+                <div className="flex flex-row justify-between tablet:flex-col">
                   <MemoizedReactMarkdown
                     className="prose dark:prose-invert"
                     remarkPlugins={[remarkGfm, remarkMath]}
