@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { useTranslation } from 'next-i18next';
 
@@ -48,7 +49,7 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
+    state: { selectedConversation, messageIsStreaming, prompts, hotkeys },
 
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -255,6 +256,16 @@ export const ChatInput = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
+
+  useHotkeys(
+    hotkeys.focusChatInput ?? '',
+    () => {
+      if (textareaRef && textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    },
+    [textareaRef],
+  );
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">

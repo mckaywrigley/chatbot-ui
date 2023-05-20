@@ -1,4 +1,14 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { IconX } from '@tabler/icons-react';
+import {
+  FC,
+  RefObject,
+  createRef,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+} from 'react';
+import { useRecordHotkeys } from 'react-hotkeys-hook';
 
 import { useTranslation } from 'next-i18next';
 
@@ -6,7 +16,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import { getSettings, saveSettings } from '@/utils/app/settings';
 
-import { Settings } from '@/types/settings';
+import { HotkeySettings, Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -14,6 +24,18 @@ interface Props {
   open: boolean;
   onClose: () => void;
 }
+
+interface HotkeyMenu {
+  key: keyof HotkeySettings;
+  name: string;
+}
+const hotkeyMenus = [
+  { key: 'newConversation', name: 'New Conversation' },
+  { key: 'focusChatInput', name: 'Focus Chat Input' },
+  { key: 'deleteConversation', name: 'Delete Conversation' },
+  { key: 'toggleChatBar', name: 'Toggle Chat Bar' },
+  { key: 'togglePromptBar', name: 'Toggle Prompt Bar' },
+] as HotkeyMenu[];
 
 export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('settings');
@@ -23,6 +45,12 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   });
   const { dispatch: homeDispatch } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
+  const hotkeyRefs = useRef<RefObject<HTMLInputElement>[]>([]);
+  hotkeyMenus.forEach(
+    (_, i) => (hotkeyRefs.current[i] = createRef<HTMLInputElement>()),
+  );
+
+  const [keys, { start, stop, isRecording }] = useRecordHotkeys();
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -45,7 +73,17 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
   const handleSave = () => {
     homeDispatch({ field: 'lightMode', value: state.theme });
-    saveSettings(state);
+
+    // Convert hotkey meenus to object.
+    const hotkeys = hotkeyMenus.reduce((acc, { key }, index) => {
+      const ref = hotkeyRefs.current[index];
+      const hotkey = ref.current?.value ?? '';
+      return { ...acc, ...{ [key]: hotkey } };
+    }, {} as HotkeySettings);
+    dispatch({ field: 'hotkeys', value: hotkeys });
+    homeDispatch({ field: 'hotkeys', value: hotkeys });
+
+    saveSettings({ ...state, ...{ hotkeys } });
   };
 
   // Render nothing if the dialog is not open.
@@ -86,6 +124,53 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
               <option value="dark">{t('Dark mode')}</option>
               <option value="light">{t('Light mode')}</option>
             </select>
+
+            <div className="text-sm font-bold my-2 text-black dark:text-neutral-200">
+              {t('Hotkey settings')}
+            </div>
+
+            <table className="w-full table ">
+              <tbody>
+                {hotkeyMenus.map(({ key, name }, index) => {
+                  return (
+                    <tr key={key}>
+                      <th className="text-sm font-bold p-2 text-black dark:text-neutral-200">
+                        {t(name)}
+                      </th>
+                      <td>
+                        <input
+                          className="m-0 w-full rounded-md border bg-transparent p-2 text-black dark:bg-transparent dark:text-white"
+                          defaultValue={state.hotkeys[key] ?? ''}
+                          ref={hotkeyRefs.current[index]}
+                          onFocus={() => {
+                            start();
+                          }}
+                          onBlur={() => {
+                            stop();
+                          }}
+                          onKeyUp={(e) => {
+                            hotkeyRefs.current[index].current!.value =
+                              Array.from(keys).join('+');
+                            stop();
+                            e.currentTarget.blur();
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <IconX
+                          className="mx-auto min-w-[20px] text-black dark:text-neutral-200"
+                          size={18}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            hotkeyRefs.current[index].current!.value = '';
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
             <button
               type="button"

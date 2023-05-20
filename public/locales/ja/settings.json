@@ -3,5 +3,11 @@
   "Theme": "テーマ",
   "Save": "保存",
   "Dark mode": "ダークモード",
-  "Light mode": "ライトモード"
+  "Light mode": "ライトモード",
+  "Hotkey settings": "ホットキーの設定",
+  "New Convrsation": "新規チャット",
+  "Focus Chat Input": "チャット入力欄にフォーカス",
+  "Delete Conversation": "チャットを削除",
+  "Toggle Chat Bar": "チャット一覧の開閉",
+  "Toggle Prompt Bar": "プロンプト一覧の開閉"
 }

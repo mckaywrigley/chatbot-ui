@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { useTranslation } from 'next-i18next';
 
@@ -34,7 +35,15 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: {
+      conversations,
+      showChatbar,
+      defaultModelId,
+      folders,
+      pluginKeys,
+      selectedConversation,
+      hotkeys,
+    },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -205,6 +214,24 @@ export const Chatbar = () => {
       });
     }
   }, [searchTerm, conversations]);
+
+  useHotkeys(
+    hotkeys.deleteConversation ?? '',
+    () => {
+      if (!selectedConversation) return;
+
+      if (conversations.length === 0) return;
+
+      if (window.confirm(t('Delete selected conversation?')!)) {
+        handleDeleteConversation(selectedConversation);
+      }
+    },
+    [handleDeleteConversation],
+  );
+
+  useHotkeys(hotkeys.toggleChatBar ?? '', handleToggleChatbar, [
+    handleToggleChatbar,
+  ]);
 
   return (
     <ChatbarContext.Provider

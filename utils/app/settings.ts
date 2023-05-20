@@ -1,10 +1,13 @@
 import { Settings } from '@/types/settings';
 
+import { initialHotkeys } from './hotkey';
+
 const STORAGE_KEY = 'settings';
 
 export const getSettings = (): Settings => {
   let settings: Settings = {
     theme: 'dark',
+    hotkeys: initialHotkeys,
   };
   const settingsJson = localStorage.getItem(STORAGE_KEY);
   if (settingsJson) {
