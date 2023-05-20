@@ -133,6 +133,25 @@ export const ChatMessage: FC<Props> = memo(
       }
     }, [isEditing]);
 
+    const CopyButton = ({ className = '' }: { className?: string }) => {
+      if (messagedCopied) {
+        return (
+          <IconCheck
+            size={20}
+            className="text-green-500 dark:text-green-400 h-fit"
+          />
+        );
+      } else {
+        return (
+          <button
+            className={`translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit ${className}`}
+            onClick={copyOnClick}
+          >
+            <IconCopy size={20} />
+          </button>
+        );
+      }
+    };
     return (
       <div
         className={`group px-4 ${
@@ -222,8 +241,9 @@ export const ChatMessage: FC<Props> = memo(
                 )}
               </div>
             ) : (
-              <div className="flex w-full flex-col md:flex-col md:justify-between">
-                <div className="flex flex-row justify-between tablet:flex-col">
+              // DOING: change from flex to grid
+              <div className="flex w-full flex-col md:justify-between">
+                <div className="flex flex-row justify-between">
                   <MemoizedReactMarkdown
                     className="prose dark:prose-invert"
                     remarkPlugins={[remarkGfm, remarkMath]}
@@ -281,20 +301,8 @@ export const ChatMessage: FC<Props> = memo(
                   >
                     {message.content}
                   </MemoizedReactMarkdown>
-                  <div className="flex m-1">
-                    {messagedCopied ? (
-                      <IconCheck
-                        size={20}
-                        className="text-green-500 dark:text-green-400 h-fit"
-                      />
-                    ) : (
-                      <button
-                        className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit"
-                        onClick={copyOnClick}
-                      >
-                        <IconCopy size={20} />
-                      </button>
-                    )}
+                  <div className="flex m-1 tablet:hidden">
+                    <CopyButton />
                   </div>
                 </div>
                 {displayFooterButtons && (
@@ -304,6 +312,9 @@ export const ChatMessage: FC<Props> = memo(
                         <SpeechButton inputText={message.content} />
                       )}
                       <FeedbackContainer conversation={conversation} />
+                      <div className="m-1 hidden tablet:flex">
+                        <CopyButton className="translate-x-[unset] !text-gray-500 hover:!text-gray-300" />
+                      </div>
                     </div>
                     <CreditCounter pluginId={message.pluginId} />
                   </div>
