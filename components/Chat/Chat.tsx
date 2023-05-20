@@ -29,10 +29,9 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
-import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { ModelSelect } from './ModelSelect';
+import { TemperatureSlider } from './Temperature';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -137,8 +136,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           return;
         }
         if (!plugin) {
-          if (updatedConversation.messages.length === 1) {
-            const { content } = message;
+          const userMessages = updatedConversation.messages.filter(
+            (m) => m.role === 'user',
+          );
+          if (userMessages.length === 1) {
+            const { content } = userMessages[0];
             const customName =
               content.length > 30 ? content.substring(0, 30) + '...' : content;
             updatedConversation = {
@@ -253,6 +255,19 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       stopConversationRef,
     ],
   );
+
+  useEffect(() => {
+    if (selectedConversation?.messages.length === 0) {
+      handleSend(
+        {
+          role: 'system',
+          content:
+            'introduce yourself and mention what kind of questions you can answer',
+        },
+        0,
+      );
+    }
+  }, [selectedConversation, handleSend]);
 
   const scrollToBottom = useCallback(() => {
     if (autoScrollEnabled) {
@@ -412,17 +427,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   {models.length > 0 && (
                     <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                       <ModelSelect />
-
-                      <SystemPrompt
-                        conversation={selectedConversation}
-                        prompts={prompts}
-                        onChangePrompt={(prompt) =>
-                          handleUpdateConversation(selectedConversation, {
-                            key: 'prompt',
-                            value: prompt,
-                          })
-                        }
-                      />
 
                       <TemperatureSlider
                         label={t('Temperature')}

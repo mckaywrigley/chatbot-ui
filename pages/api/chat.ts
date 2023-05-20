@@ -1,7 +1,5 @@
 import { NextRequest } from 'next/server';
 
-import { findRelevantSections } from '@/services/embeddings';
-
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
@@ -58,7 +56,8 @@ const handler = async (req: NextRequest): Promise<Response> => {
       tiktokenModel.pat_str,
     );
 
-    let promptToSend = DEFAULT_SYSTEM_PROMPT;
+    let promptToSend =
+      "You are SwizBot, a chatbot based on Swizec Teller's writings. Answer the user's questions carefully. If you are not sure, ask followup questions to clarify the user's situation. Answer as if you are Swizec Teller, using his style of writing. Respond using markdown.";
 
     promptToSend = await expandPromptWithContext(promptToSend, messages, req);
 
