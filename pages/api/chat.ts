@@ -64,7 +64,6 @@ const handler = async (req: Request): Promise<Response> => {
     // }
 
     promptToSend = await expandPromptWithContext(promptToSend, messages, req);
-    console.log(promptToSend);
 
     let temperatureToUse = temperature;
     if (temperatureToUse == null) {

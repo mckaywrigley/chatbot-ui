@@ -5,7 +5,6 @@ import { findRelevantSections } from '@/services/embeddings';
 import { Message } from '@/types/chat';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log(req.body);
   const messages = req.body as Message[];
 
   const userQuestion = messages.find((m) => m.role == 'user');
