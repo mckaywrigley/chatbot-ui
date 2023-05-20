@@ -19,6 +19,8 @@ import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import TokenCounter from './components/TokenCounter';
+
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { CreditCounter } from './CreditCounter';
@@ -50,6 +52,8 @@ export const ChatMessage: FC<Props> = memo(
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
+    const [isOverTokenLimit, setIsOverTokenLimit] = useState(false);
+    const [isCloseToTokenLimit, setIsCloseToTokenLimit] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -178,10 +182,16 @@ export const ChatMessage: FC<Props> = memo(
             {message.role === 'user' ? (
               <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {isEditing ? (
-                  <div className="flex w-full flex-col">
+                  <div
+                    className={`flex w-full flex-col relative ${
+                      isOverTokenLimit
+                        ? 'before:z-0 before:absolute before:border-2 before:border-red-500 before:dark:border-red-600 before:-top-3 before:-bottom-3 before:-inset-3'
+                        : ''
+                    }`}
+                  >
                     <textarea
                       ref={textareaRef}
-                      className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541] focus:outline-none"
+                      className="relative z-1 w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541] focus:outline-none"
                       value={messageContent}
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
@@ -198,11 +208,13 @@ export const ChatMessage: FC<Props> = memo(
                       }}
                     />
 
-                    <div className="mt-10 flex justify-center space-x-4">
+                    <div className="relative z-1 mt-10 flex justify-center space-x-4">
                       <button
                         className="h-[40px] rounded-md bg-blue-500 px-4 py-1 text-sm font-medium text-white enabled:hover:bg-blue-600 disabled:opacity-50"
                         onClick={handleEditMessage}
-                        disabled={messageContent.trim().length <= 0}
+                        disabled={
+                          messageContent.trim().length <= 0 || isOverTokenLimit
+                        }
                       >
                         {t('Save & Submit')}
                       </button>
@@ -216,6 +228,20 @@ export const ChatMessage: FC<Props> = memo(
                         {t('Cancel')}
                       </button>
                     </div>
+                    <TokenCounter
+                      className={` ${
+                        isOverTokenLimit
+                          ? '!text-red-500 dark:text-red-600'
+                          : ''
+                      } ${
+                        isCloseToTokenLimit || isOverTokenLimit
+                          ? 'visible'
+                          : 'invisible'
+                      } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
+                      value={messageContent}
+                      setIsOverLimit={setIsOverTokenLimit}
+                      setIsCloseToLimit={setIsCloseToTokenLimit}
+                    />
                   </div>
                 ) : (
                   <div className="prose whitespace-pre-wrap dark:prose-invert">
