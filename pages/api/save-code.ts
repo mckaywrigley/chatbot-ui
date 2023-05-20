@@ -2,16 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 
-export function generateFileName(codeBlock: string): string { 
-  const timestamp = Date.now();
-  return `codeBlock-${timestamp}.txt`;
-}
-
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const code = req.body;
-    const fileName = generateFileName();
+    const { code, fileName } = req.body;
     const filePath = path.join(process.cwd(), 'code-snippets', `${fileName}.txt`);
 
     fs.writeFile(filePath, code, (err) => {
