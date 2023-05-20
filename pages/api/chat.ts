@@ -27,6 +27,9 @@ async function expandPromptWithContext(
   // @ts-expect-error
   const { origin } = absoluteUrl(req, 'localhost:3000');
 
+  console.log(typeof messages);
+  console.log(messages);
+
   const context: Doc[] = await fetch(`${origin}/api/documentContext`, {
     method: 'POST',
     headers: {
