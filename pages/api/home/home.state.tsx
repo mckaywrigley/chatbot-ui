@@ -1,9 +1,12 @@
+import { initialHotkeys } from '@/utils/app/hotkey';
+
 import { Conversation, Message } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { HotkeySettings } from '@/types/settings';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -27,6 +30,7 @@ export interface HomeInitialState {
   defaultModelId: OpenAIModelID | undefined;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
+  hotkeys: HotkeySettings;
 }
 
 export const initialState: HomeInitialState = {
@@ -51,4 +55,5 @@ export const initialState: HomeInitialState = {
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
+  hotkeys: initialHotkeys,
 };

@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
@@ -28,7 +29,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
+    state: { prompts, defaultModelId, showPromptbar, hotkeys },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -115,6 +116,10 @@ const Promptbar = () => {
       promptDispatch({ field: 'filteredPrompts', value: prompts });
     }
   }, [searchTerm, prompts]);
+
+  useHotkeys(hotkeys.togglePromptBar ?? '', handleTogglePromptbar, [
+    handleTogglePromptbar,
+  ]);
 
   return (
     <PromptbarContext.Provider

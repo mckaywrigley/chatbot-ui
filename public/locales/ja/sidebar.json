@@ -10,5 +10,6 @@
   "Export data": "会話履歴をエクスポート",
   "Dark mode": "ダークモード",
   "Light mode": "ライトモード",
-  "Settings": "設定"
+  "Settings": "設定",
+  "Delete selected conversation?": "選択した会話を削除しますか？"
 }
