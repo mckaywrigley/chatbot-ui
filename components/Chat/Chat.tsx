@@ -178,7 +178,9 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          toast.error(
+            response.statusText || t('Unknown error, please contact support'),
+          );
 
           // remove the last message from the conversation
           homeDispatch({
