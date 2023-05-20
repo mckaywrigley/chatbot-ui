@@ -18,6 +18,7 @@ export const config = {
 type Doc = { title: string; content: string };
 
 function getDomain(req: Request) {
+  console.log(req);
   const url = new URL(req.url);
   return url.origin || 'localhost:3000';
 }
