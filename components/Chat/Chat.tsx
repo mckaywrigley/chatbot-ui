@@ -68,6 +68,22 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+
+  function extractCodeBlocks(text: string): string[] {
+    // This regular expression matches text enclosed in backticks (`),
+    // which is a common way to denote code blocks in markdown.
+    const regex = /`([^`]+)`/g;
+  
+    let match;
+    const codeBlocks: string[] = [];
+  
+    while ((match = regex.exec(text)) !== null) {
+      codeBlocks.push(match[1]);
+    }
+  
+    return codeBlocks;
+  }
+  
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
       if (selectedConversation) {
