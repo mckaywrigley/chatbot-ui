@@ -13,6 +13,8 @@ const LoginPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (username === '123' && password === '123') {
+      // set a flag in LocalStorage
+      localStorage.setItem('isLoggedIn', 'true');
       // Redirect to the home page using Next.js's router
       router.push('/');
     } else {

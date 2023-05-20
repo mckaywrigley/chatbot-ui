@@ -41,6 +41,8 @@ import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { useRouter } from 'next/router';
+
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
@@ -52,6 +54,7 @@ const Home = ({
   serverSidePluginKeysSet,
   defaultModelId,
 }: Props) => {
+  const router = useRouter();
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
@@ -75,6 +78,14 @@ const Home = ({
   } = contextValue;
 
   const stopConversationRef = useRef<boolean>(false);
+
+  useEffect(() => {
+      // Redirect to login page if user is not logged in
+      if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') !== 'true') {
+        router.push('/login');
+      }
+    }, []); // Empty dependency array means this effect runs once on mount
+
 
   const { data, error, refetch } = useQuery(
     ['GetModels', apiKey, serverSideApiKeyIsSet],
