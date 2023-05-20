@@ -6,7 +6,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => { // Specify the type for 'event' parameter
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // Check if the entered credentials are correct
@@ -31,7 +31,7 @@ function LoginPage() {
           <label>Password:</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
-        <button type="submit">Log In</button>
+        <button type="submit">Log In</button> {/* Button element for login */}
       </form>
     </div>
   );
