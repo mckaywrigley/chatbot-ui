@@ -30,6 +30,7 @@ async function expandPromptWithContext(
   console.log(typeof messages);
   console.log(messages);
   console.log(origin);
+  console.log(req.url);
 
   const context: Doc[] = await fetch(`${origin}/api/documentContext`, {
     method: 'POST',
