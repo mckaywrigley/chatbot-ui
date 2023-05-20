@@ -2,9 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 
-export default async function generateFileName(codeBlock: string): string {
-  // This is a very basic implementation. You might want to generate
-  // more meaningful names based on the content of the code block.
+export function generateFileName(codeBlock: string): string { 
   const timestamp = Date.now();
   return `codeBlock-${timestamp}.txt`;
 }
@@ -13,7 +11,7 @@ export default async function generateFileName(codeBlock: string): string {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const code = req.body;
-    const fileName = generateFileName(); // Implement this function to generate a unique file name for each code snippet
+    const fileName = generateFileName();
     const filePath = path.join(process.cwd(), 'code-snippets', `${fileName}.txt`);
 
     fs.writeFile(filePath, code, (err) => {
