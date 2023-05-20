@@ -1,5 +1,3 @@
-import absoluteUrl from 'next-absolute-url';
-
 import { findRelevantSections } from '@/services/embeddings';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
@@ -19,18 +17,18 @@ export const config = {
 
 type Doc = { title: string; content: string };
 
+function getDomain(req: Request) {
+  const url = new URL(req.url);
+  return url.origin || 'localhost:3000';
+}
+
 async function expandPromptWithContext(
   prompt: string,
   messages: Message[],
   req: Request,
 ): Promise<string> {
   // @ts-expect-error
-  const { origin } = absoluteUrl(req, 'localhost:3000');
-
-  console.log(typeof messages);
-  console.log(messages);
-  console.log(origin);
-  console.log(req.url);
+  const { origin } = getDomain(req);
 
   const context: Doc[] = await fetch(`${origin}/api/documentContext`, {
     method: 'POST',
@@ -64,9 +62,6 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     let promptToSend = DEFAULT_SYSTEM_PROMPT;
-    // if (!promptToSend) {
-    //   promptToSend = DEFAULT_SYSTEM_PROMPT;
-    // }
 
     promptToSend = await expandPromptWithContext(promptToSend, messages, req);
 
