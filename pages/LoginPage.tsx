@@ -6,7 +6,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => { // Specify the type for 'event' parameter
     event.preventDefault();
 
     // Check if the entered credentials are correct

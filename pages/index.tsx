@@ -4,7 +4,7 @@ import Link from 'next/link';
 import LoginPage from './LoginPage';
 
 function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Change the initial value to true
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Change the initial value to false
 
   // Check if the user is logged in
   if (isLoggedIn) {
