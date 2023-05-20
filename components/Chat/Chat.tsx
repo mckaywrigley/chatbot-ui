@@ -467,21 +467,23 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   </div>
                 )}
 
-                {selectedConversation?.messages.map((message, index) => (
-                  <MemoizedChatMessage
-                    key={index}
-                    message={message}
-                    messageIndex={index}
-                    onEdit={(editedMessage) => {
-                      setCurrentMessage(editedMessage);
-                      // discard edited message and the ones that come after then resend
-                      handleSend(
-                        editedMessage,
-                        selectedConversation?.messages.length - index,
-                      );
-                    }}
-                  />
-                ))}
+                {selectedConversation?.messages
+                  .filter((m) => m.role !== 'system')
+                  .map((message, index) => (
+                    <MemoizedChatMessage
+                      key={index}
+                      message={message}
+                      messageIndex={index}
+                      onEdit={(editedMessage) => {
+                        setCurrentMessage(editedMessage);
+                        // discard edited message and the ones that come after then resend
+                        handleSend(
+                          editedMessage,
+                          selectedConversation?.messages.length - index,
+                        );
+                      }}
+                    />
+                  ))}
 
                 {loading && <ChatLoader />}
 
