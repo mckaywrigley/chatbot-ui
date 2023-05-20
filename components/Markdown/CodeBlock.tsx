@@ -1,10 +1,9 @@
 import { IconCheck, IconClipboard, IconDownload } from '@tabler/icons-react';
 import { FC, memo, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-
+import { onedark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { useTranslation } from 'next-i18next';
-
+import axios from 'axios';
 import {
   generateRandomString,
   programmingLanguages,
@@ -17,7 +16,7 @@ interface Props {
 
 export const CodeBlock: FC<Props> = memo(({ language, value }) => {
   const { t } = useTranslation('markdown');
-  const [isCopied, setIsCopied] = useState<Boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const copyToClipboard = () => {
     if (!navigator.clipboard || !navigator.clipboard.writeText) {
@@ -32,33 +31,15 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
       }, 2000);
     });
   };
-  const downloadAsFile = () => {
-    const fileExtension = programmingLanguages[language] || '.file';
-    const suggestedFileName = `file-${generateRandomString(
-      3,
-      true,
-    )}${fileExtension}`;
-    const fileName = window.prompt(
-      t('Enter file name') || '',
-      suggestedFileName,
-    );
 
-    if (!fileName) {
-      // user pressed cancel on prompt
-      return;
+  const saveCodeToServer = async () => {
+    try {
+      await axios.post('save-code.ts', { code: value });
+    } catch (err) {
+      console.error(err);
     }
-
-    const blob = new Blob([value], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = url;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
+
   return (
     <div className="codeblock relative font-sans text-[16px]">
       <div className="flex items-center justify-between py-1.5 px-4">
@@ -74,7 +55,7 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
           </button>
           <button
             className="flex items-center rounded bg-none p-1 text-xs text-white"
-            onClick={downloadAsFile}
+            onClick={saveCodeToServer}
           >
             <IconDownload size={18} />
           </button>
@@ -83,7 +64,7 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
 
       <SyntaxHighlighter
         language={language}
-        style={oneDark}
+        style={onedark}
         customStyle={{ margin: 0 }}
       >
         {value}
