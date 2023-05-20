@@ -1,3 +1,5 @@
+import { NextRequest } from 'next/server';
+
 import { findRelevantSections } from '@/services/embeddings';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
@@ -17,27 +19,21 @@ export const config = {
 
 type Doc = { title: string; content: string };
 
-function getDomain(req: Request) {
-  console.log(req);
-  const url = new URL(req.url);
-  return url.origin || 'localhost:3000';
-}
-
 async function expandPromptWithContext(
   prompt: string,
   messages: Message[],
-  req: Request,
+  req: NextRequest,
 ): Promise<string> {
-  // @ts-expect-error
-  const { origin } = getDomain(req);
-
-  const context: Doc[] = await fetch(`${origin}/api/documentContext`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const context: Doc[] = await fetch(
+    `${req.nextUrl.origin}/api/documentContext`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messages),
     },
-    body: JSON.stringify(messages),
-  }).then((res) => res.json());
+  ).then((res) => res.json());
 
   let additions: string[] = [
     'The following are some relevant documents to use in your answer',
@@ -50,7 +46,7 @@ async function expandPromptWithContext(
   return prompt + '\n' + additions.join('\n');
 }
 
-const handler = async (req: Request): Promise<Response> => {
+const handler = async (req: NextRequest): Promise<Response> => {
   try {
     const { model, messages, key, prompt, temperature } =
       (await req.json()) as ChatBody;
