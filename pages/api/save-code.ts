@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 
-function generateFileName(codeBlock: string): string {
+export default async function generateFileName(codeBlock: string): string {
   // This is a very basic implementation. You might want to generate
   // more meaningful names based on the content of the code block.
   const timestamp = Date.now();
