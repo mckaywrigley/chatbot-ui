@@ -7,6 +7,7 @@ import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 
 import { HomeInitialState } from './home.state';
+import { LoginToken } from '@/types/token';
 
 export interface HomeContextProps {
   state: HomeInitialState;
@@ -20,6 +21,7 @@ export interface HomeContextProps {
     conversation: Conversation,
     data: KeyValuePair,
   ) => void;
+  handleUpdateToken: (token: LoginToken) => void;
 }
 
 const HomeContext = createContext<HomeContextProps>(undefined!);

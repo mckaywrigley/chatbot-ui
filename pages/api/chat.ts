@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError, TrialGPTStream } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -52,7 +52,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    const stream = await TrialGPTStream(model, promptToSend, temperatureToUse, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

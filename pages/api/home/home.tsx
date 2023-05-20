@@ -35,11 +35,14 @@ import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
+import LoginForm from '@/components/LoginForm';
 
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import exp from 'constants';
+import { LoginToken } from '@/types/token';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -70,6 +73,7 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      loginToken
     },
     dispatch,
   } = contextValue;
@@ -98,6 +102,30 @@ const Home = ({
   useEffect(() => {
     dispatch({ field: 'modelError', value: getModelsError(error) });
   }, [dispatch, error, getModelsError]);
+
+  // USER AUTHENTICATION ---------------------------------------
+
+  /**
+   * assume that token is set in the state, and stored in the storage.
+   * clear it if it's old, and update the state to render the login page
+   */
+  const validateStoredLoginToken = () => {
+    
+    const storedData = localStorage.getItem('trialGPTloginToken');
+    const storedToken = storedData && JSON.parse(storedData)
+
+    console.log(storedToken, storedToken?.expiration > Date.now())
+    
+    if (storedToken?.expiration > Date.now()) {
+      localStorage.removeItem('trialGPTloginToken');
+      dispatch({ field: 'loginToken', value: undefined })
+    }
+  }
+
+  const handleUpdateToken = (token: LoginToken) => {
+    dispatch({ field: 'loginToken', value: token })
+    localStorage.setItem('trialGPTloginToken', JSON.stringify(token))
+  }
 
   // FETCH MODELS ----------------------------------------------
 
@@ -347,6 +375,7 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+
   return (
     <HomeContext.Provider
       value={{
@@ -357,6 +386,7 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
+        handleUpdateToken
       }}
     >
       <Head>
@@ -369,25 +399,29 @@ const Home = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
-        <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
-        >
-          <div className="fixed top-0 w-full sm:hidden">
-            <Navbar
-              selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
-            />
-          </div>
+        <main>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Chatbar />
+          <LoginForm>
+            <div className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}>
+              <div className="fixed top-0 w-full sm:hidden">
+                <Navbar
+                  selectedConversation={selectedConversation}
+                  onNewConversation={handleNewConversation}
+                />
+              </div>
 
-            <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
+              <div className="flex h-full w-full pt-[48px] sm:pt-0">
+                <Chatbar />
+
+                <div className="flex flex-1">
+                  <Chat stopConversationRef={stopConversationRef} />
+                </div>
+
+                <Promptbar />
+              </div>
             </div>
+          </LoginForm>
 
-            <Promptbar />
-          </div>
         </main>
       )}
     </HomeContext.Provider>
