@@ -49,6 +49,9 @@ const handler = async (req: NextRequest): Promise<Response> => {
     const { model, messages, key, prompt, temperature } =
       (await req.json()) as ChatBody;
 
+    // TODO: properly keep track of what people are saying
+    console.log('Messages', messages);
+
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
       tiktokenModel.bpe_ranks,
