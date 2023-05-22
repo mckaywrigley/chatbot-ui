@@ -4,7 +4,6 @@ export interface Message {
   id: string;
   role: Role;
   content: string;
-  parentId: string;
 }
 
 export type Role = 'assistant' | 'user';
@@ -16,7 +15,6 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
-  parentId: string;
 }
 
 export interface Conversation {

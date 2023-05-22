@@ -88,8 +88,6 @@ export const ChatInput = ({
     updatePromptListVisibility(value);
   };
 
-  const [lastServerMessageId, setLastServerMessageId] = useState<string | null>(null);
-
   const handleSend = () => {
     if (messageIsStreaming) {
       return;
@@ -111,8 +109,7 @@ export const ChatInput = ({
 
     // 添加前缀
     const finalId = 'chatcmpl-' + idBase64;
-    console.log("lastServerMessageId:",lastServerMessageId)
-    onSend({ role: 'user', content ,id:finalId, parentId: lastServerMessageId || '0'}, plugin);
+    onSend({ role: 'user', content ,id:finalId}, plugin);
     setContent('');
     setPlugin(null);
 

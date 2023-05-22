@@ -27,8 +27,6 @@ interface Props {
 export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
-  const [lastServerMessageId, setLastServerMessageId] = useState<string | null>(null);
-
   const {
     state: {
       selectedConversation,
@@ -79,10 +77,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           field: 'selectedConversation',
           value: updatedConversation,
         });
-        console.log('Updated conversation:', updatedConversation);
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
-        console.log("lastServerMessageId:",lastServerMessageId)
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
@@ -90,7 +86,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
           id : updatedConversation.id,
-          parentId: lastServerMessageId || '0',
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -116,7 +111,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           signal: controller.signal,
           body,
         });
-        console.log('Response:', response);
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -124,7 +118,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           return;
         }
         const data = response.body;
-        console.log('Received response:', data);
         if (!data) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -148,10 +141,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           let text = '';
           let id = '0';
           while (!done) {
-            console.log("getSharedVar:",getSharedVar())
-            setLastServerMessageId(getSharedVar())
-            id = lastServerMessageId || '0'
-            console.log("id:",id)
             if (stopConversationRef.current === true) {
               controller.abort();
               done = true;
@@ -159,8 +148,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
-            console.log('done:', done);
-            console.log('value:', value);
             const chunkValue = decoder.decode(value);
             text += chunkValue;
             if (isFirst) {
@@ -168,12 +155,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               let match = text.match(/id:\[(.*?)\]/);
               id = match ? match[1] : '0';
               console.log("id:",id)
-              setLastServerMessageId(id)
-              console.log("lastServerMessageId:",lastServerMessageId)
               text = text.replace(/id:\[.*?\]/, '');
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                {role: 'assistant', content: text, id: id || '0', parentId: '0'},
+                {role: 'assistant', content: text, id: id || '0'},
               ];
               updatedConversation = {
                 ...updatedConversation,
@@ -213,7 +198,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               return conversation;
             },
           );
-          console.log("sharedVar:",getSharedVar())
           if (updatedConversations.length === 0) {
             updatedConversations.push(updatedConversation);
           }
@@ -223,10 +207,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         } else {
           const { answer } = await response.json();
           const { id } = await response.json();
-          const { parentId } = await response.json();
           const updatedMessages: Message[] = [
             ...updatedConversation.messages,
-            { role: 'assistant', content: answer, id: id, parentId: parentId },
+            { role: 'assistant', content: answer, id: id },
           ];
           updatedConversation = {
             ...updatedConversation,
@@ -253,7 +236,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
         }
-        console.log("sharedVar:",getSharedVar())
       }
     },
     [

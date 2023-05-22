@@ -99,13 +99,11 @@ export const OpenAIStream = async (
 
           try {
             const json = JSON.parse(data);
-            console.log("json:" + JSON.stringify(json));
             if (json.choices[0].finish_reason != null) {
               controller.close();
               return;
             }
             sharedVar = json.id
-            console.log("sharedVar:", getSharedVar())
             const text = json.choices[0].delta.content;
             if (!text) {
               controller.enqueue(encoder.encode("id:[" + json.id + "]"));
