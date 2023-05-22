@@ -164,6 +164,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             text += chunkValue;
             if (isFirst) {
               isFirst = false;
+              let match = text.match(/id:\[(.*?)\]/);
+              id = match ? match[1] : '0';
+              console.log("id:",id)
+              setLastServerMessageId(id)
+              text = text.replace(/id:\[.*?\]/, '');
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
                 {role: 'assistant', content: text, id: id || '0', parentId: '0'},
