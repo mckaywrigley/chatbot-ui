@@ -154,12 +154,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             done = doneReading;
             console.log('value:', value);
             const chunkValue = decoder.decode(value);
-            text += chunkValue;
+            const data = JSON.parse(chunkValue);
+            text += data.text;
+            setLastServerMessageId(data.id)
             if (isFirst) {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: text, id: '0', parentId: lastServerMessageId || '0' },
+                { role: 'assistant', content: text, id: data.id, parentId: '0' },
               ];
               updatedConversation = {
                 ...updatedConversation,
