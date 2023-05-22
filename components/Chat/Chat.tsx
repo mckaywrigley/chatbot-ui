@@ -169,19 +169,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             done = doneReading;
             console.log('value:', value);
             const chunkValue = decoder.decode(value);
-            console.log('chunkValue:', chunkValue);
-            // 解析 chunkValue 为 JSON 对象
-            const json = JSON.parse(chunkValue);
-            console.log('json text:', json.text);
-            console.log('json id:', json.id);
-            setLastServerMessageId(json.id);
-            text += json.text;
+            text += chunkValue;
             if (isFirst) {
               console.log('first message:', text);
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: json.text, id: json.id, parentId: lastServerMessageId || '0' },
+                { role: 'assistant', content: text, id: '0', parentId: lastServerMessageId || '0' },
               ];
               updatedConversation = {
                 ...updatedConversation,

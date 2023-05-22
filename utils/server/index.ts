@@ -99,8 +99,7 @@ export const OpenAIStream = async (
               return;
             }
             const text = json.choices[0].delta.content;
-            const id = json.id; // 获取 id 字段
-            const queue = encoder.encode(JSON.stringify({ text, id }));
+            const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
             controller.error(e);
