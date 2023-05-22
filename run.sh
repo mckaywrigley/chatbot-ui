@@ -15,6 +15,10 @@ fi
 echo "Killing node processes"
 pkill -f "/root/.nvm/versions/node/v16.20.0/bin/node"
 
+# 运行git pull命令拉取最新代码
+echo "Pulling latest code"
+git pull
+
 # 运行yarn命令
 echo "Running yarn build"
 yarn run build
