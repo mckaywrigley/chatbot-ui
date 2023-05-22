@@ -167,7 +167,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
+            console.log('value:', value);
             const chunkValue = decoder.decode(value);
+            console.log('chunkValue:', chunkValue);
             // 解析 chunkValue 为 JSON 对象
             const json = JSON.parse(chunkValue);
             console.log('json text:', json.text);
