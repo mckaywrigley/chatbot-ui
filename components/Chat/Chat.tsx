@@ -302,14 +302,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   };
   const throttledScrollDown = throttle(scrollDown, 250);
 
-  // useEffect(() => {
-  //   console.log('currentMessage', currentMessage);
-  //   if (currentMessage) {
-  //     handleSend(currentMessage);
-  //     homeDispatch({ field: 'currentMessage', value: undefined });
-  //   }
-  // }, [currentMessage]);
-
   useEffect(() => {
     throttledScrollDown();
     selectedConversation &&
