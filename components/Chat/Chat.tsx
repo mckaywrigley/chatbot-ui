@@ -129,6 +129,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           signal: controller.signal,
           body,
         });
+        console.log('Response:', response);
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -167,14 +168,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
             const chunkValue = decoder.decode(value);
-            setLastServerMessageId(updatedConversation.id);
-            text += chunkValue;
+            // 解析 chunkValue 为 JSON 对象
+            const json = JSON.parse(chunkValue);
+            setLastServerMessageId(json.id);
+            text += json.text;
             if (isFirst) {
               console.log('first message:', chunkValue);
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue, id: updatedConversation.id, parentId: lastServerMessageId || '0' },
+                { role: 'assistant', content: json.text, id: json.id, parentId: lastServerMessageId || '0' },
               ];
               updatedConversation = {
                 ...updatedConversation,
