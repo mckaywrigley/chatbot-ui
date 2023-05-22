@@ -24,6 +24,7 @@ import {
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
+import { defaultPrompts } from '@/utils/app/defaultPrompts';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -40,6 +41,7 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -300,6 +302,9 @@ const Home = ({
     const prompts = localStorage.getItem('prompts');
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
+    }
+    if (!prompts) {
+      dispatch({ field: 'prompts', value: defaultPrompts });
     }
 
     const conversationHistory = localStorage.getItem('conversationHistory');

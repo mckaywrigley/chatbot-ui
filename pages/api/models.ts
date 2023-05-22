@@ -16,7 +16,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (OPENAI_API_TYPE === 'azure') {
       url = `${OPENAI_API_HOST}/openai/deployments?api-version=${OPENAI_API_VERSION}`;
     }
-
+    console.log("FETCHING: ", url);
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -39,8 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     } else if (response.status !== 200) {
       console.error(
-        `OpenAI API returned an error ${
-          response.status
+        `OpenAI API returned an error ${response.status
         }: ${await response.text()}`,
       );
       throw new Error('OpenAI API returned an error');

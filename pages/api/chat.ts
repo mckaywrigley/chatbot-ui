@@ -52,8 +52,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    console.log("Sending: ", model.id, promptToSend, temperatureToUse, messagesToSend);
+    console.log(req.headers.get('X-MS-CLIENT-PRINCIPAL-ID'));
 
+
+    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
     return new Response(stream);
   } catch (error) {
     console.error(error);
