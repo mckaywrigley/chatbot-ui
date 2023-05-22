@@ -65,7 +65,6 @@ export const OpenAIStream = async (
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-  console.log("res", res)
   if (res.status !== 200) {
     const result = await res.json();
     if (result.error) {
@@ -87,7 +86,6 @@ export const OpenAIStream = async (
   return new ReadableStream({
     async start(controller) {
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        console.log("event:" + JSON.stringify(event));
         if (event.type === 'event') {
           const data = event.data;
 

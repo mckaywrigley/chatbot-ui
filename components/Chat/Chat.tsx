@@ -1,38 +1,23 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
-import {
-  MutableRefObject,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import {memo, MutableRefObject, useCallback, useContext, useEffect, useRef, useState,} from 'react';
 import toast from 'react-hot-toast';
 
-import { useTranslation } from 'next-i18next';
+import {useTranslation} from 'next-i18next';
 
-import { getEndpoint } from '@/utils/app/api';
-import {
-  saveConversation,
-  saveConversations,
-  updateConversation,
-} from '@/utils/app/conversation';
-import { throttle } from '@/utils/data/throttle';
+import {getEndpoint} from '@/utils/app/api';
+import {saveConversation, saveConversations, updateConversation,} from '@/utils/app/conversation';
+import {throttle} from '@/utils/data/throttle';
 
-import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import {ChatBody, Conversation, Message} from '@/types/chat';
+import {Plugin} from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 import Spinner from '../Spinner';
-import { ChatInput } from './ChatInput';
-import { ChatLoader } from './ChatLoader';
-import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
-import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
+import {ChatInput} from './ChatInput';
+import {ChatLoader} from './ChatLoader';
+import {ErrorMessageDiv} from './ErrorMessageDiv';
+import {ModelSelect} from './ModelSelect';
+import {MemoizedChatMessage} from './MemoizedChatMessage';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -171,7 +156,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             const chunkValue = decoder.decode(value);
             text += chunkValue;
             if (isFirst) {
-              console.log('first message:', text);
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
@@ -186,7 +170,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 value: updatedConversation,
               });
             } else {
-            console.log('last message:', text);
               const updatedMessages: Message[] =
                 updatedConversation.messages.map((message, index) => {
                   if (index === updatedConversation.messages.length - 1) {
