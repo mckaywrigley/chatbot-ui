@@ -170,7 +170,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             setLastServerMessageId(updatedConversation.id);
             text += chunkValue;
             if (isFirst) {
-              console.log('First message:', chunkValue);
+              console.log('first message:', chunkValue);
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
