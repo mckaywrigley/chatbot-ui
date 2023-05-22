@@ -158,6 +158,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
+            console.log('done:', done);
             console.log('value:', value);
             const chunkValue = decoder.decode(value);
             text += chunkValue;
