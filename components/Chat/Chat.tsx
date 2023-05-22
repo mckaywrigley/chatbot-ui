@@ -155,6 +155,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             console.log('value:', value);
             const chunkValue = decoder.decode(value);
             const data = JSON.parse(chunkValue);
+            console.log("data:",data)
             text += data.text;
             setLastServerMessageId(data.id)
             if (isFirst) {
