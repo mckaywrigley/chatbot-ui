@@ -147,6 +147,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           let text = '';
           let id = '0';
           while (!done) {
+            console.log("getSharedVar:",getSharedVar())
             setLastServerMessageId(getSharedVar())
             id = lastServerMessageId || '0'
             console.log("id:",id)
