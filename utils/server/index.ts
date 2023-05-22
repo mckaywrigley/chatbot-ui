@@ -92,7 +92,7 @@ export const OpenAIStream = async (
 
           try {
             const json = JSON.parse(data);
-            console.log(json)
+            console.log("json:" + JSON.stringify(json));
             if (json.choices[0].finish_reason != null) {
               controller.close();
               return;
