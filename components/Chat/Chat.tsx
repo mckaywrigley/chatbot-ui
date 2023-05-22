@@ -205,6 +205,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               return conversation;
             },
           );
+          console.log("sharedVar:",getSharedVar())
           if (updatedConversations.length === 0) {
             updatedConversations.push(updatedConversation);
           }
@@ -244,6 +245,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
         }
+        console.log("sharedVar:",getSharedVar())
       }
     },
     [
