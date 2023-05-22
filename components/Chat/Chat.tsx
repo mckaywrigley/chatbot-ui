@@ -154,6 +154,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             done = doneReading;
             console.log('value:', value);
             const chunkValue = decoder.decode(value);
+            console.log("chunkValue:",chunkValue)
             const data = JSON.parse(chunkValue);
             console.log("data:",data)
             text += data.text;
