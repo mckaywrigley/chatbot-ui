@@ -111,7 +111,7 @@ export const ChatInput = ({
 
     // 添加前缀
     const finalId = 'chatcmpl-' + idBase64;
-
+    console.log("lastServerMessageId:",lastServerMessageId)
     onSend({ role: 'user', content ,id:finalId, parentId: lastServerMessageId || '0'}, plugin);
     setContent('');
     setPlugin(null);

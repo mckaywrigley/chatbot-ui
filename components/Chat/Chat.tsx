@@ -82,6 +82,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         console.log('Updated conversation:', updatedConversation);
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
+        console.log("lastServerMessageId:",lastServerMessageId)
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
