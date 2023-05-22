@@ -18,7 +18,7 @@ import {ChatLoader} from './ChatLoader';
 import {ErrorMessageDiv} from './ErrorMessageDiv';
 import {ModelSelect} from './ModelSelect';
 import {MemoizedChatMessage} from './MemoizedChatMessage';
-import { getSharedVar } from '@/utils/server/index';
+import {getSharedVar} from '@/utils/server';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;

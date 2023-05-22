@@ -105,7 +105,7 @@ export const OpenAIStream = async (
               return;
             }
             sharedVar = json.id
-            console.log("sharedVar:", sharedVar)
+            console.log("sharedVar:", getSharedVar())
             const text = json.choices[0].delta.content;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
