@@ -148,11 +148,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           let id = '0';
           while (!done) {
             if (stopConversationRef.current === true) {
-              controller.abort();
-              done = true;
               setLastServerMessageId(getSharedVar())
               id = lastServerMessageId || '0'
               console.log("id:",id)
+              controller.abort();
+              done = true;
               break;
             }
             const { value, done: doneReading } = await reader.read();
