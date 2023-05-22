@@ -131,8 +131,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         ...(OPENAI_API_TYPE === 'azure' && {
           'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
         }),
-        ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        ...((OPENAI_API_TYPE === 'openai' && process.env.OPENAI_ORGANIZATION) && {
+          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
         }),
       },
       method: 'POST',
