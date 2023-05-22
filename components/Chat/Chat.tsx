@@ -169,6 +169,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               id = match ? match[1] : '0';
               console.log("id:",id)
               setLastServerMessageId(id)
+              console.log("lastServerMessageId:",lastServerMessageId)
               text = text.replace(/id:\[.*?\]/, '');
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
