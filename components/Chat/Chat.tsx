@@ -18,6 +18,7 @@ import {ChatLoader} from './ChatLoader';
 import {ErrorMessageDiv} from './ErrorMessageDiv';
 import {ModelSelect} from './ModelSelect';
 import {MemoizedChatMessage} from './MemoizedChatMessage';
+import { getSharedVar } from '@/utils/server/index';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -144,10 +145,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           let done = false;
           let isFirst = true;
           let text = '';
+          let id = '0';
           while (!done) {
             if (stopConversationRef.current === true) {
               controller.abort();
               done = true;
+              setLastServerMessageId(getSharedVar())
+              id = lastServerMessageId || '0'
+              console.log("id:",id)
               break;
             }
             const { value, done: doneReading } = await reader.read();
@@ -159,7 +164,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                {role: 'assistant', content: text, id: lastServerMessageId || '0', parentId: '0'},
+                {role: 'assistant', content: text, id: id || '0', parentId: '0'},
               ];
               updatedConversation = {
                 ...updatedConversation,

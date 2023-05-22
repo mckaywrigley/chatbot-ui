@@ -23,6 +23,14 @@ export class OpenAIError extends Error {
   }
 }
 
+let sharedVar = "";
+
+function getSharedVar() {
+  return sharedVar;
+}
+
+export { getSharedVar };
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
@@ -94,6 +102,7 @@ export const OpenAIStream = async (
             console.log("json:" + JSON.stringify(json));
             if (json.choices[0].finish_reason != null) {
               controller.close();
+              sharedVar = json.id
               return;
             }
             const text = json.choices[0].delta.content;
