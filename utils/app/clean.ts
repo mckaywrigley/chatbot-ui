@@ -12,6 +12,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
 
   let updatedConversation = conversation;
 
+  /*
   // check for model on each conversation
   if (!updatedConversation.model) {
     updatedConversation = {
@@ -34,6 +35,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
       temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
     };
   }
+  */
 
   if (!updatedConversation.folderId) {
     updatedConversation = {

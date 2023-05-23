@@ -1,4 +1,4 @@
-import { JarvisAIStream, OpenAIError } from '@/utils/server';
+import { JarvisAIStream } from '@/utils/server';
 
 import { ChatBody } from '@/types/chat';
 
@@ -15,13 +15,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(stream);
   } catch (error) {
-    console.log('ghere');
     console.error(error);
-    if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
-    } else {
-      return new Response('Error', { status: 500 });
-    }
+    return new Response('Error', { status: 500 });
   }
 };
 
