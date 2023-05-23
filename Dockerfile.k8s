@@ -7,14 +7,14 @@ COPY package*.json ./
 FROM base AS dependencies
 USER root
 RUN npm ci
-USER WORKABLE
+USER workable
 
 # ---- Build ----
 FROM dependencies AS build
 COPY . .
 USER root
 RUN npm run build
-USER WORKABLE
+USER workable
 
 # ---- Production ----
 FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable
