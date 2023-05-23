@@ -185,6 +185,7 @@ const Home = ({
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
+      /*
       model: lastConversation?.model || {
         id: OpenAIModels[defaultModelId].id,
         name: OpenAIModels[defaultModelId].name,
@@ -193,6 +194,7 @@ const Home = ({
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      */
       folderId: null,
     };
 
@@ -333,9 +335,9 @@ const Home = ({
           id: uuidv4(),
           name: t('New Conversation'),
           messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+          // model: OpenAIModels[defaultModelId],
+          // prompt: DEFAULT_SYSTEM_PROMPT,
+          // temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
           folderId: null,
         },
       });
@@ -360,8 +362,8 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
+        <title>Jarvis UI</title>
+        <meta name="description" content="React front-end for Jarvis AI." />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"

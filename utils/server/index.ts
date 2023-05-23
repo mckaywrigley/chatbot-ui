@@ -1,7 +1,15 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {
+  AZURE_DEPLOYMENT_ID,
+  JARVISAI_API_HOST,
+  JARVISAI_API_KEY,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION,
+} from '../app/const';
 
 import {
   ParsedEvent,
@@ -26,7 +34,7 @@ export class OpenAIError extends Error {
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   key: string,
   messages: Message[],
 ) => {
@@ -38,18 +46,19 @@ export const OpenAIStream = async (
     headers: {
       'Content-Type': 'application/json',
       ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
       }),
       ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`,
       }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
+      ...(OPENAI_API_TYPE === 'openai' &&
+        OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',
@@ -110,6 +119,60 @@ export const OpenAIStream = async (
       for await (const chunk of res.body as any) {
         parser.feed(decoder.decode(chunk));
       }
+    },
+  });
+
+  return stream;
+};
+
+export const JarvisAIStream = async (question: string) => {
+  const res = await fetch(`${JARVISAI_API_HOST}/qa?question=${question}`, {
+    headers: {
+      'x-api-key': JARVISAI_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    method: 'GET',
+  });
+
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  if (res.status !== 200) {
+    const result = await res.json();
+    if (result.error) {
+      throw new OpenAIError(
+        result.error.message,
+        result.error.type,
+        result.error.param,
+        result.error.code,
+      );
+    } else {
+      throw new Error(
+        `OpenAI API returned an error: ${
+          decoder.decode(result?.value) || result.statusText
+        }`,
+      );
+    }
+  }
+
+  const { answer } = await res.json();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const streamWord = async (word: string, isLastWord: boolean) => {
+        controller.enqueue(encoder.encode(isLastWord ? word : `${word} `));
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.floor(Math.random() * (250 - 0 + 1) + 0)),
+        );
+      };
+
+      const words = answer.split(' ');
+
+      for (const [i, word] of words.entries()) {
+        await streamWord(word, i === words.length - 1);
+      }
+
+      controller.close();
     },
   });
 

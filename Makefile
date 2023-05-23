@@ -3,16 +3,16 @@ include .env
 .PHONY: all
 
 build:
-	docker build -t chatbot-ui .
+	docker build -t jarvis-client .
 
 run:
 	export $(cat .env | xargs)
-	docker stop chatbot-ui || true && docker rm chatbot-ui || true
-	docker run --name chatbot-ui --rm -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 3000:3000 chatbot-ui
+	docker stop jarvis-client || true && docker rm jarvis-client || true
+	docker run --name jarvis-client --rm -e JARVISAI_API_HOST=${JARVISAI_API_HOST} JARVISAI_API_KEY=${JARVISAI_API_KEY} -p 3000:3000 jarvis-client
 
 logs:
-	docker logs -f chatbot-ui
+	docker logs -f jarvis-client
 
 push:
-	docker tag chatbot-ui:latest ${DOCKER_USER}/chatbot-ui:${DOCKER_TAG}
-	docker push ${DOCKER_USER}/chatbot-ui:${DOCKER_TAG}
+	docker tag jarvis-client:latest ${DOCKER_USER}/jarvis-client:${DOCKER_TAG}
+	docker push ${DOCKER_USER}/jarvis-client:${DOCKER_TAG}
