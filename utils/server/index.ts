@@ -16,7 +16,6 @@ import {
   ReconnectInterval,
   createParser,
 } from 'eventsource-parser';
-import { random } from 'lodash';
 
 export class OpenAIError extends Error {
   type: string;
@@ -162,7 +161,9 @@ export const JarvisAIStream = async (question: string) => {
     async start(controller) {
       const streamWord = async (word: string, isLastWord: boolean) => {
         controller.enqueue(encoder.encode(isLastWord ? word : `${word} `));
-        await new Promise((resolve) => setTimeout(resolve, random(0, 250)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.floor(Math.random() * (250 - 0 + 1) + 0)),
+        );
       };
 
       const words = answer.split(' ');

@@ -2,6 +2,7 @@ import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
+import { OpenAIModel } from '@/types/openai';
 
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
@@ -44,7 +45,10 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if (
+        model?.tokenLimit &&
+        tokenCount + tokens.length + 1000 > model?.tokenLimit
+      ) {
         break;
       }
       tokenCount += tokens.length;
@@ -54,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     encoding.free();
 
     const stream = await OpenAIStream(
-      model,
+      model as OpenAIModel,
       promptToSend,
       temperatureToUse,
       key,

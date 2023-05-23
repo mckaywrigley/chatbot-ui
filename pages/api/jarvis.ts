@@ -2,8 +2,6 @@ import { JarvisAIStream } from '@/utils/server';
 
 import { ChatBody } from '@/types/chat';
 
-import { last } from 'lodash';
-
 export const config = {
   runtime: 'edge',
 };
@@ -11,7 +9,9 @@ export const config = {
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { messages } = (await req.json()) as ChatBody;
-    const stream = await JarvisAIStream(last(messages)?.content || '');
+    const stream = await JarvisAIStream(
+      messages[messages.length - 1]?.content || '',
+    );
 
     return new Response(stream);
   } catch (error) {

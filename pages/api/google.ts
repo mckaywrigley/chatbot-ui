@@ -122,7 +122,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       },
       method: 'POST',
       body: JSON.stringify({
-        model: model.id,
+        model: model?.id,
         messages: [
           {
             role: 'system',
