@@ -1,6 +1,7 @@
 import { Session, SessionContextProvider } from '@supabase/auth-helpers-react';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import 'react-notion-x/src/styles.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { appWithTranslation } from 'next-i18next';
@@ -11,6 +12,8 @@ import { GoogleAnalytics } from 'nextjs-google-analytics';
 import '@/styles/globals.css';
 import '@/styles/transitionGroup.css';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import 'katex/dist/katex.min.css';
+import 'prismjs/themes/prism-tomorrow.css';
 import ua from 'universal-analytics';
 
 const inter = Inter({ subsets: ['latin'] });

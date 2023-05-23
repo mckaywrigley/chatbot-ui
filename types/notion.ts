@@ -3,3 +3,10 @@ export interface ChatEverywhereNews {
   title: string;
   createdTime: string;
 }
+
+export interface ChatEverywhereNewsPage {
+  id: string;
+  title: string;
+  createdTime: string;
+  content: string;
+}

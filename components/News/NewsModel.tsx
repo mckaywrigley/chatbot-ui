@@ -11,6 +11,18 @@ import { useTranslation } from 'next-i18next';
 
 import { ChatEverywhereNews } from '@/types/notion';
 
+import Spinner from '../Spinner/Spinner';
+import NewsPage from './NewsPage';
+
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
+
+function formatDatetime(dateString: string) {
+  return dayjs(dateString).fromNow();
+}
+
 type Props = {
   onClose: () => void;
 };
@@ -22,12 +34,21 @@ function NewsModel({ onClose }: Props) {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectPageId, setSelectedPageId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectPageId) {
+      fetch(`/api/notion/news/${selectPageId}`).then((response) => {
+        console.log(response);
+      });
+    }
+  }, [selectPageId]);
 
   const fetchMoreNews = useCallback(async (nextCursor?: string) => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/notion/newsList?startCursor=${nextCursor || ''}`,
+        `/api/notion/news?startCursor=${nextCursor || ''}`,
       );
       const { newsList, nextCursor: newNextCursor } = await response.json();
       setNewsList((prevNewsList) => [...prevNewsList, ...newsList]);
@@ -88,19 +109,46 @@ function NewsModel({ onClose }: Props) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-3xl tablet:max-w-[90vw] transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200">
-                <h1 className="mb-3">{t('Latest Updates')}</h1>
-                <ul className="max-h-[40rem] tablet:max-h-[70vh] overflow-y-auto">
+              <Dialog.Panel className="w-full max-w-3xl tablet:max-w-[90vw] h-[80vh] transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200 grid grid-rows-[max-content_1fr]">
+                <div className="flex flex-row justify-between items-center">
+                  <h1 className="mb-3">{t('Latest Updates')}</h1>
+                  <button
+                    className={`${
+                      selectPageId ? 'visible' : 'invisible'
+                    } w-max px-4 py-2  border rounded-lg shadow focus:outline-none border-neutral-800 border-opacity-50 bg-white text-black hover:bg-neutral-300 `}
+                    onClick={() => setSelectedPageId(null)}
+                  >
+                    Back
+                  </button>
+                </div>
+
+                <ul
+                  className={`${
+                    selectPageId || isLoading ? 'hidden' : ''
+                  } overflow-y-auto`}
+                >
                   {newsList.map((news, index) => (
-                    <li className="mb-3" key={`${news.id} ${index}`}>
-                      <h2 className="font-bold">{news.title}</h2>
-                      <p>{news.id}</p>
-                      <p>{news.createdTime}</p>
+                    <li
+                      className="mb-3 hover:bg-black/50 p-3 rounded-md"
+                      key={`${news.id} ${index}`}
+                      onClick={() => setSelectedPageId(news.id)}
+                    >
+                      <h3 className="text-sm font-medium leading-5">
+                        {news.title}
+                      </h3>
+                      <p>{formatDatetime(news.createdTime)}</p>
                     </li>
                   ))}
-                  {isLoading && <div>Loading...</div>}
+
                   <div className="h-1" ref={observerRef}></div>
                 </ul>
+
+                {selectPageId && <NewsPage pageId={selectPageId} />}
+                {isLoading && (
+                  <div className="flex mt-[50%]">
+                    <Spinner size="16px" className="mx-auto" />
+                  </div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

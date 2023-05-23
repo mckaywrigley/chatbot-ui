@@ -123,7 +123,7 @@ export const ChatbarSettings = () => {
           />
         )}
         <SidebarButton
-          text={t('Latest updates')}
+          text={t('Latest Updates')}
           icon={<IconBrandFacebook size={18} />}
           onClick={() => {
             homeDispatch({
