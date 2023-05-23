@@ -1,0 +1,27 @@
+# ---- Base Node ----
+FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable AS base
+WORKDIR /app
+COPY package*.json ./
+
+# ---- Dependencies ----
+FROM base AS dependencies
+USER root
+RUN npm ci
+USER workable
+
+# ---- Build ----
+FROM dependencies AS build
+COPY . .
+USER root
+RUN npm run build
+USER workable
+
+# ---- Production ----
+FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable
+WORKDIR /app
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/next.config.js ./next.config.js
+COPY --from=build /app/next-i18next.config.js ./next-i18next.config.js
