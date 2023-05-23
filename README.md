@@ -6,7 +6,7 @@ React front-end for Jarvis AI.
 
 ```shell
 docker build -t jarvis-client .
-docker run -e JARVISAI_API_HOST=xxxxxxxx JARVISAI_API_KEY=xxxxxxxx -p 3000:3000 jarvis-client
+docker run -e JARVISAI_API_HOST=xxxxxxxx -e JARVISAI_API_KEY=xxxxxxxx -p 3000:3000 jarvis-client
 ```
 
 ## Running Locally
