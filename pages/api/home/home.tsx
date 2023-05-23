@@ -65,6 +65,7 @@ const Home = ({
     state: {
       apiKey,
       lightMode,
+      userName,
       folders,
       conversations,
       selectedConversation,
@@ -256,6 +257,12 @@ const Home = ({
       dispatch({
         field: 'lightMode',
         value: settings.theme,
+      });
+    }
+    if(settings.userName){
+      dispatch({
+        field: 'userName',
+        value: settings.userName,
       });
     }
 

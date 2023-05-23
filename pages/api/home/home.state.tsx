@@ -10,6 +10,7 @@ export interface HomeInitialState {
   pluginKeys: PluginKey[];
   loading: boolean;
   lightMode: 'light' | 'dark';
+  userName:string;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   models: OpenAIModel[];
@@ -34,6 +35,7 @@ export const initialState: HomeInitialState = {
   loading: false,
   pluginKeys: [],
   lightMode: 'dark',
+  userName:'',
   messageIsStreaming: false,
   modelError: null,
   models: [],

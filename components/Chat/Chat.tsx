@@ -86,6 +86,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
           id : updatedConversation.id,
+          userName: localStorage.getItem('username') || '',
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -154,7 +155,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               isFirst = false;
               let match = text.match(/id:\[(.*?)\]/);
               id = match ? match[1] : '0';
-              console.log("id:",id)
               text = text.replace(/id:\[.*?\]/, '');
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,

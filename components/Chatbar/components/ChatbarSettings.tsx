@@ -22,6 +22,7 @@ export const ChatbarSettings = () => {
     state: {
       apiKey,
       lightMode,
+      userName,
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,

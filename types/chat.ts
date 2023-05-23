@@ -15,6 +15,7 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  userName:string;
 }
 
 export interface Conversation {
