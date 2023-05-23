@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM node:19-alpine AS base
+FROM gcr.io/staging-artifacts-786a/base/node-build/alpine/18.14 AS base
 WORKDIR /app
 COPY package*.json ./
 
