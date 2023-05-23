@@ -37,11 +37,11 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: OPENAI_API_HOST
+            - name: JARVISAI_API_HOST
               valueFrom:
                 secretKeyRef:
                   name: jarvis-client
-                  key: OPENAI_API_HOST
+                  key: JARVISAI_API_HOST
             - name: JARVISAI_API_KEY
               valueFrom:
                 secretKeyRef:
