@@ -6,4 +6,11 @@ services:
     ports:
       - 3000:3000
     environment:
-      - 'OPENAI_API_KEY='
+      - OPENAI_API_KEY
+      - DEFAULT_MODEL
+      - NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT
+      - AZURE_DEPLOYMENT_ID
+      - OPENAI_API_VERSION
+      - OPENAI_API_TYPE
+      - OPENAI_API_HOST
+      
