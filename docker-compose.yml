@@ -6,4 +6,5 @@ services:
     ports:
       - 3000:3000
     environment:
-      - 'OPENAI_API_KEY='
+      - 'JARVISAI_API_HOST='
+      - 'JARVISAI_API_KEY='
