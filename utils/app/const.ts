@@ -5,6 +5,8 @@ export const DEFAULT_SYSTEM_PROMPT =
 export const JARVISAI_API_HOST =
   process.env.JARVISAI_API_HOST || 'http://localhost:8000';
 
+export const JARVISAI_API_KEY = process.env.JARVISAI_API_KEY || '';
+
 export const OPENAI_API_HOST =
   process.env.OPENAI_API_HOST || 'https://api.openai.com';
 

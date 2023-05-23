@@ -4,6 +4,7 @@ import { OpenAIModel } from '@/types/openai';
 import {
   AZURE_DEPLOYMENT_ID,
   JARVISAI_API_HOST,
+  JARVISAI_API_KEY,
   OPENAI_API_HOST,
   OPENAI_API_TYPE,
   OPENAI_API_VERSION,
@@ -128,6 +129,7 @@ export const OpenAIStream = async (
 export const JarvisAIStream = async (question: string) => {
   const res = await fetch(`${JARVISAI_API_HOST}/qa?question=${question}`, {
     headers: {
+      'x-api-key': JARVISAI_API_KEY,
       'Content-Type': 'application/json',
     },
     method: 'GET',
