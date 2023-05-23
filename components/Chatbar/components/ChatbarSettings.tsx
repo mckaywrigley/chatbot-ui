@@ -1,11 +1,11 @@
 import {
   IconArticle,
   IconBrandFacebook,
+  IconCurrencyDollar,
   IconFileExport,
   IconLogin,
   IconMoon,
   IconSun,
-  IconCurrencyDollar
 } from '@tabler/icons-react';
 import { useContext } from 'react';
 
@@ -122,6 +122,16 @@ export const ChatbarSettings = () => {
             }}
           />
         )}
+        <SidebarButton
+          text={t('Latest updates')}
+          icon={<IconBrandFacebook size={18} />}
+          onClick={() => {
+            homeDispatch({
+              field: 'showNewsModel',
+              value: true,
+            });
+          }}
+        />
         <SidebarButton
           text={t('Follow for updates!')}
           icon={<IconBrandFacebook size={18} />}
