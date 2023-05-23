@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM gcr.io/staging-artifacts-786a/base/node-build/alpine/18.14 AS base
+FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable AS base
 WORKDIR /app
 COPY package*.json ./
 
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # ---- Production ----
-FROM gcr.io/staging-artifacts-786a/base/node-build/alpine/18.14 
+FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
