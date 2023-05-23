@@ -1,0 +1,84 @@
+name: Build,Deploy to argok8s
+
+on:
+
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  ECR_REPO: 240981035485.dkr.ecr.us-east-1.amazonaws.com
+  Docker_Image_name: jarvis-client
+jobs:
+  build_docker:
+    runs-on: python-runner-v2
+    outputs:
+      docker_tag: ${{ steps.tag.outputs.docker_tag }}
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2.3.4
+        with:
+          persist-credentials: false
+      - name: Generate Image Tag
+        id: tag
+        run: |
+          echo "IMAGE_TAG=${ECR_REPO}/${Docker_Image_name}:$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          export IMAGE_TAG=${ECR_REPO}/${Docker_Image_name}:$(git rev-parse --short HEAD)          
+          echo "docker_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9.5'
+          architecture: 'x64'
+      - name: Get GitHub commit sha and message, create tag
+        run: |
+          git_sha=$(git rev-parse --short "$GITHUB_SHA")
+          git_msg=$(git log --format=%B -n 1 ${{ github.event.after }})
+          git_tag=${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER}-${git_sha}
+          echo "GIT_TAG=$git_tag" >> $GITHUB_ENV
+          echo "::warning:: Git sha = $git_sha"
+          echo "::warning:: Git tag = $git_tag"
+          echo "::warning:: Git msg = $git_msg"
+      - name: docker build
+        run: |
+          docker build -t ${IMAGE_TAG} -f Dockerfile .
+      - name: docker push image to ECR
+        if: |
+          github.ref == 'refs/heads/main' ||
+          contains(github.event.head_commit.message, 'deploy-dev')
+        run: |
+          pip install awscli
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REPO}
+          docker push ${IMAGE_TAG}
+      - name: Checkout Argo Config
+        uses: actions/checkout@v2
+        with:
+          repository: nrccua/k8s-argocd-gitops
+          ref: main
+          token: ${{ secrets.AUTOMATION_PAT }}
+          path: argocd
+      - name: Prepare deployment PR
+        run: |
+          git config --global user.email itadmins@nrccua.org
+          git config --global user.name nrccua-ci-automation
+          find "argocd/apps/dev/templates/" -type f -name "dsc-jarvis-client.yaml" -exec sed  -i -e 's@image:.*@image: '"${IMAGE_TAG}"'@g' {} +
+          LOG=$(git log -1 --graph --abbrev-commit --date=relative | cat -)
+          cd argocd
+          git add "apps/dev/templates"
+          git commit -m """$LOG"""
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.AUTOMATION_PAT }}
+          branch: main
+          directory: argocd
+          repository: nrccua/k8s-argocd-gitops
+      - name: call slack action
+        uses: nrccua/github-action-build-slack-notification@v1.0.1
+        with:
+          app_name: ${{ github.repository }}
+          git_branch: ${{ github.ref }}
+          git_sha: ${{ github.sha }}
+          slack_url: ${{ secrets.SLACK_URL_NONPROD }}
+          deploy_url: https://jarvis.enc-np.com
