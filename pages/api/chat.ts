@@ -51,8 +51,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     encoding.free();
-    console.log("requst:{}", req)
-    console.log("ip:{}",req.headers.get('x-forwarded-for'))
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
     return new Response(stream);
   } catch (error) {
