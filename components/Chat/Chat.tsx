@@ -87,6 +87,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           temperature: updatedConversation.temperature,
           id : updatedConversation.id,
           userName: localStorage.getItem('username') || '',
+          ip: localStorage.getItem("ip") || '',
         };
         const endpoint = getEndpoint(plugin);
         let body;

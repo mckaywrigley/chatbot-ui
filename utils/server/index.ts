@@ -38,6 +38,7 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
   userName:string,
+  ip:string,
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
   if (OPENAI_API_TYPE === 'azure') {
@@ -70,9 +71,9 @@ export const OpenAIStream = async (
       temperature: temperature,
       stream: true,
       user_name:userName,
+      ip:ip,
     }),
   });
-  console.log("test")
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   if (res.status !== 200) {

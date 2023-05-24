@@ -100,6 +100,15 @@ const Home = ({
     dispatch({ field: 'modelError', value: getModelsError(error) });
   }, [dispatch, error, getModelsError]);
 
+  useEffect(() => {
+    fetch('/api/ip')
+        .then((res) => res.json())
+        .then((data) => {
+          localStorage.setItem('ip', data.ip);
+        })
+        .catch((err) => console.error(err));
+  }, []);
+
   // FETCH MODELS ----------------------------------------------
 
   const handleSelectConversation = (conversation: Conversation) => {
