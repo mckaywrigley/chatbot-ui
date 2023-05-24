@@ -129,16 +129,20 @@ export const OpenAIStream = async (
 
 export const JarvisAIStream = async (
   jarvisAuthCookie: string,
+  sessionId: string,
   question: string,
 ) => {
-  const res = await fetch(`${JARVISAI_API_HOST}/qa?question=${question}`, {
-    headers: {
-      [NAMES.COOKIES.AUTH]: jarvisAuthCookie,
-      'x-api-key': JARVISAI_API_KEY,
-      'Content-Type': 'application/json',
+  const res = await fetch(
+    `${JARVISAI_API_HOST}/qa?question=${question}&session_id=${sessionId}`,
+    {
+      headers: {
+        [NAMES.COOKIES.AUTH]: jarvisAuthCookie,
+        'x-api-key': JARVISAI_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      method: 'GET',
     },
-    method: 'GET',
-  });
+  );
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();

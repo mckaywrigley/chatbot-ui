@@ -94,6 +94,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
+          id: selectedConversation.id,
           // model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey,

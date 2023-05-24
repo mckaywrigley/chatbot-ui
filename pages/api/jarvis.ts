@@ -14,9 +14,10 @@ const handler = async (req: Request): Promise<Response> => {
   const jarvisAuthCookie = cookies[NAMES.COOKIES.AUTH] || '';
 
   try {
-    const { messages } = (await req.json()) as ChatBody;
+    const { id = '', messages } = (await req.json()) as ChatBody;
     const stream = await JarvisAIStream(
       jarvisAuthCookie,
+      id,
       messages[messages.length - 1]?.content || '',
     );
 
