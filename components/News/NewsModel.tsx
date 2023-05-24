@@ -25,10 +25,12 @@ function formatDatetime(dateString: string) {
 }
 
 type Props = {
+  className?: string;
+  open: boolean;
   onClose: () => void;
 };
 
-function NewsModel({ onClose }: Props) {
+function NewsModel({ className = '', open, onClose }: Props) {
   const { t } = useTranslation('news');
 
   const [newsList, setNewsList] = useState<ChatEverywhereNews[]>([]);
@@ -50,6 +52,7 @@ function NewsModel({ onClose }: Props) {
       setIsLoading(false);
     }
   }, []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -75,9 +78,20 @@ function NewsModel({ onClose }: Props) {
     fetchMoreNews(undefined);
   }, [fetchMoreNews]);
 
+  useEffect(() => {
+    if (open && newsList.length > 0) {
+      setSelectedPageId(newsList[0].id);
+    }
+  }, [newsList, open]);
+
   return (
-    <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose} open>
+    <Transition appear show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className={`${className} relative z-50`}
+        onClose={onClose}
+        open={open}
+      >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <Transition.Child
           as={Fragment}

@@ -584,7 +584,6 @@ const Home = ({
 
           <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
             <Chatbar />
-
             <div className="flex flex-1">
               <Chat
                 stopConversationRef={stopConversationRef}
@@ -621,13 +620,11 @@ const Home = ({
                 }
               />
             )}
-            {showNewsModel && (
-              <NewsModel
-                onClose={() =>
-                  dispatch({ field: 'showNewsModel', value: false })
-                }
-              />
-            )}
+            <NewsModel
+              open={showNewsModel}
+              onClose={() => dispatch({ field: 'showNewsModel', value: false })}
+            />
+
             <Promptbar />
           </div>
         </main>
