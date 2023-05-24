@@ -1,23 +1,8 @@
-import {
-  FC,
-  ReactElement,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { FC, ReactElement, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import { useCreateReducer } from '@/hooks/useCreateReducer';
-
 import NAMES from '@/utils/app/names';
-import { getSettings, saveSettings } from '@/utils/app/settings';
-
-import { Settings } from '@/types/settings';
-
-import HomeContext from '@/pages/api/home/home.context';
 
 import Cookies from 'js-cookie';
 
