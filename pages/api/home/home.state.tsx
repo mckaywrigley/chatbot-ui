@@ -4,7 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-import { User, CreditUsage } from '@/types/user';
+import { CreditUsage, User } from '@/types/user';
 
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -37,6 +37,7 @@ export interface HomeInitialState {
   conversationLastSyncAt: number | null;
   conversationLastUpdatedAt: number | null;
   forceSyncConversation: boolean;
+  replaceRemoteData: boolean;
   syncingConversation: boolean;
   syncSuccess: boolean | null; // null = not yet synced
 
@@ -89,6 +90,7 @@ export const initialState: HomeInitialState = {
   conversationLastSyncAt: null,
   conversationLastUpdatedAt: null,
   forceSyncConversation: true, // Sync on first load
+  replaceRemoteData: false,
   syncingConversation: false,
   syncSuccess: null,
 
