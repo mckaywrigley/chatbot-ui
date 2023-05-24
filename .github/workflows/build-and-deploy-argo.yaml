@@ -1,9 +1,8 @@
 name: Build,Deploy to argok8s
 
 on:
-
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 env:
