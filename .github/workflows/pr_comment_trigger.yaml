@@ -22,11 +22,25 @@ jobs:
               echo "::set-output name=comment::$comment"
             fi
           fi
+      - name: Fetch review comments and extract specific file and hunks
+        id: fetch_review_comments
+        if: steps.check_pr_and_branch.outputs.is_valid == 'true'
+        run: |
+          pr_number=$(jq -r '.issue.number' $GITHUB_EVENT_PATH)
+          pr_api_url=$(jq -r '.issue.pull_request.url' $GITHUB_EVENT_PATH)
+          comment_id=$(jq -r '.comment.id' $GITHUB_EVENT_PATH)
+
+          review_comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "${pr_api_url}/comments")
+          specific_file_and_hunks=$(echo "$review_comments" | jq -r --arg comment_id "$comment_id" 'map(select(.id == ($comment_id | tonumber))) | .[0] | {path: .path, diff_hunk: .diff_hunk}')
+
+          echo "::set-output name=specific_file_and_hunks::$specific_file_and_hunks"
+
       - name: Send data to Lambda function
         if: steps.check_pr_and_branch.outputs.is_valid == 'true'
         run: |
           pr_data="${{ steps.check_pr_and_branch.outputs.pr_data }}"
           comment="${{ steps.check_pr_and_branch.outputs.comment }}"
-          payload=$(jq -n --arg pr_data "$pr_data" --arg comment "$comment" '{pr_data: $pr_data, comment: $comment}')
-          response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "https://7s47kfhyp8.execute-api.us-west-1.amazonaws.com/prod/webhook")
+          specific_file_and_hunks="${{ steps.fetch_review_comments.outputs.specific_file_and_hunks }}"
+          payload=$(jq -n --arg pr_data "$pr_data" --arg comment "$comment" --arg specific_file_and_hunks "$specific_file_and_hunks" '{pr_data: $pr_data, comment: $comment, specific_file_and_hunks: ($specific_file_and_hunks | fromjson)}')
+          response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "https://your_lambda_function_url")
           echo "Lambda response: $response"
