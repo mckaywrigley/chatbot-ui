@@ -42,5 +42,5 @@ jobs:
           comment="${{ steps.check_pr_and_branch.outputs.comment }}"
           specific_file_and_hunks="${{ steps.fetch_review_comments.outputs.specific_file_and_hunks }}"
           payload=$(jq -n --arg pr_data "$pr_data" --arg comment "$comment" --arg specific_file_and_hunks "$specific_file_and_hunks" '{pr_data: $pr_data, comment: $comment, specific_file_and_hunks: ($specific_file_and_hunks | fromjson)}')
-          response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "https://your_lambda_function_url")
+          response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "https://7s47kfhyp8.execute-api.us-west-1.amazonaws.com/prod/webhook")
           echo "Lambda response: $response"
