@@ -1,0 +1,32 @@
+name: Pull Request Comment Trigger
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  process_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if comment is on a pull request and on a droid branch
+        id: check_pr_and_branch
+        run: |
+          pr_url=$(jq -r '.issue.pull_request.url' $GITHUB_EVENT_PATH)
+          comment=$(jq -r '.comment.body' $GITHUB_EVENT_PATH)
+          if [[ ! -z "$pr_url" ]]; then
+            pr_data=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $pr_url)
+            base_ref=$(echo "$pr_data" | jq -r '.base.ref')
+            if [[ $base_ref == droid/* ]]; then
+              echo "::set-output name=is_valid::true"
+              echo "::set-output name=pr_data::$pr_data"
+              echo "::set-output name=comment::$comment"
+            fi
+          fi
+      - name: Send data to Lambda function
+        if: steps.check_pr_and_branch.outputs.is_valid == 'true'
+        run: |
+          pr_data="${{ steps.check_pr_and_branch.outputs.pr_data }}"
+          comment="${{ steps.check_pr_and_branch.outputs.comment }}"
+          payload=$(jq -n --arg pr_data "$pr_data" --arg comment "$comment" '{pr_data: $pr_data, comment: $comment}')
+          response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "https://7s47kfhyp8.execute-api.us-west-1.amazonaws.com/prod/webhook")
+          echo "Lambda response: $response"
