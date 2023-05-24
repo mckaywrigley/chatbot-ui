@@ -28,6 +28,12 @@ export default async function handler(
         direction: 'descending',
       },
     ],
+    filter: {
+      property: 'Status',
+      status: {
+        equals: 'Published',
+      },
+    },
   } as QueryDatabaseParameters;
 
   if (startCursor) {

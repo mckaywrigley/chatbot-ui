@@ -2,6 +2,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { IconX } from '@tabler/icons-react';
 import React, {
   Fragment,
+  memo,
   useCallback,
   useEffect,
   useRef,
@@ -30,7 +31,7 @@ type Props = {
   onClose: () => void;
 };
 
-function NewsModel({ className = '', open, onClose }: Props) {
+const NewsModel = memo(({ className = '', open, onClose }: Props) => {
   const { t } = useTranslation('news');
 
   const [newsList, setNewsList] = useState<ChatEverywhereNews[]>([]);
@@ -46,7 +47,17 @@ function NewsModel({ className = '', open, onClose }: Props) {
         `/api/notion/news?startCursor=${nextCursor || ''}`,
       );
       const { newsList, nextCursor: newNextCursor } = await response.json();
-      setNewsList((prevNewsList) => [...prevNewsList, ...(newsList || [])]);
+      setNewsList((prevNewsList) => {
+        const newList = [...prevNewsList, ...(newsList || [])];
+
+        // remove duplicate by its id in the list, avoid confusion when in dev mode
+        const uniqueList = newList.filter(
+          (news, index, self) =>
+            index === self.findIndex((t) => t.id === news.id),
+        );
+
+        return uniqueList;
+      });
       setNextCursor(newNextCursor);
     } finally {
       setIsLoading(false);
@@ -168,6 +179,8 @@ function NewsModel({ className = '', open, onClose }: Props) {
       </Dialog>
     </Transition>
   );
-}
+});
+
+NewsModel.displayName = 'NewsModel';
 
 export default NewsModel;
