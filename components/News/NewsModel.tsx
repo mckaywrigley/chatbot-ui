@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
+import { IconX } from '@tabler/icons-react';
 import React, {
   Fragment,
   useCallback,
@@ -91,7 +92,7 @@ function NewsModel({ onClose }: Props) {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -101,17 +102,22 @@ function NewsModel({ onClose }: Props) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-3xl tablet:max-w-[90vw] h-[80vh] transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200 grid grid-rows-[max-content_1fr]">
-                <div className="flex flex-row justify-between items-center">
-                  <h1 className="mb-3">{t('Latest Updates')}</h1>
-                  <button
-                    className={`${
-                      selectPageId ? 'visible' : 'invisible'
-                    } w-max px-4 py-2  border rounded-lg shadow focus:outline-none border-neutral-800 border-opacity-50 bg-white text-black hover:bg-neutral-300 `}
-                    onClick={() => setSelectedPageId(null)}
-                  >
-                    Back
-                  </button>
+              <Dialog.Panel className="w-full max-w-3xl tablet:max-w-[90vw] h-[80vh] transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all bg-neutral-800 text-neutral-200 grid grid-rows-[max-content_1fr] mobile:h-screen mobile:!max-w-[unset] mobile:!rounded-none">
+                <div className="mb-3 flex flex-row justify-between items-center">
+                  <h1>{t('Latest Updates')}</h1>
+
+                  {!selectPageId ? (
+                    <button className="w-max min-h-[34px]" onClick={onClose}>
+                      <IconX></IconX>
+                    </button>
+                  ) : (
+                    <button
+                      className="w-max px-4 py-1 border rounded-lg shadow focus:outline-none border-neutral-800 border-opacity-50 bg-white text-black hover:bg-neutral-300 "
+                      onClick={() => setSelectedPageId(null)}
+                    >
+                      Back
+                    </button>
+                  )}
                 </div>
 
                 <ul

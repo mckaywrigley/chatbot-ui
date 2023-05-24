@@ -32,7 +32,7 @@ function NewsPage({ pageId }: Props) {
       />
     );
   }
-  return <Spinner size="16px" className="mx-auto" />;
+  return <Spinner size="16px" className="mx-auto mt-[50%]" />;
 }
 
 export default NewsPage;
