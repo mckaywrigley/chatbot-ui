@@ -4,7 +4,7 @@ import { PluginID } from './plugin';
 export interface Message {
   role: Role;
   content: string;
-  pluginId: PluginID.LANGCHAIN_CHAT | PluginID.GPT4 | null;
+  pluginId: PluginID.LANGCHAIN_CHAT | PluginID.GPT4 | PluginID.IMAGE_GEN | null;
 }
 
 export type Role = 'assistant' | 'user';
