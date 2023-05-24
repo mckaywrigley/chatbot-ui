@@ -22,6 +22,7 @@ import {
   updateConversation,
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
+import NAMES from '@/utils/app/names';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
@@ -31,6 +32,7 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
@@ -39,18 +41,22 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
+import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
+  jarvisAuthCookie: string;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
 
 const Home = ({
+  jarvisAuthCookie,
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
+  ...other
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
@@ -350,17 +356,7 @@ const Home = ({
   ]);
 
   return (
-    <HomeContext.Provider
-      value={{
-        ...contextValue,
-        handleNewConversation,
-        handleCreateFolder,
-        handleDeleteFolder,
-        handleUpdateFolder,
-        handleSelectConversation,
-        handleUpdateConversation,
-      }}
-    >
+    <>
       <Head>
         <title>Jarvis UI</title>
         <meta name="description" content="React front-end for Jarvis AI." />
@@ -370,34 +366,54 @@ const Home = ({
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {selectedConversation && (
-        <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+
+      <AuthDialog jarvisAuthCookie={jarvisAuthCookie}>
+        <HomeContext.Provider
+          value={{
+            ...contextValue,
+            handleNewConversation,
+            handleCreateFolder,
+            handleDeleteFolder,
+            handleUpdateFolder,
+            handleSelectConversation,
+            handleUpdateConversation,
+          }}
         >
-          <div className="fixed top-0 w-full sm:hidden">
-            <Navbar
-              selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
-            />
-          </div>
+          {selectedConversation && (
+            <main
+              className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+            >
+              <div className="fixed top-0 w-full sm:hidden">
+                <Navbar
+                  selectedConversation={selectedConversation}
+                  onNewConversation={handleNewConversation}
+                />
+              </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Chatbar />
+              <div className="flex h-full w-full pt-[48px] sm:pt-0">
+                <Chatbar />
 
-            <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
-            </div>
+                <div className="flex flex-1">
+                  <Chat stopConversationRef={stopConversationRef} />
+                </div>
 
-            <Promptbar />
-          </div>
-        </main>
-      )}
-    </HomeContext.Provider>
+                <Promptbar />
+              </div>
+            </main>
+          )}
+        </HomeContext.Provider>
+      </AuthDialog>
+    </>
   );
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  req,
+}) => {
+  const cookies = cookie.parse(req.headers.cookie || '');
+  const jarvisAuthCookie = cookies[NAMES.COOKIES.AUTH] || '';
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
@@ -417,6 +433,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   return {
     props: {
+      jarvisAuthCookie,
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
       serverSidePluginKeysSet,

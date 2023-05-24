@@ -1,3 +1,5 @@
+import NAMES from '@/utils/app/names';
+
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
@@ -125,9 +127,13 @@ export const OpenAIStream = async (
   return stream;
 };
 
-export const JarvisAIStream = async (question: string) => {
+export const JarvisAIStream = async (
+  jarvisAuthCookie: string,
+  question: string,
+) => {
   const res = await fetch(`${JARVISAI_API_HOST}/qa?question=${question}`, {
     headers: {
+      [NAMES.COOKIES.AUTH]: jarvisAuthCookie,
       'x-api-key': JARVISAI_API_KEY,
       'Content-Type': 'application/json',
     },
