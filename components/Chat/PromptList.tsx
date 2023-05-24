@@ -1,5 +1,7 @@
 import { FC, MutableRefObject } from 'react';
 
+import { getNonDeletedCollection } from '@/utils/app/conversation';
+
 import { Prompt } from '@/types/prompt';
 
 interface Props {
@@ -22,7 +24,7 @@ export const PromptList: FC<Props> = ({
       ref={promptListRef}
       className="z-10 max-h-52 w-full overflow-scroll rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
     >
-      {prompts.map((prompt, index) => (
+      {getNonDeletedCollection(prompts).map((prompt, index) => (
         <li
           key={prompt.id}
           className={`${

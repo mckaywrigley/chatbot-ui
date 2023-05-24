@@ -1,5 +1,6 @@
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import dayjs from 'dayjs';
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from './const';
 
@@ -71,6 +72,10 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
       if (!conversation.folderId) {
         conversation.folderId = null;
+      }
+
+      if(!conversation.lastUpdateAtUTC) {
+        conversation.lastUpdateAtUTC = dayjs().valueOf();
       }
 
       acc.push(conversation);

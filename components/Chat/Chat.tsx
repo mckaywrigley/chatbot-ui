@@ -24,6 +24,8 @@ import { Plugins } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
+
 import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
 import Spinner from '../Spinner';
 import { StoreConversationButton } from '../Spinner/StoreConversationButton';
@@ -32,7 +34,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
+import dayjs from 'dayjs';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -50,7 +52,6 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
       modelError,
       loading,
       user,
-      isPaidUser,
       outputLanguage,
       currentMessage,
       messageIsStreaming,
@@ -67,15 +68,12 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
   );
 
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const { fetchAndUpdateCreditUsage } = useFetchCreditUsage();
 
   const logGaEvent = useCallback(
     (messageLength?: number) => {
@@ -177,7 +175,9 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          toast.error(
+            response.statusText || t('Unknown error, please contact support'),
+          );
 
           // remove the last message from the conversation
           homeDispatch({
@@ -238,6 +238,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             updatedConversation = {
               ...updatedConversation,
               messages: updatedMessages,
+              lastUpdateAtUTC: dayjs().valueOf(),
             };
             homeDispatch({
               field: 'selectedConversation',
@@ -258,6 +259,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             updatedConversation = {
               ...updatedConversation,
               messages: updatedMessages,
+              lastUpdateAtUTC: dayjs().valueOf(),
             };
             homeDispatch({
               field: 'selectedConversation',
@@ -265,6 +267,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             });
           }
         }
+        
         saveConversation(updatedConversation);
         const updatedConversations: Conversation[] = conversations.map(
           (conversation) => {
@@ -389,7 +392,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 sm:px-4 sm:max-w-[600px]">
+                <div className="mx-auto flex max-w-[350px] flex-col space-y-10 pt-12 md:px-4 sm:max-w-[600px] ">
                   <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                     {models.length === 0 ? (
                       <div>
@@ -419,7 +422,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             ) : (
               <>
                 <div
-                  className="justify-center border hidden sm:flex
+                  className="justify-center border hidden md:flex
                   border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200 sticky top-0 z-10"
                 >
                   {selectedConversation?.name}

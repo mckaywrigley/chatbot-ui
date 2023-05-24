@@ -24,13 +24,15 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
-import { syncConversations } from '@/utils/app/conversation';
+import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
+import { syncData } from '@/utils/app/sync';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
+import { LatestExportFormat } from '@/types/export';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
@@ -124,10 +126,10 @@ const Home = ({
 
   // FETCH MODELS ----------------------------------------------
 
-  const isMobileLayout = useMediaQuery('(max-width: 640px)');
+  const isTabletLayout = useMediaQuery('(max-width: 768px)');
   const handleSelectConversation = (conversation: Conversation) => {
     //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
     }
 
@@ -142,11 +144,11 @@ const Home = ({
   // SWITCH LAYOUT SHOULD CLOSE ALL SIDEBAR --------------------
 
   useEffect(() => {
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
       dispatch({ field: 'showPromptbar', value: false });
     }
-  }, [isMobileLayout]);
+  }, [isTabletLayout]);
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -155,16 +157,27 @@ const Home = ({
       id: uuidv4(),
       name,
       type,
+      lastUpdateAtUTC: dayjs().valueOf(),
     };
 
     const updatedFolders = [...folders, newFolder];
 
     dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleDeleteFolder = (folderId: string) => {
-    const updatedFolders = folders.filter((f) => f.id !== folderId);
+    const updatedFolders = folders.map((folder) => {
+      if (folder.id === folderId) {
+        return {
+          ...folder,
+          deleted: true,
+        };
+      }
+
+      return folder;
+    });
     dispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
 
@@ -195,6 +208,7 @@ const Home = ({
 
     dispatch({ field: 'prompts', value: updatedPrompts });
     savePrompts(updatedPrompts);
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   const handleUpdateFolder = (folderId: string, name: string) => {
@@ -203,6 +217,7 @@ const Home = ({
         return {
           ...f,
           name,
+          lastUpdateAtUTC: dayjs().valueOf(),
         };
       }
 
@@ -212,13 +227,15 @@ const Home = ({
     dispatch({ field: 'folders', value: updatedFolders });
 
     saveFolders(updatedFolders);
+
+    updateConversationLastUpdatedAtTimeStamp();
   };
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
     //  CLOSE CHATBAR ON MOBILE LAYOUT WHEN SELECTING CONVERSATION
-    if (isMobileLayout) {
+    if (isTabletLayout) {
       dispatch({ field: 'showChatbar', value: false });
     }
 
@@ -237,6 +254,7 @@ const Home = ({
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: DEFAULT_TEMPERATURE,
       folderId: null,
+      lastUpdateAtUTC: dayjs().valueOf(),
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -256,7 +274,7 @@ const Home = ({
   ) => {
     const updatedConversation = {
       ...conversation,
-      [data.key]: data.value,
+      [data.key]: data.value
     };
 
     const { single, all } = updateConversation(
@@ -266,7 +284,7 @@ const Home = ({
 
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
-
+    updateConversationLastUpdatedAtTimeStamp();
     event('interaction', {
       category: 'Conversation',
       label: 'Create New Conversation',
@@ -296,44 +314,69 @@ const Home = ({
     if (!user) return;
     if (!isPaidUser) return;
 
-    let conversationLastUpdatedAt = localStorage.getItem(
+    const conversationLastUpdatedAt = localStorage.getItem(
       'conversationLastUpdatedAt',
     );
 
     const syncConversationsAction = async () => {
-      await syncConversations(
-        supabase,
-        user,
-        // Subtract 1 year to force sync
-        conversationLastUpdatedAt || dayjs().subtract(1, 'year').toString(),
-      );
+      try {
+        dispatch({ field: 'syncingConversation', value: true });
+
+        const syncResult: LatestExportFormat | null = await syncData(
+          supabase,
+          user,
+        );
+
+        if (syncResult !== null) {
+          const { history, folders, prompts } = syncResult;
+          dispatch({ field: 'conversations', value: history });
+          dispatch({ field: 'folders', value: folders });
+          dispatch({ field: 'prompts', value: prompts });
+          saveConversations(history);
+          saveFolders(folders);
+          savePrompts(prompts);
+
+          // skip if selected conversation is already in history
+          const selectedConversationFromRemote = history.find(
+            (remoteConversation) => remoteConversation.id === selectedConversation?.id,
+          );
+          if (
+            selectedConversation &&
+            selectedConversationFromRemote
+          ) {
+            dispatch({
+              field: 'selectedConversation',
+              value: selectedConversationFromRemote,
+            });
+          }
+        }
+      } catch (e) {
+        dispatch({ field: 'syncSuccess', value: false });
+        console.log('error', e);
+      }
+
+      dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
+      if (forceSyncConversation) {
+        dispatch({ field: 'forceSyncConversation', value: false });
+      }
+      dispatch({ field: 'syncSuccess', value: true });
+      dispatch({ field: 'syncingConversation', value: false });
     };
 
-    // Sync if we haven't sync for more than 2 minutes or it is the first time syncing upon loading
+    // Sync if we haven't sync for more than 5 seconds or it is the first time syncing upon loading
     if (
       !forceSyncConversation &&
       ((conversationLastSyncAt &&
-        dayjs().diff(conversationLastSyncAt, 'minutes') < 2) ||
+        dayjs().diff(conversationLastSyncAt, 'seconds') < 5) ||
         !conversationLastUpdatedAt)
     )
       return;
 
-    try {
-      dispatch({ field: 'syncingConversation', value: true });
-      syncConversationsAction();
-    } catch (e) {
-      dispatch({ field: 'syncSuccess', value: false });
-      console.log('error', e);
-    }
-
-    dispatch({ field: 'conversationLastSyncAt', value: dayjs().toString() });
-    if (forceSyncConversation) {
-      dispatch({ field: 'forceSyncConversation', value: false });
-    }
-    dispatch({ field: 'syncSuccess', value: true });
-    dispatch({ field: 'syncingConversation', value: false });
+    syncConversationsAction();
   }, [
     conversations,
+    prompts,
+    folders,
     user,
     supabase,
     dispatch,
@@ -575,14 +618,14 @@ const Home = ({
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
           style={{ height: containerHeight }}
         >
-          <div className="fixed top-0 w-full sm:hidden">
+          <div className="fixed top-0 w-full md:hidden">
             <Navbar
               selectedConversation={selectedConversation}
               onNewConversation={handleNewConversation}
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0 overflow-x-hidden">
+          <div className="flex h-full w-full pt-[48px] md:pt-0 overflow-x-hidden">
             <Chatbar />
             <div className="flex flex-1">
               <Chat

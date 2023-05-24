@@ -19,6 +19,8 @@ import { PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import TokenCounter from './components/TokenCounter';
+
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { CreditCounter } from './CreditCounter';
@@ -50,6 +52,8 @@ export const ChatMessage: FC<Props> = memo(
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
+    const [isOverTokenLimit, setIsOverTokenLimit] = useState(false);
+    const [isCloseToTokenLimit, setIsCloseToTokenLimit] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -133,6 +137,25 @@ export const ChatMessage: FC<Props> = memo(
       }
     }, [isEditing]);
 
+    const CopyButton = ({ className = '' }: { className?: string }) => {
+      if (messagedCopied) {
+        return (
+          <IconCheck
+            size={20}
+            className="text-green-500 dark:text-green-400 h-fit"
+          />
+        );
+      } else {
+        return (
+          <button
+            className={`translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit ${className}`}
+            onClick={copyOnClick}
+          >
+            <IconCopy size={20} />
+          </button>
+        );
+      }
+    };
     return (
       <div
         className={`group px-4 ${
@@ -159,10 +182,16 @@ export const ChatMessage: FC<Props> = memo(
             {message.role === 'user' ? (
               <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {isEditing ? (
-                  <div className="flex w-full flex-col">
+                  <div
+                    className={`flex w-full flex-col relative ${
+                      isOverTokenLimit
+                        ? 'before:z-0 before:absolute before:border-2 before:border-red-500 before:dark:border-red-600 before:-top-3 before:-bottom-3 before:-inset-3'
+                        : ''
+                    }`}
+                  >
                     <textarea
                       ref={textareaRef}
-                      className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541] focus:outline-none"
+                      className="relative z-1 w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541] focus:outline-none"
                       value={messageContent}
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
@@ -179,11 +208,13 @@ export const ChatMessage: FC<Props> = memo(
                       }}
                     />
 
-                    <div className="mt-10 flex justify-center space-x-4">
+                    <div className="relative z-1 mt-10 flex justify-center space-x-4">
                       <button
                         className="h-[40px] rounded-md bg-blue-500 px-4 py-1 text-sm font-medium text-white enabled:hover:bg-blue-600 disabled:opacity-50"
                         onClick={handleEditMessage}
-                        disabled={messageContent.trim().length <= 0}
+                        disabled={
+                          messageContent.trim().length <= 0 || isOverTokenLimit
+                        }
                       >
                         {t('Save & Submit')}
                       </button>
@@ -197,6 +228,20 @@ export const ChatMessage: FC<Props> = memo(
                         {t('Cancel')}
                       </button>
                     </div>
+                    <TokenCounter
+                      className={` ${
+                        isOverTokenLimit
+                          ? '!text-red-500 dark:text-red-600'
+                          : ''
+                      } ${
+                        isCloseToTokenLimit || isOverTokenLimit
+                          ? 'visible'
+                          : 'invisible'
+                      } absolute right-2 bottom-2 text-sm text-neutral-500 dark:text-neutral-400`}
+                      value={messageContent}
+                      setIsOverLimit={setIsOverTokenLimit}
+                      setIsCloseToLimit={setIsCloseToTokenLimit}
+                    />
                   </div>
                 ) : (
                   <div className="prose whitespace-pre-wrap dark:prose-invert">
@@ -205,7 +250,7 @@ export const ChatMessage: FC<Props> = memo(
                 )}
 
                 {!isEditing && (
-                  <div className="flex flex-row mt-2 md:mt-0">
+                  <div className="flex flex-row m-1">
                     <button
                       className={`text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit mr-1`}
                       onClick={toggleEditing}
@@ -222,8 +267,9 @@ export const ChatMessage: FC<Props> = memo(
                 )}
               </div>
             ) : (
-              <div className="flex w-full flex-col md:flex-col md:justify-between">
-                <div className="flex flex-row">
+              // DOING: change from flex to grid
+              <div className="flex w-full flex-col md:justify-between">
+                <div className="flex flex-row justify-between">
                   <MemoizedReactMarkdown
                     className="prose dark:prose-invert"
                     remarkPlugins={[remarkGfm, remarkMath]}
@@ -281,20 +327,8 @@ export const ChatMessage: FC<Props> = memo(
                   >
                     {message.content}
                   </MemoizedReactMarkdown>
-                  <div className="flex">
-                    {messagedCopied ? (
-                      <IconCheck
-                        size={20}
-                        className="text-green-500 dark:text-green-400 h-fit"
-                      />
-                    ) : (
-                      <button
-                        className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300 h-fit"
-                        onClick={copyOnClick}
-                      >
-                        <IconCopy size={20} />
-                      </button>
-                    )}
+                  <div className="flex m-1 tablet:hidden">
+                    <CopyButton />
                   </div>
                 </div>
                 {displayFooterButtons && (
@@ -304,6 +338,9 @@ export const ChatMessage: FC<Props> = memo(
                         <SpeechButton inputText={message.content} />
                       )}
                       <FeedbackContainer conversation={conversation} />
+                      <div className="m-1 hidden tablet:flex">
+                        <CopyButton className="translate-x-[unset] !text-gray-500 hover:!text-gray-300" />
+                      </div>
                     </div>
                     <CreditCounter pluginId={message.pluginId} />
                   </div>
