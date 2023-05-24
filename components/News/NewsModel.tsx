@@ -36,14 +36,6 @@ function NewsModel({ onClose }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectPageId, setSelectedPageId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (selectPageId) {
-      fetch(`/api/notion/news/${selectPageId}`).then((response) => {
-        console.log(response);
-      });
-    }
-  }, [selectPageId]);
-
   const fetchMoreNews = useCallback(async (nextCursor?: string) => {
     setIsLoading(true);
     try {
@@ -51,7 +43,7 @@ function NewsModel({ onClose }: Props) {
         `/api/notion/news?startCursor=${nextCursor || ''}`,
       );
       const { newsList, nextCursor: newNextCursor } = await response.json();
-      setNewsList((prevNewsList) => [...prevNewsList, ...newsList]);
+      setNewsList((prevNewsList) => [...prevNewsList, ...(newsList || [])]);
       setNextCursor(newNextCursor);
     } finally {
       setIsLoading(false);
