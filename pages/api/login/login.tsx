@@ -1,6 +1,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]"
+import { IconBrandGoogle, IconBrandGithub } from "@tabler/icons-react";
 
 const LogIn = () => {
     const {data : session} = useSession();
@@ -20,8 +21,8 @@ const LogIn = () => {
                 </div>
             </div>
           <div className="my-5">
-          <button className="w-100 my-1 w-[280px] bg-white rounded-md shadow-xl py-2" onClick={()=>signIn('google')}>Login with Google</button>
-          <button className="w-100 my-1 w-[280px] bg-white rounded-md shadow-xl py-2" onClick={()=>signIn('github')}>Login with Github</button>
+          <button className="w-100 my-1 w-[280px] bg-white rounded-md shadow-xl py-2 flex items-center justify-center" onClick={()=>signIn('google')}><IconBrandGoogle className="mx-2"/>Login with Google </button>
+          <button className="w-100 my-1 w-[280px] bg-white rounded-md shadow-xl py-2 flex items-center justify-center" onClick={()=>signIn('github')}><IconBrandGithub className="mx-2"/>Login with Github </button>
           </div>
         </div>
       </div>
