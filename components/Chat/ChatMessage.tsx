@@ -331,20 +331,25 @@ export const ChatMessage: FC<Props> = memo(
                     <CopyButton />
                   </div>
                 </div>
-                {displayFooterButtons && (
-                  <div className="flex flex-row items-center mt-3 w-full justify-between">
-                    <div className="flex flex-row">
-                      {message.pluginId !== PluginID.LANGCHAIN_CHAT && (
+                <div className="flex flex-row items-center mt-3 w-full justify-between">
+                  <div className="flex flex-row">
+                    {message.pluginId === PluginID.GPT4 ||
+                      (message.pluginId === null && (
                         <SpeechButton inputText={message.content} />
-                      )}
-                      <FeedbackContainer conversation={conversation} />
-                      <div className="m-1 hidden tablet:flex">
-                        <CopyButton className="translate-x-[unset] !text-gray-500 hover:!text-gray-300" />
-                      </div>
-                    </div>
-                    <CreditCounter pluginId={message.pluginId} />
+                      ))}
+                    {displayFooterButtons && (
+                      <>
+                        <FeedbackContainer conversation={conversation} />
+                        <div className="m-1 hidden tablet:flex">
+                          <CopyButton className="translate-x-[unset] !text-gray-500 hover:!text-gray-300" />
+                        </div>
+                      </>
+                    )}
                   </div>
-                )}
+                  {displayFooterButtons && (
+                    <CreditCounter pluginId={message.pluginId} />
+                  )}
+                </div>
               </div>
             )}
           </div>

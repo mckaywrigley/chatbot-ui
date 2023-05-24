@@ -18,6 +18,10 @@ export const getEndpoint = (plugin: Plugin | null) => {
     return 'api/chat-gpt4';
   }
 
+  if (plugin.id === PluginID.IMAGE_GEN) {
+    return 'api/image-gen';
+  }
+
   return 'api/chat';
 };
 

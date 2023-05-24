@@ -27,4 +27,7 @@ export interface CreditUsage {
   [PluginID.GPT4]: {
     remainingCredits: number;
   }
+  [PluginID.IMAGE_GEN]: {
+    remainingCredits: number;
+  }
 }
