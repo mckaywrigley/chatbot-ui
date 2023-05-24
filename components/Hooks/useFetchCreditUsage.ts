@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useState } from 'react';
 
 import { PluginID } from '@/types/plugin';
@@ -17,20 +17,24 @@ export const useFetchCreditUsage = () => {
   ) => {
     if(!isPaidUser) return;
 
-    // GPT-4
     const { data, error } = await supabaseClient
       .from('user_credits')
       .select('*')
       .eq('user_id', userId)
-      .eq('api_type', PluginID.GPT4);
+    
+    const gpt4Credits = (data?.find((creditRow) => creditRow.api_type === PluginID.GPT4)?.balance || 0) as number;
+    const imageGenCredits = (data?.find((creditRow) => creditRow.api_type === PluginID.IMAGE_GEN)?.balance || 0) as number;
 
     if (error) {
       console.error(error);
     } else if (data.length !== 0) {
       setCreditUsage({
         [PluginID.GPT4]: {
-          remainingCredits: data[0].balance,
+          remainingCredits: gpt4Credits,
         },
+        [PluginID.IMAGE_GEN]: {
+          remainingCredits: imageGenCredits,
+        }
       });
     }
   };
