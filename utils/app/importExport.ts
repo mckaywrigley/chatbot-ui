@@ -8,6 +8,7 @@ import {
 } from '@/types/export';
 
 import { cleanConversationHistory } from './clean';
+
 import dayjs from 'dayjs';
 
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
@@ -75,20 +76,11 @@ export const getExportableData = (): LatestExportFormat => {
   const folders = localStorage.getItem('folders');
   const prompts = localStorage.getItem('prompts');
 
-  if (history) {
-    return {
-      version: 4,
-      history: JSON.parse(history),
-      folders: folders ? JSON.parse(folders) : [],
-      prompts: prompts ? JSON.parse(prompts) : [],
-    };
-  }
-
   return {
     version: 4,
-    history: [],
-    folders: [],
-    prompts: [],
+    history: history ? JSON.parse(history) : [],
+    folders: folders ? JSON.parse(folders) : [],
+    prompts: prompts ? JSON.parse(prompts) : [],
   };
 };
 

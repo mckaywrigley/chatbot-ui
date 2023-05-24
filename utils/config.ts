@@ -4,4 +4,5 @@ import { PluginID } from '@/types/plugin';
 export const DefaultMonthlyCredits = {
   [PluginID.LANGCHAIN_CHAT]: 0,
   [PluginID.GPT4]: 25,
+  [PluginID.IMAGE_GEN]: 200,
 }

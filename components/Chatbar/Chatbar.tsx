@@ -175,6 +175,10 @@ export const Chatbar = () => {
     homeDispatch({ field: 'folders', value: updatedFolders });
     saveFolders(updatedFolders);
     updateConversationLastUpdatedAtTimeStamp();
+
+    homeDispatch({ field: 'forceSyncConversation', value: true });
+    homeDispatch({ field: 'replaceRemoteData', value: true });
+
     event('interaction', {
       category: 'Conversation',
       label: 'Clear conversations',

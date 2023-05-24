@@ -37,6 +37,7 @@ export interface HomeInitialState {
   conversationLastSyncAt: number | null;
   conversationLastUpdatedAt: number | null;
   forceSyncConversation: boolean;
+  replaceRemoteData: boolean;
   syncingConversation: boolean;
   syncSuccess: boolean | null; // null = not yet synced
 
@@ -90,6 +91,7 @@ export const initialState: HomeInitialState = {
   conversationLastSyncAt: null,
   conversationLastUpdatedAt: null,
   forceSyncConversation: true, // Sync on first load
+  replaceRemoteData: false,
   syncingConversation: false,
   syncSuccess: null,
 

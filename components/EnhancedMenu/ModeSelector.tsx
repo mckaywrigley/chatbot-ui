@@ -64,12 +64,20 @@ const ModeSelector = () => {
             {t('Online mode')}
           </option>
           {isPaidUser && (
-            <option
-              value={PluginID.GPT4}
-              className="dark:bg-[#343541] dark:text-white text-yellow-600"
-            >
-              {t('GPT-4')}
-            </option>
+            <>
+              <option
+                value={PluginID.GPT4}
+                className="dark:bg-[#343541] dark:text-white text-yellow-600"
+              >
+                {t('GPT-4')}
+              </option>
+              <option
+                value={PluginID.IMAGE_GEN}
+                className="dark:bg-[#343541] dark:text-white text-yellow-600"
+              >
+                {t('AI Image')}
+              </option>
+            </>
           )}
         </select>
       </div>

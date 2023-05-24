@@ -27,6 +27,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
   } = useContext(HomeContext);
 
   const gpt4Credit = creditUsage && creditUsage[PluginID.GPT4].remainingCredits;
+  const aiImageCredit = creditUsage && creditUsage[PluginID.IMAGE_GEN].remainingCredits;
 
   const userEmail = user?.email;
 
@@ -114,6 +115,29 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                               </a>
                             ),
                           )}
+                        </td>
+                      </tr>
+                      <tr className="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                        <th
+                          scope="row"
+                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        >
+                          AI image generation
+                        </th>
+                        <td className="px-6 py-4">
+                          {DefaultMonthlyCredits[PluginID.IMAGE_GEN]}
+                        </td>
+                        <td
+                          className={`px-6 py-4 ${
+                            aiImageCredit === 0 ? 'text-red-400 font-semibold' : ''
+                          }`}
+                        >
+                          {aiImageCredit === null
+                            ? DefaultMonthlyCredits[PluginID.IMAGE_GEN]
+                            : aiImageCredit}
+                        </td>
+                        <td className="px-6 py-4 flex flex-col text-left">
+                          N/A
                         </td>
                       </tr>
                     </tbody>

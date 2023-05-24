@@ -100,6 +100,7 @@ const Home = ({
       isPaidUser,
       conversationLastSyncAt,
       forceSyncConversation,
+      replaceRemoteData,
     },
     dispatch,
   } = contextValue;
@@ -274,7 +275,7 @@ const Home = ({
   ) => {
     const updatedConversation = {
       ...conversation,
-      [data.key]: data.value
+      [data.key]: data.value,
     };
 
     const { single, all } = updateConversation(
@@ -325,6 +326,7 @@ const Home = ({
         const syncResult: LatestExportFormat | null = await syncData(
           supabase,
           user,
+          replaceRemoteData,
         );
 
         if (syncResult !== null) {
@@ -338,12 +340,10 @@ const Home = ({
 
           // skip if selected conversation is already in history
           const selectedConversationFromRemote = history.find(
-            (remoteConversation) => remoteConversation.id === selectedConversation?.id,
+            (remoteConversation) =>
+              remoteConversation.id === selectedConversation?.id,
           );
-          if (
-            selectedConversation &&
-            selectedConversationFromRemote
-          ) {
+          if (selectedConversation && selectedConversationFromRemote) {
             dispatch({
               field: 'selectedConversation',
               value: selectedConversationFromRemote,
@@ -359,6 +359,7 @@ const Home = ({
       if (forceSyncConversation) {
         dispatch({ field: 'forceSyncConversation', value: false });
       }
+      dispatch({ field: 'replaceRemoteData', value: false });
       dispatch({ field: 'syncSuccess', value: true });
       dispatch({ field: 'syncingConversation', value: false });
     };

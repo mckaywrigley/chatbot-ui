@@ -102,7 +102,6 @@ const mergeTwoObjects = (
   let mergedObject: MergeableObject;
 
   if (localObject !== null && remoteObject !== null) {
-
     // If both conversations are not deleted, then we compare the lastUpdateAtUTC
     mergedObject =
       (remoteObject.lastUpdateAtUTC || 0) > (localObject.lastUpdateAtUTC || 0)
@@ -164,6 +163,7 @@ const mergeTwoMergeableCollections = (
 export const syncData = async (
   supabase: SupabaseClient,
   user: User,
+  replaceRemoteData: boolean = false,
 ): Promise<LatestExportFormat | null> => {
   let mergedHistory: Conversation[] = [];
   let mergedFolders: FolderInterface[] = [];
@@ -176,7 +176,7 @@ export const syncData = async (
   let remoteConversations: Conversation[] = [];
   let localConversations = cleanConversationHistory(localDataObject.history);
 
-  if (remoteDataObject) {
+  if (remoteDataObject && !replaceRemoteData) {
     remoteConversations = cleanConversationHistory(remoteDataObject.history);
   }
 
@@ -189,7 +189,7 @@ export const syncData = async (
   let remoteFolders: FolderInterface[] = [];
   let localFolders = localDataObject.folders;
 
-  if (remoteDataObject) {
+  if (remoteDataObject && !replaceRemoteData) {
     remoteFolders = remoteDataObject.folders;
   }
 
@@ -202,7 +202,7 @@ export const syncData = async (
   let remotePrompts: Prompt[] = [];
   let localPrompts = localDataObject.prompts;
 
-  if (remoteDataObject) {
+  if (remoteDataObject && !replaceRemoteData) {
     remotePrompts = remoteDataObject.prompts;
   }
 
