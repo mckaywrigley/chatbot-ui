@@ -33,12 +33,13 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { Session } from 'next-auth';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat = memo(({ stopConversationRef }: Props) => {
+export const Chat = memo(({ stopConversationRef}: Props) => {
   const { t } = useTranslation('chat');
 
   const {
