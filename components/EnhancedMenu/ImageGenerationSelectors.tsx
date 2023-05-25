@@ -90,7 +90,7 @@ const ImageGenerationSelectors = () => {
           value={key}
           className="dark:bg-[#343541] dark:text-white"
         >
-          {value}
+          {t(key)}
         </option>,
       );
     }

@@ -30,6 +30,7 @@ import { SpeechButton } from './SpeechButton';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import dayjs from 'dayjs';
 
 interface Props {
   message: Message;
@@ -158,6 +159,24 @@ export const ChatMessage: FC<Props> = memo(
         );
       }
     };
+
+    const downloadFile = async (url: string, filename: string) => {
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const href = URL.createObjectURL(blob);
+
+      // Create a "hidden" anchor tag with the download attribute and simulate a click.
+      const link = document.createElement('a');
+      link.href = href;
+      link.download = filename;
+      link.style.display = 'none';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+
     return (
       <div
         className={`group px-4 ${
@@ -325,6 +344,17 @@ export const ChatMessage: FC<Props> = memo(
                           </td>
                         );
                       },
+                      img({ src }) {
+                        return (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={src}
+                            alt={t("Click to download image") || "Click to download image"}
+                            className="cursor-pointer"
+                            onClick={() => src && downloadFile(src, `chateverywhere-ai-image-${dayjs().valueOf()}.png`)}
+                          />
+                        );
+                      }
                     }}
                   >
                     {message.content}
