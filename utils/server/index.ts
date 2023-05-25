@@ -54,7 +54,6 @@ export const OpenAIStream = async (
     max_tokens: isGPT4Model ? 2000 : 800,
     temperature,
     stream: true,
-    top_p: 1,
     presence_penalty: 0,
     frequency_penalty: 0,
   };
