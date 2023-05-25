@@ -341,7 +341,7 @@ const Home = ({
             (remoteConversation) =>
               remoteConversation.id === selectedConversation?.id,
           );
-          if (selectedConversation && selectedConversationFromRemote) {
+          if (selectedConversation && selectedConversationFromRemote && selectedConversation !== selectedConversationFromRemote) {
             dispatch({
               field: 'selectedConversation',
               value: selectedConversationFromRemote,

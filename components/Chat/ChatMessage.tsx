@@ -26,11 +26,12 @@ import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { CreditCounter } from './CreditCounter';
 import { FeedbackContainer } from './FeedbackContainer';
 import { SpeechButton } from './SpeechButton';
+import Image from 'next/image';
 
+import dayjs from 'dayjs';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import dayjs from 'dayjs';
 
 interface Props {
   message: Message;
@@ -175,7 +176,7 @@ export const ChatMessage: FC<Props> = memo(
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  };
+    };
 
     return (
       <div
@@ -345,13 +346,21 @@ export const ChatMessage: FC<Props> = memo(
                         );
                       },
                       img({ src }) {
+                        if(!src) return<></>;
                         return (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={src}
-                            alt={t("Click to download image") || "Click to download image"}
+                            alt={t('Click to download image')}
+                            width={512}
+                            height={512}
                             className="cursor-pointer"
-                            onClick={() => src && downloadFile(src, `chateverywhere-ai-image-${dayjs().valueOf()}.png`)}
+                            onClick={() =>
+                              src &&
+                              downloadFile(
+                                src,
+                                `chateverywhere-ai-image-${dayjs().valueOf()}.png`,
+                              )
+                            }
                           />
                         );
                       }
