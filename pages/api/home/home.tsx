@@ -29,6 +29,7 @@ import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { syncData } from '@/utils/app/sync';
 import { getIsSurveyFilledFromLocalStorage } from '@/utils/app/ui';
+import { deepEqual } from '@/utils/app/ui';
 
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
@@ -341,7 +342,11 @@ const Home = ({
             (remoteConversation) =>
               remoteConversation.id === selectedConversation?.id,
           );
-          if (selectedConversation && selectedConversationFromRemote && selectedConversation !== selectedConversationFromRemote) {
+          if (
+            selectedConversation &&
+            selectedConversationFromRemote &&
+            !deepEqual(selectedConversation, selectedConversationFromRemote)
+          ) {
             dispatch({
               field: 'selectedConversation',
               value: selectedConversationFromRemote,
