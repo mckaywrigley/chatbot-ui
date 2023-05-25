@@ -138,6 +138,8 @@ export const ChatMessage: FC<Props> = memo(
     }, [isEditing]);
 
     const CopyButton = ({ className = '' }: { className?: string }) => {
+      if (message.pluginId === PluginID.IMAGE_GEN) return <></>;
+
       if (messagedCopied) {
         return (
           <IconCheck
