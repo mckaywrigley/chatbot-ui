@@ -9,6 +9,7 @@ import React, {
 import HomeContext from '@/pages/api/home/home.context';
 
 import ChangeOutputLanguageButton from './ChangeOutputLanguageButton';
+import ConversationStyleSelector from './ConversationStyleSelector';
 import ModeSelector from './ModeSelector';
 
 import PropTypes from 'prop-types';
@@ -60,6 +61,7 @@ const EnhancedMenu = forwardRef<HTMLDivElement, EnhancedMenuProps>(
         }}
       >
         <ModeSelector />
+        <ConversationStyleSelector />
         <ChangeOutputLanguageButton />
       </div>
     );
