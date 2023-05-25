@@ -14,6 +14,10 @@ export interface ChatBody {
   messages: Message[];
   prompt: string;
   temperature: number;
+
+  // Image generations parameters
+  numberOfSamples?: number;
+  imageStyle?: string;
 }
 
 export interface Conversation {
@@ -26,4 +30,7 @@ export interface Conversation {
   folderId: string | null;
   lastUpdateAtUTC: number; // timestamp in UTC in milliseconds
   deleted?: boolean;
+  // Image generations parameters
+  numberOfSamples?: number;
+  imageStyle?: string;
 }

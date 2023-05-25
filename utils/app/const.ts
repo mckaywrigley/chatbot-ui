@@ -15,5 +15,6 @@ export const OPENAI_API_VERSION =
 export const OPENAI_ORGANIZATION =
   process.env.OPENAI_ORGANIZATION || '';
 
-export const AZURE_DEPLOYMENT_ID =
-  process.env.AZURE_DEPLOYMENT_ID || '';
+export const DEFAULT_IMAGE_GENERATION_STYLE = "photographic";
+
+export const DEFAULT_IMAGE_GENERATION_SAMPLE = 1;

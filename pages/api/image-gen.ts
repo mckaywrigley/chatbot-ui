@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
 import {
+  DEFAULT_IMAGE_GENERATION_SAMPLE,
+  DEFAULT_IMAGE_GENERATION_STYLE,
+} from '@/utils/app/const';
+import {
   addUsageEntry,
   getAdminSupabaseClient,
   getUserProfile,
@@ -27,46 +31,45 @@ const IMAGE_GENERATION_CONFIG = {
   engineName: 'stable-diffusion-xl-beta-v2-2-2',
   height: 512,
   width: 512,
-  stylePreset: 'photographic',
   cfgScale: 4,
   steps: 50,
-  negativePrompts: "blur, low resolution"
+  negativePrompts: 'blur, low resolution',
 };
 
 const CREATIVELY_LEVELS_MAPPING = {
   high: {
     steps: 40,
-    cfgScale: 2
+    cfgScale: 2,
   },
   medium: {
     steps: 50,
-    cfgScale: 4
+    cfgScale: 4,
   },
   low: {
     steps: 100,
-    cfgScale: 7
-  }
-}
+    cfgScale: 7,
+  },
+};
 
 // The lower the temperature, the less creative the generation
 const getImageGenerationConfig = (temperature: number = 0.5) => {
-  if(temperature < 0.3) {
+  if (temperature < 0.3) {
     return {
       ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.low
-    }
-  }else if(temperature < 0.7) {
+      ...CREATIVELY_LEVELS_MAPPING.low,
+    };
+  } else if (temperature < 0.7) {
     return {
       ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.medium
-    }
-  }else {
+      ...CREATIVELY_LEVELS_MAPPING.medium,
+    };
+  } else {
     return {
       ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.high
-    }
+      ...CREATIVELY_LEVELS_MAPPING.high,
+    };
   }
-}
+};
 
 const handler = async (req: Request): Promise<Response> => {
   const userToken = req.headers.get('user-token');
@@ -96,16 +99,21 @@ const handler = async (req: Request): Promise<Response> => {
     const requestBody = (await req.json()) as ChatBody;
 
     const imageGeneration = async () => {
-      const latestUserPrompt =
+      const latestUserPromptMessage =
         requestBody.messages[requestBody.messages.length - 1].content;
 
       const generationTemperature = requestBody.temperature;
-      const numberOfImages = 2;
+      const numberOfImages =
+        requestBody.numberOfSamples || DEFAULT_IMAGE_GENERATION_SAMPLE;
+      const imageStyle =
+        requestBody.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
 
       writeToStream('```Image Generation \n');
       writeToStream('Generating image(s) ... \n');
 
-      const imageGenerationConfig = getImageGenerationConfig(generationTemperature);
+      const imageGenerationConfig = getImageGenerationConfig(
+        generationTemperature,
+      );
 
       const options = {
         method: 'POST',
@@ -116,31 +124,33 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           text_prompts: [
             {
-              text: latestUserPrompt,
+              text: latestUserPromptMessage,
               weight: 0.5,
             },
             {
               text: imageGenerationConfig.negativePrompts,
               weight: -0.5,
-            }
+            },
           ],
           height: imageGenerationConfig.height,
           width: imageGenerationConfig.width,
-          style_preset: imageGenerationConfig.stylePreset,
+          style_preset: imageStyle,
           cfg_scale: imageGenerationConfig.cfgScale,
           steps: imageGenerationConfig.steps,
         }),
       };
 
-      for(let imageIndex = 0; imageIndex < numberOfImages; imageIndex++) {
+      for (let imageIndex = 0; imageIndex < numberOfImages; imageIndex++) {
         const imageGenerationResponse = await fetch(
           `https://api.stability.ai/v1/generation/${IMAGE_GENERATION_CONFIG.engineName}/text-to-image`,
           options,
         );
-  
-        const imageGenerationResponseJson = await imageGenerationResponse.json();
-        const base64ImageString = imageGenerationResponseJson.artifacts[0].base64;
-  
+
+        const imageGenerationResponseJson =
+          await imageGenerationResponse.json();
+        const base64ImageString =
+          imageGenerationResponseJson.artifacts[0].base64;
+
         // Upload base64 Image to Supabase Storage
         const imageFileName = `${user.id}-${v4()}.png`;
         const { error } = await supabase.storage
@@ -150,18 +160,18 @@ const handler = async (req: Request): Promise<Response> => {
             upsert: false,
           });
         if (error) throw error;
-  
+
         const { data: imagePublicUrlData } = await supabase.storage
           .from('ai-images')
           .getPublicUrl(imageFileName);
-  
-        if(imageIndex === 0) {
+
+        if (imageIndex === 0) {
           writeToStream(`Receiving image(s) ... \n`);
           writeToStream('``` \n');
         }
-  
+
         writeToStream(`![Generated Image](${imagePublicUrlData.publicUrl}) \n`);
-  
+
         addUsageEntry(PluginID.IMAGE_GEN, user.id);
         subtractCredit(user.id, PluginID.IMAGE_GEN);
       }
