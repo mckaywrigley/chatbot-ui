@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -25,6 +26,7 @@ import TokenCounter from './components/TokenCounter';
 import EnhancedMenu from '../EnhancedMenu/EnhancedMenu';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { PluginID } from '@/types/plugin';
 
 interface Props {
   onSend: () => void;
@@ -73,7 +75,6 @@ export const ChatInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = selectedConversation?.model.maxLength;
 
     setContent(value);
     updatePromptListVisibility(value);
@@ -267,13 +268,15 @@ export const ChatInput = ({
     };
   }, []);
 
+  const isAiImagePluginSelected = useMemo(() => currentMessage?.pluginId === PluginID.IMAGE_GEN, [currentMessage?.pluginId]);
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div
         className={` ${
           enhancedMenuDisplayValue === 'none'
             ? 'mt-[1.5rem] md:mt-[3rem]'
-            : 'mt-[8.2rem] md:mt-[6.7rem]'
+            : `${isAiImagePluginSelected ? 'mt-[13.7rem] md:mt-[9.5rem]' : 'mt-[10.7rem] md:mt-[6.7rem]'}`
         } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl transition-all ease-in-out`}
       >
         {messageIsStreaming && (
@@ -358,7 +361,7 @@ export const ChatInput = ({
           />
 
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             {messageIsStreaming ? (
