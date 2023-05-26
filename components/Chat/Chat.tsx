@@ -1,4 +1,8 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import {
+  IconClearAll,
+  IconScreenshot,
+  IconSettings,
+} from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -29,10 +33,12 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
+
+import { toPng } from 'html-to-image';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -307,6 +313,27 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   };
   const throttledScrollDown = throttle(scrollDown, 250);
 
+  const onScreenshot = () => {
+    if (chatContainerRef.current === null) {
+      return;
+    }
+
+    chatContainerRef.current.classList.remove('max-h-full');
+    toPng(chatContainerRef.current, { cacheBust: true })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `${selectedConversation?.name || 'conversation'}.png`;
+        link.href = dataUrl;
+        link.click();
+        if (chatContainerRef.current) {
+          chatContainerRef.current.classList.add('max-h-full');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   // useEffect(() => {
   //   console.log('currentMessage', currentMessage);
   //   if (currentMessage) {
@@ -453,6 +480,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     onClick={onClearAll}
                   >
                     <IconClearAll size={18} />
+                  </button>
+                  <button
+                    className="ml-2 cursor-pointer hover:opacity-50"
+                    onClick={onScreenshot}
+                  >
+                    <IconScreenshot size={18} />
                   </button>
                 </div>
                 {showSettings && (
