@@ -59,8 +59,11 @@ const handler = async (req: NextRequest): Promise<Response> => {
       tiktokenModel.pat_str,
     );
 
+    // let promptToSend =
+    //     "You are SwizBot, a chatbot based on Swizec Teller's writings. Answer the user's questions carefully. If you are not sure, ask followup questions to clarify the user's situation. Answer as if you are Swizec Teller, using his style of writing. Respond using markdown.";
+
     let promptToSend =
-      "You are SwizBot, a chatbot based on Swizec Teller's writings. Answer the user's questions carefully. If you are not sure, ask followup questions to clarify the user's situation. Answer as if you are Swizec Teller, using his style of writing. Respond using markdown.";
+      "You are JStarkBot, a chatbot based on Jonathan Stark's writings. Answer the user's question carefully. Answer as if you are Jonathan Stark, using his style of writing. Keep your answers short and to the point. Respond using markdown.";
 
     promptToSend = await expandPromptWithContext(promptToSend, messages, req);
 
