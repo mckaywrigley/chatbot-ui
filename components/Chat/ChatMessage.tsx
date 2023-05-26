@@ -6,9 +6,18 @@ import {
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
-import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import { event } from 'nextjs-google-analytics';
 
 import { updateConversation } from '@/utils/app/conversation';
@@ -26,7 +35,6 @@ import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { CreditCounter } from './CreditCounter';
 import { FeedbackContainer } from './FeedbackContainer';
 import { SpeechButton } from './SpeechButton';
-import Image from 'next/image';
 
 import dayjs from 'dayjs';
 import rehypeMathjax from 'rehype-mathjax';
@@ -178,6 +186,60 @@ export const ChatMessage: FC<Props> = memo(
       document.body.removeChild(link);
     };
 
+    const ImgComponent = useMemo(() => {
+      const Component = ({
+        src,
+      }: React.DetailedHTMLProps<
+        React.ImgHTMLAttributes<HTMLImageElement>,
+        HTMLImageElement
+      >) => {
+        if (!src) return <></>;
+        return (
+          <Image
+            src={src}
+            alt={t('Click to download image')}
+            width={512}
+            height={512}
+            className="cursor-pointer"
+            onClick={() =>
+              downloadFile(
+                src,
+                `chateverywhere-ai-image-${dayjs().valueOf()}.png`,
+              )
+            }
+          />
+        );
+      };
+      Component.displayName = 'ImgComponent';
+      return Component;
+    }, [t]);
+
+    const CodeComponent = useMemo(() => {
+      const Component: React.FC<any> = ({
+        node,
+        inline,
+        className,
+        children,
+        ...props
+      }) => {
+        const match = /language-(\w+)/.exec(className || '');
+        return !inline ? (
+          <CodeBlock
+            key={Math.random()}
+            language={(match && match[1]) || ''}
+            value={String(children).replace(/\n$/, '')}
+            {...props}
+          />
+        ) : (
+          <code className={className} {...props}>
+            {children}
+          </code>
+        );
+      };
+      Component.displayName = 'CodeComponent';
+      return Component;
+    }, []);
+
     return (
       <div
         className={`group px-4 ${
@@ -309,21 +371,7 @@ export const ChatMessage: FC<Props> = memo(
                           </a>
                         );
                       },
-                      code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        return !inline ? (
-                          <CodeBlock
-                            key={Math.random()}
-                            language={(match && match[1]) || ''}
-                            value={String(children).replace(/\n$/, '')}
-                            {...props}
-                          />
-                        ) : (
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        );
-                      },
+                      code: CodeComponent,
                       table({ children }) {
                         return (
                           <table className="border-collapse border border-black px-3 py-1 dark:border-white">
@@ -345,25 +393,7 @@ export const ChatMessage: FC<Props> = memo(
                           </td>
                         );
                       },
-                      img({ src }) {
-                        if(!src) return<></>;
-                        return (
-                          <Image
-                            src={src}
-                            alt={t('Click to download image')}
-                            width={512}
-                            height={512}
-                            className="cursor-pointer"
-                            onClick={() =>
-                              src &&
-                              downloadFile(
-                                src,
-                                `chateverywhere-ai-image-${dayjs().valueOf()}.png`,
-                              )
-                            }
-                          />
-                        );
-                      }
+                      img: ImgComponent,
                     }}
                   >
                     {message.content}
