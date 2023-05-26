@@ -17,8 +17,6 @@ const ConversationStyleSelector = () => {
   }, [selectedConversation]);
 
   const temperatureOnChange = (temperature: string) => {
-    console.log('temperatureOnChange', temperature);
-    console.log('selectedConversation', selectedConversation);
     homeDispatch({
       field: 'selectedConversation',
       value: {

@@ -13,6 +13,10 @@ const nextConfig = {
 
     return config;
   },
+
+  images: {
+    domains: ['localhost', 'gdldiwtaingbnreeyuoj.supabase.co', 'tlzqgrjdkmblgtbmalki.supabase.co']
+  },
 };
 
 module.exports = nextConfig;

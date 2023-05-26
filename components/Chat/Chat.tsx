@@ -1,3 +1,5 @@
+import { DEFAULT_IMAGE_GENERATION_STYLE, DEFAULT_IMAGE_GENERATION_SAMPLE } from '@/utils/app/const';
+
 import { IconArrowDown, IconClearAll } from '@tabler/icons-react';
 import {
   MutableRefObject,
@@ -20,11 +22,9 @@ import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugins } from '@/types/plugin';
+import { PluginID, Plugins } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
-
-import { useFetchCreditUsage } from '@/components/Hooks/useFetchCreditUsage';
 
 import { NewConversationMessagesContainer } from '../ConversationStarter/NewConversationMessagesContainer';
 import Spinner from '../Spinner';
@@ -147,20 +147,13 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           temperature: updatedConversation.temperature,
         };
         const endpoint = getEndpoint(plugin);
-        let body;
-        if (!plugin) {
-          const filteredChatBodyMessages = chatBody.messages.map((message) => ({
-            role: message.role,
-            content: message.content,
-          }));
-
-          body = JSON.stringify({
-            ...chatBody,
-            messages: filteredChatBodyMessages,
-          });
-        } else {
-          body = JSON.stringify(chatBody);
+        
+        if(plugin?.id === PluginID.IMAGE_GEN) {
+          chatBody.numberOfSamples = selectedConversation.numberOfSamples || DEFAULT_IMAGE_GENERATION_SAMPLE;
+          chatBody.imageStyle = selectedConversation.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
         }
+        
+        const body = JSON.stringify(chatBody);
         const controller = new AbortController();
         const response = await fetch(endpoint, {
           method: 'POST',

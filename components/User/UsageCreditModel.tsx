@@ -122,7 +122,7 @@ export const UsageCreditModel: FC<Props> = ({ onClose }) => {
                           scope="row"
                           className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          AI image generation
+                          {t('AI Image')}
                         </th>
                         <td className="px-6 py-4">
                           {DefaultMonthlyCredits[PluginID.IMAGE_GEN]}
