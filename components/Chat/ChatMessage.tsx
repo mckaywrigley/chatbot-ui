@@ -275,6 +275,13 @@ export const ChatMessage: FC<Props> = memo(
                     remarkPlugins={[remarkGfm, remarkMath]}
                     rehypePlugins={[rehypeMathjax]}
                     components={{
+                      p({ node, children, ...props }) {
+                        return (
+                          <p className="m-0" {...props}>
+                            {children}
+                          </p>
+                        );
+                      },
                       a({ node, children, href, ...props }) {
                         return (
                           <a
