@@ -57,7 +57,6 @@ export const OpenAIStream = async (
     presence_penalty: 0,
     frequency_penalty: 0,
   };
-  console.log(bodyToSend);
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
