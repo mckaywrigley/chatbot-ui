@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconMicrophone,
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -343,6 +344,16 @@ export const ChatInput = ({
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
             ) : (
               <IconSend size={18} />
+            )}
+          </button>
+          <button
+            className="absolute right-9 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={handleSend}
+          >
+            {messageIsStreaming ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
+            ) : (
+              <IconMicrophone size={18} />
             )}
           </button>
 
