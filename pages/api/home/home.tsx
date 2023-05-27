@@ -100,6 +100,7 @@ const Home = ({
       conversationLastSyncAt,
       forceSyncConversation,
       replaceRemoteData,
+      messageIsStreaming
     },
     dispatch,
   } = contextValue;
@@ -311,6 +312,7 @@ const Home = ({
   // CLOUD SYNC ------------------------------------------
 
   useEffect(() => {
+    if(messageIsStreaming) return;
     if (!user) return;
     if (!isPaidUser) return;
 
