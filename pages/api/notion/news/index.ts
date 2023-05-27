@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest } from 'next/server';
 
 import { ChatEverywhereNews } from '@/types/notion';
 
@@ -9,16 +9,20 @@ const newsDatabaseID = process.env.NOTION_NEWS_DATABASE_ID as string;
 const notionKey = process.env.NOTION_SECRET_KEY as string;
 const client = new Client({ auth: notionKey });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export const config = {
+  runtime: 'edge',
+};
+
+const handler = async (req: NextRequest): Promise<Response> => {
   if (req.method !== 'GET') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
+    return new Response('Error', {
+      status: 405,
+      statusText: 'Method not allowed',
+    });
   }
 
-  const { startCursor } = req.query;
+  const startCursor = req.nextUrl.searchParams.get('startCursor');
+
   const query = {
     database_id: newsDatabaseID,
     page_size: 15,
@@ -44,7 +48,7 @@ export default async function handler(
     const response = await client.databases.query(query);
     const results = response.results;
 
-    res.status(200).json({
+    const responsePayload = {
       newsList: results
         .map((page) => {
           if (
@@ -62,9 +66,16 @@ export default async function handler(
         })
         .filter((page) => page !== null) as ChatEverywhereNews[],
       nextCursor: response.next_cursor,
-    });
+    };
+
+    return new Response(JSON.stringify(responsePayload));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    return new Response('Error', {
+      status: 500,
+      statusText: 'Internal server error',
+    });
   }
-}
+};
+
+export default handler;
