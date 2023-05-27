@@ -68,7 +68,11 @@ const handler = async (req: NextRequest): Promise<Response> => {
       nextCursor: response.next_cursor,
     };
 
-    return new Response(JSON.stringify(responsePayload));
+    return new Response(JSON.stringify(responsePayload), {
+      headers: {
+        'Cache-Control': 's-maxage=300, stale-while-revalidate',
+      },
+    });
   } catch (error) {
     console.error(error);
     return new Response('Error', {
