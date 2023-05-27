@@ -64,8 +64,10 @@ function BlogPage() {
             fetch(`https://hamburgerai.cn/blog/query?parentId=${item.id}`) // 在 URL 中传递 parentId 参数
                 .then((response) => response.json())
                 .then((data) => {
-                    item.children = data;
-                    setSidebarData([...sidebarData]); // 更新侧边栏数据
+                    if (data && data.length > 0) {
+                        item.children = data;
+                        setSidebarData([...sidebarData]); // 更新侧边栏数据
+                    }
                 })
                 .catch((error) => {
                     console.error('Error:', error);
