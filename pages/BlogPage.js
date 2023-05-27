@@ -49,7 +49,7 @@ function BlogPage() {
 
     useEffect(() => {
         // 获取根目录的子级元素
-        fetch(`/api/sidebar?parentId=0`)
+        fetch(`http://localhost:5000/blog/query?parentId=0`)
             .then(response => response.json())
             .then(data => {
                 setSidebarData(data);
@@ -61,7 +61,7 @@ function BlogPage() {
 
     const handleSidebarItemClick = (item) => {
         if (item.type === 'directory') {
-            fetch(`/api/sidebar?parentId=${item.id}`) // 在 URL 中传递 parentId 参数
+            fetch(`http://localhost:5000/blog/query?parentId=${item.id}`) // 在 URL 中传递 parentId 参数
                 .then((response) => response.json())
                 .then((data) => {
                     item.children = data;
@@ -71,10 +71,10 @@ function BlogPage() {
                     console.error('Error:', error);
                 });
         } else if (item.type === 'article') {
-            fetch(`/api/content/${item.id}`)
-                .then(response => response.text())
+            fetch(`http://localhost:5000/blog/query?id=${item.id}`)
+                .then(response => response.json())
                 .then(data => {
-                    setContentData(data);
+                    setContentData(data.content);
                 })
                 .catch(error => {
                     console.error('Error:', error);
