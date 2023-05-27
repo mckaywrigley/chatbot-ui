@@ -15,7 +15,7 @@ import { event } from 'nextjs-google-analytics/dist/interactions';
 
 import { getEndpoint } from '@/utils/app/api';
 import {
-  DEFAULT_IMAGE_GENERATION_SAMPLE,
+  DEFAULT_IMAGE_GENERATION_QUALITY,
   DEFAULT_IMAGE_GENERATION_STYLE,
 } from '@/utils/app/const';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
@@ -153,9 +153,9 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
         const endpoint = getEndpoint(plugin);
 
         if (plugin?.id === PluginID.IMAGE_GEN) {
-          chatBody.numberOfSamples =
-            selectedConversation.numberOfSamples ||
-            DEFAULT_IMAGE_GENERATION_SAMPLE;
+          chatBody.imageQuality =
+            selectedConversation.imageQuality ||
+            DEFAULT_IMAGE_GENERATION_QUALITY;
           chatBody.imageStyle =
             selectedConversation.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
         }

@@ -80,3 +80,7 @@ export const removeSecondLastLine = (originalText: string): string => {
 
   return originalText.replace(toBeRemovedString, '');
 };
+
+export const capitalizeFirstLetter = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
