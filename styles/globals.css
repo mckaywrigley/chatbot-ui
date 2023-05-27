@@ -37,3 +37,31 @@
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+.blog-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  flex: 0 0 20%;
+  max-width: 20%;
+  background-color: #f1f1f1;
+  padding: 20px;
+  height: 100vh;
+}
+
+.sidebar-content {
+  margin-top: 20px;
+}
+
+.separator {
+  width: 1px;
+  background-color: #ccc;
+}
+
+.content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  background-color: #fff;
+}
