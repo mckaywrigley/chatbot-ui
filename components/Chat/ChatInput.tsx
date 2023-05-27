@@ -290,7 +290,8 @@ export const ChatInput = ({
               }`
         } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl transition-all ease-in-out`}
       >
-        {messageIsStreaming && (
+        {/* Disable stop generating button for image generation until implemented */}
+        {messageIsStreaming && currentMessage?.pluginId !== PluginID.IMAGE_GEN && (
           <button
             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
             onClick={handleStopConversation}
