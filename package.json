@@ -44,6 +44,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-transition-group": "^4.4.5",
     "rehype-mathjax": "^4.0.2",
+    "remark-breaks": "^3.0.3",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "stream": "^0.0.2",

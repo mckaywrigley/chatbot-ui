@@ -1,10 +1,7 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 
-import {
-  OPENAI_API_HOST,
-  OPENAI_API_TYPE,
-} from '../app/const';
+import { OPENAI_API_HOST, OPENAI_API_TYPE } from '../app/const';
 
 import {
   ParsedEvent,
@@ -45,25 +42,28 @@ export const OpenAIStream = async (
 
   const isGPT4Model = model.id === OpenAIModelID.GPT_4;
 
+  const bodyToSend = {
+    ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      ...normalizeMessages(messages),
+    ],
+    max_tokens: isGPT4Model ? 2000 : 800,
+    temperature,
+    stream: true,
+    presence_penalty: 0,
+    frequency_penalty: 0,
+  };
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     method: 'POST',
-    body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        ...normalizeMessages(messages),
-      ],
-      max_tokens: isGPT4Model ? 2000 : 800,
-      temperature: temperature,
-      stream: true,
-    }),
+    body: JSON.stringify(bodyToSend),
   });
 
   const encoder = new TextEncoder();
@@ -120,4 +120,5 @@ export const OpenAIStream = async (
 };
 
 // Truncate log message to 4000 characters
-export const truncateLogMessage = (message: string) => message.length > 4000 ? `${message.slice(0, 4000)}...` : message;
+export const truncateLogMessage = (message: string) =>
+  message.length > 4000 ? `${message.slice(0, 4000)}...` : message;
