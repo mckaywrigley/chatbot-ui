@@ -87,7 +87,9 @@ function BlogPage() {
     return (
         <div className="blog-container">
             <div className="sidebar">
-                <h2>Hamburger 文章</h2>
+                <div className="sidebar-header">
+                    <h2>Hamburger 文章</h2>
+                </div>
                 <div className="sidebar-content">
                     {sidebarData.map((item) => (
                         <SidebarItem
@@ -103,6 +105,51 @@ function BlogPage() {
             <div className="content">
                 <MarkdownRenderer markdownContent={contentData} />
             </div>
+            <style jsx>{`
+              .blog-container {
+                display: flex;
+                height: 100vh;
+              }
+
+              .sidebar {
+                flex: 0 0 20%;
+                max-width: 20%;
+                background-color: #f1f1f1;
+                padding: 20px;
+                height: 100vh;
+              }
+
+              .sidebar-header {
+                margin-bottom: 20px;
+              }
+
+              .sidebar-header h2 {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+              }
+
+              .sidebar-header p {
+                font-size: 14px;
+                color: #888;
+                margin-bottom: 0;
+              }
+
+              .sidebar-content {
+                margin-top: 20px;
+              }
+
+              .separator {
+                width: 1px;
+                background-color: #ccc;
+              }
+
+              .content {
+                flex: 1 1 auto;
+                overflow-y: auto;
+                background-color: #fff;
+              }
+            `}</style>
         </div>
     );
 }
