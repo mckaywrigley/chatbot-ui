@@ -57,10 +57,10 @@ const generateMjPrompt = (
       break;
   }
 
-  if(temperature === 0.5){
-    resultPrompt += ' --chaos 25'
-  }else if(temperature > 0.5){
-    resultPrompt += ' --chaos 50'
+  if (temperature === 0.5) {
+    resultPrompt += ' --chaos 25';
+  } else if (temperature > 0.5) {
+    resultPrompt += ' --chaos 50';
   }
 
   return resultPrompt;
@@ -109,6 +109,9 @@ const handler = async (req: Request): Promise<Response> => {
 
       writeToStream('```MJImage \n');
       writeToStream('Initializing ... \n');
+      writeToStream(
+        'This feature is still in Beta, please expect some non-ideal images and report any issue to admin. Thanks. \n',
+      );
 
       const imageGenerationResponse = await fetch(
         `https://api.thenextleg.io/v2/imagine`,
@@ -120,7 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
               latestUserPromptMessage,
               requestBody.imageStyle,
               requestBody.imageQuality,
-              requestBody.temperature
+              requestBody.temperature,
             ),
           }),
         },
