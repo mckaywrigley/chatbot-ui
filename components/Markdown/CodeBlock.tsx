@@ -19,7 +19,7 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
   const { t } = useTranslation('markdown');
   const [isCopied, setIsCopied] = useState<Boolean>(false);
 
-  const disableButtonsForLanguageTags = ['Image'];
+  const disableButtonsForLanguageTags = ['MJImage'];
 
   const copyToClipboard = () => {
     if (!navigator.clipboard || !navigator.clipboard.writeText) {

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 
 import {
-  DEFAULT_IMAGE_GENERATION_SAMPLE,
   DEFAULT_IMAGE_GENERATION_STYLE,
 } from '@/utils/app/const';
+
 import {
   addUsageEntry,
   getAdminSupabaseClient,
@@ -14,9 +14,7 @@ import {
 
 import { ChatBody } from '@/types/chat';
 import { PluginID } from '@/types/plugin';
-
-import { decode } from 'base64-arraybuffer';
-import { v4 } from 'uuid';
+import dayjs from 'dayjs';
 
 const supabase = getAdminSupabaseClient();
 
@@ -50,7 +48,12 @@ const handler = async (req: Request): Promise<Response> => {
   const stream = new TransformStream();
   const writer = stream.writable.getWriter();
 
-  const writeToStream = async (text: string) => {
+  let jobTerminated = false;
+
+  const writeToStream = async (text: string, removeLastLine?: boolean) => {
+    if(removeLastLine) {
+      await writer.write(encoder.encode('[REMOVE_LAST_LINE]'));
+    }
     await writer.write(encoder.encode(text));
   };
 
@@ -66,8 +69,8 @@ const handler = async (req: Request): Promise<Response> => {
       const latestUserPromptMessage =
         requestBody.messages[requestBody.messages.length - 1].content;
 
-      writeToStream('```Image Generation \n');
-      writeToStream('Generating ... \n');
+      writeToStream('```MJImage \n');
+      writeToStream('Initializing ... \n');
 
       const options = {
         method: 'POST',
@@ -104,8 +107,9 @@ const handler = async (req: Request): Promise<Response> => {
       let imageGenerationProgress = null;
 
       while (
-        Date.now() - generationStartedAt < MAX_TIMEOUT * 1000 ||
-        imageGenerationProgress < 100
+        !jobTerminated &&
+        (Date.now() - generationStartedAt < MAX_TIMEOUT * 1000 ||
+          imageGenerationProgress < 100)
       ) {
         await sleep(4000);
         const imageGenerationProgressResponse = await fetch(
@@ -127,7 +131,8 @@ const handler = async (req: Request): Promise<Response> => {
         const generationProgress = imageGenerationProgressResponseJson.progress;
 
         if (generationProgress === 100) {
-          writeToStream(`100% ... \n`);
+          const generationLengthInSecond = Math.round((Date.now() - generationStartedAt)/1000);
+          writeToStream(`Completed in ${generationLengthInSecond}s ! \n`);
           writeToStream('``` \n');
 
           writeToStream(
@@ -140,8 +145,19 @@ const handler = async (req: Request): Promise<Response> => {
           await writeToStream('[DONE]');
           writer.close();
           return;
-        } else if (generationProgress !== imageGenerationProgress) {
-          writeToStream(`${generationProgress}% ... \n`);
+        } else {
+          if (imageGenerationProgress === null) {
+            writeToStream(
+              `Started to generate @ ${dayjs().format('hh:mm:ss')} \n`,
+            );
+          } else {
+            writeToStream(
+              `${
+                generationProgress === 0
+                  ? 'Waiting to be processed'
+                  : `${generationProgress} %`
+              } ... @ ${dayjs().format('hh:mm:ss')} \n`,true);
+          }
           imageGenerationProgress = generationProgress;
         }
       }
@@ -153,8 +169,9 @@ const handler = async (req: Request): Promise<Response> => {
       writer.close();
       return;
     } catch (error) {
-      console.log(error);
+      jobTerminated = true;
 
+      console.log(error);
       await writeToStream(
         'Error occurred while generating image, please try again later.',
       );
