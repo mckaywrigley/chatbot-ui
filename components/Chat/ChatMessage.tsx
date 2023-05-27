@@ -38,6 +38,7 @@ import { SpeechButton } from './SpeechButton';
 
 import dayjs from 'dayjs';
 import rehypeMathjax from 'rehype-mathjax';
+import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
@@ -355,8 +356,8 @@ export const ChatMessage: FC<Props> = memo(
               <div className="flex w-full flex-col md:justify-between">
                 <div className="flex flex-row justify-between">
                   <MemoizedReactMarkdown
-                    className="prose dark:prose-invert whitespace-pre-wrap"
-                    remarkPlugins={[remarkGfm, remarkMath]}
+                    className="prose dark:prose-invert"
+                    remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
                     rehypePlugins={[rehypeMathjax]}
                     components={{
                       a({ node, children, href, ...props }) {
