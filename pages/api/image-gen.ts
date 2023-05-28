@@ -39,7 +39,7 @@ const generateMjPrompt = (
   let resultPrompt = userInputText;
 
   if (style !== 'default') {
-    resultPrompt += `, ${capitalizeFirstLetter(style)} style`;
+    resultPrompt += `, ${capitalizeFirstLetter(style)} style --v 5.1`;
   }
 
   switch (quality) {
@@ -171,7 +171,7 @@ const handler = async (req: Request): Promise<Response> => {
           await imageGenerationProgressResponse.json();
 
         const generationProgress = imageGenerationProgressResponseJson.progress;
-
+        
         if (generationProgress === 100) {
           const generationLengthInSecond = Math.round(
             (Date.now() - generationStartedAt) / 1000,
