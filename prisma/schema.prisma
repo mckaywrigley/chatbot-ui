@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ConversationHistory {
+  idx         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @unique
+  name        String
+  messages    Json[]
+  model       Json
+  prompt      String
+  temperature Float
+  folderId    String?
+}
