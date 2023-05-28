@@ -40,6 +40,24 @@ Pull from ghcr:
 docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
 ```
 
+Run using docker-compose (this requires the `.env.local` file, see [Running Locally](#running-locally):
+
+```shell
+docker-compose up
+```
+
+Or:
+
+```shell
+make run
+```
+
+There are several other convenient `make` commands:
+ * `make build` to build the image
+ * `DOCKER_USER=example DOCKER_TAG=latest make push` to push the image to Docker Hub
+ * `make run` to run the app
+ * `make logs` to follow the logs
+
 ## Running Locally
 
 **1. Clone Repo**
