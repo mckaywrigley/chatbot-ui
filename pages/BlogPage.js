@@ -49,7 +49,7 @@ function BlogPage() {
 
     useEffect(() => {
         // 获取根目录的子级元素
-        fetch(`https://hamburgerai.cn/blog/query?parentId=0`)
+        fetch(process.env.OPENAI_API_HOST+`/blog/query?parentId=0`)
             .then(response => response.json())
             .then(data => {
                 setSidebarData(data);
@@ -61,7 +61,7 @@ function BlogPage() {
 
     const handleSidebarItemClick = (item) => {
         if (item.type === 'directory') {
-            fetch(`https://hamburgerai.cn/blog/query?parentId=${item.id}`) // 在 URL 中传递 parentId 参数
+            fetch(process.env.OPENAI_API_HOST+`/blog/query?parentId=${item.id}`) // 在 URL 中传递 parentId 参数
                 .then((response) => response.json())
                 .then((data) => {
                     if (data && data.length > 0) {
@@ -73,7 +73,7 @@ function BlogPage() {
                     console.error('Error:', error);
                 });
         } else if (item.type === 'article') {
-            fetch(`https://hamburgerai.cn/blog/query?id=${item.id}`)
+            fetch(process.env.OPENAI_API_HOST+`/blog/query?id=${item.id}`)
                 .then(response => response.json())
                 .then(data => {
                     setContentData(data.content);
