@@ -58,7 +58,7 @@ const generateMjPrompt = (
   }
 
   if (temperature === 0.5) {
-    resultPrompt += ' --chaos 25';
+    resultPrompt += ' --chaos 5';
   } else if (temperature > 0.5) {
     resultPrompt += ' --chaos 50';
   }
