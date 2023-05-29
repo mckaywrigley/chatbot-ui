@@ -1,15 +1,21 @@
-// lib/prisma.ts
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient;
+}
+
 import { PrismaClient } from '@prisma/client';
 
-let Prisma: PrismaClient;
+// Avoid instantiating too many instances of Prisma in development
+// https://www.prisma.io/docs/support/help-articles/nextjs-prisma-client-dev-practices#problem
+let prisma: PrismaClient;
 
 if (process.env.NODE_ENV === 'production') {
-  Prisma = new PrismaClient();
+  prisma = new PrismaClient();
 } else {
   if (!global.prisma) {
     global.prisma = new PrismaClient();
   }
-  Prisma = global.prisma;
+  prisma = global.prisma;
 }
 
-export default Prisma;
+export default prisma;
