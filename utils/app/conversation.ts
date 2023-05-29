@@ -1,5 +1,7 @@
 import { Conversation } from '@/types/chat';
 
+import remoteStorage from '@/lib/remoteStorage';
+
 export const updateConversation = (
   updatedConversation: Conversation,
   allConversations: Conversation[],
@@ -25,6 +27,7 @@ export const saveConversation = (conversation: Conversation) => {
   localStorage.setItem('selectedConversation', JSON.stringify(conversation));
 };
 
-export const saveConversations = (conversations: Conversation[]) => {
+export const saveConversations = async (conversations: Conversation[]) => {
+  remoteStorage.setItem('conversationHistory', conversations);
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
 };
