@@ -20,3 +20,13 @@ model ConversationHistory {
   temperature Float
   folderId    String?
 }
+
+model Prompt {
+  idx         String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @unique
+  name        String
+  description String
+  content     String
+  model       Json
+  folderId    String?
+}
