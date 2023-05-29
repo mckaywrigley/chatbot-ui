@@ -47,6 +47,7 @@ export interface HomeInitialState {
   showUsageModel: boolean;
   showSurveyModel: boolean;
   showNewsModel: boolean;
+  showFeaturesModel: boolean;
   user: User | null;
   isPaidUser: boolean;
   isSurveyFilled: boolean;
@@ -101,6 +102,7 @@ export const initialState: HomeInitialState = {
   showUsageModel: false,
   showSurveyModel: false,
   showNewsModel: false,
+  showFeaturesModel: false,
   user: null,
   isPaidUser: false,
   isSurveyFilled: false,
