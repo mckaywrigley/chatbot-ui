@@ -308,8 +308,6 @@ const Home = ({
         'conversationHistory',
       );
 
-      console.log(conversationHistory);
-
       if (conversationHistory) {
         const parsedConversationHistory: Conversation[] = conversationHistory;
         const cleanedConversationHistory = cleanConversationHistory(

@@ -24,6 +24,7 @@ import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
+import remoteStorage from '@/lib/remoteStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
@@ -113,7 +114,7 @@ export const Chatbar = () => {
     window.location.reload();
   };
 
-  const handleClearConversations = () => {
+  const handleClearConversations = async () => {
     defaultModelId &&
       homeDispatch({
         field: 'selectedConversation',
@@ -130,7 +131,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: [] });
 
-    localStorage.removeItem('conversationHistory');
+    await remoteStorage.removeItem('conversationHistory');
     localStorage.removeItem('selectedConversation');
 
     const updatedFolders = folders.filter((f) => f.type !== 'chat');
