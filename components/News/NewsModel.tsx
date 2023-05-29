@@ -148,7 +148,7 @@ const NewsModel = memo(({ className = '', open, onClose }: Props) => {
                 <ul
                   className={`${
                     selectPageId || isLoading ? 'hidden' : ''
-                  } overflow-y-auto`}
+                  } overflow-y-auto cursor-pointer`}
                 >
                   {newsList.map((news, index) => (
                     <li

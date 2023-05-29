@@ -107,7 +107,7 @@ const FeaturesModel = memo(({ className = '', open, onClose }: Props) => {
                 <ul
                   className={`${
                     selectPageId || isLoading ? 'hidden' : ''
-                  } overflow-y-auto list-outside list-disc`}
+                  } overflow-y-auto list-outside list-disc cursor-pointer`}
                 >
                   {featuresList.map((featureItem, index) => (
                     <li
