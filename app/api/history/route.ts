@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Prisma from '@/lib/prisma';
 
 export async function GET() {
-  const conversations = await Prisma.conversationHistory.findMany({
+  const conversations = await Prisma.history.findMany({
     select: {
       id: true,
       name: true,
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const { conversations } = await request.json();
 
   for await (const conversation of conversations) {
-    await Prisma.conversationHistory.upsert({
+    await Prisma.history.upsert({
       where: { id: conversation.id },
       update: conversation,
       create: conversation,
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE() {
-  await Prisma.conversationHistory.deleteMany({});
+  await Prisma.history.deleteMany({});
 
   return NextResponse.json({ status: 'ok' });
 }

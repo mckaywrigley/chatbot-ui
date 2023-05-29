@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ConversationHistory {
+model History {
   idx         String  @id @default(auto()) @map("_id") @db.ObjectId
   id          String  @unique
   name        String

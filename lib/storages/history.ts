@@ -1,7 +1,7 @@
 import { Conversation } from '@/types/chat';
 
 export const historyGET = async () => {
-  const response = await fetch('/api/conversation-history');
+  const response = await fetch('/api/history');
   const conversations = await response.json();
   return conversations;
 };
@@ -17,14 +17,14 @@ export const historyPOST = async (conversations: Conversation[]) => {
     folderId: conversation.folderId,
   }));
 
-  await fetch('/api/conversation-history', {
+  await fetch('/api/history', {
     method: 'POST',
     body: JSON.stringify({ conversations: body }),
   });
 };
 
 export const historyDELETE = async () => {
-  await fetch('/api/conversation-history', {
+  await fetch('/api/history', {
     method: 'DELETE',
   });
 };
