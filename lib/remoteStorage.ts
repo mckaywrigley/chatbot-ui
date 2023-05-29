@@ -1,51 +1,38 @@
 import { Conversation } from '@/types/chat';
+import { Prompt } from '@/types/prompt';
+
+import { historyDELETE, historyGET, historyPOST } from './storages/history';
+import { promptsDELETE, promptsGET, promptsPOST } from './storages/prompts';
 
 class RemoteStorage {
   async getItem(key: string) {
     if (key === 'conversationHistory') {
-      return await this.conversationHistoryGET();
+      return await historyGET();
+    }
+
+    if (key === 'prompts') {
+      return await promptsGET();
     }
   }
 
-  async setItem(key: string, value: Conversation[]) {
+  async setItem(key: string, value: Conversation[] | Prompt[]) {
     if (key === 'conversationHistory') {
-      await this.conversationHistoryPOST(value);
+      await historyPOST(value as Conversation[]);
+    }
+
+    if (key === 'prompts') {
+      await promptsPOST(value as Prompt[]);
     }
   }
 
   async removeItem(key: string) {
     if (key === 'conversationHistory') {
-      await this.conversationHistoryDELETE();
+      await historyDELETE();
     }
-  }
 
-  async conversationHistoryGET() {
-    const response = await fetch('/api/conversation-history');
-    const conversations = await response.json();
-    return conversations;
-  }
-
-  async conversationHistoryPOST(conversations: Conversation[]) {
-    const body = conversations.map((conversation) => ({
-      id: conversation.id,
-      name: conversation.name,
-      messages: conversation.messages,
-      model: conversation.model,
-      prompt: conversation.prompt,
-      temperature: conversation.temperature,
-      folderId: conversation.folderId,
-    }));
-
-    await fetch('/api/conversation-history', {
-      method: 'POST',
-      body: JSON.stringify({ conversations: body }),
-    });
-  }
-
-  async conversationHistoryDELETE() {
-    await fetch('/api/conversation-history', {
-      method: 'DELETE',
-    });
+    if (key === 'prompts') {
+      await promptsDELETE();
+    }
   }
 }
 
