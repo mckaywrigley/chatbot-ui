@@ -78,18 +78,6 @@ export const exportData = async () => {
   let folders = await remoteStorage.getItem('folders');
   let prompts = await remoteStorage.getItem('prompts');
 
-  if (history) {
-    history = JSON.parse(history);
-  }
-
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
-
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
-
   const data = {
     version: 4,
     history: history || [],
@@ -117,9 +105,7 @@ export const importData = async (
   const { history, folders, prompts } = cleanData(data);
 
   const oldConversations = await remoteStorage.getItem('conversationHistory');
-  const oldConversationsParsed = oldConversations
-    ? JSON.parse(oldConversations)
-    : [];
+  const oldConversationsParsed = oldConversations ? oldConversations : [];
 
   const newHistory: Conversation[] = [
     ...oldConversationsParsed,
