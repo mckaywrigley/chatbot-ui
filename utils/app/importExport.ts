@@ -76,7 +76,7 @@ function currentDate() {
 export const exportData = async () => {
   let history = await remoteStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
+  let prompts = await remoteStorage.getItem('prompts');
 
   if (history) {
     history = JSON.parse(history);
@@ -149,13 +149,13 @@ export const importData = async (
   );
   localStorage.setItem('folders', JSON.stringify(newFolders));
 
-  const oldPrompts = localStorage.getItem('prompts');
-  const oldPromptsParsed = oldPrompts ? JSON.parse(oldPrompts) : [];
+  const oldPrompts = await remoteStorage.getItem('prompts');
+  const oldPromptsParsed = oldPrompts ? oldPrompts : [];
   const newPrompts: Prompt[] = [...oldPromptsParsed, ...prompts].filter(
     (prompt, index, self) =>
       index === self.findIndex((p) => p.id === prompt.id),
   );
-  localStorage.setItem('prompts', JSON.stringify(newPrompts));
+  await remoteStorage.setItem('prompts', newPrompts);
 
   return {
     version: 4,

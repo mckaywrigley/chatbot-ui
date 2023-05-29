@@ -1,5 +1,7 @@
 import { Prompt } from '@/types/prompt';
 
+import remoteStorage from '@/lib/remoteStorage';
+
 export const updatePrompt = (updatedPrompt: Prompt, allPrompts: Prompt[]) => {
   const updatedPrompts = allPrompts.map((c) => {
     if (c.id === updatedPrompt.id) {
@@ -17,6 +19,6 @@ export const updatePrompt = (updatedPrompt: Prompt, allPrompts: Prompt[]) => {
   };
 };
 
-export const savePrompts = (prompts: Prompt[]) => {
-  localStorage.setItem('prompts', JSON.stringify(prompts));
+export const savePrompts = async (prompts: Prompt[]) => {
+  await remoteStorage.setItem('prompts', prompts);
 };

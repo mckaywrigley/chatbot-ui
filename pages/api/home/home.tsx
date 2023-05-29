@@ -299,9 +299,9 @@ const Home = ({
         dispatch({ field: 'folders', value: JSON.parse(folders) });
       }
 
-      const prompts = localStorage.getItem('prompts');
+      const prompts = await remoteStorage.getItem('prompts');
       if (prompts) {
-        dispatch({ field: 'prompts', value: JSON.parse(prompts) });
+        dispatch({ field: 'prompts', value: prompts });
       }
 
       const conversationHistory = await remoteStorage.getItem(
