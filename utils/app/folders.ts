@@ -1,5 +1,7 @@
 import { FolderInterface } from '@/types/folder';
 
-export const saveFolders = (folders: FolderInterface[]) => {
-  localStorage.setItem('folders', JSON.stringify(folders));
+import remoteStorage from '@/lib/remoteStorage';
+
+export const saveFolders = async (folders: FolderInterface[]) => {
+  await remoteStorage.setItem('folders', folders);
 };
