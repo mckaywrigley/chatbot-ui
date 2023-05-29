@@ -39,6 +39,7 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
+import remoteStorage from '@/lib/remoteStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -251,95 +252,103 @@ const Home = ({
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
-    const settings = getSettings();
-    if (settings.theme) {
-      dispatch({
-        field: 'lightMode',
-        value: settings.theme,
-      });
-    }
+    async function init() {
+      const settings = getSettings();
+      if (settings.theme) {
+        dispatch({
+          field: 'lightMode',
+          value: settings.theme,
+        });
+      }
 
-    const apiKey = localStorage.getItem('apiKey');
+      const apiKey = localStorage.getItem('apiKey');
 
-    if (serverSideApiKeyIsSet) {
-      dispatch({ field: 'apiKey', value: '' });
+      if (serverSideApiKeyIsSet) {
+        dispatch({ field: 'apiKey', value: '' });
 
-      localStorage.removeItem('apiKey');
-    } else if (apiKey) {
-      dispatch({ field: 'apiKey', value: apiKey });
-    }
+        localStorage.removeItem('apiKey');
+      } else if (apiKey) {
+        dispatch({ field: 'apiKey', value: apiKey });
+      }
 
-    const pluginKeys = localStorage.getItem('pluginKeys');
-    if (serverSidePluginKeysSet) {
-      dispatch({ field: 'pluginKeys', value: [] });
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      dispatch({ field: 'pluginKeys', value: pluginKeys });
-    }
+      const pluginKeys = localStorage.getItem('pluginKeys');
+      if (serverSidePluginKeysSet) {
+        dispatch({ field: 'pluginKeys', value: [] });
+        localStorage.removeItem('pluginKeys');
+      } else if (pluginKeys) {
+        dispatch({ field: 'pluginKeys', value: pluginKeys });
+      }
 
-    if (window.innerWidth < 640) {
-      dispatch({ field: 'showChatbar', value: false });
-      dispatch({ field: 'showPromptbar', value: false });
-    }
+      if (window.innerWidth < 640) {
+        dispatch({ field: 'showChatbar', value: false });
+        dispatch({ field: 'showPromptbar', value: false });
+      }
 
-    const showChatbar = localStorage.getItem('showChatbar');
-    if (showChatbar) {
-      dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
-    }
+      const showChatbar = localStorage.getItem('showChatbar');
+      if (showChatbar) {
+        dispatch({ field: 'showChatbar', value: showChatbar === 'true' });
+      }
 
-    const showPromptbar = localStorage.getItem('showPromptbar');
-    if (showPromptbar) {
-      dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
-    }
+      const showPromptbar = localStorage.getItem('showPromptbar');
+      if (showPromptbar) {
+        dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
+      }
 
-    const folders = localStorage.getItem('folders');
-    if (folders) {
-      dispatch({ field: 'folders', value: JSON.parse(folders) });
-    }
+      const folders = localStorage.getItem('folders');
+      if (folders) {
+        dispatch({ field: 'folders', value: JSON.parse(folders) });
+      }
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
+      const prompts = localStorage.getItem('prompts');
+      if (prompts) {
+        dispatch({ field: 'prompts', value: JSON.parse(prompts) });
+      }
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
+      const conversationHistory = await remoteStorage.getItem(
+        'conversationHistory',
       );
 
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
+      console.log(conversationHistory);
+
+      if (conversationHistory) {
+        const parsedConversationHistory: Conversation[] = conversationHistory;
+        const cleanedConversationHistory = cleanConversationHistory(
+          parsedConversationHistory,
+        );
+
+        dispatch({ field: 'conversations', value: cleanedConversationHistory });
+      }
+
+      const selectedConversation = localStorage.getItem('selectedConversation');
+      if (selectedConversation) {
+        const parsedSelectedConversation: Conversation =
+          JSON.parse(selectedConversation);
+        const cleanedSelectedConversation = cleanSelectedConversation(
+          parsedSelectedConversation,
+        );
+
+        dispatch({
+          field: 'selectedConversation',
+          value: cleanedSelectedConversation,
+        });
+      } else {
+        const lastConversation = conversations[conversations.length - 1];
+        dispatch({
+          field: 'selectedConversation',
+          value: {
+            id: uuidv4(),
+            name: t('New Conversation'),
+            messages: [],
+            model: OpenAIModels[defaultModelId],
+            prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+            folderId: null,
+          },
+        });
+      }
     }
 
-    const selectedConversation = localStorage.getItem('selectedConversation');
-    if (selectedConversation) {
-      const parsedSelectedConversation: Conversation =
-        JSON.parse(selectedConversation);
-      const cleanedSelectedConversation = cleanSelectedConversation(
-        parsedSelectedConversation,
-      );
-
-      dispatch({
-        field: 'selectedConversation',
-        value: cleanedSelectedConversation,
-      });
-    } else {
-      const lastConversation = conversations[conversations.length - 1];
-      dispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
-    }
+    init();
   }, [
     defaultModelId,
     dispatch,

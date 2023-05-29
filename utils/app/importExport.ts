@@ -12,6 +12,8 @@ import { Prompt } from '@/types/prompt';
 
 import { cleanConversationHistory } from './clean';
 
+import remoteStorage from '@/lib/remoteStorage';
+
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
 }
@@ -109,9 +111,9 @@ export const exportData = () => {
   URL.revokeObjectURL(url);
 };
 
-export const importData = (
+export const importData = async (
   data: SupportedExportFormats,
-): LatestExportFormat => {
+): Promise<LatestExportFormat> => {
   const { history, folders, prompts } = cleanData(data);
 
   const oldConversations = localStorage.getItem('conversationHistory');
@@ -126,7 +128,7 @@ export const importData = (
     (conversation, index, self) =>
       index === self.findIndex((c) => c.id === conversation.id),
   );
-  localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
+  await remoteStorage.setItem('conversationHistory', newHistory);
   if (newHistory.length > 0) {
     localStorage.setItem(
       'selectedConversation',

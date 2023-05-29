@@ -28,6 +28,5 @@ export const saveConversation = (conversation: Conversation) => {
 };
 
 export const saveConversations = async (conversations: Conversation[]) => {
-  remoteStorage.setItem('conversationHistory', conversations);
-  localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+  await remoteStorage.setItem('conversationHistory', conversations);
 };
