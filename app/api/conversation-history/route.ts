@@ -31,3 +31,9 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ status: 'ok' });
 }
+
+export async function DELETE() {
+  await Prisma.conversationHistory.deleteMany({});
+
+  return NextResponse.json({ status: 'ok' });
+}

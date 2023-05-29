@@ -13,6 +13,12 @@ class RemoteStorage {
     }
   }
 
+  async removeItem(key: string) {
+    if (key === 'conversationHistory') {
+      await this.conversationHistoryDELETE();
+    }
+  }
+
   async conversationHistoryGET() {
     const response = await fetch('/api/conversation-history');
     const conversations = await response.json();
@@ -33,6 +39,12 @@ class RemoteStorage {
     await fetch('/api/conversation-history', {
       method: 'POST',
       body: JSON.stringify({ conversations: body }),
+    });
+  }
+
+  async conversationHistoryDELETE() {
+    await fetch('/api/conversation-history', {
+      method: 'DELETE',
     });
   }
 }
