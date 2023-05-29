@@ -13,7 +13,7 @@ function NewsPage({ pageId }: Props) {
   const [recordMap, setRecordMap] = useState<ExtendedRecordMap>();
 
   const fetchPageData = useCallback(async () => {
-    const response = await fetch(`/api/notion/news/${pageId}`);
+    const response = await fetch(`/api/notion/${pageId}`);
     const { recordMap } = await response.json();
     setRecordMap(recordMap);
   }, [pageId]);
