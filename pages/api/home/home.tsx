@@ -294,7 +294,7 @@ const Home = ({
         dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
       }
 
-      const folders = localStorage.getItem('folders');
+      const folders = await remoteStorage.getItem('folders');
       if (folders) {
         dispatch({ field: 'folders', value: JSON.parse(folders) });
       }

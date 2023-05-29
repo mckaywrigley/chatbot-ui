@@ -75,7 +75,7 @@ function currentDate() {
 
 export const exportData = async () => {
   let history = await remoteStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
+  let folders = await remoteStorage.getItem('folders');
   let prompts = await remoteStorage.getItem('prompts');
 
   if (history) {
@@ -138,8 +138,8 @@ export const importData = async (
     localStorage.removeItem('selectedConversation');
   }
 
-  const oldFolders = localStorage.getItem('folders');
-  const oldFoldersParsed = oldFolders ? JSON.parse(oldFolders) : [];
+  const oldFolders = await remoteStorage.getItem('folders');
+  const oldFoldersParsed = oldFolders ? oldFolders : [];
   const newFolders: FolderInterface[] = [
     ...oldFoldersParsed,
     ...folders,
@@ -147,7 +147,7 @@ export const importData = async (
     (folder, index, self) =>
       index === self.findIndex((f) => f.id === folder.id),
   );
-  localStorage.setItem('folders', JSON.stringify(newFolders));
+  await remoteStorage.setItem('folders', newFolders);
 
   const oldPrompts = await remoteStorage.getItem('prompts');
   const oldPromptsParsed = oldPrompts ? oldPrompts : [];
