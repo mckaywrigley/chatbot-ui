@@ -296,7 +296,7 @@ const Home = ({
 
       const folders = await remoteStorage.getItem('folders');
       if (folders) {
-        dispatch({ field: 'folders', value: JSON.parse(folders) });
+        dispatch({ field: 'folders', value: folders });
       }
 
       const prompts = await remoteStorage.getItem('prompts');
