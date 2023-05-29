@@ -1,6 +1,8 @@
 import { Conversation } from '@/types/chat';
+import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
 
+import { foldersDELETE, foldersGET, foldersPOST } from './storages/folders';
 import { historyDELETE, historyGET, historyPOST } from './storages/history';
 import { promptsDELETE, promptsGET, promptsPOST } from './storages/prompts';
 
@@ -13,15 +15,26 @@ class RemoteStorage {
     if (key === 'prompts') {
       return await promptsGET();
     }
+
+    if (key === 'folders') {
+      return await foldersGET();
+    }
   }
 
-  async setItem(key: string, value: Conversation[] | Prompt[]) {
+  async setItem(
+    key: string,
+    value: Conversation[] | Prompt[] | FolderInterface[],
+  ) {
     if (key === 'conversationHistory') {
       await historyPOST(value as Conversation[]);
     }
 
     if (key === 'prompts') {
       await promptsPOST(value as Prompt[]);
+    }
+
+    if (key === 'folders') {
+      await foldersPOST(value as FolderInterface[]);
     }
   }
 
@@ -32,6 +45,10 @@ class RemoteStorage {
 
     if (key === 'prompts') {
       await promptsDELETE();
+    }
+
+    if (key === 'folders') {
+      await foldersDELETE();
     }
   }
 }

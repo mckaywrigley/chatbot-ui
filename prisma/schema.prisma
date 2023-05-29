@@ -30,3 +30,10 @@ model Prompt {
   model       Json
   folderId    String?
 }
+
+model Folder {
+  idx  String @id @default(auto()) @map("_id") @db.ObjectId
+  id   String @unique
+  name String
+  type String
+}
