@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
@@ -107,6 +107,8 @@ export const Chatbar = () => {
     });
     homeDispatch({ field: 'folders', value: folders });
     homeDispatch({ field: 'prompts', value: prompts });
+
+    window.location.reload();
   };
 
   const handleClearConversations = () => {
@@ -115,10 +117,11 @@ export const Chatbar = () => {
         field: 'selectedConversation',
         value: {
           id: uuidv4(),
-          name: 'New conversation',
+          name: t('New Conversation'),
           messages: [],
           model: OpenAIModels[defaultModelId],
           prompt: DEFAULT_SYSTEM_PROMPT,
+          temperature: DEFAULT_TEMPERATURE,
           folderId: null,
         },
       });
@@ -156,10 +159,11 @@ export const Chatbar = () => {
           field: 'selectedConversation',
           value: {
             id: uuidv4(),
-            name: 'New conversation',
+            name: t('New Conversation'),
             messages: [],
             model: OpenAIModels[defaultModelId],
             prompt: DEFAULT_SYSTEM_PROMPT,
+            temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         });

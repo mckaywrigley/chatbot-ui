@@ -24,5 +24,6 @@
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Giới hạn tin nhắn là {{maxLength}} ký tự. Bạn đã nhập {{valueLength}} ký tự.",
   "Please enter a message": "Vui lòng nhập một tin nhắn",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI là một bộ công cụ chatbot tiên tiến cho các mô hình chat của OpenAI nhằm mô phỏng giao diện và chức năng của ChatGPT.",
-  "Are you sure you want to clear all messages?": "Bạn có chắc chắn muốn xóa tất cả tin nhắn không?"
+  "Are you sure you want to clear all messages?": "Bạn có chắc chắn muốn xóa tất cả tin nhắn không?",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Các giá trị cao hơn như 0,8 sẽ làm cho đầu ra ngẫu nhiên hơn, trong khi các giá trị thấp hơn như 0,2 sẽ làm cho đầu ra tập trung và xác định hơn."
 }
