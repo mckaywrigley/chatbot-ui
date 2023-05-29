@@ -1,14 +1,38 @@
+import { Conversation } from '@/types/chat';
+
 class RemoteStorage {
-  async setItem(key: string, value: object) {
+  async getItem(key: string) {
     if (key === 'conversationHistory') {
-      await this.conversationHistory(value);
+      return await this.conversationHistoryGET();
     }
   }
 
-  async conversationHistory(conversations: object) {
+  async setItem(key: string, value: Conversation[]) {
+    if (key === 'conversationHistory') {
+      await this.conversationHistoryPOST(value);
+    }
+  }
+
+  async conversationHistoryGET() {
+    const response = await fetch('/api/conversation-history');
+    const conversations = await response.json();
+    return conversations;
+  }
+
+  async conversationHistoryPOST(conversations: Conversation[]) {
+    const body = conversations.map((conversation) => ({
+      id: conversation.id,
+      name: conversation.name,
+      messages: conversation.messages,
+      model: conversation.model,
+      prompt: conversation.prompt,
+      temperature: conversation.temperature,
+      folderId: conversation.folderId,
+    }));
+
     await fetch('/api/conversation-history', {
       method: 'POST',
-      body: JSON.stringify({ conversations }),
+      body: JSON.stringify({ conversations: body }),
     });
   }
 }
