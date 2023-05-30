@@ -16,8 +16,8 @@ export interface ChatBody {
   temperature: number;
 
   // Image generations parameters
-  numberOfSamples?: number;
   imageStyle?: string;
+  imageQuality?: string;
 }
 
 export interface Conversation {
@@ -31,6 +31,6 @@ export interface Conversation {
   lastUpdateAtUTC: number; // timestamp in UTC in milliseconds
   deleted?: boolean;
   // Image generations parameters
-  numberOfSamples?: number;
   imageStyle?: string;
+  imageQuality?: string;
 }

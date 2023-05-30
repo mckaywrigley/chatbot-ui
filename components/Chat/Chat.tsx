@@ -1,5 +1,3 @@
-import { DEFAULT_IMAGE_GENERATION_STYLE, DEFAULT_IMAGE_GENERATION_SAMPLE } from '@/utils/app/const';
-
 import { IconArrowDown, IconClearAll } from '@tabler/icons-react';
 import {
   MutableRefObject,
@@ -16,8 +14,13 @@ import { useTranslation } from 'next-i18next';
 import { event } from 'nextjs-google-analytics/dist/interactions';
 
 import { getEndpoint } from '@/utils/app/api';
+import {
+  DEFAULT_IMAGE_GENERATION_QUALITY,
+  DEFAULT_IMAGE_GENERATION_STYLE,
+} from '@/utils/app/const';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { updateConversationLastUpdatedAtTimeStamp } from '@/utils/app/conversation';
+import { removeSecondLastLine } from '@/utils/app/ui';
 import { getOrGenerateUserId } from '@/utils/data/taggingHelper';
 import { throttle } from '@/utils/data/throttle';
 
@@ -34,6 +37,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+
 import dayjs from 'dayjs';
 
 interface Props {
@@ -147,12 +151,15 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           temperature: updatedConversation.temperature,
         };
         const endpoint = getEndpoint(plugin);
-        
-        if(plugin?.id === PluginID.IMAGE_GEN) {
-          chatBody.numberOfSamples = selectedConversation.numberOfSamples || DEFAULT_IMAGE_GENERATION_SAMPLE;
-          chatBody.imageStyle = selectedConversation.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
+
+        if (plugin?.id === PluginID.IMAGE_GEN) {
+          chatBody.imageQuality =
+            selectedConversation.imageQuality ||
+            DEFAULT_IMAGE_GENERATION_QUALITY;
+          chatBody.imageStyle =
+            selectedConversation.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
         }
-        
+
         const body = JSON.stringify(chatBody);
         const controller = new AbortController();
         const response = await fetch(endpoint, {
@@ -214,10 +221,17 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
           done = doneReading;
           const chunkValue = decoder.decode(value);
           text += chunkValue;
+
           if (text.includes('[DONE]')) {
             text = text.replace('[DONE]', '');
             done = true;
           }
+
+          if (text.includes('[REMOVE_LAST_LINE]')) {
+            text = text.replace('[REMOVE_LAST_LINE]', '');
+            text = removeSecondLastLine(text);
+          }
+
           if (isFirst) {
             isFirst = false;
             const updatedMessages: Message[] = [
@@ -260,7 +274,7 @@ export const Chat = memo(({ stopConversationRef, googleAdSenseId }: Props) => {
             });
           }
         }
-        
+
         saveConversation(updatedConversation);
         const updatedConversations: Conversation[] = conversations.map(
           (conversation) => {

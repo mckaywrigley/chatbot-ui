@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 
 import {
-  DEFAULT_IMAGE_GENERATION_SAMPLE,
+  DEFAULT_IMAGE_GENERATION_QUALITY,
   DEFAULT_IMAGE_GENERATION_STYLE,
 } from '@/utils/app/const';
+import { capitalizeFirstLetter } from '@/utils/app/ui';
 import {
   addUsageEntry,
   getAdminSupabaseClient,
@@ -15,8 +16,7 @@ import {
 import { ChatBody } from '@/types/chat';
 import { PluginID } from '@/types/plugin';
 
-import { decode } from 'base64-arraybuffer';
-import { v4 } from 'uuid';
+import dayjs from 'dayjs';
 
 const supabase = getAdminSupabaseClient();
 
@@ -24,51 +24,46 @@ export const config = {
   runtime: 'edge',
 };
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 const unauthorizedResponse = new Response('Unauthorized', { status: 401 });
 
-// Reference https://platform.stability.ai/rest-api#tag/v1generation/operation/textToImage
-const IMAGE_GENERATION_CONFIG = {
-  engineName: 'stable-diffusion-xl-beta-v2-2-2',
-  height: 512,
-  width: 512,
-  cfgScale: 4,
-  steps: 50,
-  negativePrompts: 'blur, low resolution',
-};
+const MAX_TIMEOUT = 600; // 10 minutes
 
-const CREATIVELY_LEVELS_MAPPING = {
-  high: {
-    steps: 40,
-    cfgScale: 2,
-  },
-  medium: {
-    steps: 50,
-    cfgScale: 4,
-  },
-  low: {
-    steps: 100,
-    cfgScale: 7,
-  },
-};
+const generateMjPrompt = (
+  userInputText: string,
+  style: string = DEFAULT_IMAGE_GENERATION_STYLE,
+  quality: string = DEFAULT_IMAGE_GENERATION_QUALITY,
+  temperature: number = 0.5,
+): string => {
+  let resultPrompt = userInputText;
 
-// The lower the temperature, the less creative the generation
-const getImageGenerationConfig = (temperature: number = 0.5) => {
-  if (temperature < 0.3) {
-    return {
-      ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.low,
-    };
-  } else if (temperature < 0.7) {
-    return {
-      ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.medium,
-    };
-  } else {
-    return {
-      ...IMAGE_GENERATION_CONFIG,
-      ...CREATIVELY_LEVELS_MAPPING.high,
-    };
+  if (style !== 'default') {
+    resultPrompt += `, ${capitalizeFirstLetter(style)} style --v 5.1`;
   }
+
+  switch (quality) {
+    case 'High':
+      resultPrompt += ' --quality 1';
+      break;
+    case 'Medium':
+      resultPrompt += ' --quality .5';
+      break;
+    case 'Low':
+      resultPrompt += ' --quality .25';
+      break;
+    default:
+      resultPrompt += ' --quality 1';
+      break;
+  }
+
+  if (temperature === 0.5) {
+    resultPrompt += ' --chaos 5';
+  } else if (temperature > 0.5) {
+    resultPrompt += ' --chaos 50';
+  }
+
+  return resultPrompt;
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -91,107 +86,155 @@ const handler = async (req: Request): Promise<Response> => {
   const stream = new TransformStream();
   const writer = stream.writable.getWriter();
 
-  const writeToStream = async (text: string) => {
+  let jobTerminated = false;
+
+  const writeToStream = async (text: string, removeLastLine?: boolean) => {
+    if (removeLastLine) {
+      await writer.write(encoder.encode('[REMOVE_LAST_LINE]'));
+    }
     await writer.write(encoder.encode(text));
   };
 
-  try {
-    const requestBody = (await req.json()) as ChatBody;
+  const requestBody = (await req.json()) as ChatBody;
 
-    const imageGeneration = async () => {
+  const imageGeneration = async () => {
+    const requestHeader = {
+      Authorization: `Bearer ${process.env.THE_NEXT_LEG_API_KEY || ''}`,
+      'Content-Type': 'application/json',
+    };
+
+    try {
       const latestUserPromptMessage =
         requestBody.messages[requestBody.messages.length - 1].content;
 
-      const generationTemperature = requestBody.temperature;
-      const numberOfImages =
-        requestBody.numberOfSamples || DEFAULT_IMAGE_GENERATION_SAMPLE;
-      const imageStyle =
-        requestBody.imageStyle || DEFAULT_IMAGE_GENERATION_STYLE;
-
-      writeToStream('```Image Generation \n');
-      writeToStream('Generating image(s) ... \n');
-
-      const imageGenerationConfig = getImageGenerationConfig(
-        generationTemperature,
+      writeToStream('```MJImage \n');
+      writeToStream('Initializing ... \n');
+      writeToStream(
+        'This feature is still in Beta, please expect some non-ideal images and report any issue to admin. Thanks. \n',
       );
 
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.STABILITY_AI_KEY}`,
+      const imageGenerationResponse = await fetch(
+        `https://api.thenextleg.io/v2/imagine`,
+        {
+          method: 'POST',
+          headers: requestHeader,
+          body: JSON.stringify({
+            msg: generateMjPrompt(
+              latestUserPromptMessage,
+              requestBody.imageStyle,
+              requestBody.imageQuality,
+              requestBody.temperature,
+            ),
+          }),
         },
-        body: JSON.stringify({
-          text_prompts: [
-            {
-              text: latestUserPromptMessage,
-              weight: 0.5,
-            },
-            {
-              text: imageGenerationConfig.negativePrompts,
-              weight: -0.5,
-            },
-          ],
-          height: imageGenerationConfig.height,
-          width: imageGenerationConfig.width,
-          style_preset: imageStyle,
-          cfg_scale: imageGenerationConfig.cfgScale,
-          steps: imageGenerationConfig.steps,
-        }),
-      };
+      );
 
-      for (let imageIndex = 0; imageIndex < numberOfImages; imageIndex++) {
-        const imageGenerationResponse = await fetch(
-          `https://api.stability.ai/v1/generation/${IMAGE_GENERATION_CONFIG.engineName}/text-to-image`,
-          options,
+      if (!imageGenerationResponse.ok) {
+        throw new Error('Image generation failed');
+      }
+
+      const imageGenerationResponseJson = await imageGenerationResponse.json();
+
+      if (
+        imageGenerationResponseJson.success !== true ||
+        !imageGenerationResponseJson.messageId
+      ) {
+        console.log(imageGenerationResponseJson);
+        console.error('Failed during submitting request');
+        throw new Error('Image generation failed');
+      }
+
+      const imageGenerationMessageId = imageGenerationResponseJson.messageId;
+
+      // Check every 4 seconds if the image generation is done
+      let generationStartedAt = Date.now();
+      let imageGenerationProgress = null;
+
+      while (
+        !jobTerminated &&
+        (Date.now() - generationStartedAt < MAX_TIMEOUT * 1000 ||
+          imageGenerationProgress < 100)
+      ) {
+        await sleep(4000);
+        const imageGenerationProgressResponse = await fetch(
+          `https://api.thenextleg.io/v2/message/${imageGenerationMessageId}?authToken=${process.env.THE_NEXT_LEG_API_KEY}`,
+          { method: 'GET' },
         );
 
-        const imageGenerationResponseJson =
-          await imageGenerationResponse.json();
-        const base64ImageString =
-          imageGenerationResponseJson.artifacts[0].base64;
-
-        // Upload base64 Image to Supabase Storage
-        const imageFileName = `${user.id}-${v4()}.png`;
-        const { error } = await supabase.storage
-          .from('ai-images')
-          .upload(imageFileName, decode(base64ImageString), {
-            cacheControl: '3600',
-            upsert: false,
-          });
-        if (error) throw error;
-
-        const { data: imagePublicUrlData } = await supabase.storage
-          .from('ai-images')
-          .getPublicUrl(imageFileName);
-
-        if (imageIndex === 0) {
-          writeToStream(`Receiving image(s) ... \n`);
-          writeToStream('``` \n');
+        if (!imageGenerationProgressResponse.ok) {
+          console.log(await imageGenerationProgressResponse.status);
+          console.log(await imageGenerationProgressResponse.text());
+          throw new Error('Unable to fetch image generation progress');
         }
 
-        writeToStream(`![Generated Image](${imagePublicUrlData.publicUrl}) \n`);
+        const imageGenerationProgressResponseJson =
+          await imageGenerationProgressResponse.json();
 
-        addUsageEntry(PluginID.IMAGE_GEN, user.id);
-        subtractCredit(user.id, PluginID.IMAGE_GEN);
+        const generationProgress = imageGenerationProgressResponseJson.progress;
+        
+        if (generationProgress === 100) {
+          const generationLengthInSecond = Math.round(
+            (Date.now() - generationStartedAt) / 1000,
+          );
+          writeToStream(`Completed in ${generationLengthInSecond}s\n`);
+          writeToStream('``` \n');
+
+          writeToStream(
+            `![Generated Image](${imageGenerationProgressResponseJson.response.imageUrl}) \n`,
+          );
+          addUsageEntry(PluginID.IMAGE_GEN, user.id);
+          subtractCredit(user.id, PluginID.IMAGE_GEN);
+          imageGenerationProgress = 100;
+
+          await writeToStream('[DONE]');
+          writer.close();
+          return;
+        } else {
+          if (imageGenerationProgress === null) {
+            writeToStream(
+              `Started to generate @ ${dayjs().format('hh:mm:ss')} \n`,
+            );
+          } else {
+            writeToStream(
+              `${
+                generationProgress === 0
+                  ? 'Waiting to be processed'
+                  : `${generationProgress} %`
+              } ... @ ${dayjs().format('hh:mm:ss')} \n`,
+              true,
+            );
+          }
+          imageGenerationProgress = generationProgress;
+        }
       }
 
       await writeToStream('[DONE]');
+      await writeToStream(
+        'Unable to finish the generation in 5 minutes, please try again later.',
+      );
       writer.close();
-    };
+      return;
+    } catch (error) {
+      jobTerminated = true;
 
-    imageGeneration();
+      console.log(error);
+      await writeToStream(
+        'Error occurred while generating image, please try again later.',
+      );
+      await writeToStream('[DONE]');
+      writer.close();
+      return;
+    }
+  };
 
-    return new NextResponse(stream.readable, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-      },
-    });
-  } catch (error) {
-    writer.close();
-    return new Response('Error', { status: 500 });
-  }
+  imageGeneration();
+
+  return new NextResponse(stream.readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+    },
+  });
 };
 
 export default handler;

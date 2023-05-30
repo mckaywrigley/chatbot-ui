@@ -201,7 +201,7 @@ export const ChatMessage: FC<Props> = memo(
             alt={t('Click to download image')}
             width={512}
             height={512}
-            className="cursor-pointer"
+            className="cursor-pointer w-full"
             onClick={() =>
               downloadFile(
                 src,
@@ -356,7 +356,7 @@ export const ChatMessage: FC<Props> = memo(
               <div className="flex w-full flex-col md:justify-between">
                 <div className="flex flex-row justify-between">
                   <MemoizedReactMarkdown
-                    className="prose dark:prose-invert"
+                    className="prose dark:prose-invert min-w-full"
                     remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
                     rehypePlugins={[rehypeMathjax]}
                     components={{

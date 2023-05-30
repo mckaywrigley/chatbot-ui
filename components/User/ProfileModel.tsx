@@ -30,7 +30,7 @@ const PlanDetail = {
       'Cloud sync',
       'AI speech',
       'GPT-4 integration (Credit system)',
-      'AI image generation (Coming)',
+      'AI image generation (Credit system)',
     ],
   },
 };
