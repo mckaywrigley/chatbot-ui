@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { NotionRenderer } from 'react-notion-x';
-import { Collection } from 'react-notion-x/build/third-party/collection';
 
 import Spinner from '../Spinner/Spinner';
+import TierTag from './TierTag';
 
 import { ExtendedRecordMap } from 'notion-types';
 
@@ -28,6 +28,19 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
     if (!blockId) return '';
     return recordMap?.block[blockId]?.value?.properties?.title[0][0] || '';
   };
+  const getPropertiesTier = (recordMap: ExtendedRecordMap) => {
+    if (!recordMap) return [];
+    const blockId = Object.keys(recordMap.block).find((key) => {
+      return key.replace(/-/g, '') === pageId.replace(/-/g, '');
+    });
+    if (!blockId) return [];
+    console.log(recordMap?.block[blockId]?.value?.properties);
+    if (!recordMap?.block[blockId]?.value?.properties['{wW:']) return [];
+
+    return recordMap?.block[blockId]?.value?.properties['{wW:'][0][0].split(
+      ',',
+    );
+  };
 
   useEffect(() => {
     fetchPageData(pageId);
@@ -38,8 +51,13 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
     }
     return (
       <div className="overflow-scroll m-2 !w-full">
-        <div className="text-center font-bold text-lg">
+        <div className="text-center font-bold text-lg m-1">
           {getPageTitle(recordMap)}
+        </div>
+        <div className="text-center ">
+          {getPropertiesTier(recordMap).map((tier: string, index: number) => {
+            return <TierTag key={index} tier={tier} />;
+          })}
         </div>
         <NotionRenderer
           className=""
@@ -48,8 +66,9 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
           darkMode={true}
           components={{
             Collection: () => {
-              return <div></div>;
+              return <></>;
             },
+
             PageLink: ({ ...props }) => {
               return (
                 <a
