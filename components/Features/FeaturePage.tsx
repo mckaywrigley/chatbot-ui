@@ -37,9 +37,9 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
     console.log(recordMap?.block[blockId]?.value?.properties);
     if (!recordMap?.block[blockId]?.value?.properties['{wW:']) return [];
 
-    return recordMap?.block[blockId]?.value?.properties['{wW:'][0][0].split(
-      ',',
-    );
+    return recordMap?.block[blockId]?.value?.properties['{wW:'][0][0]
+      .split(',')
+      .filter((item: string) => item !== '');
   };
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
         <div className="text-center font-bold text-lg m-1">
           {getPageTitle(recordMap)}
         </div>
-        <div className="text-center ">
+        <div className="text-center my-2">
           {getPropertiesTier(recordMap).map((tier: string, index: number) => {
             return <TierTag key={index} tier={tier} />;
           })}
