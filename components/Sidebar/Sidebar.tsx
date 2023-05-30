@@ -64,7 +64,7 @@ const Sidebar = <T,>({
     <div
       className={`${isOpen ? 'w-[260px]' : 'w-0'} ${
         side === 'left' ? 'tablet:left-0' : 'tablet:right-0'
-      } transition-all h-full ease-linear relative box-content tablet:fixed tablet:z-10`}
+      } transition-all h-full ease-linear mobile:max-h-[calc(100vh-48px)] relative box-content tablet:fixed tablet:z-10`}
     >
       <div
         className={`${
