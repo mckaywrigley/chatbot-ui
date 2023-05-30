@@ -60,11 +60,10 @@ export const NewConversationMessagesContainer: FC<Props> = ({
   };
   const featureOnClick = () => {
     dispatch({ field: 'showFeaturesModel', value: true });
-
-    // event('Survey banner clicked', {
-    //   category: 'Engagement',
-    //   label: 'survey_banner',
-    // });
+    event('Feature banner clicked', {
+      category: 'Engagement',
+      label: 'feature_introduction_banner',
+    });
   };
 
   return (
