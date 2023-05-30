@@ -15,6 +15,6 @@ export const OPENAI_API_VERSION =
 export const OPENAI_ORGANIZATION =
   process.env.OPENAI_ORGANIZATION || '';
 
-export const DEFAULT_IMAGE_GENERATION_STYLE = "photographic";
+export const DEFAULT_IMAGE_GENERATION_STYLE = "Default";
 
-export const DEFAULT_IMAGE_GENERATION_SAMPLE = 1;
+export const DEFAULT_IMAGE_GENERATION_QUALITY = "high";

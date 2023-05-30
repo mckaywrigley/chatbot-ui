@@ -62,3 +62,25 @@ export const deepEqual = (obj1: any, obj2: any): boolean => {
 
   return false;
 };
+
+export const removeSecondLastLine = (originalText: string): string => {
+  const lastNewLineIndex = originalText.lastIndexOf('\n');
+  const toBeRemovedLineEndAt = originalText.lastIndexOf(
+    '\n',
+    lastNewLineIndex - 1,
+  );
+  const toBeRemovedLineBeginAt = originalText.lastIndexOf(
+    '\n',
+    toBeRemovedLineEndAt - 1,
+  );
+  const toBeRemovedString = originalText.substring(
+    toBeRemovedLineBeginAt,
+    toBeRemovedLineEndAt,
+  );
+
+  return originalText.replace(toBeRemovedString, '');
+};
+
+export const capitalizeFirstLetter = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};

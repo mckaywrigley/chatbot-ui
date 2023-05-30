@@ -15,7 +15,7 @@ const nextConfig = {
   },
 
   images: {
-    domains: ['localhost', 'gdldiwtaingbnreeyuoj.supabase.co', 'tlzqgrjdkmblgtbmalki.supabase.co']
+    domains: ['localhost', 'gdldiwtaingbnreeyuoj.supabase.co', 'tlzqgrjdkmblgtbmalki.supabase.co', 'cdn.discordapp.com']
   },
 };
 
