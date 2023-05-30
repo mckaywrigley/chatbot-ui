@@ -30,7 +30,8 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "uuid": "^9.0.0",
-    "web-streams-polyfill": "^3.2.1"
+    "web-streams-polyfill": "^3.2.1",
+    "window.ai": "^0.2.1"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",

@@ -10,7 +10,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
-
+import { ModelID } from 'window.ai';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -84,13 +84,25 @@ const Home = ({
       if (!apiKey && !serverSideApiKeyIsSet && !windowaiEnabled) return null;
       if(windowaiEnabled) {
         if(!windowai) return null;
-        return windowai.getCurrentModel().then(
-          (modelID: WindowAIModelID) => {
+        let models = windowai
+          .getCurrentModel()
+          .then((modelID: ModelID) => {
+            console.log(modelID);
+            if(modelID){
+              return [WindowAIModels[modelID]]
+            }
+            // external model
+            else{
               return [
-                  WindowAIModels[modelID ? modelID : "customOrLocal"],
-              ]
-        }
-        )
+                {
+                  id: "externalOrLocal",
+                  name: 'External Model',
+                  maxLength: 100000,
+                  tokenLimit: 100000,
+            },]
+          }
+          });
+        return models;
       }
       else{
         return getModels(

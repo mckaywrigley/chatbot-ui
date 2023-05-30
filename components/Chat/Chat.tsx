@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import toast from 'react-hot-toast';
+import { ModelID } from 'window.ai';
 
 import { useTranslation } from 'next-i18next';
 
@@ -24,7 +25,6 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 import {
   OpenAIModel,
   OpenAIModels,
-  WindowAIModelID,
   WindowAIModels,
 } from '@/types/openai';
 import { Plugin } from '@/types/plugin';
@@ -468,9 +468,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       if (event === EventType.ModelChanged) {
         let models = windowai
           .getCurrentModel()
-          .then((modelID: WindowAIModelID) => {
+          .then((modelID: ModelID) => {
             console.log(modelID);
-            return [WindowAIModels[modelID ? modelID : 'customOrLocal']];
+            if(modelID){
+              return [WindowAIModels[modelID]]
+            }
+            // external model
+            else{
+              return [
+                {
+                  id: "externalOrLocal",
+                  name: 'External Model',
+                  maxLength: 100000,
+                  tokenLimit: 100000,
+            },]
+          }
           });
         models.then((models: OpenAIModel[]) => {
           homeDispatch({ field: 'models', value: models });
