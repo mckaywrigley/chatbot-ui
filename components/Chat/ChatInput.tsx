@@ -70,6 +70,16 @@ export const ChatInput = ({
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
 
+  const SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+  const SpeechGrammarList = window.SpeechGrammarList || webkitSpeechGrammarList;
+  const SpeechRecognitionEvent =
+    window.SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
+  
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const maxLength = selectedConversation?.model.maxLength;
@@ -105,6 +115,38 @@ export const ChatInput = ({
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
     }
+  };
+
+  const handlerecording = () => {
+    if (!recognition) return;
+    
+    if (recognition.recognizing) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  };
+
+  recognition.onstart = () => {
+    console.log('Speech recognition started');
+  };
+  
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map((result) => result[0])
+      .map((result) => result.transcript)
+      .join('');
+  
+    // Update the recorded text in the textarea
+    setContent(transcript);
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+  };
+  
+  recognition.onend = () => {
+    console.log('Speech recognition ended');
   };
 
   const handleStopConversation = () => {
@@ -347,8 +389,8 @@ export const ChatInput = ({
             )}
           </button>
           <button
-            className="absolute right-9 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            onClick={handleSend}
+            className="absolute right-8 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={handlerecording}
           >
             {messageIsStreaming ? (
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
