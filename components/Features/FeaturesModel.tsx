@@ -125,7 +125,7 @@ const FeaturesModel = memo(({ className = '', open, onClose }: Props) => {
                           {featureItem.tier.length > 0 &&
                             featureItem.tier.map((tier) => (
                               <TierTag
-                                key={`${featureItem.id} ${index} tier`}
+                                key={`${featureItem.id} ${index} ${tier}`}
                                 tier={tier}
                               />
                             ))}
