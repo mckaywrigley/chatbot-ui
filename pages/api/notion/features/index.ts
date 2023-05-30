@@ -21,7 +21,10 @@ const handler = async (req: NextRequest): Promise<Response> => {
     });
   }
 
-  const query = {
+  const url = new URL(req.nextUrl);
+  const { lang } = Object.fromEntries(url.searchParams.entries());
+
+  const databaseQuery = {
     database_id: featuresDatabaseID,
     sorts: [
       {
@@ -32,13 +35,13 @@ const handler = async (req: NextRequest): Promise<Response> => {
     filter: {
       property: 'Status',
       status: {
-        equals: 'Published',
+        equals: lang === 'zh' ? 'Published-zh' : 'Published',
       },
     },
   } as QueryDatabaseParameters;
 
   try {
-    const response = await client.databases.query(query);
+    const response = await client.databases.query(databaseQuery);
     const results = response.results;
 
     const responsePayload = {

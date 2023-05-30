@@ -1,13 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { IconX } from '@tabler/icons-react';
-import React, {
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { Fragment, memo, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -43,10 +36,14 @@ const FeaturesModel = memo(({ className = '', open, onClose }: Props) => {
     setSelectedPageId(pageId);
   };
 
+  const { i18n } = useTranslation();
+
   const fetchLatestFeatures = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/notion/features`);
+      const url = new URL('/api/notion/features', window.location.origin);
+      if (/^zh/.test(i18n.language)) url.searchParams.append('lang', 'zh');
+      const response = await fetch(url);
       const { featuresList } = await response.json();
       setFeaturesList(featuresList);
     } finally {
