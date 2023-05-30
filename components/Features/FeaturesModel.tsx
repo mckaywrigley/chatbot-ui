@@ -39,6 +39,10 @@ const FeaturesModel = memo(({ className = '', open, onClose }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectPageId, setSelectedPageId] = useState<string | null>(null);
 
+  const changeSelectPageId = (pageId: string) => {
+    setSelectedPageId(pageId);
+  };
+
   const fetchLatestFeatures = async () => {
     setIsLoading(true);
     try {
@@ -136,7 +140,12 @@ const FeaturesModel = memo(({ className = '', open, onClose }: Props) => {
                   <div className="h-1" ref={observerRef}></div>
                 </ul>
 
-                {selectPageId && <FeaturesPage pageId={selectPageId} />}
+                {selectPageId && (
+                  <FeaturesPage
+                    pageId={selectPageId}
+                    internalLinkOnClick={changeSelectPageId}
+                  />
+                )}
                 {isLoading && (
                   <div className="flex mt-[50%]">
                     <Spinner size="16px" className="mx-auto" />
