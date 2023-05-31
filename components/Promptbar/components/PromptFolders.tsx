@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 
+import { getNonDeletedCollection } from '@/utils/app/conversation';
+
 import { FolderInterface } from '@/types/folder';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -47,7 +49,7 @@ export const PromptFolders = () => {
 
   return (
     <div className="flex w-full flex-col pt-2">
-      {folders
+      {getNonDeletedCollection(folders)
         .filter((folder) => folder.type === 'prompt')
         .map((folder, index) => (
           <Folder
