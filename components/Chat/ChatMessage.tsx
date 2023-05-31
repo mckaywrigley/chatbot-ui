@@ -359,11 +359,18 @@ export const ChatMessage: FC<Props> = memo(
                   }}
                 >
                   <ol>
-                    {(message.sources || []).map(
+                    {(message.sources || []).reverse().map(
                       (source): React.ReactElement => (
-                        <li key={source.TITLE}>
-                          <p className="prose prose-sm dark:prose-invert font-normal">
-                            {source.TITLE}
+                        <li className="mb-4" key={source.TITLE}>
+                          <p className="prose prose-sm dark:prose-invert font-normal inline">
+                            <a
+                              className="font-normal text-blue-500 dark:text-blue-100"
+                              href="#"
+                            >
+                              &quot;{source.TITLE}&quot;
+                            </a>
+                            &nbsp;by&nbsp;
+                            {source.AUTHORS},&nbsp;{source.YEAR}.
                           </p>
                         </li>
                       ),
