@@ -26,12 +26,18 @@ export default async function handler(req: NextRequest): Promise<Response> {
   const api = new NotionCompatAPI(
     new Client({ auth: process.env.NOTION_SECRET_KEY }),
   );
+
+  const cacheControlValue = `public, s-maxage=3600, stale-while-revalidate`;
+
   try {
     const recordMap = await api.getPage(id as string);
 
     return new Response(JSON.stringify({ recordMap }), {
       status: 200,
       statusText: 'OK',
+      headers: {
+        'Cache-Control': cacheControlValue,
+      },
     });
   } catch (error) {
     console.error(error);
