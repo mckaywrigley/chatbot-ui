@@ -46,9 +46,6 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
     fetchPageData(pageId);
   }, [pageId]);
   if (recordMap) {
-    {
-      /* <div className="text-center font-bold">{title}</div> */
-    }
     return (
       <div className="overflow-scroll m-2 !w-full">
         <div className="text-center font-bold text-lg m-1">
