@@ -27,8 +27,6 @@ export default async function handler(req: NextRequest): Promise<Response> {
     new Client({ auth: process.env.NOTION_SECRET_KEY }),
   );
 
-  const cacheControlValue = `public, s-maxage=3600, stale-while-revalidate`;
-
   try {
     const recordMap = await api.getPage(id as string);
 
@@ -36,7 +34,7 @@ export default async function handler(req: NextRequest): Promise<Response> {
       status: 200,
       statusText: 'OK',
       headers: {
-        'Cache-Control': cacheControlValue,
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate',
       },
     });
   } catch (error) {
