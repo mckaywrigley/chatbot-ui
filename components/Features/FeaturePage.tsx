@@ -34,7 +34,6 @@ function FeaturePage({ pageId, internalLinkOnClick }: Props) {
       return key.replace(/-/g, '') === pageId.replace(/-/g, '');
     });
     if (!blockId) return [];
-    console.log(recordMap?.block[blockId]?.value?.properties);
     if (!recordMap?.block[blockId]?.value?.properties['{wW:']) return [];
 
     return recordMap?.block[blockId]?.value?.properties['{wW:'][0][0]
