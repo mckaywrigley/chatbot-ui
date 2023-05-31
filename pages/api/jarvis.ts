@@ -15,13 +15,16 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { id = '', messages } = (await req.json()) as ChatBody;
-    const stream = await JarvisAIStream(
+    const { stream, sources } = await JarvisAIStream(
       jarvisAuthCookie,
       id,
       messages[messages.length - 1]?.content || '',
     );
 
-    return new Response(stream);
+    return new Response(
+      stream,
+      sources ? { statusText: JSON.stringify(sources) } : undefined,
+    );
   } catch (error) {
     console.error(error);
     return new Response('Error', { status: 500 });

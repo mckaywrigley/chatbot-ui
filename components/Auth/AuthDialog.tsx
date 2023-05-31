@@ -42,11 +42,12 @@ export const AuthDialog: FC<Props> = ({ children, jarvisAuthCookie }) => {
             role="dialog"
           >
             <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
-              {t('Auth Code')}
+              {t('Access Code')}
             </div>
 
             <input
               className="mt-2 w-full rounded-lg border border-neutral-500 px-4 py-2 text-neutral-900 shadow focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-[#40414F] dark:text-neutral-100"
+              placeholder={t('Enter access code') || ''}
               type="password"
               value={jarvisAuth || ''}
               onChange={(e) => {
@@ -66,7 +67,7 @@ export const AuthDialog: FC<Props> = ({ children, jarvisAuthCookie }) => {
                 saveJarvisAuth();
               }}
             >
-              {t('Enter')}
+              {t('Continue')}
             </button>
           </div>
         </div>

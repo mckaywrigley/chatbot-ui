@@ -159,6 +159,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               done = true;
               break;
             }
+            const sources = JSON.parse(response.statusText || '[]');
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
             const chunkValue = decoder.decode(value);
@@ -167,7 +168,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
+                { role: 'assistant', content: chunkValue, sources },
               ];
               updatedConversation = {
                 ...updatedConversation,
@@ -184,6 +185,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     return {
                       ...message,
                       content: text,
+                      sources,
                     };
                   }
                   return message;

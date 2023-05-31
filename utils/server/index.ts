@@ -165,7 +165,7 @@ export const JarvisAIStream = async (
     }
   }
 
-  const { answer } = await res.json();
+  const { answer, sources = [] } = await res.json();
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -186,5 +186,5 @@ export const JarvisAIStream = async (
     },
   });
 
-  return stream;
+  return { stream, sources };
 };
