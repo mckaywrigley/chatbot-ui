@@ -5,6 +5,7 @@ import React, {
   memo,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -28,10 +29,11 @@ function formatDatetime(dateString: string) {
 type Props = {
   className?: string;
   open: boolean;
+  onOpen: () => void;
   onClose: () => void;
 };
 
-const NewsModel = memo(({ className = '', open, onClose }: Props) => {
+const NewsModel = memo(({ className = '', open, onOpen, onClose }: Props) => {
   const { t } = useTranslation('news');
 
   const [newsList, setNewsList] = useState<ChatEverywhereNews[]>([]);
@@ -39,6 +41,7 @@ const NewsModel = memo(({ className = '', open, onClose }: Props) => {
   const observerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectPageId, setSelectedPageId] = useState<string | null>(null);
+  const latestNewsId = useMemo(() => newsList[0]?.id, [newsList]);
 
   const fetchMoreNews = useCallback(async (nextCursor?: string) => {
     setIsLoading(true);
@@ -63,6 +66,16 @@ const NewsModel = memo(({ className = '', open, onClose }: Props) => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (!latestNewsId) return;
+
+    const latestNewsIdInLocalStorage = readLatestNewsIdFromLocalStorage();
+    if (latestNewsId !== latestNewsIdInLocalStorage) {
+      onOpen();
+      storeLatestNewsIdToLocalStorage(latestNewsId);
+    }
+  }, [latestNewsId, onOpen]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -184,3 +197,11 @@ const NewsModel = memo(({ className = '', open, onClose }: Props) => {
 NewsModel.displayName = 'NewsModel';
 
 export default NewsModel;
+
+function storeLatestNewsIdToLocalStorage(id: string) {
+  localStorage.setItem('latestNewsId', id);
+}
+
+function readLatestNewsIdFromLocalStorage() {
+  return localStorage.getItem('latestNewsId');
+}
