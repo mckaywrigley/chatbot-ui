@@ -74,7 +74,7 @@ export const ChatbarSettings = () => {
   };
 
   return (
-    <>
+    <div className="min-h-min">
       <CloudSyncStatusComponent />
       <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm overflow-auto">
         {conversations.length > 0 ? (
@@ -144,6 +144,6 @@ export const ChatbarSettings = () => {
           }}
         />
       </div>
-    </>
+    </div>
   );
 };
