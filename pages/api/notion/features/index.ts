@@ -38,7 +38,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
         equals: lang === 'zh' ? 'Published-zh' : 'Published',
       },
     },
-  } as QueryDatabaseParameters;
+  } as unknown as QueryDatabaseParameters;
 
   try {
     const response = await client.databases.query(databaseQuery);

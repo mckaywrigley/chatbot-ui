@@ -38,7 +38,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
         equals: 'Published',
       },
     },
-  } as QueryDatabaseParameters;
+  } as unknown as QueryDatabaseParameters;
 
   if (startCursor) {
     query.start_cursor = startCursor as string;

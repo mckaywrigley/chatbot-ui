@@ -1,31 +1,43 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest } from 'next/server';
 
-import { NotionAPI } from 'notion-client';
+import { Client } from '@notionhq/client';
+import { NotionCompatAPI } from 'notion-compat';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req: NextRequest): Promise<Response> {
   if (req.method !== 'GET') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
+    return new Response('Error', {
+      status: 405,
+      statusText: 'Method not allowed',
+    });
   }
 
-  const { id } = req.query;
+  const id = req.nextUrl.searchParams.get('id');
   if (!id) {
-    res.status(400).json({ message: 'Missing id' });
-    return;
+    return new Response('Missing id', {
+      status: 400,
+      statusText: 'Missing id',
+    });
   }
 
-  const api = new NotionAPI();
+  const api = new NotionCompatAPI(
+    new Client({ auth: process.env.NOTION_SECRET_KEY }),
+  );
   try {
     const recordMap = await api.getPage(id as string);
 
-    res.status(200).json({
-      recordMap,
+    return new Response(JSON.stringify({ recordMap }), {
+      status: 200,
+      statusText: 'OK',
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    return new Response('Internal server error', {
+      status: 500,
+      statusText: 'Internal server error',
+    });
   }
 }
