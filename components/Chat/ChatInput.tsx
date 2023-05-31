@@ -15,6 +15,7 @@ import { useTranslation } from 'next-i18next';
 import useDisplayAttribute from '@/hooks/useDisplayAttribute';
 import useFocusHandler from '@/hooks/useFocusInputHandler';
 
+import { getNonDeletedCollection } from '@/utils/app/conversation';
 import { getPluginIcon } from '@/utils/app/ui';
 
 import { PluginID } from '@/types/plugin';
@@ -68,7 +69,7 @@ export const ChatInput = ({
   const [isCloseToTokenLimit, setIsCloseToTokenLimit] = useState(false);
 
   const prompts = useMemo(() => {
-    return originalPrompts.filter((prompt) => !prompt.deleted);
+    return getNonDeletedCollection(originalPrompts);
   }, [originalPrompts]);
 
   const filteredPrompts = prompts.filter((prompt) =>
@@ -291,14 +292,15 @@ export const ChatInput = ({
         } stretch mx-2 mt-4 mb-4 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl transition-all ease-in-out`}
       >
         {/* Disable stop generating button for image generation until implemented */}
-        {messageIsStreaming && currentMessage?.pluginId !== PluginID.IMAGE_GEN && (
-          <button
-            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-            onClick={handleStopConversation}
-          >
-            <IconPlayerStop size={16} /> {t('Stop Generating')}
-          </button>
-        )}
+        {messageIsStreaming &&
+          currentMessage?.pluginId !== PluginID.IMAGE_GEN && (
+            <button
+              className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+              onClick={handleStopConversation}
+            >
+              <IconPlayerStop size={16} /> {t('Stop Generating')}
+            </button>
+          )}
 
         {!messageIsStreaming &&
           selectedConversation &&
