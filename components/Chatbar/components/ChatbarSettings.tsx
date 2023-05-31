@@ -5,6 +5,7 @@ import {
   IconFileExport,
   IconLogin,
   IconMoon,
+  IconNews,
   IconSun,
 } from '@tabler/icons-react';
 import { useContext } from 'react';
@@ -134,7 +135,7 @@ export const ChatbarSettings = () => {
         />
         <SidebarButton
           text={t('Follow for updates!')}
-          icon={<IconBrandFacebook size={18} />}
+          icon={<IconNews size={18} />}
           onClick={() => {
             window.open(
               'https://www.facebook.com/groups/621367689441014',
