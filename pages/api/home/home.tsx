@@ -102,7 +102,7 @@ const Home = ({
       conversationLastSyncAt,
       forceSyncConversation,
       replaceRemoteData,
-      messageIsStreaming
+      messageIsStreaming,
     },
     dispatch,
   } = contextValue;
@@ -314,7 +314,7 @@ const Home = ({
   // CLOUD SYNC ------------------------------------------
 
   useEffect(() => {
-    if(messageIsStreaming) return;
+    if (messageIsStreaming) return;
     if (!user) return;
     if (!isPaidUser) return;
 
@@ -673,6 +673,7 @@ const Home = ({
             )}
             <NewsModel
               open={showNewsModel}
+              onOpen={() => dispatch({ field: 'showNewsModel', value: true })}
               onClose={() => dispatch({ field: 'showNewsModel', value: false })}
             />
 
