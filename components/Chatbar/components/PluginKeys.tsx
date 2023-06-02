@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { PluginID, PluginKey } from '@/types/plugin';
 
-import HomeContext from '@/pages/api/home/home.context';
+import HomeContext from '@/pages/home/home.context';
 
 import { SidebarButton } from '@/components/Sidebar/SidebarButton';
 

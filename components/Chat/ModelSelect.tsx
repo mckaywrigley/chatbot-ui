@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 
 import { OpenAIModel } from '@/types/openai';
 
-import HomeContext from '@/pages/api/home/home.context';
+import HomeContext from '@/pages/home/home.context';
 
 export const ModelSelect = () => {
   const { t } = useTranslation('chat');

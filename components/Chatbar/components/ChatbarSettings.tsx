@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
-import HomeContext from '@/pages/api/home/home.context';
+import HomeContext from '@/pages/home/home.context';
 
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 

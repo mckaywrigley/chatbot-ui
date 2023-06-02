@@ -8,7 +8,7 @@ import { savePrompts } from '@/utils/app/prompts';
 import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
-import HomeContext from '@/pages/api/home/home.context';
+import HomeContext from '@/pages/home/home.context';
 
 import { PromptFolders } from './components/PromptFolders';
 import { PromptbarSettings } from './components/PromptbarSettings';
