@@ -1,7 +1,6 @@
 import NextAuth from "next-auth"
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
-import { signIn } from "next-auth/react";
 
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
