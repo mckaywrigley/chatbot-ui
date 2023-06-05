@@ -12,6 +12,14 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    import { init } from '@vercel/analytics'
+
+init({
+  // Your Vercel project ID
+  projectId: 'prj_k4m7RXbupPQKvt1LuTLrKMkydnLG',
+  // Your Vercel project's domain
+  domain: 'chat.disheng.org'
+})
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
