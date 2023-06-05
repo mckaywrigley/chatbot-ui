@@ -9,8 +9,11 @@ import {
 
 import Search from '../Search';
 
+import Image from 'next/image'
+
 interface Props<T> {
   isOpen: boolean;
+  showLogo: boolean;
   addItemButtonTitle: string;
   side: 'left' | 'right';
   items: T[];
@@ -27,6 +30,7 @@ interface Props<T> {
 
 const Sidebar = <T,>({
   isOpen,
+  showLogo = false,
   addItemButtonTitle,
   side,
   items,
@@ -57,8 +61,9 @@ const Sidebar = <T,>({
   return isOpen ? (
     <div>
       <div
-        className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
+        className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-pga-dark p-2 text-[14px] transition-all sm:relative sm:top-0`}
       >
+        {showLogo && <Image width="200" height="200" src='https://res.cloudinary.com/pgahq/image/upload/v1645527712/logo_pga.png' alt="logo" />}
         <div className="flex items-center">
           <button
             className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"

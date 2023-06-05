@@ -30,6 +30,7 @@
 
 html {
   background: #202123;
+  color: white;
 }
 
 @media (max-width: 720px) {

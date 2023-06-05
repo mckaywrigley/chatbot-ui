@@ -13,6 +13,17 @@ const nextConfig = {
 
     return config;
   },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/pgahq/image/upload/v1645527712/logo_pga.png'
+      }
+    ]
+  }
 };
 
 module.exports = nextConfig;

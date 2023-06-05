@@ -5,9 +5,17 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
-  darkMode: 'class',
+  // darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+    },
+    colors: {
+      pga: {
+        DEFAULT: '#003970',
+        mid: '#00203D',
+        dark: '#001529'
+      },
+    }
   },
   variants: {
     extend: {
