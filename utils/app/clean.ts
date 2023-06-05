@@ -31,7 +31,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (updatedConversation.temperature === null || updatedConversation.temperature === undefined) {
     updatedConversation = {
       ...updatedConversation,
-      temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
+      temperature: DEFAULT_TEMPERATURE,
     };
   }
 
