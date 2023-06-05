@@ -7,7 +7,11 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'tuna': '#343541',
+      },
+    },
   },
   variants: {
     extend: {
