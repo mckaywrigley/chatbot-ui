@@ -40,6 +40,8 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { useSession } from 'next-auth/react';
+import LoginPage from '@/pages/login';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -56,6 +58,7 @@ const Home = ({
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
+  const { data: session } = useSession()
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -346,6 +349,8 @@ const Home = ({
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
   ]);
+
+  if(!session) {return <LoginPage/>}
 
   return (
     <HomeContext.Provider
