@@ -41,6 +41,10 @@ import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]"
+
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
@@ -347,6 +351,14 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+  //AUTH SESSION ---------------------------------------------
+
+  const { data: session } = useSession();
+
+  if(!session){
+    return <div>Please Login</div>
+  }
+
   return (
     <HomeContext.Provider
       value={{
@@ -395,7 +407,9 @@ const Home = ({
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const {locale} = ctx;
+
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
@@ -413,6 +427,21 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     serverSidePluginKeysSet = true;
   }
 
+  const session = await getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+
+  if(!session){
+      return {
+          redirect: {
+            destination: '/auth/login',
+            permanent: false,
+          },
+        }
+  }
+
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
@@ -426,6 +455,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'promptbar',
         'settings',
       ])),
+      session
     },
   };
 };
