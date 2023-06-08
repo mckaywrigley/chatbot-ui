@@ -1,0 +1,1 @@
+export default <h1>There was an error. Please go back</h1>

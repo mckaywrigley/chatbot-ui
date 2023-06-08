@@ -126,6 +126,7 @@ const Promptbar = () => {
       }}
     >
       <Sidebar<Prompt>
+        showLogo={false}
         side={'right'}
         isOpen={showPromptbar}
         addItemButtonTitle={t('New prompt')}
