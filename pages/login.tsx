@@ -20,7 +20,7 @@ export default function Unauthorized() {
       />
       <p>Welcome to PGA GPT. Login with your Okta account below.</p>
       <LoginButton handleClick={() => signIn()}>
-        <div>{t('Login')}</div>
+        <div>Login</div>
       </LoginButton>
     </div>
   );
