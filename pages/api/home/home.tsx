@@ -15,7 +15,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, LOGIN_REQUIRED } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -45,12 +45,14 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
+  loginRequired: string;
 }
 
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
+  loginRequired,
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
@@ -346,6 +348,8 @@ const Home = ({
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
   ]);
+  if (session) { console.log(session.user?.email)}
+  if (loginRequired === 'true' && !session) {return <LoginPage/>}
 
   return (
     <HomeContext.Provider
@@ -408,6 +412,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCSEId = process.env.GOOGLE_CSE_ID;
+  const loginRequired = LOGIN_REQUIRED;
 
   if (googleApiKey && googleCSEId) {
     serverSidePluginKeysSet = true;
@@ -418,6 +423,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
       serverSidePluginKeysSet,
+      loginRequired,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',
