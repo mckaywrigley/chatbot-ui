@@ -25,5 +25,6 @@
   "Please enter a message": "Por favor, insira uma mensagem",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI é um kit de chatbot avançado para os modelos de chat do OpenAI com o objetivo de imitar a interface e a funcionalidade do ChatGPT.",
   "Are you sure you want to clear all messages?": "Tem certeza de que deseja limpar todas as mensagens?",
-  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Valores mais altos como 0,8 tornarão a saída mais aleatória, enquanto valores mais baixos como 0,2 a tornarão mais focada e determinística."
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Valores mais altos como 0,8 tornarão a saída mais aleatória, enquanto valores mais baixos como 0,2 a tornarão mais focada e determinística.",
+  "Default system prompt": "Você é o ChatGPT, um grande modelo de linguagem treinado pela OpenAI. Siga as instruções do usuário cuidadosamente. Responda usando markdown."
 }
