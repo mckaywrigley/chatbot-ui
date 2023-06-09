@@ -1,6 +1,7 @@
 import { IconFileImport } from '@tabler/icons-react';
 import { FC } from 'react';
 import { useTranslation } from 'next-i18next';
+import { SupportedExportFormats } from '@/types/export';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 
 interface Props {
@@ -30,61 +31,82 @@ interface HistoryItem {
 export const Import: FC<Props> = ({ onImport }) => {
   const { t } = useTranslation('sidebar');
 
+  const isJSONFormatValid = (data: any): boolean => {
+    if (Array.isArray(data)) {
+      for (const item of data) {
+        if (
+          !(
+            item.hasOwnProperty('title') &&
+            item.hasOwnProperty('create_time') &&
+            item.hasOwnProperty('update_time') &&
+            item.hasOwnProperty('mapping')
+          )
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  };
+
   const transformJSON = (inputFile: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const data = JSON.parse(e.target?.result as string);
 
-      const outputData: {
-        version: number;
-        history: HistoryItem[];
-        folders?: any[];
-        prompts?: any[];
-      } = {
-        version: 4,
-        history: [],
-      };
-
-      for (const item of data) {
-        const historyItem: HistoryItem = {
-          id: item.id,
-          name: item.title,
-          messages: [],
-          model: {
-            id: 'gpt-3.5-turbo',
-            name: 'GPT-3.5',
-            maxLength: 12000,
-            tokenLimit: 4000,
-          },
-          prompt: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
-          temperature: 0,
-          folderId: null,
-        };
-
-        const mapping = item.mapping;
-        for (const node_id in mapping) {
-          const node = mapping[node_id];
-          if (node && 'message' in node && node['message'] !== null && 'content' in node['message'] && node['message']['content'] !== null && 'parts' in node['message']['content']) {
-            const role = node['message']['author']['role'];
-            const content = node['message']['content']['parts'][0];
-            const message: Message = {
-              role: role,
-              content: content,
-            };
-            historyItem.messages.push(message);
-          }
-        }
-
-        outputData.history.push(historyItem);
+      if (isJSONFormatValid(data)) {
+        const outputData = transformOpenAIJSONData(data);
+        onImport(outputData);
+      } else {
+        const outputData = data;
+        onImport(outputData);
       }
-
-      outputData.folders = [];
-      outputData.prompts = [];
-
-      onImport(outputData);
     };
 
     reader.readAsText(inputFile);
+  };
+
+  const transformOpenAIJSONData = (data: any): SupportedExportFormats => {
+    const transformedData: SupportedExportFormats = {
+      version: 4,
+      history: [],
+      folders: [],
+      prompts: []
+    };
+
+    for (const item of data) {
+      const historyItem: HistoryItem = {
+        id: item.id,
+        name: item.title,
+        messages: [],
+        model: {
+          id: '',
+          name: '',
+          maxLength: 12000,
+          tokenLimit: 4000,
+        },
+        prompt: '',
+        temperature: 1,
+        folderId: null,
+      };
+
+      if (item.mapping) {
+        const mappingKeys = Object.keys(item.mapping);
+        for (const key of mappingKeys) {
+          const message = item.mapping[key].message;
+          if (message) {
+            const role = message.author.role === 'user' ? 'user' : 'assistant';
+            const content = message.content.parts.join('');
+            historyItem.messages.push({ role, content });
+          }
+        }
+      }
+
+      transformedData.history.push(historyItem);
+    }
+
+    return transformedData;
   };
 
   return (
@@ -97,6 +119,7 @@ export const Import: FC<Props> = ({ onImport }) => {
         accept=".json"
         onChange={(e) => {
           if (!e.target.files?.length) return;
+
           const file = e.target.files[0];
           transformJSON(file);
         }}
@@ -106,7 +129,9 @@ export const Import: FC<Props> = ({ onImport }) => {
         text={t('Import data')}
         icon={<IconFileImport size={18} />}
         onClick={() => {
-          const importFile = document.querySelector('#import-file') as HTMLInputElement;
+          const importFile = document.querySelector(
+            '#import-file',
+          ) as HTMLInputElement;
           if (importFile) {
             importFile.click();
           }
