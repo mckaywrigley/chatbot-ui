@@ -55,13 +55,8 @@ export const Import: FC<Props> = ({ onImport }) => {
     reader.onload = (e) => {
       const data = JSON.parse(e.target?.result as string);
 
-      if (isJSONFormatValid(data)) {
-        const outputData = transformOpenAIJSONData(data);
-        onImport(outputData);
-      } else {
-        const outputData = data;
-        onImport(outputData);
-      }
+      const outputData = (isJSONFormatValid(data)) ? transformOpenAIJSONData(data) : data;
+      onImport(outputData);
     };
 
     reader.readAsText(inputFile);
