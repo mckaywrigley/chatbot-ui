@@ -4,6 +4,7 @@ const csv = require('csv');
 
 const SWIZ_CSV_FILE = `${process.cwd()}/data/embedded_sections.csv`;
 const JSTARK_CSV_FILE = `${process.cwd()}/data/jstark_embedded_sections.csv`;
+const JOSH_DOODY_CSV_FILE = `${process.cwd()}/data/josh_doody_embedded_sections.csv`;
 
 export interface Section {
   type: 'section';
@@ -17,7 +18,7 @@ export type SectionWithEmbedding = Section & {
 
 export async function readEmbeddingsFromCSV() {
   const readStream = fs
-    .createReadStream(JSTARK_CSV_FILE)
+    .createReadStream(JOSH_DOODY_CSV_FILE)
     .pipe(csv.parse({ from_line: 2 }));
 
   const data = [];
