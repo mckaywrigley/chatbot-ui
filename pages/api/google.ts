@@ -6,6 +6,7 @@ import { cleanSourceText } from '@/utils/server/google';
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
+import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
@@ -14,6 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
     const { messages, key, model, googleAPIKey, googleCSEId } =
       req.body as GoogleBody;
+
+    const encoding = encoding_for_model(model.id as TiktokenModel);
 
     const userMessage = messages[messages.length - 1];
     const query = encodeURIComponent(userMessage.content.trim());
@@ -68,8 +71,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
             return {
               ...source,
-              // TODO: switch to tokens
-              text: sourceText.slice(0, 2000),
+              text: truncateTokens(encoding, sourceText, 1000),
             } as GoogleSource;
           }
           // }
@@ -142,8 +144,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.status(200).json({ answer });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error'})
+    res.status(500).json({ error: String(error) });
   }
 };
+
+/**
+ * Truncates the input text to the specified tokens limit.
+ */
+function truncateTokens(encoding: Tiktoken, text: string, limit: number) {
+  const tokens = encoding.encode(text);
+  if (tokens.length <= limit) return text;
+  const truncatedTokens = tokens.slice(0, limit);
+  const truncatedText = new TextDecoder().decode(
+    encoding.decode(truncatedTokens),
+  );
+  return truncatedText;
+}
 
 export default handler;
