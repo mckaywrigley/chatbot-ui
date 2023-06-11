@@ -6,7 +6,7 @@ import { cleanSourceText } from '@/utils/server/google';
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
-import { Tiktoken, encoding_for_model } from '@dqbd/tiktoken';
+import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
@@ -16,7 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const { messages, key, model, googleAPIKey, googleCSEId } =
       req.body as GoogleBody;
 
-    const encoding = encoding_for_model(model.id);
+    const encoding = encoding_for_model(model.id as TiktokenModel);
 
     const userMessage = messages[messages.length - 1];
     const query = encodeURIComponent(userMessage.content.trim());
