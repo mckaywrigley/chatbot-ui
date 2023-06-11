@@ -160,7 +160,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
-            const chunkValue = decoder.decode(value);
+            const chunkValue = decoder.decode(value, {stream:true});  // fix for correct utf8 decoding
             text += chunkValue;
             if (isFirst) {
               isFirst = false;
