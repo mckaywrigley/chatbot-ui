@@ -20,9 +20,9 @@ USER workable
 FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable
 WORKDIR /home/workable/app
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/next.config.js ./next.config.js
-COPY --from=build /app/next-i18next.config.js ./next-i18next.config.js
-COPY --from=build /app/Procfile.k8s ./Procfile
+COPY --from=build /home/workable/app/.next ./.next
+COPY --from=build /home/workable/app/public ./public
+COPY --from=build /home/workable/app/package*.json ./
+COPY --from=build /home/workable/app/next.config.js ./next.config.js
+COPY --from=build /home/workable/app/next-i18next.config.js ./next-i18next.config.js
+COPY --from=build /home/workable/app/Procfile-k8s ./Procfile
