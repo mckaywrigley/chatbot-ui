@@ -53,8 +53,6 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
-  const { getModels } = useApiService();
-  const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -77,29 +75,6 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error, refetch } = useQuery(
-    ['GetModels', apiKey, serverSideApiKeyIsSet],
-    ({ signal }) => {
-      if (!apiKey && !serverSideApiKeyIsSet) return null;
-
-      return getModels(
-        {
-          key: apiKey,
-        },
-        signal,
-      );
-    },
-    { enabled: true, refetchOnMount: false },
-  );
-
-  useEffect(() => {
-    if (data) dispatch({ field: 'models', value: data });
-  }, [data, dispatch]);
-
-  useEffect(() => {
-    dispatch({ field: 'modelError', value: getModelsError(error) });
-  }, [dispatch, error, getModelsError]);
-
   useEffect(() => {
     fetch('/api/ip')
         .then((res) => res.json())
@@ -108,17 +83,6 @@ const Home = ({
         })
         .catch((err) => console.error(err));
   }, []);
-
-  // FETCH MODELS ----------------------------------------------
-
-  const handleSelectConversation = (conversation: Conversation) => {
-    dispatch({
-      field: 'selectedConversation',
-      value: conversation,
-    });
-
-    saveConversation(conversation);
-  };
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -371,7 +335,6 @@ const Home = ({
         handleCreateFolder,
         handleDeleteFolder,
         handleUpdateFolder,
-        handleSelectConversation,
         handleUpdateConversation,
       }}
     >
