@@ -19,7 +19,7 @@ USER workable
 # ---- Production ----
 FROM gcr.io/staging-artifacts-786a/base/node/alpine/19.9:stable
 WORKDIR /home/workable/app
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /home/workable/app/node_modules ./node_modules
 COPY --from=build /home/workable/app/.next ./.next
 COPY --from=build /home/workable/app/public ./public
 COPY --from=build /home/workable/app/package*.json ./
