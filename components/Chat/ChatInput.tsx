@@ -285,7 +285,7 @@ export const ChatInput = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} className='animate-pulse'/>}
           </button>
 
           {showPluginSelect && (
