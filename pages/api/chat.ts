@@ -1,5 +1,6 @@
+import { OPENAI_API_HOST, OPENAI_ORGANIZATION } from '../../utils/app/const';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -15,7 +16,15 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const {
+      model,
+      messages,
+      key,
+      prompt,
+      temperature,
+      functions,
+      function_call,
+    } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -41,7 +50,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      const tokens = encoding.encode(message.content);
+      const text = JSON.stringify(message); // 実際はJSONじゃないが、似たようなものだと思う
+      const tokens = encoding.encode(text);
 
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
         break;
@@ -52,9 +62,37 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    console.log(messages);
 
-    return new Response(stream);
+    const url = `${OPENAI_API_HOST}/v1/chat/completions`;
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+        ...(OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: model.id,
+        messages: [
+          {
+            role: 'system',
+            content: promptToSend,
+          },
+          ...messages,
+        ],
+        max_tokens: 1000,
+        temperature,
+        stream: true,
+        functions,
+        function_call,
+      }),
+    });
+
+    // レスポンスはすべてクライアントサイドで処理する
+    return response;
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
