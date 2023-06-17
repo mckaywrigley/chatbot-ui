@@ -15,6 +15,19 @@ export const functions = [
       },
     },
   },
+  {
+    name: 'web-text-scraper',
+    description: 'Scrapes the text from the specified URL',
+    parameters: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'The URL to scrape',
+        },
+      },
+    },
+  },
 ];
 
 export async function runPlugin(
@@ -31,6 +44,15 @@ export async function runPlugin(
       try {
         const { query } = JSON.parse(functionCall.arguments || '{}');
         content = await googleSearchPlugin({ query });
+      } catch (error) {
+        content = String(error);
+      }
+      break;
+    }
+    case 'web-text-scraper': {
+      try {
+        const { url } = JSON.parse(functionCall.arguments || '{}');
+        content = await webScraperPlugin(url);
       } catch (error) {
         content = String(error);
       }
@@ -61,4 +83,19 @@ export async function googleSearchPlugin(body: GoogleBody) {
     .join('\n');
 
   return text;
+}
+
+export async function webScraperPlugin(url: string) {
+  const response = await fetch('/api/proxy', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
+  });
+  const html = await response.text();
+
+  // 本文抽出
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const article = doc.querySelector('article,main,div');
+
+  return article?.textContent?.slice(0, 1000) || '';
 }
