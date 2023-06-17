@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
 
+import { googleSearchPlugin } from '@/services/googleSearchPlugin';
+
 import { getEndpoint } from '@/utils/app/api';
 import {
   saveConversation,
@@ -291,12 +293,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     switch (functionCall.name) {
       case 'google-search': {
         const { query } = JSON.parse(functionCall.arguments || '{}');
-        const result = `## Search result of ${query}`;
-        handleSend({
-          role: 'function',
-          name: functionCall.name,
-          content: result,
-        });
+        Promise.resolve()
+          .then(() => googleSearchPlugin({ query }))
+          .catch((error) => String(error))
+          .then((content) =>
+            handleSend({
+              role: 'function',
+              name: functionCall.name,
+              content,
+            }),
+          );
         break;
       }
       default:

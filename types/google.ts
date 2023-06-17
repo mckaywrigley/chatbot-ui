@@ -1,8 +1,9 @@
-import { ChatBody, Message } from './chat';
+import { Message } from './chat';
 
-export interface GoogleBody extends ChatBody {
-  googleAPIKey: string;
-  googleCSEId: string;
+export interface GoogleBody {
+  query: string;
+  googleAPIKey?: string;
+  googleCSEId?: string;
 }
 
 export interface GoogleResponse {
