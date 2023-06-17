@@ -1,6 +1,8 @@
 import { Message } from '@/types/chat';
 import { GoogleBody } from '@/types/google';
 
+import TurndownService from 'turndown';
+
 export const functions = [
   {
     name: 'google-search',
@@ -17,7 +19,7 @@ export const functions = [
   },
   {
     name: 'web-text-scraper',
-    description: 'Scrapes the text from the specified URL',
+    description: 'Scrapes the text from the specified URL and return Markdown',
     parameters: {
       type: 'object',
       properties: {
@@ -95,7 +97,13 @@ export async function webScraperPlugin(url: string) {
   // 本文抽出
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  const article = doc.querySelector('article,main,div');
+  const article = doc.querySelector('article,main,div') ?? document.body;
 
-  return article?.textContent?.slice(0, 1000) || '';
+  const turndownService = new TurndownService();
+  turndownService.addRule('script', {
+    filter: 'script',
+    replacement: () => '',
+  });
+  const markdown = turndownService.turndown(article.innerHTML || '');
+  return markdown.slice(0, 2000);
 }
