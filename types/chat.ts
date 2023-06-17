@@ -3,9 +3,14 @@ import { OpenAIModel } from './openai';
 export interface Message {
   role: Role;
   content: string;
+  name?: string;
+  function_call?: {
+    name?: string;
+    arguments?: string;
+  };
 }
 
-export type Role = 'assistant' | 'user';
+export type Role = 'user' | 'assistant' | 'function';
 
 export interface ChatBody {
   model: OpenAIModel;
@@ -13,6 +18,8 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  functions: unknown[];
+  function_call: 'none' | 'auto' | { name: string };
 }
 
 export interface Conversation {

@@ -38,14 +38,6 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-interface Delta {
-  content?: string;
-  function_call?: {
-    name?: string;
-    arguments?: string;
-  };
-}
-
 export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
@@ -75,6 +67,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const nextFunctionCallRef = useRef<Message['function_call']>();
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -107,6 +101,22 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
+          functions: [
+            {
+              name: 'google-search',
+              description: 'Searches Google for the specified query',
+              parameters: {
+                type: 'object',
+                properties: {
+                  query: {
+                    type: 'string',
+                    description: 'The query to search for',
+                  },
+                },
+              },
+            },
+          ],
+          function_call: 'auto', // autoはデフォルト値で、自動で関数を決める
         };
         const endpoint = getEndpoint(plugin);
         const body = JSON.stringify({
@@ -162,7 +172,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         const decoder = new TextDecoder();
         let done = false;
         let isFirst = true;
-        const jsonBuffer: Delta = {};
+        const jsonBuffer: Message = { role: 'assistant', content: '' };
         while (!done) {
           if (stopConversationRef.current === true) {
             controller.abort();
@@ -185,24 +195,35 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             try {
               const result = JSON.parse(line);
-              const delta: Delta = result.choices[0].delta;
-              if (typeof delta.content === 'string') {
-                jsonBuffer.content = (jsonBuffer.content || '') + delta.content;
+              const { content, function_call } = result.choices[0]
+                .delta as Message;
+              if (typeof content === 'string') {
+                jsonBuffer.content = [jsonBuffer.content, content].join('');
               }
-              // TODO: function_call
+              if (typeof function_call === 'object' && function_call) {
+                jsonBuffer.function_call = {
+                  name: [
+                    jsonBuffer.function_call?.name,
+                    function_call.name,
+                  ].join(''),
+                  arguments: [
+                    jsonBuffer.function_call?.arguments,
+                    function_call.arguments,
+                  ].join(''),
+                };
+              }
             } catch (error) {
               console.error(error);
               console.error(chunkValue);
               // XXX: JSONが途切れることがある？
             }
           }
-          const text = jsonBuffer.content || ''; // TODO: function_call
 
           if (isFirst) {
             isFirst = false;
             const updatedMessages: Message[] = [
               ...updatedConversation.messages,
-              { role: 'assistant', content: text },
+              { ...jsonBuffer },
             ];
             updatedConversation = {
               ...updatedConversation,
@@ -218,7 +239,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 if (index === updatedConversation.messages.length - 1) {
                   return {
                     ...message,
-                    content: text,
+                    ...jsonBuffer,
                   };
                 }
                 return message;
@@ -248,6 +269,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         }
         homeDispatch({ field: 'conversations', value: updatedConversations });
         saveConversations(updatedConversations);
+        nextFunctionCallRef.current = jsonBuffer.function_call;
         homeDispatch({ field: 'messageIsStreaming', value: false });
       }
     },
@@ -259,6 +281,28 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       stopConversationRef,
     ],
   );
+
+  // プラグインを実行
+  useEffect(() => {
+    const functionCall = nextFunctionCallRef.current;
+    nextFunctionCallRef.current = undefined;
+    if (!functionCall) return;
+
+    switch (functionCall.name) {
+      case 'google-search': {
+        const { query } = JSON.parse(functionCall.arguments || '{}');
+        const result = `## Search result of ${query}`;
+        handleSend({
+          role: 'function',
+          name: functionCall.name,
+          content: result,
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  }, [nextFunctionCallRef.current]);
 
   const scrollToBottom = useCallback(() => {
     if (autoScrollEnabled) {

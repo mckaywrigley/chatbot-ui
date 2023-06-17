@@ -16,8 +16,15 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } =
-      (await req.json()) as ChatBody;
+    const {
+      model,
+      messages,
+      key,
+      prompt,
+      temperature,
+      functions,
+      function_call,
+    } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -43,7 +50,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      const tokens = encoding.encode(message.content);
+      const text = JSON.stringify(message); // 実際はJSONじゃないが、似たようなものだと思う
+      const tokens = encoding.encode(text);
 
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
         break;
@@ -53,6 +61,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     encoding.free();
+
+    console.log(messages);
 
     const url = `${OPENAI_API_HOST}/v1/chat/completions`;
     const response = await fetch(url, {
@@ -76,6 +86,8 @@ const handler = async (req: Request): Promise<Response> => {
         max_tokens: 1000,
         temperature,
         stream: true,
+        functions,
+        function_call,
       }),
     });
 
