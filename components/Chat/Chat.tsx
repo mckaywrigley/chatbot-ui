@@ -12,14 +12,10 @@ import toast from 'react-hot-toast';
 
 import { useTranslation } from 'next-i18next';
 
-import { googleSearchPlugin } from '@/services/googleSearchPlugin';
+import { functions, runPlugin } from '@/services/pluginService';
 
 import { getEndpoint } from '@/utils/app/api';
-import {
-  saveConversation,
-  saveConversations,
-  updateConversation,
-} from '@/utils/app/conversation';
+import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -103,21 +99,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
-          functions: [
-            {
-              name: 'google-search',
-              description: 'Searches Google for the specified query',
-              parameters: {
-                type: 'object',
-                properties: {
-                  query: {
-                    type: 'string',
-                    description: 'The query to search for',
-                  },
-                },
-              },
-            },
-          ],
+          functions,
           function_call: 'auto', // autoはデフォルト値で、自動で関数を決める
         };
         const endpoint = getEndpoint(plugin);
@@ -290,24 +272,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     nextFunctionCallRef.current = undefined;
     if (!functionCall) return;
 
-    switch (functionCall.name) {
-      case 'google-search': {
-        const { query } = JSON.parse(functionCall.arguments || '{}');
-        Promise.resolve()
-          .then(() => googleSearchPlugin({ query }))
-          .catch((error) => String(error))
-          .then((content) =>
-            handleSend({
-              role: 'function',
-              name: functionCall.name,
-              content,
-            }),
-          );
-        break;
-      }
-      default:
-        break;
-    }
+    runPlugin(functionCall).then((message) => message && handleSend(message));
   }, [nextFunctionCallRef.current]);
 
   const scrollToBottom = useCallback(() => {
