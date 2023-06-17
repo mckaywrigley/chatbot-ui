@@ -1,5 +1,6 @@
+import { OPENAI_API_HOST, OPENAI_ORGANIZATION } from '../../utils/app/const';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -15,7 +16,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { model, messages, key, prompt, temperature } =
+      (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -52,9 +54,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    const url = `${OPENAI_API_HOST}/v1/chat/completions`;
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+        ...(OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: model.id,
+        messages: [
+          {
+            role: 'system',
+            content: promptToSend,
+          },
+          ...messages,
+        ],
+        max_tokens: 1000,
+        temperature,
+        stream: true,
+      }),
+    });
 
-    return new Response(stream);
+    // レスポンスはすべてクライアントサイドで処理する
+    return response;
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {

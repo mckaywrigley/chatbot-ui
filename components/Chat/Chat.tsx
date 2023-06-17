@@ -29,13 +29,21 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
+}
+
+interface Delta {
+  content?: string;
+  function_call?: {
+    name?: string;
+    arguments?: string;
+  };
 }
 
 export const Chat = memo(({ stopConversationRef }: Props) => {
@@ -127,7 +135,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          let errorMessage = response.statusText;
+          response
+            .json()
+            .then((json) => {
+              errorMessage += '\n' + json?.error?.message; // 可能ならbodyまで表示
+            })
+            .finally(() => {
+              toast.error(errorMessage);
+            });
           return;
         }
         const data = response.body;
@@ -151,7 +167,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           const decoder = new TextDecoder();
           let done = false;
           let isFirst = true;
-          let text = '';
+          const jsonBuffer: Delta = {};
           while (!done) {
             if (stopConversationRef.current === true) {
               controller.abort();
@@ -161,12 +177,38 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
             const chunkValue = decoder.decode(value);
-            text += chunkValue;
+
+            // Parse Server-Sent Event
+            const sseLines = chunkValue
+              .split('data:')
+              .map((s) => s.trim())
+              .filter((s) => s);
+            for (const line of sseLines) {
+              if (line === '[DONE]') {
+                done = true;
+                break;
+              }
+              try {
+                const result = JSON.parse(line);
+                const delta: Delta = result.choices[0].delta;
+                if (typeof delta.content === 'string') {
+                  jsonBuffer.content =
+                    (jsonBuffer.content || '') + delta.content;
+                }
+                // TODO: function_call
+              } catch (error) {
+                console.error(error);
+                console.error(chunkValue);
+                // XXX: JSONが途切れることがある？
+              }
+            }
+            const text = jsonBuffer.content || ''; // TODO: function_call
+
             if (isFirst) {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
+                { role: 'assistant', content: text },
               ];
               updatedConversation = {
                 ...updatedConversation,
