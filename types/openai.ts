@@ -1,10 +1,11 @@
-import { OPENAI_API_TYPE } from '../utils/app/const';
+import {LLAMA_API_HOST, OPENAI_API_HOST} from "@/utils/app/const";
 
 export interface OpenAIModel {
   id: string;
   name: string;
   maxLength: number; // maximum length of a message
   tokenLimit: number;
+  url: string;
 }
 
 export enum OpenAIModelID {
@@ -16,19 +17,7 @@ export enum OpenAIModelID {
   LLAMA_13B = 'llama-13b',
   LLAMA_33B = 'llama-33b',
   LLAMA_65B = 'llama-65b',
-}
-
-export const LlamaModels = [
-  { id: OpenAIModelID.LLAMA_7B, name: "LLAMA-7B" },
-  { id: OpenAIModelID.LLAMA_13B, name: "LLAMA-13B" },
-  { id: OpenAIModelID.LLAMA_33B, name: "LLAMA-33B" },
-  { id: OpenAIModelID.LLAMA_65B, name: "LLAMA-65B" },
-];
-
-const LlamaModelSet = new Set(LlamaModels.map(item => item.id.valueOf()));
-
-export function is_llama(model_name: string) {
-  return LlamaModelSet.has(model_name);
+  ANY_LLAMA = 'any-llama',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -40,47 +29,62 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     name: 'GPT-3.5',
     maxLength: 12000,
     tokenLimit: 4000,
+    url: OPENAI_API_HOST,
   },
   [OpenAIModelID.GPT_3_5_AZ]: {
     id: OpenAIModelID.GPT_3_5_AZ,
     name: 'GPT-3.5',
     maxLength: 12000,
     tokenLimit: 4000,
+    url: OPENAI_API_HOST,
   },
   [OpenAIModelID.GPT_4]: {
     id: OpenAIModelID.GPT_4,
     name: 'GPT-4',
     maxLength: 24000,
     tokenLimit: 8000,
+    url: OPENAI_API_HOST,
   },
   [OpenAIModelID.GPT_4_32K]: {
     id: OpenAIModelID.GPT_4_32K,
     name: 'GPT-4-32K',
     maxLength: 96000,
     tokenLimit: 32000,
+    url: OPENAI_API_HOST,
   },
   [OpenAIModelID.LLAMA_7B]: {
     id: OpenAIModelID.LLAMA_7B,
     name: 'LLAMA-7B',
     maxLength: 24000,
     tokenLimit: 8000,
+    url: LLAMA_API_HOST,
   },
   [OpenAIModelID.LLAMA_13B]: {
     id: OpenAIModelID.LLAMA_13B,
     name: 'LLAMA-13B',
     maxLength: 24000,
     tokenLimit: 8000,
+    url: LLAMA_API_HOST,
   },
   [OpenAIModelID.LLAMA_33B]: {
     id: OpenAIModelID.LLAMA_33B,
     name: 'LLAMA-33B',
     maxLength: 24000,
     tokenLimit: 8000,
+    url: LLAMA_API_HOST,
   },
   [OpenAIModelID.LLAMA_65B]: {
     id: OpenAIModelID.LLAMA_65B,
     name: 'LLAMA-65B',
     maxLength: 24000,
     tokenLimit: 8000,
+    url: LLAMA_API_HOST,
   },
+  [OpenAIModelID.ANY_LLAMA]: {
+    id: fallbackModelID,
+    name: 'any-llama',
+    maxLength: 12000,
+    tokenLimit: 4000,
+    url: LLAMA_API_HOST,
+  }
 };

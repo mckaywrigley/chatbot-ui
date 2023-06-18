@@ -1,16 +1,17 @@
-import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
-
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {Message} from '@/types/chat';
+import {OpenAIModel} from '@/types/openai';
 
 import {
-  ParsedEvent,
-  ReconnectInterval,
-  createParser,
-} from 'eventsource-parser';
+  AZURE_DEPLOYMENT_ID,
+  LLAMA_API_HOST,
+  LLAMA_STREAM_MODE,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION
+} from '../app/const';
 
-import { is_llama } from '@/types/openai';
-import { LLAMA_API_HOST, LLAMA_STREAM_MODE } from '../app/const';
+import {createParser, ParsedEvent, ReconnectInterval,} from 'eventsource-parser';
 
 export class OpenAIError extends Error {
   type: string;
@@ -33,14 +34,11 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  let url = `${model.url}/v1/chat/completions`;
   if (OPENAI_API_TYPE === 'azure') {
     url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${OPENAI_API_VERSION}`;
   }
-  if (is_llama(model.id)) {
-    url = `${LLAMA_API_HOST}/v1/chat/completions`;
-  }
-  const streaming = !is_llama(model.id) || (LLAMA_STREAM_MODE === '1');
+  const streaming = model.url !== LLAMA_API_HOST || (LLAMA_STREAM_MODE === '1');
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -68,6 +66,9 @@ export const OpenAIStream = async (
       temperature: temperature,
       stream: streaming,
     }),
+  }).catch((e) => {
+    console.error('c\'est oui', url);
+    throw e;
   });
 
   const encoder = new TextEncoder();
@@ -90,7 +91,7 @@ export const OpenAIStream = async (
     }
   }
 
-  const stream = !streaming ?
+  return !streaming ?
     new ReadableStream({
       async start(controller) {
         try {
@@ -132,6 +133,4 @@ export const OpenAIStream = async (
         }
       },
     });
-
-  return stream;
 };
