@@ -26,10 +26,15 @@
     "react-markdown": "^8.0.5",
     "react-query": "^3.39.3",
     "react-syntax-highlighter": "^15.5.0",
+    "rehype-dom-parse": "^4.0.2",
     "rehype-mathjax": "^4.0.2",
+    "rehype-remark": "^9.1.2",
+    "rehype-sanitize": "^5.0.1",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "turndown": "^7.1.2",
+    "remark-stringify": "^10.0.3",
+    "unified": "^10.1.2",
+    "unist-util-filter": "^4.0.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

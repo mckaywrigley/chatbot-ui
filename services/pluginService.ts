@@ -1,7 +1,13 @@
 import { Message } from '@/types/chat';
 import { GoogleBody } from '@/types/google';
 
-import TurndownService from 'turndown';
+import rehypeDomParse from 'rehype-dom-parse';
+import rehypeRemark from 'rehype-remark';
+import rehypeSanitize, { Root } from 'rehype-sanitize';
+import remarkGfm from 'remark-gfm';
+import remarkStringify from 'remark-stringify';
+import { Plugin, unified } from 'unified';
+import { filter } from 'unist-util-filter';
 
 export const functions = [
   {
@@ -97,13 +103,31 @@ export async function webScraperPlugin(url: string) {
   // 本文抽出
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  const article = doc.querySelector('article,main,div') ?? document.body;
+  const article =
+    doc.querySelector('article,#article,.article,main,#main,.main') ?? doc.body;
 
-  const turndownService = new TurndownService();
-  turndownService.addRule('script', {
-    filter: 'script',
-    replacement: () => '',
-  });
-  const markdown = turndownService.turndown(article.innerHTML || '');
+  const file = await unified()
+    .use(rehypeDomParse, { fragment: true })
+    .use(removeExtra)
+    .use(rehypeSanitize)
+    .use(rehypeRemark)
+    .use(remarkGfm)
+    .use(remarkStringify)
+    .process(article.innerHTML);
+
+  const markdown = String(file);
+
   return markdown.slice(0, 2000);
 }
+
+const ignoreTagNames = ['style', 'script', 'nav'];
+const removeExtra: Plugin<[], Root, Root> = () => (tree) => {
+  return (
+    filter(tree, { cascade: false }, (node) => {
+      return (
+        node.type !== 'comment' &&
+        !('tagName' in node && ignoreTagNames.includes(node.tagName + ''))
+      );
+    }) || undefined
+  );
+};
