@@ -1,3 +1,4 @@
+import { IconTrash } from '@tabler/icons-react';
 import {
   Dispatch,
   FC,
@@ -11,6 +12,8 @@ import { useQuery } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
+
+import { getPlugins } from '@/utils/app/localPlugins';
 
 import { Plugin } from '@/types/plugin';
 
@@ -44,11 +47,6 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
     return result.json();
   };
 
-  const getPlugins = () => {
-    const plugins = localStorage.getItem('plugins');
-    if (!plugins) return null;
-    return JSON.parse(localStorage.getItem('plugins') as string);
-  };
   const addPlugin = (plugin: Plugin) => {
     const localStoragePlugins = Object.keys(getPlugins() || {});
     if (localStoragePlugins.includes(plugin.id)) {
@@ -100,12 +98,20 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   };
 
   const toggleIsOpened = () => setIsOpened(!isOpened);
+
+  const handleDeletePlugin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const newPlugins = plugins.filter(
+      (plugin) => plugin.id !== e.currentTarget.value,
+    );
+    setPlugins(newPlugins);
+    const newLocalPlugins = Object.assign({}, localPlugins);
+    delete newLocalPlugins[e.currentTarget.value];
+    localStorage.removeItem('plugins');
+    localStorage.setItem('plugins', JSON.stringify(newLocalPlugins));
+    setLocalPlugins(newLocalPlugins);
+    setIsOpened(false);
+  };
   const handleClickPlugin = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.currentTarget.value === 'none') {
-      setPlugins([]);
-      setIsOpened(false);
-      return;
-    }
     if (pluginsIdList.includes(e.currentTarget.value)) {
       const newPlugins = plugins.filter(
         (plugin) => plugin.id !== e.currentTarget.value,
@@ -163,29 +169,41 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
         >
           {Object.keys(localPlugins).length > 0 && (
             <div className="w-full flex flex-col items-start gap-2 rounded cursor-pointer bg-transparent p-2 border border-neutral-200 dark:border-neutral-600 dark:text-white max-h-[7.5rem] overflow-y-auto">
-              {Object.keys(localPlugins).map((pluginName) => (
-                <button
-                  key={localPlugins[pluginName].id}
-                  id={localPlugins[pluginName].id}
-                  value={localPlugins[pluginName].id}
-                  className="w-full pl-1 rounded flex items-start hover:bg-gray-100 dark:bg-[#343541] dark:text-white dark:hover:bg-gray-400 dark:hover:text-black transition-colors duration-200"
-                  onClick={handleClickPlugin}
+              {Object.keys(localPlugins).map((pluginId) => (
+                <div
+                  key={pluginId}
+                  className="w-full pl-1 rounded flex items-start dark:bg-[#343541] dark:text-white"
                 >
-                  <img
-                    className="w-5 h-5 mr-2 bg-white rounded"
-                    src={localPlugins[pluginName].logo as string}
-                    alt={localPlugins[pluginName].name}
-                  />
-                  <span>{t(localPlugins[pluginName].name)}</span>
-                  <input
-                    type={'checkbox'}
-                    checked={pluginsIdList.includes(
-                      localPlugins[pluginName].id,
-                    )}
-                    readOnly={true}
-                    className="self-center ml-auto mr-1"
-                  />
-                </button>
+                  <button
+                    id={pluginId}
+                    value={pluginId}
+                    onClick={handleClickPlugin}
+                    className="flex items-center w-full rounded p-1 dark:hover:bg-gray-400 hover:bg-gray-100 dark:hover:text-black transition-colors duration-200"
+                  >
+                    <img
+                      className="w-5 h-5 mr-2 bg-white rounded"
+                      src={localPlugins[pluginId].logo as string}
+                      alt={localPlugins[pluginId].name}
+                    />
+                    <span>{t(localPlugins[pluginId].name)}</span>
+                    <input
+                      type={'checkbox'}
+                      checked={pluginsIdList.includes(
+                        localPlugins[pluginId].id,
+                      )}
+                      readOnly={true}
+                      className="self-center ml-auto"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    className="self-center rounded p-1 ml-2 dark:hover:bg-gray-400 hover:bg-gray-100 dark:hover:text-black transition-colors duration-200"
+                    value={pluginId}
+                    onClick={handleDeletePlugin}
+                  >
+                    <IconTrash size={16} />
+                  </button>
+                </div>
               ))}
             </div>
           )}
