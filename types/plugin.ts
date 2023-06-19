@@ -37,3 +37,61 @@ export const Plugins: Record<PluginID, Plugin> = {
 };
 
 export const PluginList = Object.values(Plugins);
+
+export interface PluginApiOperation {
+  operationId: string;
+  serverUrl: string;
+  apiPath: string;
+  method: string;
+  summary?: string;
+  parameters?: [{
+    name: string;
+    in: string;
+    description?: string;
+    required?: boolean;
+    schema: {
+      type: string;
+    }
+  }];
+  requestBody?: {
+    required?: boolean;
+    content: {
+      [key: string]: {
+        schema: {
+          type: string;
+          required?: string[];
+          properties: {
+            [key: string]: {
+              type: string;
+              description?: string;
+              required?: boolean;
+            }
+          }
+        }
+      }
+    }
+  };
+  responses?: {
+    [key: string]: {
+      description?: string;
+      content?: {
+        [key: string]: {
+          schema: {
+            type: string;
+            required?: string[];
+            properties?: {
+              [key: string]: {
+                type: string;
+                description?: string;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export interface PluginApiOperationList {
+  [operationId: string]: PluginApiOperation;
+}
