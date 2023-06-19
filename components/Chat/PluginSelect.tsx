@@ -41,6 +41,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [localPlugins, setLocalPlugins] = useState<Record<string, Plugin>>({});
   const [toggleIsUpdated, setToggleIsUpdated] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const downloadPlugin = async (url: string) => {
     const result = await fetch(url, { method: 'GET' });
@@ -134,34 +135,59 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
         {t('Plugin')}
       </label>
-      <div className="pl-2 w-full rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
-        <div
-          className="w-full cursor-pointer bg-transparent p-2 flex justify-between items-center"
-          onClick={toggleIsOpened}
-        >
-          <div className="flex items-start gap-1">
-            {plugins.length > 0 ? (
-              plugins.map((plugin) => {
-                return (
-                  <img
-                    className="w-5 h-5 bg-white rounded"
-                    key={plugin.id}
-                    src={plugin.logo}
-                    alt={plugin.name}
-                  />
-                );
-              })
+      <button
+        type="button"
+        className="relative cursor-pointer p-2 flex justify-between items-center pl-2 w-full rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={toggleIsOpened}
+      >
+        {plugins.length > 0 ? (
+          <div className="flex gap-1.5">
+            {plugins.length < 6 ? (
+              <>
+                {plugins.map((plugin) => {
+                  return (
+                    <img
+                      className="w-5 h-5 bg-white rounded"
+                      key={plugin.id}
+                      src={plugin.logo}
+                      alt={plugin.name}
+                    />
+                  );
+                })}
+              </>
             ) : (
-              <span>{t('Unchecked')}</span>
+              <>
+                {plugins.map((plugin, index) => {
+                  if (index > 4) return <></>;
+                  return (
+                    <img
+                      className="w-5 h-5 bg-white rounded"
+                      key={plugin.id}
+                      src={plugin.logo}
+                      alt={plugin.name}
+                    />
+                  );
+                })}
+                <span>...</span>
+              </>
+            )}
+            {isHovered && plugins && plugins.length > 0 && (
+              <span className="absolute top-7 left-0 mt-2 p-1 whitespace-nowrap bg-black bg-opacity-50 text-white text-sm rounded-md">
+                {plugins.map((plugin) => plugin.name).join(', ')}
+              </span>
             )}
           </div>
-          <Image
-            className="w-3 h-3"
-            src={lightMode === 'dark' ? chevronDownIcon : chevronDownIconBlack}
-            alt="down"
-          />
-        </div>
-      </div>
+        ) : (
+          <span>{t('Unchecked')}</span>
+        )}
+        <Image
+          className="w-3 h-3"
+          src={lightMode === 'dark' ? chevronDownIcon : chevronDownIconBlack}
+          alt="down"
+        />
+      </button>
       {isOpened && (
         <div
           ref={selectRef}
