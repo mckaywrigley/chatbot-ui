@@ -1,9 +1,12 @@
 import { KeyValuePair } from './data';
 
 export interface Plugin {
-  id: PluginID;
-  name: PluginName;
-  requiredKeys: KeyValuePair[];
+  id: string;
+  name: string;
+  requiredKeys?: KeyValuePair[];
+  url?: string;
+  logo?: string;
+  description?: string;
 }
 
 export interface PluginKey {
