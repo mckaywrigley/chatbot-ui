@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useQuery } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
@@ -27,19 +28,75 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const { t } = useTranslation('chat');
 
   const pluginsIdList = plugins.map((plugin) => plugin.id as string);
+  const [shouldDownloadPlugin, setShouldDownloadPlugin] = useState(false);
   const {
     state: { lightMode },
   } = useContext(HomeContext);
 
   const selectRef = useRef<HTMLDivElement>(null);
   const [isOpened, setIsOpened] = useState<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [localPlugins, setLocalPlugins] = useState<Record<string, Plugin>>({});
   const [toggleIsUpdated, setToggleIsUpdated] = useState<boolean>(false);
+
+  const downloadPlugin = async (url: string) => {
+    const result = await fetch(url, { method: 'GET' });
+    return result.json();
+  };
 
   const getPlugins = () => {
     const plugins = localStorage.getItem('plugins');
     if (!plugins) return null;
     return JSON.parse(localStorage.getItem('plugins') as string);
+  };
+  const addPlugin = (plugin: Plugin) => {
+    const localStoragePlugins = Object.keys(getPlugins() || {});
+    if (localStoragePlugins.includes(plugin.id)) {
+      alert('This plugin is already installed');
+      return;
+    }
+    const currentPlugins = getPlugins();
+    if (currentPlugins) {
+      currentPlugins[plugin.id] = plugin;
+      localStorage.setItem('plugins', JSON.stringify(currentPlugins));
+    } else {
+      const newPlugins = { [plugin.id]: plugin };
+      localStorage.setItem('plugins', JSON.stringify(newPlugins));
+    }
+    setPlugins((prev) => [...prev, plugin]);
+    setIsOpened(false);
+    setToggleIsUpdated((prev) => !prev);
+  };
+
+  const { isLoading, error, data } = useQuery(
+    'addPlugin',
+    () => downloadPlugin(textareaRef.current?.value as string),
+    {
+      enabled: shouldDownloadPlugin,
+      onSuccess: (data) => {
+        const newPlugin = {
+          id: data.name_for_model,
+          name: data.name_for_human,
+          description: data.description_for_human,
+          url: textareaRef.current?.value as string,
+          logo: data.logo_url,
+        };
+        addPlugin(newPlugin);
+        setShouldDownloadPlugin(false);
+        textareaRef.current!.value = '';
+      },
+      onError: () => {
+        setShouldDownloadPlugin(false);
+        alert('Please enter a valid URL');
+        textareaRef.current!.value = '';
+      },
+    },
+  );
+
+  const handleAddPluginClick = () => {
+    if (!textareaRef.current || textareaRef.current.value === '')
+      return alert('Please enter a valid URL');
+    setShouldDownloadPlugin(true);
   };
 
   const toggleIsOpened = () => setIsOpened(!isOpened);
@@ -132,6 +189,41 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
               ))}
             </div>
           )}
+          <div className="mt-1 mb-1 w-full flex gap-1.5 rounded border border-neutral-200 bg-transparent pr-2 pl-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+            <span
+              className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-1 md:pl-3"
+              hidden={!isLoading}
+            >
+              Loading...
+            </span>
+            <>
+              <textarea
+                className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-1 md:pl-3"
+                ref={textareaRef}
+                style={{
+                  resize: 'none',
+                  bottom: `${textareaRef?.current?.scrollHeight}px`,
+                  maxHeight: '400px',
+                  overflow: `${
+                    textareaRef.current &&
+                    textareaRef.current.scrollHeight > 400
+                      ? 'auto'
+                      : 'hidden'
+                  }`,
+                }}
+                hidden={isLoading}
+                placeholder={t('Type the domain of plugin...') || ''}
+                rows={1}
+              />
+              <button
+                className="rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+                onClick={handleAddPluginClick}
+                hidden={isLoading}
+              >
+                <span>Add</span>
+              </button>
+            </>
+          </div>
         </div>
       )}
     </div>
