@@ -1,103 +1,275 @@
-import { FC, useEffect, useRef } from 'react';
+import { IconTrash } from '@tabler/icons-react';
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useQuery } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 
-import { Plugin, PluginList } from '@/types/plugin';
+import { getPlugins } from '@/utils/app/localPlugins';
+
+import { Plugin } from '@/types/plugin';
+
+import HomeContext from '@/pages/api/home/home.context';
+
+import chevronDownIconBlack from '@/public/icons/chevron-down-black.svg';
+import chevronDownIcon from '@/public/icons/chevron-down.svg';
 
 interface Props {
-  plugin: Plugin | null;
-  onPluginChange: (plugin: Plugin) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
+  plugins: Array<Plugin>;
+  setPlugins: Dispatch<SetStateAction<Array<Plugin>>>;
 }
 
-export const PluginSelect: FC<Props> = ({
-  plugin,
-  onPluginChange,
-  onKeyDown,
-}) => {
+export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const { t } = useTranslation('chat');
 
-  const selectRef = useRef<HTMLSelectElement>(null);
+  const pluginsIdList = plugins.map((plugin) => plugin.id as string);
+  const [shouldDownloadPlugin, setShouldDownloadPlugin] = useState(false);
+  const {
+    state: { lightMode },
+  } = useContext(HomeContext);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLSelectElement>) => {
-    const selectElement = selectRef.current;
-    const optionCount = selectElement?.options.length || 0;
+  const selectRef = useRef<HTMLDivElement>(null);
+  const [isOpened, setIsOpened] = useState<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [localPlugins, setLocalPlugins] = useState<Record<string, Plugin>>({});
+  const [toggleIsUpdated, setToggleIsUpdated] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
-    if (e.key === '/' && e.metaKey) {
-      e.preventDefault();
-      if (selectElement) {
-        selectElement.selectedIndex =
-          (selectElement.selectedIndex + 1) % optionCount;
-        selectElement.dispatchEvent(new Event('change'));
-      }
-    } else if (e.key === '/' && e.shiftKey && e.metaKey) {
-      e.preventDefault();
-      if (selectElement) {
-        selectElement.selectedIndex =
-          (selectElement.selectedIndex - 1 + optionCount) % optionCount;
-        selectElement.dispatchEvent(new Event('change'));
-      }
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (selectElement) {
-        selectElement.dispatchEvent(new Event('change'));
-      }
+  const downloadPlugin = async (url: string) => {
+    const result = await fetch(url, { method: 'GET' });
+    return result.json();
+  };
 
-      onPluginChange(
-        PluginList.find(
-          (plugin) =>
-            plugin.name === selectElement?.selectedOptions[0].innerText,
-        ) as Plugin,
-      );
-    } else {
-      onKeyDown(e);
+  const addPlugin = (plugin: Plugin) => {
+    const localStoragePlugins = Object.keys(getPlugins() || {});
+    if (localStoragePlugins.includes(plugin.id)) {
+      alert('This plugin is already installed');
+      return;
     }
+    const currentPlugins = getPlugins();
+    if (currentPlugins) {
+      currentPlugins[plugin.id] = plugin;
+      localStorage.setItem('plugins', JSON.stringify(currentPlugins));
+    } else {
+      const newPlugins = { [plugin.id]: plugin };
+      localStorage.setItem('plugins', JSON.stringify(newPlugins));
+    }
+    setPlugins((prev) => [...prev, plugin]);
+    setIsOpened(false);
+    setToggleIsUpdated((prev) => !prev);
+  };
+
+  const { isLoading, error, data } = useQuery(
+    'addPlugin',
+    () => downloadPlugin(textareaRef.current?.value as string),
+    {
+      enabled: shouldDownloadPlugin,
+      onSuccess: (data) => {
+        const newPlugin = {
+          id: data.name_for_model,
+          name: data.name_for_human,
+          description: data.description_for_human,
+          url: textareaRef.current?.value as string,
+          logo: data.logo_url,
+        };
+        addPlugin(newPlugin);
+        setShouldDownloadPlugin(false);
+        textareaRef.current!.value = '';
+      },
+      onError: () => {
+        setShouldDownloadPlugin(false);
+        alert('Please enter a valid URL');
+        textareaRef.current!.value = '';
+      },
+    },
+  );
+
+  const handleAddPluginClick = () => {
+    if (!textareaRef.current || textareaRef.current.value === '')
+      return alert('Please enter a valid URL');
+    setShouldDownloadPlugin(true);
+  };
+
+  const toggleIsOpened = () => setIsOpened(!isOpened);
+
+  const handleDeletePlugin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const newPlugins = plugins.filter(
+      (plugin) => plugin.id !== e.currentTarget.value,
+    );
+    setPlugins(newPlugins);
+    const newLocalPlugins = Object.assign({}, localPlugins);
+    delete newLocalPlugins[e.currentTarget.value];
+    localStorage.removeItem('plugins');
+    localStorage.setItem('plugins', JSON.stringify(newLocalPlugins));
+    setLocalPlugins(newLocalPlugins);
+    setIsOpened(false);
+  };
+  const handleClickPlugin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (pluginsIdList.includes(e.currentTarget.value)) {
+      const newPlugins = plugins.filter(
+        (plugin) => plugin.id !== e.currentTarget.value,
+      );
+      setPlugins(newPlugins);
+      setIsOpened(false);
+      return;
+    }
+    const newPlugin = localPlugins[e.currentTarget.value];
+    setPlugins((prev) => [...prev, newPlugin]);
+    setIsOpened(false);
   };
 
   useEffect(() => {
-    if (selectRef.current) {
-      selectRef.current.focus();
-    }
-  }, []);
+    setLocalPlugins(getPlugins() || {});
+  }, [toggleIsUpdated]);
 
   return (
     <div className="flex flex-col">
-      <div className="mb-1 w-full rounded border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
-        <select
+      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
+        {t('Plugin')}
+      </label>
+      <button
+        type="button"
+        className="relative cursor-pointer p-2 flex justify-between items-center pl-2 w-full rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={toggleIsOpened}
+      >
+        {plugins.length > 0 ? (
+          <div className="flex gap-1.5">
+            {plugins.length < 6 ? (
+              <>
+                {plugins.map((plugin) => {
+                  return (
+                    <img
+                      className="w-5 h-5 bg-white rounded"
+                      key={plugin.id}
+                      src={plugin.logo}
+                      alt={plugin.name}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                {plugins.map((plugin, index) => {
+                  if (index > 4) return <></>;
+                  return (
+                    <img
+                      className="w-5 h-5 bg-white rounded"
+                      key={plugin.id}
+                      src={plugin.logo}
+                      alt={plugin.name}
+                    />
+                  );
+                })}
+                <span>...</span>
+              </>
+            )}
+            {isHovered && plugins && plugins.length > 0 && (
+              <span className="absolute top-7 left-0 mt-2 p-1 whitespace-nowrap bg-black bg-opacity-50 text-white text-sm rounded-md">
+                {plugins.map((plugin) => plugin.name).join(', ')}
+              </span>
+            )}
+          </div>
+        ) : (
+          <span>{t('Not Selected')}</span>
+        )}
+        <Image
+          className="w-3 h-3"
+          src={lightMode === 'dark' ? chevronDownIcon : chevronDownIconBlack}
+          alt="down"
+        />
+      </button>
+      {isOpened && (
+        <div
           ref={selectRef}
-          className="w-full cursor-pointer bg-transparent p-2"
-          placeholder={t('Select a plugin') || ''}
-          value={plugin?.id || ''}
-          onChange={(e) => {
-            onPluginChange(
-              PluginList.find(
-                (plugin) => plugin.id === e.target.value,
-              ) as Plugin,
-            );
-          }}
-          onKeyDown={(e) => {
-            handleKeyDown(e);
-          }}
+          className="mb-1 w-full rounded border border-neutral-200 bg-transparent flex flex-col p-1.5 gap-1.5 text-neutral-900 dark:border-neutral-600 dark:text-white"
         >
-          <option
-            key="chatgpt"
-            value="chatgpt"
-            className="dark:bg-[#343541] dark:text-white"
-          >
-            ChatGPT
-          </option>
-
-          {PluginList.map((plugin) => (
-            <option
-              key={plugin.id}
-              value={plugin.id}
-              className="dark:bg-[#343541] dark:text-white"
+          {Object.keys(localPlugins).length > 0 && (
+            <div className="w-full flex flex-col items-start gap-2 rounded cursor-pointer bg-transparent p-2 border border-neutral-200 dark:border-neutral-600 dark:text-white max-h-[7.5rem] overflow-y-auto">
+              {Object.keys(localPlugins).map((pluginId) => (
+                <div
+                  key={pluginId}
+                  className="w-full pl-1 rounded flex items-start dark:bg-[#343541] dark:text-white"
+                >
+                  <button
+                    id={pluginId}
+                    value={pluginId}
+                    onClick={handleClickPlugin}
+                    className="flex items-center w-full rounded p-1 dark:hover:bg-gray-400 hover:bg-gray-100 dark:hover:text-black transition-colors duration-200"
+                  >
+                    <img
+                      className="w-5 h-5 mr-2 bg-white rounded"
+                      src={localPlugins[pluginId].logo as string}
+                      alt={localPlugins[pluginId].name}
+                    />
+                    <span>{t(localPlugins[pluginId].name)}</span>
+                    <input
+                      type={'checkbox'}
+                      checked={pluginsIdList.includes(
+                        localPlugins[pluginId].id,
+                      )}
+                      readOnly={true}
+                      className="self-center ml-auto"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    className="self-center rounded p-1 ml-2 dark:hover:bg-gray-400 hover:bg-gray-100 dark:hover:text-black transition-colors duration-200"
+                    value={pluginId}
+                    onClick={handleDeletePlugin}
+                  >
+                    <IconTrash size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-1 mb-1 w-full flex gap-1.5 rounded border border-neutral-200 bg-transparent pr-2 pl-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+            <span
+              className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-1 md:pl-3"
+              hidden={!isLoading}
             >
-              {plugin.name}
-            </option>
-          ))}
-        </select>
-      </div>
+              Loading...
+            </span>
+            <>
+              <textarea
+                className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-1 md:pl-3"
+                ref={textareaRef}
+                style={{
+                  resize: 'none',
+                  bottom: `${textareaRef?.current?.scrollHeight}px`,
+                  maxHeight: '400px',
+                  overflow: `${
+                    textareaRef.current &&
+                    textareaRef.current.scrollHeight > 400
+                      ? 'auto'
+                      : 'hidden'
+                  }`,
+                }}
+                hidden={isLoading}
+                placeholder={t('Type the domain of plugin...') || ''}
+                rows={1}
+              />
+              <button
+                className="rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+                onClick={handleAddPluginClick}
+                hidden={isLoading}
+              >
+                <span>Add</span>
+              </button>
+            </>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
