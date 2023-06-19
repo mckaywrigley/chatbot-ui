@@ -180,7 +180,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
             )}
           </div>
         ) : (
-          <span>{t('Unchecked')}</span>
+          <span>{t('Not Selected')}</span>
         )}
         <Image
           className="w-3 h-3"
