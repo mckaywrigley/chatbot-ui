@@ -1,8 +1,14 @@
 import { OpenAIModel } from './openai';
 
+export interface PluginNameLogo {
+  name: string;
+  logo: string;
+}
+
 export interface Message {
   role: Role;
   content: string;
+  pluginIdNameLogoMap?: Record<string, PluginNameLogo>;
 }
 
 export type Role = 'assistant' | 'user';
@@ -13,6 +19,7 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  pluginUrlList?: string[];
 }
 
 export interface Conversation {
