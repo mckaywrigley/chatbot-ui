@@ -27,6 +27,6 @@
   "Are you sure you want to clear all messages?": "모든 메시지를 지우시겠습니까?",
   "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "1에 가까울수록 더 무작위로 만들고, 낮을수록 더 집중적이고 결정론적으로 만들어줍니다.",
   "Plugin": "플러그인",
-  "Unchecked": "선택 안함",
+  "Not Selected": "선택 안함",
   "Type the domain of plugin...": "플러그인의 도메인을 입력하세요..."
 }
