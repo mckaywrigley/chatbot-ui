@@ -38,6 +38,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const [localPlugins, setLocalPlugins] = useState<Record<string, Plugin>>({});
   const [toggleIsUpdated, setToggleIsUpdated] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const downloadPlugin = async (url: string) => {
     const result = await fetch(url, { method: 'GET' });
@@ -47,7 +48,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const addPlugin = (plugin: Plugin) => {
     const localStoragePlugins = Object.keys(getPlugins() || {});
     if (localStoragePlugins.includes(plugin.id)) {
-      alert('This plugin is already installed');
+      setErrorMessage('This plugin is already installed');
       return;
     }
     const currentPlugins = getPlugins();
@@ -82,15 +83,15 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
       },
       onError: () => {
         setShouldDownloadPlugin(false);
-        alert('Please enter a valid URL');
         textareaRef.current!.value = '';
+        setErrorMessage('Please enter a valid URL');
       },
     },
   );
 
   const handleAddPluginClick = () => {
     if (!textareaRef.current || textareaRef.current.value === '')
-      return alert('Please enter a valid URL');
+      return setErrorMessage('Please enter a valid URL');
     setShouldDownloadPlugin(true);
   };
 
@@ -250,6 +251,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
                 hidden={isLoading}
                 placeholder={t('Type the domain of plugin...') || ''}
                 rows={1}
+                onChange={() => setErrorMessage('')}
               />
               <button
                 className="rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
@@ -260,6 +262,9 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
               </button>
             </>
           </div>
+          {errorMessage && (
+            <span className="text-red-500 ml-1">{t(errorMessage)}</span>
+          )}
         </div>
       )}
     </div>
