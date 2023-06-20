@@ -1,4 +1,4 @@
-import { IconTrash } from '@tabler/icons-react';
+import { IconChevronDown, IconTrash } from '@tabler/icons-react';
 import {
   Dispatch,
   FC,
@@ -11,16 +11,12 @@ import {
 import { useQuery } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
 
 import { getPlugins } from '@/utils/app/localPlugins';
 
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
-
-import chevronDownIconBlack from '@/public/icons/chevron-down-black.svg';
-import chevronDownIcon from '@/public/icons/chevron-down.svg';
 
 interface Props {
   plugins: Array<Plugin>;
@@ -182,11 +178,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
         ) : (
           <span>{t('Not Selected')}</span>
         )}
-        <Image
-          className="w-3 h-3"
-          src={lightMode === 'dark' ? chevronDownIcon : chevronDownIconBlack}
-          alt="down"
-        />
+        <IconChevronDown size={16} />
       </button>
       {isOpened && (
         <div
