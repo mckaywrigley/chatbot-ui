@@ -1,13 +1,14 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import { AZURE_DEPLOYMENT_ID, BITAPAI_API_HOST, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
 
 import {
   ParsedEvent,
   ReconnectInterval,
   createParser,
 } from 'eventsource-parser';
+import { resolve } from 'path';
 
 export class OpenAIError extends Error {
   type: string;
@@ -22,11 +23,73 @@ export class OpenAIError extends Error {
     this.code = code;
   }
 }
+export const BITAPAIStream = async (
+  system: string,
+  assistant: string,
+  user: string
+) => {
+  let url = `${BITAPAI_API_HOST}/v1/prompt`;
+  const res = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-KEY': '97fc8c3c-fc51-4348-9e66-86fc770d0fc4'
+    },
+    method: "POST",
+    body: JSON.stringify({
+      system,
+      assistant,
+      user
+    })
+  })
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
 
+  if (res.status !== 200) {
+    const result = await res.json();
+    try {
+      console.log(result?.message)
+    } catch (error) {
+      throw new Error(
+        `BITAPAI API returned an error: ${error}`,
+      );
+    }
+  }
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const onParse = (event: ParsedEvent | ReconnectInterval) => {
+        if (event.type === 'event') {
+          const data = event.data;
+
+          try {
+            const json = JSON.parse(data);
+            if (json.choices[0].finish_reason != null) {
+              controller.close();
+              return;
+            }
+            const text = json.choices[0].delta.content;
+            const queue = encoder.encode(text);
+            controller.enqueue(queue);
+          } catch (e) {
+            controller.error(e);
+          }
+        }
+      };
+
+      const parser = createParser(onParse);
+
+      for await (const chunk of res.body as any) {
+        parser.feed(decoder.decode(chunk));
+      }
+    },
+  });
+
+  return stream;
+}
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   key: string,
   messages: Message[],
 ) => {
@@ -49,7 +112,7 @@ export const OpenAIStream = async (
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',
@@ -77,8 +140,7 @@ export const OpenAIStream = async (
       );
     } else {
       throw new Error(
-        `OpenAI API returned an error: ${
-          decoder.decode(result?.value) || result.statusText
+        `OpenAI API returned an error: ${decoder.decode(result?.value) || result.statusText
         }`,
       );
     }

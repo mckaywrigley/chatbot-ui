@@ -12,9 +12,9 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@dqbd/tiktoken": "^1.0.2",
+    "@dqbd/tiktoken": "^1.0.7",
     "@tabler/icons-react": "^2.9.0",
-    "eventsource-parser": "^0.1.0",
+    "eventsource-parser": "^1.0.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",
     "next-i18next": "^13.2.2",

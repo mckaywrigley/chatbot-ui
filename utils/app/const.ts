@@ -5,11 +5,14 @@ export const DEFAULT_SYSTEM_PROMPT =
 export const OPENAI_API_HOST =
   process.env.OPENAI_API_HOST || 'https://api.openai.com';
 
+export const BITAPAI_API_HOST =
+  process.env.BITAPAI_API_HOST || 'https://api.bitapai.io';
+
 export const DEFAULT_TEMPERATURE = 
   parseFloat(process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE || "1");
 
 export const OPENAI_API_TYPE =
-  process.env.OPENAI_API_TYPE || 'openai';
+  process.env.OPENAI_API_TYPE || 'BITAPAI';
 
 export const OPENAI_API_VERSION =
   process.env.OPENAI_API_VERSION || '2023-03-15-preview';

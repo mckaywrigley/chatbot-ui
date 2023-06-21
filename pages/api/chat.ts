@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { BITAPAIStream, OpenAIError, OpenAIStream } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -51,10 +51,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     encoding.free();
-
+    const BITAPAI_stream = await BITAPAIStream("You are an AI assistant","How may I assist you today?","What is the meaning of life?")
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
-
-    return new Response(stream);
+    // console.log(BITAPAI_stream)
+    return new Response(BITAPAI_stream);
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
