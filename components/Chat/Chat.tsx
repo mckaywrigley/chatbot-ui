@@ -1,4 +1,4 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconSettings, IconCapture } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -33,6 +33,7 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { toPng } from 'html-to-image';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -67,6 +68,27 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const onScreenshot = () => {
+    if (chatContainerRef.current === null) {
+      return;
+    }
+
+    chatContainerRef.current.classList.remove('max-h-full');
+    toPng(chatContainerRef.current, { cacheBust: true })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `${selectedConversation?.name || 'conversation'}.png`;
+        link.href = dataUrl;
+        link.click();
+        if (chatContainerRef.current) {
+          chatContainerRef.current.classList.add('max-h-full');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -453,6 +475,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     onClick={onClearAll}
                   >
                     <IconClearAll size={18} />
+                  </button>
+                  <button 
+                    className="ml-2 cursor-pointer hover:opacity-50"
+                    onClick={onScreenshot}>
+                    <IconCapture size={18}/>
                   </button>
                 </div>
                 {showSettings && (
