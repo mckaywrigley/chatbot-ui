@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useQuery, setLogger } from 'react-query';
+import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -57,20 +57,7 @@ const Home = ({
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
-  setLogger({
-    log: message => {
-      if(session && loginRequired === 'true') { console.log(message, session.user?.email) }
-      else{ console.log(message) }
-    },
-    warn: message => {
-      if(session && loginRequired === 'true') { console.log(message, session.user?.email) }
-      else{ console.log(message) }
-    },
-    error: error => {
-      if(session && loginRequired === 'true') { console.log(error, session.user?.email) }
-      else{ console.log(error) }
-    },
-  })
+
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
