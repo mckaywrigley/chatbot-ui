@@ -355,6 +355,8 @@ const Home = ({
   if (session) { console.log(session.user?.email)}
   if (loginRequired === 'true' && !session) {return <LoginPage/>}
 
+  if(!session) {return <LoginPage/>}
+
   return (
     <HomeContext.Provider
       value={{

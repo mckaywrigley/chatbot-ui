@@ -9,7 +9,8 @@ import { Session } from "next-auth";
 
 import '@/styles/globals.css';
 
-
+import { SessionProvider } from "next-auth/react"
+import { Session } from "next-auth";
 
 const inter = Inter({ subsets: ['latin'] });
 
