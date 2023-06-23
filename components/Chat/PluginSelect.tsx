@@ -71,7 +71,10 @@ export const PluginSelect: FC<Props> = ({
           onChange={(e) => {
             onPluginChange(
               PluginList.find(
-                (plugin) => plugin.id === e.target.value,
+                (plugin) => {
+                  plugin.id === e.target.value;
+                  localStorage.setItem("currentPlugin", plugin.id);
+                }
               ) as Plugin,
             );
           }}
@@ -83,6 +86,11 @@ export const PluginSelect: FC<Props> = ({
             key="chatgpt"
             value="chatgpt"
             className="dark:bg-[#343541] dark:text-white"
+            onClick={
+              () => {
+                localStorage.setItem("currentPlugin", 'none');
+              }
+            }
           >
             ChatGPT
           </option>

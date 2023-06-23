@@ -32,5 +32,6 @@
   "Temperature": "生成温度",
   "Precise": "保守",
   "Neutral": "中立",
-  "Creative": "随性"
+  "Creative": "随性",
+  "Default system prompt": "你是 ChatGPT，OpenAI 训练的大型语言模型。仔细按照用户的说明进行操作。使用降价响应。"
 }

@@ -31,5 +31,6 @@
   "Neutral": "Neutraali",
   "Creative": "Luova",
   "View Account Usage": "Näytä tilin käyttötilastot",
-  "Search...": "Hae..."
+  "Search...": "Hae...",
+  "Default system prompt": "Olet ChatGPT, OpenAI:n kouluttama suuri kielimalli. Noudata tarkasti käyttäjän ohjeita. Vastaa käyttämällä markdownia."
 }

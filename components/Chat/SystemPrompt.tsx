@@ -36,6 +36,7 @@ export const SystemPrompt: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const DEFAULT_SYSTEM_PROMPT_TRANSLATED = t('Default system prompt');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const promptListRef = useRef<HTMLUListElement | null>(null);
@@ -170,7 +171,7 @@ export const SystemPrompt: FC<Props> = ({
     if (conversation.prompt) {
       setValue(conversation.prompt);
     } else {
-      setValue(DEFAULT_SYSTEM_PROMPT);
+      setValue(DEFAULT_SYSTEM_PROMPT_TRANSLATED);
     }
   }, [conversation]);
 
