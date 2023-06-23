@@ -6,12 +6,23 @@ import { cleanSourceText } from '@/utils/server/google';
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 
+import { auth } from './auth';
+
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
 import jsdom, { JSDOM } from 'jsdom';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
+    const authResult = auth(req);
+
+    if (authResult.error) {
+      return new Response('Unauthorized', {
+        status: authResult.status,
+        statusText: authResult.statusText,
+      });
+    }
+
     const { messages, key, model, googleAPIKey, googleCSEId } =
       req.body as GoogleBody;
 
@@ -142,7 +153,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.status(200).json({ answer });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error'})
+    res.status(500).json({ error: 'Error' });
   }
 };
 

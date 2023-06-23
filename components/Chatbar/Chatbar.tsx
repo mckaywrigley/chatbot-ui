@@ -46,6 +46,15 @@ export const Chatbar = () => {
     dispatch: chatDispatch,
   } = chatBarContextValue;
 
+  const handleGuestCodeChange = useCallback(
+    (guestCode: string) => {
+      homeDispatch({ field: 'guestCode', value: guestCode });
+
+      localStorage.setItem('guestCode', guestCode);
+    },
+    [homeDispatch],
+  );
+
   const handleApiKeyChange = useCallback(
     (apiKey: string) => {
       homeDispatch({ field: 'apiKey', value: apiKey });
@@ -217,6 +226,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handleGuestCodeChange,
       }}
     >
       <Sidebar<Conversation>
