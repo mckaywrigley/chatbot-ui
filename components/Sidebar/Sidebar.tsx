@@ -2,12 +2,16 @@ import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+
+
 import {
   CloseSidebarButton,
   OpenSidebarButton,
 } from './components/OpenCloseButton';
 
 import Search from '../Search';
+
+import tailwindConfig from '@/tailwind.config';
 
 interface Props<T> {
   isOpen: boolean;
@@ -47,7 +51,10 @@ const Sidebar = <T,>({
   };
 
   const highlightDrop = (e: any) => {
-    e.target.style.background = '#343541';
+    e.target.style.background =
+      tailwindConfig.theme.extend.colors[
+        'sidebar-target-background-highlighted'
+      ];
   };
 
   const removeHighlight = (e: any) => {

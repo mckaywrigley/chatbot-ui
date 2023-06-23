@@ -78,7 +78,7 @@ export const PromptComponent = ({ prompt }: Props) => {
   return (
     <div className="relative flex items-center">
       <button
-        className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-sidebar-promptbar-prompt-background-highlighted/90"
         draggable="true"
         onClick={(e) => {
           e.stopPropagation();
