@@ -8,12 +8,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 
 import { useTranslation } from 'next-i18next';
 
-import { getPlugins } from '@/utils/app/localPlugins';
+import { getPlugins } from '@/utils/app/plugins';
 
+import { API } from '@/types/api';
 import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -27,7 +28,6 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const { t } = useTranslation('chat');
 
   const pluginsIdList = plugins.map((plugin) => plugin.id as string);
-  const [shouldDownloadPlugin, setShouldDownloadPlugin] = useState(false);
   const {
     state: { lightMode },
   } = useContext(HomeContext);
@@ -41,7 +41,11 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const downloadPlugin = async (url: string) => {
-    const result = await fetch(url, { method: 'GET' });
+    const result = await fetch(API.ADD_PLUGIN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url }),
+    });
     return result.json();
   };
 
@@ -64,11 +68,9 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
     setToggleIsUpdated((prev) => !prev);
   };
 
-  const { isLoading, error, data } = useQuery(
-    'addPlugin',
+  const mutation = useMutation(
     () => downloadPlugin(textareaRef.current?.value as string),
     {
-      enabled: shouldDownloadPlugin,
       onSuccess: (data) => {
         const newPlugin = {
           id: data.name_for_model,
@@ -78,11 +80,9 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
           logo: data.logo_url,
         };
         addPlugin(newPlugin);
-        setShouldDownloadPlugin(false);
         textareaRef.current!.value = '';
       },
       onError: () => {
-        setShouldDownloadPlugin(false);
         textareaRef.current!.value = '';
         setErrorMessage('Please enter a valid URL');
       },
@@ -92,7 +92,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
   const handleAddPluginClick = () => {
     if (!textareaRef.current || textareaRef.current.value === '')
       return setErrorMessage('Please enter a valid URL');
-    setShouldDownloadPlugin(true);
+    mutation.mutate();
   };
 
   const toggleIsOpened = () => setIsOpened(!isOpened);
@@ -229,7 +229,7 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
           <div className="mt-1 mb-1 w-full flex gap-1.5 rounded border border-neutral-200 bg-transparent pr-2 pl-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
             <span
               className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-1 md:pl-3"
-              hidden={!isLoading}
+              hidden={!mutation.isLoading}
             >
               Loading...
             </span>
@@ -248,15 +248,16 @@ export const PluginSelect: FC<Props> = ({ plugins, setPlugins }) => {
                       : 'hidden'
                   }`,
                 }}
-                hidden={isLoading}
+                hidden={mutation.isLoading}
                 placeholder={t('Type the domain of plugin...') || ''}
                 rows={1}
                 onChange={() => setErrorMessage('')}
+                disabled={mutation.isLoading}
               />
               <button
                 className="rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
                 onClick={handleAddPluginClick}
-                hidden={isLoading}
+                hidden={mutation.isLoading}
               >
                 <span>Add</span>
               </button>

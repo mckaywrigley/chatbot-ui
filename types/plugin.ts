@@ -1,3 +1,5 @@
+import { getPluginUrl } from '@/utils/app/plugins';
+
 import { KeyValuePair } from './data';
 import { OpenAIFunction } from './openai';
 
@@ -48,15 +50,17 @@ export interface PluginApiOperation {
   apiPath: string;
   method: string;
   summary?: string;
-  parameters?: [{
-    name: string;
-    in: string;
-    description?: string;
-    required?: boolean;
-    schema: {
-      type: string;
-    }
-  }];
+  parameters?: [
+    {
+      name: string;
+      in: string;
+      description?: string;
+      required?: boolean;
+      schema: {
+        type: string;
+      };
+    },
+  ];
   requestBody?: {
     required?: boolean;
     content: {
@@ -69,11 +73,11 @@ export interface PluginApiOperation {
               type: string;
               description?: string;
               required?: boolean;
-            }
-          }
-        }
-      }
-    }
+            };
+          };
+        };
+      };
+    };
   };
   responses?: {
     [key: string]: {
@@ -87,13 +91,13 @@ export interface PluginApiOperation {
               [key: string]: {
                 type: string;
                 description?: string;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+              };
+            };
+          };
+        };
+      };
+    };
+  };
 }
 
 export interface PluginApiOperationList {
@@ -119,9 +123,13 @@ export function resolveRef(ref: string, document: any): any {
   return current;
 }
 
-export async function getPluginApiOperationsFromUrl(pluginUrl: string): Promise<PluginApiOperationList | null> {
-  const plugin = await fetch(pluginUrl, { method: 'GET' })
-    .then((response) => response.json())
+export async function getPluginApiOperationsFromUrl(
+  url: string,
+): Promise<PluginApiOperationList | null> {
+  const pluginUrl = getPluginUrl(url);
+  const plugin = await fetch(pluginUrl, { method: 'GET' }).then((response) =>
+    response.json(),
+  );
   const result = await fetch(plugin.api.url, { method: 'GET' });
   const yamlContent = await result.text();
 
@@ -161,7 +169,10 @@ export async function getPluginApiOperationsFromUrl(pluginUrl: string): Promise<
         let content: any = {};
         for (const key in contentObject) {
           if (contentObject[key].schema.hasOwnProperty('$ref')) {
-            contentObject[key].schema = resolveRef(contentObject[key].schema.$ref, document);
+            contentObject[key].schema = resolveRef(
+              contentObject[key].schema.$ref,
+              document,
+            );
           }
           content[key] = {
             schema: {
@@ -188,7 +199,10 @@ export async function getPluginApiOperationsFromUrl(pluginUrl: string): Promise<
           let content: any = {};
           for (const key in contentObject) {
             if (contentObject[key].schema.hasOwnProperty('$ref')) {
-              contentObject[key].schema = resolveRef(contentObject[key].schema.$ref, document);
+              contentObject[key].schema = resolveRef(
+                contentObject[key].schema.$ref,
+                document,
+              );
             }
             content[key] = {
               schema: {
@@ -209,11 +223,19 @@ export async function getPluginApiOperationsFromUrl(pluginUrl: string): Promise<
   return pluginApiOperationList;
 }
 
-export function getOpenAIFunctionFromPluginApiOperation(pluginApiOperation: PluginApiOperation): OpenAIFunction {
-  const { operationId: id, summary, parameters, requestBody } = pluginApiOperation;
+export function getOpenAIFunctionFromPluginApiOperation(
+  pluginApiOperation: PluginApiOperation,
+): OpenAIFunction {
+  const {
+    operationId: id,
+    summary,
+    parameters,
+    requestBody,
+  } = pluginApiOperation;
 
   // Build the properties object for OpenAIFunction
-  const properties: { [key: string]: { type: string; description: string } } = {};
+  const properties: { [key: string]: { type: string; description: string } } =
+    {};
   if (parameters) {
     for (const parameter of parameters) {
       properties[parameter.name] = {
@@ -224,14 +246,19 @@ export function getOpenAIFunctionFromPluginApiOperation(pluginApiOperation: Plug
   }
 
   // Build the required array for OpenAIFunction
-  const required = parameters?.filter((parameter) => parameter.required).map((parameter) => parameter.name) || [];
+  const required =
+    parameters
+      ?.filter((parameter) => parameter.required)
+      .map((parameter) => parameter.name) || [];
 
   if (requestBody) {
     for (const key in requestBody.content) {
       for (const propertyKey in requestBody.content[key].schema.properties) {
         properties[propertyKey] = {
           type: requestBody.content[key].schema.properties[propertyKey].type,
-          description: requestBody.content[key].schema.properties[propertyKey].description || '',
+          description:
+            requestBody.content[key].schema.properties[propertyKey]
+              .description || '',
         };
         if (requestBody.content[key].schema.properties[propertyKey].required) {
           required.push(propertyKey);
@@ -254,13 +281,19 @@ export function getOpenAIFunctionFromPluginApiOperation(pluginApiOperation: Plug
   return openAIFunction;
 }
 
-export const runPluginApiOperation = async (operation: PluginApiOperation, args: string) => {
-  let query: {[key: string]: string} = {};
+export const runPluginApiOperation = async (
+  operation: PluginApiOperation,
+  args: string,
+) => {
+  let query: { [key: string]: string } = {};
   if (operation.parameters) {
     for (const parameter of operation.parameters) {
       if (parameter.in === 'path' && args.includes(parameter.name)) {
         const newPath = JSON.parse(args)[parameter.name];
-        operation.apiPath = operation.apiPath.replace(`{${parameter.name}}`, newPath);
+        operation.apiPath = operation.apiPath.replace(
+          `{${parameter.name}}`,
+          newPath,
+        );
       }
       if (parameter.in === 'query' && args.includes(parameter.name)) {
         const newQuery = JSON.parse(args)[parameter.name];
@@ -272,15 +305,15 @@ export const runPluginApiOperation = async (operation: PluginApiOperation, args:
   let body: any = {};
   if (operation.requestBody) {
     for (const key in operation.requestBody.content) {
-      for (const propertyKey in operation.requestBody.content[key].schema.properties) {
+      for (const propertyKey in operation.requestBody.content[key].schema
+        .properties) {
         if (args.includes(propertyKey)) {
           body[propertyKey] = JSON.parse(args)[propertyKey];
         }
       }
     }
     body = JSON.stringify(body);
-  }
-  else {
+  } else {
     body = undefined;
   }
 
@@ -303,8 +336,7 @@ export const runPluginApiOperation = async (operation: PluginApiOperation, args:
         if (operation.responses[key].content) {
           const data = await response.json();
           return data;
-        }
-        else {
+        } else {
           return response.statusText;
         }
       }
@@ -313,8 +345,7 @@ export const runPluginApiOperation = async (operation: PluginApiOperation, args:
   try {
     const data = await response.json();
     return data;
-  }
-  catch (err) {
+  } catch (err) {
     return response.statusText;
   }
-}
+};
