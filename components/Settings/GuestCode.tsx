@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const GuestCode: FC<Props> = ({ guestCode, onGuestCodeChange }) => {
-  // const { t } = useTranslation('sidebar');
+  const { t } = useTranslation('sidebar');
   const [isChanging, setIsChanging] = useState(false);
   const [newKey, setNewKey] = useState(guestCode);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +45,7 @@ export const GuestCode: FC<Props> = ({ guestCode, onGuestCodeChange }) => {
         value={newKey}
         onChange={(e) => setNewKey(e.target.value)}
         onKeyDown={handleEnterDown}
-        // placeholder={t('API Key') || 'API Key'}
+        placeholder={t('Enter Guest Code') || 'Enter Guest Code'}
       />
 
       <div className="flex w-[40px]">
@@ -71,7 +71,7 @@ export const GuestCode: FC<Props> = ({ guestCode, onGuestCodeChange }) => {
     </div>
   ) : (
     <SidebarButton
-      text={'Guest Code'}
+      text={t('Guest Code') || 'Guest Code'}
       icon={<IconKey size={18} />}
       onClick={() => setIsChanging(true)}
     />
