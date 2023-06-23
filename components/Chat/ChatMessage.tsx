@@ -1,5 +1,6 @@
 import {
   IconCheck,
+  IconChevronDown,
   IconCopy,
   IconEdit,
   IconRobot,
@@ -9,7 +10,6 @@ import {
 import { FC, memo, useContext, useEffect, useRef, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
 
 import { updateConversation } from '@/utils/app/conversation';
 
@@ -20,8 +20,6 @@ import HomeContext from '@/pages/api/home/home.context';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 
-import chevronDownIconBlack from '@/public/icons/chevron-down-black.svg';
-import chevronDownIcon from '@/public/icons/chevron-down.svg';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -245,15 +243,7 @@ export const ChatMessage: FC<Props> = memo(
                             ),
                           )}
                         </div>
-                        <Image
-                          className="w-3 h-3 m-0"
-                          src={
-                            lightMode === 'dark'
-                              ? chevronDownIcon
-                              : chevronDownIconBlack
-                          }
-                          alt="down"
-                        />
+                        <IconChevronDown size={16} />
                       </button>
                       {isPluginListOpened && (
                         <div className="rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white mt-1.5">
