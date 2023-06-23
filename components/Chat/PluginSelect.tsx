@@ -70,12 +70,10 @@ export const PluginSelect: FC<Props> = ({
           value={plugin?.id || ''}
           onChange={(e) => {
             onPluginChange(
-              PluginList.find(
-                (plugin) => {
-                  plugin.id === e.target.value;
-                  localStorage.setItem("currentPlugin", plugin.id);
-                }
-              ) as Plugin,
+              PluginList.find((plugin) => {
+                plugin.id === e.target.value;
+                localStorage.setItem('currentPlugin', plugin.id);
+              }) as Plugin,
             );
           }}
           onKeyDown={(e) => {
@@ -86,15 +84,12 @@ export const PluginSelect: FC<Props> = ({
             key="chatgpt"
             value="chatgpt"
             className="dark:bg-[#343541] dark:text-white"
-            onClick={
-              () => {
-                localStorage.setItem("currentPlugin", 'none');
-              }
-            }
+            onClick={() => {
+              localStorage.setItem('currentPlugin', 'none');
+            }}
           >
             ChatGPT
           </option>
-
           {PluginList.map((plugin) => (
             <option
               key={plugin.id}

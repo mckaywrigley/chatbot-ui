@@ -77,14 +77,18 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             </div>
 
             <select
-              className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+              className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200 "
               value={state.theme}
               onChange={(event) =>
                 dispatch({ field: 'theme', value: event.target.value })
               }
             >
-              <option value="dark">{t('Dark mode')}</option>
-              <option value="light">{t('Light mode')}</option>
+              <option className="dark:bg-[#202123]" value="dark">
+                {t('Dark mode')}
+              </option>
+              <option className="dark:bg-[#202123]" value="light">
+                {t('Light mode')}
+              </option>
             </select>
 
             <button

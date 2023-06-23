@@ -23,6 +23,7 @@ interface Props<T> {
   handleCreateItem: () => void;
   handleCreateFolder: () => void;
   handleDrop: (e: any) => void;
+  children: JSX.Element;
 }
 
 const Sidebar = <T,>({
@@ -39,6 +40,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
+  children,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -56,6 +58,7 @@ const Sidebar = <T,>({
 
   return isOpen ? (
     <div>
+      {children}
       <div
         className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#202123] p-2 text-[14px] transition-all sm:relative sm:top-0`}
       >
@@ -83,7 +86,6 @@ const Sidebar = <T,>({
           searchTerm={searchTerm}
           onSearch={handleSearchTerm}
         />
-
         <div className="flex-grow overflow-auto">
           {items?.length > 0 && (
             <div className="flex border-b border-white/20 pb-2">
