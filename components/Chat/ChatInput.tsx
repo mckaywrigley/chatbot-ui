@@ -15,11 +15,13 @@ import {
   useRef,
   useState,
 } from 'react';
+import { BiSolidBusiness } from 'react-icons/bi';
+import { SiOpenai } from 'react-icons/si';
 
 import { useTranslation } from 'next-i18next';
 
 import { Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -285,7 +287,13 @@ export const ChatInput = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            {plugin && plugin.id === PluginID.GOOGLE_SEARCH ? (
+              <IconBrandGoogle size={20} />
+            ) : plugin && plugin.id === PluginID.EDGAR ? (
+              <BiSolidBusiness size={20} />
+            ) : (
+              <SiOpenai size={20} />
+            )}
           </button>
 
           {showPluginSelect && (

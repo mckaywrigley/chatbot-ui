@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
+import { RETRIEVAL_STREAM_PLUGINS } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -136,7 +137,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        if (!plugin || RETRIEVAL_STREAM_PLUGINS.includes(plugin.id)) {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =
