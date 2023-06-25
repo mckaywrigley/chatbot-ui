@@ -13,10 +13,12 @@ export interface PluginKey {
 
 export enum PluginID {
   GOOGLE_SEARCH = 'google-search',
+  OPENAI_WHISPER = 'openai-whisper'
 }
 
 export enum PluginName {
   GOOGLE_SEARCH = 'Google Search',
+  OPENAI_WHISPER = 'OpenAI Whisper'
 }
 
 export const Plugins: Record<PluginID, Plugin> = {
@@ -30,6 +32,20 @@ export const Plugins: Record<PluginID, Plugin> = {
       },
       {
         key: 'GOOGLE_CSE_ID',
+        value: '',
+      },
+    ],
+  },
+  [PluginID.OPENAI_WHISPER]: {
+    id: PluginID.OPENAI_WHISPER,
+    name: PluginName.OPENAI_WHISPER,
+    requiredKeys: [
+      {
+        key: 'OPENAI_API_KEY',
+        value: '',
+      },
+      {
+        key: 'WHISPER_LANGUAGE',
         value: '',
       },
     ],

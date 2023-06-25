@@ -9,5 +9,9 @@ export const getEndpoint = (plugin: Plugin | null) => {
     return 'api/google';
   }
 
+  if (plugin.id === PluginID.OPENAI_WHISPER) {
+    return 'api/whisper';
+  }
+
   return 'api/chat';
 };

@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconMicrophone,
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -19,7 +20,7 @@ import {
 import { useTranslation } from 'next-i18next';
 
 import { Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID, Plugins } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -27,6 +28,14 @@ import HomeContext from '@/pages/api/home/home.context';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+
+import { OpenAIWhisperRequest } from '@/utils/server';
+import { getEndpoint } from '@/utils/app/api';
+
+import axios from 'axios';
+
+import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../../utils/app/const';
+import { WhisperBody } from '@/types/whisper';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
@@ -48,7 +57,7 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
+    state: { selectedConversation, messageIsStreaming, prompts, apiKey },
 
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -62,8 +71,11 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isProcessingWhisper, setIsProcessingWhisper] = useState<boolean>(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -103,6 +115,72 @@ export const ChatInput = ({
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
+    }
+  };
+
+  async function blobToBase64(blob: Blob): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result) {
+            resolve(reader.result as string);
+          } else {
+            reject(new Error('Failed to convert Blob to base64'));
+          }
+        };
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  const handleDictation = async () => {
+    if (isRecording || isProcessingWhisper) {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+      }
+      return;
+    }
+  
+    try {
+      setIsRecording(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const options = { mimeType: "audio/webm" };
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+  
+      mediaRecorder.start();
+      mediaRecorder.addEventListener('dataavailable', async (e: BlobEvent) => {
+        setIsRecording(false);
+        setIsProcessingWhisper(true);
+        const b64audio = await blobToBase64(e.data);
+        const whisperBody: WhisperBody = {
+          audioBlob: b64audio,
+          key: apiKey,
+        };
+  
+        const endpoint = getEndpoint(Plugins['openai-whisper']);
+        const body = JSON.stringify(whisperBody);
+        const controller = new AbortController();
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body,
+        });
+  
+        const res = await response.json();
+        const content = res.text.length ? res.text : "Nothing detected...";
+        setContent(content);
+        setIsProcessingWhisper(false);
+      });
+    } catch (err) {
+      console.error('Error while recording:', err);
+      setIsRecording(false);
+      setIsProcessingWhisper(false);
     }
   };
 
@@ -336,13 +414,26 @@ export const ChatInput = ({
           />
 
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-9 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             {messageIsStreaming ? (
               <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
             ) : (
               <IconSend size={18} />
+            )}
+          </button>
+          
+          <button
+            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={handleDictation}
+          >
+          {isProcessingWhisper ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
+            ) : isRecording ? (
+              <IconPlayerStop size={18} />
+            ) : (
+              <IconMicrophone size={18} />
             )}
           </button>
 
