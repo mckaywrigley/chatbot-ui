@@ -1,3 +1,4 @@
+import { useSession } from 'next-auth/react';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 
@@ -31,6 +32,8 @@ import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
+import LoginPage from '@/pages/login';
+
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
@@ -40,8 +43,6 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useSession } from 'next-auth/react';
-import LoginPage from '@/pages/login';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -60,7 +61,7 @@ const Home = ({
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
 
 
@@ -357,7 +358,9 @@ const Home = ({
   if (session) { console.log(session.user?.email)}
   if (loginRequired === 'true' && !session) {return <LoginPage/>}
 
-  if(!session) {return <LoginPage/>}
+  if (!session) {
+    return <LoginPage />;
+  }
 
   return (
     <HomeContext.Provider
@@ -390,15 +393,15 @@ const Home = ({
               onNewConversation={handleNewConversation}
             />
           </div>
-
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             <Chatbar />
 
             <div className="flex flex-1">
               <Chat stopConversationRef={stopConversationRef} />
             </div>
-
-            <Promptbar />
+            <div>
+              <Promptbar />
+            </div>
           </div>
         </main>
       )}

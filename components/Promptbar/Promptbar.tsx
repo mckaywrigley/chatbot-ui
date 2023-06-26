@@ -15,6 +15,7 @@ import { PromptbarSettings } from './components/PromptbarSettings';
 import { Prompts } from './components/Prompts';
 
 import Sidebar from '../Sidebar';
+import { Workspace } from '../Workspace/Workspace';
 import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
@@ -144,7 +145,9 @@ const Promptbar = () => {
         handleCreateItem={handleCreatePrompt}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
-      />
+      >
+        <Workspace />
+      </Sidebar>
     </PromptbarContext.Provider>
   );
 };
