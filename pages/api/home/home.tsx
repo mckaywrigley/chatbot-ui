@@ -40,6 +40,8 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { useUser } from '@/services/authService';
+import AuthScreen from '@/components/Auth/Auth';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -52,6 +54,7 @@ const Home = ({
   serverSidePluginKeysSet,
   defaultModelId,
 }: Props) => {
+  const { user } = useUser();
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
@@ -348,49 +351,57 @@ const Home = ({
   ]);
 
   return (
-    <HomeContext.Provider
-      value={{
-        ...contextValue,
-        handleNewConversation,
-        handleCreateFolder,
-        handleDeleteFolder,
-        handleUpdateFolder,
-        handleSelectConversation,
-        handleUpdateConversation,
-      }}
-    >
-      <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
-        <meta
-          name="viewport"
-          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
+    <>
+      {!user ? (
+        <AuthScreen
+          user={user}
         />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      {selectedConversation && (
-        <main
-          className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+      ) : (
+        <HomeContext.Provider
+          value={{
+            ...contextValue,
+            handleNewConversation,
+            handleCreateFolder,
+            handleDeleteFolder,
+            handleUpdateFolder,
+            handleSelectConversation,
+            handleUpdateConversation,
+          }}
         >
-          <div className="fixed top-0 w-full sm:hidden">
-            <Navbar
-              selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
+          <Head>
+            <title>Chatbot UI</title>
+            <meta name="description" content="ChatGPT but better." />
+            <meta
+              name="viewport"
+              content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
             />
-          </div>
+            <link rel="icon" href="/favicon.ico" />
+          </Head>
+          {selectedConversation && (
+            <main
+              className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
+            >
+              <div className="fixed top-0 w-full sm:hidden">
+                <Navbar
+                  selectedConversation={selectedConversation}
+                  onNewConversation={handleNewConversation}
+                />
+              </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Chatbar />
+              <div className="flex h-full w-full pt-[48px] sm:pt-0">
+                <Chatbar />
 
-            <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
-            </div>
+                <div className="flex flex-1">
+                  <Chat stopConversationRef={stopConversationRef} />
+                </div>
 
-            <Promptbar />
-          </div>
-        </main>
+                <Promptbar />
+              </div>
+            </main>
+          )}
+        </HomeContext.Provider>
       )}
-    </HomeContext.Provider>
+    </>
   );
 };
 export default Home;
