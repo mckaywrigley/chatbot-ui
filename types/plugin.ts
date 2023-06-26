@@ -150,9 +150,7 @@ export async function getPluginApiOperationsFromUrl(
         in: param.in,
         description: param.description,
         required: param.required,
-        schema: {
-          type: param.schema.type,
-        },
+        schema: param.schema,
       }));
 
       const pluginApiOperation: PluginApiOperation = {
@@ -168,18 +166,14 @@ export async function getPluginApiOperationsFromUrl(
       if (contentObject) {
         let content: any = {};
         for (const key in contentObject) {
-          if (contentObject[key].schema.hasOwnProperty('$ref')) {
+          if (contentObject[key].schema?.hasOwnProperty('$ref')) {
             contentObject[key].schema = resolveRef(
               contentObject[key].schema.$ref,
               document,
             );
           }
           content[key] = {
-            schema: {
-              type: contentObject[key].schema.type,
-              required: contentObject[key].schema.required,
-              properties: contentObject[key].schema.properties,
-            },
+            schema: contentObject[key].schema,
           };
         }
         pluginApiOperation.requestBody = {
@@ -198,18 +192,14 @@ export async function getPluginApiOperationsFromUrl(
         if (contentObject) {
           let content: any = {};
           for (const key in contentObject) {
-            if (contentObject[key].schema.hasOwnProperty('$ref')) {
+            if (contentObject[key].schema?.hasOwnProperty('$ref')) {
               contentObject[key].schema = resolveRef(
                 contentObject[key].schema.$ref,
                 document,
               );
             }
             content[key] = {
-              schema: {
-                type: contentObject[key].schema.type,
-                required: contentObject[key].schema.required,
-                properties: contentObject[key].schema.properties,
-              },
+              schema: contentObject[key].schema,
             };
           }
           pluginApiOperation.responses[key].content = content;
@@ -234,14 +224,10 @@ export function getOpenAIFunctionFromPluginApiOperation(
   } = pluginApiOperation;
 
   // Build the properties object for OpenAIFunction
-  const properties: { [key: string]: { type: string; description: string } } =
-    {};
+  const properties: { [key: string]: {} } = {};
   if (parameters) {
     for (const parameter of parameters) {
-      properties[parameter.name] = {
-        type: parameter.schema.type,
-        description: parameter.description || '',
-      };
+      properties[parameter.name] = parameter.schema;
     }
   }
 

@@ -50,10 +50,7 @@ export interface OpenAIFunction {
   parameters: {
     type: string;
     properties: {
-      [key: string]: {
-        type: string;
-        description: string;
-      },
+      [key: string]: {},
     },
     required: string[];
   };
