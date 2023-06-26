@@ -23,6 +23,57 @@ export class OpenAIError extends Error {
   }
 }
 
+export const OpenAIWhisperRequest = async (
+  audioBlob: Blob,
+  key: string,
+) => {
+  const formData = new FormData();
+  formData.append('model', 'whisper-1');
+  formData.append('file', audioBlob, 'openai.webm');
+
+  let url = `${OPENAI_API_HOST}/v1/audio/transcriptions`;
+  if (OPENAI_API_TYPE === 'azure') { // untested
+    url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/audio/transcriptions?api-version=${OPENAI_API_VERSION}`;
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      ...(OPENAI_API_TYPE === 'openai' && {
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+      }),
+      ...(OPENAI_API_TYPE === 'azure' && {
+        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+      }),
+      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
+        'OpenAI-Organization': OPENAI_ORGANIZATION,
+      }),
+    },
+    body: formData,
+  });
+
+  const decoder = new TextDecoder();
+
+  if (response.status !== 200) {
+    const result = await response.json();
+    if (result.error) {
+      throw new OpenAIError(
+        result.error.message,
+        result.error.type,
+        result.error.param,
+        result.error.code,
+      );
+    } else {
+      throw new Error(
+        `OpenAI API returned an error: ${
+          decoder.decode(result?.value) || result.statusText
+        }`,
+      );
+    }
+  }
+  return response;
+};
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
