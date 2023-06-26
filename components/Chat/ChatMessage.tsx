@@ -238,6 +238,13 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                       </code>
                     );
                   },
+                  a({ children, href }) {
+                    return (
+                      <a href={href} target="_blank" rel="noreferrer">
+                        {children}
+                      </a>
+                    );
+                  },
                   table({ children }) {
                     return (
                       <table className="border-collapse border border-black px-3 py-1 dark:border-white">
