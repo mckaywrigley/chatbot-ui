@@ -94,6 +94,8 @@ When deploying the application, the following environment variables can be set:
 | GOOGLE_API_KEY                    |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 | GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 | API_BASE_URL | https://api.openai.com | Backend API URL |
+| LOG_INCOMING_MESSAGES | false | Log incoming messages to the console |
+| LOG_TRIM_MESSAGES | true | Log only the last message to the console |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 

@@ -25,3 +25,9 @@ export const LOGIN_REQUIRED =
 
 export const API_BASE_URL = 
   process.env.API_BASE_URL || 'https://api.openai.com';
+
+export const LOG_INCOMING_MESSAGES =
+ process.env.LOG_INCOMING_MESSAGES || 'false';
+
+export const LOG_TRIM_MESSAGES =
+ process.env.LOG_TRIM_MESSAGES || 'false';
