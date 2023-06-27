@@ -46,6 +46,7 @@ export const PluginList = Object.values(Plugins);
 
 export interface PluginApiOperation {
   operationId: string;
+  nameForModel: string;
   serverUrl: string;
   apiPath: string;
   method: string;
@@ -155,6 +156,7 @@ export async function getPluginApiOperationsFromUrl(
 
       const pluginApiOperation: PluginApiOperation = {
         operationId: operationObject.operationId,
+        nameForModel: plugin.name_for_model,
         serverUrl: serverUrl || '',
         apiPath,
         method,

@@ -183,14 +183,14 @@ export const OpenAIFunctionCall = async (
   ]
 
   const message = data.choices[0].message;
+  let response_from_plugin = '';
   if ('function_call' in message) {
     const function_name = message.function_call.name;
-    const operation = operations[function_name]
-    let content = '';
+    const operation = operations[function_name];
 
     if (operation) {
       const result = await runPluginApiOperation(operation, message.function_call.arguments);
-      content = JSON.stringify(result);
+      response_from_plugin = JSON.stringify(result);
     }
 
     secondMessages = [
@@ -199,7 +199,7 @@ export const OpenAIFunctionCall = async (
       {
         "role": "function",
         "name": function_name,
-        "content": content,
+        "content": response_from_plugin,
       },
     ]
   }
@@ -238,6 +238,16 @@ export const OpenAIFunctionCall = async (
 
   const stream = new ReadableStream({
     async start(controller) {
+      if ('function_call' in message) {
+        const name_for_model = operations[message.function_call.name]?.nameForModel;
+        const request_to_plugin = message.function_call.arguments
+        controller.enqueue(encoder.encode('[start]'));
+        controller.enqueue(encoder.encode(`[name_for_model]${name_for_model}`));
+        controller.enqueue(encoder.encode(`[request_to_plugin]${request_to_plugin}`));
+        controller.enqueue(encoder.encode(`[response_from_plugin]${response_from_plugin}`));
+        controller.enqueue(encoder.encode('[end]'));
+      }
+      
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
         if (event.type === 'event') {
           const data = event.data;
