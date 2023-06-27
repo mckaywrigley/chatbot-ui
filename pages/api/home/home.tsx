@@ -88,7 +88,8 @@ const Home = ({
         signal,
       );
     },
-    { enabled: true, refetchOnMount: false },
+    // ! get models is turned off
+    { enabled: false, refetchOnMount: false },
   );
 
   useEffect(() => {
