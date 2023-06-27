@@ -1,10 +1,10 @@
-interface Workspace {
+export interface Workspace {
     name: string;
     slug: string;
     logo: string;
 }
   
-interface WorkspaceSelectorProps {
+export interface WorkspaceSelectorProps {
     workspaces: Workspace[];
     onSelectWorkspace: (workspace: Workspace) => void;
 }
