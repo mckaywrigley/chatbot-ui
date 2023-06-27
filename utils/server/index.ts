@@ -1,7 +1,14 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import {
+  AZURE_DEPLOYMENT_ID,
+  BITAPAI_API_HOST,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+  OPENAI_ORGANIZATION,
+} from '../app/const';
 
 import {
   ParsedEvent,
@@ -23,10 +30,17 @@ export class OpenAIError extends Error {
   }
 }
 
+export class BitapaiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BitapaiError';
+  }
+}
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
-  temperature : number,
+  temperature: number,
   key: string,
   messages: Message[],
 ) => {
@@ -38,18 +52,19 @@ export const OpenAIStream = async (
     headers: {
       'Content-Type': 'application/json',
       ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
       }),
       ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`,
       }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
+      ...(OPENAI_API_TYPE === 'openai' &&
+        OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': OPENAI_ORGANIZATION,
+        }),
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      ...(OPENAI_API_TYPE === 'openai' && { model: model.id }),
       messages: [
         {
           role: 'system',
@@ -114,4 +129,35 @@ export const OpenAIStream = async (
   });
 
   return stream;
+};
+
+export const BitapaiConversation = async (
+  key: string,
+  messages: Message[],
+  systemPrompt: string,
+) => {
+  const url = `${BITAPAI_API_HOST}/v1/conversation`;
+
+  const res = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-KEY': `${key ? key : process.env.BITAPAI_API_KEY}`,
+    },
+    method: 'POST',
+    body: JSON.stringify([
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      ...messages,
+    ]),
+  });
+
+  const json = await res.json();
+
+  if (res.status !== 200) {
+    throw new BitapaiError(`Bitapai: ${json}`);
+  }
+
+  return json?.['assistant'] || '';
 };

@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { BitapaiConversation, BitapaiError, OpenAIError } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -15,7 +15,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { model, messages, key, prompt, temperature } =
+      (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -52,12 +53,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    // const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    const response = await BitapaiConversation(
+      key,
+      messagesToSend,
+      'You are an AI assistant',
+    );
 
-    return new Response(stream);
+    return new Response(response);
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
+      return new Response('Error', { status: 500, statusText: error.message });
+    } else if (error instanceof BitapaiError) {
       return new Response('Error', { status: 500, statusText: error.message });
     } else {
       return new Response('Error', { status: 500 });
