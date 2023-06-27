@@ -23,7 +23,7 @@
   "click if using a .env.local file": "fes clic si estàs utilitzant un fitxer .env.local",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "El límit del missatge és de {{maxLength}} caràcters. Has introduït {{valueLength}} caràcters.",
   "Please enter a message": "Si us plau, introdueix un missatge",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI és un kit avançat de chatbot per als models de xat d'OpenAI que busca imitar la interfície i funcionalitat de ChatGPT.",
+  "{{APP_NAME_TRANSLATED}} is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "{{APP_NAME_TRANSLATED}} és un kit avançat de chatbot per als models de xat d'OpenAI que busca imitar la interfície i funcionalitat de ChatGPT.",
   "Are you sure you want to clear all messages?": "Estàs segur que vols esborrar tots els missatges?",
   "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Valors més alts com 0,8 faran que la sortida sigui més aleatòria, mentre que valors més baixos com 0,2 la faran més enfocada i determinista.",
   "Default system prompt": "Sou ChatGPT, un gran model d'idioma format per OpenAI. Seguiu atentament les instruccions de l'usuari. Respon utilitzant la reducció."

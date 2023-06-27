@@ -370,7 +370,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>{APP_NAME_TRANSLATED}</title>
+        <title> {t(`{{APP_NAME_TRANSLATED}}`, { APP_NAME_TRANSLATED })}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
