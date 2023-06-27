@@ -51,7 +51,6 @@ export const Workspace: FC = () => {
   const workspaceAPICallHandler = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedValue(event.target.value);
     //event.target.value === workspace.slug
-
     APICall();
   };
 
