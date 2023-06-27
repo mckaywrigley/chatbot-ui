@@ -33,17 +33,15 @@ export const Workspace: FC = () => {
 
   const APICall = async () => {
     const url = API_ENTRYPOINT + PRIVATE_API_ENTRYPOINT + WORKSPACES_ENDPOINT;
-    console.log(url);
     try {
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(selectedWorkspace!.slug),
       });
       const data = await response.json();
-      console.log(data);
       //do sth with the post response data
     } catch (error) {
-      console.log(error);
+      //if error occured do sth
     }
   };
   APICall();
