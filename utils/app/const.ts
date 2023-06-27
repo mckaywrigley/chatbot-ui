@@ -19,10 +19,11 @@ export const OPENAI_ORGANIZATION = process.env.OPENAI_ORGANIZATION || '';
 export const AZURE_DEPLOYMENT_ID = process.env.AZURE_DEPLOYMENT_ID || '';
 
 export const API_ENTRYPOINT =
-  process.env.API_ENTRYPOINT || 'SumUp Azure OpenAI Chat UI';
+  process.env.NEXT_PUBLIC_API_ENTRYPOINT || 'SumUp Azure OpenAI Chat UI';
 
 export const PRIVATE_API_ENTRYPOINT =
-  process.env.PRIVATE_API_ENTRYPOINT || 'SumUp Azure OpenAI Chat UI';
+  process.env.NEXT_PUBLIC_PRIVATE_API_ENTRYPOINT ||
+  'SumUp Azure OpenAI Chat UI';
 
 export const WORKSPACES_ENDPOINT =
-  process.env.WORKSPACES_ENDPOINT || 'SumUp Azure OpenAI Chat UI';
+  process.env.NEXT_PUBLIC_WORKSPACES_ENDPOINT || 'SumUp Azure OpenAI Chat UI';

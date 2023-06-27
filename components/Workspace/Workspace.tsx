@@ -11,8 +11,6 @@ interface Workspace {
   slug: string;
   logo: string;
 }
-console.log('OUTSIDE COMP');
-console.log(API_ENTRYPOINT);
 
 const workspaces: Workspace[] = [
   { name: 'Legal', slug: 'legal', logo: 'url-to-legal.png' },
@@ -24,12 +22,6 @@ const workspaces: Workspace[] = [
 ];
 
 export const Workspace: FC = () => {
-  // const PRIVATE_API_ENTRYPOINT = `${API_ENTRYPOINT}/private`;
-  // const WORKSPACES_ENDPOINT = `${PRIVATE_API_ENTRYPOINT}/workspaces`;
-  console.log('***********');
-  console.log(API_ENTRYPOINT);
-  console.log(WORKSPACES_ENDPOINT);
-
   const [selectedValue, setSelectedValue] = useState(workspaces[0].slug);
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace>(
     workspaces[0],
@@ -40,7 +32,9 @@ export const Workspace: FC = () => {
   };
 
   const APICall = async () => {
-    const response = await fetch(WORKSPACES_ENDPOINT, {
+    const url = API_ENTRYPOINT + PRIVATE_API_ENTRYPOINT + WORKSPACES_ENDPOINT;
+    console.log(url);
+    const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(selectedWorkspace!.slug),
     });
@@ -48,8 +42,11 @@ export const Workspace: FC = () => {
     console.log(data);
     //do sth with the post response data
   };
-
-  APICall();
+  try {
+    APICall();
+  } catch (error) {
+    console.log(error);
+  }
   // api call to have default workspace without choosing it in select bar
   const workspaceAPICallHandler = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedValue(event.target.value);
