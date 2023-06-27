@@ -9,6 +9,8 @@ export interface Message {
   role: Role;
   content: string;
   pluginIdNameLogoMap?: Record<string, PluginNameLogo>;
+  requestToPlugin?: string;
+  responseFromPlugin?: string;
 }
 
 export type Role = 'assistant' | 'user';

@@ -48,7 +48,8 @@ export const ChatMessage: FC<Props> = memo(
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [messageContent, setMessageContent] = useState(message.content);
     const [messagedCopied, setMessageCopied] = useState(false);
-    const [isPluginListOpened, setIsPluginListOpened] = useState(false);
+    const [isPluginDebuggingOpened, setIsPluginDebuggingOpened] =
+      useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -221,39 +222,18 @@ export const ChatMessage: FC<Props> = memo(
                 <div className="flex-col">
                   {message.pluginIdNameLogoMap &&
                   Object.keys(message.pluginIdNameLogoMap).length > 0 ? (
-                    <div className="w-fit p-3 mb-2 rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
+                    <div className="w-fit md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-3 mb-2 rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
                       <button
                         className="flex items-center h-fit gap-1"
                         type="button"
-                        onClick={() => setIsPluginListOpened((prev) => !prev)}
+                        onClick={() =>
+                          setIsPluginDebuggingOpened((prev) => !prev)
+                        }
                       >
                         <div className="flex gap-1">
                           {Object.keys(message.pluginIdNameLogoMap).map(
                             (pluginId) => (
-                              <img
-                                className="w-5 h-5 m-0 bg-white rounded"
-                                key={pluginId}
-                                src={
-                                  message.pluginIdNameLogoMap![pluginId].logo
-                                }
-                                alt={
-                                  message.pluginIdNameLogoMap![pluginId].name
-                                }
-                              />
-                            ),
-                          )}
-                        </div>
-                        <IconChevronDown size={16} />
-                      </button>
-                      {isPluginListOpened && (
-                        <div className="rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white mt-1.5">
-                          {Object.keys(message.pluginIdNameLogoMap).map(
-                            (pluginId) => (
-                              <div
-                                key={pluginId}
-                                className="flex items-center h-fit gap-1.5 space-y-1.5 p-1"
-                              >
-                                `
+                              <>
                                 <img
                                   className="w-5 h-5 m-0 bg-white rounded"
                                   key={pluginId}
@@ -267,8 +247,49 @@ export const ChatMessage: FC<Props> = memo(
                                 <span>
                                   {message.pluginIdNameLogoMap![pluginId].name}
                                 </span>
-                              </div>
+                              </>
                             ),
+                          )}
+                        </div>
+                        <IconChevronDown size={16} />
+                      </button>
+                      {isPluginDebuggingOpened && (
+                        <div className="rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white mt-1.5">
+                          {message.requestToPlugin &&
+                          message.requestToPlugin.length > 0 ? (
+                            <div className="w-full p-3 mb-2 rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
+                              <span>Request to the plugin</span>
+                              <div className="rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white mt-1.5">
+                                <CodeBlock
+                                  key={Math.random()}
+                                  language={'json'}
+                                  value={message.requestToPlugin.replace(
+                                    /\n$/,
+                                    '',
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <></>
+                          )}
+                          {message.responseFromPlugin &&
+                          message.responseFromPlugin.length > 0 ? (
+                            <div className="w-full p-3 mb-2 rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white">
+                              <span>Response from the plugin</span>
+                              <div className="rounded border border-neutral-200 bg-transparent text-neutral-900 dark:border-neutral-600 dark:text-white mt-1.5">
+                                <CodeBlock
+                                  key={Math.random()}
+                                  language={'json'}
+                                  value={message.responseFromPlugin.replace(
+                                    /\n$/,
+                                    '',
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <></>
                           )}
                         </div>
                       )}
