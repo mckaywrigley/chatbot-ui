@@ -34,28 +34,25 @@ export const Workspace: FC = () => {
   const APICall = async () => {
     const url = API_ENTRYPOINT + PRIVATE_API_ENTRYPOINT + WORKSPACES_ENDPOINT;
     console.log(url);
-    const response = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(selectedWorkspace!.slug),
-    });
-    const data = await response.json();
-    console.log(data);
-    //do sth with the post response data
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(selectedWorkspace!.slug),
+      });
+      const data = await response.json();
+      console.log(data);
+      //do sth with the post response data
+    } catch (error) {
+      console.log(error);
+    }
   };
-  try {
-    APICall();
-  } catch (error) {
-    console.log(error);
-  }
+  APICall();
   // api call to have default workspace without choosing it in select bar
   const workspaceAPICallHandler = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedValue(event.target.value);
     //event.target.value === workspace.slug
-    try {
-      APICall();
-    } catch (error) {
-      console.log(error);
-    }
+
+    APICall();
   };
 
   return (
