@@ -56,6 +56,8 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
+  const APP_NAME_TRANSLATED = t('APP_NAME');
+
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
@@ -368,7 +370,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>{APP_NAME_TRANSLATED}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
