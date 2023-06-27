@@ -95,7 +95,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           model: updatedConversation.model,
           messages: updatedConversation.messages.map((message) => {
             if (!message.pluginIdNameLogoMap) return message;
-            const { pluginIdNameLogoMap, ...rest } = message;
+            const {
+              pluginIdNameLogoMap,
+              requestToPlugin,
+              responseFromPlugin,
+              ...rest
+            } = message;
             return rest;
           }),
           key: apiKey,
@@ -158,32 +163,51 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           const { value, done: doneReading } = await reader.read();
           done = doneReading;
           const chunkValue = decoder.decode(value);
-          text += chunkValue;
+
           if (isFirst) {
             isFirst = false;
             let updatedMessages: Message[];
-            if (plugins && plugins?.length > 0) {
+            if (
+              plugins &&
+              plugins?.length > 0 &&
+              chunkValue.startsWith('[start]')
+            ) {
+              const pattern1 = /\[name_for_model](.*?)\[/s;
+              const pattern2 =
+                /\[request_to_plugin](.*?)\[response_from_plugin]/s;
+              const pattern3 = /\[response_from_plugin](.*?)\[end]/s;
+              const pattern4 = /\[end](.*?)$/s;
+              const pluginId = chunkValue.match(pattern1)?.[1];
+              const requestToPlugin = chunkValue.match(pattern2)?.[1];
+              const responseFromPlugin = chunkValue.match(pattern3)?.[1] || '';
+              const firstChunk = chunkValue.match(pattern4)?.[1];
+
+              text += firstChunk;
+
+              const pluginIdNameLogoMap = {} as Record<string, PluginNameLogo>;
+              plugins.forEach((plugin) => {
+                if (plugin.id === pluginId) {
+                  pluginIdNameLogoMap[plugin.id] = {
+                    name: plugin.name as string,
+                    logo: plugin.logo as string,
+                  };
+                }
+              });
               updatedMessages = [
                 ...updatedConversation.messages,
                 {
                   role: 'assistant',
-                  content: chunkValue,
-                  pluginIdNameLogoMap: plugins.reduce(
-                    (accumulator, current) => {
-                      accumulator[current.name as string] = {
-                        logo: current.logo as string,
-                        name: current.name as string,
-                      } as PluginNameLogo;
-                      return accumulator;
-                    },
-                    {} as Record<string, PluginNameLogo>,
-                  ),
+                  content: text,
+                  pluginIdNameLogoMap: pluginIdNameLogoMap,
+                  requestToPlugin: requestToPlugin,
+                  responseFromPlugin: responseFromPlugin,
                 },
               ];
             } else {
+              text += chunkValue;
               updatedMessages = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
+                { role: 'assistant', content: text },
               ];
             }
             updatedConversation = {
@@ -195,6 +219,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               value: updatedConversation,
             });
           } else {
+            text += chunkValue;
             const updatedMessages: Message[] = updatedConversation.messages.map(
               (message, index) => {
                 if (index === updatedConversation.messages.length - 1) {
