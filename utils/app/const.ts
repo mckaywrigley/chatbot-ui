@@ -16,7 +16,6 @@ export const OPENAI_API_VERSION =
 
 export const OPENAI_ORGANIZATION = process.env.OPENAI_ORGANIZATION || '';
 
-export const AZURE_DEPLOYMENT_ID = process.env.AZURE_DEPLOYMENT_ID || '';
 
 export const API_ENTRYPOINT =
   process.env.NEXT_PUBLIC_API_ENTRYPOINT || 'localhost:3000';
@@ -28,3 +27,18 @@ export const WORKSPACES_ENDPOINT =
   process.env.NEXT_PUBLIC_WORKSPACES_ENDPOINT || 'Zeno Chat UI';
 
 export const APP_NAME = process.env.APP_NAME || 'Zeno Chat UI';
+
+export const AZURE_DEPLOYMENT_ID =
+  process.env.AZURE_DEPLOYMENT_ID || '';
+
+export const LOGIN_REQUIRED = 
+  process.env.LOGIN_REQUIRED || 'false';
+
+export const API_BASE_URL = 
+  process.env.API_BASE_URL || 'https://api.openai.com';
+
+export const LOG_INCOMING_MESSAGES =
+ process.env.LOG_INCOMING_MESSAGES || 'false';
+
+export const LOG_TRIM_MESSAGES =
+ process.env.LOG_TRIM_MESSAGES || 'false';
