@@ -6,11 +6,7 @@ import {
   WORKSPACES_ENDPOINT,
 } from '@/utils/app/const';
 
-interface Workspace {
-  name: string;
-  slug: string;
-  logo: string;
-}
+import { Workspace } from '@/types/workspaces';
 
 const workspaces: Workspace[] = [
   { name: 'Legal', slug: 'legal', logo: 'url-to-legal.png' },
@@ -21,7 +17,7 @@ const workspaces: Workspace[] = [
   },
 ];
 
-export const Workspace: FC = () => {
+export const WorkspaceComponent: FC = () => {
   const [selectedValue, setSelectedValue] = useState(workspaces[0].slug);
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace>(
     workspaces[0],
