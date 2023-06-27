@@ -46,6 +46,7 @@ export const ChatInput = ({
   showScrollDownButton,
 }: Props) => {
   const { t } = useTranslation('chat');
+  const APP_NAME_TRANSLATED = t('APP_NAME');
 
   const {
     state: { selectedConversation, messageIsStreaming, prompts },
@@ -284,7 +285,11 @@ export const ChatInput = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} className='animate-pulse'/>}
+            {plugin ? (
+              <IconBrandGoogle size={20} />
+            ) : (
+              <IconBolt size={20} className="animate-pulse" />
+            )}
           </button>
 
           {showPluginSelect && (
@@ -385,11 +390,12 @@ export const ChatInput = ({
           rel="noreferrer"
           className="underline"
         >
-          ChatBot UI
+          {t(`{{APP_NAME_TRANSLATED}}`, { APP_NAME_TRANSLATED })}
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          `{{APP_NAME_TRANSLATED}} is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.`,
+          { APP_NAME_TRANSLATED },
         )}
       </div>
     </div>

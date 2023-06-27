@@ -23,7 +23,7 @@
   "click if using a .env.local file": "もし.env.localファイルを使用している場合はこちらをクリックしてください",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "メッセージの文字数は{{maxLength}}文字までです。あなたは{{valueLength}}文字を入力しました。",
   "Please enter a message": "メッセージを入力してください",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UIは、ChatGPTと同様のインターフェイスと機能を実現するための、チャットボットキットです。",
+  "{{APP_NAME_TRANSLATED}} is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "{{APP_NAME_TRANSLATED}}は、ChatGPTと同様のインターフェイスと機能を実現するための、チャットボットキットです。",
   "Are you sure you want to clear all messages?": "すべてのメッセージを削除してもよろしいですか？",
   "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8のような高い値は出力をよりランダムにし、0.2のような低い値はより焦点を絞り、決定論的にします。",
   "Default system prompt": "あなたは、OpenAI によってトレーニングされた大規模な言語モデルである ChatGPT です。ユーザーの指示に注意深く従ってください。マークダウンを使用して応答します。"

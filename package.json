@@ -27,6 +27,7 @@
     "react-i18next": "^12.2.0",
     "react-markdown": "^8.0.5",
     "react-query": "^3.39.3",
+    "react-select": "^5.7.3",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",

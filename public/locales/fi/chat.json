@@ -24,7 +24,7 @@
   "click if using a .env.local file": "klikkaa jos käytät .env.local-tiedostoa",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Viestin maksimipituus on {{maxLength}} merkkiä. Olet käyttänyt {{valueLength}} merkkiä.",
   "Please enter a message": "Ole hyvä ja syötä viesti",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI on OpenAI:n keskustelumalleille tarkoitettu käyttöliittymä joka pyrkii jäljittelemään ChatGPT:n käyttöliittymää ja toiminnallisuuksia.",
+  "{{APP_NAME_TRANSLATED}} is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "{{APP_NAME_TRANSLATED}} on OpenAI:n keskustelumalleille tarkoitettu käyttöliittymä joka pyrkii jäljittelemään ChatGPT:n käyttöliittymää ja toiminnallisuuksia.",
   "Are you sure you want to clear all messages?": "Haluatko varmasti poistaa kaikki viestit?",
   "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Suuremmat arvot kuten 0.8 tekevät vastauksista satunnaisempia, kun taas pienemmät arvot kuten 0.2 tekevät niistä keskittyneempiä ja johdonmukaisempia.",
   "Precise": "Tarkka",
