@@ -1,6 +1,7 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 
 import {
   CloseSidebarButton,
@@ -54,6 +55,15 @@ const Sidebar = <T,>({
     e.target.style.background = 'none';
   };
 
+  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
+
+  useEffect(() => {
+    const username = localStorage.getItem('username');
+    if (!username) {
+      setShowUsernamePrompt(true);
+    }
+  }, []);
+
   return isOpen ? (
     <div>
       <div
@@ -83,6 +93,19 @@ const Sidebar = <T,>({
           searchTerm={searchTerm}
           onSearch={handleSearchTerm}
         />
+        <div>
+          {showUsernamePrompt &&
+              <p style={{
+                color: 'red',
+                fontWeight: 'bold',
+                fontSize: '20px',
+                textAlign: 'center',
+                padding: '10px'
+              }}>
+                建议设置用户名以提供更好的聊天
+              </p>}
+          {/* Rest of the render code */}
+        </div>
 
         <div className="flex-grow overflow-auto">
           {items?.length > 0 && (

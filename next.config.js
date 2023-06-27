@@ -11,6 +11,13 @@ const nextConfig = {
       layers: true,
     };
 
+    // 移除热模块替换插件
+    if (!isServer && dev) {
+      config.plugins = config.plugins.filter(
+        (plugin) => plugin.constructor.name !== 'HotModuleReplacementPlugin'
+      );
+    }
+
     return config;
   },
 };

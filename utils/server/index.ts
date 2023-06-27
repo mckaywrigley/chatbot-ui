@@ -23,12 +23,22 @@ export class OpenAIError extends Error {
   }
 }
 
+let sharedVar = "";
+
+function getSharedVar() {
+  return sharedVar;
+}
+
+export { getSharedVar };
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
   temperature : number,
   key: string,
   messages: Message[],
+  userName:string,
+  ip:string,
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
   if (OPENAI_API_TYPE === 'azure') {
@@ -51,21 +61,17 @@ export const OpenAIStream = async (
     body: JSON.stringify({
       ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
       messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
         ...messages,
       ],
       max_tokens: 1000,
       temperature: temperature,
       stream: true,
+      user_name:userName,
+      ip:ip,
     }),
   });
-
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-
   if (res.status !== 200) {
     const result = await res.json();
     if (result.error) {
@@ -84,7 +90,7 @@ export const OpenAIStream = async (
     }
   }
 
-  const stream = new ReadableStream({
+  return new ReadableStream({
     async start(controller) {
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
         if (event.type === 'event') {
@@ -96,9 +102,14 @@ export const OpenAIStream = async (
               controller.close();
               return;
             }
+            sharedVar = json.id
             const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
+            if (!text) {
+              controller.enqueue(encoder.encode("id:[" + json.id + "]"));
+            } else {
+              const queue = encoder.encode(text);
+              controller.enqueue(queue);
+            }
           } catch (e) {
             controller.error(e);
           }
@@ -112,6 +123,4 @@ export const OpenAIStream = async (
       }
     },
   });
-
-  return stream;
 };

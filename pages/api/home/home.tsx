@@ -53,8 +53,6 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
-  const { getModels } = useApiService();
-  const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -65,6 +63,7 @@ const Home = ({
     state: {
       apiKey,
       lightMode,
+      userName,
       folders,
       conversations,
       selectedConversation,
@@ -76,39 +75,14 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error, refetch } = useQuery(
-    ['GetModels', apiKey, serverSideApiKeyIsSet],
-    ({ signal }) => {
-      if (!apiKey && !serverSideApiKeyIsSet) return null;
-
-      return getModels(
-        {
-          key: apiKey,
-        },
-        signal,
-      );
-    },
-    { enabled: true, refetchOnMount: false },
-  );
-
   useEffect(() => {
-    if (data) dispatch({ field: 'models', value: data });
-  }, [data, dispatch]);
-
-  useEffect(() => {
-    dispatch({ field: 'modelError', value: getModelsError(error) });
-  }, [dispatch, error, getModelsError]);
-
-  // FETCH MODELS ----------------------------------------------
-
-  const handleSelectConversation = (conversation: Conversation) => {
-    dispatch({
-      field: 'selectedConversation',
-      value: conversation,
-    });
-
-    saveConversation(conversation);
-  };
+    fetch('/api/ip')
+        .then((res) => res.json())
+        .then((data) => {
+          localStorage.setItem('ip', data.ip);
+        })
+        .catch((err) => console.error(err));
+  }, []);
 
   // FOLDER OPERATIONS  --------------------------------------------
 
@@ -258,6 +232,12 @@ const Home = ({
         value: settings.theme,
       });
     }
+    if(settings.userName){
+      dispatch({
+        field: 'userName',
+        value: settings.userName,
+      });
+    }
 
     const apiKey = localStorage.getItem('apiKey');
 
@@ -355,12 +335,11 @@ const Home = ({
         handleCreateFolder,
         handleDeleteFolder,
         handleUpdateFolder,
-        handleSelectConversation,
         handleUpdateConversation,
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>Hamburger</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"

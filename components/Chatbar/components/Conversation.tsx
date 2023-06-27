@@ -28,7 +28,6 @@ interface Props {
 export const ConversationComponent = ({ conversation }: Props) => {
   const {
     state: { selectedConversation, messageIsStreaming },
-    handleSelectConversation,
     handleUpdateConversation,
   } = useContext(HomeContext);
 
@@ -123,7 +122,6 @@ export const ConversationComponent = ({ conversation }: Props) => {
               ? 'bg-[#343541]/90'
               : ''
           }`}
-          onClick={() => handleSelectConversation(conversation)}
           disabled={messageIsStreaming}
           draggable="true"
           onDragStart={(e) => handleDragStart(e, conversation)}
