@@ -5,6 +5,8 @@ import { useTranslation } from 'next-i18next';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { EdgarParams } from '@/components/Chat/EdgarParams';
+import PluginPicker from '@/components/Chat/PluginPicker';
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 
 import { Import } from '../../Settings/Import';
@@ -61,7 +63,7 @@ export const ChatbarSettings = () => {
       ) : null}
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}
-
+      <PluginPicker />
       <SettingDialog
         open={isSettingDialogOpen}
         onClose={() => {
