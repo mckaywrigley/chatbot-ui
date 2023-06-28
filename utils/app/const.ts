@@ -4,3 +4,5 @@ export const DEFAULT_SYSTEM_PROMPT =
 
 export const BITAPAI_API_HOST =
   process.env.BITAPAI_API_HOST || 'https://api.bitapai.io';
+
+export const MESSAGE_MAX_LENGTH = 1000;
