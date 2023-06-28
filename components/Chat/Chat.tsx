@@ -349,15 +349,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             Welcome to Chatbot UI
           </div>
           <div className="text-center text-lg text-black dark:text-white">
-            <div className="mb-8">{`Chatbot UI is an open source clone of OpenAI's ChatGPT UI.`}</div>
+            {/* <div className="mb-8">{`Chatbot UI is an open source clone of OpenAI's ChatGPT UI.`}</div> */}
             <div className="mb-2 font-bold">
-              Important: Chatbot UI is 100% unaffiliated with OpenAI.
+              {/* Important: Chatbot UI is 100% unaffiliated with OpenAI. */}
             </div>
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
-              Chatbot UI allows you to plug in your API key to use this UI with
-              their API.
+              Chatbot UI allows you to plug in your BitAPAI API key to use this
+              UI with their API.
             </div>
             <div className="mb-2">
               It is <span className="italic">only</span> used to communicate
@@ -365,18 +365,20 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             </div>
             <div className="mb-2">
               {t(
-                'Please set your OpenAI API key in the bottom left of the sidebar.',
+                'Please set your Bitapai API key in the bottom left of the sidebar.',
               )}
             </div>
             <div>
-              {t("If you don't have an OpenAI API key, you can get one here: ")}
+              {t(
+                "If you don't have an BitAPAI API key, you can get one here: ",
+              )}
               <a
-                href="https://platform.openai.com/account/api-keys"
+                href="https://bitapai.io/"
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-500 hover:underline"
               >
-                openai.com
+                bitapai.io
               </a>
             </div>
           </div>

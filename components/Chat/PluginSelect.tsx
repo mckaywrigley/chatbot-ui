@@ -79,13 +79,13 @@ export const PluginSelect: FC<Props> = ({
             handleKeyDown(e);
           }}
         >
-          <option
+          {/* <option
             key="chatgpt"
             value="chatgpt"
             className="dark:bg-[#343541] dark:text-white"
           >
             ChatGPT
-          </option>
+          </option> */}
 
           {PluginList.map((plugin) => (
             <option
