@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
     const response = await BitapaiConversation(
       key,
       messagesToSend,
-      'You are an AI assistant. Respond using markdown.',
+      promptToSend,
     );
 
     return new Response(response);
