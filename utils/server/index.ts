@@ -104,7 +104,6 @@ export const OpenAIStream = async (
               return;
             }
             const text = json.choices[0].delta.content;
-            console.log(text);
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {

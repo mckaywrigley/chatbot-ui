@@ -63,7 +63,6 @@ export const ChatbarSettings = () => {
       ) : null}
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}
-      <PluginPicker />
       <SettingDialog
         open={isSettingDialogOpen}
         onClose={() => {

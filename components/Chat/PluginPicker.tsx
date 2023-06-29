@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { IoArrowBack } from 'react-icons/io5';
 import Select, { ActionMeta, MultiValue } from 'react-select';
@@ -6,9 +6,17 @@ import Datepicker from 'tailwind-datepicker-react';
 
 import Image from 'next/image';
 
-interface Props {
+import { KeyValuePair } from '@/types/data';
+import { Plugin, PluginID, Plugins } from '@/types/plugin';
+
+interface EdgarParamsProps {
   onBack: () => void;
-  onSave: () => void;
+  onSave: (plugin: Plugin) => void;
+}
+
+interface PluginPickerProps {
+  onPluginChange: (plugin: Plugin) => void;
+  onClose: () => void;
 }
 
 interface Option {
@@ -27,7 +35,7 @@ const formTypes = [
   { value: '10-Q', label: '10-Q' },
 ];
 
-const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
+const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
   const [selectedSymbolData, setSelectedSymbolData] = useState<
     MultiValue<Option>
   >([]);
@@ -38,7 +46,10 @@ const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [startDateShow, setStartDateShow] = useState<Boolean | null>(false);
   const [endDateShow, setEndDateShow] = useState<Boolean | null>(false);
-  const dateToNumber = (date: Date) => {
+  const dateToNumber = (date: Date | null) => {
+    if (!date) {
+      return 0;
+    }
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // add 1 to get the month number in the range 1-12
     const day = date.getDate();
@@ -53,6 +64,16 @@ const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
     const day = number % 100;
     return new Date(year, month - 1, day);
   };
+  const updatePlugin = (plugin: Plugin) => {
+    const requiredKeys: KeyValuePair[] = [
+      { key: 'symbol', value: selectedSymbolData || '' },
+      { key: 'formTypes', value: selectedFormTypes || '' },
+      { key: 'startDate', value: dateToNumber(startDate) },
+      { key: 'endDate', value: dateToNumber(endDate) },
+    ];
+    const updatedPlugin = { ...plugin, requiredKeys };
+    return updatedPlugin;
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -62,14 +83,12 @@ const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
       >
         <IoArrowBack size={25} />
       </button>
-      <h2 className="font-bold text-xl text-gray-500 mb-4">EDGAR Parameters</h2>
+      <h2 className="font-bold text-lg text-gray-500 mb-4">EDGAR Parameters</h2>
       <Select
         isMulti
         className="mb-4"
         options={symbolData}
-        onChange={(selectedSymbolData) =>
-          setSelectedSymbolData(selectedSymbolData)
-        }
+        onChange={setSelectedSymbolData}
         placeholder="Symbol"
         styles={{
           option: (provided) => ({
@@ -82,9 +101,7 @@ const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
         isMulti
         className="mb-4"
         options={formTypes}
-        onChange={(selectedFormTypes) =>
-          setSelectedFormTypes(selectedFormTypes)
-        }
+        onChange={setSelectedFormTypes}
         placeholder="Form Type"
         styles={{
           option: (provided) => ({
@@ -96,99 +113,131 @@ const EdgarParams: React.FC<Props> = ({ onBack, onSave }) => {
       <div className="flex items-center mb-4">
         <div className="w-1/2 mr-2">
           <Datepicker
-            selected={startDate}
             onChange={setStartDate}
             show={startDateShow}
             setShow={setStartDateShow}
+            options={{ defaultDate: null }}
           />
         </div>
         <div className="text-gray-500 mr-2">To</div>
         <div className="w-1/2 mr-2">
           <Datepicker
-            selected={endDate}
             onChange={setEndDate}
             show={endDateShow}
             setShow={setEndDateShow}
+            options={{ defaultDate: null }}
           />
         </div>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={onSave}
+          onClick={() => {
+            const updatedPlugin = updatePlugin(Plugins[PluginID.EDGAR]);
+            onSave(updatedPlugin);
+          }}
         >
           Save
         </button>
       </div>
     </div>
   );
-};
+});
 
-const PluginPicker = () => {
-  const [showModal, setShowModal] = useState(true);
-  const [showEdgarSettings, setShowEdgarSettings] = useState(false);
+export const PluginPicker: React.FC<PluginPickerProps> = memo(
+  ({ onPluginChange, onClose }) => {
+    const modalRef = useRef<HTMLInputElement>(null);
+    const [showEdgarSettings, setShowEdgarSettings] = useState(false);
 
-  if (!showModal) return null;
+    const handleOutsideClick = (e: any) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
 
-  const closeEdgarSettingsAndModal = () => {
-    setShowEdgarSettings(false);
-    setShowModal(false);
-  };
+    useEffect(() => {
+      addEventListener('mousedown', handleOutsideClick);
+      return () => removeEventListener('mousedown', handleOutsideClick);
+    }, []);
 
-  return (
-    <div className="fixed z-10 inset-0 overflow-y-auto">
-      <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-          <div className="absolute inset-0 bg-gray-500 opacity-75" />
-        </div>
+    const handlePluginSelection = (pluginId: PluginID) => {
+      if (pluginId === PluginID.EDGAR) {
+        setShowEdgarSettings(true);
+      } else {
+        const plugin = Plugins[pluginId];
+        onPluginChange(plugin);
+      }
+    };
 
-        <span
-          className="hidden sm:inline-block sm:align-middle sm:h-screen"
-          aria-hidden="true"
-        >
-          &#8203;
-        </span>
+    return (
+      <div className="fixed z-10 inset-0 overflow-y-auto">
+        <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div className="absolute inset-0 bg-gray-500 opacity-75" />
+          </div>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          {showEdgarSettings ? (
-            <EdgarParams
-              onBack={() => setShowEdgarSettings(false)}
-              onSave={closeEdgarSettingsAndModal}
-            />
-          ) : (
-            <div className="p-6">
-              <h2 className="text-xl text-gray-500 font-bold mb-4">
-                Choose a Plugin
-              </h2>
-              <div className="flex space-x-10">
-                <Image
-                  className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
-                  src="/chatgpticon.svg"
-                  alt="ChatGPT"
-                  width={48}
-                  height={48}
-                />
-                <Image
-                  className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
-                  src="/googleicon.svg"
-                  alt="Google"
-                  width={48}
-                  height={48}
-                />
-                <div onClick={() => setShowEdgarSettings(true)}>
-                  <Image
-                    className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
-                    src="/edgaricon.svg"
-                    alt="EDGAR"
-                    width={48}
-                    height={48}
-                  />
+          <span
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+
+          <div
+            ref={modalRef}
+            className="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          >
+            {showEdgarSettings ? (
+              <EdgarParams
+                onBack={() => setShowEdgarSettings(false)}
+                onSave={(plugin: Plugin) => {
+                  setShowEdgarSettings(false);
+                  onPluginChange(plugin);
+                }}
+              />
+            ) : (
+              <div className="p-6">
+                <h2 className="text-lg text-gray-500 font-bold mb-4">
+                  Choose a Plugin
+                </h2>
+                <div className="flex space-x-10">
+                  <div
+                    onClick={() => handlePluginSelection('chatgpt' as PluginID)}
+                  >
+                    <Image
+                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      src="/chatgpticon.svg"
+                      alt="ChatGPT"
+                      width={42}
+                      height={42}
+                    />
+                  </div>
+                  <div
+                    onClick={() =>
+                      handlePluginSelection(PluginID.GOOGLE_SEARCH)
+                    }
+                  >
+                    <Image
+                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      src="/googleicon.svg"
+                      alt="Google"
+                      width={42}
+                      height={42}
+                    />
+                  </div>
+                  <div onClick={() => handlePluginSelection(PluginID.EDGAR)}>
+                    <Image
+                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      src="/edgaricon.svg"
+                      alt="EDGAR"
+                      width={42}
+                      height={42}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default PluginPicker;
+    );
+  },
+);

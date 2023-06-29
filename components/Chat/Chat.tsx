@@ -498,9 +498,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               handleSend(message, 0, plugin);
             }}
             onScrollDownClick={handleScrollDown}
-            onRegenerate={() => {
+            onRegenerate={(plugin) => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, null);
+                handleSend(currentMessage, 2, plugin);
               }
             }}
             showScrollDownButton={showScrollDownButton}

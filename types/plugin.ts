@@ -39,7 +39,24 @@ export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.EDGAR]: {
     id: PluginID.EDGAR,
     name: PluginName.EDGAR,
-    requiredKeys: [],
+    requiredKeys: [
+      {
+        key: 'symbols',
+        value: [],
+      },
+      {
+        key: 'formTypes',
+        value: [],
+      },
+      {
+        key: 'startDate',
+        value: 0,
+      },
+      {
+        key: 'endDate',
+        value: 0,
+      },
+    ],
   },
 };
 

@@ -88,9 +88,7 @@ export const RetrievalStream = async (
       const handler = BaseCallbackHandler.fromMethods({
         handleLLMNewToken(token: string) {
           const queue = encoder.encode(token);
-          if (controller) {
-            controller.enqueue(queue);
-          }
+          controller.enqueue(queue);
         },
         handleLLMError(err: Error) {
           controller.error(err);
