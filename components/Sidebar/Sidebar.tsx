@@ -1,5 +1,5 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
-import { ReactNode } from 'react';
+import { ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -8,6 +8,7 @@ import {
 } from './components/OpenCloseButton';
 
 import Search from '../Search';
+import HomeContext from '@/pages/api/home/home.context';
 
 interface Props<T> {
   isOpen: boolean;
@@ -41,6 +42,10 @@ const Sidebar = <T,>({
   handleDrop,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
+
+  const {
+    state: { folders },
+  } = useContext(HomeContext);
 
   const allowDrop = (e: any) => {
     e.preventDefault();
@@ -85,7 +90,7 @@ const Sidebar = <T,>({
         />
 
         <div className="flex-grow overflow-auto">
-          {items?.length > 0 && (
+          {folders?.length > 0 && (
             <div className="flex border-b border-white/20 pb-2">
               {folderComponent}
             </div>
