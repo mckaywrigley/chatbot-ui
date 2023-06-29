@@ -15,6 +15,8 @@ On the frontend we had to remove all the OpenAI integrations like entering the O
   - While OpenAI had several model options to choose for according to the API key provided, we didn't have to do that for BITAPAI
 - replace chatgpt integrations with BITAPAI on frontend
   - Remove OpenAI, chatgpt words form frontend
+- creating folder when no prompts were available didn't showed the folder
+  - this issue was fixed by checking for if folders exists and removing old logic of checking if prompts exists to show folders
 
 ### Backend
 
