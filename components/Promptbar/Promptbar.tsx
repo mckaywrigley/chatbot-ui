@@ -44,16 +44,16 @@ const Promptbar = () => {
 
   const handleCreatePrompt = () => {
     // if (defaultModelId) {
-    //   const newPrompt: Prompt = {
-    //     id: uuidv4(),
-    //     name: `Prompt ${prompts.length + 1}`,
-    //     description: '',
-    //     content: '',
-    //     folderId: null,
-    //   };
-    //   const updatedPrompts = [...prompts, newPrompt];
-    //   homeDispatch({ field: 'prompts', value: updatedPrompts });
-    //   savePrompts(updatedPrompts);
+    const newPrompt: Prompt = {
+      id: uuidv4(),
+      name: `Prompt ${prompts.length + 1}`,
+      description: '',
+      content: '',
+      folderId: null,
+    };
+    const updatedPrompts = [...prompts, newPrompt];
+    homeDispatch({ field: 'prompts', value: updatedPrompts });
+    savePrompts(updatedPrompts);
     // }
   };
 
