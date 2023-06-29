@@ -4,14 +4,13 @@ import { useTranslation } from 'next-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
 import { exportData, importData } from '@/utils/app/importExport';
 
 import { Conversation } from '@/types/chat';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
-import { OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -34,7 +33,7 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: { conversations, showChatbar, folders, pluginKeys },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -112,20 +111,6 @@ export const Chatbar = () => {
   };
 
   const handleClearConversations = () => {
-    defaultModelId &&
-      homeDispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
-
     homeDispatch({ field: 'conversations', value: [] });
 
     localStorage.removeItem('conversationHistory');
@@ -154,20 +139,6 @@ export const Chatbar = () => {
 
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
-      defaultModelId &&
-        homeDispatch({
-          field: 'selectedConversation',
-          value: {
-            id: uuidv4(),
-            name: t('New Conversation'),
-            messages: [],
-            model: OpenAIModels[defaultModelId],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
-            folderId: null,
-          },
-        });
-
       localStorage.removeItem('selectedConversation');
     }
   };

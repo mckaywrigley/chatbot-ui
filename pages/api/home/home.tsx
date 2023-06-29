@@ -15,7 +15,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -28,7 +28,6 @@ import { getSettings } from '@/utils/app/settings';
 import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
-import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 
 import { Chat } from '@/components/Chat/Chat';
@@ -44,14 +43,9 @@ import { v4 as uuidv4 } from 'uuid';
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
-  defaultModelId: OpenAIModelID;
 }
 
-const Home = ({
-  serverSideApiKeyIsSet,
-  serverSidePluginKeysSet,
-  defaultModelId,
-}: Props) => {
+const Home = ({ serverSideApiKeyIsSet, serverSidePluginKeysSet }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
@@ -88,12 +82,9 @@ const Home = ({
         signal,
       );
     },
-    { enabled: true, refetchOnMount: false },
+    // ! get models is turned off
+    { enabled: false, refetchOnMount: false },
   );
-
-  useEffect(() => {
-    if (data) dispatch({ field: 'models', value: data });
-  }, [data, dispatch]);
 
   useEffect(() => {
     dispatch({ field: 'modelError', value: getModelsError(error) });
@@ -185,14 +176,8 @@ const Home = ({
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
-      model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-      },
       prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      temperature: lastConversation?.temperature,
       folderId: null,
     };
 
@@ -234,8 +219,6 @@ const Home = ({
   }, [selectedConversation]);
 
   useEffect(() => {
-    defaultModelId &&
-      dispatch({ field: 'defaultModelId', value: defaultModelId });
     serverSideApiKeyIsSet &&
       dispatch({
         field: 'serverSideApiKeyIsSet',
@@ -246,7 +229,7 @@ const Home = ({
         field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
-  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
+  }, [, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
 
@@ -333,19 +316,13 @@ const Home = ({
           id: uuidv4(),
           name: t('New Conversation'),
           messages: [],
-          model: OpenAIModels[defaultModelId],
           prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+          temperature: lastConversation?.temperature,
           folderId: null,
         },
       });
     }
-  }, [
-    defaultModelId,
-    dispatch,
-    serverSideApiKeyIsSet,
-    serverSidePluginKeysSet,
-  ]);
+  }, [dispatch, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   return (
     <HomeContext.Provider
@@ -396,14 +373,6 @@ const Home = ({
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const defaultModelId =
-    (process.env.DEFAULT_MODEL &&
-      Object.values(OpenAIModelID).includes(
-        process.env.DEFAULT_MODEL as OpenAIModelID,
-      ) &&
-      process.env.DEFAULT_MODEL) ||
-    fallbackModelID;
-
   let serverSidePluginKeysSet = false;
 
   const googleApiKey = process.env.GOOGLE_API_KEY;
@@ -415,8 +384,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
-      defaultModelId,
+      serverSideApiKeyIsSet: !!process.env.BITAPAI_API_KEY,
       serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
