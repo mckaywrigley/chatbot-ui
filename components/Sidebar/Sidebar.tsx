@@ -8,6 +8,7 @@ import {
 } from './components/OpenCloseButton';
 
 import Search from '../Search';
+import Signout from '../Signout/Signout';
 
 interface Props<T> {
   isOpen: boolean;
@@ -113,8 +114,8 @@ const Sidebar = <T,>({
           )}
         </div>
         {footerComponent}
+        <Signout />
       </div>
-
       <CloseSidebarButton onClick={toggleOpen} side={side} />
     </div>
   ) : (
