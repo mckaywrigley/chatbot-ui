@@ -13,10 +13,12 @@ export interface PluginKey {
 
 export enum PluginID {
   GOOGLE_SEARCH = 'google-search',
+  EDGAR = 'edgar',
 }
 
 export enum PluginName {
   GOOGLE_SEARCH = 'Google Search',
+  EDGAR = 'FinChat (EDGAR)',
 }
 
 export const Plugins: Record<PluginID, Plugin> = {
@@ -31,6 +33,28 @@ export const Plugins: Record<PluginID, Plugin> = {
       {
         key: 'GOOGLE_CSE_ID',
         value: '',
+      },
+    ],
+  },
+  [PluginID.EDGAR]: {
+    id: PluginID.EDGAR,
+    name: PluginName.EDGAR,
+    requiredKeys: [
+      {
+        key: 'symbols',
+        value: [],
+      },
+      {
+        key: 'formTypes',
+        value: [],
+      },
+      {
+        key: 'startDate',
+        value: 0,
+      },
+      {
+        key: 'endDate',
+        value: 0,
       },
     ],
   },

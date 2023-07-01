@@ -15,22 +15,25 @@ import {
   useRef,
   useState,
 } from 'react';
+import { IoBusinessOutline } from 'react-icons/io5';
+import { SiOpenai } from 'react-icons/si';
 
 import { useTranslation } from 'next-i18next';
 
 import { Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { PluginSelect } from './PluginSelect';
+import { PluginPicker } from './PluginPicker';
+// import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
-  onRegenerate: () => void;
+  onRegenerate: (plugin: Plugin | null) => void;
   onScrollDownClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -61,6 +64,7 @@ export const ChatInput = ({
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
+  const [showPluginPicker, setShowPluginPicker] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
@@ -99,7 +103,7 @@ export const ChatInput = ({
 
     onSend({ role: 'user', content }, plugin);
     setContent('');
-    setPlugin(null);
+    //setPlugin(null);
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
@@ -273,7 +277,7 @@ export const ChatInput = ({
           selectedConversation.messages.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-              onClick={onRegenerate}
+              onClick={() => onRegenerate(plugin)}
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>
@@ -282,13 +286,33 @@ export const ChatInput = ({
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            onClick={() => setShowPluginSelect(!showPluginSelect)}
+            onClick={() => setShowPluginPicker(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            {plugin && plugin.id === PluginID.GOOGLE_SEARCH ? (
+              <IconBrandGoogle size={20} />
+            ) : plugin && plugin.id === PluginID.EDGAR ? (
+              <IoBusinessOutline size={20} />
+            ) : (
+              <SiOpenai size={20} />
+            )}
           </button>
 
-          {showPluginSelect && (
+          {showPluginPicker && (
+            <PluginPicker
+              onPluginChange={(plugin: Plugin) => {
+                setPlugin(plugin);
+                setShowPluginPicker(false);
+
+                if (textareaRef && textareaRef.current) {
+                  textareaRef.current.focus();
+                }
+              }}
+              onClose={() => setShowPluginPicker(false)}
+            />
+          )}
+
+          {/* {showPluginSelect && (
             <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
               <PluginSelect
                 plugin={plugin}
@@ -309,7 +333,7 @@ export const ChatInput = ({
                 }}
               />
             </div>
-          )}
+          )} */}
 
           <textarea
             ref={textareaRef}

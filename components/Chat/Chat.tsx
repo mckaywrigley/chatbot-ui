@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
+import { RETRIEVAL_STREAM_PLUGINS } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -21,7 +22,9 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { EdgarKeyValuePair } from '@/types/data';
+import { EdgarParams } from '@/types/edgar';
+import { Plugin, PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -29,10 +32,10 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -104,6 +107,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         let body;
         if (!plugin) {
           body = JSON.stringify(chatBody);
+        } else if (plugin.id === PluginID.EDGAR) {
+          const edgarKeys = plugin.requiredKeys as EdgarKeyValuePair[];
+          body = JSON.stringify({
+            ...chatBody,
+            edgarParams: edgarKeys.reduce((acc, key) => {
+              acc[key.key] = key.value;
+              return acc;
+            }, {} as EdgarParams),
+          });
         } else {
           body = JSON.stringify({
             ...chatBody,
@@ -136,7 +148,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        if (!plugin || RETRIEVAL_STREAM_PLUGINS.includes(plugin.id)) {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =
@@ -224,7 +236,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           };
           homeDispatch({
             field: 'selectedConversation',
-            value: updateConversation,
+            value: updatedConversation,
           });
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -497,9 +509,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               handleSend(message, 0, plugin);
             }}
             onScrollDownClick={handleScrollDown}
-            onRegenerate={() => {
+            onRegenerate={(plugin) => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, null);
+                handleSend(currentMessage, 2, plugin);
               }
             }}
             showScrollDownButton={showScrollDownButton}
