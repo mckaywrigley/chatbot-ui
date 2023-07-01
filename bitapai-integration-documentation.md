@@ -17,6 +17,9 @@ On the frontend we had to remove all the OpenAI integrations like entering the O
   - Remove OpenAI, chatgpt words form frontend
 - creating folder when no prompts were available didn't showed the folder
   - this issue was fixed by checking for if folders exists and removing old logic of checking if prompts exists to show folders
+- We have added models select option
+  - To provide models select option go to `~/utils/config/models.ts`
+    - And provide the name for model
 
 ### Backend
 
@@ -29,6 +32,8 @@ One the backend we removed OpenAI's API integration and added constants, configs
 - remove logic for models, tokens, temprature and encoding
   - Remove OpenAI specific implementations like models, tokens, temprature etc.
 - OpenAI's api call was removed
+- On the backend after adding the model to the `~/utils/config/models.ts` file we need to add api implementation for that model
+  - On the `~/api/chat.ts` route add the logic for the model to return response to the frontend
 
 _Note: not all commits are documented as they are self explanatory and consise. Please refer to commit log for any missing information about commits here_
 
