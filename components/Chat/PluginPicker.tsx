@@ -6,7 +6,7 @@ import Datepicker from 'tailwind-datepicker-react';
 
 import Image from 'next/image';
 
-import { EdgarKeyValuePair } from '@/types/data';
+import { KeyValuePair } from '@/types/data';
 import { Plugin, PluginID, Plugins } from '@/types/plugin';
 
 interface EdgarParamsProps {
@@ -66,7 +66,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
     return new Date(year, month - 1, day);
   };
   const updatePlugin = (plugin: Plugin) => {
-    const requiredKeys: EdgarKeyValuePair[] = [
+    const requiredKeys: KeyValuePair[] = [
       {
         key: 'symbols',
         value:
@@ -88,8 +88,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       },
     ];
     const updatedPlugin = { ...plugin, requiredKeys };
-    console.log(selectedSymbols);
-    console.log(requiredKeys);
+    // console.log(requiredKeys);
     return updatedPlugin;
   };
 
@@ -165,16 +164,15 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
     const modalRef = useRef<HTMLInputElement>(null);
     const [showEdgarSettings, setShowEdgarSettings] = useState(false);
 
-    const handleOutsideClick = (e: any) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-
     useEffect(() => {
+      const handleOutsideClick = (e: any) => {
+        if (modalRef.current && !modalRef.current.contains(e.target)) {
+          onClose();
+        }
+      };
       addEventListener('mousedown', handleOutsideClick);
       return () => removeEventListener('mousedown', handleOutsideClick);
-    }, [handleOutsideClick]);
+    }, []);
 
     const handlePluginSelection = (pluginId: PluginID) => {
       if (pluginId === PluginID.EDGAR) {
