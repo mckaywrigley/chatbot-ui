@@ -174,7 +174,7 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
     useEffect(() => {
       addEventListener('mousedown', handleOutsideClick);
       return () => removeEventListener('mousedown', handleOutsideClick);
-    }, []);
+    }, [handleOutsideClick]);
 
     const handlePluginSelection = (pluginId: PluginID) => {
       if (pluginId === PluginID.EDGAR) {
@@ -259,3 +259,5 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
     );
   },
 );
+EdgarParams.displayName = 'EdgarParams';
+PluginPicker.displayName = 'PluginPicker';
