@@ -1,105 +1,41 @@
-# Chatbot UI
+# My TypeScript Website
 
-Chatbot UI is an open source chat UI for AI models.
+This is a simple website built with TypeScript and Express.
 
-See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
+## Structure
 
-![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
+The main entry point of the application is `src/index.ts`. This file imports and uses the express application from `src/app.ts` and also imports any necessary utilities from `src/utils/helpers.ts` and `src/utils/constants.ts`.
 
-## Updates
+The express application is set up in `src/app.ts`. This file imports and uses the routes from `src/routes/home.ts`, `src/routes/about.ts`, and `src/routes/contact.ts`. It also imports any necessary components from `src/components/header.ts`, `src/components/footer.ts`, and `src/components/navigation.ts`.
 
-Chatbot UI will be updated over time.
+The routes for the application are defined in `src/routes/*.ts`. These files import and use any necessary components from `src/components/*.ts` and also import any necessary utilities from `src/utils/helpers.ts` and `src/utils/constants.ts`.
 
-Expect frequent improvements.
+The components used in the application are defined in `src/components/*.ts`. These files import and use any necessary styles from `src/styles/*.css` and also import any necessary utilities from `src/utils/helpers.ts` and `src/utils/constants.ts`.
 
-**Next up:**
+The styles used in the application are defined in `src/styles/*.css`.
 
-- [ ] Sharing
-- [ ] "Bots"
+Utilities and constants used throughout the application are defined in `src/utils/helpers.ts` and `src/utils/constants.ts`.
 
-## Deploy
+The HTML structure of the application is defined in `public/*.html`. These files link to the compiled JavaScript from `public/assets/js/main.js` and the compiled CSS from `public/assets/css/styles.css`. They also use images from `public/assets/images/*.png` and `public/assets/images/*.jpg`.
 
-**Vercel**
+The compiled JavaScript of the application is in `public/assets/js/main.js`.
 
-Host your own live version of Chatbot UI with Vercel.
+The compiled CSS of the application is in `public/assets/css/styles.css`.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
+The images used in the application are in `public/assets/images/*.png` and `public/assets/images/*.jpg`.
 
-**Docker**
+## Setup
 
-Build locally:
+To set up the application, first install the dependencies with `npm install`. Then, start the application with `npm start`.
 
-```shell
-docker build -t chatgpt-ui .
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
-```
+## Build
 
-Pull from ghcr:
+To build the application, run `npm run build`.
 
-```
-docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
-```
+## Test
 
-## Running Locally
+To test the application, run `npm test`.
 
-**1. Clone Repo**
+## License
 
-```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
-```
-
-**2. Install Dependencies**
-
-```bash
-npm i
-```
-
-**3. Provide OpenAI API Key**
-
-Create a .env.local file in the root of the repo with your OpenAI API Key:
-
-```bash
-OPENAI_API_KEY=YOUR_KEY
-```
-
-> You can set `OPENAI_API_HOST` where access to the official OpenAI host is restricted or unavailable, allowing users to configure an alternative host for their specific needs.
-
-> Additionally, if you have multiple OpenAI Organizations, you can set `OPENAI_ORGANIZATION` to specify one.
-
-**4. Run App**
-
-```bash
-npm run dev
-```
-
-**5. Use It**
-
-You should be able to start chatting.
-
-## Configuration
-
-When deploying the application, the following environment variables can be set:
-
-| Environment Variable              | Default value                  | Description                                                                                                                               |
-| --------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| OPENAI_API_KEY                    |                                | The default API key used for authentication with OpenAI                                                                                   |
-| OPENAI_API_HOST                   | `https://api.openai.com`       | The base url, for Azure use `https://<endpoint>.openai.azure.com`                                                                         |
-| OPENAI_API_TYPE                   | `openai`                       | The API type, options are `openai` or `azure`                                                                                             |
-| OPENAI_API_VERSION                | `2023-03-15-preview`           | Only applicable for Azure OpenAI                                                                                                          |
-| AZURE_DEPLOYMENT_ID               |                                | Needed when Azure OpenAI, Ref [Azure OpenAI API](https://learn.microsoft.com/zh-cn/azure/cognitive-services/openai/reference#completions) |
-| OPENAI_ORGANIZATION               |                                | Your OpenAI organization ID                                                                                                               |
-| DEFAULT_MODEL                     | `gpt-3.5-turbo`                | The default model to use on new conversations, for Azure use `gpt-35-turbo`                                                               |
-| NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations                                                                                     |
-| NEXT_PUBLIC_DEFAULT_TEMPERATURE   | 1                              | The default temperature to use on new conversations                                                                                       |
-| GOOGLE_API_KEY                    |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
-| GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
-
-If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
-
-If you don't have an OpenAI API key, you can get one [here](https://platform.openai.com/account/api-keys).
-
-## Contact
-
-If you have any questions, feel free to reach out to Mckay on [Twitter](https://twitter.com/mckaywrigley).
-
-[GCSE]: https://developers.google.com/custom-search/v1/overview
+This project is licensed under the MIT License.

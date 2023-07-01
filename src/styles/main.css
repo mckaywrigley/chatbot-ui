@@ -1,0 +1,44 @@
+/* src/styles/main.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+header, footer {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+nav {
+    background: #333;
+    color: #fff;
+}
+
+nav ul {
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li {
+    display: inline;
+    padding: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+footer {
+    text-align: center;
+}

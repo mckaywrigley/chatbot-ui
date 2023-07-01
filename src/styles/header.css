@@ -1,0 +1,27 @@
+.header {
+    background-color: #f8f9fa;
+    margin-bottom: 1em;
+    padding: 1em;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header h1 {
+    font-size: 2em;
+    color: #333;
+}
+
+.header nav {
+    margin-top: 1em;
+}
+
+.header nav a {
+    margin: 0 1em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.header nav a:hover {
+    color: #0056b3;
+}
