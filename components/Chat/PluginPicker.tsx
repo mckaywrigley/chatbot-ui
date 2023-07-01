@@ -6,7 +6,7 @@ import Datepicker from 'tailwind-datepicker-react';
 
 import Image from 'next/image';
 
-import { KeyValuePair } from '@/types/data';
+import { EdgarKeyValuePair } from '@/types/data';
 import { Plugin, PluginID, Plugins } from '@/types/plugin';
 
 interface EdgarParamsProps {
@@ -24,21 +24,22 @@ interface Option {
   label: string;
 }
 
-const symbolData = [
+const symbols = [
   { value: 'AAPL', label: 'Apple Inc.' },
   { value: 'GOOG', label: 'Google Inc.' },
   { value: 'TSLA', label: 'Tesla, Inc.' },
 ];
 
 const formTypes = [
-  { value: '8-K', label: '8-K' },
-  { value: '10-Q', label: '10-Q' },
+  { value: '10-K', label: 'Annual Report' },
+  { value: '10-Q', label: 'Quarterly Report' },
+  { value: '8-K', label: 'Current Report' },
 ];
 
 const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
-  const [selectedSymbolData, setSelectedSymbolData] = useState<
-    MultiValue<Option>
-  >([]);
+  const [selectedSymbols, setSelectedSymbols] = useState<MultiValue<Option>>(
+    [],
+  );
   const [selectedFormTypes, setSelectedFormTypes] = useState<
     MultiValue<Option>
   >([]);
@@ -65,13 +66,30 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
     return new Date(year, month - 1, day);
   };
   const updatePlugin = (plugin: Plugin) => {
-    const requiredKeys: KeyValuePair[] = [
-      { key: 'symbol', value: selectedSymbolData || '' },
-      { key: 'formTypes', value: selectedFormTypes || '' },
-      { key: 'startDate', value: dateToNumber(startDate) },
-      { key: 'endDate', value: dateToNumber(endDate) },
+    const requiredKeys: EdgarKeyValuePair[] = [
+      {
+        key: 'symbols',
+        value:
+          selectedSymbols.length !== 0
+            ? selectedSymbols.map((symbol) => symbol.value)
+            : symbols,
+      },
+      {
+        key: 'formTypes',
+        value:
+          selectedFormTypes.length !== 0
+            ? selectedFormTypes.map((formType) => formType.value)
+            : formTypes,
+      },
+      { key: 'startDate', value: dateToNumber(startDate) || 0 },
+      {
+        key: 'endDate',
+        value: dateToNumber(endDate) || dateToNumber(new Date()),
+      },
     ];
     const updatedPlugin = { ...plugin, requiredKeys };
+    console.log(selectedSymbols);
+    console.log(requiredKeys);
     return updatedPlugin;
   };
 
@@ -87,8 +105,8 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       <Select
         isMulti
         className="mb-4"
-        options={symbolData}
-        onChange={setSelectedSymbolData}
+        options={symbols}
+        onChange={setSelectedSymbols}
         placeholder="Symbol"
         styles={{
           option: (provided) => ({

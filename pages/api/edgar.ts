@@ -2,7 +2,7 @@ import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { RetrievalStream } from '@/utils/server/langchain';
 import { initVectorStore } from '@/utils/server/pinecone';
 
-import { ChatBody } from '@/types/chat';
+import { EdgarBody } from '@/types/edgar';
 
 export const config = {
   runtime: 'edge',
@@ -10,8 +10,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } =
-      (await req.json()) as ChatBody;
+    const { model, messages, key, prompt, temperature, edgarParams } =
+      (await req.json()) as EdgarBody;
 
     let promptToSend = prompt;
     if (!promptToSend) {
@@ -35,11 +35,15 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Create the retriever
+    const { symbols, formTypes, startDate, endDate } = edgarParams;
     const metadataFilter = {
-      source:
-        'https://www.sec.gov/Archives/edgar/data/1318605/000095017023001409/tsla-20221231.htm', //testing
+      $and: [
+        { symbol: { $in: symbols } },
+        { form_type: { $in: formTypes } },
+        { report_date: { $gte: startDate, $lte: endDate } },
+      ],
     };
-    const retriever = vectorStore.asRetriever(4, metadataFilter);
+    const retriever = vectorStore.asRetriever(8, metadataFilter);
 
     const stream = await RetrievalStream(
       model,
