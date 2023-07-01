@@ -43,3 +43,19 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     tokenLimit: 32000,
   },
 };
+
+export interface OpenAIFunction {
+  name: string;
+  description: string;
+  parameters: {
+    type: string;
+    properties: {
+      [key: string]: {},
+    },
+    required: string[];
+  };
+}
+
+export interface OpenAIFunctionList {
+  [name: string]: OpenAIFunction;
+}
