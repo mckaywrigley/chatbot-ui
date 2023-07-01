@@ -145,7 +145,12 @@ export async function getPluginApiOperationsFromUrl(
     const apiPath = path;
     for (const method in document.paths[path]) {
       const operationObject = document.paths[path][method];
-      const serverUrl = document.servers && document.servers[0]?.url;
+      let serverUrl;
+      if (document.servers && document.servers[0]?.url) {
+        serverUrl = document.servers[0]?.url;
+      } else {
+        serverUrl = url.substring(0, url.lastIndexOf('.well-known/ai-plugin.json'));
+      }
       const parameters = operationObject.parameters?.map((param: any) => ({
         name: param.name,
         in: param.in,
@@ -157,7 +162,7 @@ export async function getPluginApiOperationsFromUrl(
       const pluginApiOperation: PluginApiOperation = {
         operationId: operationObject.operationId,
         nameForModel: plugin.name_for_model,
-        serverUrl: serverUrl || '',
+        serverUrl: serverUrl,
         apiPath,
         method,
         summary: operationObject.summary,
