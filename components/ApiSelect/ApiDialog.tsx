@@ -15,34 +15,38 @@ interface Props {
 }
 
 export const ModelDialog: FC<Props> = ({ open, onClose }) => {
-  const { t } = useTranslation('model');
+  const { t } = useTranslation('API');
   const {
     dispatch: homeDispatch,
-    state: { model },
+    state: { API },
   } = useContext(HomeContext);
 
   return (
     <Dialog onClose={onClose} open={open}>
       <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
-        {t('Choose from available models')}
+        {t('Choose from available APIs')}
       </div>
       <div className="space-y-2">
         <div>
           <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
-            {t('Model')}
+            {t('API')}
           </div>
           <select
             className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200 "
-            value={model}
+            value={API}
             onChange={(event) =>
-              homeDispatch({ field: 'model', value: event.target.value })
+              homeDispatch({ field: 'API', value: event.target.value })
             }
           >
-            {Models.map((model) => (
-              <option key={model.name} value={model.name}>
-                {t(model.name)}
-              </option>
-            ))}
+            {Models ? (
+              Models?.map((API) => (
+                <option key={API.name} value={API.name}>
+                  {t(API.name)}
+                </option>
+              ))
+            ) : (
+              <option>No models available</option>
+            )}
           </select>
         </div>
         <div>
