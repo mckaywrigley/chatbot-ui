@@ -22,7 +22,7 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { EdgarKeyValuePair } from '@/types/data';
+import { KeyValuePair } from '@/types/data';
 import { EdgarParams } from '@/types/edgar';
 import { Plugin, PluginID } from '@/types/plugin';
 
@@ -108,7 +108,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!plugin) {
           body = JSON.stringify(chatBody);
         } else if (plugin.id === PluginID.EDGAR) {
-          const edgarKeys = plugin.requiredKeys as EdgarKeyValuePair[];
+          const edgarKeys = plugin.requiredKeys as KeyValuePair[];
           body = JSON.stringify({
             ...chatBody,
             edgarParams: edgarKeys.reduce((acc, key) => {
