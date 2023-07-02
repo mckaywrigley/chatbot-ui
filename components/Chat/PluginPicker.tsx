@@ -1,13 +1,15 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useContext, useEffect, useRef, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { IoArrowBack } from 'react-icons/io5';
-import Select, { ActionMeta, MultiValue } from 'react-select';
+import Select, { MultiValue, StylesConfig } from 'react-select';
 import Datepicker from 'tailwind-datepicker-react';
 
 import Image from 'next/image';
 
 import { KeyValuePair } from '@/types/data';
 import { Plugin, PluginID, Plugins } from '@/types/plugin';
+
+import HomeContext from '@/pages/api/home/home.context';
 
 interface EdgarParamsProps {
   onBack: () => void;
@@ -37,6 +39,9 @@ const formTypes = [
 ];
 
 const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
+  const {
+    state: { lightMode },
+  } = useContext(HomeContext);
   const [selectedSymbols, setSelectedSymbols] = useState<MultiValue<Option>>(
     [],
   );
@@ -88,44 +93,68 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       },
     ];
     const updatedPlugin = { ...plugin, requiredKeys };
-    console.log(requiredKeys);
+    // console.log(requiredKeys);
     return updatedPlugin;
   };
 
+  const selectCustomStyles: StylesConfig = {
+    clearIndicator: () => ({ display: 'none' }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused
+        ? lightMode === 'dark'
+          ? '#1F2937'
+          : '#E3EBFD'
+        : lightMode === 'dark'
+        ? '#3B4150'
+        : 'white',
+      color: lightMode === 'dark' ? 'white' : 'gray',
+    }),
+    control: (provided) => ({
+      ...provided,
+      backgroundColor: lightMode === 'dark' ? '#3B4150' : 'white',
+      color: lightMode === 'dark' ? 'white' : 'gray',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: lightMode === 'dark' ? '#3B4150' : 'white',
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: '#9FA3AE',
+    }),
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="p-6 rounded-lg shadow-lg">
       <button
         className="mb-4  text-blue-500 hover:text-blue-700 font-bold py-2"
         onClick={onBack}
       >
         <IoArrowBack size={25} />
       </button>
-      <h2 className="font-bold text-lg text-gray-500 mb-4">EDGAR Parameters</h2>
+      <h2 className="font-bold text-lg dark:text-neutral-200 text-gray-700 mb-4">
+        EDGAR Parameters
+      </h2>
       <Select
         isMulti
         className="mb-4"
         options={symbols}
-        onChange={setSelectedSymbols}
+        onChange={(selectedOptions) =>
+          setSelectedSymbols(selectedOptions as Option[])
+        }
         placeholder="Symbol"
-        styles={{
-          option: (provided) => ({
-            ...provided,
-            color: 'gray',
-          }),
-        }}
+        styles={selectCustomStyles}
       />
       <Select
         isMulti
         className="mb-4"
         options={formTypes}
-        onChange={setSelectedFormTypes}
+        onChange={(selectedOptions) =>
+          setSelectedFormTypes(selectedOptions as Option[])
+        }
         placeholder="Form Type"
-        styles={{
-          option: (provided) => ({
-            ...provided,
-            color: 'gray',
-          }),
-        }}
+        styles={selectCustomStyles}
       />
       <div className="flex items-center mb-4">
         <div className="w-1/2 mr-2">
@@ -136,7 +165,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
             options={{ defaultDate: null }}
           />
         </div>
-        <div className="text-gray-500 mr-2">To</div>
+        <div className="dark:text-neutral-200 text-gray-700 mr-2">To</div>
         <div className="w-1/2 mr-2">
           <Datepicker
             onChange={setEndDate}
@@ -170,8 +199,8 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
           onClose();
         }
       };
-      addEventListener('mousedown', handleOutsideClick);
-      return () => removeEventListener('mousedown', handleOutsideClick);
+      window.addEventListener('mousedown', handleOutsideClick);
+      return () => window.removeEventListener('mousedown', handleOutsideClick);
     }, []);
 
     const handlePluginSelection = (pluginId: PluginID) => {
@@ -184,7 +213,7 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
     };
 
     return (
-      <div className="fixed z-10 inset-0 overflow-y-auto">
+      <div className="fixed z-50 inset-0 overflow-y-auto">
         <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <div className="fixed inset-0 transition-opacity" aria-hidden="true">
             <div className="absolute inset-0 bg-gray-500 opacity-75" />
@@ -199,7 +228,7 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
 
           <div
             ref={modalRef}
-            className="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            className="inline-block align-bottom border border-gray-300 bg-white dark:bg-[#202123] rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
           >
             {showEdgarSettings ? (
               <EdgarParams
@@ -210,43 +239,57 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
                 }}
               />
             ) : (
-              <div className="p-6">
-                <h2 className="text-lg text-gray-500 font-bold mb-4">
+              <div className="p-6 mb-6">
+                <h2 className="text-lg dark:text-neutral-200 text-gray-700 font-bold mb-4">
                   Choose a Plugin
                 </h2>
                 <div className="flex space-x-10">
                   <div
+                    className="relative group inline-block"
                     onClick={() => handlePluginSelection('chatgpt' as PluginID)}
                   >
                     <Image
-                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      className="grayscale hover:grayscale-0 cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
                       src="/chatgpticon.svg"
                       alt="ChatGPT"
                       width={42}
                       height={42}
                     />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-70 transition ease-in-out duration-200 pointer-events-none p-2 rounded-md bg-black text-white text-xs z-10">
+                      ChatGPT
+                    </div>
                   </div>
                   <div
+                    className="relative group inline-block"
                     onClick={() =>
                       handlePluginSelection(PluginID.GOOGLE_SEARCH)
                     }
                   >
                     <Image
-                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      className="grayscale hover:grayscale-0 cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
                       src="/googleicon.svg"
                       alt="Google"
                       width={42}
                       height={42}
                     />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-70 transition ease-in-out duration-200 pointer-events-none p-2 rounded-md bg-black text-white text-xs z-10">
+                      Google
+                    </div>
                   </div>
-                  <div onClick={() => handlePluginSelection(PluginID.EDGAR)}>
+                  <div
+                    className="relative group inline-block"
+                    onClick={() => handlePluginSelection(PluginID.EDGAR)}
+                  >
                     <Image
-                      className="cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
+                      className="grayscale hover:grayscale-0 cursor-pointer bg-cover bg-center rounded-full hover:shadow-2xl hover:scale-110 transition duration-300 ease-in-out"
                       src="/edgaricon.svg"
                       alt="EDGAR"
                       width={42}
                       height={42}
                     />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-70 transition ease-in-out duration-200 pointer-events-none p-2 rounded-md bg-black text-white text-xs z-10">
+                      EDGAR
+                    </div>
                   </div>
                 </div>
               </div>

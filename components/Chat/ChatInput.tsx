@@ -19,6 +19,7 @@ import { IoBusinessOutline } from 'react-icons/io5';
 import { SiOpenai } from 'react-icons/si';
 
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 
 import { Message } from '@/types/chat';
 import { Plugin, PluginID } from '@/types/plugin';
@@ -292,7 +293,12 @@ export const ChatInput = ({
             {plugin && plugin.id === PluginID.GOOGLE_SEARCH ? (
               <IconBrandGoogle size={20} />
             ) : plugin && plugin.id === PluginID.EDGAR ? (
-              <IoBusinessOutline size={20} />
+              <Image
+                src="/edgarchaticon.svg"
+                alt="ChatGPT"
+                width={20}
+                height={20}
+              />
             ) : (
               <SiOpenai size={20} />
             )}
