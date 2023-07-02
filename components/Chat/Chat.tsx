@@ -49,7 +49,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
-      model,
+      api,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -94,7 +94,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           messages: updatedConversation.messages,
           key: apiKey,
           prompt: updatedConversation.prompt,
-          model,
+          api,
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -247,7 +247,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       pluginKeys,
       selectedConversation,
       stopConversationRef,
-      model,
+      api,
     ],
   );
 
@@ -419,7 +419,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             ) : (
               <>
                 <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                  {t('Model')}: {model}
+                  {t('Api')}: {api}
                   <button
                     className="ml-2 cursor-pointer hover:opacity-50"
                     onClick={onClearAll}

@@ -24,7 +24,7 @@ export interface HomeInitialState {
   searchTerm: string;
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
-  API: string;
+  api: string;
 }
 
 export const initialState: HomeInitialState = {
@@ -47,5 +47,5 @@ export const initialState: HomeInitialState = {
   searchTerm: '',
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
-  API: 'BITAPAI',
+  api: 'BITAPAI',
 };

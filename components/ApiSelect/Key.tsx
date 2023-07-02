@@ -21,7 +21,7 @@ export const Key = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
-    state: { apiKey, model },
+    state: { apiKey, api },
   } = useContext(HomeContext);
 
   const [newKey, setNewKey] = useState(apiKey);
@@ -83,7 +83,7 @@ export const Key = () => {
     </div>
   ) : (
     <SidebarButton
-      text={t(`${model} API Key`)}
+      text={t(`${api} API Key`)}
       icon={<IconKey size={18} />}
       onClick={() => setIsChanging(true)}
     />

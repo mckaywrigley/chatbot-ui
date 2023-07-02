@@ -9,7 +9,7 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { messages, key, prompt, model } = (await req.json()) as ChatBody;
+    const { messages, key, prompt, api } = (await req.json()) as ChatBody;
 
     let promptToSend = prompt;
     if (!promptToSend) {
@@ -25,12 +25,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     let response;
 
-    switch (model) {
+    switch (api) {
       case 'BITAPAI':
         response = await BitapaiConversation(key, messagesToSend, promptToSend);
         break;
       default:
-        throw new Error(`${model} Model not implemented`);
+        throw new Error(`${api} not implemented`);
     }
 
     return new Response(response);

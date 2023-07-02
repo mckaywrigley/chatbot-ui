@@ -18,7 +18,7 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation('API');
   const {
     dispatch: homeDispatch,
-    state: { API },
+    state: { api },
   } = useContext(HomeContext);
 
   return (
@@ -33,15 +33,15 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
           </div>
           <select
             className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200 "
-            value={API}
+            value={api}
             onChange={(event) =>
-              homeDispatch({ field: 'API', value: event.target.value })
+              homeDispatch({ field: 'api', value: event.target.value })
             }
           >
             {Models ? (
-              Models?.map((API) => (
-                <option key={API.name} value={API.name}>
-                  {t(API.name)}
+              Models?.map((api) => (
+                <option key={api.name} value={api.name}>
+                  {t(api.name)}
                 </option>
               ))
             ) : (
