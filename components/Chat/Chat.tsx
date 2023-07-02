@@ -49,6 +49,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      api,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -93,6 +94,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           messages: updatedConversation.messages,
           key: apiKey,
           prompt: updatedConversation.prompt,
+          api,
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -245,6 +247,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       pluginKeys,
       selectedConversation,
       stopConversationRef,
+      api,
     ],
   );
 
@@ -356,29 +359,31 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
           <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
-              Chatbot UI allows you to plug in your BitAPAI API key to use this
-              UI with their API.
+              Chatbot UI allows you to plug in your API key to use this UI with
+              their API.
             </div>
             <div className="mb-2">
               It is <span className="italic">only</span> used to communicate
               with their API.
             </div>
             <div className="mb-2">
-              {t(
-                'Please set your Bitapai API key in the bottom left of the sidebar.',
-              )}
+              {t('Please set your API key in the bottom left of the sidebar.')}
             </div>
-            <div>
+            {/* <div>
               {t(
-                "If you don't have an BitAPAI API key, you can get one here: ",
+                "If you don't have an API key, please get one form respective website.",
               )}
+            </div> */}
+            <div>
+              {t('Tip: use BitAPAI to get started immediately, get your key ')}
+              {/* <a href="https://bitapai.io">https://bitapai.io</a> */}
               <a
                 href="https://bitapai.io/"
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-500 hover:underline"
               >
-                bitapai.io
+                here.
               </a>
             </div>
           </div>
@@ -416,7 +421,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             ) : (
               <>
                 <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                  {t('Model')}: {'BitAPAI'}
+                  {t('Api')}: {api}
                   <button
                     className="ml-2 cursor-pointer hover:opacity-50"
                     onClick={onClearAll}

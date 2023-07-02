@@ -9,6 +9,7 @@ export interface ChatBody {
   messages: Message[];
   key: string;
   prompt: string;
+  api: string;
 }
 
 export interface Conversation {

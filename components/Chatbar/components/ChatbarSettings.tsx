@@ -1,14 +1,14 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconGrain, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { ModelDialog } from '@/components/ApiSelect/ApiDialog';
 import { SettingDialog } from '@/components/Settings/SettingDialog';
 
 import { Import } from '../../Settings/Import';
-import { Key } from '../../Settings/Key';
 import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
@@ -16,7 +16,9 @@ import { PluginKeys } from './PluginKeys';
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
-  const [isSettingDialogOpen, setIsSettingDialog] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<'setting' | 'model' | null>(
+    null,
+  );
 
   const {
     state: {
@@ -38,6 +40,12 @@ export const ChatbarSettings = () => {
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+      <SidebarButton
+        text={t('Select API')}
+        icon={<IconGrain size={18} />}
+        onClick={() => setDialogOpen('model')}
+      />
+
       {conversations.length > 0 ? (
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
@@ -53,19 +61,26 @@ export const ChatbarSettings = () => {
       <SidebarButton
         text={t('Settings')}
         icon={<IconSettings size={18} />}
-        onClick={() => setIsSettingDialog(true)}
+        onClick={() => setDialogOpen('setting')}
       />
 
-      {!serverSideApiKeyIsSet ? (
+      {/* {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-      ) : null}
+      ) : null} */}
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}
 
       <SettingDialog
-        open={isSettingDialogOpen}
+        open={dialogOpen === 'setting'}
         onClose={() => {
-          setIsSettingDialog(false);
+          setDialogOpen(null);
+        }}
+      />
+
+      <ModelDialog
+        open={dialogOpen === 'model'}
+        onClose={() => {
+          setDialogOpen(null);
         }}
       />
     </div>
