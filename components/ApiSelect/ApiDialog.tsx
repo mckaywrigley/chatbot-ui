@@ -32,7 +32,7 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
             {t('API')}
           </div>
           <select
-            className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200 "
+            className="w-full cursor-pointer bg-transparent p-2 text-neutral-200"
             value={api}
             onChange={(event) =>
               homeDispatch({ field: 'api', value: event.target.value })
@@ -40,7 +40,7 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
           >
             {Models ? (
               Models?.map((api) => (
-                <option key={api.name} value={api.name}>
+                <option key={api.name} value={api.name} className="text-black">
                   {t(api.name)}
                 </option>
               ))
