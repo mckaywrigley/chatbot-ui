@@ -72,14 +72,14 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
         value:
           selectedSymbols.length !== 0
             ? selectedSymbols.map((symbol) => symbol.value)
-            : symbols,
+            : symbols.map((symbol) => symbol.value),
       },
       {
         key: 'formTypes',
         value:
           selectedFormTypes.length !== 0
             ? selectedFormTypes.map((formType) => formType.value)
-            : formTypes,
+            : formTypes.map((formType) => formType.value),
       },
       { key: 'startDate', value: dateToNumber(startDate) || 0 },
       {
@@ -88,7 +88,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       },
     ];
     const updatedPlugin = { ...plugin, requiredKeys };
-    // console.log(requiredKeys);
+    console.log(requiredKeys);
     return updatedPlugin;
   };
 
