@@ -34,7 +34,7 @@ export const BitapaiConversation = async (
   const json = await res.json();
 
   if (res.status !== 200) {
-    throw new BitapaiError(`Bitapai: ${json}`);
+    throw new BitapaiError(`BitAPAI: ${json}`);
   }
 
   return json?.['assistant'] || '';
