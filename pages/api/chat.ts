@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import {
-  BitapaiConversation,
-  BitapaiError,
+  BitAPAIConversation,
+  BitAPAIError,
   ValidatorEndpointConversation,
   ValidatorEndpointError,
 } from '@/utils/server';
@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     switch (api) {
       case 'BITAPAI':
-        response = await BitapaiConversation(key, messagesToSend, promptToSend);
+        response = await BitAPAIConversation(key, messagesToSend, promptToSend);
         break;
       case 'Validator Endpoint':
         response = await ValidatorEndpointConversation(
@@ -51,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error(error);
     if (
-      error instanceof BitapaiError ||
+      error instanceof BitAPAIError ||
       error instanceof ValidatorEndpointError
     ) {
       return NextResponse.json(

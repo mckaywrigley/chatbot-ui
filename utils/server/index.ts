@@ -1,4 +1,4 @@
-export { BitapaiConversation, BitapaiError } from './integrations/BitAPAI';
+export { BitAPAIConversation, BitAPAIError } from './integrations/BitAPAI';
 export {
   ValidatorEndpointConversation,
   ValidatorEndpointError,
