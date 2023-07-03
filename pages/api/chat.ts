@@ -1,5 +1,10 @@
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { BitapaiConversation, BitapaiError } from '@/utils/server';
+import {
+  BitapaiConversation,
+  BitapaiError,
+  ValidatorEndpointConversation,
+  ValidatorEndpointError,
+} from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -29,6 +34,13 @@ const handler = async (req: Request): Promise<Response> => {
       case 'BITAPAI':
         response = await BitapaiConversation(key, messagesToSend, promptToSend);
         break;
+      case 'Validator Endpoint':
+        response = await ValidatorEndpointConversation(
+          key,
+          messagesToSend,
+          promptToSend,
+        );
+        break;
       default:
         throw new Error(`${api} not implemented`);
     }
@@ -36,7 +48,10 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(response);
   } catch (error) {
     console.error(error);
-    if (error instanceof BitapaiError) {
+    if (
+      error instanceof BitapaiError ||
+      error instanceof ValidatorEndpointError
+    ) {
       return new Response('Error', { status: 500, statusText: error.message });
     } else {
       return new Response('Error', { status: 500 });
