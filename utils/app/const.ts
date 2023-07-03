@@ -6,3 +6,6 @@ export const BITAPAI_API_HOST =
   process.env.BITAPAI_API_HOST || 'https://api.bitapai.io';
 
 export const MESSAGE_MAX_LENGTH = 1000;
+
+export const VALIDATOR_ENDPOINT_API_HOST =
+  process.env.VALIDATOR_ENDPOINT_API_HOST || 'https://validator-api.fabhed.dev';
