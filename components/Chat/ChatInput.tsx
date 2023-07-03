@@ -395,7 +395,7 @@ export const ChatInput = ({
         .{' '}
         {t(
           `{{APP_NAME_TRANSLATED}} is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.`,
-          { APP_NAME_TRANSLATED },
+          { APP_NAME_TRANSLATED }
         )}
       </div>
     </div>
