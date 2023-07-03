@@ -1,3 +1,5 @@
+import { NextResponse } from 'next/server';
+
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import {
   BitapaiConversation,
@@ -52,9 +54,17 @@ const handler = async (req: Request): Promise<Response> => {
       error instanceof BitapaiError ||
       error instanceof ValidatorEndpointError
     ) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      return NextResponse.json(
+        { type: 'Error', error: error.message },
+        {
+          status: 500,
+        },
+      );
     } else {
-      return new Response('Error', { status: 500 });
+      return NextResponse.json(
+        { type: 'Error', error: 'Unknown error occured' },
+        { status: 500 },
+      );
     }
   }
 };
