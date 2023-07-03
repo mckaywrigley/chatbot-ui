@@ -369,14 +369,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             <div className="mb-2">
               {t('Please set your API key in the bottom left of the sidebar.')}
             </div>
-            {/* <div>
-              {t(
-                "If you don't have an API key, please get one form respective website.",
-              )}
-            </div> */}
             <div>
               {t('Tip: use BitAPAI to get started immediately, get your key ')}
-              {/* <a href="https://bitapai.io">https://bitapai.io</a> */}
               <a
                 href="https://bitapai.io/"
                 target="_blank"
