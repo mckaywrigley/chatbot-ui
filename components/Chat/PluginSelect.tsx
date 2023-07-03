@@ -82,7 +82,7 @@ export const PluginSelect: FC<Props> = ({
           <option
             key="chatgpt"
             value="chatgpt"
-            className="dark:bg-[#343541] dark:text-white"
+            className="dark:bg-transparent dark:text-black"
           >
             ChatGPT
           </option>
@@ -91,7 +91,7 @@ export const PluginSelect: FC<Props> = ({
             <option
               key={plugin.id}
               value={plugin.id}
-              className="dark:bg-[#343541] dark:text-white"
+              className="dark:bg-transparent dark:text-black"
             >
               {plugin.name}
             </option>

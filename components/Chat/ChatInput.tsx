@@ -234,7 +234,7 @@ export const ChatInput = ({
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
       textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+        textareaRef?.current?.scrollHeight > 800 ? 'auto' : 'hidden'
       }`;
     }
   }, [content]);
@@ -257,11 +257,12 @@ export const ChatInput = ({
   }, []);
 
   return (
-    <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
+    <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-transparent to-transparent pt-6 dark:border-black/20 dark:via-transparent dark:to-transparent md:pt-2">
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
+        {/* Remove Regenerate response
         {messageIsStreaming && (
           <button
-            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-black py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-transparent dark:text-black md:mb-0 md:mt-2"
             onClick={handleStopConversation}
           >
             <IconPlayerStop size={16} /> {t('Stop Generating')}
@@ -272,14 +273,14 @@ export const ChatInput = ({
           selectedConversation &&
           selectedConversation.messages.length > 0 && (
             <button
-              className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+            className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-transparent py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:text-black md:mb-0 md:mt-2"
               onClick={onRegenerate}
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>
-          )}
+          )} */}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-black shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-black dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
@@ -287,9 +288,10 @@ export const ChatInput = ({
           >
             {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
           </button>
+          
 
           {showPluginSelect && (
-            <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
+            <div className="absolute left-0 bottom-14 rounded bg-transparent dark:bg-transparent">
               <PluginSelect
                 plugin={plugin}
                 onKeyDown={(e: any) => {
@@ -313,13 +315,13 @@ export const ChatInput = ({
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-white dark:bg-transparent dark:text-black md:py-3 md:pl-10"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
-              maxHeight: '400px',
+              height: '1000px !important',
               overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
+                textareaRef.current && textareaRef.current.scrollHeight > 1000
                   ? 'auto'
                   : 'hidden'
               }`,
@@ -335,8 +337,9 @@ export const ChatInput = ({
             onKeyDown={handleKeyDown}
           />
 
+
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            className="absolute right-2 top-2 rounded-sm p-1 text-white opacity-80 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             {messageIsStreaming ? (
@@ -379,18 +382,17 @@ export const ChatInput = ({
           )}
         </div>
       </div>
-      <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
+      <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-black/50 md:px-4 md:pt-3 md:pb-6">
         <a
           href="https://github.com/mckaywrigley/chatbot-ui"
           target="_blank"
           rel="noreferrer"
           className="underline"
         >
-          ChatBot UI
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          "",
         )}
       </div>
     </div>

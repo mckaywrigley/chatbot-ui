@@ -28,10 +28,10 @@ export const ModelSelect = () => {
 
   return (
     <div className="flex flex-col">
-      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
+      <label className="mb-2 text-left text-black dark:text-black">
         {t('Model')}
       </label>
-      <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
+      <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-black dark:border-black dark:text-black">
         <select
           className="w-full bg-transparent p-2"
           placeholder={t('Select a model') || ''}
@@ -42,7 +42,7 @@ export const ModelSelect = () => {
             <option
               key={model.id}
               value={model.id}
-              className="dark:bg-[#343541] dark:text-white"
+              className="dark:bg-transparent dark:text-black"
             >
               {model.id === defaultModelId
                 ? `Default (${model.name})`

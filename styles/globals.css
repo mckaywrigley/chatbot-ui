@@ -29,7 +29,8 @@
 }
 
 html {
-  background: #202123;
+  background: url('bkd0.png') center/cover no-repeat;
+  overflow: hidden;
 }
 
 @media (max-width: 720px) {

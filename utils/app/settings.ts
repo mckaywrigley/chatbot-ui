@@ -2,6 +2,7 @@ import { Settings } from '@/types/settings';
 
 const STORAGE_KEY = 'settings';
 
+
 export const getSettings = (): Settings => {
   let settings: Settings = {
     theme: 'dark',
