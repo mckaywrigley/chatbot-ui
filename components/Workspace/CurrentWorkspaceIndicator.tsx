@@ -1,3 +1,4 @@
+import { Workspace } from '@/types/workspaces';
 import React from 'react'
 
 type Props = {
