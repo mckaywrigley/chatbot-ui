@@ -110,7 +110,7 @@ export const RetrievalStream = async (
       );
 
       // Extract 'page_content' and 'source' from each document in 'source_documents' and format them as desired
-      let sourceDocumentsData = '\n\n**Sources:**\n'; // Start with two empty lines
+      let sourceDocumentsData = '\n\n**Sources:**\n';
       res.sourceDocuments
         .slice(0, 4)
         .forEach((doc: Document, index: number) => {

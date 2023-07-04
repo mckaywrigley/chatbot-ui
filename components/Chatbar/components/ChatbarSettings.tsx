@@ -1,5 +1,5 @@
 import { IconFileExport, IconSettings } from '@tabler/icons-react';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -36,8 +36,43 @@ export const ChatbarSettings = () => {
     handleApiKeyChange,
   } = useContext(ChatbarContext);
 
+  useEffect(() => {
+    const script = document.createElement('script');
+
+    script.src = 'https://donorbox.org/install-popup-button.js';
+    script.async = true;
+    script.defer = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+      <div className="flex justify-start w-full ml-6">
+        <a
+          className="dbox-donation-button"
+          style={{
+            background:
+              '#3498db url(https://donorbox.org/images/white_logo.svg) no-repeat 24px',
+            color: '#fff',
+            textDecoration: 'none',
+            fontFamily: 'Verdana, sans-serif',
+            display: 'inline-block',
+            fontSize: 14,
+            padding: '8px 21px 10px 45px',
+            marginTop: '10px',
+            borderRadius: 8,
+          }}
+          href="https://donorbox.org/support-access-to-knowledge?default_interval=o"
+        >
+          Donate
+        </a>
+      </div>
+
       {conversations.length > 0 ? (
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
