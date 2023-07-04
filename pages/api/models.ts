@@ -14,7 +14,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     let url = `${OPENAI_API_HOST}/v1/models`;
     if (OPENAI_API_TYPE === 'azure') {
-      url = `${OPENAI_API_HOST}/openai/deployments?api-version=${OPENAI_API_VERSION}`;
+      // Model verを取得する際にapi-versionをこれにしないとエラーになるので仕方なく固定
+      url = `${OPENAI_API_HOST}/openai/deployments?api-version=2022-12-01`;
     }
 
     const response = await fetch(url, {
