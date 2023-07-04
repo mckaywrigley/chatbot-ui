@@ -13,6 +13,11 @@ const handler = async (req: Request): Promise<Response> => {
     const { model, messages, key, prompt, temperature, edgarParams } =
       (await req.json()) as EdgarBody;
 
+    // // Add this block to reject GPT-4
+    // if (model.id === 'gpt-4') {
+    //   throw new Error('GPT-4 model is not supported at this time.');
+    // }
+
     let promptToSend = prompt;
     if (!promptToSend) {
       promptToSend = DEFAULT_SYSTEM_PROMPT;

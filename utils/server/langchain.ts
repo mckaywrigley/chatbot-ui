@@ -15,6 +15,11 @@ import {
 import { VectorStoreRetriever } from 'langchain/vectorstores/base';
 import { PineconeStore } from 'langchain/vectorstores/pinecone';
 
+interface Document {
+  pageContent: string;
+  metadata: Record<string, any>;
+}
+
 // Define the run function
 const run = async (
   model: OpenAIModel,
@@ -103,6 +108,23 @@ export const RetrievalStream = async (
         retriever,
         handler,
       );
+
+      // Extract 'page_content' and 'source' from each document in 'source_documents' and format them as desired
+      let sourceDocumentsData = '\n\n**Sources:**\n'; // Start with two empty lines
+      res.sourceDocuments
+        .slice(0, 4)
+        .forEach((doc: Document, index: number) => {
+          sourceDocumentsData += `${index + 1}. *Symbol: ${
+            doc.metadata.symbol
+          },  Form Type: ${doc.metadata.form_type},  Report Date: ${
+            doc.metadata.report_date
+          },*  [*more*](${doc.metadata.source})\n`;
+        });
+
+      // Enqueue the formatted string to the stream
+      const sourceDocumentsQueue = encoder.encode(sourceDocumentsData);
+      controller.enqueue(sourceDocumentsQueue);
+
       controller.close();
     },
   });
