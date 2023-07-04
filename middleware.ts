@@ -5,7 +5,7 @@ export { default } from "next-auth/middleware"
 
 export function middleware(request: NextRequest) {
 
-    if(request.nextUrl.searchParams.get('workspace') || request.cookies.has('workspace')){
+    if((request.nextUrl.searchParams.has('workspace') || request.cookies.has('workspace')) && (request.cookies.has('token') || request.nextUrl.searchParams.has('token'))){
         const response = NextResponse.next();
         return response;
     } else {
@@ -14,5 +14,5 @@ export function middleware(request: NextRequest) {
         });
     }
   }
-  
-export const config = { matcher: ["/api/private/:path*"] }
+
+export const config = { matcher: ["/api/private/:path*", "/api/chat", "/api/google"] }

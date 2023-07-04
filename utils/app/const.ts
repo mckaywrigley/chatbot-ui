@@ -46,3 +46,8 @@ export const LOG_INCOMING_MESSAGES =
 export const LOG_TRIM_MESSAGES =
  process.env.LOG_TRIM_MESSAGES || 'false';
 
+export const PUBLIC_API_ENTRYPOINT = 
+ process.env.PUBLIC_API_ENTRYPOINT || 'public';
+
+export const AUTH_ENDPOINT = 
+  process.env.WORKSPACES_ENDPOINT || 'auth';
