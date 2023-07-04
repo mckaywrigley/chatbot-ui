@@ -97,6 +97,7 @@ When deploying the application, the following environment variables can be set:
 | LOGIN_REQUIRED | false | Require auth to access the app |
 | LOG_INCOMING_MESSAGES | false | Log incoming messages to the console |
 | LOG_TRIM_MESSAGES | true | Log only the last message to the console |
+| DATABASE_URL | file:./dev.db | Url to database of your choice |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 

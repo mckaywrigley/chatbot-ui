@@ -18,13 +18,16 @@ export const OPENAI_ORGANIZATION = process.env.OPENAI_ORGANIZATION || '';
 
 
 export const API_ENTRYPOINT =
-  process.env.NEXT_PUBLIC_API_ENTRYPOINT || 'localhost:3000';
+  process.env.NEXT_PUBLIC_API_ENTRYPOINT || 'http://127.0.0.1:3000/api';
 
 export const PRIVATE_API_ENTRYPOINT =
-  process.env.NEXT_PUBLIC_PRIVATE_API_ENTRYPOINT || 'Zeno Chat UI';
+  process.env.NEXT_PUBLIC_PRIVATE_API_ENTRYPOINT || 'private';
 
 export const WORKSPACES_ENDPOINT =
-  process.env.NEXT_PUBLIC_WORKSPACES_ENDPOINT || 'Zeno Chat UI';
+  process.env.NEXT_PUBLIC_WORKSPACES_ENDPOINT || 'workspace';
+
+export const PROMPT_ENDPOINT =
+process.env.NEXT_PUBLIC_WORKSPACES_ENDPOINT || 'prompt';
 
 export const APP_NAME = process.env.APP_NAME || 'Zeno Chat UI';
 

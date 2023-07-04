@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconBookmarks,
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -20,13 +21,16 @@ import { useTranslation } from 'next-i18next';
 
 import { Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
-import { Prompt } from '@/types/prompt';
+import { Prompt, PromptRequest } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import toast from 'react-hot-toast';
+import { useSession } from 'next-auth/react';
+import { API_ENTRYPOINT, PRIVATE_API_ENTRYPOINT, PROMPT_ENDPOINT } from '@/utils/app/const';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
@@ -58,11 +62,13 @@ export const ChatInput = ({
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
+  const [lastSavedPrompt, setLastSavedPrompt] = useState<string>();
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const { data: session } = useSession();
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -87,6 +93,47 @@ export const ChatInput = ({
     setContent(value);
     updatePromptListVisibility(value);
   };
+  
+  const handleSave = async () => {
+    if(!session){
+      toast.error(`Log in, please`)
+      return;
+    }
+    if (messageIsStreaming) {
+      return;
+    }
+    if(!content){
+      toast.error(`Please enter a message`)
+      return;
+    }
+    if(content === lastSavedPrompt)
+    {
+      toast.error(`Same prompt has already been saved`)
+      return;
+    }
+
+    try {
+      const postData : PromptRequest = {
+        id: session?.user?.id as string,
+        prompt: content,
+      };
+      const url = `${API_ENTRYPOINT}/${PRIVATE_API_ENTRYPOINT}/${PROMPT_ENDPOINT}/create`;
+      const response = await fetch(url,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+    
+      setLastSavedPrompt(content);
+      toast.success(`Prompt: "${content}" saved`)
+    }
+    catch (e) {
+      toast.error(`${e}`);
+    }
+  }
 
   const handleSend = () => {
     if (messageIsStreaming) {
@@ -338,9 +385,15 @@ export const ChatInput = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
-
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={handleSave}
+          >
+              <IconBookmarks size={18} />
+          </button>
+
+          <button
+            className="absolute right-8 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
           >
             {messageIsStreaming ? (
