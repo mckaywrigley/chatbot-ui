@@ -34,7 +34,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     switch (api) {
       case 'BITAPAI':
-        response = await BitAPAIConversation(key, messagesToSend, promptToSend);
+        // add Respond using markdown to BitAPAI cause it supports markdown response
+        response = await BitAPAIConversation(
+          key,
+          messagesToSend,
+          `${promptToSend} Respond using markdown.`,
+        );
         break;
       case 'Validator Endpoint':
         response = await ValidatorEndpointConversation(

@@ -33,6 +33,7 @@ export const ValidatorEndpointConversation = async (
         },
         ...messages,
       ],
+      top_n: 1,
     }),
   });
 
@@ -44,5 +45,5 @@ export const ValidatorEndpointConversation = async (
     );
   }
 
-  return json?.['choices'][0] || '';
+  return json?.['choices'][0]['message']['content'] || '';
 };
