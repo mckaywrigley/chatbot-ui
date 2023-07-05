@@ -296,7 +296,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     });
   };
 
+  const handleScrollUp = () => {
+    chatContainerRef.current?.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   const handleSettings = () => {
+    handleScrollUp();
     setShowSettings(!showSettings);
   };
 
