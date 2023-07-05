@@ -40,6 +40,22 @@ Pull from ghcr:
 docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 ghcr.io/mckaywrigley/chatbot-ui:main
 ```
 
+## Adding a new API integration
+
+To add a new API integration in the chat UI, follow these steps.
+
+**1. Adding new API select option**
+
+Add your API to the `~/utils/config/models.ts` file
+
+**2. Adding API logic on the backend**
+
+The request from frontend will be made on the route `/api/chat` which corresponds to file `~/pages/api/chat.ts`. So we will have to add our new API that we just added in the configs to the switch statement.
+
+**3. Creating API converstation function**
+
+Create a new file for your integration under `~/utils/server/integrations` and then export the files from `~/utils/server/index.ts`
+
 ## Running Locally
 
 **1. Clone Repo**
