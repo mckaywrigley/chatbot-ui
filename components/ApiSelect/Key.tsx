@@ -47,7 +47,7 @@ export const Key = () => {
   }, [isChanging]);
 
   return isChanging ? (
-    <div className="duration:200 flex w-full cursor-pointer items-center rounded-md py-3 px-3 transition-colors hover:bg-gray-500/10">
+    <div className="duration:200 flex w-full cursor-pointer items-center rounded-md py-3 px-3 transition-colors bg-gray-300 ">
       <IconKey size={18} />
 
       <input

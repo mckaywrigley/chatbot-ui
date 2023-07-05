@@ -32,7 +32,7 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
             {t('API')}
           </div>
           <select
-            className="w-full cursor-pointer bg-transparent p-2 text-neutral-200"
+            className="w-full cursor-pointer bg-transparent p-2 dark:text-neutral-200 text-black"
             value={api}
             onChange={(event) =>
               homeDispatch({ field: 'api', value: event.target.value })
