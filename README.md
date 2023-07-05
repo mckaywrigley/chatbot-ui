@@ -43,7 +43,7 @@ Create a new file for your integration under `~/utils/server/integrations` and t
 **1. Clone Repo**
 
 ```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
+git clone https://github.com/crazydevlegend/chatbot-ui.git
 ```
 
 **2. Install Dependencies**
