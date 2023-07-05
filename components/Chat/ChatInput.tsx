@@ -377,7 +377,7 @@ export const ChatInput = ({
           </button>
 
           {showScrollDownButton && (
-            <div className="absolute bottom-12 right-0 lg:bottom-0 lg:-right-10">
+            <div className="absolute -top-10 right-1 lg:top-2 lg:-right-11">
               <button
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
                 onClick={onScrollDownClick}
