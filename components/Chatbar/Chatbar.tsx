@@ -235,7 +235,9 @@ export const Chatbar = () => {
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
         handleDrop={handleDrop}
         footerComponent={<ChatbarSettings />}
-      ><></></Sidebar>
+      >
+        <></>
+      </Sidebar>
     </ChatbarContext.Provider>
   );
 };
