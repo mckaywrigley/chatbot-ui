@@ -28,6 +28,11 @@
   height: 6px;
 }
 
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 html {
   background: #202123;
 }
