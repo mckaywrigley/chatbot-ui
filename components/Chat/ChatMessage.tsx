@@ -129,6 +129,9 @@ export const ChatMessage: FC<Props> = memo(
         textareaRef.current.style.height = 'inherit';
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       }
+      if (isEditing && textareaRef.current) {
+        textareaRef.current.focus();
+      }
     }, [isEditing]);
 
     return (
@@ -166,7 +169,7 @@ export const ChatMessage: FC<Props> = memo(
                         fontFamily: 'inherit',
                         fontSize: 'inherit',
                         lineHeight: 'inherit',
-                        padding: '0',
+                        padding: '0 6px',
                         margin: '0',
                         overflow: 'hidden',
                       }}

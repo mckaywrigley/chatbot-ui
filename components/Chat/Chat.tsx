@@ -31,6 +31,7 @@ import HomeContext from '@/pages/api/home/home.context';
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
+import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
@@ -484,7 +485,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 )}
 
                 {selectedConversation?.messages.map((message, index) => (
-                  <MemoizedChatMessage
+                  <ChatMessage
                     key={index}
                     message={message}
                     messageIndex={index}
