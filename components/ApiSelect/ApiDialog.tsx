@@ -40,7 +40,7 @@ export const ModelDialog: FC<Props> = ({ open, onClose }) => {
           >
             {Models ? (
               Models?.map((api) => (
-                <option key={api.name} value={api.name} className="text-black">
+                <option key={api.id} value={api.id} className="text-black">
                   {t(api.name)}
                 </option>
               ))

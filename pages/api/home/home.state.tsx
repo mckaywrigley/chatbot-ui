@@ -47,5 +47,5 @@ export const initialState: HomeInitialState = {
   searchTerm: '',
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
-  api: 'BITAPAI',
+  api: 'bitapai',
 };
