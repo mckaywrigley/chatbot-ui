@@ -4,6 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
+import { DEFAULT_TEMPERATURE } from '../../utils/const';
 
 export interface HomeInitialState {
   apiKey: string;
@@ -42,7 +43,7 @@ export const initialState: HomeInitialState = {
   selectedConversation: undefined,
   currentMessage: undefined,
   prompts: [],
-  temperature: 1,
+  temperature: DEFAULT_TEMPERATURE,
   showPromptbar: true,
   showChatbar: true,
   currentFolder: undefined,
