@@ -4,7 +4,7 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-import { DEFAULT_TEMPERATURE } from '../../utils/const';
+import { DEFAULT_TEMPERATURE } from '../../utils/app/const';
 
 export interface HomeInitialState {
   apiKey: string;
