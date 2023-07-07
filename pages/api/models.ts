@@ -1,4 +1,4 @@
-import { OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '@/utils/app/const';
+import { OPENAI_API_HOST, OPENAI_API_PREFIX, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '@/utils/app/const';
 
 import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 
@@ -12,7 +12,7 @@ const handler = async (req: Request): Promise<Response> => {
       key: string;
     };
 
-    let url = `${OPENAI_API_HOST}/v1/models`;
+    let url = `${OPENAI_API_HOST}${OPENAI_API_PREFIX}/models`;
     if (OPENAI_API_TYPE === 'azure') {
       url = `${OPENAI_API_HOST}/openai/deployments?api-version=${OPENAI_API_VERSION}`;
     }
