@@ -38,6 +38,8 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
+import { p } from 'vitest/dist/types-fafda418';
+
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
@@ -489,12 +491,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     key={index}
                     message={message}
                     messageIndex={index}
-                    onEdit={(editedMessage) => {
+                    onEdit={(editedMessage, plugin) => {
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
                       handleSend(
                         editedMessage,
                         selectedConversation?.messages.length - index,
+                        plugin,
                       );
                     }}
                   />

@@ -40,18 +40,16 @@ const formTypes = [
 
 const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
   const {
-    state: { lightMode },
+    state: { lightMode, edgarPluginKeys },
   } = useContext(HomeContext);
-  const [selectedSymbols, setSelectedSymbols] = useState<MultiValue<Option>>(
-    [],
-  );
-  const [selectedFormTypes, setSelectedFormTypes] = useState<
-    MultiValue<Option>
-  >([]);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [startDateShow, setStartDateShow] = useState<Boolean | null>(false);
-  const [endDateShow, setEndDateShow] = useState<Boolean | null>(false);
+
+  const numberToDate = (number: number) => {
+    const year = Math.floor(number / 10000);
+    const month = Math.floor((number % 10000) / 100);
+    const day = number % 100;
+    return new Date(year, month - 1, day);
+  };
+
   const dateToNumber = (date: Date | null) => {
     if (!date) {
       return 0;
@@ -64,12 +62,26 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
     const dayStr = (day < 10 ? '0' + day : day) as string;
     return parseInt(`${year}${monthStr}${dayStr}`);
   };
-  const numberToDate = (number: number) => {
-    const year = Math.floor(number / 10000);
-    const month = Math.floor((number % 10000) / 100);
-    const day = number % 100;
-    return new Date(year, month - 1, day);
-  };
+
+  const [selectedSymbols, setSelectedSymbols] = useState<MultiValue<Option>>(
+    [],
+  );
+  const [selectedFormTypes, setSelectedFormTypes] = useState<
+    MultiValue<Option>
+  >([]);
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const [startDate, setStartDate] = useState<Date | null>(() => {
+    const d = edgarPluginKeys?.find((key) => key.key === 'startDate')?.value;
+    return d ? numberToDate(d) : oneYearAgo;
+  });
+  const [endDate, setEndDate] = useState<Date | null>(() => {
+    const d = edgarPluginKeys?.find((key) => key.key === 'endDate')?.value;
+    return d ? numberToDate(d) : new Date();
+  });
+  const [startDateShow, setStartDateShow] = useState<Boolean | null>(false);
+  const [endDateShow, setEndDateShow] = useState<Boolean | null>(false);
+
   const updatePlugin = (plugin: Plugin) => {
     const requiredKeys: KeyValuePair[] = [
       {
@@ -86,11 +98,8 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
             ? selectedFormTypes.map((formType) => formType.value)
             : formTypes.map((formType) => formType.value),
       },
-      { key: 'startDate', value: dateToNumber(startDate) || 0 },
-      {
-        key: 'endDate',
-        value: dateToNumber(endDate) || dateToNumber(new Date()),
-      },
+      { key: 'startDate', value: dateToNumber(startDate) },
+      { key: 'endDate', value: dateToNumber(endDate) },
     ];
     const updatedPlugin = { ...plugin, requiredKeys };
     // console.log(requiredKeys);
@@ -98,7 +107,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
   };
 
   const selectCustomStyles: StylesConfig = {
-    clearIndicator: () => ({ display: 'none' }),
+    // clearIndicator: () => ({ display: 'none' }),
     option: (provided, state) => ({
       ...provided,
       backgroundColor: state.isFocused
@@ -125,6 +134,32 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
     }),
   };
 
+  // on load
+  useEffect(() => {
+    const symbolKeys = edgarPluginKeys?.find(
+      (key) => key.key === 'symbols',
+    )?.value;
+    if (symbolKeys && symbolKeys.length !== symbols.length) {
+      setSelectedSymbols(
+        symbolKeys.map((symbol: string) => ({
+          value: symbol,
+          label: symbols.find((s) => s.value === symbol)?.label,
+        })),
+      );
+    }
+    const formTypeKeys = edgarPluginKeys?.find(
+      (key) => key.key === 'formTypes',
+    )?.value;
+    if (formTypeKeys && formTypeKeys.length !== formTypes.length) {
+      setSelectedFormTypes(
+        formTypeKeys.map((formType: string) => ({
+          value: formType,
+          label: formTypes.find((f) => f.value === formType)?.label,
+        })),
+      );
+    }
+  }, [edgarPluginKeys]);
+
   return (
     <div className="p-6 rounded-lg shadow-lg">
       <button
@@ -139,6 +174,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       <Select
         isMulti
         className="mb-4"
+        value={selectedSymbols}
         options={symbols}
         onChange={(selectedOptions) =>
           setSelectedSymbols(selectedOptions as Option[])
@@ -149,6 +185,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
       <Select
         isMulti
         className="mb-4"
+        value={selectedFormTypes}
         options={formTypes}
         onChange={(selectedOptions) =>
           setSelectedFormTypes(selectedOptions as Option[])
@@ -162,7 +199,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
             onChange={setStartDate}
             show={startDateShow}
             setShow={setStartDateShow}
-            options={{ defaultDate: null }}
+            options={{ defaultDate: startDate }}
           />
         </div>
         <div className="dark:text-neutral-200 text-gray-700 mr-2">To</div>
@@ -171,7 +208,7 @@ const EdgarParams: React.FC<EdgarParamsProps> = memo(({ onBack, onSave }) => {
             onChange={setEndDate}
             show={endDateShow}
             setShow={setEndDateShow}
-            options={{ defaultDate: null }}
+            options={{ defaultDate: endDate }}
           />
         </div>
         <button
@@ -195,6 +232,13 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
 
     useEffect(() => {
       const handleOutsideClick = (e: any) => {
+        if (
+          e.target instanceof SVGElement ||
+          e.target instanceof SVGPathElement ||
+          (e.target instanceof HTMLDivElement && e.target.querySelector('svg'))
+        ) {
+          return;
+        }
         if (modalRef.current && !modalRef.current.contains(e.target)) {
           onClose();
         }
@@ -207,7 +251,7 @@ export const PluginPicker: React.FC<PluginPickerProps> = memo(
       if (pluginId === PluginID.EDGAR) {
         setShowEdgarSettings(true);
       } else {
-        const plugin = Plugins[pluginId];
+        const plugin = Plugins[pluginId] ?? null;
         onPluginChange(plugin);
       }
     };

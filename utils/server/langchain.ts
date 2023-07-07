@@ -114,11 +114,11 @@ export const RetrievalStream = async (
       res.sourceDocuments
         .slice(0, 4)
         .forEach((doc: Document, index: number) => {
-          sourceDocumentsData += `${index + 1}. *Symbol: ${
+          sourceDocumentsData += `${index + 1}. Symbol: \`${
             doc.metadata.symbol
-          },  Form Type: ${doc.metadata.form_type},  Report Date: ${
+          }\`,  Form Type: \`${doc.metadata.form_type}\`,  Report Date: \`${
             doc.metadata.report_date
-          },*  [*more*](${doc.metadata.source})\n`;
+          }\`,  [more](${doc.metadata.source})\n`;
         });
 
       // Enqueue the formatted string to the stream

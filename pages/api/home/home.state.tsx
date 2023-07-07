@@ -1,13 +1,16 @@
 import { Conversation, Message } from '@/types/chat';
+import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
-import { PluginKey } from '@/types/plugin';
+import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
 export interface HomeInitialState {
   apiKey: string;
   pluginKeys: PluginKey[];
+  selectedPlugin: Plugin | null;
+  edgarPluginKeys: KeyValuePair[] | null;
   loading: boolean;
   lightMode: 'light' | 'dark';
   messageIsStreaming: boolean;
@@ -33,6 +36,8 @@ export const initialState: HomeInitialState = {
   apiKey: '',
   loading: false,
   pluginKeys: [],
+  selectedPlugin: null,
+  edgarPluginKeys: null,
   lightMode: 'dark',
   messageIsStreaming: false,
   modelError: null,

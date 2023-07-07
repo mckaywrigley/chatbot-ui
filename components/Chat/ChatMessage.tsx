@@ -13,6 +13,7 @@ import { useTranslation } from 'next-i18next';
 import { updateConversation } from '@/utils/app/conversation';
 
 import { Message } from '@/types/chat';
+import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -26,7 +27,7 @@ import remarkMath from 'remark-math';
 export interface Props {
   message: Message;
   messageIndex: number;
-  onEdit?: (editedMessage: Message) => void;
+  onEdit?: (editedMessage: Message, selectedPlugin: Plugin | null) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
@@ -36,6 +37,7 @@ export const ChatMessage: FC<Props> = memo(
     const {
       state: {
         selectedConversation,
+        selectedPlugin,
         conversations,
         currentMessage,
         messageIsStreaming,
@@ -67,7 +69,7 @@ export const ChatMessage: FC<Props> = memo(
     const handleEditMessage = () => {
       if (message.content != messageContent) {
         if (selectedConversation && onEdit) {
-          onEdit({ ...message, content: messageContent });
+          onEdit({ ...message, content: messageContent }, selectedPlugin);
         }
       }
       setIsEditing(false);

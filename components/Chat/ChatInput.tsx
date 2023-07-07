@@ -52,8 +52,13 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
-
+    state: {
+      selectedPlugin,
+      selectedConversation,
+      messageIsStreaming,
+      prompts,
+    },
+    handleSelectPlugin,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
@@ -66,7 +71,7 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [showPluginPicker, setShowPluginPicker] = useState(false);
-  const [plugin, setPlugin] = useState<Plugin | null>(null);
+  // const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -102,7 +107,7 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    onSend({ role: 'user', content }, selectedPlugin);
     setContent('');
     //setPlugin(null);
 
@@ -278,7 +283,7 @@ export const ChatInput = ({
           selectedConversation.messages.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
-              onClick={() => onRegenerate(plugin)}
+              onClick={() => onRegenerate(selectedPlugin)}
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>
@@ -290,12 +295,12 @@ export const ChatInput = ({
             onClick={() => setShowPluginPicker(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin && plugin.id === PluginID.GOOGLE_SEARCH ? (
+            {selectedPlugin && selectedPlugin.id === PluginID.GOOGLE_SEARCH ? (
               <IconBrandGoogle size={20} />
-            ) : plugin && plugin.id === PluginID.EDGAR ? (
+            ) : selectedPlugin && selectedPlugin.id === PluginID.EDGAR ? (
               <Image
                 src="/edgarchaticon.svg"
-                alt="ChatGPT"
+                alt="EDGAR"
                 width={20}
                 height={20}
               />
@@ -306,8 +311,8 @@ export const ChatInput = ({
 
           {showPluginPicker && (
             <PluginPicker
-              onPluginChange={(plugin: Plugin) => {
-                setPlugin(plugin);
+              onPluginChange={(selectedPlugin: Plugin | null) => {
+                handleSelectPlugin(selectedPlugin);
                 setShowPluginPicker(false);
 
                 if (textareaRef && textareaRef.current) {
