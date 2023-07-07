@@ -10,6 +10,8 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
+import { Models } from '@/utils/config/models';
+
 import HomeContext from '@/pages/api/home/home.context';
 
 import ChatbarContext from '../Chatbar/Chatbar.context';
@@ -27,6 +29,8 @@ export const Key = () => {
   const [newKey, setNewKey] = useState(apiKey);
 
   const { handleApiKeyChange } = useContext(ChatbarContext);
+
+  const choosenApiName = Models.find((model) => model.id === api)?.name;
 
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
@@ -47,7 +51,7 @@ export const Key = () => {
   }, [isChanging]);
 
   return isChanging ? (
-    <div className="duration:200 flex w-full cursor-pointer items-center rounded-md py-3 px-3 transition-colors bg-gray-300 ">
+    <div className="duration:200 flex w-full cursor-pointer items-center rounded-md py-3 px-3 transition-colors bg-gray-300 dark:bg-neutral-800">
       <IconKey size={18} />
 
       <input
@@ -83,7 +87,7 @@ export const Key = () => {
     </div>
   ) : (
     <SidebarButton
-      text={t(`${api} API Key`)}
+      text={t(`${choosenApiName} API Key`)}
       icon={<IconKey size={18} />}
       onClick={() => setIsChanging(true)}
     />

@@ -26,17 +26,17 @@ Host your own live version of Chatbot UI with Vercel.
 
 To add a new API integration in the chat UI, follow these steps.
 
-**1. Adding new API select option**
+Add config for your API to the `~/utils/config/models.ts` file
 
-Add your API to the `~/utils/config/models.ts` file
+Here are all the available option for config:
 
-**2. Adding API logic on the backend**
-
-The request from frontend will be made on the route `/api/chat` which corresponds to file `~/pages/api/chat.ts`. So we will have to add our new API that we just added in the configs to the switch statement.
-
-**3. Creating API converstation function**
-
-Create a new file for your integration under `~/utils/server/integrations` and then export the files from `~/utils/server/index.ts`
+- id(string): unique identifier for your api
+- name(string): name for your api that user sees on frontend
+- endpoint(string): url for your api , used in fetch api's url
+- requestBuilder((secret: string, data: any) => RequestInit): function that recieves client's secret key, and data, must return object of type RequestInit, you can format your request's config here, For ex: to add Authorization header with secret key and change the data sending format for the api call.
+- responseExtractor((json: any) => string): function that recieves json of the api call's response. You can extract your response that you want to send client (often according to the docs of api you just added), You will mainly extract out the AI's response from the json and return it.
+- errorExtractor((json: any) => string): recieves json response of api call, but only in case of error, useful to send back error message from the api.
+- defaultPrompt(string): default prompt to be used when not supplied by user for you API.
 
 ## Running Locally
 
