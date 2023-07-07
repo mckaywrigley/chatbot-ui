@@ -7,3 +7,4 @@ services:
       - 3000:3000
     environment:
       - 'OPENAI_API_KEY='
+      - NEXT_PUBLIC_DEFAULT_TEMPERATURE: '0.8'
