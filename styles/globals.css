@@ -41,3 +41,37 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+.chat-textarea-display {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.chat-textarea-display textarea{
+  width: 90%;
+}
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.btn {
+  float: right;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-right: 9px;
+  color: gray;
+  background-color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
