@@ -13,9 +13,15 @@ COPY . .
 RUN npm run build
 
 # ---- Production ----
-FROM node:19-alpine AS production
+FROM node:19-alpine AS production-base
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.byted.org/g' /etc/apk/repositories && \
+    apk upgrade && apk add bash vim
+
+FROM production-base AS production
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=build /app/entrypoint.sh ./entrypoint.sh
+COPY --from=build /app/env.sh ./env.sh
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/package*.json ./
