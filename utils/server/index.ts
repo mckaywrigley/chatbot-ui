@@ -1,8 +1,7 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_PREFIX, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
-
+import{ AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_PREFIX, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '@/utils/app/const'
 import {
   ParsedEvent,
   ReconnectInterval,
@@ -89,6 +88,10 @@ export const OpenAIStream = async (
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
         if (event.type === 'event') {
           const data = event.data;
+          if(data === '[DONE]') {
+            controller.close();
+            return
+          }
 
           try {
             const json = JSON.parse(data);

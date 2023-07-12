@@ -5,6 +5,7 @@ let BASEPATH = process.env.BASEPATH || ''
 const nextConfig = {
   i18n,
   reactStrictMode: true,
+  assetPrefix: BASEPATH,
   basePath: BASEPATH,
   webpack(config, { isServer, dev }) {
     config.experiments = {
