@@ -14,6 +14,8 @@ export default function Document(props: Props) {
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Chatbot UI"></meta>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="__env.js" />
       </Head>
       <body>
         <Main />
