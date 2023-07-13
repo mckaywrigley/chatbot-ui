@@ -1,14 +1,14 @@
 import { Plugin, PluginID } from '@/types/plugin';
-import { BASEPATH } from '@/utils/app/const';
+import { getEnvValue } from '@/utils/app/config';
 
 export const getEndpoint = (plugin: Plugin | null) => {
   if (!plugin) {
-    return `${BASEPATH}/api/chat`;
+    return `${getEnvValue('BASEPATH')}/api/chat`;
   }
 
   if (plugin.id === PluginID.GOOGLE_SEARCH) {
-    return `${BASEPATH}/api/google`;
+    return `${getEnvValue('BASEPATH')}/api/google`;
   }
 
-  return `${BASEPATH}/api/chat`;
+  return `${getEnvValue('BASEPATH')}/api/chat`;
 };

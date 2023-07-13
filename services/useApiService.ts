@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { useFetch } from '@/hooks/useFetch';
-import { BASEPATH } from '@/utils/app/const';
+import { getEnvValue } from '@/utils/app/config';
 export interface GetModelsRequestProps {
   key: string;
 }
@@ -27,7 +27,7 @@ const useApiService = () => {
 
   const getModels = useCallback(
     (params: GetModelsRequestProps, signal?: AbortSignal) => {
-      return fetchService.post<GetModelsRequestProps>(`${BASEPATH}/api/models`, {
+      return fetchService.post<GetModelsRequestProps>(`${getEnvValue('BASEPATH')}/api/models`, {
         body: { key: params.key },
         headers: {
           'Content-Type': 'application/json',

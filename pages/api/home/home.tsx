@@ -15,7 +15,8 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, BASEPATH } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { getEnvValue } from '@/utils/app/config';
 import {
   saveConversation,
   saveConversations,
@@ -366,7 +367,7 @@ const Home = ({
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
         />
-        <link rel="icon" href={`${BASEPATH}/favicon.ico`} />
+        <link rel="icon" href={`${getEnvValue('BASEPATH')}/favicon.ico`} />
       </Head>
       {selectedConversation && (
         <main

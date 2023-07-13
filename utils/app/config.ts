@@ -1,10 +1,6 @@
-// function isBrowser(): boolean {
-//     return typeof window !== 'undefined'
-// }
-
 function isBrowser() {
-    return Boolean(typeof window !== "undefined" && window.__env );
-  }
+    return Boolean(typeof window !== "undefined");
+}
 
 const config: {
     public: PublicConfig,
@@ -37,16 +33,13 @@ const sortKeys = (obj: any) => {
 };
 
 if (isBrowser()) {
-    console.log('execute in browser config')
     Object.entries(window.__env).forEach(([key, value]) => {
         config.public[key] = convertBoolean(value);
     });
     // we need to make sure keys are always in the same order to prevent "Text content did not match" issue 
     // when displaying config on a page
     config.public = sortKeys(config.public);
-    console.log(JSON.stringify(config))
 } else {
-    console.log('execute in server config')
     Object.entries(process.env).forEach(([key, value]) => {
         if (key.startsWith(publicPrefix)) {
             config.public[key.replace(publicPrefix, '')] = convertBoolean(value);
@@ -58,7 +51,6 @@ if (isBrowser()) {
     console.log(JSON.stringify(config))
     // we need to make sure keys are always in the same order to prevent "Text content did not match" issue 
     // when displaying config on a page
-    config.public = sortKeys(config.public);
 }
 config.public.DEFAULT_TEMPERATURE = parseFloat(process.env.NEXT_PUBLIC_DEFAULT_TEMPERATURE || "1")
 declare global {
@@ -86,18 +78,15 @@ interface ServerConfig {
     [key: string]: any
 }
 
-export function env(key = '') {
-    console.log('get env', key)
+export function getEnvValue(key = '') {
     if (!key.length) {
         throw new Error('No env key provided');
     }
 
     if (isBrowser()) {
-        console.log('get env value from __env', window.__env[key])
         return window.__env[key];
     }
 
-    console.log('get env from procee', process.env[key])
     return process.env[key];
 }
 export default config;

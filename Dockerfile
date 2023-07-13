@@ -1,3 +1,4 @@
+ARG BASE_PATH=''
 # ---- Base Node ----
 FROM node:19-alpine AS base
 WORKDIR /app
@@ -9,7 +10,10 @@ RUN npm ci
 
 # ---- Build ----
 FROM dependencies AS build
+ARG BASE_PATH
 COPY . .
+ENV BASEPATH=${BASE_PATH}
+ENV NEXT_PUBLIC_BASEPATH=${BASE_PATH}
 RUN npm run build
 
 # ---- Production ----
@@ -31,5 +35,8 @@ COPY --from=build /app/next-i18next.config.js ./next-i18next.config.js
 # Expose the port the app will run on
 EXPOSE 3000
 
+ENTRYPOINT ["./entrypoint.sh"]
 # Start the application
 CMD ["npm", "start"]
+
+
