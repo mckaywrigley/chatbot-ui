@@ -1,8 +1,8 @@
+# syntax = docker/dockerfile:1.2
 # ---- Base Node ----
 FROM node:19-alpine AS base
 WORKDIR /app
 COPY package*.json ./
-
 # ---- Dependencies ----
 FROM base AS dependencies
 RUN npm ci
@@ -10,7 +10,10 @@ RUN npm ci
 # ---- Build ----
 FROM dependencies AS build
 COPY . .
-RUN npm run build
+RUN --mount=type=secret,id=chatgpt,dst=/secrets/.env.local \
+    echo "NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT=$(grep NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT /secrets/.env.local | cut -d '=' -f2)" >> .env.local && \
+    echo "NEXT_PUBLIC_DEFAULT_TEMPERATURE=$(grep NEXT_PUBLIC_DEFAULT_TEMPERATURE /secrets/.env.local | cut -d '=' -f2)" >> .env.local && \
+    npm run build
 
 # ---- Production ----
 FROM node:19-alpine AS production

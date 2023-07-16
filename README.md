@@ -34,6 +34,13 @@ docker build -t chatgpt-ui .
 docker run -e OPENAI_API_KEY=xxxxxxxx -p 3000:3000 chatgpt-ui
 ```
 
+Build locally with .env.local:
+
+```shell
+DOCKER_BUILDKIT=1 docker build --secret id=chatgpt,src=.env.local -t chatgpt-ui .
+docker run --env-file .env.local -p 3000:3000 chatgpt-ui
+```
+
 Pull from ghcr:
 
 ```
