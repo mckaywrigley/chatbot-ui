@@ -1,0 +1,39 @@
+{
+  "version": 4,
+  "history": [],
+  "folders": [
+    {
+      "id": "f1d2d2f9-4c0e-4b0f-a9d9-21dcca806142",
+      "name": "Dogs",
+      "type": "prompt"
+    },
+    {
+      "id": "a1b2c3d4-5e6f-7g8h-9i10-11j12k13l14",
+      "name": "Cats",
+      "type": "prompt"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "a1234567-89b0-1c2d-3e4f-5g6h7i8j9k0l",
+      "name": "Dog Care Tips",
+      "description": "Tips for caring for dogs",
+      "content": "What are some tips for taking care of a dog?",
+      "folderId": "f1d2d2f9-4c0e-4b0f-a9d9-21dcca806142"
+    },
+    {
+      "id": "b2345678-90c1-2d3e-4f5g-6h7i8j9k0l1m",
+      "name": "Cat Behavior Guide",
+      "description": "Guide for understanding cat behavior",
+      "content": "Why does my cat behave strangely at night?",
+      "folderId": "a1b2c3d4-5e6f-7g8h-9i10-11j12k13l14"
+    },
+    {
+      "id": "c3456789-01d2-3e4f-5g6h-7i8j-9k0l1m2n",
+      "name": "Bird Watching Tips",
+      "description": "Tips for bird watching",
+      "content": "What are some tips for bird watching?",
+      "folderId": null
+    }
+  ]
+}

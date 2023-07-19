@@ -48,3 +48,6 @@ tmp/
 *.bak
 *.orig
 tmp.*
+
+# Chat history
+chatbot_ui_history_*.json

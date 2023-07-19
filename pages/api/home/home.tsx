@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 
+
+
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 
-import { useCreateReducer } from '@/hooks/useCreateReducer';
+
+
+import { FieldNames, useCreateReducer } from '@/hooks/useCreateReducer';
+
+
 
 import useErrorService from '@/services/errorService';
+import promptService from '@/services/promptService';
 import useApiService from '@/services/useApiService';
+
+
 
 import {
   cleanConversationHistory,
@@ -47,6 +56,13 @@ interface Props {
   defaultModelId: OpenAIModelID;
 }
 
+const defaultModel = {
+  id: 'gpt-3.5-turbo',
+  name: 'GPT-3.5',
+  maxLength: 12000,
+  tokenLimit: 4000,
+};
+
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
@@ -55,6 +71,7 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
+  const { getPrompts } = promptService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -292,15 +309,44 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    const folders = localStorage.getItem('folders');
-    if (folders) {
-      dispatch({ field: 'folders', value: JSON.parse(folders) });
+    // NOTE: Uncomment to add example prompts from the static prompt service.
+    // const promptCollections = [getPrompts('Example Prompts')];
+    const promptCollections = [];
+
+    const remoteFolders = [];
+    const remotePrompts = [];
+
+    // For every prompt service call, generate a folder.
+    // Put all the prompts from that service call into that folder.
+    for (const promptCollection of promptCollections) {
+      // Create prompt folder.
+      const { id, name, prompts } = promptCollection;
+      const folder = { id, name, type: 'prompt' };
+      remoteFolders.push(folder);
+
+      // Create prompts and add them to the folder.
+      for (const prompt of prompts) {
+        const { id, name, description, content, systemContent } = prompt;
+
+        // Prepend system behavior to the user prompt.
+        const fullContent = `${systemContent}\n${content}`;
+
+        const newPrompt = {
+          id,
+          name,
+          description,
+          content: fullContent,
+          folderId: folder.id,
+        };
+        remotePrompts.push(newPrompt);
+      }
     }
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
+    const updatedFolders = dispatchPromptBarItems('folders', remoteFolders);
+    saveFolders(updatedFolders);
+
+    const updatedPrompts = dispatchPromptBarItems('prompts', remotePrompts);
+    savePrompts(updatedPrompts);
 
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
@@ -339,6 +385,24 @@ const Home = ({
           folderId: null,
         },
       });
+    }
+
+    function dispatchPromptBarItems(
+      fieldName: FieldNames<HomeInitialState>,
+      remoteItems: Array<FolderType | Prompt>,
+    ) {
+      const items = localStorage.getItem(fieldName);
+      const localItems = items ? JSON.parse(items) : [];
+      const allItems = [...localItems, ...remoteItems];
+      const uniqueItems = Array.from(
+        new Set(allItems.map((obj) => JSON.stringify(obj))),
+      ).map((json) => JSON.parse(json));
+
+      if (uniqueItems?.length) {
+        dispatch({ field: fieldName, value: uniqueItems });
+      }
+
+      return uniqueItems;
     }
   }, [
     defaultModelId,

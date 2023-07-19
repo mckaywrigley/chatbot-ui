@@ -1,0 +1,39 @@
+{
+  "version": 4,
+  "history": [],
+  "folders": [
+    {
+      "id": "d4567890-12e3-4f5g-6h7i-8j9k0l1m2n3o",
+      "name": "Photography",
+      "type": "prompt"
+    },
+    {
+      "id": "e5678901-23f4-5g6h-7i8j-9k0l1m2n3o4p",
+      "name": "Gardening",
+      "type": "prompt"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "d1234567-89e0-1f2g-3h4i-5j6k7l8m9n0o",
+      "name": "Photography Tips",
+      "description": "Tips for improving photography skills",
+      "content": "How can I improve my photography skills?",
+      "folderId": "d4567890-12e3-4f5g-6h7i-8j9k0l1m2n3o"
+    },
+    {
+      "id": "e2345678-90f1-2g3h-4i5j-6k7l8m9n0o1p",
+      "name": "Gardening Guide",
+      "description": "Guide for starting a home garden",
+      "content": "What are some tips for starting a home garden?",
+      "folderId": "e5678901-23f4-5g6h-7i8j-9k0l1m2n3o4p"
+    },
+    {
+      "id": "f3456789-01g2-3h4i-5j6k-7l8m9n0o1p2q",
+      "name": "Cooking Basics",
+      "description": "Basics of cooking",
+      "content": "What are some basic cooking techniques I should know?",
+      "folderId": null
+    }
+  ]
+}
