@@ -442,6 +442,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         }
   }
 
+  if (session.user) session.user = replaceUndefinedWithNullHash(session.user);
+
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
@@ -459,3 +461,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   };
 };
+
+function replaceUndefinedWithNullHash(obj) {
+  const newObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    newObj[key] = value === undefined ? null : value;
+  }
+  return newObj;
+}
