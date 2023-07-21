@@ -7,3 +7,17 @@ services:
       - 3000:3000
     environment:
       - 'OPENAI_API_KEY='
+      - 'DEFAULT_MODEL='
+      - 'NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT='
+      - 'GOOGLE_CLIENT_ID='
+      - 'GOOGLE_CLIENT_SECRET='
+      - 'NEXTAUTH_URL='
+      - 'NEXTAUTH_SECRET='
+      - 'GITHUB_ID='
+      - 'GITHUB_SECRET='
+      - 'LOGIN_REQUIRED='
+      - 'APP_NAME='
+      - 'API_ENTRYPOINT='
+      - 'PRIVATE_API_ENTRYPOINT='
+      - 'WORKSPACES_ENDPOINT='
+      - 'DATABASE_URL='
