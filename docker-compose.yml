@@ -5,6 +5,7 @@ services:
     build: .
     ports:
       - 3000:3000
+    network: host
     environment:
       - 'OPENAI_API_KEY='
       - 'DEFAULT_MODEL='
