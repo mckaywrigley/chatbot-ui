@@ -1,6 +1,11 @@
 import { IRoleOption, formType } from '@/constants';
 import { useModel } from '@/hooks';
-import { Form, Input, Modal, Select, Button, FormItemProps } from 'antd';
+import Button from 'antd/lib/button';
+import Select from 'antd/lib/select';
+import Modal from 'antd/lib/modal';
+import Form from 'antd/lib/form';
+import Input from 'antd/lib/input';
+
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
 import { replaceAtPosition } from '@/utils/app/replaceAttr';;
 
