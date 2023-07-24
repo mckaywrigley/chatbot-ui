@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
+import { ModelContextProvider } from '@/hooks';
 
 import '@/styles/globals.css';
 
@@ -15,10 +16,12 @@ function App({ Component, pageProps }: AppProps<{}>) {
   return (
     <div className={inter.className}>
       <Toaster />
-      <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
-        <Analytics />
-      </QueryClientProvider>
+      <ModelContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} />
+          <Analytics />
+        </QueryClientProvider>
+      </ModelContextProvider>
     </div>
   );
 }
