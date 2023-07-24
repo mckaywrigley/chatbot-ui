@@ -1,6 +1,6 @@
 import { IRole } from '@/constants';
 import { useModel } from '@/hooks';
-import { Card } from 'antd';
+import Card from 'antd/lib/card';
 import Image from 'next/image';
 import { FC, useCallback } from 'react';
 
