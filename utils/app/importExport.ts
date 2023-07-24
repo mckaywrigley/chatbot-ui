@@ -82,41 +82,6 @@ export const exportDataXLSX = () => {
   const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([wbout], { type: 'application/octet-stream' });
   FileSaver.saveAs(blob, `${selectedConversation.name}.xlsx`);
-
-  // let folders = localStorage.getItem('folders');
-  // let prompts = localStorage.getItem('prompts');
-
-  // if (history) {
-  //   history = JSON.parse(history);
-  // }
-
-  // if (folders) {
-  //   folders = JSON.parse(folders);
-  // }
-
-  // if (prompts) {
-  //   prompts = JSON.parse(prompts);
-  // }
-
-  // const data = {
-  //   version: 4,
-  //   history: history || [],
-  //   folders: folders || [],
-  //   prompts: prompts || [],
-  // } as LatestExportFormat;
-
-  // const blob = new Blob([JSON.stringify(data, null, 2)], {
-  //   type: 'application/json',
-  // });
-  // const url = URL.createObjectURL(blob);
-  // const link = document.createElement('a');
-  // link.download = `chatbot_ui_history_${currentDate()}.json`;
-  // link.href = url;
-  // link.style.display = 'none';
-  // document.body.appendChild(link);
-  // link.click();
-  // document.body.removeChild(link);
-  // URL.revokeObjectURL(url);
 };
 export const exportDataDoc = () => {
   const conversation = localStorage.getItem('selectedConversation');
