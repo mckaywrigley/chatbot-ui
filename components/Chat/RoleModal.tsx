@@ -1,4 +1,4 @@
-import { IRole, formType } from '@/constants';
+import { IRoleOption, formType } from '@/constants';
 import { useModel } from '@/hooks';
 import { Form, Input, Modal, Select, Button, FormItemProps } from 'antd';
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
@@ -26,9 +26,9 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
   }, [fetchPrompt]);
 
   useEffect(() => {
-    const values = currentRole.options?.reduce((pre, cur, index) => {
+    const values = currentRole.options?.reduce((pre: any, cur: IRoleOption, index: number) => {
       const { option, type, key } = cur;
-      if (type === formType.select) {
+      if (type === formType.select && !!option) {
         const o = option[index] ? option[index] : option[0];
         pre = { ...pre, [key]: o.value };
       } else pre = { ...pre, [key]: '' };
@@ -50,7 +50,7 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
     onCancelModal();
   };
 
-  const onChange = (values) => {
+  const onChange = (values: FormData) => {
     const lastValues = form.getFieldsValue();
     fetchExmple(currentRole.example, { ...lastValues, values });
   };
@@ -58,7 +58,7 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
   const formRender = useCallback(() => {
     const { options } = currentRole;
     return (
-      options?.map((item) => {
+      options?.map((item: IRoleOption) => {
         const { type, label, option, key } = item;
         return <Form.Item
           key={key}
