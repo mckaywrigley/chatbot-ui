@@ -396,6 +396,7 @@ export const Chat = memo(({ stopConversationRef}: Props) => {
             className="max-h-full overflow-x-hidden"
             ref={chatContainerRef}
             onScroll={handleScroll}
+            id="chatInbox"
           >
             {selectedConversation?.messages.length === 0 ? (
               <>

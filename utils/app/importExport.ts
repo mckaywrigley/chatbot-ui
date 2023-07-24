@@ -71,42 +71,64 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
+export const exportDataXLSX = () => {
+  let selectedConversation = localStorage.getItem('selectedConversation')
+  selectedConversation = JSON.parse(selectedConversation);
+  const FileSaver = require('file-saver');
+  const XLSX = require('XLSX');
+  const worksheet = XLSX.utils.json_to_sheet(selectedConversation.messages);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  FileSaver.saveAs(blob, `${selectedConversation.name}.xlsx`);
 
-  if (history) {
-    history = JSON.parse(history);
-  }
+  // let folders = localStorage.getItem('folders');
+  // let prompts = localStorage.getItem('prompts');
 
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
+  // if (history) {
+  //   history = JSON.parse(history);
+  // }
 
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
+  // if (folders) {
+  //   folders = JSON.parse(folders);
+  // }
 
-  const data = {
-    version: 4,
-    history: history || [],
-    folders: folders || [],
-    prompts: prompts || [],
-  } as LatestExportFormat;
+  // if (prompts) {
+  //   prompts = JSON.parse(prompts);
+  // }
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json',
+  // const data = {
+  //   version: 4,
+  //   history: history || [],
+  //   folders: folders || [],
+  //   prompts: prompts || [],
+  // } as LatestExportFormat;
+
+  // const blob = new Blob([JSON.stringify(data, null, 2)], {
+  //   type: 'application/json',
+  // });
+  // const url = URL.createObjectURL(blob);
+  // const link = document.createElement('a');
+  // link.download = `chatbot_ui_history_${currentDate()}.json`;
+  // link.href = url;
+  // link.style.display = 'none';
+  // document.body.appendChild(link);
+  // link.click();
+  // document.body.removeChild(link);
+  // URL.revokeObjectURL(url);
+};
+export const exportDataDoc = () => {
+  const conversation = localStorage.getItem('selectedConversation');
+  const FileSaver = require('file-saver');
+  const parsedConversation = JSON.parse(conversation);
+  const messages = parsedConversation.messages;
+  let docContent = '';
+  messages.forEach((message) => {
+    docContent += `${message.role} ${message.content}\n\n`;
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = `chatbot_ui_history_${currentDate()}.json`;
-  link.href = url;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const blob = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
+  FileSaver.saveAs(blob, `${parsedConversation.name}.doc`);
 };
 
 export const importData = (
