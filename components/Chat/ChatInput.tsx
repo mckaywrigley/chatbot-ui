@@ -15,6 +15,7 @@ import {
   useEffect,
   useRef,
   useState,
+  ChangeEvent
 } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -46,9 +47,9 @@ export const ChatInput = ({
   textareaRef,
   showScrollDownButton,
 }: Props) => {
-  
-  const handleFileUpload = (e) => {
-    if (!e.target.files || e.target.files.length === 0) {
+
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target?.files || e.target.files.length === 0) {
       return;
     }
     const allowedFormats = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
@@ -57,12 +58,16 @@ export const ChatInput = ({
       alert('Invalid file format. Only PDF, Word, and Excel files are allowed.');
       return;
     }
+
     const reader = new FileReader();
     reader.onload = (event) => {
-      const fileContent = event.target.result;
-      onSend({ role: 'user', content: fileContent }, plugin);
-      e.target.value = null;
+      const fileContent = event?.target?.result as string; // Cast fileContent to string
+      if (fileContent) {
+        onSend({ role: 'user', content: fileContent }, plugin);
+      }
+      e.target.value = '';
     };
+
     reader.readAsText(file);
   };
   

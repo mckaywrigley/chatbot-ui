@@ -462,10 +462,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-function replaceUndefinedWithNullHash(obj) {
-  const newObj = {};
-  for (const [key, value] of Object.entries(obj)) {
+function replaceUndefinedWithNullHash(obj: unknown) {
+  const newObj: { [key: string]: unknown } = {}; // Use type assertion
+
+  for (const [key, value] of Object.entries(obj as { [key: string]: unknown })) {
     newObj[key] = value === undefined ? null : value;
   }
+
   return newObj;
 }
+
