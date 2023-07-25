@@ -34,6 +34,9 @@ import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 
+import { CustomizedMessage } from './CustomizedMessage';
+import { NEXT_PUBLIC_PAGE_TITLE, NEXT_PUBLIC_MESSAGE_TITLE } from '@/utils/app/const';
+
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
@@ -405,15 +408,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'Chatbot UI'
+                      NEXT_PUBLIC_PAGE_TITLE
                     )}
                   </div>
 
                   {models.length > 0 && (
                     <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                      <ModelSelect />
+                      {/* <ModelSelect /> */}
 
-                      <SystemPrompt
+                      {/* <SystemPrompt
                         conversation={selectedConversation}
                         prompts={prompts}
                         onChangePrompt={(prompt) =>
@@ -422,9 +425,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                             value: prompt,
                           })
                         }
-                      />
+                      /> */}
 
-                      <TemperatureSlider
+                      {/* <TemperatureSlider
                         label={t('Temperature')}
                         onChangeTemperature={(temperature) =>
                           handleUpdateConversation(selectedConversation, {
@@ -432,7 +435,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                             value: temperature,
                           })
                         }
-                      />
+                      /> */}
+                      {<CustomizedMessage
+                        label={t(NEXT_PUBLIC_MESSAGE_TITLE)}
+                        // onChangeTemperature={(temperature) =>
+                        //   handleUpdateConversation(selectedConversation, {
+                        //     key: 'temperature',
+                        //     value: temperature,
+                        //   })
+                        // }
+                      />}
                     </div>
                   )}
                 </div>
@@ -458,7 +470,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 {showSettings && (
                   <div className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
                     <div className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
-                      <ModelSelect />
+                      {/* <ModelSelect /> */}
                     </div>
                   </div>
                 )}
