@@ -17,7 +17,7 @@ export const RoleList: FC<Props> = ({
 }) => {
 
   return (
-    <div className='flex'>
+    <div className='flex w-full overflow-auto'>
       {list.map((role: IRole) => (<Role key={role.index} role={role} onSelect={onSelect} />))}
     </div>
   );
