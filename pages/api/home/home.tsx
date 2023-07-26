@@ -70,6 +70,7 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      chatInputref,
     },
     dispatch,
   } = contextValue;
@@ -205,6 +206,8 @@ const Home = ({
     saveConversations(updatedConversations);
 
     dispatch({ field: 'loading', value: false });
+
+    chatInputref?.focus();
   };
 
   const handleUpdateConversation = (

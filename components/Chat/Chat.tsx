@@ -349,6 +349,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     };
   }, [messagesEndRef]);
 
+  useEffect(() => {
+    homeDispatch({ field: 'chatInputref', value: textareaRef.current });
+  }, [textareaRef, homeDispatch]);
+
   return (
     <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
       {!(apiKey || serverSideApiKeyIsSet) ? (
