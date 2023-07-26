@@ -17,8 +17,12 @@ export const RoleList: FC<Props> = ({
 }) => {
 
   return (
-    <div className='flex w-full overflow-auto'>
-      {list.map((role: IRole) => (<Role key={role.index} role={role} onSelect={onSelect} />))}
+    <div className='flex lg:w-full w-screen overflow-x-scroll'>
+      {list.map((role: IRole) => (
+        <div key={role.index} className='flex-1'>
+          <Role role={role} onSelect={onSelect} />
+        </div>
+      ))}
     </div>
   );
 };
