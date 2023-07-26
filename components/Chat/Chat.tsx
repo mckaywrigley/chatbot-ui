@@ -41,6 +41,13 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
+const messageMapUtil = (messages: Message[]) => {
+  return messages.map(m => {
+    const { hide, ...restM } = m;
+    return restM;
+  });
+}
+
 export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
@@ -75,30 +82,28 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
       if (selectedConversation) {
         let updatedConversation: Conversation;
+        let newMessage = [...selectedConversation.messages, message];
         if (deleteCount) {
-          const updatedMessages = [...selectedConversation.messages];
+          const updatedMessages: Message[] = [...selectedConversation.messages];
           for (let i = 0; i < deleteCount; i++) {
             updatedMessages.pop();
           }
-          updatedConversation = {
-            ...selectedConversation,
-            messages: [...updatedMessages, message],
-          };
-        } else {
-          updatedConversation = {
-            ...selectedConversation,
-            messages: [...selectedConversation.messages, message],
-          };
+          newMessage = [...updatedMessages, message];
         }
+        updatedConversation = {
+          ...selectedConversation,
+          messages: newMessage,
+        };
         homeDispatch({
           field: 'selectedConversation',
           value: updatedConversation,
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
+
         const chatBody: ChatBody = {
           model: updatedConversation.model,
-          messages: updatedConversation.messages,
+          messages: messageMapUtil(updatedConversation.messages),
           key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
@@ -139,7 +144,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        const handleWithoutPlugin = async () => {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =
@@ -175,10 +180,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 ...updatedConversation,
                 messages: updatedMessages,
               };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
             } else {
               const updatedMessages: Message[] =
                 updatedConversation.messages.map((message, index) => {
@@ -194,11 +195,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 ...updatedConversation,
                 messages: updatedMessages,
               };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
             }
+            homeDispatch({
+              field: 'selectedConversation',
+              value: updatedConversation,
+            });
           }
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -215,7 +216,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'conversations', value: updatedConversations });
           saveConversations(updatedConversations);
           homeDispatch({ field: 'messageIsStreaming', value: false });
-        } else {
+        }
+        const handleWithPlugin = async () => {
           const { answer } = await response.json();
           const updatedMessages: Message[] = [
             ...updatedConversation.messages,
@@ -245,6 +247,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           saveConversations(updatedConversations);
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
+        }
+
+        if (!plugin) {
+          await handleWithoutPlugin();
+        } else {
+          await handleWithPlugin();
         }
       }
     },
@@ -351,7 +359,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [messagesEndRef]);
 
   const onRoleSelect = useCallback((prompt: string) => {
-    handleSend({ role: 'user', content: prompt }, 0, null);
+    handleSend({ role: 'user', content: prompt, hide: true }, 0, null);
   }, [handleSend]);
 
   return (

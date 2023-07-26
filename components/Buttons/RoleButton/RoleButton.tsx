@@ -27,18 +27,16 @@ const Role: FC<Props> = ({
   }, [role, setRoleModalOpen, setCurrentRole, onSelect]);
 
   return (
-    <>
-      <Card
-        className='m-1'
-        onClick={onClick}
-        hoverable
-        style={{ width: 200 }}
-        bodyStyle={{ padding: 12 }}
-        cover={<Image src={role.img} alt={role.imgAlt} width={200} height={200} />}
-      >
-        <Meta title={role.title} description={role.description} />
-      </Card>
-    </>
+    <Card
+      className='m-1'
+      onClick={onClick}
+      hoverable
+      style={{ width: 130 }}
+      bodyStyle={{ padding: 12 }}
+      cover={<Image src={role.img} alt={role.imgAlt} width={130} height={130} />}
+    >
+      <Meta title={role.title} description={role.description} />
+    </Card>
   );
 };
 
