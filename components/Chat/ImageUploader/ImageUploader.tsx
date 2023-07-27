@@ -24,7 +24,7 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
     logger: (m) => {
       console.log(m);
       setStatus(m.status);
-      setProgress(parseInt(m.progress * 100));
+      setProgress(parseInt(m.progress) * 100);
     },
   });
 
@@ -32,7 +32,7 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
     form.setFieldValue(name, ocr);
   }, [form, name, ocr]);
 
-  const convertImageToText = useCallback(async (imageData) => {
+  const convertImageToText = useCallback(async (imageData: any) => {
 
     if (!imageData) return;
     await worker.load();
