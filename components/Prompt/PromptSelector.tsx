@@ -22,7 +22,7 @@ export const PromptSelector: FC<Props> = ({ options, label, name, form }) => {
     form.setFieldValue(name, options[0].prompt);
   }, [form, name, options]);
 
-  const onChange = useCallback((e) => {
+  const onChange = useCallback((e: any) => {
     const { prompt, value } = options.find((o: IOption) => o.value === e) || {};
     const v = prompt || '';
     form.setFieldValue(name, v);
@@ -30,7 +30,7 @@ export const PromptSelector: FC<Props> = ({ options, label, name, form }) => {
     setOption(value);
   }, [form, name, options]);
 
-  const onValueChange = useCallback((e) => {
+  const onValueChange = useCallback((e: any) => {
     form.setFieldValue(name, e);
     setPrompt(e);
   }, [form, name]);

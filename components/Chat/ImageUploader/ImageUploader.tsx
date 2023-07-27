@@ -22,7 +22,6 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
 
   const worker = createWorker({
     logger: (m) => {
-      console.log(m);
       setStatus(m.status);
       setProgress(parseInt(m.progress) * 100);
     },
@@ -44,8 +43,8 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
     setOcr(text.replace(/\s+/g, ' ').trim());
   }, [worker, lang]);
 
-  const handleImageChange = useCallback((e) => {
-    const file = e.target.files[0];
+  const handleImageChange = useCallback((e: any) => {
+    const file = e.target?.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onloadend = () => {

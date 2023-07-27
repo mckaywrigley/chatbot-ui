@@ -64,7 +64,6 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const onChange = (values: FormData) => {
     const lastValues = form.getFieldsValue();
-    console.log('lastValues', lastValues);
     fetchExmple(currentRole.example, { ...lastValues, values });
   };
 
