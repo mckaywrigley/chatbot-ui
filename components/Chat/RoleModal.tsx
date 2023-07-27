@@ -5,9 +5,9 @@ import Select from 'antd/lib/select';
 import Modal from 'antd/lib/modal';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
-
+import { ImageUploader } from './ImageUploader';
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
-import { replaceAtPosition } from '@/utils/app/replaceAttr';;
+import { replaceAtPosition } from '@/utils/app/replaceAttr'; import { PromptSelector } from '../Prompt/PromptSelector';
 
 interface Props {
   onSelect: (params: string) => void;
@@ -20,9 +20,16 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const fetchPrompt = useCallback((template: string, values: FormData) => {
-    return replaceAtPosition(template, Object.values(values));
-  }, []);
+  const fetchPrompt = useCallback((template: string, values: any) => {
+    if (currentRole.imgAlt === 'imageRecognizer') {
+      const keys = Object.keys(values);
+      return keys.reduce((pre, cur) => {
+        return `${pre}\n${values[cur]}`;
+      }, '');
+    } else {
+      return replaceAtPosition(template, Object.values(values));
+    }
+  }, [currentRole]);
 
   const fetchExmple = useCallback((template: string, values: FormData) => {
     if (!values) return;
@@ -46,10 +53,10 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const onCancelModal = useCallback(() => {
     setRoleModalOpen(false);
-  }, [setRoleModalOpen]);
+    form.setFieldsValue({});
+  }, [form, setRoleModalOpen]);
 
   const onFinish = (values: any) => {
-    console.log('Form values:', values);
     const prompt = fetchPrompt(currentRole.prompt, values);
     onSelect(prompt);
     onCancelModal();
@@ -57,6 +64,7 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const onChange = (values: FormData) => {
     const lastValues = form.getFieldsValue();
+    console.log('lastValues', lastValues);
     fetchExmple(currentRole.example, { ...lastValues, values });
   };
 
@@ -65,28 +73,54 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
     return (
       options?.map((item: IRoleOption) => {
         const { type, label, option, key } = item;
+        let Item = null;
+        if (type === formType.select) {
+          Item = <Select
+            size="middle"
+            style={{ width: 200 }}
+            options={option}
+            placeholder={`请选择${label}`}
+          />
+        } else if (type === formType.input) {
+          Item = <Input
+            placeholder={`请输入${label}`}
+            style={{ width: 200 }}
+          />
+        } else if (type === formType.imageUploader) {
+          return <ImageUploader
+            form={form}
+            name={key}
+            key={key}
+            label={label}
+          />
+        } else if (type === formType.promptSelect) {
+          return <PromptSelector
+            size="middle"
+            style={{ width: 200 }}
+            options={option}
+            placeholder={`请选择${label}`}
+            key={key}
+            name={key}
+            label={label}
+            form={form}
+          />
+        }
+
         return <Form.Item
           key={key}
           label={label}
           name={key}
           rules={[{ required: true, message: `请输入或选择${label}` }]}
         >
-          {
-            type === formType.select ? <Select
-              size="middle"
-              style={{ width: 200 }}
-              options={option}
-              placeholder={`请选择${label}`}
-            />
-              : <Input
-                placeholder={`请输入${label}`}
-                style={{ width: 200 }}
-              />
-          }
+          {Item}
         </Form.Item>
       })
     )
-  }, [currentRole]);
+  }, [currentRole, form]);
+
+  const onFormSubmit = () => {
+    form.submit();
+  }
 
   return (
     <Modal
@@ -98,7 +132,7 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
         <Button key="cancel" onClick={onCancelModal}>
           取消
         </Button>,
-        <Button key="submit" className="bg-[#202123] select-none items-center rounded-md border border-white/20 text-white transition-colors duration-200 hover:bg-gray-500/10" type="primary" onClick={() => form.submit()}>
+        <Button key="submit" className="bg-[#202123] select-none items-center rounded-md border border-white/20 text-white transition-colors duration-200 hover:bg-gray-500/10" type="primary" onClick={onFormSubmit}>
           提交
         </Button>,
       ]}

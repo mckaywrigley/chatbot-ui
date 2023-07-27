@@ -12,6 +12,7 @@ export interface IRole {
 export interface IOption {
   label: any;
   value: any;
+  prompt?: string;
 }
 
 export interface IRoleOption {
@@ -28,5 +29,7 @@ export enum language {
 
 export enum formType {
   select = 'select',
-  input = 'input'
+  input = 'input',
+  imageUploader = 'imageUploader',
+  promptSelect = 'promptSelect'
 }

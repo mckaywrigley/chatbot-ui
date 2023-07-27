@@ -1,8 +1,9 @@
 import { IRole, formType, language } from './type';
 import { translator } from './translator';
 import { travelor } from './travelor';
-import { ieltes } from './learnfaster';
+import { learnfaster } from './learnfaster';
 import { petBehaviorist } from './petBehaviorist';
+import { imageRecognizer } from './imageRecognizer';
 export {
   formType,
   language
@@ -14,7 +15,8 @@ export const defaultRoleList: IRole[] = [
   translator,
   travelor,
   petBehaviorist,
-  ieltes
+  imageRecognizer,
+  learnfaster,
 ];
 
 
