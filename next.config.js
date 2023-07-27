@@ -5,6 +5,17 @@ const nextConfig = {
   i18n,
   reactStrictMode: true,
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.interpublic.com',
+        port: '',
+        pathname: '/wp-content/**',
+      },
+    ],
+  },
+
   webpack(config, { isServer, dev }) {
     config.experiments = {
       asyncWebAssembly: true,

@@ -41,3 +41,12 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+.logo {
+  margin: 0 auto;
+}
+
+.siri {
+  margin: 0 auto;
+  border-radius: 100%;
+}
