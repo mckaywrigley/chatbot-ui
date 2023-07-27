@@ -50,6 +50,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       loading,
       prompts,
       api,
+      selectedPlugins
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -94,6 +95,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           messages: updatedConversation.messages,
           key: apiKey,
           prompt: updatedConversation.prompt,
+          plugins: selectedPlugins,
           api,
         };
         const endpoint = getEndpoint(plugin);
@@ -248,6 +250,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       selectedConversation,
       stopConversationRef,
       api,
+      selectedPlugins
     ],
   );
 

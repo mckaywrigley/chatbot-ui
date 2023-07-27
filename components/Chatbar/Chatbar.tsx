@@ -157,6 +157,10 @@ export const Chatbar = () => {
     }
   };
 
+  const handlePluginsChange = (plugins: string[]) => {
+    homeDispatch({ field: 'selectedPlugins', value: plugins });
+  };
+
   useEffect(() => {
     if (searchTerm) {
       chatDispatch({
@@ -188,6 +192,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handlePluginsChange,
       }}
     >
       <Sidebar<Conversation>
