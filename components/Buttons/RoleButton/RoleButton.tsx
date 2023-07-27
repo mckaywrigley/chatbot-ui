@@ -3,6 +3,7 @@ import { useModel } from '@/hooks';
 import Card from 'antd/lib/card';
 import Image from 'next/image';
 import { FC, useCallback } from 'react';
+import va from '@vercel/analytics';
 
 interface Props {
   role: IRole;
@@ -18,6 +19,7 @@ const Role: FC<Props> = ({
   const { setRoleModalOpen, setCurrentRole } = useModel('global');
 
   const onClick = useCallback(() => {
+    va.track(role.imgAlt, { eventType: 'click' });
     if (role.options) {
       setRoleModalOpen(true);
       setCurrentRole(role);

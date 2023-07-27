@@ -20,10 +20,12 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
   const [lang, setLang] = useState<any>('chi_sim');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+
   const worker = createWorker({
     logger: (m) => {
+      console.log('worker m: ', m);
       setStatus(m.status);
-      setProgress(parseInt(m.progress) * 100);
+      setProgress(parseInt(`${m.progress * 100}`));
     },
   });
 

@@ -7,6 +7,7 @@ import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import { ImageUploader } from './ImageUploader';
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
+import va from '@vercel/analytics';
 import { replaceAtPosition } from '@/utils/app/replaceAttr'; import { PromptSelector } from '../Prompt/PromptSelector';
 
 interface Props {
@@ -58,6 +59,7 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const onFinish = (values: any) => {
     const prompt = fetchPrompt(currentRole.prompt, values);
+    va.track(currentRole.imgAlt, { eventType: 'submit', prompt });
     onSelect(prompt);
     onCancelModal();
   };
