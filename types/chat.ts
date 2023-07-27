@@ -3,12 +3,13 @@ export interface Message {
   content: string;
 }
 
-export type Role = 'assistant' | 'user';
+export type Role = 'system' | 'assistant' | 'user';
 
 export interface ChatBody {
   messages: Message[];
   key: string;
   prompt: string;
+  plugins: string[];
   api: string;
 }
 

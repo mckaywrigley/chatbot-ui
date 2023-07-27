@@ -25,6 +25,7 @@ export interface HomeInitialState {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   api: string;
+  selectedPlugins: string[];
 }
 
 export const initialState: HomeInitialState = {
@@ -48,4 +49,5 @@ export const initialState: HomeInitialState = {
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
   api: 'bitapai',
+  selectedPlugins: [],
 };
