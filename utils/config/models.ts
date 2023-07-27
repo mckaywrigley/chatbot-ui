@@ -4,25 +4,36 @@ export const Models: Array<IModel> = [
   {
     id: 'bitapai',
     name: 'BitAPAI',
-    endpoint: 'https://api.bitapai.io/v1/conversation',
+    endpoint: 'https://api.bitapai.io/text',
     requestBuilder: (secret, data) => {
+      data = data.map((message) => ({
+        role: message.role,
+        prompt: message.content,
+      }));
+      console.log(data);
+
       return {
         headers: {
           'Content-Type': 'application/json',
           'X-API-KEY': secret,
         },
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          conversation: data,
+          count: 1,
+          // uids: [387, 158, 40, 410, 187, 500, 846],
+          // return_all: true,
+        }),
       };
     },
     responseExtractor: (json: any) => {
-      return json?.assistant || '';
+      return json?.['response_data'][0]['response'] || '';
     },
     errorExtractor: (json: any) => {
       return `BitAPAI Error: ${json || 'Unknown error'}`;
     },
     defaultPrompt:
-      "You are an AI assistant. Follow the user's instructions carefully. Respond using markdown.",
+      "**Start new session** You are an AI assistant. Follow the user's instructions carefully. Respond using markdown.",
   },
   {
     id: 'validator-endpoint',

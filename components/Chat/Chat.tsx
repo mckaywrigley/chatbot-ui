@@ -50,7 +50,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       loading,
       prompts,
       api,
-      selectedPlugins
+      selectedPlugins,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -250,7 +250,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       selectedConversation,
       stopConversationRef,
       api,
-      selectedPlugins
+      selectedPlugins,
     ],
   );
 
