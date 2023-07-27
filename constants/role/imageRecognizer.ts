@@ -7,7 +7,7 @@ enum fields {
 
 const recorgnizerFields = {
   [fields.tool]: {
-    label: '分析工具',
+    label: '常规解析',
     value: 'tool',
     prompt: '你是一个图片分析工具，接下来你要根据上传图片解析成的文字做出分析，注意忽略所有你不认识的字：'
   },
@@ -25,7 +25,7 @@ export const fetch = (): IRole => {
     index: 5,
     img: '/images/imagerecognizer.png',
     imgAlt: 'imageRecognizer',
-    title: '图片分析',
+    title: '图片解析',
     description: '可用于分析各类图片报告（如医疗诊断报告）',
     example: '',
     prompt: '',
