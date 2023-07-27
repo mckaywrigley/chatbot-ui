@@ -138,8 +138,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
+
+        console.log('got a response back from OpenAI');
+
         if (!plugin) {
           if (updatedConversation.messages.length === 1) {
+            // debugger;
             const { content } = message;
             const customName =
               content.length > 30 ? content.substring(0, 30) + '...' : content;
@@ -147,6 +151,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               ...updatedConversation,
               name: customName,
             };
+            console.log('newly created conversation name is:', customName);
           }
           homeDispatch({ field: 'loading', value: false });
           const reader = data.getReader();
@@ -174,10 +179,26 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 ...updatedConversation,
                 messages: updatedMessages,
               };
+              // const updatedConversations: Conversation[] = [...conversations, updatedConversation];
+              // // const updatedConversations: Conversation[] = conversations.map((conversation) => {
+              // //     if (conversation.id === selectedConversation.id) {
+              // //       return updatedConversation;
+              // //     }
+              // //     return conversation;
+              // //   }
+              // // );
+              // console.log('updatedConversations', updatedConversations);
               homeDispatch({
                 field: 'selectedConversation',
                 value: updatedConversation,
               });
+              // homeDispatch({
+              //   field: 'conversations',
+              //   value: updatedConversations,
+              // });
+
+              // saveConversation(updatedConversation);
+              // saveConversations(updatedConversations);
             } else {
               const updatedMessages: Message[] =
                 updatedConversation.messages.map((message, index) => {
@@ -200,15 +221,28 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
           }
           saveConversation(updatedConversation);
+          // const updatedConversations: Conversation[] = conversations.map(
+          //   (conversation) => {
+          //     if (conversation.id === selectedConversation.id) {
+          //       return updatedConversation;
+          //     }
+          //     return conversation;
+          //   },
+          // );
+          // Make a const for the updatedConversations
+          // if the id exists in the updatedConversations, then replace it
+          // otherwise, add it to the end of the array
+          let conversationExists = false;
           const updatedConversations: Conversation[] = conversations.map(
             (conversation) => {
               if (conversation.id === selectedConversation.id) {
+                conversationExists = true;
                 return updatedConversation;
               }
               return conversation;
             },
           );
-          if (updatedConversations.length === 0) {
+          if (!conversationExists) {
             updatedConversations.push(updatedConversation);
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });

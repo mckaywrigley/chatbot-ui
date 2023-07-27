@@ -41,6 +41,14 @@ export const Chatbar = () => {
     handleUpdateConversation,
   } = useContext(HomeContext);
 
+  useEffect(() => {
+    // console log the names of the conversations on conversations change
+    console.log(JSON.stringify(
+      conversations.map((conversation, index) => `${index+1}. ${conversation.name}`), null, 2
+      )
+    );
+  }, [conversations]);
+
   const {
     state: { searchTerm, filteredConversations },
     dispatch: chatDispatch,

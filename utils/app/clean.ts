@@ -82,8 +82,9 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
         conversation.folderId = null;
       }
 
-      if (!conversation.messages) {
-        conversation.messages = [];
+      if (!conversation.messages || conversation.messages.length === 0) {
+        // if there are no messages, we don't want to add the conversation to the history
+        return acc;
       }
 
       acc.push(conversation);

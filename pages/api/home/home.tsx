@@ -12,11 +12,11 @@ import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 
 import {
-  cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
+  getConversationHistory,
   saveConversation,
   saveConversations,
   updateConversation,
@@ -55,7 +55,7 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
-  const [initialRender, setInitialRender] = useState<boolean>(true);
+  const isInitialRender = useRef<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
@@ -180,6 +180,8 @@ const Home = ({
   // CONVERSATION OPERATIONS  --------------------------------------------
 
   const handleNewConversation = () => {
+    const conversations = getConversationHistory();
+    console.log('conversations', conversations);
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
@@ -251,6 +253,13 @@ const Home = ({
       });
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
+  // useEffect(() => {
+  //   if (isInitialRender.current) {
+  //     isInitialRender.current = false;
+  //     handleNewConversation();
+  //   }
+  // }, []);
+
   // ON LOAD --------------------------------------------
 
   useEffect(() => {
@@ -305,44 +314,46 @@ const Home = ({
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
+    const conversations = getConversationHistory();
+    dispatch({ field: 'conversations', value: conversations });
 
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      handleNewConversation();
     }
 
-    const selectedConversation = localStorage.getItem('selectedConversation');
-    if (selectedConversation) {
-      const parsedSelectedConversation: Conversation =
-        JSON.parse(selectedConversation);
-      const cleanedSelectedConversation = cleanSelectedConversation(
-        parsedSelectedConversation,
-      );
+    // const selectedConversation = localStorage.getItem('selectedConversation');
+    // // const selectedConversation = null;
+    // if (selectedConversation) {
+    //   const parsedSelectedConversation: Conversation =
+    //     JSON.parse(selectedConversation);
+    //   const cleanedSelectedConversation = cleanSelectedConversation(
+    //     parsedSelectedConversation,
+    //   );
 
-      dispatch({
-        field: 'selectedConversation',
-        value: cleanedSelectedConversation,
-      });
-    } else {
-      const lastConversation = conversations[conversations.length - 1];
-      dispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
-    }
+    //   dispatch({
+    //     field: 'selectedConversation',
+    //     value: cleanedSelectedConversation,
+    //   });
+    // } else {
+    //   console.log('Inside "ON LOAD" useEffect, calling handleNewConversation');
+    //   handleNewConversation();
+    //   const lastConversation = conversations[conversations.length - 1];
+    //   dispatch({
+    //     field: 'selectedConversation',
+    //     value: {
+    //       id: uuidv4(),
+    //       name: t('New Conversation'),
+    //       messages: [],
+    //       model: OpenAIModels[defaultModelId],
+    //       prompt: DEFAULT_SYSTEM_PROMPT,
+    //       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+    //       folderId: null,
+    //     },
+    //   });
+
+
+    // }
   }, [
     defaultModelId,
     dispatch,
