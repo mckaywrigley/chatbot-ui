@@ -31,11 +31,11 @@ const Role: FC<Props> = ({
       className='m-1'
       onClick={onClick}
       hoverable
-      style={{ width: 130 }}
-      bodyStyle={{ padding: 12 }}
-      cover={<Image src={role.img} alt={role.imgAlt} width={130} height={130} />}
+      style={{ width: 110 }}
+      bodyStyle={{ padding: 12, fontSize: 14, minHeight: 106 }}
+      cover={<Image src={role.img} alt={role.imgAlt} width={110} height={110} />}
     >
-      <Meta title={role.title} description={role.description} />
+      <Meta style={{ fontSize: 12 }} title={role.title} description={role.description} />
     </Card>
   );
 };

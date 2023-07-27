@@ -1,6 +1,6 @@
 import { formType, IRole } from './type';
 
-export const ieltes: IRole = {
+export const learnfaster: IRole = {
   index: 3,
   img: '/images/learnfaster.png',
   imgAlt: 'learnfaster',
