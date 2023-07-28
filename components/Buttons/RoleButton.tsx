@@ -2,7 +2,7 @@ import { IRole } from '@/constants';
 import { useModel } from '@/hooks';
 import dynamic from 'next/dynamic'
 import Image from 'next/image';
-import Card from 'antd/lib/Card';
+import Card from 'antd/lib/card';
 import { FC, useCallback } from 'react';
 import va from '@vercel/analytics';
 
