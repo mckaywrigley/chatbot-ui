@@ -5,16 +5,17 @@ import Select from 'antd/lib/select';
 import Modal from 'antd/lib/modal';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
-import { ImageUploader } from './ImageUploader';
+import dynamic from 'next/dynamic'
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
 import va from '@vercel/analytics';
 import { replaceAtPosition } from '@/utils/app/replaceAttr'; import { PromptSelector } from '../Prompt/PromptSelector';
 
+const ImageUploader = dynamic(() => import('./ImageUploader'))
 interface Props {
   onSelect: (params: string) => void;
 }
 
-export const RoleModal: FC<Props> = ({ onSelect }) => {
+const RoleModal: FC<Props> = ({ onSelect }) => {
   const { roleModalOpen, setRoleModalOpen, currentRole } = useModel('global');
   const [example, setExample] = useState('');
   const [form] = Form.useForm();
@@ -155,3 +156,5 @@ export const RoleModal: FC<Props> = ({ onSelect }) => {
     </Modal>
   );
 };
+
+export default RoleModal;

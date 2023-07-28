@@ -19,23 +19,30 @@ import {
   updateConversation,
 } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
-
+import dynamic from 'next/dynamic'
 import { ChatBody, Conversation, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
-
 import HomeContext from '@/pages/api/home/home.context';
 
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
-import { ModelSelect } from './ModelSelect';
-import { RoleList } from './RoleList/RoleList';
-import { SystemPrompt } from './SystemPrompt';
-import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
-import { RoleModal } from './RoleModal';
-import { IRole } from '@/constants';
+// import { SystemPrompt } from './SystemPrompt';
+// import { TemperatureSlider } from './Temperature';
+
+const RoleModal = dynamic(() => import('./RoleModal'), {
+  loading: () => <div><Spinner size="16px" className="mx-auto" /></div>,
+});
+const RoleList = dynamic(() => import('./RoleList'), {
+  loading: () => <div><Spinner size="16px" className="mx-auto" /></div>,
+});
+const ModelSelect = dynamic(() => import('./ModelSelect'), {
+  loading: () => <div><Spinner size="16px" className="mx-auto" /></div>,
+});
+const MemoizedChatMessage = dynamic(() => import('./MemoizedChatMessage'), {
+  loading: () => <div><Spinner size="16px" className="mx-auto" /></div>,
+});
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -265,12 +272,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     ],
   );
 
-  const scrollToBottom = useCallback(() => {
-    if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      textareaRef.current?.focus();
-    }
-  }, [autoScrollEnabled]);
+  // const scrollToBottom = useCallback(() => {
+  //   if (autoScrollEnabled) {
+  //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  //     textareaRef.current?.focus();
+  //   }
+  // }, [autoScrollEnabled]);
 
   const handleScroll = () => {
     if (chatContainerRef.current) {
