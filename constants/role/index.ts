@@ -14,8 +14,8 @@ export type { IRole, IOption, IRoleOption } from './type';
 export const defaultRoleList: IRole[] = [
   translator,
   travelor,
-  petBehaviorist,
   imageRecognizer,
+  petBehaviorist,
   learnfaster,
 ];
 
