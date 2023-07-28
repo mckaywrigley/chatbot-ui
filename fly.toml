@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for chatbot-ui-tob on 2023-07-25T19:39:51-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "chatbot-ui-tob"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  AZURE_DEPLOYMENT_ID = "gpt-35-16k"
+  DEFAULT_MODEL = "gpt-3.5-turbo"
+  OPENAI_API_HOST = "https://tob-internal-chatgpt.openai.azure.com"
+  OPENAI_API_TYPE = "azure"
+  # override with Fly secrets
+  OPENAI_API_KEY = ""
+
+
+# [checks]
+#   [checks.healthz]
+#     port = 3000
+#     type = "http"
+#     interval = "1m0s"
+#     timeout = "5s"
+#     grace_period = "10s"
+#     method = "get"
+#     path = "/healthz"
