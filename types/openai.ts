@@ -46,7 +46,6 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
   [OpenAIModelID.GPT_35_TURBO_16K]: {
     id: OpenAIModelID.GPT_35_TURBO_16K,
     name: "GPT 3.5 Turbo",
-    maxLength: 12000,
     maxLength: 48000,
     tokenLimit: 16000,
   },
