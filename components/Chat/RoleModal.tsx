@@ -22,6 +22,7 @@ const RoleModal: FC<Props> = ({ onSelect }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // 获取prompt：1.白名单内的模块通过拼接的方式获取 2.通过替换提示词关键字拼接
   const fetchPrompt = useCallback((template: string, values: any) => {
     if (currentRole.imgAlt === 'imageRecognizer') {
       const keys = Object.keys(values);
@@ -33,12 +34,14 @@ const RoleModal: FC<Props> = ({ onSelect }) => {
     }
   }, [currentRole]);
 
+  // 获取prompt示例
   const fetchExmple = useCallback((template: string, values: FormData) => {
     if (!values) return;
     const promp = fetchPrompt(template, values);
     setExample(promp);
   }, [fetchPrompt]);
 
+  // 首次打开设置默认值和默认示例
   useEffect(() => {
     const values = currentRole.options?.reduce((pre: any, cur: IRoleOption, index: number) => {
       const { option, type, key } = cur;
@@ -58,6 +61,7 @@ const RoleModal: FC<Props> = ({ onSelect }) => {
     form.setFieldsValue({});
   }, [form, setRoleModalOpen]);
 
+  // 提交预设提示词
   const onFinish = (values: any) => {
     const prompt = fetchPrompt(currentRole.prompt, values);
     va.track(currentRole.imgAlt, { eventType: 'submit', prompt });

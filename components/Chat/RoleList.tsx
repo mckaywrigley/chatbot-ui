@@ -13,9 +13,9 @@ const RoleList: FC<Props> = ({
 }) => {
 
   return (
-    <div className='flex flex-wrap lg:w-max w-screen'>
+    <div className='flex flex-wrap md:w-full w-screen pb-40 overflow-y-scroll' style={{ marginTop: 10 }}>
       {list.map((role: IRole) => (
-        <div key={role.index} className='mr-7 w-1/4 lg:mr-1 lg:w-1/5'>
+        <div key={role.index} className='mr-7 w-1/4 md:mr-1 md:w-1/6'>
           <RoleButton role={role} onSelect={onSelect} />
         </div>
       ))}

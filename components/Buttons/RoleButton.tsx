@@ -36,9 +36,9 @@ const RoleButton: FC<Props> = ({
       className='m-1'
       onClick={onClick}
       hoverable
-      style={{ width: 110 }}
+      style={{ width: 115 }}
       bodyStyle={{ padding: 12, fontSize: 14, minHeight: 106 }}
-      cover={<Image src={role.img} alt={role.imgAlt} width={110} height={110} />}
+      cover={<Image src={role.img} alt={role.imgAlt} width={115} height={115} />}
     >
       <Meta style={{ fontSize: 12 }} title={role.title} description={role.description} />
     </Card>
