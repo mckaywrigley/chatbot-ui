@@ -16,7 +16,7 @@
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
-    "next": "13.2.4",
+    "next": "13.4.12",
     "next-i18next": "^13.2.2",
     "openai": "^3.2.1",
     "react": "18.2.0",
