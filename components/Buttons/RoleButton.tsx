@@ -1,18 +1,21 @@
 import { IRole } from '@/constants';
 import { useModel } from '@/hooks';
-import Card from 'antd/lib/card';
+import dynamic from 'next/dynamic'
 import Image from 'next/image';
+import Card from 'antd/lib/card';
 import { FC, useCallback } from 'react';
 import va from '@vercel/analytics';
+
+// const Card = dynamic(() => import('antd/lib/card'));
 
 interface Props {
   role: IRole;
   onSelect: (params: string) => void;
 }
 
-const { Meta } = Card;
+const { Meta } = Card as any;
 
-const Role: FC<Props> = ({
+const RoleButton: FC<Props> = ({
   role,
   onSelect
 }) => {
@@ -42,4 +45,4 @@ const Role: FC<Props> = ({
   );
 };
 
-export default Role;
+export default RoleButton;

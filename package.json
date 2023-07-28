@@ -9,7 +9,10 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "analyze": "ANALYZE=true next build",
+    "analyze:server": "BUNDLE_ANALYZE=server next build",
+    "analyze:browser": "BUNDLE_ANALYZE=browser next build"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
@@ -31,11 +34,12 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0",
-    "tesseract.js": "^2.0.0-beta.1"
+    "tesseract.js": "^2.0.0-beta.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",
+    "@next/bundle-analyzer": "^13.4.12",
     "@tailwindcss/typography": "^0.5.9",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/jsdom": "^21.1.1",

@@ -12,7 +12,7 @@ interface Props {
   label: string;
 }
 
-export const ImageUploader: FC<Props> = ({ form, name, label }) => {
+const ImageUploader: FC<Props> = ({ form, name, label }) => {
   const [ocr, setOcr] = useState("");
   const [imageData, setImageData] = useState<any>('');
   const [progress, setProgress] = useState(0);
@@ -125,3 +125,5 @@ export const ImageUploader: FC<Props> = ({ form, name, label }) => {
 
   );
 };
+
+export default ImageUploader;

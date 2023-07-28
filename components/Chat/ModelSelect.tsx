@@ -7,7 +7,7 @@ import { OpenAIModel } from '@/types/openai';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-export const ModelSelect = () => {
+const ModelSelect = () => {
   const { t } = useTranslation('chat');
 
   const {
@@ -64,3 +64,5 @@ export const ModelSelect = () => {
     </div>
   );
 };
+
+export default ModelSelect;
