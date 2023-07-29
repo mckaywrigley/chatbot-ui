@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { DragEvent, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
@@ -82,18 +82,18 @@ const Promptbar = () => {
     savePrompts(updatedPrompts);
   };
 
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     if (e.dataTransfer) {
       const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
 
       const updatedPrompt = {
         ...prompt,
-        folderId: e.target.dataset.folderId,
+        folderId: e.currentTarget.dataset.folderId,
       };
 
       handleUpdatePrompt(updatedPrompt);
 
-      e.target.style.background = 'none';
+      e.currentTarget.style.background = 'none';
     }
   };
 

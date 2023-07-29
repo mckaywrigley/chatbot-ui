@@ -7,6 +7,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import {
+  DragEvent,
   KeyboardEvent,
   ReactElement,
   useContext,
@@ -23,7 +24,10 @@ import SidebarActionButton from '@/components/Buttons/SidebarActionButton';
 interface Props {
   currentFolder: FolderInterface;
   searchTerm: string;
-  handleDrop: (e: any, folder: FolderInterface) => void;
+  handleDrop: (
+    e: DragEvent<HTMLButtonElement>,
+    folder: FolderInterface,
+  ) => void;
   folderComponent: (ReactElement | undefined)[];
 }
 
@@ -53,26 +57,26 @@ const Folder = ({
     setIsRenaming(false);
   };
 
-  const dropHandler = (e: any) => {
+  const dropHandler = (e: DragEvent<HTMLButtonElement>) => {
     if (e.dataTransfer) {
       setIsOpen(true);
 
       handleDrop(e, currentFolder);
 
-      e.target.style.background = 'none';
+      e.currentTarget.style.background = 'none';
     }
   };
 
-  const allowDrop = (e: any) => {
+  const allowDrop = (e: DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
 
-  const highlightDrop = (e: any) => {
-    e.target.style.background = '#343541';
+  const highlightDrop = (e: DragEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.background = '#343541';
   };
 
-  const removeHighlight = (e: any) => {
-    e.target.style.background = 'none';
+  const removeHighlight = (e: DragEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.background = 'none';
   };
 
   useEffect(() => {
@@ -114,7 +118,7 @@ const Folder = ({
           <button
             className={`flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-sm transition-colors duration-200 hover:bg-[#343541]/90`}
             onClick={() => setIsOpen(!isOpen)}
-            onDrop={(e) => dropHandler(e)}
+            onDrop={dropHandler}
             onDragOver={allowDrop}
             onDragEnter={highlightDrop}
             onDragLeave={removeHighlight}

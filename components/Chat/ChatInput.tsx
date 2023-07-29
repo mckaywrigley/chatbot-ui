@@ -292,7 +292,7 @@ export const ChatInput = ({
             <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
               <PluginSelect
                 plugin={plugin}
-                onKeyDown={(e: any) => {
+                onKeyDown={(e: KeyboardEvent<HTMLSelectElement>) => {
                   if (e.key === 'Escape') {
                     e.preventDefault();
                     setShowPluginSelect(false);

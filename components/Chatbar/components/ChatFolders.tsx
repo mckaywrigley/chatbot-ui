@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { DragEvent, useContext } from 'react';
 
 import { FolderInterface } from '@/types/folder';
 
@@ -18,7 +18,10 @@ export const ChatFolders = ({ searchTerm }: Props) => {
     handleUpdateConversation,
   } = useContext(HomeContext);
 
-  const handleDrop = (e: any, folder: FolderInterface) => {
+  const handleDrop = (
+    e: DragEvent<HTMLButtonElement>,
+    folder: FolderInterface,
+  ) => {
     if (e.dataTransfer) {
       const conversation = JSON.parse(e.dataTransfer.getData('conversation'));
       handleUpdateConversation(conversation, {

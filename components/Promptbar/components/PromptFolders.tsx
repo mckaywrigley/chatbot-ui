@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { DragEvent, useContext } from 'react';
 
 import { FolderInterface } from '@/types/folder';
 
@@ -19,7 +19,10 @@ export const PromptFolders = () => {
     handleUpdatePrompt,
   } = useContext(PromptbarContext);
 
-  const handleDrop = (e: any, folder: FolderInterface) => {
+  const handleDrop = (
+    e: DragEvent<HTMLButtonElement>,
+    folder: FolderInterface,
+  ) => {
     if (e.dataTransfer) {
       const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
 

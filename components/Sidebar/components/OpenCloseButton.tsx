@@ -1,7 +1,8 @@
 import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
+import { MouseEventHandler } from 'react';
 
 interface Props {
-  onClick: any;
+  onClick: MouseEventHandler<HTMLDivElement | HTMLButtonElement>;
   side: 'left' | 'right';
 }
 

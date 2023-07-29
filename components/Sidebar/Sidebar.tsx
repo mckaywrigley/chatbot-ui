@@ -1,5 +1,5 @@
 import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
-import { ReactNode } from 'react';
+import { DragEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -22,7 +22,7 @@ interface Props<T> {
   toggleOpen: () => void;
   handleCreateItem: () => void;
   handleCreateFolder: () => void;
-  handleDrop: (e: any) => void;
+  handleDrop: (e: DragEvent<HTMLDivElement>) => void;
 }
 
 const Sidebar = <T,>({
@@ -42,16 +42,16 @@ const Sidebar = <T,>({
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
-  const allowDrop = (e: any) => {
+  const allowDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  const highlightDrop = (e: any) => {
-    e.target.style.background = '#343541';
+  const highlightDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.currentTarget.style.background = '#343541';
   };
 
-  const removeHighlight = (e: any) => {
-    e.target.style.background = 'none';
+  const removeHighlight = (e: DragEvent<HTMLDivElement>) => {
+    e.currentTarget.style.background = 'none';
   };
 
   return isOpen ? (

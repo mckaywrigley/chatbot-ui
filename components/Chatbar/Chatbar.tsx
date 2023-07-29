@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { DragEvent, useCallback, useContext, useEffect } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -177,12 +177,12 @@ export const Chatbar = () => {
     localStorage.setItem('showChatbar', JSON.stringify(!showChatbar));
   };
 
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     if (e.dataTransfer) {
       const conversation = JSON.parse(e.dataTransfer.getData('conversation'));
       handleUpdateConversation(conversation, { key: 'folderId', value: 0 });
       chatDispatch({ field: 'searchTerm', value: '' });
-      e.target.style.background = 'none';
+      e.currentTarget.style.background = 'none';
     }
   };
 
