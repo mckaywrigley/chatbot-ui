@@ -38,7 +38,7 @@ const RoleButton: FC<Props> = ({
       hoverable
       style={{ width: 115 }}
       bodyStyle={{ padding: 12, fontSize: 14, minHeight: 106 }}
-      cover={<Image src={role.img} alt={role.imgAlt} width={115} height={115} />}
+      cover={<Image priority src={role.img} alt={role.imgAlt} width={115} height={115} />}
     >
       <Meta style={{ fontSize: 12 }} title={role.title} description={role.description} />
     </Card>
