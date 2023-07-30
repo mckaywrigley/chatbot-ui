@@ -22,6 +22,7 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
 
 
   const worker = createWorker({
+    langPath: '/tesseract/',
     logger: (m) => {
       console.log('worker m: ', m);
       setStatus(m.status);
