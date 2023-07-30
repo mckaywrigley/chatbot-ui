@@ -5,6 +5,18 @@ import Select from "antd/lib/select";
 import { languageOptions } from './config';
 import TextArea from "antd/lib/input/TextArea";
 import Input from "antd/lib/input";
+import Progress from "antd/lib/progress";
+
+const STATUS = {
+  loading_tesseract: 'loading tesseract core',
+  initializing_tesseract: 'initializing tesseract',
+  loading_language: 'loading language traineddata',
+  initializing_api: 'initializing api',
+  initialize_api: 'initialized api',
+  recognizing: 'recognizing text'
+}
+
+const STATUS_LIST = Object.values(STATUS);
 
 interface Props {
   form: FormInstance;
@@ -16,7 +28,6 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
   const [ocr, setOcr] = useState("");
   const [imageData, setImageData] = useState<any>('');
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('');
   const [lang, setLang] = useState<any>('chi_sim');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -25,8 +36,14 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
     langPath: '/tesseract/',
     logger: (m) => {
       console.log('worker m: ', m);
-      setStatus(m.status);
-      setProgress(parseInt(`${m.progress * 100}`));
+      const i = STATUS_LIST.findIndex((s) => m.status?.includes(s));
+      if (i) {
+        let progress = (i / STATUS_LIST.length);
+        if (m.status === STATUS.recognizing) {
+          progress = progress + (m.progress / STATUS_LIST.length);
+        }
+        setProgress(parseInt(`${progress * 100}`));
+      }
     },
   });
 
@@ -89,39 +106,31 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
           accept="image/*"
         />
       </div>
-      {!!status && status !== 'recognizing text' && <div>
-        <div className="progress-label">提取状态: {status}...</div>
+      {progress < 100 && progress > 0 && <div className="flex">
+        <div className='w-24'>解析进度：</div><Progress percent={progress} status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />
       </div>}
-      {progress < 100 && progress > 0 && <div>
-        <div className="progress-label">Progress ({progress}%)</div>
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${progress}%` }} ></div>
-        </div>
-      </div>}
-      <div className="display-flex">
-        {/*图片展示： {imageData ?? <Image className='w-0.3 h-auto mr-50' src={imageData} alt="" />} */}
-        <Form.Item
-          name={name}
-          rules={[{ required: true, message: `请输入或选择${label}` }]}
-        >
-          <TextArea
-            ref={textareaRef}
-            className="w-full resize-none max-h-200 rounded-lg border border-neutral-200 bg-transparent px-4 py-3 text-neutral-900 dark:border-neutral-600 dark:text-neutral-100"
-            style={{
-              resize: 'none',
-              bottom: `${textareaRef?.current?.scrollHeight}px`,
-              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
-                ? 'auto'
-                : 'hidden'
-                }`,
-            }}
-            placeholder={''}
-            value={ocr || ''}
-            rows={3}
-            onChange={handleChange}
-          />
-        </Form.Item>
-      </div>
+      {/*图片展示： {imageData ?? <Image className='w-0.3 h-auto mr-50' src={imageData} alt="" />} */}
+      <Form.Item
+        name={name}
+        rules={[{ required: true, message: `请输入或选择${label}` }]}
+      >
+        <TextArea
+          ref={textareaRef}
+          className="w-full resize-none max-h-200 rounded-lg border border-neutral-200 bg-transparent px-4 py-3 text-neutral-900 dark:border-neutral-600 dark:text-neutral-100"
+          style={{
+            resize: 'none',
+            bottom: `${textareaRef?.current?.scrollHeight}px`,
+            overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+              ? 'auto'
+              : 'hidden'
+              }`,
+          }}
+          placeholder={''}
+          value={ocr || ''}
+          rows={3}
+          onChange={handleChange}
+        />
+      </Form.Item>
     </Form.Item>
 
   );

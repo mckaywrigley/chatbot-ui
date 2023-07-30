@@ -37,7 +37,7 @@ export const PromptSelector: FC<Props> = ({ options, label, name, form }) => {
 
   return (
     <Form.Item
-      className='px-1'
+      className='px-1 mb-0'
       label={label}
       key={name}
     >
