@@ -31,37 +31,36 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
   const [lang, setLang] = useState<any>('chi_sim');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // 语言包地址：https://github.com/naptha/tessdata/blob/gh-pages/4.0.0_best/chi_sim.traineddata.gz
-  const worker = createWorker({
-    langPath: '/tesseract/',
-    logger: (m) => {
-      console.log('worker m: ', m);
-      const i = STATUS_LIST.findIndex((s) => m.status?.includes(s));
-      if (i) {
-        let progress = (i / STATUS_LIST.length);
-        if (m.status === STATUS.recognizing) {
-          progress = progress + (m.progress / STATUS_LIST.length);
-        }
-        setProgress(parseInt(`${progress * 100}`));
-      }
-    },
-  });
-
   useEffect(() => {
     form.setFieldValue(name, ocr);
+    // 语言包地址：https://github.com/naptha/tessdata/blob/gh-pages/4.0.0_best/chi_sim.traineddata.gz
   }, [form, name, ocr]);
 
   const convertImageToText = useCallback(async (imageData: any) => {
-
+    console.log('imageData', imageData)
     if (!imageData) return;
-    await worker.load();
-    await worker.loadLanguage(lang);
-    await worker.initialize(lang);
+    const worker = await createWorker({
+      langPath: '/tesseract/',
+      logger: (m) => {
+        console.log('worker m: ', m);
+        const i = STATUS_LIST.findIndex((s) => m.status?.includes(s));
+        if (i) {
+          let progress = (i / STATUS_LIST.length);
+          if (m.status === STATUS.recognizing) {
+            progress = progress + (m.progress / STATUS_LIST.length);
+          }
+          setProgress(parseInt(`${progress * 100}`));
+        }
+      },
+    });
+    await (await worker).load();
+    await (await worker).loadLanguage(lang);
+    await (await worker).initialize(lang);
     const {
       data: { text },
-    } = await worker.recognize(imageData);
+    } = await (await worker).recognize(imageData);
     setOcr(text.replace(/\s+/g, ' ').trim());
-  }, [worker, lang]);
+  }, [lang]);
 
   const handleImageChange = useCallback((e: any) => {
     const file = e.target?.files?.[0];
