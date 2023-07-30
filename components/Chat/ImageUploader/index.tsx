@@ -20,8 +20,9 @@ const ImageUploader: FC<Props> = ({ form, name, label }) => {
   const [lang, setLang] = useState<any>('chi_sim');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-
+  // 语言包地址：https://github.com/naptha/tessdata/blob/gh-pages/4.0.0_best/chi_sim.traineddata.gz
   const worker = createWorker({
+    langPath: '/tesseract/',
     logger: (m) => {
       console.log('worker m: ', m);
       setStatus(m.status);
