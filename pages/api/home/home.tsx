@@ -40,17 +40,20 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
-
+import { useRouter } from 'next/router';
+import { atelierSeasideDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
+  openaiApiKey: String;
 }
 
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
+  openaiApiKey,
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
@@ -80,10 +83,10 @@ const Home = ({
     ['GetModels', apiKey, serverSideApiKeyIsSet],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;
-
       return getModels(
         {
-          key: apiKey,
+          key: "" ,
+          ff:true
         },
         signal,
       );
@@ -182,6 +185,7 @@ const Home = ({
     const lastConversation = conversations[conversations.length - 1];
 
     const newConversation: Conversation = {
+      kk:"testing",
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
@@ -213,6 +217,7 @@ const Home = ({
   ) => {
     const updatedConversation = {
       ...conversation,
+      zzz:"1",
       [data.key]: data.value,
     };
 
@@ -259,14 +264,14 @@ const Home = ({
       });
     }
 
-    const apiKey = localStorage.getItem('apiKey');
+    let apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
-      dispatch({ field: 'apiKey', value: '' });
-
+      dispatch({ field: 'apiKey', value: openaiApiKey }); // Updating Key with server side key
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
       dispatch({ field: 'apiKey', value: apiKey });
+    }else{
     }
 
     const pluginKeys = localStorage.getItem('pluginKeys');
@@ -345,7 +350,14 @@ const Home = ({
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
+    openaiApiKey,
   ]);
+
+  const dispatchSomeAction = (OBJ: any) => {
+    dispatch(OBJ);
+  };
+  const router = useRouter();
+  const { id } = router.query;
 
   return (
     <HomeContext.Provider
@@ -360,19 +372,16 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>{`OnPage.ai Chatbot-${id}`}</title>
         <meta name="description" content="ChatGPT but better." />
-        <meta
-          name="viewport"
-          content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
-        />
+        <meta name="viewport" content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
-          <div className="fixed top-0 w-full sm:hidden">
+          <div className="fixed top-0 w-full sm:hidden">            
             <Navbar
               selectedConversation={selectedConversation}
               onNewConversation={handleNewConversation}
@@ -395,7 +404,7 @@ const Home = ({
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({  locale, query  }) => {
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
@@ -408,16 +417,48 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCSEId = process.env.GOOGLE_CSE_ID;
+    /* 
+    if there is id,  fetch user plan data
+    if user plan data is apsumo then activate server side api key
+    */
+    // id = e475894d2fd9914bd121656d1fee2ab14ff0cb161f68ea21
+    const { id } = query;
+    let profile 
+    let OPENAI_API_KEY =false
+    let ChatbotCounter;
+    if( id ){
+      const userToken = { "token": id };
+      const response = await fetch("https://devserver.similarcontent.com/sc/api/profiles2s", { method: "POST",headers: {
+          'Content-Type': 'application/json'
+        }, body: JSON.stringify( userToken ) });
+      const data = await response.json();
+      profile= data.data?.profile;
+      if (profile?.plan?.plan_profile?.chatbot == 1){
+        //console.log(profile?.plan?.plan_profile);
+        OPENAI_API_KEY = data.data?.settings?.OPENAI_API_KEY; 
+        const foundCounter = profile.Counters.find((counter: { id: string }) => {
+          return counter.id === "chatbot_tokens"
+        });
+        if(foundCounter){
+          ChatbotCounter = foundCounter
+        }
+        //console.log(  ChatbotCounter);
+      }else{
+        console.log("No server API-KEY ");
+      }
 
-  if (googleApiKey && googleCSEId) {
+    }
+
+  if (googleApiKey && googleCSEId && (!!OPENAI_API_KEY || false)) {
     serverSidePluginKeysSet = true;
   }
 
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+      serverSideApiKeyIsSet: !!OPENAI_API_KEY,
       defaultModelId,
       serverSidePluginKeysSet,
+      openaiApiKey: OPENAI_API_KEY,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

@@ -96,7 +96,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
-          key: apiKey,
+          key: "",// + apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
         };
@@ -125,6 +125,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           body,
         });
         if (!response.ok) {
+          console.log("===>")
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
           toast.error(response.statusText);
@@ -136,7 +137,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        if (!plugin) {          
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =
