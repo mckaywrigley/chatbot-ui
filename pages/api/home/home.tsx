@@ -10,6 +10,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
+import { loadChatHistory } from '@/services/loadChatService';
 
 import {
   cleanConversationHistory,
@@ -253,6 +254,24 @@ const Home = ({
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchChatHistory = async () => {
+      if (isMounted && session?.user?.name) {
+        localStorage.setItem('user', JSON.stringify(session?.user?.name));
+      }
+    };
+
+    fetchChatHistory();
+
+    // Cleanup function to stop the loop when the component is unmounted
+    return () => {
+      isMounted = false;
+    };
+  }, [session]);
 
   useEffect(() => {
     const settings = getSettings();
@@ -305,18 +324,19 @@ const Home = ({
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
-
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
-
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    if (session?.user?.name){
+      localStorage.setItem('user', JSON.stringify(session?.user?.name));
+      loadChatHistory().then( (chatHistory) => {
+        let parsedConversationHistory: Conversation[] = []
+        if (chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
+          const cleanedConversationHistory = cleanConversationHistory(
+            parsedConversationHistory,
+          );
+          dispatch({ field: 'conversations', value: cleanedConversationHistory });
+      });
     }
 
+    // const conversationHistory = localStorage.getItem('conversationHistory');
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation =
@@ -353,11 +373,10 @@ const Home = ({
 
   //AUTH SESSION ---------------------------------------------
 
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
 
-  if(!session){
-    return <div>Please Login</div>
-  }
+  if(!session) return <div>Please Login</div>
+  localStorage.setItem('user', JSON.stringify(session?.user?.name))
 
   return (
     <HomeContext.Provider

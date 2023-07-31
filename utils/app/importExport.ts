@@ -9,6 +9,7 @@ import {
 } from '@/types/export';
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
+import { loadChatHistory } from '@/services/loadChatService';
 
 import { cleanConversationHistory } from './clean';
 
@@ -72,7 +73,13 @@ function currentDate() {
 }
 
 export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
+  let history;
+  loadChatHistory().then( (chatHistory) => {
+    history = []
+    if (chatHistory.length > 0) history = JSON.parse(chatHistory);
+  });
+
+  // let history = localStorage.getItem('conversationHistory');
   let folders = localStorage.getItem('folders');
   let prompts = localStorage.getItem('prompts');
 
