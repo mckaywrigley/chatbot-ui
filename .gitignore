@@ -38,3 +38,7 @@ yarn-error.log*
 next-env.d.ts
 .idea
 pnpm-lock.yaml
+
+# pwa artifacts
+public/sw.js
+public/workbox-*.js

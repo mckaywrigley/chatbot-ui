@@ -1,0 +1,27 @@
+{
+  "name": "Chatbot UI",
+  "short_name": "chatbot-ui",
+  "description": "Chatbot UI is an open source chat UI for AI models.",
+  "icons": [
+    {
+      "src": "/favicon-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#202123",
+  "background_color": "#343541",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
