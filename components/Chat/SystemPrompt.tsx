@@ -9,13 +9,14 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-
 import { Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
 
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { PrivateAIModel } from '@/types/privateIA';
+import { OpenAIModel } from '@/types/openai';
+import { defaultPrompt } from '@/utils/app/prompts';
 
 interface Props {
   conversation: Conversation;
@@ -36,6 +37,7 @@ export const SystemPrompt: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentModel, setCurrentModel] = useState<OpenAIModel | PrivateAIModel>(conversation.model);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const promptListRef = useRef<HTMLUListElement | null>(null);
@@ -46,7 +48,7 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = conversation.model.maxLength;
+    const maxLength = conversation?.model && 'maxLength' in conversation.model ? conversation?.model.maxLength : 1000;
 
     if (value.length > maxLength) {
       alert(
@@ -167,11 +169,17 @@ export const SystemPrompt: FC<Props> = ({
   }, [value]);
 
   useEffect(() => {
-    if (conversation.prompt) {
-      setValue(conversation.prompt);
+    if (conversation.model !== currentModel) {
+      setValue(defaultPrompt(conversation.model.id));
     } else {
-      setValue(DEFAULT_SYSTEM_PROMPT);
+      if (conversation.prompt) {
+        setValue(conversation.prompt);
+      } else {
+        setValue(defaultPrompt(conversation.model.id));
+      }
     }
+
+    setCurrentModel(conversation.model);
   }, [conversation]);
 
   useEffect(() => {

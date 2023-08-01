@@ -15,14 +15,14 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
 import { saveFolders } from '@/utils/app/folders';
-import { savePrompts } from '@/utils/app/prompts';
+import { defaultPrompt, savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
 import { Conversation } from '@/types/chat';
@@ -40,11 +40,13 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { PrivateAIModelID, PrivateAIModels } from '@/types/privateIA';
+import { getModelById } from '@/utils/app/model';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
-  defaultModelId: OpenAIModelID;
+  defaultModelId: PrivateAIModelID;
 }
 
 const Home = ({
@@ -181,17 +183,16 @@ const Home = ({
   const handleNewConversation = () => {
     const lastConversation = conversations[conversations.length - 1];
 
+    const model = lastConversation?.model || {
+      id: PrivateAIModels[defaultModelId].id,
+      name: PrivateAIModels[defaultModelId].name,
+    };
     const newConversation: Conversation = {
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
-      model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-      },
-      prompt: DEFAULT_SYSTEM_PROMPT,
+      model,
+      prompt: defaultPrompt(model.id),
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
@@ -327,14 +328,15 @@ const Home = ({
       });
     } else {
       const lastConversation = conversations[conversations.length - 1];
+      const model = getModelById(defaultModelId);
       dispatch({
         field: 'selectedConversation',
         value: {
           id: uuidv4(),
           name: t('New Conversation'),
           messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
+          model: model,
+          prompt: defaultPrompt(model.id),
           temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
           folderId: null,
         },
@@ -396,13 +398,13 @@ const Home = ({
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const defaultModelId =
+  const defaultModelId = (process.env.PRIVATE_IA_URL ? PrivateAIModelID.PRIVATE_IA :
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
         process.env.DEFAULT_MODEL as OpenAIModelID,
       ) &&
       process.env.DEFAULT_MODEL) ||
-    fallbackModelID;
+    fallbackModelID);
 
   let serverSidePluginKeysSet = false;
 

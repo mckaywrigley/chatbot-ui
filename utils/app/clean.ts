@@ -1,7 +1,9 @@
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from './const';
+import { DEFAULT_TEMPERATURE } from './const';
+import { defaultPrompt } from './prompts';
+import { PrivateAIModelID, PrivateAIModels } from '@/types/privateIA';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -16,7 +18,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
+      model: updatedConversation.model || PrivateAIModels[PrivateAIModelID.PRIVATE_IA],
     };
   }
 
@@ -24,7 +26,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.prompt) {
     updatedConversation = {
       ...updatedConversation,
-      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
+      prompt: updatedConversation.prompt || defaultPrompt(updatedConversation.model.id),
     };
   }
 
@@ -67,11 +69,11 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
   return history.reduce((acc: any[], conversation) => {
     try {
       if (!conversation.model) {
-        conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+        conversation.model = PrivateAIModels[PrivateAIModelID.PRIVATE_IA];
       }
 
       if (!conversation.prompt) {
-        conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+        conversation.prompt = defaultPrompt(conversation.model.id);
       }
 
       if (!conversation.temperature) {

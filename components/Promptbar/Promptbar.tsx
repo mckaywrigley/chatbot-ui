@@ -19,6 +19,7 @@ import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { getModelById } from '@/utils/app/model';
 
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
@@ -50,7 +51,7 @@ const Promptbar = () => {
         name: `Prompt ${prompts.length + 1}`,
         description: '',
         content: '',
-        model: OpenAIModels[defaultModelId],
+        model: getModelById(defaultModelId),
         folderId: null,
       };
 

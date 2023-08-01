@@ -1,4 +1,5 @@
 import { OpenAIModel } from './openai';
+import { PrivateAIModel } from './privateIA';
 
 export interface Message {
   role: Role;
@@ -8,7 +9,7 @@ export interface Message {
 export type Role = 'assistant' | 'user';
 
 export interface ChatBody {
-  model: OpenAIModel;
+  model: OpenAIModel | PrivateAIModel;
   messages: Message[];
   key: string;
   prompt: string;
@@ -19,7 +20,7 @@ export interface Conversation {
   id: string;
   name: string;
   messages: Message[];
-  model: OpenAIModel;
+  model: OpenAIModel | PrivateAIModel;
   prompt: string;
   temperature: number;
   folderId: string | null;
