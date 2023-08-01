@@ -15,6 +15,7 @@
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
+    "file-saver": "^2.0.5",
     "i18next": "^22.4.13",
     "next": "13.2.4",
     "next-auth": "^4.22.1",
@@ -30,7 +31,8 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",
