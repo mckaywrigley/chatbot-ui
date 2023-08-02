@@ -115,7 +115,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
           });
         }
+        let done = false;
         const controller = new AbortController();
+        const initialTimeout = 10000; // Initial time out is big
+        const chunkTimeout = 10; // Timeout to wait for next chunk
+        var timeoutId = setTimeout(() => {
+          done = true;
+          controller.abort(); // Abort the fetch if timeout expires
+        }, initialTimeout);
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -149,7 +156,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'loading', value: false });
           const reader = data.getReader();
           const decoder = new TextDecoder();
-          let done = false;
           let isFirst = true;
           let text = '';
           while (!done) {
@@ -160,6 +166,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
+            // Reset the timeout for the next chunk
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              homeDispatch({ field: 'messageIsStreaming', value: false });
+            }, chunkTimeout);
+            
             const chunkValue = decoder.decode(value);
             text += chunkValue;
             if (isFirst) {
