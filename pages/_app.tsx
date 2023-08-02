@@ -5,6 +5,8 @@ import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import { ModelContextProvider } from '@/hooks';
+import Providers from '@/components/Providers';
+import TopBar from '@/components/TopBar';
 
 import '@/styles/globals.css';
 
@@ -12,13 +14,15 @@ const inter = Inter({ subsets: ['latin'] });
 
 function App({ Component, pageProps }: AppProps<{}>) {
   const queryClient = new QueryClient();
-
   return (
     <div className={inter.className}>
       <Toaster />
       <ModelContextProvider>
         <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
+          <Providers>
+            <TopBar />
+            <Component {...pageProps} />
+          </Providers>
           <Analytics />
         </QueryClientProvider>
       </ModelContextProvider>

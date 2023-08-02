@@ -12,16 +12,21 @@
     "coverage": "vitest run --coverage",
     "analyze": "ANALYZE=true next build",
     "analyze:server": "BUNDLE_ANALYZE=server next build",
-    "analyze:browser": "BUNDLE_ANALYZE=browser next build"
+    "analyze:browser": "BUNDLE_ANALYZE=browser next build",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^5.0.0",
     "@tabler/icons-react": "^2.9.0",
     "@vercel/analytics": "^1.0.1",
     "antd": "^5.7.2",
+    "bcrypt": "^5.1.0",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",
+    "next-auth": "^4.22.3",
     "next-i18next": "^13.2.2",
     "openai": "^3.2.1",
     "react": "18.2.0",
@@ -42,6 +47,7 @@
     "@next/bundle-analyzer": "^13.4.12",
     "@tailwindcss/typography": "^0.5.9",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/bcrypt": "^5.0.0",
     "@types/jsdom": "^21.1.1",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",
@@ -58,6 +64,7 @@
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.5",
+    "prisma": "^5.0.0",
     "tailwindcss": "^3.2.7",
     "typescript": "4.9.5",
     "vitest": "^0.29.7"

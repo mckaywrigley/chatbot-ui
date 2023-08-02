@@ -7,12 +7,16 @@ const { i18n } = require('./next-i18next.config');
 const nextConfig = {
   i18n,
   reactStrictMode: true,
-
+  // experimental: {
+  //   appDir: true,
+  //   serverComponentsExternalPackages: ['bcrypt'],
+  // },
   webpack(config, { isServer, dev }) {
     config.experiments = {
       asyncWebAssembly: true,
       layers: true,
     };
+    config.externals = [...config.externals, 'bcrypt'];
 
     return config;
   },
