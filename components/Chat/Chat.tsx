@@ -13,14 +13,18 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
+
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { SendAction } from '@/types/conversation';
 import { throttle } from '@/utils/data/throttle';
 
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { ChatBody, Conversation, Message, SendMessage, ChatNode } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -36,6 +40,8 @@ import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
+
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -61,7 +67,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
-  const [currentMessage, setCurrentMessage] = useState<Message>();
+  const [currentMessage, setCurrentMessage] = useState<ChatNode>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
@@ -72,25 +78,53 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const { currentMessageList, modifiedMessage, actions } =
+    useContext(ConversationContext);
+
   const handleSend = useCallback(
-    async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
+    async (
+      chatNode: ChatNode,
+      sendAction: SendAction,
+      messageIndex?: number,
+      plugin: Plugin | null = null,
+    ) => {
       if (selectedConversation) {
         let updatedConversation: Conversation;
-        if (deleteCount) {
-          const updatedMessages = [...selectedConversation.messages];
-          for (let i = 0; i < deleteCount; i++) {
-            updatedMessages.pop();
-          }
-          updatedConversation = {
-            ...selectedConversation,
-            messages: [...updatedMessages, message],
-          };
-        } else {
-          updatedConversation = {
-            ...selectedConversation,
-            messages: [...selectedConversation.messages, message],
-          };
+
+        let sendMessages: SendMessage[];
+
+        // regenergate
+        switch (sendAction) {
+          case SendAction.SEND:
+            // Perform the SEND action
+            actions.addMessage(chatNode);
+            sendMessages = currentMessageList.map((chatNode) => {
+              let { id, create_time, ...message } = chatNode.message;
+              return message;
+            });
+            break;
+          case SendAction.EDIT:
+            // Perform the EDIT action
+            actions.addMessage(chatNode, messageIndex);
+            sendMessages = currentMessageList.map((chatNode) => {
+              let { id, create_time, ...message } = chatNode.message;
+              return message;
+            });
+            break;
+          case SendAction.REGENERATE:
+            // Perform the REGENERATE action
+            actions.popCurrentMessageList();
+            sendMessages = currentMessageList.map((chatNode) => {
+              let { id, create_time, ...message } = chatNode.message;
+              return message;
+            });
+            break;
         }
+
+        updatedConversation = {
+          ...selectedConversation,
+        };
+
         homeDispatch({
           field: 'selectedConversation',
           value: updatedConversation,
@@ -99,7 +133,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
           model: updatedConversation.model,
-          messages: updatedConversation.messages,
+          messages: sendMessages,
           key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
@@ -140,9 +174,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
+        const nodeId = uuidv4();
+        const currentTime = getCurrentUnixTime();
+        updatedConversation = {
+          ...selectedConversation,
+        };
+
         if (!plugin) {
-          if (updatedConversation.messages.length === 1) {
-            const { content } = message;
+          if (currentMessageList.length === 1) {
+            const { content } = currentMessageList[0].message;
             const customName =
               content.length > 30 ? content.substring(0, 30) + '...' : content;
             updatedConversation = {
@@ -151,11 +191,28 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             };
           }
           homeDispatch({ field: 'loading', value: false });
+
+          let responseNode: ChatNode = {
+            id: nodeId,
+            message: {
+              id: nodeId,
+              role: 'assistant',
+              content: '',
+              create_time: currentTime,
+            },
+            children: [],
+            parentMessageId: chatNode.id,
+          };
+
+          updatedConversation.current_node = responseNode.id;
+          actions.addMessage(responseNode);
+
           const reader = data.getReader();
           const decoder = new TextDecoder();
           let done = false;
           let isFirst = true;
           let text = '';
+
           while (!done) {
             if (stopConversationRef.current === true) {
               controller.abort();
@@ -166,40 +223,30 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             done = doneReading;
             const chunkValue = decoder.decode(value);
             text += chunkValue;
-            if (isFirst) {
-              isFirst = false;
-              const updatedMessages: Message[] = [
-                ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
-              ];
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            } else {
-              const updatedMessages: Message[] =
-                updatedConversation.messages.map((message, index) => {
-                  if (index === updatedConversation.messages.length - 1) {
-                    return {
-                      ...message,
-                      content: text,
-                    };
-                  }
-                  return message;
-                });
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            }
+
+            // Update the chatNode in the selectedConversation
+            let updateChatNode: ChatNode = {
+              id: nodeId,
+              message: {
+                id: nodeId,
+                role: 'assistant',
+                content: text,
+                create_time: currentTime,
+              },
+              children: [],
+              parentMessageId: chatNode.id,
+            };
+
+            updatedConversation = {
+              ...updatedConversation,
+              mapping: {
+                ...updatedConversation?.mapping,
+                [updateChatNode.id]: updateChatNode,
+              },
+              current_node: updateChatNode.id,
+            };
+
+            modifiedMessage(updateChatNode);
           }
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -218,17 +265,31 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
         } else {
           const { answer } = await response.json();
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: answer },
-          ];
+
+          let updateChatNode: ChatNode = {
+            id: nodeId,
+            message: {
+              id: nodeId,
+              role: 'assistant',
+              content: answer,
+              create_time: currentTime,
+            },
+            children: [],
+            parentMessageId: chatNode.id,
+          };
+
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages,
+            mapping: {
+              ...updatedConversation?.mapping,
+              [updateChatNode.id]: updateChatNode,
+            },
+            current_node: updateChatNode.id,
           };
+
           homeDispatch({
             field: 'selectedConversation',
-            value: updateConversation,
+            value: updatedConversation,
           });
           saveConversation(updatedConversation);
           const updatedConversations: Conversation[] = conversations.map(
@@ -301,10 +362,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       confirm(t<string>('Are you sure you want to clear all messages?')) &&
       selectedConversation
     ) {
-      handleUpdateConversation(selectedConversation, {
-        key: 'messages',
-        value: [],
+      let systemNode = selectedConversation.mapping[selectedConversation.id];
+      let updatedConversation = {
+        ...selectedConversation,
+      };
+      updatedConversation.current_node = systemNode.id;
+      updatedConversation.mapping = {
+        [systemNode.id]: {
+          ...systemNode,
+        },
+      };
+      homeDispatch({
+        field: 'selectedConversation',
+        value: updatedConversation,
       });
+      updateConversation(updatedConversation, conversations)
     }
   };
 
@@ -325,10 +397,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   useEffect(() => {
     throttledScrollDown();
-    selectedConversation &&
-      setCurrentMessage(
-        selectedConversation.messages[selectedConversation.messages.length - 2],
-      );
+    // selectedConversation &&
+    //   setCurrentMessage(
+    //     currentMessageList[currentMessageList.length - 2],
+    //   );
   }, [selectedConversation, throttledScrollDown]);
 
   useEffect(() => {
@@ -416,7 +488,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               <button
                 className="ml-2 cursor-pointer hover:opacity-50 disabled:hidden"
                 onClick={onClearAll}
-                disabled={selectedConversation?.messages.length === 0}
+                disabled={currentMessageList.length === 0}
               >
                 <IconClearAll size={18} />
               </button>
@@ -435,16 +507,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                     <ModelSelect />
 
-                    <SystemPrompt
-                      conversation={selectedConversation}
-                      prompts={prompts}
-                      onChangePrompt={(prompt) =>
-                        handleUpdateConversation(selectedConversation, {
-                          key: 'prompt',
-                          value: prompt,
-                        })
-                      }
-                    />
+                      <SystemPrompt
+                        conversation={selectedConversation!}
+                        prompts={prompts}
+                        onChangePrompt={(prompt) =>
+                          handleUpdateConversation(selectedConversation!, {
+                            key: 'prompt',
+                            value: prompt,
+                          })
+                        }
+                      />
 
                     <TemperatureSlider
                       label={t('Temperature')}
@@ -459,7 +531,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 )}
               </div>
             )}
-            {selectedConversation?.messages.length === 0 ? (
+            {currentMessageList.length === 0 ? (
               <>
                 <div className="container mx-auto px-3 pt-5 pb-36 md:pt-12 sm:max-w-[700px]">
                   <CardList
@@ -470,17 +542,19 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               </>
             ) : (
               <>
-                {selectedConversation?.messages.map((message, index) => (
+                {currentMessageList?.map((message, index) => (
                   <MemoizedChatMessage
-                    key={index}
-                    message={message}
+                    key={message.id}
+                    chatNode={message}
                     messageIndex={index}
                     onEdit={(editedMessage) => {
                       setCurrentMessage(editedMessage);
                       // discard edited message and the ones that come after then resend
                       handleSend(
                         editedMessage,
-                        selectedConversation?.messages.length - index,
+                        SendAction.EDIT,
+                        index,
+                        // currentMessageList?.length - index,
                       );
                     }}
                   />
@@ -502,12 +576,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             selectedPrompt={selectedPrompt}
             onSend={(message, plugin) => {
               setCurrentMessage(message);
-              handleSend(message, 0, plugin);
+              handleSend(message, SendAction.SEND, undefined, plugin);
             }}
             onScrollDownClick={handleScrollDown}
             onRegenerate={() => {
               if (currentMessage) {
-                handleSend(currentMessage, 2, null);
+                handleSend(currentMessage, SendAction.REGENERATE, undefined);
               }
             }}
             showScrollDownButton={showScrollDownButton}

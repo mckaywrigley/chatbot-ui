@@ -6,6 +6,7 @@ import {
   IconRepeat,
   IconSend,
 } from '@tabler/icons-react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   KeyboardEvent,
   MutableRefObject,
@@ -18,7 +19,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Message } from '@/types/chat';
+import { ChatNode } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -27,9 +28,11 @@ import HomeContext from '@/pages/api/home/home.context';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { ConversationContext } from '@/utils/contexts/conversaionContext';
+import { getCurrentUnixTime } from '@/utils/app/chatRoomUtils';
 
 interface Props {
-  onSend: (message: Message, plugin: Plugin | null) => void;
+  onSend: (message: ChatNode, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
   selectedPrompt: any; // Update the type to match your prompt data type
@@ -65,6 +68,8 @@ export const ChatInput = ({
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
 
+  const { currentMessageList } = useContext(ConversationContext);
+
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
   const filteredPrompts = prompts.filter((prompt) =>
@@ -99,7 +104,13 @@ export const ChatInput = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    const nodeId = uuidv4();
+    onSend({
+      id: nodeId,
+      message: { id: nodeId, role: 'user', content, create_time: getCurrentUnixTime() },
+      parentMessageId: selectedConversation?.current_node,
+      children: [],
+    }, plugin);
     setContent('');
     setPlugin(null);
 
@@ -282,7 +293,7 @@ export const ChatInput = ({
 
         {!messageIsStreaming &&
           selectedConversation &&
-          selectedConversation.messages.length > 0 && (
+          currentMessageList.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
               onClick={onRegenerate}
