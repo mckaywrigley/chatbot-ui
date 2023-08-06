@@ -1,6 +1,5 @@
 # Security Policy
 
-
 This security policy outlines the process for reporting vulnerabilities and secrets found within this GitHub repository. It is essential that all contributors and users adhere to this policy in order to maintain a secure and stable environment.
 
 ## Reporting a Vulnerability
@@ -30,7 +29,7 @@ If you discover any secrets, such as API keys or passwords, within the repositor
 
 2. **Contact the repository maintainer(s) privately.** Notify them of the discovered secret, its location, and any potential risks associated with it.
 
-3. **Wait for a response and further instructions.** 
+3. **Wait for a response and further instructions.**
 
 ## Responsible Disclosure
 
@@ -50,4 +49,3 @@ We are committed to maintaining the security of our project. When vulnerabilitie
 We welcome contributions that help improve the security of our project. If you have suggestions or want to contribute code to address security issues, please follow the standard contribution guidelines for this repository. When submitting a pull request related to security, please mention that it addresses a security issue and provide any necessary context.
 
 By adhering to this security policy, you contribute to the overall security and stability of the project. Thank you for your cooperation and responsible handling of vulnerabilities and secrets.
-
