@@ -33,6 +33,8 @@ import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
+import CardList from "@/components/Cards/CardList";
+import {Prompt} from "@/types/prompt";
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -63,6 +65,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showScrollDownButton, setShowScrollDownButton] =
     useState<boolean>(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<any | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -261,6 +264,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     }
   }, [autoScrollEnabled]);
 
+  const handlePromptSelect = (prompt: any) => {
+    setSelectedPrompt(prompt); // Update the selectedPrompt state with the selected prompt
+  };
+
   const handleScroll = () => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
@@ -398,43 +405,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           >
             {selectedConversation?.messages.length === 0 ? (
               <>
-                <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-                  <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                    {models.length === 0 ? (
-                      <div>
-                        <Spinner size="16px" className="mx-auto" />
-                      </div>
-                    ) : (
-                      'Chatbot UI'
-                    )}
-                  </div>
-
-                  {models.length > 0 && (
-                    <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                      <ModelSelect />
-
-                      <SystemPrompt
-                        conversation={selectedConversation}
-                        prompts={prompts}
-                        onChangePrompt={(prompt) =>
-                          handleUpdateConversation(selectedConversation, {
-                            key: 'prompt',
-                            value: prompt,
-                          })
-                        }
-                      />
-
-                      <TemperatureSlider
-                        label={t('Temperature')}
-                        onChangeTemperature={(temperature) =>
-                          handleUpdateConversation(selectedConversation, {
-                            key: 'temperature',
-                            value: temperature,
-                          })
-                        }
-                      />
-                    </div>
-                  )}
+                <div className="container mx-auto px-3 pt-5 md:pt-12 sm:max-w-[700px]">
+                  <CardList cards={prompts} handlePromptSelect={handlePromptSelect} />
                 </div>
               </>
             ) : (
@@ -492,6 +464,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           <ChatInput
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
+            selectedPrompt={selectedPrompt}
             onSend={(message, plugin) => {
               setCurrentMessage(message);
               handleSend(message, 0, plugin);

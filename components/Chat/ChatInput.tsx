@@ -32,6 +32,7 @@ interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
+  selectedPrompt: any; // Update the type to match your prompt data type
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
@@ -43,6 +44,7 @@ export const ChatInput = ({
   onScrollDownClick,
   stopConversationRef,
   textareaRef,
+  selectedPrompt,
   showScrollDownButton,
 }: Props) => {
   const { t } = useTranslation('chat');
@@ -238,6 +240,12 @@ export const ChatInput = ({
       }`;
     }
   }, [content]);
+
+  useEffect(() => {
+    if (selectedPrompt) {
+      handlePromptSelect(selectedPrompt);
+    }
+  }, [selectedPrompt]); // Add selectedPrompt to the dependency array
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
