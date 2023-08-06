@@ -123,17 +123,16 @@ export const ChatInput = ({
     return mobileRegex.test(userAgent);
   };
 
-  const handleInitModal = () => {
-    const selectedPrompt = filteredPrompts[activePromptIndex];
-    if (selectedPrompt) {
+  const handleInitModal = (card = false) => {
+    const prompt = card ? selectedPrompt : filteredPrompts[activePromptIndex];
+    if (prompt) {
       setContent((prevContent) => {
-        const newContent = prevContent?.replace(
-          /\/\w*$/,
-          selectedPrompt.content,
-        );
+        const newContent = card
+          ? `${prevContent ? prevContent + ' ' : ''}${prompt.content}`
+          : prevContent?.replace(/\/\w*$/, prompt.content);
         return newContent;
       });
-      handlePromptSelect(selectedPrompt);
+      handlePromptSelect(prompt);
     }
     setShowPromptList(false);
   };
@@ -197,7 +196,7 @@ export const ChatInput = ({
     }
   }, []);
 
-  const handlePromptSelect = (prompt: Prompt) => {
+  const handlePromptSelect = (prompt: Prompt, card = false) => {
     const parsedVariables = parseVariables(prompt.content);
     setVariables(parsedVariables);
 
@@ -205,24 +204,29 @@ export const ChatInput = ({
       setIsModalVisible(true);
     } else {
       setContent((prevContent) => {
-        const updatedContent = prevContent?.replace(/\/\w*$/, prompt.content);
+        const updatedContent = card
+          ? `${prevContent ? prevContent + ' ' : ''}${prompt.content}`
+          : prevContent?.replace(/\/\w*$/, prompt.content);
+        selectedPrompt = null;
         return updatedContent;
       });
+
       updatePromptListVisibility(prompt.content);
     }
   };
 
   const handleSubmit = (updatedVariables: string[]) => {
+    console.log(content);
     const newContent = content?.replace(/{{(.*?)}}/g, (match, variable) => {
       const index = variables.indexOf(variable);
       return updatedVariables[index];
     });
-
     setContent(newContent);
 
     if (textareaRef && textareaRef.current) {
       textareaRef.current.focus();
     }
+    selectedPrompt = null;
   };
 
   useEffect(() => {
@@ -243,7 +247,7 @@ export const ChatInput = ({
 
   useEffect(() => {
     if (selectedPrompt) {
-      handlePromptSelect(selectedPrompt);
+      handleInitModal(true);
     }
   }, [selectedPrompt]); // Add selectedPrompt to the dependency array
 
