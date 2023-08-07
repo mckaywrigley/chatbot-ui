@@ -1,4 +1,9 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import {
+  IconClearAll,
+  IconScreenshot,
+  IconSettings,
+  IconMarkdown,
+} from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -307,6 +312,30 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   };
   const throttledScrollDown = throttle(scrollDown, 250);
 
+  const onMarkdown = () => {
+    if (!selectedConversation){
+      return '';
+    }
+    let markdownContent = '';
+
+    selectedConversation.messages.forEach(obj => {
+      markdownContent += `## ${obj.role === "user" ? t('You') : t("AI")}\n\n${obj.content}\n\n`;
+    });
+
+    const date = new Date().toLocaleString("default", { year: "numeric", month: "long", day: "numeric" })
+    const time = new Date().toLocaleTimeString("default", {hour12: true, hour: "numeric", minute: "numeric"})
+
+    markdownContent += `---\n`
+    markdownContent += `${t("Exported on")} ` + date + ` ${t("at")} ` + time + ".";
+
+    const markdownFile = new Blob([markdownContent], { type: 'text/markdown' });
+    const downloadLink = document.createElement('a');
+
+    downloadLink.href = URL.createObjectURL(markdownFile);
+    downloadLink.download = `${selectedConversation?.name || 'conversation'}.md`;
+    downloadLink.click();
+  }
+
   // useEffect(() => {
   //   console.log('currentMessage', currentMessage);
   //   if (currentMessage) {
@@ -453,6 +482,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     onClick={onClearAll}
                   >
                     <IconClearAll size={18} />
+                  </button>
+                  <button
+                      className="ml-2 cursor-pointer hover:opacity-50"
+                      onClick={onMarkdown}
+                  >
+                    <IconMarkdown size={18} />
                   </button>
                 </div>
                 {showSettings && (
