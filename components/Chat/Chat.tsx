@@ -2,6 +2,7 @@ import {
   IconClearAll,
   IconScreenshot,
   IconSettings,
+  IconMarkdown,
 } from '@tabler/icons-react';
 import {
   MutableRefObject,
@@ -393,6 +394,27 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   };
   const throttledScrollDown = throttle(scrollDown, 250);
 
+  const onMarkdown = () => {
+    let markdownContent = '';
+
+    currentMessageList.forEach(obj => {
+      markdownContent += `## ${obj.message.role === "user" ? t('You') : t("AI")}\n\n${obj.message.content}\n\n`;
+    });
+
+    const date = new Date().toLocaleString("default", { year: "numeric", month: "long", day: "numeric" })
+    const time = new Date().toLocaleTimeString("default", {hour12: true, hour: "numeric", minute: "numeric"})
+
+    markdownContent += `---\n`
+    markdownContent += `${t("Exported on")} ` + date + ` ${t("at")} ` + time + ".";
+
+    const markdownFile = new Blob([markdownContent], { type: 'text/markdown' });
+    const downloadLink = document.createElement('a');
+
+    downloadLink.href = URL.createObjectURL(markdownFile);
+    downloadLink.download = `${selectedConversation?.name || 'conversation'}.md`;
+    downloadLink.click();
+  }
+
   const onScreenshot = () => {
     if (chatContainerRef.current === null) {
       return;
@@ -525,6 +547,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                       onClick={onScreenshot}
                   >
                     <IconScreenshot size={18} />
+                  </button>
+
+                  <button
+                    className="ml-2 cursor-pointer hover:opacity-50"
+                    onClick={onMarkdown}
+                  >
+                    <IconMarkdown size={18} />
                   </button>
                 </div>
                 {showSettings && selectedConversation && (
