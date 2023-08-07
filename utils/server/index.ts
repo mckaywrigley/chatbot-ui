@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { SendMessage } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
 import {
@@ -34,7 +34,7 @@ export const OpenAIStream = async (
   systemPrompt: string,
   temperature: number,
   key: string,
-  messages: Message[],
+  messages: SendMessage[],
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
   if (OPENAI_API_TYPE === 'azure') {

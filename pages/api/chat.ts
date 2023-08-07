@@ -1,7 +1,7 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
-import { ChatBody, Message } from '@/types/chat';
+import { ChatBody, Message, SendMessage } from '@/types/chat';
 
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     const prompt_tokens = encoding.encode(promptToSend);
 
     let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
+    let messagesToSend: SendMessage[] = [];
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];

@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 import HomeContext from '@/pages/api/home/home.context';
+import { Conversation } from '@/types/chat';
 
 interface Props {
   label: string;
