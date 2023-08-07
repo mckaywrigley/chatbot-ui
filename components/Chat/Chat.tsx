@@ -1,4 +1,4 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll, IconSettings, IconPdf } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -33,6 +33,9 @@ import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+
+import {jsPDF} from "jspdf";
+import html2canvas from "html2canvas";
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -300,6 +303,34 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     }
   };
 
+  const onPdf = () => {
+    if (chatContainerRef.current === null) {
+      return;
+    }
+    else {
+      chatContainerRef.current.classList.remove('max-h-full')
+      html2canvas(chatContainerRef.current).then((canvas) => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.classList.add('max-h-full')
+        }
+        const imgData = canvas.toDataURL('image/png');
+        const orientation = canvas.width > canvas.height ? "l" : "p";
+        const pixelRatio = window.devicePixelRatio > 2 ? window.devicePixelRatio : 2
+        const pdf = new jsPDF(
+            orientation,
+            "pt",
+            [canvas.width / pixelRatio, canvas.height / pixelRatio],
+            true,
+        );
+        var pdfWidth = pdf.internal.pageSize.getWidth();
+        var pdfHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, "", "FAST");
+        const title = `${selectedConversation?.name || 'conversation'}.pdf`
+        pdf.save(title)
+      })
+    }
+  };
+
   const scrollDown = () => {
     if (autoScrollEnabled) {
       messagesEndRef.current?.scrollIntoView(true);
@@ -453,6 +484,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                     onClick={onClearAll}
                   >
                     <IconClearAll size={18} />
+                  </button>
+
+                  <button
+                      className="ml-2 cursor-pointer hover:opacity-50"
+                      onClick={onPdf}
+                  >
+                    <IconPdf size={18} />
                   </button>
                 </div>
                 {showSettings && (
