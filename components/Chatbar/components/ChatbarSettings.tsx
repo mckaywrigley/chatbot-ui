@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings, IconLogout} from '@tabler/icons-react';
+import { IconFileExport,IconFile, IconSettings, IconLogout} from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -33,7 +33,8 @@ export const ChatbarSettings = () => {
   const {
     handleClearConversations,
     handleImportConversations,
-    handleExportData,
+    handleExportDataDoc,
+    handleExportDataXLSX,
     handleApiKeyChange,
   } = useContext(ChatbarContext);
 
@@ -43,12 +44,18 @@ export const ChatbarSettings = () => {
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
 
-      <Import onImport={handleImportConversations} />
+      {/*<Import onImport={handleImportConversations} />*/}
 
       <SidebarButton
-        text={t('Export data')}
+        text={t('Export data Doc')}
         icon={<IconFileExport size={18} />}
-        onClick={() => handleExportData()}
+        onClick={() => handleExportDataDoc()}
+      />
+
+      <SidebarButton
+        text={t('Export data XLSX')}
+        icon={<IconFile size={18} />}
+        onClick={() => handleExportDataXLSX()}
       />
 
       <SidebarButton
