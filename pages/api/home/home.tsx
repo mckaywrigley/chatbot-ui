@@ -324,17 +324,17 @@ const Home = ({
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
-    if (session?.user?.name){
-      localStorage.setItem('user', JSON.stringify(session?.user?.name));
-      loadChatHistory().then( (chatHistory) => {
-        let parsedConversationHistory: Conversation[] = []
-        if (chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
-          const cleanedConversationHistory = cleanConversationHistory(
-            parsedConversationHistory,
-          );
-          dispatch({ field: 'conversations', value: cleanedConversationHistory });
-      });
-    }
+    
+    // Load Conversations History Block
+    localStorage.setItem('user', JSON.stringify(session?.user?.name));
+    loadChatHistory().then( (chatHistory) => {
+      let parsedConversationHistory: Conversation[] = []
+      if (chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
+        const cleanedConversationHistory = cleanConversationHistory(
+          parsedConversationHistory,
+        );
+        dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    });
 
     // const conversationHistory = localStorage.getItem('conversationHistory');
     const selectedConversation = localStorage.getItem('selectedConversation');
@@ -369,6 +369,7 @@ const Home = ({
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
+    session
   ]);
 
   //AUTH SESSION ---------------------------------------------
