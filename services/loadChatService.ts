@@ -14,9 +14,8 @@ export const loadChatHistory = async () => {
       });
       return conversations;
     });
-      // 'conversations' contains an array of conversation objects retrieved for the specific user
-    console.log(user)
-    return querySnapshot[0].conversations;
+    // 'conversations' contains an array of conversation objects retrieved for the specific user
+    return (querySnapshot[0] != undefined) ?  querySnapshot[0].conversations : ''
   } catch (error) {
     console.error('Error loading conversations:', error);
     return [];

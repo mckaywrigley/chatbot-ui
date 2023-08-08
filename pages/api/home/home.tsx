@@ -11,6 +11,7 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 import { loadChatHistory } from '@/services/loadChatService';
+import { loadPromptHistory } from '@/services/loadPromptService';
 
 import {
   cleanConversationHistory,
@@ -272,8 +273,9 @@ const Home = ({
       isMounted = false;
     };
   }, [session]);
-
+  
   useEffect(() => {
+    localStorage.setItem('user', JSON.stringify(session?.user?.name));
     const settings = getSettings();
     if (settings.theme) {
       dispatch({
@@ -319,17 +321,17 @@ const Home = ({
     if (folders) {
       dispatch({ field: 'folders', value: JSON.parse(folders) });
     }
-
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
+    // Load Prompt History
+    loadPromptHistory().then( (promptHistory) => {
+      let parsedPromptHistory: Prompt[] = []
+      if (promptHistory !== '' && promptHistory.length > 0) parsedPromptHistory = JSON.parse(promptHistory);
+      dispatch({ field: 'prompts', value: parsedPromptHistory });
+    });
     
     // Load Conversations History Block
-    localStorage.setItem('user', JSON.stringify(session?.user?.name));
     loadChatHistory().then( (chatHistory) => {
       let parsedConversationHistory: Conversation[] = []
-      if (chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
+      if (chatHistory !== '' && chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
         const cleanedConversationHistory = cleanConversationHistory(
           parsedConversationHistory,
         );
