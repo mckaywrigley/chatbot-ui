@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client"
 import { NextApiRequest, NextApiResponse } from "next/types"
 import { z } from "zod";
 
-const prisma = new PrismaClient()
 
 const DeletePromptRequest = z.object({
     id: z.number()
@@ -22,13 +20,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 async function deletePrompt(rawData : any) {
 
     try {
-     const data = DeletePromptRequest.parse(rawData);
-     const result = await prisma.prompt.delete({
-        where: {
-           id: data.id,
-         },
-       });
-     return result;
+    //  const data = DeletePromptRequest.parse(rawData);
+    //  const result = await prisma.prompt.delete({
+    //     where: {
+    //        id: data.id,
+    //      },
+    //    });
+    //  return result;
+    return 1;
     } catch (e)
     {
      console.log(e);

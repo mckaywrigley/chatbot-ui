@@ -1,4 +1,4 @@
-import { IconBuildingStore, IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconBuildingStore, IconFileExport, IconLogout, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -13,9 +13,10 @@ import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { MarketplaceDialog } from '@/components/Settings/MarketplaceDialog';
 import UserInfo from '@/components/User/UserInfo';
+import Signout from '@/components/Signout/Signout';
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
@@ -72,6 +73,13 @@ export const ChatbarSettings = () => {
         icon={<IconSettings size={18} />}
         onClick={() => setIsSettingDialog(true)}
       />
+       {
+          session ?  <SidebarButton
+          text={t('Sign out')}
+          icon={<IconLogout size={18} />}
+          onClick={() => signOut()}
+        /> : null
+       }
 
       {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />

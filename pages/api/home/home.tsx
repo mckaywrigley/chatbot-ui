@@ -357,19 +357,20 @@ const Home = ({
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
   ]);
-  
-  if (session) { console.log(session.user?.email)}
-  if (loginRequired === 'true' && !session) {
-    removeTokenCookie();
-    return <LoginPage/>
-  }
+  // Temporary disable LOGIN_REQUIRED	check 
+  //   
+  // if (session) { console.log(session.user?.email)}
+  // if (loginRequired === 'true' && !session) {
+  //   removeTokenCookie();
+  //   return <LoginPage/>
+  // }
 
-  if (!session) {
-    return <LoginPage />;
-  }
-  if (loginRequired === 'true' && session) {
-    setTokenCookie(session.user.accessToken.accessToken || "")
-  }
+  // if (!session) {
+  //   return <LoginPage />;
+  // }
+  // if (loginRequired === 'true' && session) {
+  //   setTokenCookie(session.user.accessToken.accessToken || "")
+  // }
   return (
     <HomeContext.Provider
       value={{
@@ -383,7 +384,8 @@ const Home = ({
       }}
     >
       <Head>
-        <title> {t(`{{APP_NAME_TRANSLATED}}`, { APP_NAME_TRANSLATED })}</title>
+        {/* <title> {t(`{{APP_NAME_TRANSLATED}}`, { APP_NAME_TRANSLATED })}</title> */}
+        <title>{APP_NAME_TRANSLATED}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"

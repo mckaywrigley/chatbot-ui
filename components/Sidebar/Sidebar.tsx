@@ -9,6 +9,7 @@ import {
 
 import Search from '../Search';
 import Signout from '../Signout/Signout';
+import { useSession } from 'next-auth/react';
 
 interface Props<T> {
   isOpen: boolean;
@@ -44,6 +45,7 @@ const Sidebar = <T,>({
   children,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
+  const { data: session } = useSession()
 
   const allowDrop = (e: any) => {
     e.preventDefault();
@@ -114,7 +116,6 @@ const Sidebar = <T,>({
           )}
         </div>
         {footerComponent}
-        <Signout />
       </div>
       <CloseSidebarButton onClick={toggleOpen} side={side} />
     </div>

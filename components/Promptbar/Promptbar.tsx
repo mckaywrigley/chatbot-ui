@@ -20,9 +20,11 @@ import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { useSession } from 'next-auth/react';
 
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
+  const { data: session } = useSession();
 
   const promptBarContextValue = useCreateReducer<PromptbarInitialState>({
     initialState,
@@ -146,7 +148,9 @@ const Promptbar = () => {
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
       >
-        <WorkspaceComponent />
+        {
+         session ?  <WorkspaceComponent /> : <></>
+        }
       </Sidebar>
     </PromptbarContext.Provider>
   );

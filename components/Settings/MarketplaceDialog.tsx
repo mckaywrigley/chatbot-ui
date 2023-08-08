@@ -25,10 +25,10 @@ export const MarketplaceDialog: FC<Props> = ({ open, onClose }) => {
 
   useEffect(() => {
     async function setPrompts() {
-        const privPrompts = await getPrivatePrompts(session?.user.id);
-        const pubPrompts = await getPublicPrompts();
-        setPrivatePrompts(privPrompts);
-        setPublicPrompts(pubPrompts);
+        //const privPrompts = await getPrivatePrompts(session?.user.id);
+        //const pubPrompts = await getPublicPrompts();
+        //setPrivatePrompts(privPrompts);
+        //setPublicPrompts(pubPrompts);
     }
     setPrompts();
  }, [onClose])
@@ -164,23 +164,23 @@ async function getPublicPrompts() {
   return res.json()
 }
 
-async function getPrivatePrompts(ownerId : string) {
-  let data = { "ownerId": ownerId}
-  const url = `${BASE_API_PROMPT_URL}/getPrivate`;
-  const res = await fetch(url,{
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST'
-  })
+// async function getPrivatePrompts(ownerId : string) {
+//   let data = { "ownerId": ownerId}
+//   const url = `${BASE_API_PROMPT_URL}/getPrivate`;
+//   const res = await fetch(url,{
+//     body: JSON.stringify(data),
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     method: 'POST'
+//   })
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch data')
-  }
+//   if (!res.ok) {
+//     throw new Error('Failed to fetch data')
+//   }
  
-  return res.json();
-}
+//   return res.json();
+// }
 
 async function changePromptVisibility(id: string){
   let data = { "id": id}

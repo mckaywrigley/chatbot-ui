@@ -10,13 +10,24 @@ export interface OpenAIModel {
 export enum OpenAIModelID {
   GPT_3_5 = 'gpt-3.5-turbo',
   GPT_3_5_AZ = 'gpt-35-turbo',
+  GPT_3_5_TURBO_0301 = 'gpt-3.5-turbo-0301',
+  GPT_3_5_TURBO_0613 = 'gpt-3.5-turbo-0613',
+  GPT_3_5_TURBO_16k = 'gpt-3.5-turbo-16k',
+  GPT_3_5_TURBO_16k_0613 = 'gpt-3.5-turbo-16k-0613',
   GPT_4 = 'gpt-4',
   GPT_4_32K = 'gpt-4-32k',
+  GPT_4_0314 = 'gpt-4-0314',
+  GPT_4_0613 = 'gpt-4-0613'
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
 export const fallbackModelID = OpenAIModelID.GPT_3_5;
 
+/**
+ * API Key Rate limits:
+  - ! TODO: Add to models appropriate limits that match certain models
+  https://platform.openai.com/account/rate-limits
+ */
 export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
   [OpenAIModelID.GPT_3_5]: {
     id: OpenAIModelID.GPT_3_5,
@@ -39,6 +50,42 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
   [OpenAIModelID.GPT_4_32K]: {
     id: OpenAIModelID.GPT_4_32K,
     name: 'GPT-4-32K',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_3_5_TURBO_0301]: {
+    id: OpenAIModelID.GPT_3_5_TURBO_0301,
+    name: 'GPT-3.5 TURBO (0301)',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_3_5_TURBO_0613]: {
+    id: OpenAIModelID.GPT_3_5_TURBO_0613,
+    name: 'GPT-3.5 TURBO (0613)',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_3_5_TURBO_16k]: {
+    id: OpenAIModelID.GPT_3_5_TURBO_16k,
+    name: 'GPT-3.5 TURBO 16k',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_3_5_TURBO_16k_0613]: {
+    id: OpenAIModelID.GPT_3_5_TURBO_16k_0613,
+    name: 'GPT-3.5 TURBO 16k (0613)',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_4_0314]: {
+    id: OpenAIModelID.GPT_4_0314,
+    name: 'GPT-4 (0314)',
+    maxLength: 96000,
+    tokenLimit: 32000,
+  },
+  [OpenAIModelID.GPT_4_0613]: {
+    id: OpenAIModelID.GPT_4_0613,
+    name: 'GPT-4 (0613)',
     maxLength: 96000,
     tokenLimit: 32000,
   },
