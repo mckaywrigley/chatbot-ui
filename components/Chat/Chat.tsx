@@ -338,6 +338,30 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     }
   };
 
+  const onMarkdown = () => {
+    if (!selectedConversation){
+      return '';
+    }
+    let markdownContent = '';
+
+    selectedConversation.messages.forEach(obj => {
+      markdownContent += `## ${obj.role === "user" ? t('You') : t("AI")}\n\n${obj.content}\n\n`;
+    });
+
+    const date = new Date().toLocaleString("default", { year: "numeric", month: "long", day: "numeric" })
+    const time = new Date().toLocaleTimeString("default", {hour12: true, hour: "numeric", minute: "numeric"})
+
+    markdownContent += `---\n`
+    markdownContent += `${t("Exported on")} ` + date + ` ${t("at")} ` + time + ".";
+
+    const markdownFile = new Blob([markdownContent], { type: 'text/markdown' });
+    const downloadLink = document.createElement('a');
+
+    downloadLink.href = URL.createObjectURL(markdownFile);
+    downloadLink.download = `${selectedConversation?.name || 'conversation'}.md`;
+    downloadLink.click();
+  }
+
   const handleScrollDown = () => {
     chatContainerRef.current?.scrollTo({
       top: chatContainerRef.current.scrollHeight,
@@ -526,6 +550,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                             onClick={generatePdfHandler}
                         >
                           <IconPdf size={24} />
+                        </button>
+                        <button
+                            className="ml-2 cursor-pointer hover:opacity-50"
+                            onClick={onMarkdown}
+                        >
+                          Export to Markdown
                         </button>
                       </div>
                       {showSettings && (

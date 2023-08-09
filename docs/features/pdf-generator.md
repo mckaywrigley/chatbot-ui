@@ -1,4 +1,4 @@
-# PWA Feature
+# PDF generator
 This feature adds PDF generator from the chat.
 
 | Feature name  | Description                      | Date       | Contributor                         |
