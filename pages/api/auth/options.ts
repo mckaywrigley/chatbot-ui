@@ -28,21 +28,25 @@ export const options: NextAuthOptions = {
         // This is where you need to retrieve user data
         // to verify with credentials
         // Docs: https://next-auth.js.org/configuration/providers/credentials
-        const res = await fetch(`${backendURL}/api/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: credentials?.username,
-            password: credentials?.password,
-          })
-        });
-
-        const user = await res.json();
-        if (user && Object.keys(user).length !== 0) {
-          return user;
-        } else {
+        try {
+          const res = await fetch(`${backendURL}/api/login`, {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: credentials?.username,
+              password: credentials?.password,
+            })
+          });
+          const user = await res.json();
+          if (user && Object.keys(user).length !== 0) {
+            return user;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error('error', error)
           return null;
         }
       }
@@ -55,7 +59,6 @@ export const options: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       let jsonuser = user;
-      console.log('jwt user', user)
       if (user && typeof user === 'string') {
         jsonuser = JSON.parse(user as any);
       }

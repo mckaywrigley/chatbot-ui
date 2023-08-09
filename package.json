@@ -13,7 +13,8 @@
     "analyze": "ANALYZE=true next build",
     "analyze:server": "BUNDLE_ANALYZE=server next build",
     "analyze:browser": "BUNDLE_ANALYZE=browser next build",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",

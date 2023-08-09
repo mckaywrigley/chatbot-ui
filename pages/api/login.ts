@@ -11,8 +11,6 @@ interface RequestBody {
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
     const body = req.body as RequestBody;
-    console.log('body', body);
-
     const user = await prisma.user.findFirst({
       where: {
         email: body?.username,
@@ -25,6 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         ...userWithoutPass,
         accessToken
       };
+      console.log('handler result: ', result)
       res.status(200).json(JSON.stringify(result));
     } else {
       res.status(500).json({});
