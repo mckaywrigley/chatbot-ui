@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import SigninButton from "@/components/Buttons/SinginButton";
+import SigninButton from "./Buttons/SinginButton";
 
 const AppBar = () => {
   return (

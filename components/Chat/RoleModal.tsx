@@ -8,7 +8,8 @@ import Input from 'antd/lib/input';
 import dynamic from 'next/dynamic'
 import { FC, useCallback, useEffect, useState, useRef } from 'react';
 import va from '@vercel/analytics';
-import { replaceAtPosition } from '@/utils/app/replaceAttr'; import { PromptSelector } from '../Prompt/PromptSelector';
+import { replaceAtPosition } from '@/utils/app/replaceAttr';
+import { PromptSelector } from '../Prompt/PromptSelector';
 
 const ImageUploader = dynamic(() => import('./ImageUploader'))
 interface Props {

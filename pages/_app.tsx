@@ -6,9 +6,9 @@ import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
 import { ModelContextProvider } from '@/hooks';
 import Providers from '@/components/Providers';
-import TopBar from '@/components/TopBar';
 
 import '@/styles/globals.css';
+import '@/styles/style.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,13 +18,12 @@ function App({ Component, pageProps }: AppProps<{}>) {
     <div className={inter.className}>
       <Toaster />
       <ModelContextProvider>
-        <QueryClientProvider client={queryClient}>
-          <Providers>
-            <TopBar />
+        <Providers>
+          <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
-          </Providers>
-          <Analytics />
-        </QueryClientProvider>
+            <Analytics />
+          </QueryClientProvider>
+        </Providers>
       </ModelContextProvider>
     </div>
   );

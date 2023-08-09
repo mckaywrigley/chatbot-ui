@@ -7,8 +7,8 @@ const { i18n } = require('./next-i18next.config');
 const nextConfig = {
   i18n,
   reactStrictMode: true,
+  // TODO：edge环境需要移除这个包
   // experimental: {
-  //   appDir: true,
   //   serverComponentsExternalPackages: ['bcrypt'],
   // },
   webpack(config, { isServer, dev }) {
@@ -16,8 +16,6 @@ const nextConfig = {
       asyncWebAssembly: true,
       layers: true,
     };
-    config.externals = [...config.externals, 'bcrypt'];
-
     return config;
   },
 };

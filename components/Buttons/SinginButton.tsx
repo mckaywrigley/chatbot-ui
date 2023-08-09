@@ -1,20 +1,22 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 const SigninButton = () => {
   const { data: session } = useSession();
-  if (session && session.user) {
-    return (
-      <div className='flex gap-4 ml-auto'>
-        <p className='text-sky-600'>{session.user.name}</p>
-        <button onClick={() => signOut()} className='text-red-600'>
-          Sign Out
-        </button>
-      </div>
-    )
-  }
+  const signedIn = session && session.user;
 
-  return <button onClick={() => signIn()} className="text-green-600 ml-auto">SigninButton</button>
+  const onSignInBtnClick = useCallback(() => {
+    if (signedIn) signOut();
+    else signIn();
+  }, [signedIn]);
+  return (
+    <div className='flex ml-2'>
+      {signedIn ? <p className='text-sky-600'>{session?.user?.name}</p> : <></>}
+      <button onClick={() => onSignInBtnClick()} className="ml-2 cursor-pointer hover:opacity-50">
+        {signedIn ? '退出登录' : '登陆'}
+      </button>
+    </div>
+  )
 };
 
 export default SigninButton;

@@ -1,0 +1,28 @@
+/* Switch element */
+.form-switch {
+    @apply relative select-none;
+    width: 68px;
+}
+
+.form-switch label {
+    @apply block overflow-hidden cursor-pointer rounded;
+    height: 38px;
+}
+
+.form-switch label>span:first-child {
+    @apply absolute block rounded shadow;
+    width: 30px;
+    height: 30px;
+    top: 4px;
+    left: 4px;
+    right: 50%;
+    transition: all .15s ease-out;
+}
+
+.form-switch input[type="checkbox"]:checked+label {
+    @apply bg-blue-600;
+}
+
+.form-switch input[type="checkbox"]:checked+label>span:first-child {
+    left: 34px;
+}

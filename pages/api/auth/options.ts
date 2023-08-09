@@ -1,11 +1,10 @@
 import type { NextAuthOptions } from "next-auth";
 import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "../../../lib/prismadb";
+
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const options: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
@@ -15,21 +14,21 @@ export const options: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         username: {
-          label: "Username:",
+          label: "用户名:",
           type: "text",
-          placeholder: "your-cool-username"
+          placeholder: "输入应用名"
         },
         password: {
-          label: "Password:",
+          label: "密码:",
           type: "password",
-          placeholder: "your-awesome-password"
+          placeholder: "输入密码"
         }
       },
       async authorize(credentials) {
         // This is where you need to retrieve user data
         // to verify with credentials
         // Docs: https://next-auth.js.org/configuration/providers/credentials
-        const res = await fetch('api/login', {
+        const res = await fetch(`${backendURL}/api/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -41,14 +40,31 @@ export const options: NextAuthOptions = {
         });
 
         const user = await res.json();
-
-        if (user) {
-          return user
+        if (user && Object.keys(user).length !== 0) {
+          return user;
         } else {
-          return null
+          return null;
         }
       }
-    })
+    }),
+
   ],
+  pages: {
+    signIn: "/auth/signin",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      let jsonuser = user;
+      console.log('jwt user', user)
+      if (user && typeof user === 'string') {
+        jsonuser = JSON.parse(user as any);
+      }
+      return { ...token, ...jsonuser }
+    },
+    async session({ token, session, user }) {
+      session.user = token as any;
+      return session;
+    },
+  }
 }
 
