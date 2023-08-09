@@ -29,6 +29,16 @@ git checkout -b my-branch-name
 ```
 
 Before submitting your pull request, please make sure your changes pass our automated tests and adhere to our code style guidelines.
+## Internationalization
+
+This project supports multiple locales and translations can be found in [public/locales](public/locales).
+Whenever you add some English text to the UI, make sure to :
+
+1. wrap the English string with the `t(...)` function
+1. add the English string to the locale files. You can repeat the English text as a default translation for all languages as a first step.
+1. then run the `npm run update-translations` command. This will suggest translations for your new texts.
+1. review the changes
+1. `git add` and `git commit` whatever feels safe
 
 ## Pull Request Process
 
