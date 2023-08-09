@@ -10,6 +10,8 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
+import { loadChatHistory } from '@/services/loadChatService';
+import { loadPromptHistory } from '@/services/loadPromptService';
 
 import {
   cleanConversationHistory,
@@ -253,8 +255,27 @@ const Home = ({
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
+  const { data: session } = useSession();
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchChatHistory = async () => {
+      if (isMounted && session?.user?.name) {
+        localStorage.setItem('user', JSON.stringify(session?.user?.name));
+      }
+    };
+
+    fetchChatHistory();
+
+    // Cleanup function to stop the loop when the component is unmounted
+    return () => {
+      isMounted = false;
+    };
+  }, [session]);
+  
+  useEffect(() => {
+    localStorage.setItem('user', JSON.stringify(session?.user?.name));
     const settings = getSettings();
     if (settings.theme) {
       dispatch({
@@ -300,23 +321,24 @@ const Home = ({
     if (folders) {
       dispatch({ field: 'folders', value: JSON.parse(folders) });
     }
+    // Load Prompt History
+    loadPromptHistory().then( (promptHistory) => {
+      let parsedPromptHistory: Prompt[] = []
+      if (promptHistory !== '' && promptHistory.length > 0) parsedPromptHistory = JSON.parse(promptHistory);
+      dispatch({ field: 'prompts', value: parsedPromptHistory });
+    });
+    
+    // Load Conversations History Block
+    loadChatHistory().then( (chatHistory) => {
+      let parsedConversationHistory: Conversation[] = []
+      if (chatHistory !== '' && chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
+        const cleanedConversationHistory = cleanConversationHistory(
+          parsedConversationHistory,
+        );
+        dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    });
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
-
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
-
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
-    }
-
+    // const conversationHistory = localStorage.getItem('conversationHistory');
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation =
@@ -349,15 +371,15 @@ const Home = ({
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
+    session
   ]);
 
   //AUTH SESSION ---------------------------------------------
 
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
 
-  if(!session){
-    return <div>Please Login</div>
-  }
+  if(!session) return <div>Please Login</div>
+  localStorage.setItem('user', JSON.stringify(session?.user?.name))
 
   return (
     <HomeContext.Provider
