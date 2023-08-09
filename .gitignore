@@ -39,3 +39,10 @@ next-env.d.ts
 .idea
 pnpm-lock.yaml
 prisma/dev.db
+
+
+# pwa artifacts
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map

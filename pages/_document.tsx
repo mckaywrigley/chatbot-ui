@@ -21,6 +21,7 @@ export default function Document(props: Props) {
           name="apple-mobile-web-app-title"
           content={'Zeno'}
         ></meta>
+        <link rel="manifest" href="/manifest.json" />
       </Head>
       <body>
         <Main />
