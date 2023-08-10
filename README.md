@@ -91,13 +91,14 @@ When deploying the application, the following environment variables can be set:
 | DEFAULT_MODEL                     | `gpt-3.5-turbo`                | The default model to use on new conversations, for Azure use `gpt-35-turbo`                                                               |
 | NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations                                                                                     |
 | NEXT_PUBLIC_DEFAULT_TEMPERATURE   | 1                              | The default temperature to use on new conversations                                                                                       |
+| GUEST_CODE                        | `1234`                         | Password for accessing the API services to prevent unauthorized operations.                                                               |
 | GOOGLE_API_KEY                    |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 | GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
-| API_BASE_URL | https://api.openai.com | Backend API URL |
-| NEXT_PUBLIC_LOGIN_REQUIRED | false | Require auth to access the app |
-| LOG_INCOMING_MESSAGES | false | Log incoming messages to the console |
-| LOG_TRIM_MESSAGES | true | Log only the last message to the console |
-| DATABASE_URL | file:./dev.db | Url to database of your choice |
+| API_BASE_URL                      | https://api.openai.com         | Backend API URL                                                                                                                           |
+| NEXT_PUBLIC_LOGIN_REQUIRED        | false                          | Require auth to access the app                                                                                                            |
+| LOG_INCOMING_MESSAGES             | false                          | Log incoming messages to the console                                                                                                      |
+| LOG_TRIM_MESSAGES                 | true                           | Log only the last message to the console                                                                                                  |
+| DATABASE_URL                      | file:./dev.db                  | Url to database of your choice                                                                                                            |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 

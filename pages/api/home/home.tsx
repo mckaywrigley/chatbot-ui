@@ -16,12 +16,17 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, LOGIN_REQUIRED } from '@/utils/app/const';
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  DEFAULT_TEMPERATURE,
+  LOGIN_REQUIRED,
+} from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+import { removeTokenCookie, setTokenCookie } from '@/utils/app/cookies';
 import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
@@ -43,11 +48,11 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
-import { removeTokenCookie, setTokenCookie } from '@/utils/app/cookies';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
+  serverSideGuestCodeIsSet: boolean;
   defaultModelId: OpenAIModelID;
   loginRequired: string;
 }
@@ -55,6 +60,7 @@ interface Props {
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
+  serverSideGuestCodeIsSet,
   defaultModelId,
   loginRequired,
 }: Props) => {
@@ -66,12 +72,10 @@ const Home = ({
   const [initialRender, setInitialRender] = useState<boolean>(true);
   const { data: session } = useSession();
 
-
-
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
   });
-  
+
   const {
     state: {
       apiKey,
@@ -81,6 +85,7 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      guestCode,
     },
     dispatch,
   } = contextValue;
@@ -88,14 +93,22 @@ const Home = ({
   const stopConversationRef = useRef<boolean>(false);
 
   const { data, error, refetch } = useQuery(
-    ['GetModels', apiKey, serverSideApiKeyIsSet],
+    [
+      'GetModels',
+      apiKey,
+      serverSideApiKeyIsSet,
+      guestCode,
+      !serverSideGuestCodeIsSet,
+    ],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;
+      if (!guestCode && serverSideGuestCodeIsSet) return null;
 
       return getModels(
         {
           key: apiKey,
         },
+        guestCode,
         signal,
       );
     },
@@ -257,7 +270,17 @@ const Home = ({
         field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
-  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
+    serverSideGuestCodeIsSet &&
+      dispatch({
+        field: 'serverSideGuestCodeIsSet',
+        value: serverSideGuestCodeIsSet,
+      });
+  }, [
+    defaultModelId,
+    serverSideApiKeyIsSet,
+    serverSidePluginKeysSet,
+    serverSideGuestCodeIsSet,
+  ]);
 
   // ON LOAD --------------------------------------------
 
@@ -271,6 +294,7 @@ const Home = ({
     }
 
     const apiKey = localStorage.getItem('apiKey');
+    const guestCode = localStorage.getItem('guestCode');
 
     if (serverSideApiKeyIsSet) {
       dispatch({ field: 'apiKey', value: '' });
@@ -278,6 +302,14 @@ const Home = ({
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
       dispatch({ field: 'apiKey', value: apiKey });
+    }
+
+    if (!serverSideGuestCodeIsSet) {
+      dispatch({ field: 'guestCode', value: '' });
+
+      localStorage.removeItem('guestCode');
+    } else if (guestCode) {
+      dispatch({ field: 'guestCode', value: guestCode });
     }
 
     const pluginKeys = localStorage.getItem('pluginKeys');
@@ -355,10 +387,11 @@ const Home = ({
     defaultModelId,
     dispatch,
     serverSideApiKeyIsSet,
+    serverSideGuestCodeIsSet,
     serverSidePluginKeysSet,
   ]);
-  // Temporary disable LOGIN_REQUIRED	check 
-  //   
+  // Temporary disable LOGIN_REQUIRED	check
+  //
   // if (session) { console.log(session.user?.email)}
   // if (loginRequired === 'true' && !session) {
   //   removeTokenCookie();
@@ -442,6 +475,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+      serverSideGuestCodeIsSet: !!process.env.GUEST_CODE,
       defaultModelId,
       serverSidePluginKeysSet,
       loginRequired,

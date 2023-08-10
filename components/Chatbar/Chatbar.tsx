@@ -186,6 +186,15 @@ export const Chatbar = () => {
     }
   };
 
+  const handleGuestCodeChange = useCallback(
+    (guestCode: string) => {
+      homeDispatch({ field: 'guestCode', value: guestCode });
+
+      localStorage.setItem('guestCode', guestCode);
+    },
+    [homeDispatch],
+  );
+
   useEffect(() => {
     if (searchTerm) {
       chatDispatch({
@@ -217,6 +226,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handleGuestCodeChange,
       }}
     >
       <Sidebar<Conversation>
