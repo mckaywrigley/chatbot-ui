@@ -13,8 +13,13 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     let url = `${OPENAI_API_HOST}/v1/models`;
+    const apiVer = (OPENAI_API_TYPE === 'azure') ? Number(`${OPENAI_API_VERSION}`.substring(0, 7).replace('-', '')) : 202305;
     if (OPENAI_API_TYPE === 'azure') {
-      url = `${OPENAI_API_HOST}/openai/deployments?api-version=${OPENAI_API_VERSION}`;
+      if (apiVer >= 202305) {
+        url = `${OPENAI_API_HOST}/openai/models?api-version=${OPENAI_API_VERSION}`;
+      } else {
+        url = `${OPENAI_API_HOST}/openai/deployments?api-version=${OPENAI_API_VERSION}`;
+      }
     }
 
     const response = await fetch(url, {
@@ -50,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const models: OpenAIModel[] = json.data
       .map((model: any) => {
-        const model_name = (OPENAI_API_TYPE === 'azure') ? model.model : model.id;
+        const model_name = (apiVer < 202305) ? model.model : model.id;
         for (const [key, value] of Object.entries(OpenAIModelID)) {
           if (value === model_name) {
             return {
