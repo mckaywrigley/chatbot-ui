@@ -1,0 +1,13 @@
+{
+  "New prompt": "新增提示 (Prompt)",
+  "New folder": "新增資料夾",
+  "No prompts.": "無提示詞",
+  "Search prompts...": "搜索提示...",
+  "Name": "名稱",
+  "A name for your prompt.": "提示詞名稱",
+  "Description": "描述",
+  "A description for your prompt.": "提示詞描述",
+  "Prompt": "提示詞",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "提示內容。使用 {{}} 表示一個變量。例如：{{name}} 是一個 {{adjective}} {{noun}}",
+  "Save": "保存"
+}
