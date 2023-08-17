@@ -13,6 +13,7 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  chatToken?: string | null;
 }
 
 export interface Conversation {

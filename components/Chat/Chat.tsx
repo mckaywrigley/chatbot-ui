@@ -98,6 +98,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey,
+          chatToken: new URLSearchParams(window.location.search).get('chatToken'),
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
         };
