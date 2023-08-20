@@ -54,7 +54,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
 
-    return new Response(stream);
+    const response =  new Response(stream);
+    response.headers.set('Content-Type', 'text/event-stream');
+    return response;
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
