@@ -2,6 +2,6 @@ version: '3.6'
 
 services:
   chatgpt:
-    build: chatgpt-ui:latest
+    image: chatgpt-ui:latest
     ports:
       - 3000:3000
