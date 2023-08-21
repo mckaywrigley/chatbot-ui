@@ -13,6 +13,7 @@
   "OR": "ODER",
   "Loading...": "Laden...",
   "Type a message...": "Schreibe eine Nachricht...",
+  "Type a message or type \"/\" to select a prompt...": "Schreibe eine Nachricht oder gib \"/\" ein, um einen Prompt auszuwählen...",
   "Error fetching models.": "Fehler beim Abrufen der Sprachmodelle.",
   "AI": "KI",
   "You": "Du",
@@ -25,5 +26,8 @@
   "Please enter a message": "Bitte gib eine Nachricht ein",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UI ist ein fortschrittliches Chatbot-Toolkit für OpenAI's Chat-Modelle, das darauf abzielt, die Benutzeroberfläche und Funktionalität von ChatGPT nachzuahmen.",
   "Are you sure you want to clear all messages?": "Bist du sicher, dass du alle Nachrichten löschen möchtest?",
-  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Höhere Werte wie 0,8 machen die Ausgabe zufälliger, während niedrigere Werte wie 0,2 sie fokussierter und deterministischer machen werden."
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "Höhere Werte wie 0,8 machen die Ausgabe zufälliger, während niedrigere Werte wie 0,2 sie fokussierter und deterministischer machen werden.",
+  "Search...": "Suchen...",
+  "No data.": "Keine Daten.",
+  "View Account Usage": "Kontonutzung anzeigen"
 }

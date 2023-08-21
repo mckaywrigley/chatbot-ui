@@ -1,11 +1,13 @@
 {
   "New folder": "Neuer Ordner",
   "New chat": "Neue Konversation",
+  "New Conversation": "Neue Konversation",
   "No conversations.": "Keine Konversationen.",
   "Search conversations...": "Konversationen suchen...",
   "OpenAI API Key": "OpenAI API-Schlüssel",
   "Import data": "Konversationen importieren",
   "Are you sure?": "Bist du sicher?",
   "Clear conversations": "Konversationen löschen",
-  "Export data": "Konversationen exportieren"
+  "Export data": "Konversationen exportieren",
+  "Settings": "Einstellungen"
 }

@@ -1,12 +1,13 @@
 {
-  "New prompt": "New prompt",
-  "New folder": "New folder",
-  "No prompts.": "No prompts.",
-  "Search prompts...": "Search prompts...",
+  "New prompt": "Neuer Prompt",
+  "New folder": "Neuer Ordner",
+  "No prompts.": "Keine Prompts.",
+  "Search prompts...": "Prompts durchsuchen...",
   "Name": "Name",
-  "Description": "Description",
-  "A description for your prompt.": "A description for your prompt.",
+  "Description": "Beschreibung",
+  "A description for your prompt.": "Eine Beschreibung für deinen Prompt",
   "Prompt": "Prompt",
-  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}",
-  "Save": "Save"
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": "Prompt Inhalt. Verwende {{}} um eine Variable zu deklarieren. Beispiel: {{name}} ist ein {{adjektiv}} {{nomen}}",
+  "Save": "Speichern",
+  "No data.": "Keine Daten."
 }
