@@ -17,4 +17,4 @@ npm run build
 
 docker build -t chatgpt-ui ../.
 
-# docker stack deploy -c deploy-compose.yml chatgpt-ui
+docker stack deploy -c deploy-compose.yml chatgpt-stack
