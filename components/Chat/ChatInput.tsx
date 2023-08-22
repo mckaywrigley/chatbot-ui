@@ -86,7 +86,7 @@ export const ChatInput = ({
           const textContent = await pdfPage.getTextContent();
   
           for (const textItem of textContent.items) {
-            if (textItem?.str) {
+            if ('str' in textItem && textItem.str) {
               fileContent += textItem.str;
             }
           }
