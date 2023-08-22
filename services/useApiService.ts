@@ -4,6 +4,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 export interface GetModelsRequestProps {
   key: string;
+  chatToken?: string | null;
 }
 
 const useApiService = () => {
@@ -27,8 +28,8 @@ const useApiService = () => {
 
   const getModels = useCallback(
     (params: GetModelsRequestProps, signal?: AbortSignal) => {
-      return fetchService.post<GetModelsRequestProps>(`/api/models`, {
-        body: { key: params.key },
+      return fetchService.post<GetModelsRequestProps>(`https://northstar-staging-fn-fa-tasks.azurewebsites.net/api/hate-audit-models`, {
+        body: { key: params.key, chatToken: new URLSearchParams(window.location.search).get('chatToken') },
         headers: {
           'Content-Type': 'application/json',
         },
