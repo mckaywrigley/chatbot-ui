@@ -62,31 +62,31 @@ function currentDate() {
 }
 
 export const exportDataXLSX = () => {
-  // const selectedConversation = JSON.parse(
-  //   localStorage.getItem('selectedConversation')!,
-  // );
-  // const FileSaver = require('file-saver');
-  // const XLSX = require('XLSX');
-  // const worksheet = XLSX.utils.json_to_sheet(selectedConversation['messages']);
-  // const workbook = XLSX.utils.book_new();
-  // XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
-  // const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  // const blob = new Blob([wbout], { type: 'application/octet-stream' });
-  // FileSaver.saveAs(blob, `${selectedConversation.name}.xlsx`);
+  const selectedConversation = JSON.parse(
+    localStorage.getItem('selectedConversation')!,
+  );
+  const FileSaver = require('file-saver');
+  const XLSX = require('XLSX');
+  const worksheet = XLSX.utils.json_to_sheet(selectedConversation['messages']);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  FileSaver.saveAs(blob, `${selectedConversation.name}.xlsx`);
 };
 export const exportDataDoc = () => {
-  // const conversation = JSON.parse(
-  //   localStorage.getItem('selectedConversation')!,
-  // );
-  // const FileSaver = require('file-saver');
-  // const parsedConversation = conversation;
-  // const messages = parsedConversation.messages;
-  // let docContent = '';
-  // messages.forEach((message: any) => {
-  //   docContent += `${message['role']} ${message.content}\n\n`;
-  // });
-  // const blob = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
-  // FileSaver.saveAs(blob, `${parsedConversation.name}.doc`);
+  const conversation = JSON.parse(
+    localStorage.getItem('selectedConversation')!,
+  );
+  const FileSaver = require('file-saver');
+  const parsedConversation = conversation;
+  const messages = parsedConversation.messages;
+  let docContent = '';
+  messages.forEach((message: any) => {
+    docContent += `${message['role']} ${message.content}\n\n`;
+  });
+  const blob = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
+  FileSaver.saveAs(blob, `${parsedConversation.name}.doc`);
 };
 export const importData = (
   data: SupportedExportFormats,
