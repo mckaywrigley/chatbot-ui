@@ -13,4 +13,8 @@ npm install
 # Build the Next.js app for production
 npm run build
 
-npm run start
+# Launch local docker environment
+echo "run the 'docker-compose --env-file .env.local' in order to run the application locally"
+
+
+#npm run start
