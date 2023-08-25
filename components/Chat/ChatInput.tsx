@@ -19,6 +19,10 @@ import {
 } from 'react';
 
 import { useTranslation } from 'next-i18next';
+import mammoth from 'mammoth';
+import { readFile, utils as XLSXUtils, read } from 'xlsx';
+import { PDFDocument } from 'pdf-lib';
+import * as pdfjs from 'pdfjs-dist';
 
 import { Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
@@ -48,27 +52,72 @@ export const ChatInput = ({
   showScrollDownButton,
 }: Props) => {
 
-  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target?.files || e.target.files.length === 0) {
       return;
     }
-    const allowedFormats = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+    
     const file = e.target.files[0];
+    const allowedFormats = [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
     if (!allowedFormats.includes(file.type)) {
       alert('Invalid file format. Only PDF, Word, and Excel files are allowed.');
       return;
     }
+  
+    try {
+      let fileContent = '';
+  
+      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+        fileContent = result.value;
+      } else if (file.type === 'application/pdf') {
+        const pdfBytes = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfjsDoc = await pdfjs.getDocument({ data: pdfBytes }).promise;
+  
+        for (let pageNum = 1; pageNum <= pdfjsDoc.numPages; pageNum++) {
+          const pdfPage = await pdfjsDoc.getPage(pageNum);
+          const textContent = await pdfPage.getTextContent();
+  
+          for (const textItem of textContent.items) {
+            if ('str' in textItem && textItem.str) {
+              fileContent += textItem.str;
+            }
+          }
+        }
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+        const fileData = await file.arrayBuffer();
+        const data = new Uint8Array(fileData);
+        const workbook = read(data, { type: 'array' });
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const fileContent = event?.target?.result as string; // Cast fileContent to string
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const excelContent = XLSXUtils.sheet_to_json(worksheet);
+
+        excelContent.forEach((row: any) => {
+          Object.values(row).forEach((cellValue: any) => {
+            if (cellValue) {
+              fileContent += cellValue + ' ';
+            }
+          });
+        });
+      }
+  
       if (fileContent) {
         onSend({ role: 'user', content: fileContent }, plugin);
       }
       e.target.value = '';
-    };
 
-    reader.readAsText(file);
+    } catch (error) {
+      console.error('Error reading file:', error);
+      alert('An error occurred while reading the file.');
+    }
   };
   
   const { t } = useTranslation('chat');
