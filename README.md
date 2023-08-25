@@ -17,11 +17,31 @@ Expect frequent improvements.
 - [ ] Sharing
 - [ ] "Bots"
 
-## Deploy
+## Local Development
+**Setup Local .env.local**
+```
+$ cd chatbot-ui
+$ cp .env.local.example .env.local
+```
+ - Add an auth application to your github for localhost login capability
+ - Add your local environment variables to the .env.local
+ - Once you have your .env.local file set move on to launching the application locally.
+
+**Following are the commands for local development**
+```
+$ cd chatbot-ui
+$ ./build-local.sh
+$ docker-compose --env-file .env.local up
+```
+
+
+## Deploy Live Server
 **Following are the commands for deployment**
 ```
-$ chmod +x deploy.sh  
-$ ./deploy.sh
+$ git clone git@github.com:MicroHealthLLC/chatbot-ui.git
+$ cd chatbot-ui/deployment
+$ chmod +x deploy-prod.sh 
+$ ./deploy-prod.sh
 ```
 
 **Docker**

@@ -13,4 +13,8 @@ npm install
 # Build the Next.js app for production
 npm run build
 
-npm run start
+# npm run start
+
+docker build -t chatgpt-ui ../.
+
+docker stack deploy -c deploy-stack.yml chatgpt-stack
