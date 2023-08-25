@@ -1,5 +1,15 @@
 # Chatbot UI
 
+## News
+
+Chatbot UI 2.0 is out as an updated, hosted product!
+
+Check out [Takeoff Chat](https://www.takeoffchat.com/).
+
+Open source version coming soon!
+
+## About
+
 Chatbot UI is an open source chat UI for AI models.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
