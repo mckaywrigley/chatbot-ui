@@ -14,7 +14,7 @@ npm install
 npm run build
 
 # Launch local docker environment
-echo "run the 'docker-compose --env-file .env.local' in order to run the application locally"
+echo "run the 'docker-compose --env-file .env.local up' in order to run the application locally"
 
 
 #npm run start
