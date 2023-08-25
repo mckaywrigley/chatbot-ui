@@ -64,6 +64,28 @@ az acr create --resource-group $RES_GROUP --name $ACR_NAME --sku Standard --loca
 az acr build --registry $ACR_NAME --image <image-name> --file Dockerfile ./src
 ```
 
+**4. Deploy to your preferred container solution**
+
+The easiest deployment would be to deploy a Web App and use your built image in the container registry.
+Replace the parameters below and deploy.
+
+```bash
+az webapp create -g $RES_GROUP -p MyPlan -n MyUniqueAppName -i $ACR_NAME/<image-name>:tag
+```
+
+**4.1. Update application settings**
+
+Values that need to be added as application settings
+
+| Environment Variable              | Default value                  | Description                                                                                                                               |
+| --------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| OPENAI_API_KEY                    |                                | The default API key used for authentication with Azure OpenAI                                                                             |
+| OPENAI_API_HOST                   | `https://api.openai.com`       | The base url, for Azure use `https://<endpoint>.openai.azure.com`                                                                         |
+| OPENAI_API_TYPE                   | `openai`                       | The API type, options are `openai` or `azure` set this to `azure`                                                                         |
+| OPENAI_API_VERSION                | `2023-03-15-preview`           | Only applicable for Azure OpenAI                                                                                                          |
+| AZURE_DEPLOYMENT_ID               |                                | Name of you model deployment in Azure OpenAI                                                                                              |
+| DEFAULT_MODEL                     | `gpt-3.5-turbo`                | The default model to use on new conversations, for Azure use `gpt-35-turbo`                                                               |
+
 ## Docker
 
 Build locally:
