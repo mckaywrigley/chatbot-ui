@@ -70,6 +70,11 @@ git clone https://github.com/mckaywrigley/chatbot-ui.git
 **2. Install Dependencies**
 
 ```bash
+nvm install 20
+nvm install node
+```
+
+```bash
 npm i
 ```
 
