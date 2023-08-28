@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8443",
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest",
@@ -32,8 +32,7 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0",
-    "xlsx": "^0.18.5"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",
