@@ -12,6 +12,8 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@copilotkit/react-core": "^0.7.0",
+    "@copilotkit/react-textarea": "^0.18.0",
     "@dqbd/tiktoken": "^1.0.2",
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
