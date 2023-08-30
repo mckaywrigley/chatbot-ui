@@ -32,10 +32,12 @@
     "react-markdown": "^8.0.5",
     "react-query": "^3.39.3",
     "react-syntax-highlighter": "^15.5.0",
+    "react-tooltip": "^5.21.1",
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",
