@@ -282,6 +282,10 @@ export const Chat = memo(({ stopConversationRef}: Props) => {
     }
   };
 
+  useEffect(() => {
+    handleScroll()
+  })
+
   const handleScrollDown = () => {
     chatContainerRef.current?.scrollTo({
       top: chatContainerRef.current.scrollHeight,
