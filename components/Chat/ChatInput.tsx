@@ -383,7 +383,7 @@ export const ChatInput = ({
       
         .{' '}
         {t(
-          "Congratulations, Jun Zhun and Jiayu Tao, on your engagement! May your love and commitment to each other bring you endless joy and happiness. ",
+          "Congratulations, Jun Zhu and Jiayu Tao, on your engagement! May your love and commitment to each other bring you endless joy and happiness, as you embark on this beautiful journey together. ",
         )}
       </div>
     </div>
