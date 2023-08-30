@@ -33,11 +33,13 @@ import HomeContext from '@/pages/api/home/home.context';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { IconArrowUp } from '@tabler/icons-react';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
+  onScrollUpClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
@@ -47,6 +49,7 @@ export const ChatInput = ({
   onSend,
   onRegenerate,
   onScrollDownClick,
+  onScrollUpClick,
   stopConversationRef,
   textareaRef,
   showScrollDownButton,
@@ -434,6 +437,17 @@ export const ChatInput = ({
                 onClick={onScrollDownClick}
               >
                 <IconArrowDown size={18} />
+              </button>
+            </div>
+          )}
+
+          {!showScrollDownButton && (
+            <div className="absolute bottom-12 right-0 lg:bottom-0 lg:-right-10">
+              <button
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
+                onClick={onScrollUpClick}
+              >
+                <IconArrowUp size={18} />
               </button>
             </div>
           )}
