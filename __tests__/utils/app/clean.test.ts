@@ -54,12 +54,12 @@ describe('Conversation tests', () => {
             return item
         }))
 
-        for (const {folderId, model, prompt, temperature, messages} in result) {
-            expect(model).toBe(OpenAIModels[OpenAIModelID.GPT_3_5])
-            expect(prompt).toBe(DEFAULT_SYSTEM_PROMPT)
-            expect(temperature).toBe(DEFAULT_TEMPERATURE)
-            expect(folderId).toBe(null)
-            expect(messages).toStrictEqual([])
+        for (const results in result) {
+            expect(result.model).toBe(OpenAIModels[OpenAIModelID.GPT_3_5])
+            expect(result.prompt).toBe(DEFAULT_SYSTEM_PROMPT)
+            expect(result.temperature).toBe(DEFAULT_TEMPERATURE)
+            expect(result.folderId).toBe(null)
+            expect(result.messages).toStrictEqual([])
         }
     })
 
