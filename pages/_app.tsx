@@ -1,3 +1,4 @@
+import { CopilotProvider } from '@copilotkit/react-core';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
@@ -15,9 +16,11 @@ function App({ Component, pageProps }: AppProps<{}>) {
   return (
     <div className={inter.className}>
       <Toaster />
-      <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
-      </QueryClientProvider>
+      <CopilotProvider>
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} />
+        </QueryClientProvider>
+      </CopilotProvider>
     </div>
   );
 }
