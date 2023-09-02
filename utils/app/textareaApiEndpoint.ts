@@ -27,13 +27,11 @@ export const textareaApiEndpoint = ChatlikeApiEndpoint.custom(
       signal: abortSignal,
     });
 
-    const fullPayload = await res.text();
-
-    // check if the response is an error
-    if (res.status !== 200) {
-      throw new Error(fullPayload);
+    // Check if the response is an error before reading the body
+    if (!res.ok) {
+      throw new Error(`textareaApiEndpoint request failed with status ${res.status}`);
     }
 
-    return fullPayload;
+    return await res.text();
   },
 );
