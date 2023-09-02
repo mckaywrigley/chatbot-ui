@@ -1,17 +1,28 @@
-import { ChatlikeApiEndpoint, MinimalChatGPTMessage } from "@copilotkit/react-textarea";
+import {
+  ChatlikeApiEndpoint,
+  MinimalChatGPTMessage,
+} from '@copilotkit/react-textarea';
+
+import { getEndpoint } from './api';
 
 export const textareaApiEndpoint = ChatlikeApiEndpoint.custom(
   async (
     abortSignal: AbortSignal,
     messages: MinimalChatGPTMessage[],
-    forwardedProps?: { [key: string]: any },
+    forwardedParams?: { [key: string]: any },
   ) => {
-    const res = await fetch('api/autosuggestions', {
+    const chatEndpoint = getEndpoint(null);
+
+    const prompt = messages.find((m) => m.role === 'system')?.content || '';
+    const remainingMessages = messages.filter((m) => m.role !== 'system');
+
+    const res = await fetch(chatEndpoint, {
       method: 'POST',
       body: JSON.stringify({
-        ...forwardedProps,
-        messages: messages,
+        prompt: prompt,
+        messages: remainingMessages,
         max_tokens: 5,
+        ...forwardedParams,
       }),
       signal: abortSignal,
     });
