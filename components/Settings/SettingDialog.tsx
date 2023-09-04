@@ -72,44 +72,45 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
           />
           <div
             ref={modalRef}
-            className="inline-block max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-neutral-600 border-neutral-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-neutral-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-neutral-600 border-neutral-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-neutral-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
             <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
               {t('Settings')}
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="text-sm font-bold text-black dark:text-neutral-200">
-                {t('Theme')}
-              </div>
-
-              <select
-                className="cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
-                value={state.theme}
-                onChange={(event) =>
-                  dispatch({ field: 'theme', value: event.target.value })
-                }
-              >
-                <option value="dark">{t('Dark mode')}</option>
-                <option value="light">{t('Light mode')}</option>
-              </select>
-            </div>
-
-            {!serverSideApiKeyIsSet ? (
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-bold text-black dark:text-neutral-200">
-                  {t('OpenAI API Key')}
+                  {t('Theme')}
                 </div>
-
-                <input
-                  className="bg-transparent border dark:border-neutral-600 border-neutral-200 rounded-md px-3 py-1"
-                  placeholder="Enter your API key"
-                  defaultValue={apiKey}
-                  ref={apiKeyRef}
-                />
+                <select
+                  className="cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+                  value={state.theme}
+                  onChange={(event) =>
+                    dispatch({ field: 'theme', value: event.target.value })
+                  }
+                >
+                  <option value="dark">{t('Dark mode')}</option>
+                  <option value="light">{t('Light mode')}</option>
+                </select>
               </div>
-            ) : null}
+
+              {!serverSideApiKeyIsSet ? (
+                <div className="flex flex-col lg:flex-row justify-between gap-2 lg:items-center">
+                  <div className="text-sm font-bold text-black dark:text-neutral-200">
+                    {t('OpenAI API Key')}
+                  </div>
+
+                  <input
+                    className="bg-transparent border dark:border-neutral-600 border-neutral-200 rounded-md px-3 py-1"
+                    placeholder="Enter your API key"
+                    defaultValue={apiKey}
+                    ref={apiKeyRef}
+                  />
+                </div>
+              ) : null}
+            </div>
 
             <button
               type="button"
