@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { FC, useContext, useEffect, useRef } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -9,6 +9,8 @@ import { getSettings, saveSettings } from '@/utils/app/settings';
 import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
+
+import ChatbarContext from '../Chatbar/Chatbar.context';
 
 interface Props {
   open: boolean;
@@ -21,8 +23,13 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const { state, dispatch } = useCreateReducer<Settings>({
     initialState: settings,
   });
-  const { dispatch: homeDispatch } = useContext(HomeContext);
+  const {
+    state: { apiKey, serverSideApiKeyIsSet },
+    dispatch: homeDispatch,
+  } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
+  const { handleApiKeyChange } = useContext(ChatbarContext);
+  const apiKeyRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -45,6 +52,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
   const handleSave = () => {
     homeDispatch({ field: 'lightMode', value: state.theme });
+    handleApiKeyChange(apiKeyRef.current?.value || '');
     saveSettings(state);
   };
 
@@ -62,30 +70,46 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             className="hidden sm:inline-block sm:h-screen sm:align-middle"
             aria-hidden="true"
           />
-
           <div
             ref={modalRef}
-            className="dark:border-netural-400 inline-block max-h-[400px] transform overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#202123] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-neutral-600 border-neutral-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-neutral-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
             <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
               {t('Settings')}
             </div>
 
-            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
-              {t('Theme')}
+            <div className="flex justify-between items-center">
+              <div className="text-sm font-bold text-black dark:text-neutral-200">
+                {t('Theme')}
+              </div>
+
+              <select
+                className="cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+                value={state.theme}
+                onChange={(event) =>
+                  dispatch({ field: 'theme', value: event.target.value })
+                }
+              >
+                <option value="dark">{t('Dark mode')}</option>
+                <option value="light">{t('Light mode')}</option>
+              </select>
             </div>
 
-            <select
-              className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
-              value={state.theme}
-              onChange={(event) =>
-                dispatch({ field: 'theme', value: event.target.value })
-              }
-            >
-              <option value="dark">{t('Dark mode')}</option>
-              <option value="light">{t('Light mode')}</option>
-            </select>
+            {!serverSideApiKeyIsSet ? (
+              <div className="flex justify-between items-center">
+                <div className="text-sm font-bold text-black dark:text-neutral-200">
+                  {t('OpenAI API Key')}
+                </div>
+
+                <input
+                  className="bg-transparent border dark:border-neutral-600 border-neutral-200 rounded-md px-3 py-1"
+                  placeholder="Enter your API key"
+                  defaultValue={apiKey}
+                  ref={apiKeyRef}
+                />
+              </div>
+            ) : null}
 
             <button
               type="button"
