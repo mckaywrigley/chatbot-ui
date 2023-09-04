@@ -36,7 +36,20 @@ export const initialState: HomeInitialState = {
   lightMode: 'dark',
   messageIsStreaming: false,
   modelError: null,
-  models: [],
+  models: [
+    {
+      id: 'gpt-3.5-turbo',
+      name: 'GPT-3.5 Turbo',
+      maxLength: 6000,
+      tokenLimit: 4097,
+    },
+    {
+      id: 'gpt-4',
+      name: 'GPT-4',
+      maxLength: 6000,
+      tokenLimit: 8192,
+    },
+  ],
   folders: [],
   conversations: [],
   selectedConversation: undefined,
