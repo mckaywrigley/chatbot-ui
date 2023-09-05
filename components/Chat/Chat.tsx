@@ -293,6 +293,13 @@ export const Chat = memo(({ stopConversationRef}: Props) => {
     });
   };
 
+  const handleScrollUp = () => {
+    chatContainerRef.current?.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   const handleSettings = () => {
     setShowSettings(!showSettings);
   };
@@ -513,6 +520,7 @@ export const Chat = memo(({ stopConversationRef}: Props) => {
               handleSend(message, 0, plugin);
             }}
             onScrollDownClick={handleScrollDown}
+            onScrollUpClick={handleScrollUp}
             onRegenerate={() => {
               if (currentMessage) {
                 handleSend(currentMessage, 2, null);
