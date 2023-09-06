@@ -7,7 +7,6 @@ export type Role = 'assistant' | 'user';
 
 export interface ChatBody {
   messages: Message[];
-  key: string;
   prompt: string;
   temperature: number;
 }
