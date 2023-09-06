@@ -10,8 +10,6 @@ import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import ChatbarContext from '../Chatbar/Chatbar.context';
-
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -28,7 +26,6 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
-  const { handleApiKeyChange } = useContext(ChatbarContext);
   const apiKeyRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,7 +49,6 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
   const handleSave = () => {
     homeDispatch({ field: 'lightMode', value: state.theme });
-    handleApiKeyChange(apiKeyRef.current?.value || '');
     saveSettings(state);
   };
 
@@ -95,21 +91,6 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
                   <option value="light">{t('Light mode')}</option>
                 </select>
               </div>
-
-              {!serverSideApiKeyIsSet ? (
-                <div className="flex flex-col lg:flex-row justify-between gap-2 lg:items-center">
-                  <div className="text-sm font-bold text-black dark:text-neutral-200">
-                    {t('OpenAI API Key')}
-                  </div>
-
-                  <input
-                    className="bg-transparent border dark:border-neutral-600 border-neutral-200 rounded-md px-3 py-1"
-                    placeholder="Enter your API key"
-                    defaultValue={apiKey}
-                    ref={apiKeyRef}
-                  />
-                </div>
-              ) : null}
             </div>
 
             <button

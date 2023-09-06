@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useEffect, useRef } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -7,9 +6,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
-
-import useErrorService from '@/services/errorService';
-import useApiService from '@/services/useApiService';
 
 import {
   cleanConversationHistory,
@@ -40,15 +36,8 @@ import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
 
-interface Props {
-  serverSideApiKeyIsSet: boolean;
-  serverSidePluginKeysSet: boolean;
-}
-
 const Home = () => {
   const { t } = useTranslation('chat');
-  const { getModels } = useApiService();
-  const { getModelsError } = useErrorService();
 
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
