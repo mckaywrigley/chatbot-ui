@@ -21,12 +21,8 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   const { state, dispatch } = useCreateReducer<Settings>({
     initialState: settings,
   });
-  const {
-    state: { apiKey, serverSideApiKeyIsSet },
-    dispatch: homeDispatch,
-  } = useContext(HomeContext);
+  const { dispatch: homeDispatch } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
-  const apiKeyRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
