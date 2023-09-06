@@ -6,7 +6,7 @@ const generateParametersSchema = z
     decoder_input_details: z.boolean().default(true),
     details: z.boolean().default(true),
     do_sample: z.boolean().default(false),
-    max_new_tokens: z.number().int().min(0).max(511),
+    max_new_tokens: z.number(),
     repetition_penalty: z.number().min(0),
     return_full_text: z.boolean(),
     seed: z.number().int().min(0),

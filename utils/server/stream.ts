@@ -8,16 +8,20 @@ import {
   createParser,
 } from 'eventsource-parser';
 
-interface StreamEventData {
-  token: {
-    id: number;
-    text: string;
-    logprob: number;
-    special: boolean;
-  };
-  generated_text: null | string;
-  details: null | string;
-}
+type StreamEventData =
+  | {
+      token: {
+        id: number;
+        text: string;
+        logprob: number;
+        special: boolean;
+      };
+      generated_text: null | string;
+      details: null | string;
+    }
+  | {
+      error: string;
+    };
 
 export const LLMStream = async (
   systemPrompt: string,
@@ -61,6 +65,11 @@ export const LLMStream = async (
 
           try {
             const json = JSON.parse(data) as StreamEventData;
+
+            if ('error' in json) {
+              throw new Error(json.error);
+            }
+
             if (json.generated_text != null) {
               controller.close();
               return;

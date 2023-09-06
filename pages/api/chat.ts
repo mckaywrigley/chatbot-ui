@@ -59,6 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
       promptToSend,
       {
         temperature: temperatureToUse,
+        max_new_tokens: 1024,
       },
       messagesToSend,
     );
