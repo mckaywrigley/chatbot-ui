@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { LLMStream } from '@/utils/server/stream';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -55,21 +55,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(
+    const stream = await LLMStream(
       promptToSend,
-      temperatureToUse,
-      key,
+      {
+        temperature: temperatureToUse,
+      },
       messagesToSend,
     );
 
     return new Response(stream);
   } catch (error) {
     console.error(error);
-    if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
-    } else {
-      return new Response('Error', { status: 500 });
-    }
+
+    return new Response('Error', { status: 500 });
   }
 };
 

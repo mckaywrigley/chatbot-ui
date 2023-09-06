@@ -1,42 +1,25 @@
 import { Message } from '@/types/chat';
 
+import { GenerateParameters } from './schema';
+
 import {
   ParsedEvent,
   ReconnectInterval,
   createParser,
 } from 'eventsource-parser';
 
-export class OpenAIError extends Error {
-  type: string;
-  param: string;
-  code: string;
-
-  constructor(message: string, type: string, param: string, code: string) {
-    super(message);
-    this.name = 'OpenAIError';
-    this.type = type;
-    this.param = param;
-    this.code = code;
-  }
-}
-
-export const OpenAIStream = async (
+export const LLMStream = async (
   systemPrompt: string,
-  temperature: number,
-  key: string,
+  parameters: GenerateParameters,
   messages: Message[],
 ) => {
   let url = `${process.env.MODEL_ENDPOINT}/generate_stream`;
 
-  const prompt = `[/INST] <<SYS>> ${systemPrompt} <</SYS>> [/INST]`;
-
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({
-      inputs: prompt,
-      parameters: {
-        temperature,
-      },
+      inputs: generatePrompt(messages, systemPrompt),
+      parameters,
     }),
   });
 
@@ -46,12 +29,7 @@ export const OpenAIStream = async (
   if (res.status !== 200) {
     const result = await res.json();
     if (result.error) {
-      throw new OpenAIError(
-        result.error.message,
-        result.error.type,
-        result.error.param,
-        result.error.code,
-      );
+      throw new Error(result.error);
     } else {
       throw new Error(
         `OpenAI API returned an error: ${
@@ -91,4 +69,20 @@ export const OpenAIStream = async (
   });
 
   return stream;
+};
+
+const generatePrompt = (messages: Message[], systemPrompt?: string) => {
+  const prompt = messages
+    .map((message) =>
+      message.role === 'user'
+        ? `[INST] ${message.content} [/INST]`
+        : `${message.content}`,
+    )
+    .join('\n');
+
+  if (systemPrompt) {
+    return `[/INST] <<SYS>> ${systemPrompt} <</SYS>> [/INST] \n ${prompt}`;
+  }
+
+  return prompt;
 };

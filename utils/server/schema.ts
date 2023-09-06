@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const GenerateParametersGenerateParameters = z
+const generateParametersSchema = z
   .object({
     best_of: z.number().min(0),
     decoder_input_details: z.boolean().default(true),
@@ -20,8 +20,10 @@ const GenerateParametersGenerateParameters = z
     watermark: z.boolean().default(false),
   })
   .deepPartial();
+export type GenerateParameters = z.infer<typeof generateParametersSchema>;
 
-const InputSchema = z.object({
+export const generateInputSchema = z.object({
   inputs: z.string(),
-  parameters: GenerateParametersGenerateParameters,
+  parameters: generateParametersSchema,
 });
+export type GenerateInput = z.infer<typeof generateInputSchema>;
