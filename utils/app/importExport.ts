@@ -66,7 +66,7 @@ export const exportDataXLSX = () => {
     localStorage.getItem('selectedConversation')!,
   );
   const FileSaver = require('file-saver');
-  const XLSX = require('XLSX');
+  const XLSX = require('xlsx');
   const worksheet = XLSX.utils.json_to_sheet(selectedConversation['messages']);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
