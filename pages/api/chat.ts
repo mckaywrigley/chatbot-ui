@@ -13,13 +13,14 @@ export const config = {
   runtime: 'edge',
 };
 
-const MODEL_TOKEN_LIMIT = 4028;
+export const MODEL_TOKEN_LIMIT = 4028;
 
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
+
     const encoding = new Tiktoken(
       tiktokenModel.bpe_ranks,
       tiktokenModel.special_tokens,

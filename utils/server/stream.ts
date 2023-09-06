@@ -8,6 +8,17 @@ import {
   createParser,
 } from 'eventsource-parser';
 
+interface StreamEventData {
+  token: {
+    id: number;
+    text: string;
+    logprob: number;
+    special: boolean;
+  };
+  generated_text: null | string;
+  details: null | string;
+}
+
 export const LLMStream = async (
   systemPrompt: string,
   parameters: GenerateParameters,
@@ -17,6 +28,9 @@ export const LLMStream = async (
 
   const res = await fetch(url, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       inputs: generatePrompt(messages, systemPrompt),
       parameters,
@@ -46,12 +60,12 @@ export const LLMStream = async (
           const data = event.data;
 
           try {
-            const json = JSON.parse(data);
-            if (json.choices[0].finish_reason != null) {
+            const json = JSON.parse(data) as StreamEventData;
+            if (json.generated_text != null) {
               controller.close();
               return;
             }
-            const text = json.choices[0].delta.content;
+            const text = json.token.text;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
