@@ -17,8 +17,7 @@ const MODEL_TOKEN_LIMIT = 4028;
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { messages, key, prompt, temperature } =
-      (await req.json()) as ChatBody;
+    const { messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(

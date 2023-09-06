@@ -35,18 +35,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: {
-      selectedConversation,
-      conversations,
-      models,
-      apiKey,
-      pluginKeys,
-      serverSideApiKeyIsSet,
-      messageIsStreaming,
-      modelError,
-      loading,
-      prompts,
-    },
+    state: { selectedConversation, conversations, apiKey, loading, prompts },
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -191,13 +180,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'messageIsStreaming', value: false });
       }
     },
-    [
-      apiKey,
-      conversations,
-      pluginKeys,
-      selectedConversation,
-      stopConversationRef,
-    ],
+    [apiKey, conversations, selectedConversation, stopConversationRef],
   );
 
   const scrollToBottom = useCallback(() => {
@@ -304,39 +287,31 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           <>
             <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
               <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                {models.length === 0 ? (
-                  <div>
-                    <Spinner size="16px" className="mx-auto" />
-                  </div>
-                ) : (
-                  'Chatbot UI'
-                )}
+                Chatbot UI
               </div>
 
-              {models.length > 0 && (
-                <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                  <SystemPrompt
-                    conversation={selectedConversation}
-                    prompts={prompts}
-                    onChangePrompt={(prompt) =>
-                      handleUpdateConversation(selectedConversation, {
-                        key: 'prompt',
-                        value: prompt,
-                      })
-                    }
-                  />
+              <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
+                <SystemPrompt
+                  conversation={selectedConversation}
+                  prompts={prompts}
+                  onChangePrompt={(prompt) =>
+                    handleUpdateConversation(selectedConversation, {
+                      key: 'prompt',
+                      value: prompt,
+                    })
+                  }
+                />
 
-                  <TemperatureSlider
-                    label={t('Temperature')}
-                    onChangeTemperature={(temperature) =>
-                      handleUpdateConversation(selectedConversation, {
-                        key: 'temperature',
-                        value: temperature,
-                      })
-                    }
-                  />
-                </div>
-              )}
+                <TemperatureSlider
+                  label={t('Temperature')}
+                  onChangeTemperature={(temperature) =>
+                    handleUpdateConversation(selectedConversation, {
+                      key: 'temperature',
+                      value: temperature,
+                    })
+                  }
+                />
+              </div>
             </div>
           </>
         ) : (

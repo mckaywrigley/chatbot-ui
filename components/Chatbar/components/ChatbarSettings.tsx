@@ -15,10 +15,8 @@ import { ClearConversations } from './ClearConversations';
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
   const [isSettingDialogOpen, setIsSettingDialog] = useState<boolean>(false);
-
   const {
-    state: { serverSidePluginKeysSet, conversations },
-    dispatch: homeDispatch,
+    state: { conversations },
   } = useContext(HomeContext);
 
   const {

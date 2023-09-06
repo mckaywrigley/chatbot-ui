@@ -32,7 +32,7 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, defaultModelId, folders, pluginKeys },
+    state: { conversations, showChatbar, folders },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -71,18 +71,17 @@ export const Chatbar = () => {
   };
 
   const handleClearConversations = () => {
-    defaultModelId &&
-      homeDispatch({
-        field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
-      });
+    homeDispatch({
+      field: 'selectedConversation',
+      value: {
+        id: uuidv4(),
+        name: t('New Conversation'),
+        messages: [],
+        prompt: DEFAULT_SYSTEM_PROMPT,
+        temperature: DEFAULT_TEMPERATURE,
+        folderId: null,
+      },
+    });
 
     homeDispatch({ field: 'conversations', value: [] });
 
@@ -112,18 +111,17 @@ export const Chatbar = () => {
 
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
-      defaultModelId &&
-        homeDispatch({
-          field: 'selectedConversation',
-          value: {
-            id: uuidv4(),
-            name: t('New Conversation'),
-            messages: [],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
-            folderId: null,
-          },
-        });
+      homeDispatch({
+        field: 'selectedConversation',
+        value: {
+          id: uuidv4(),
+          name: t('New Conversation'),
+          messages: [],
+          prompt: DEFAULT_SYSTEM_PROMPT,
+          temperature: DEFAULT_TEMPERATURE,
+          folderId: null,
+        },
+      });
 
       localStorage.removeItem('selectedConversation');
     }
