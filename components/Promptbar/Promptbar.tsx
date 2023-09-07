@@ -137,7 +137,10 @@ const Promptbar = () => {
         }
         toggleOpen={handleTogglePromptbar}
         handleCreateItem={handleCreatePrompt}
-        handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
+        handleCreateFolder={() =>
+          filteredPrompts.length &&
+          handleCreateFolder(t('New folder'), 'prompt')
+        }
         handleDrop={handleDrop}
       />
     </PromptbarContext.Provider>

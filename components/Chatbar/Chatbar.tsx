@@ -44,15 +44,6 @@ export const Chatbar = () => {
     dispatch: chatDispatch,
   } = chatBarContextValue;
 
-  const handleApiKeyChange = useCallback(
-    (apiKey: string) => {
-      homeDispatch({ field: 'apiKey', value: apiKey });
-
-      localStorage.setItem('apiKey', apiKey);
-    },
-    [homeDispatch],
-  );
-
   const handleExportData = () => {
     exportData();
   };
@@ -184,7 +175,10 @@ export const Chatbar = () => {
         }
         toggleOpen={handleToggleChatbar}
         handleCreateItem={handleNewConversation}
-        handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
+        handleCreateFolder={() =>
+          filteredConversations.length &&
+          handleCreateFolder(t('New folder'), 'chat')
+        }
         handleDrop={handleDrop}
         footerComponent={<ChatbarSettings />}
       />
