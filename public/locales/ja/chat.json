@@ -4,6 +4,7 @@
   "Stop Generating": "回答をストップ",
   "Prompt limit is {{maxLength}} characters": "プロンプトの文字数は{{maxLength}}文字までです",
   "System Prompt": "システムのプロンプト",
+  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "あなたはOpenAIによってトレーニングされた大規模言語モデルのChatGPTです。ユーザーの指示には注意深く従ってください。マークダウンを使用して応答してください。",
   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully.": "あなたはOpenAIによってトレーニングされた大規模言語モデルのChatGPTです。ユーザーの指示には注意深く従ってください。",
   "Enter a prompt": "プロンプトを入力してください",
   "Regenerate response": "もう一度回答する",
@@ -25,5 +26,5 @@
   "Please enter a message": "メッセージを入力してください",
   "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "Chatbot UIは、ChatGPTと同様のインターフェイスと機能を実現するための、チャットボットキットです。",
   "Are you sure you want to clear all messages?": "すべてのメッセージを削除してもよろしいですか？",
-  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8のような高い値は出力をよりランダムにし、0.2のような低い値はより焦点を絞り、決定論的にします。",
+  "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.": "0.8のような高い値は出力をよりランダムにし、0.2のような低い値はより焦点を絞り、決定論的にします。"
 }
