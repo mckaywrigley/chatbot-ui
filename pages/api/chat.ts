@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { LLMStream } from '@/utils/server/stream';
 
 import { ChatBody, Message } from '@/types/chat';
 
@@ -13,11 +13,14 @@ export const config = {
   runtime: 'edge',
 };
 
+export const MODEL_TOKEN_LIMIT = 4028;
+
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { messages, prompt, temperature } = (await req.json()) as ChatBody;
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
+
     const encoding = new Tiktoken(
       tiktokenModel.bpe_ranks,
       tiktokenModel.special_tokens,
@@ -43,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if (tokenCount + tokens.length + 1000 > MODEL_TOKEN_LIMIT) {
         break;
       }
       tokenCount += tokens.length;
@@ -52,16 +55,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
+    const stream = await LLMStream(
+      promptToSend,
+      {
+        temperature: temperatureToUse,
+        max_new_tokens: 1024,
+      },
+      messagesToSend,
+    );
 
     return new Response(stream);
   } catch (error) {
     console.error(error);
-    if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
-    } else {
-      return new Response('Error', { status: 500 });
-    }
+
+    return new Response('Error', { status: 500 });
   }
 };
 
