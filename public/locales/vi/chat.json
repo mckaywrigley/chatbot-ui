@@ -4,7 +4,7 @@
   "Stop Generating": "Dừng tạo",
   "Prompt limit is {{maxLength}} characters": "Giới hạn Prompt là {{maxLength}} ký tự",
   "System Prompt": "Prompt hệ thống",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Bạn là ChatGPT, một mô hình ngôn ngữ lớn được đào tạo bởi OpenAI. Hãy tuân theo hướng dẫn của người dùng một cách cẩn thận. Phản hồi bằng cách sử dụng định dạng markdown.",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "Bạn là ChatGPT, một mô hình ngôn ngữ lớn được đào tạo bởi OpenAI. Hãy tuân theo hướng dẫn của người dùng một cách cẩn thận. Phản hồi bằng cách sử dụng định dạng markdown.",
   "Enter a prompt": "Nhập một Prompt",
   "Regenerate response": "Tạo lại phản hồi",
   "Sorry, there was an error.": "Xin lỗi, đã xảy ra lỗi.",

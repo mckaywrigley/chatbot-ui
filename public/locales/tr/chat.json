@@ -4,7 +4,7 @@
   "Stop Generating": "Durdur",
   "Prompt limit is {{maxLength}} characters": "Prompt sınırı {{maxLength}} karakterdir",
   "System Prompt": "Sistem Prompt",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Sen ChatGPT'sin, OpenAI tarafından eğitilmiş büyük bir dil modelisin. Kullanıcının talimatlarını dikkatlice takip et. Yanıtını markdown kullanarak ver.",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "Sen ChatGPT'sin, OpenAI tarafından eğitilmiş büyük bir dil modelisin. Kullanıcının talimatlarını dikkatlice takip et. Yanıtını markdown kullanarak ver.",
   "Enter a prompt": "Bir prompt girin",
   "Regenerate response": "Yanıtı Yeniden Oluştur",
   "Sorry, there was an error.": "Üzgünüm, bir hata oluştu.",

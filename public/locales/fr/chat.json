@@ -4,7 +4,7 @@
   "Stop Generating": "Interrompre la génération",
   "Prompt limit is {{maxLength}} characters": "La limite du prompt est de {{maxLength}} caractères",
   "System Prompt": "Prompt du système",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Vous êtes ChatGPT, un grand modèle linguistique entraîné par OpenAI. Suivez attentivement les instructions de l'utilisateur. Répondez en utilisant Markdown.",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "Vous êtes ChatGPT, un grand modèle linguistique entraîné par OpenAI. Suivez attentivement les instructions de l'utilisateur. Répondez en utilisant Markdown.",
   "Enter a prompt": "Entrez un prompt",
   "Regenerate response": "Régénérer la réponse",
   "Sorry, there was an error.": "Désolé, une erreur est survenue.",

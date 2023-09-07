@@ -4,7 +4,7 @@
   "Stop Generating": "Lopeta generointi",
   "Prompt limit is {{maxLength}} characters": "Promptin maksimipituus on {{maxLength}} merkkiä",
   "System Prompt": "System prompt",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Sinä olet ChatGPT, OpenAI:n opettama laaja kielimalli. Seuraa käyttäjän ohjeita tarkasti. Vastaa käyttäen markdownia.",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "Sinä olet ChatGPT, OpenAI:n opettama laaja kielimalli. Seuraa käyttäjän ohjeita tarkasti. Vastaa käyttäen markdownia.",
   "Enter a prompt": "Syötä prompti",
   "Regenerate response": "Luo vastaus uudelleen",
   "Sorry, there was an error.": "Valitettavasti tapahtui virhe.",

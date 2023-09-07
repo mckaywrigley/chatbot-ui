@@ -4,7 +4,7 @@
   "Stop Generating": "Nu mai generați",
   "Prompt limit is {{maxLength}} characters": "Limita mesajelor este de {{maxLength}} caractere",
   "System Prompt": "Solicitări de sistem",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "Sunteți ChatGPT, un model de limbă mare antrenat de OpenAI. Urmați cu atenție instrucțiunile de utilizare. Vă rugăm să răspundeți folosind markdown.",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "Sunteți ChatGPT, un model de limbă mare antrenat de OpenAI. Urmați cu atenție instrucțiunile de utilizare. Vă rugăm să răspundeți folosind markdown.",
   "Enter a prompt": "Introdu o cerere",
   "Regenerate response": "Regenerați răspunsul",
   "Sorry, there was an error.": "Scuze, a aparut o eroare.",
