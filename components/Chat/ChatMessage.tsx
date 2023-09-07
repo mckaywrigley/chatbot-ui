@@ -156,7 +156,7 @@ export const ChatMessage: FC<Props> = memo(
                   <div className="flex w-full flex-col">
                     <textarea
                       ref={textareaRef}
-                      className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541]"
+                      className="w-full resize-none whitespace-pre-wrap border-none bg-black/10 p-2 rounded-md"
                       value={messageContent}
                       onChange={handleInputChange}
                       onKeyDown={handlePressEnter}
@@ -166,8 +166,6 @@ export const ChatMessage: FC<Props> = memo(
                         fontFamily: 'inherit',
                         fontSize: 'inherit',
                         lineHeight: 'inherit',
-                        padding: '0',
-                        margin: '0',
                         overflow: 'hidden',
                       }}
                     />
