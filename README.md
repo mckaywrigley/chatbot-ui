@@ -1,8 +1,8 @@
-# Chatbot UI
+# Sol IQGPT
 
 ## News
 
-Chatbot UI 2.0 is out as an updated, hosted product!
+Sol IQGPT 2.0 is out as an updated, hosted product!
 
 Check out [Takeoff Chat](https://www.takeoffchat.com/).
 
@@ -10,15 +10,15 @@ Open source version coming soon!
 
 ## About
 
-Chatbot UI is an open source chat UI for AI models.
+Sol IQGPT is an open source chat UI for AI models.
 
 See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
 
-![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
+![Sol IQGPT](./public/screenshots/screenshot-0402023.jpg)
 
 ## Updates
 
-Chatbot UI will be updated over time.
+Sol IQGPT will be updated over time.
 
 Expect frequent improvements.
 
@@ -31,7 +31,7 @@ Expect frequent improvements.
 
 **Vercel**
 
-Host your own live version of Chatbot UI with Vercel.
+Host your own live version of Sol IQGPT with Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
 
