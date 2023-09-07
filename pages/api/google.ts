@@ -1,6 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { OPENAI_API_HOST } from '@/utils/app/const';
+import {
+  AZURE_DEPLOYMENT_ID,
+  OPENAI_API_HOST,
+  OPENAI_API_TYPE,
+  OPENAI_API_VERSION,
+} from '@/utils/app/const';
 import { cleanSourceText } from '@/utils/server/google';
 
 import { Message } from '@/types/chat';
@@ -112,12 +117,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const answerMessage: Message = { role: 'user', content: answerPrompt };
 
-    const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
+    let url = `${OPENAI_API_HOST}/v1/models`;
+    if (OPENAI_API_TYPE === 'azure') {
+      url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${OPENAI_API_VERSION}`;
+    }
+    console.log(url);
+
+    const answerRes = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-        ...(process.env.OPENAI_ORGANIZATION && {
-          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
+        ...(OPENAI_API_TYPE === 'azure' && {
+          'api-key': `${key ? key : process.env.OPENAI_API_KEY}`,
         }),
       },
       method: 'POST',
@@ -126,12 +136,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         messages: [
           {
             role: 'system',
-            content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link), etc, as you use them. Maximum 4 sentences.`,
+            content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link){:target="_blank"}, etc, as you use them. Maximum 4 sentences.`,
           },
           answerMessage,
         ],
-        max_tokens: 1000,
-        temperature: 1,
+        max_tokens: 4000,
+        temperature: 0,
         stream: false,
       }),
     });
@@ -142,7 +152,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.status(200).json({ answer });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error'})
+    res.status(500).json({ error: 'Error' });
   }
 };
 

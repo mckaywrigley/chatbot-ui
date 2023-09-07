@@ -270,7 +270,7 @@ export const ChatInput = ({
 
         {!messageIsStreaming &&
           selectedConversation &&
-          selectedConversation.messages.length > 0 && (
+          selectedConversation?.messages?.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
               onClick={onRegenerate}
@@ -378,20 +378,6 @@ export const ChatInput = ({
             />
           )}
         </div>
-      </div>
-      <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
-        <a
-          href="https://github.com/mckaywrigley/chatbot-ui"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
-          ChatBot UI
-        </a>
-        .{' '}
-        {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
-        )}
       </div>
     </div>
   );
