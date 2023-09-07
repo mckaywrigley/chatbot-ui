@@ -6,7 +6,7 @@
   "Prompt limit is {{maxLength}} characters": "提示字数限制为 {{maxLength}} 个字符",
   "New Conversation": "新的聊天",
   "System Prompt": "系统提示",
-  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "你是 ChatGPT，一个由 OpenAI 训练的大型语言模型。请仔细遵循用户的指示。使用 Markdown 格式进行回应。",
+  "You are Sol IQGPT, a large language model. Follow user's instructions carefully to generate smart contract code in solidity or vyper. after generating code, add a section for explaining how the generated code works and respond using markdown": "您是Sol IQGPT，一种大型语言模型。请仔细遵循用户的指示，在Solidity或Vyper中生成智能合约代码。生成代码后，请添加一个解释生成代码工作原理的部分，并使用Markdown进行响应。",
   "Enter a prompt": "输入一个提示",
   "Regenerate response": "重新生成回应",
   "Sorry, there was an error.": "抱歉，出现了错误。",
