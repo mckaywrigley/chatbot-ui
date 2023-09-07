@@ -64,10 +64,10 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
           />
           <div
             ref={modalRef}
-            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#2b323f] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
-            <div className="text-lg pb-4 font-bold text-black dark:text-gray-200">
+            <div className="text-xl border-b pb-4 mb-4 border-gray-200 dark:border-gray-600 font-bold text-black dark:text-gray-200">
               {t('Settings')}
             </div>
 
@@ -91,7 +91,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
             <button
               type="button"
-              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-gray-500 text-gray-900 hover:bg-gray-100 focus:outline-none dark:border-gray-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-300"
+              className="w-full px-4 py-2 mt-6 rounded-lg shadow bg-brand-700 hover:bg-brand-800 text-white"
               onClick={() => {
                 handleSave();
                 onClose();
