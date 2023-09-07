@@ -303,7 +303,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
         ) : (
           <>
-            <div className="sticky top-0 z-10 flex justify-center border border-b-gray-300 bg-gray-100 py-2 text-sm text-gray-500 dark:border-none dark:bg-[#444654] dark:text-gray-200">
+            <div className="sticky top-0 z-10 flex justify-center border border-b-gray-300 bg-gray-100 py-2 text-sm text-gray-500 dark:border-none dark:bg-[#2b323f] dark:text-gray-200">
               SOL IQGPT | Temp : {selectedConversation?.temperature} |
               <button
                 className="ml-2 cursor-pointer hover:opacity-50"
@@ -332,7 +332,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             {loading && <ChatLoader />}
 
             <div
-              className="h-[162px] bg-white dark:bg-[#343541]"
+              className="h-[162px] bg-white dark:bg-gray-800"
               ref={messagesEndRef}
             />
           </>
