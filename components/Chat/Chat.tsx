@@ -213,20 +213,24 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     });
   };
 
+  const onClearAll = () => {
+    if (
+      confirm(t<string>('Are you sure you want to clear all messages?')) &&
+      selectedConversation
+    ) {
+      handleUpdateConversation(selectedConversation, {
+        key: 'messages',
+        value: [],
+      });
+    }
+  };
+
   const scrollDown = () => {
     if (autoScrollEnabled) {
       messagesEndRef.current?.scrollIntoView(true);
     }
   };
   const throttledScrollDown = throttle(scrollDown, 250);
-
-  // useEffect(() => {
-  //   console.log('currentMessage', currentMessage);
-  //   if (currentMessage) {
-  //     handleSend(currentMessage);
-  //     homeDispatch({ field: 'currentMessage', value: undefined });
-  //   }
-  // }, [currentMessage]);
 
   useEffect(() => {
     throttledScrollDown();
@@ -268,40 +272,47 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         onScroll={handleScroll}
       >
         {selectedConversation?.messages.length === 0 ? (
-          <>
-            <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-              <div className="flex items-center gap-2 justify-center">
-                <IQGPTLogo className="w-14 h-14 mt-1" />
-                <span className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                  Sol IQGPT
-                </span>
-              </div>
-              <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                <SystemPrompt
-                  conversation={selectedConversation}
-                  prompts={prompts}
-                  onChangePrompt={(prompt) =>
-                    handleUpdateConversation(selectedConversation, {
-                      key: 'prompt',
-                      value: prompt,
-                    })
-                  }
-                />
-
-                <TemperatureSlider
-                  label={t('Temperature')}
-                  onChangeTemperature={(temperature) =>
-                    handleUpdateConversation(selectedConversation, {
-                      key: 'temperature',
-                      value: temperature,
-                    })
-                  }
-                />
-              </div>
+          <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
+            <div className="flex items-center gap-2 justify-center">
+              <IQGPTLogo className="w-14 h-14 mt-1" />
+              <span className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                Sol IQGPT
+              </span>
             </div>
-          </>
+            <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
+              <SystemPrompt
+                conversation={selectedConversation}
+                prompts={prompts}
+                onChangePrompt={(prompt) =>
+                  handleUpdateConversation(selectedConversation, {
+                    key: 'prompt',
+                    value: prompt,
+                  })
+                }
+              />
+              <TemperatureSlider
+                label={t('Temperature')}
+                onChangeTemperature={(temperature) =>
+                  handleUpdateConversation(selectedConversation, {
+                    key: 'temperature',
+                    value: temperature,
+                  })
+                }
+              />
+            </div>
+          </div>
         ) : (
           <>
+            <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+              SOL IQGPT | Temp : {selectedConversation?.temperature} |
+              <button
+                className="ml-2 cursor-pointer hover:opacity-50"
+                onClick={onClearAll}
+              >
+                <IconClearAll size={18} />
+              </button>
+            </div>
+
             {selectedConversation?.messages.map((message, index) => (
               <MemoizedChatMessage
                 key={index}
@@ -331,7 +342,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       <ChatInput
         stopConversationRef={stopConversationRef}
         textareaRef={textareaRef}
-        onSend={(message, plugin) => {
+        onSend={(message) => {
           setCurrentMessage(message);
           handleSend(message, 0);
         }}
