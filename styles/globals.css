@@ -29,7 +29,7 @@
 }
 
 html {
-  background: #202123;
+  @apply bg-gray-800
 }
 
 @media (max-width: 720px) {

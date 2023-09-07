@@ -271,10 +271,10 @@ export const ChatInput = ({
             </button>
           )}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-gray-700 dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+        <div className="relative mx-2 flex w-full items-center justify-between flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-gray-700 dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 px-4 text-black dark:bg-transparent dark:text-white"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -297,7 +297,7 @@ export const ChatInput = ({
           />
 
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-gray-800 opacity-60 hover:bg-gray-200 hover:text-gray-900 dark:bg-opacity-50 dark:text-gray-100 dark:hover:text-gray-200"
+            className="absolute right-2 top-[5px] rounded-sm p-1 text-gray-800 opacity-60 hover:bg-gray-200 hover:text-gray-900 dark:bg-opacity-50 dark:text-gray-100 dark:hover:text-gray-200"
             onClick={handleSend}
           >
             {messageIsStreaming ? (
