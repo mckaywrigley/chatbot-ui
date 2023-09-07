@@ -64,20 +64,20 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
           />
           <div
             ref={modalRef}
-            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-neutral-600 border-neutral-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-neutral-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
-            <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
+            <div className="text-lg pb-4 font-bold text-black dark:text-gray-200">
               {t('Settings')}
             </div>
 
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
-                <div className="text-sm font-bold text-black dark:text-neutral-200">
+                <div className="text-sm font-bold text-black dark:text-gray-200">
                   {t('Theme')}
                 </div>
                 <select
-                  className="cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+                  className="cursor-pointer bg-transparent p-2 text-gray-700 dark:text-gray-200"
                   value={state.theme}
                   onChange={(event) =>
                     dispatch({ field: 'theme', value: event.target.value })
@@ -91,7 +91,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
             <button
               type="button"
-              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-gray-500 text-gray-900 hover:bg-gray-100 focus:outline-none dark:border-gray-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-300"
               onClick={() => {
                 handleSave();
                 onClose();

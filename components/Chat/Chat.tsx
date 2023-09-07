@@ -265,7 +265,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [messagesEndRef]);
 
   return (
-    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-hidden bg-white dark:bg-gray-800">
       <div
         className="max-h-full overflow-x-hidden"
         ref={chatContainerRef}
@@ -279,7 +279,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 Sol IQGPT
               </span>
             </div>
-            <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
+            <div className="flex h-full flex-col space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600">
               <SystemPrompt
                 conversation={selectedConversation}
                 prompts={prompts}
@@ -303,7 +303,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           </div>
         ) : (
           <>
-            <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+            <div className="sticky top-0 z-10 flex justify-center border border-b-gray-300 bg-gray-100 py-2 text-sm text-gray-500 dark:border-none dark:bg-[#444654] dark:text-gray-200">
               SOL IQGPT | Temp : {selectedConversation?.temperature} |
               <button
                 className="ml-2 cursor-pointer hover:opacity-50"

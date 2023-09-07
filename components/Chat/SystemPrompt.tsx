@@ -193,12 +193,12 @@ export const SystemPrompt: FC<Props> = ({
 
   return (
     <div className="flex flex-col">
-      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
+      <label className="mb-2 text-left text-gray-700 dark:text-gray-400">
         {t('System Prompt')}
       </label>
       <textarea
         ref={textareaRef}
-        className="w-full rounded-lg border border-neutral-200 bg-transparent px-4 py-3 text-neutral-900 dark:border-neutral-600 dark:text-neutral-100"
+        className="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-gray-900 dark:border-gray-600 dark:text-gray-100"
         style={{
           resize: 'none',
           bottom: `${textareaRef?.current?.scrollHeight}px`,
