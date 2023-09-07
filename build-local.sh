@@ -1,8 +1,9 @@
 #!/bin/bash
 
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# sudo apt-get install -y nodejs
 
+nvm install 20
 
 # Pull the latest changes from your Git repository (if you are using version control)
 # Uncomment the next line if you are using Git
@@ -15,7 +16,9 @@ npm install
 npm run build
 
 # Launch local docker environment
-echo "run the 'docker-compose --env-file .env.local up' in order to run the application locally"
+echo "running docker compose"
+
+docker-compose --env-file .env.local up
 
 
 #npm run start
