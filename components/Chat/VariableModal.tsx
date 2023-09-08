@@ -83,7 +83,7 @@ export const VariableModal: FC<Props> = ({
     >
       <div
         ref={modalRef}
-        className="dark:border-gray-600 inline-block max-h-[400px] transform overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#2b323f] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+        className="dark:border-gray-600 inline-block max-h-[400px] transform overflow-y-auto rounded-lg border border-gray-300 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-750 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
         role="dialog"
       >
         <div className="mb-4 text-2xl font-bold text-black dark:text-gray-200">

@@ -20,6 +20,9 @@ module.exports = {
         input: '#60a5fa 0px 0px 0px 1.5px',
       },
       colors: {
+        gray: {
+          750: '#303948',
+        },
         brand: {
           50: '#ffe5f1',
           100: '#ffcce4',
@@ -32,18 +35,6 @@ module.exports = {
           700: '#ff3396',
           800: '#ff1a88',
           900: '#5d1738',
-        },
-        alpha: {
-          50: '#ffffff0a',
-          100: '#ffffff0f',
-          200: '#ffffff14',
-          300: '#ffffff29',
-          400: '#ffffff3d',
-          500: '#ffffff5C',
-          600: '#ffffff7a',
-          700: '#ffffffa3',
-          800: '#ffffffcc',
-          900: '#ffffffeb',
         },
       },
       fontFamily: {

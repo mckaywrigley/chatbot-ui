@@ -64,7 +64,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
           />
           <div
             ref={modalRef}
-            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#2b323f] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block w-full max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200 bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-750 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
             <div className="text-xl border-b pb-4 mb-4 border-gray-200 dark:border-gray-600 font-bold text-black dark:text-gray-200">

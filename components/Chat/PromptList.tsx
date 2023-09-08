@@ -26,9 +26,7 @@ export const PromptList: FC<Props> = ({
         <li
           key={prompt.id}
           className={`w-full rounded-md m-1 ${
-            index === activePromptIndex
-              ? 'bg-gray-200 dark:bg-[#2b323f] dark:text-black'
-              : ''
+            index === activePromptIndex ? 'bg-black/10 dark:text-black' : ''
           } cursor-pointer px-3 py-2 text-sm text-black dark:text-white`}
           onClick={(e) => {
             e.preventDefault();

@@ -63,7 +63,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
 
           <div
             ref={modalRef}
-            className="inline-block max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200  bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-[#2b323f] sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
+            className="inline-block max-h-[400px] transform overflow-y-auto rounded-lg border dark:border-gray-600 border-gray-200  bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-750 sm:my-8 sm:max-h-[600px] sm:w-full sm:max-w-lg sm:p-6 sm:align-middle"
             role="dialog"
           >
             <div className="text-sm font-bold text-black dark:text-gray-200">
