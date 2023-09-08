@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 *{
-  @apply outline-none focus:focus:ring-2 focus:ring-blue-600  
+  @apply outline-none focus-visible:ring-2 focus:ring-blue-600  
 }
 
 ::-webkit-scrollbar-track {
