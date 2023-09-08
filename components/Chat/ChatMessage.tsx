@@ -136,7 +136,7 @@ export const ChatMessage: FC<Props> = memo(
         className={`group md:px-4 ${
           message.role === 'assistant'
             ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-100'
-            : 'bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-100'
+            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100'
         }`}
         style={{ overflowWrap: 'anywhere' }}
       >
