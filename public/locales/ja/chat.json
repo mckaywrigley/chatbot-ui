@@ -4,7 +4,6 @@
   "Stop Generating": "回答をストップ",
   "Prompt limit is {{maxLength}} characters": "プロンプトの文字数は{{maxLength}}文字までです",
   "System Prompt": "システムのプロンプト",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "あなたはOpenAIによってトレーニングされた大規模言語モデルのChatGPTです。ユーザーの指示には注意深く従ってください。",
   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully.": "あなたはOpenAIによってトレーニングされた大規模言語モデルのChatGPTです。ユーザーの指示には注意深く従ってください。",
   "Enter a prompt": "プロンプトを入力してください",
   "Regenerate response": "もう一度回答する",
