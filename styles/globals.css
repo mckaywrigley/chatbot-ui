@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  @apply outline-none focus:focus:ring-2 focus:ring-blue-600  
+}
+
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
