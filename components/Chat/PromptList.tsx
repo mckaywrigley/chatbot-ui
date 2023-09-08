@@ -20,14 +20,14 @@ export const PromptList: FC<Props> = ({
   return (
     <ul
       ref={promptListRef}
-      className="z-10 max-h-52 w-full overflow-scroll rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
+      className="z-10 flex justify-center items-center max-h-52 w-full overflow-auto rounded border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500 dark:bg-gray-700 dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]"
     >
       {prompts.map((prompt, index) => (
         <li
           key={prompt.id}
-          className={`${
+          className={`w-full rounded-md m-1 ${
             index === activePromptIndex
-              ? 'bg-gray-200 dark:bg-[#202123] dark:text-black'
+              ? 'bg-gray-200 dark:bg-[#2b323f] dark:text-black'
               : ''
           } cursor-pointer px-3 py-2 text-sm text-black dark:text-white`}
           onClick={(e) => {
