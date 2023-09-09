@@ -9,7 +9,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage", 
+    "headless": "next dev -p 3000"
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
@@ -19,6 +20,7 @@
     "next": "13.2.4",
     "next-i18next": "^13.2.2",
     "openai": "^3.2.1",
+    "pm2": "^5.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.0",

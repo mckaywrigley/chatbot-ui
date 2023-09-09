@@ -1,0 +1,14 @@
+{
+    "apps": [
+      {
+        "name": "chatbot-ui",
+        "script": "npm",
+        "args": "run headless",
+        "watch": true,
+        "ignore_watch": ["node_modules"],
+        "env": {
+          "NODE_ENV": "development"
+        }
+      }
+    ]
+  }
