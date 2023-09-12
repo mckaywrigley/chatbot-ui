@@ -48,6 +48,8 @@ const Sidebar = <T,>({
 
   const highlightDrop = (e: any) => {
     e.target.style.background = '#343541';
+    e.target.style.height = '42px'
+    e.target.style.borderRadius = '8px'
   };
 
   const removeHighlight = (e: any) => {
