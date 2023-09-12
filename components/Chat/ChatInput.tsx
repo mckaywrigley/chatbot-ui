@@ -24,7 +24,6 @@ import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import { ChatInputTokenCount } from './ChatInputTokenCount';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
@@ -311,10 +310,6 @@ export const ChatInput = ({
               />
             </div>
           )}
-
-          <div className="absolute bottom-full md:mb-4 mb-12 mx-auto flex w-full justify-center md:justify-end pointer-events-none">
-            <ChatInputTokenCount content={content} />
-          </div>
 
           <textarea
             ref={textareaRef}
