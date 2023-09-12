@@ -18,6 +18,7 @@ interface Props<T> {
   folderComponent: ReactNode;
   footerComponent?: ReactNode;
   searchTerm: string;
+  foldersCount: string;
   handleSearchTerm: (searchTerm: string) => void;
   toggleOpen: () => void;
   handleCreateItem: () => void;
@@ -39,6 +40,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
+  foldersCount
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -85,7 +87,7 @@ const Sidebar = <T,>({
         />
 
         <div className="flex-grow overflow-auto">
-          {items?.length > 0 && (
+          {foldersCount > 0 && (
             <div className="flex border-b border-white/20 pb-2">
               {folderComponent}
             </div>
