@@ -240,6 +240,7 @@ export const Chatbar = () => {
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'chat')}
         handleDrop={handleDrop}
         footerComponent={<ChatbarSettings />}
+        foldersCount={folders.filter((folder) => folder.type === 'chat').length}
       />
     </ChatbarContext.Provider>
   );
