@@ -15,6 +15,7 @@ npm install
 npm run build
 
 # Launch local docker environment
+echo deploying local docker environment
 docker-compose --env-file .env.local up
 
 
