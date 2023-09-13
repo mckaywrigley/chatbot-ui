@@ -18,6 +18,7 @@ interface Props<T> {
   folderComponent: ReactNode;
   footerComponent?: ReactNode;
   searchTerm: string;
+  foldersCount: number;
   handleSearchTerm: (searchTerm: string) => void;
   toggleOpen: () => void;
   handleCreateItem: () => void;
@@ -39,6 +40,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
+  foldersCount
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -48,6 +50,8 @@ const Sidebar = <T,>({
 
   const highlightDrop = (e: any) => {
     e.target.style.background = '#343541';
+    e.target.style.height = '42px'
+    e.target.style.borderRadius = '8px'
   };
 
   const removeHighlight = (e: any) => {
@@ -85,7 +89,7 @@ const Sidebar = <T,>({
         />
 
         <div className="flex-grow overflow-auto">
-          {items?.length > 0 && (
+          {foldersCount > 0 && (
             <div className="flex border-b border-white/20 pb-2">
               {folderComponent}
             </div>
