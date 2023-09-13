@@ -18,7 +18,7 @@ interface Props<T> {
   folderComponent: ReactNode;
   footerComponent?: ReactNode;
   searchTerm: string;
-  foldersCount: string;
+  foldersCount: number;
   handleSearchTerm: (searchTerm: string) => void;
   toggleOpen: () => void;
   handleCreateItem: () => void;
