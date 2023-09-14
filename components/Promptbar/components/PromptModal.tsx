@@ -26,6 +26,26 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
     }
   };
 
+  const savePrompt = () => {
+
+    if(!name){
+      alert(t('Please fill out the name field'));
+      return;
+    }
+    if(!content){
+      alert(t('Please fill out the prompt field'));
+      return;
+    }
+     const updatedPrompt = {
+       ...prompt,
+       name,
+       description,
+       content: content.trim(),
+       };
+       onUpdatePrompt(updatedPrompt);
+       onClose();
+  }
+
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -108,17 +128,7 @@ export const PromptModal: FC<Props> = ({ prompt, onClose, onUpdatePrompt }) => {
             <button
               type="button"
               className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
-              onClick={() => {
-                const updatedPrompt = {
-                  ...prompt,
-                  name,
-                  description,
-                  content: content.trim(),
-                };
-
-                onUpdatePrompt(updatedPrompt);
-                onClose();
-              }}
+              onClick={savePrompt}
             >
               {t('Save')}
             </button>
