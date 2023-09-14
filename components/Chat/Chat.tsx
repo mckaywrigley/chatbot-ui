@@ -351,23 +351,23 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
-          <div className="text-center text-4xl font-bold text-black dark:text-white">
-            Welcome to DoctoGPT
-          </div>
-          <div className="text-center text-lg text-black dark:text-white">
+           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
+              <div className="text-center text-4xl font-bold text-black dark:text-white">
+                Welcome to DoctoGPT
+              </div>
 
-            <div className="mb-2 font-bold">
-              Important
+              <div className=" text-amber-600 dark:text-amber-600">
+              <div className=" font-bold text-amber-600 mb-2">
+                  Important
+                </div>
+
+                <ul className='list-disc font-light text-left text-sm'>
+                    <li>Do not include personal information (such as names, email addresses, ID) in your prompt.</li>
+                    <li>Be aware that DoctoGPT’ answer may not always be accurate or suitable : it is crucial to approach them critically.</li>
+                    <li>Be aware that monitoring is in place to track user activity (who submitted what, and when).</li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div className=" text-gray-500 dark:text-gray-400">
-
-            <ul className='list-disc'>
-                <li>Do not include personal information (such as names, email addresses, ID) in your prompt.</li>
-                <li>Be aware that DoctoGPT’ answer may not always be accurate or suitable : it is crucial to approach them critically.</li>
-                <li>Be aware that monitoring is in place to track user activity (who submitted what, and when).</li>
-            </ul>
-          </div>
         </div>
       ) : modelError ? (
         <ErrorMessageDiv error={modelError} />
@@ -387,7 +387,23 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'DoctoGPT'
+                      <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
+                        <div className="text-center text-4xl font-bold text-black dark:text-white">
+                          Welcome to DoctoGPT
+                        </div>
+
+                        <div className=" text-amber-600 dark:text-amber-600">
+                        <div className=" font-bold text-amber-600 mb-2">
+                                                            Important
+                                                          </div>
+
+                          <ul className='list-disc font-light text-left text-sm'>
+                              <li>Do not include personal information (such as names, email addresses, ID) in your prompt.</li>
+                              <li>Be aware that DoctoGPT’ answer may not always be accurate or suitable : it is crucial to approach them critically.</li>
+                              <li>Be aware that monitoring is in place to track user activity (who submitted what, and when).</li>
+                          </ul>
+                        </div>
+                      </div>
                     )}
                   </div>
 
