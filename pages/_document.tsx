@@ -7,8 +7,7 @@ type Props = DocumentProps & {
 };
 
 export default function Document(props: Props) {
-  const currentLocale =
-    props.__NEXT_DATA__.locale ?? i18nextConfig.i18n.defaultLocale;
+  const currentLocale = i18nextConfig.i18n.defaultLocale;
   return (
     <Html lang={currentLocale}>
       <Head>
