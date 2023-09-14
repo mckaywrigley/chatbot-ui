@@ -309,6 +309,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
 
     const handleSettings = () => {
         setShowSettings(!showSettings);
+        handleScrollUp()
     };
 
     const onClearAll = () => {
