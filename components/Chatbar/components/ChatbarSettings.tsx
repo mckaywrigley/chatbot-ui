@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconBrandGithub, IconSettings } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -66,6 +66,14 @@ export const ChatbarSettings = () => {
         open={isSettingDialogOpen}
         onClose={() => {
           setIsSettingDialog(false);
+        }}
+      />
+
+      <SidebarButton
+        text={t('GitHub Repo')}
+        icon={<IconBrandGithub size={18} />}
+        onClick={() => {
+          window.open('https://github.com/raffertyuy/fork-chatbot-ui', '_blank');
         }}
       />
     </div>
