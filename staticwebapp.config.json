@@ -1,20 +1,27 @@
 {
     "routes": [
         {
-        "route": "/*",
-        "allowedRoles": ["authenticated"]
+          "route": "/login",
+          "redirect": "/.auth/login/aad"
+        },
+        {
+          "route": "/logout",
+          "redirect": "/.auth/logout"
+        },
+        {
+          "route": "/*",
+          "allowedRoles": ["authenticated"]
         }
     ],
     "responseOverrides": {
         "401": {
-        "statusCode": 302,
-        "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer"
+            "statusCode": 302,
+            "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer"
         }
     },
     "auth": {
         "identityProviders": {
             "azureActiveDirectory": {
-                "userDetailsClaim": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
                 "registration": {
                     "openIdIssuer": "https://login.microsoftonline.com/common",
                     "clientIdSettingName": "AZURE_CLIENT_ID",
