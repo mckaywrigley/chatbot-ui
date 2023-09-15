@@ -113,11 +113,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const answerMessage: Message = { role: 'user', content: answerPrompt };
 
-    const requestUrl = process.env.OPENAI_API_TYPE === 'openai'
+    let requestUrl = process.env.OPENAI_API_TYPE === 'openai'
       ? `${OPENAI_API_HOST}/v1/chat/completions`
       : `${OPENAI_API_HOST}/openai/deployments/${process.env.AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${process.env.OPENAI_API_VERSION}`;
 
-    const requestHeader = process.env.OPENAI_API_TYPE === 'openai'
+    let requestHeader = JSON.stringify(process.env.OPENAI_API_TYPE === 'openai'
       ? {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
@@ -128,10 +128,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       : {
         'Content-Type': 'application/json',
         'api-key': `${process.env.OPENAI_API_KEY}`
-      };
+      });
 
     const answerRes = await fetch(requestUrl, {
-      headers: requestHeader,
+      headers: JSON.parse(requestHeader),
       method: 'POST',
       body: JSON.stringify({
         model: model.id,
