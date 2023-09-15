@@ -39,14 +39,6 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
-      - name: Update settings in staticwebapp.config.json
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: 'staticwebapp.config.json'
-        env:
-          AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
-          AAD_CLIENT_SECRET: ${{ secrets.AAD_CLIENT_SECRET }}
-
       - name: SWA Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
