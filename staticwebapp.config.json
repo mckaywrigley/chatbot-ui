@@ -19,9 +19,6 @@
                     "openIdIssuer": "https://login.microsoftonline.com/common/v2.0",
                     "clientIdSettingName": "AZURE_CLIENT_ID",
                     "clientSecretSettingName": "AZURE_CLIENT_SECRET"
-                },
-                "login": {
-                    "loginParameters": ["resource=https://graph.microsoft.com"]
                 }
             }
         }
