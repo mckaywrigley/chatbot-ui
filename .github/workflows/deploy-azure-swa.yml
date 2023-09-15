@@ -10,15 +10,6 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    container:
-      image: node:18
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-
   build_test_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
