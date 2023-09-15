@@ -69,7 +69,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     if (!selectedConversation) return;
 
     const { messages } = selectedConversation;
-    const findIndex = messages.findIndex((elm) => elm === message);
+    const findIndex = messages.findIndex((elm) => elm.role===message.role && elm.content===message.content);
 
     if (findIndex < 0) return;
 
