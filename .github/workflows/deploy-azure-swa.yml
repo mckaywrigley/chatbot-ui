@@ -19,6 +19,10 @@ jobs:
         with:
           submodules: true
       
+      - name: Delete staticwebapp.config.json if pull request
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: rm staticwebapp.config.json
+      
       - name: Update settings in staticwebapp.config.json
         uses: cschleiden/replace-tokens@v1
         with:
