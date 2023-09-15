@@ -5,12 +5,6 @@
           "allowedRoles": ["authenticated"]
         }
     ],
-    "responseOverrides": {
-        "401": {
-            "statusCode": 302,
-            "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer"
-        }
-    },
     "auth": {
         "identityProviders": {
             "azureActiveDirectory": {
@@ -25,5 +19,11 @@
                 }
             }
         }
+    },
+    "navigationFallback": {
+        "rewrite": "index.html"
+    },
+    "globalHeaders": {
+      "Cache-Control": "no-cache"
     }
 }
