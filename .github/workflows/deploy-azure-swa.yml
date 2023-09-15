@@ -13,8 +13,12 @@ jobs:
   build_test_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Build, Test and Deploy Job
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: actions/checkout@v3
         with:
           submodules: true
