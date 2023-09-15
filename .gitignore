@@ -2,7 +2,6 @@
 
 .env
 .env.local
-staticwebapp.config.json
 
 # dependencies
 /node_modules

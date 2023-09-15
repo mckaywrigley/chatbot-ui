@@ -17,12 +17,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install dependencies
-        run: npm ci
-      - name: Run Vitest Suite
-        run: npm test
+      
 
-  build_and_deploy_job:
+  build_test_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
@@ -30,7 +27,27 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Build And Deploy
+      
+      # Only Needed for Testing
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+
+      - name: Update settings in staticwebapp.config.json
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: 'staticwebapp.config.json'
+        env:
+          AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
+          AAD_CLIENT_SECRET: ${{ secrets.AAD_CLIENT_SECRET }}
+
+      - name: SWA Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
