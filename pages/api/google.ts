@@ -25,6 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         googleCSEId ? googleCSEId : process.env.GOOGLE_CSE_ID
       }&q=${query}&num=5`,
     );
+    console.info(googleRes);
 
     const googleData = await googleRes.json();
 
@@ -112,14 +113,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const answerMessage: Message = { role: 'user', content: answerPrompt };
 
-    const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
-      headers: {
+    const requestUrl = process.env.OPENAI_API_TYPE === 'openai'
+      ? `${OPENAI_API_HOST}/v1/chat/completions`
+      : `${OPENAI_API_HOST}/openai/deployments/${process.env.AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${process.env.OPENAI_API_VERSION}`;
+
+    const requestHeader = process.env.OPENAI_API_TYPE === 'openai'
+      ? {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
         ...(process.env.OPENAI_ORGANIZATION && {
           'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
         }),
-      },
+      }
+      : {
+        'Content-Type': 'application/json',
+        'api-key': `${process.env.OPENAI_API_KEY}`
+      };
+
+    const answerRes = await fetch(requestUrl, {
+      headers: requestHeader,
       method: 'POST',
       body: JSON.stringify({
         model: model.id,
@@ -138,6 +150,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const { choices: choices2 } = await answerRes.json();
     const answer = choices2[0].message.content;
+
+    console.info(answer);
 
     res.status(200).json({ answer });
   } catch (error) {
