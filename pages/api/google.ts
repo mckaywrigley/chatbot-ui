@@ -142,7 +142,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
           },
           answerMessage,
         ],
-        max_tokens: 1000,
         temperature: 1,
         stream: false,
       }),

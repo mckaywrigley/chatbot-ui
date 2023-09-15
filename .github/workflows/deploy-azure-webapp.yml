@@ -4,9 +4,6 @@
 name: Azure App Service CI/CD
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
