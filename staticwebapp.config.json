@@ -1,8 +1,8 @@
 {
     "routes": [
         {
-          "route": "/*",
-          "allowedRoles": ["anonymous"]
+          "route": "/index.html",
+          "allowedRoles": ["authenticated"]
         }
     ],
      "responseOverrides": {
