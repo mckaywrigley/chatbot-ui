@@ -14,7 +14,6 @@ stages:
                     repository: 'chatbot'
                     dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
                     containerRegistry: 'azure-cr-dev'
-                    arguments: ${{parameters.buildArguments}}
                     tags: latest
               - task: Docker@2
                 displayName: Push Image
