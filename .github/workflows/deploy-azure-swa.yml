@@ -13,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: node:16
+      image: node:18
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
