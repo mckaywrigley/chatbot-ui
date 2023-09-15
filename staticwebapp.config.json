@@ -9,7 +9,7 @@
           "redirect": "/.auth/logout"
         },
         {
-          "route": "/*",
+          "route": "/api",
           "allowedRoles": ["authenticated"]
         }
     ],

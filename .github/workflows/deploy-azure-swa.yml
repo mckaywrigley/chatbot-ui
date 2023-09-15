@@ -15,10 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Build, Test and Deploy Job
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-        with:
-          submodules: true
       - uses: actions/checkout@v3
         with:
           submodules: true
