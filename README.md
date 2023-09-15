@@ -1,4 +1,14 @@
-# Chatbot UI
+# About this Repo
+This is a repo forked from [mckaywrigley/chatbot-ui](https://github.com/mckaywrigley/chatbot-ui).
+
+This repo has the following changes:
+- Personally deployed to Azure Static Web Apps (see [actions](.github/workflows/deploy-azure-swa.yml))
+- Added `staticwebapp.config.json` to enable Azure AD authentication.
+- Removed hard coded `max_tokens` (previously set to `1000`)
+- Fixes to [`google.ts`](/pages/api/google.ts) which previously only calls OpenAI (not Azure OpenAI) **_NOTE: This not fully working yet..._**
+
+
+# Chatbot UI (from [mckaywrigley/chatbot-ui](https://github.com/mckaywrigley/chatbot-ui))
 
 ## News
 
