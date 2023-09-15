@@ -2,15 +2,21 @@
     "routes": [
         {
           "route": "/*",
-          "allowedRoles": ["authenticated"]
+          "allowedRoles": ["anonymous"]
         }
     ],
+     "responseOverrides": {
+        "401": {
+            "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer",
+            "statusCode": 302
+        }
+    },
     "auth": {
         "identityProviders": {
             "azureActiveDirectory": {
                 "userDetailsClaim": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
                 "registration": {
-                    "openIdIssuer": "https://login.microsoftonline.com/532c913e-8397-402d-a684-8f117ca4b576",
+                    "openIdIssuer": "https://login.microsoftonline.com/common/v2.0",
                     "clientIdSettingName": "AZURE_CLIENT_ID",
                     "clientSecretSettingName": "AZURE_CLIENT_SECRET"
                 },
