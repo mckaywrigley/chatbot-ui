@@ -1,0 +1,12 @@
+{
+  "New prompt": "پیش‌نویس جدید",
+  "New folder": "پوشه جدید",
+  "No prompts.": "پیش‌نویسی وجود ندارد.",
+  "Search prompts...": "جستجوی پیش‌نویس‌ها...",
+  "Name": "نام",
+  "Description": "توضیحات",
+  "A description for your prompt.": "توضیحاتی برای پیش‌نویس خود وارد کنید.",
+  "Prompt": "پیش‌نویس",
+  "Prompt content. Use {{}} to denote a variable. Ex: {{name}} is a {{adjective}} {{noun}}": " پیش‌نویس. از {{}} برای نمایش متغیرها استفاده کنید. مثال: {{name}} یک {{adjective}} {{noun}} است",
+  "Save": "ذخیره"
+}
