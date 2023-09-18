@@ -23,15 +23,9 @@ export const LLMStream = async (
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const { status, stream } = await getStream(runID);
 
-        // New chunks are the difference between the current stream and the previous stream
-        const newChunks = stream.slice(
-          previousStreamResult.stream.length,
-          stream.length,
-        );
-
         // If there are new chunks, send them to the client
-        if (newChunks.length > 0) {
-          const joinedChunks = newChunks.join('');
+        if (stream.length > 0) {
+          const joinedChunks = stream.join('');
           controller.enqueue(new TextEncoder().encode(joinedChunks));
         }
 
@@ -64,6 +58,9 @@ const getStream = async (runID: string) => {
     status: Status;
     stream: { output: string }[];
   };
+
+  console.log(result);
+
   return { ...result, stream: result.stream.map((s) => s.output) };
 };
 
@@ -98,13 +95,13 @@ const generatePrompt = (messages: Message[], systemPrompt?: string) => {
   const prompt = messages
     .map((message) =>
       message.role === 'user'
-        ? `[INST] ${message.content} [/INST]`
-        : `${message.content}`,
+        ? `### User Message \n\n ${message.content}`
+        : `### Assistant \n\n ${message.content}`,
     )
     .join('\n');
 
   if (systemPrompt) {
-    return `[/INST] <<SYS>> ${systemPrompt} <</SYS>> [/INST] \n ${prompt}`;
+    return `### System Prompt \n\n ${systemPrompt} ${prompt}`;
   }
 
   return prompt;
