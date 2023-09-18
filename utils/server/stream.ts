@@ -92,7 +92,7 @@ const generatePrompt = (messages: Message[], systemPrompt?: string) => {
     .join('\n\n');
 
   if (systemPrompt) {
-    return `### System Prompt \n\n ${systemPrompt} ${prompt}`;
+    return `### System Prompt \n\n ${systemPrompt} ${prompt} \n\n ### Assistant \n`;
   }
 
   return prompt;
