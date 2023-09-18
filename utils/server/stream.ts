@@ -2,6 +2,8 @@ import { Message } from '@/types/chat';
 
 import { GenerateParameters, Status, statusSchema } from './schema';
 
+const BASE_URL = 'https://api.runpod.ai/v2/';
+
 export const LLMStream = async (
   systemPrompt: string,
   parameters: GenerateParameters,
@@ -23,19 +25,39 @@ export const LLMStream = async (
         }
 
         // If the status is 'COMPLETED', close the stream
-        if (status === 'COMPLETED') {
+        if (status === statusSchema.enum.COMPLETED) {
           controller.close();
           break;
         }
       }
+    },
+    cancel() {
+      const res = cancelRun(runID);
+      console.log('🦀 Canceled the run: ', res);
     },
   });
 
   return stream;
 };
 
+const cancelRun = async (runID: string) => {
+  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/cancel/${runID}`;
+
+  const runResult = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.API_KEY}`,
+    },
+  });
+
+  const { status } = (await runResult.json()) as { status: Status };
+
+  return status;
+};
+
 const getStream = async (runID: string) => {
-  const url = `https://api.runpod.ai/v2/${process.env.ENDPOINT_ID}/stream/${runID}`;
+  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/stream/${runID}`;
 
   const streamResult = await fetch(url, {
     method: 'GET',
@@ -60,7 +82,7 @@ const getNewRunID = async (
   parameters: GenerateParameters,
   messages: Message[],
 ) => {
-  const url = `https://api.runpod.ai/v2/${process.env.ENDPOINT_ID}/run`;
+  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/run`;
 
   const runResult = await fetch(url, {
     method: 'POST',
