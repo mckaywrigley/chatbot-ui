@@ -95,10 +95,10 @@ const generatePrompt = (messages: Message[], systemPrompt?: string) => {
   const prompt = messages
     .map((message) =>
       message.role === 'user'
-        ? `### User Message \n\n ${message.content}`
-        : `### Assistant \n\n ${message.content}`,
+        ? `### User Message \n ${message.content}`
+        : `### Assistant \n ${message.content}`,
     )
-    .join('\n');
+    .join('\n\n');
 
   if (systemPrompt) {
     return `### System Prompt \n\n ${systemPrompt} ${prompt}`;
