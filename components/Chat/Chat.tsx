@@ -497,15 +497,17 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                                         <div
                                             className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
                                             <ModelSelect/>
-                                            <TemperatureSlider
-                                                label={t('Temperature')}
-                                                onChangeTemperature={(temperature) =>
-                                                    handleUpdateConversation(selectedConversation, {
-                                                        key: 'temperature',
-                                                        value: temperature,
-                                                    })
-                                                }
-                                            />
+                                           {selectedConversation != undefined && (
+                                                <TemperatureSlider
+                                                    label={t('Temperature')}
+                                                    onChangeTemperature={(temperature) =>
+                                                        handleUpdateConversation(selectedConversation, {
+                                                            key: 'temperature',
+                                                            value: temperature,
+                                                        })
+                                                    }
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 )}
