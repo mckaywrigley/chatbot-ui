@@ -49,12 +49,13 @@ describe('Conversation tests', () => {
     })
 
     it('cleans conversation history with valid array correctly', () => {
-        const result: Conversation[] = cleanConversationHistory(tempHistory.reduce((item) => {
-            item.model = undefined;
+        // @ts-ignore
+        const results: Conversation[] = cleanConversationHistory(tempHistory.reduce((item) => {
+            item.model = null;
             return item
         }))
 
-        for (const results in result) {
+        for (const result: Conversation in results) {
             expect(result.model).toBe(OpenAIModels[OpenAIModelID.GPT_3_5])
             expect(result.prompt).toBe(DEFAULT_SYSTEM_PROMPT)
             expect(result.temperature).toBe(DEFAULT_TEMPERATURE)
@@ -70,6 +71,7 @@ describe('Conversation tests', () => {
     })
 
     it('invalid conversation types are removed during clean', () => {
+        // @ts-ignore
         tempHistory[1] = 'this is not a conversation'
         expect(tempHistory.length).toEqual(3);
 
