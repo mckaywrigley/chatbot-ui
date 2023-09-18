@@ -2,22 +2,13 @@ import { z } from 'zod';
 
 const generateParametersSchema = z
   .object({
-    best_of: z.number().min(0),
-    decoder_input_details: z.boolean().default(true),
-    details: z.boolean().default(true),
-    do_sample: z.boolean().default(false),
+    temperature: z.number(),
+    top_p: z.number(),
+    top_k: z.number(),
     max_new_tokens: z.number(),
-    repetition_penalty: z.number().min(0),
-    return_full_text: z.boolean(),
-    seed: z.number().int().min(0),
-    stop: z.array(z.string()).max(4),
-    temperature: z.number().min(0),
-    top_k: z.number().int().min(0),
-    top_n_tokens: z.number().int().min(0),
-    top_p: z.number().min(0).max(1),
-    truncate: z.number().int().min(0),
-    typical_p: z.number().min(0).max(1),
-    watermark: z.boolean().default(false),
+    token_repetition_penalty: z.number(),
+    token_repetition_range: z.number(),
+    token_repetition_decay: z.number(),
   })
   .deepPartial();
 export type GenerateParameters = z.infer<typeof generateParametersSchema>;
@@ -27,3 +18,10 @@ export const generateInputSchema = z.object({
   parameters: generateParametersSchema,
 });
 export type GenerateInput = z.infer<typeof generateInputSchema>;
+
+export const statusSchema = z.enum([
+  'UNINITIALIZED',
+  'COMPLETED',
+  'IN_PROGRESS',
+]);
+export type Status = z.infer<typeof statusSchema>;

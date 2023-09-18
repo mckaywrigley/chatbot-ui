@@ -1,97 +1,97 @@
 import { Message } from '@/types/chat';
 
-import { GenerateParameters } from './schema';
-
-import {
-  ParsedEvent,
-  ReconnectInterval,
-  createParser,
-} from 'eventsource-parser';
-
-type StreamEventData =
-  | {
-      token: {
-        id: number;
-        text: string;
-        logprob: number;
-        special: boolean;
-      };
-      generated_text: null | string;
-      details: null | string;
-    }
-  | {
-      error: string;
-    };
+import { GenerateParameters, Status, statusSchema } from './schema';
 
 export const LLMStream = async (
   systemPrompt: string,
   parameters: GenerateParameters,
   messages: Message[],
 ) => {
-  let url = `${process.env.MODEL_ENDPOINT}/generate_stream`;
+  const runID = await getNewRunID(systemPrompt, parameters, messages);
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      inputs: generatePrompt(messages, systemPrompt),
-      parameters,
-    }),
-  });
-
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-
-  if (res.status !== 200) {
-    const result = await res.json();
-    if (result.error) {
-      throw new Error(result.error);
-    } else {
-      throw new Error(
-        `OpenAI API returned an error: ${
-          decoder.decode(result?.value) || result.statusText
-        }`,
-      );
-    }
-  }
+  let previousStreamResult: {
+    status: Status;
+    stream: string[];
+  } = {
+    status: statusSchema.Enum.UNINITIALIZED,
+    stream: [],
+  };
 
   const stream = new ReadableStream({
-    async start(controller) {
-      const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === 'event') {
-          const data = event.data;
+    async pull(controller) {
+      while (true) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const { status, stream } = await getStream(runID);
 
-          try {
-            const json = JSON.parse(data) as StreamEventData;
+        // New chunks are the difference between the current stream and the previous stream
+        const newChunks = stream.slice(
+          previousStreamResult.stream.length,
+          stream.length,
+        );
 
-            if ('error' in json) {
-              throw new Error(json.error);
-            }
-
-            if (json.generated_text != null) {
-              controller.close();
-              return;
-            }
-            const text = json.token.text;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
+        // If there are new chunks, send them to the client
+        if (newChunks.length > 0) {
+          const joinedChunks = newChunks.join('');
+          controller.enqueue(new TextEncoder().encode(joinedChunks));
         }
-      };
 
-      const parser = createParser(onParse);
+        previousStreamResult = { status, stream };
 
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
+        // If the status is 'COMPLETED', close the stream
+        if (status === 'COMPLETED') {
+          controller.close();
+          break;
+        }
       }
     },
   });
 
   return stream;
+};
+
+const getStream = async (runID: string) => {
+  const url = `https://api.runpod.ai/v2/${process.env.ENDPOINT_ID}/stream/${runID}`;
+
+  const streamResult = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.API_KEY}`,
+    },
+  });
+
+  const result = (await streamResult.json()) as {
+    status: Status;
+    stream: { output: string }[];
+  };
+  return { ...result, stream: result.stream.map((s) => s.output) };
+};
+
+const getNewRunID = async (
+  systemPrompt: string,
+  parameters: GenerateParameters,
+  messages: Message[],
+) => {
+  const url = `https://api.runpod.ai/v2/${process.env.ENDPOINT_ID}/run`;
+
+  const runResult = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.API_KEY}`,
+    },
+    body: JSON.stringify({
+      input: {
+        prompt: generatePrompt(messages, systemPrompt),
+        ...parameters,
+        stream: true,
+      },
+    }),
+  });
+
+  const { id } = (await runResult.json()) as { id: string; status: Status };
+
+  return id;
 };
 
 const generatePrompt = (messages: Message[], systemPrompt?: string) => {

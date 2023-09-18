@@ -1,4 +1,4 @@
 export interface ProcessEnv {
-  MODEL_ENDPOINT: string;
+  ENDPOINT_ID: string;
   NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT: string;
 }
