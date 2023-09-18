@@ -8,17 +8,18 @@ export const LLMStream = async (
   messages: Message[],
 ) => {
   const runID = await getNewRunID(systemPrompt, parameters, messages);
+  const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async pull(controller) {
       while (true) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const { status, stream } = await getStream(runID);
 
         // If there are new chunks, send them to the client
         if (stream.length > 0) {
           const joinedChunks = stream.join('');
-          controller.enqueue(new TextEncoder().encode(joinedChunks));
+          controller.enqueue(encoder.encode(joinedChunks));
         }
 
         // If the status is 'COMPLETED', close the stream
