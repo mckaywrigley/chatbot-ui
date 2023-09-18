@@ -9,14 +9,6 @@ export const LLMStream = async (
 ) => {
   const runID = await getNewRunID(systemPrompt, parameters, messages);
 
-  let previousStreamResult: {
-    status: Status;
-    stream: string[];
-  } = {
-    status: statusSchema.Enum.UNINITIALIZED,
-    stream: [],
-  };
-
   const stream = new ReadableStream({
     async pull(controller) {
       while (true) {
@@ -28,8 +20,6 @@ export const LLMStream = async (
           const joinedChunks = stream.join('');
           controller.enqueue(new TextEncoder().encode(joinedChunks));
         }
-
-        previousStreamResult = { status, stream };
 
         // If the status is 'COMPLETED', close the stream
         if (status === 'COMPLETED') {
