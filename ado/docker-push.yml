@@ -1,3 +1,10 @@
+trigger:
+    branches:
+        include:
+            - main
+
+pr: none
+
 stages:
   - stage: build_push
     displayName: Build and Push Image
