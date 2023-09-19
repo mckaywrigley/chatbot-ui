@@ -430,8 +430,8 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     >
                         {selectedConversation?.messages?.length === 0 ? (
                             <>
-                                <div
-                                    className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
+                                <div className="h-[calc(100vh-162px)]">
+                                    <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
                                     <div
                                         className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
                                         {models.length === 0 ? (
@@ -470,6 +470,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                                             />
                                         </div>
                                     )}
+                                </div>
                                 </div>
                             </>
                         ) : (
