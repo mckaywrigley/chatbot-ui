@@ -69,12 +69,12 @@ const getStream = async (runID: string) => {
 
   const result = (await streamResult.json()) as {
     status: Status;
-    stream: { output: { text: string } }[];
+    stream: { output: string }[];
   };
 
   console.log('🦀 Stream result: ', result);
 
-  return { ...result, stream: result.stream.map((s) => s.output.text) };
+  return { ...result, stream: result.stream.map((s) => s.output) };
 };
 
 const getNewRunID = async (
@@ -93,9 +93,8 @@ const getNewRunID = async (
     body: JSON.stringify({
       input: {
         prompt: generatePrompt(messages, systemPrompt),
-        sampling_params: {
-          ...parameters,
-        },
+        ...parameters,
+        stream: true,
       },
     }),
   });
