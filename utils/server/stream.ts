@@ -72,7 +72,7 @@ const getStream = async (runID: string) => {
     stream: { output: { text: string } }[];
   };
 
-  console.log(result);
+  console.log('🦀 Stream result: ', result);
 
   return { ...result, stream: result.stream.map((s) => s.output.text) };
 };
