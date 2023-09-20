@@ -28,7 +28,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
+    state: { prompts, defaultModelId, showPromptbar, folders },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -144,6 +144,7 @@ const Promptbar = () => {
         handleCreateItem={handleCreatePrompt}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
+        foldersCount={folders.filter((folder) => folder.type === 'prompt').length}
       />
     </PromptbarContext.Provider>
   );
