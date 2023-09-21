@@ -94,7 +94,6 @@ const getNewRunID = async (
       input: {
         prompt: generatePrompt(messages, systemPrompt),
         ...parameters,
-        stream: true,
       },
     }),
   });
@@ -108,13 +107,13 @@ const generatePrompt = (messages: Message[], systemPrompt?: string) => {
   const prompt = messages
     .map((message) =>
       message.role === 'user'
-        ? `### User Message \n ${message.content}`
-        : `### Assistant \n ${message.content}`,
+        ? `[INST] ${message.content} [/INST]`
+        : `${message.content}`,
     )
-    .join('\n\n');
+    .join('\n');
 
   if (systemPrompt) {
-    return `### System Prompt \n\n ${systemPrompt} ${prompt} \n\n ### Assistant \n`;
+    return `[/INST] <<SYS>> ${systemPrompt} <</SYS>> [/INST]\n${prompt}`;
   }
 
   return prompt;
