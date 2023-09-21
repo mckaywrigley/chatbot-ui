@@ -51,6 +51,10 @@ const cancelRun = async (runID: string) => {
     },
   });
 
+  if (!runResult.ok) {
+    throw new Error('Failed to cancel run');
+  }
+
   const { status } = (await runResult.json()) as { status: Status };
 
   return status;
@@ -66,6 +70,10 @@ const getStream = async (runID: string) => {
       Authorization: `Bearer ${process.env.API_KEY}`,
     },
   });
+
+  if (!streamResult.ok) {
+    throw new Error('Failed to get stream');
+  }
 
   const result = (await streamResult.json()) as {
     status: Status;
@@ -97,6 +105,10 @@ const getNewRunID = async (
       },
     }),
   });
+
+  if (!runResult.ok) {
+    throw new Error('Failed to get run ID');
+  }
 
   const { id } = (await runResult.json()) as { id: string; status: Status };
 
