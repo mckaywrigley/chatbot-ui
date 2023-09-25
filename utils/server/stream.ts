@@ -119,13 +119,13 @@ const generatePrompt = (messages: Message[], systemPrompt?: string) => {
   const prompt = messages
     .map((message) =>
       message.role === 'user'
-        ? `[INST] ${message.content} [/INST]`
-        : `${message.content}`,
+        ? `### User Message \n ${message.content}`
+        : `### Assistant \n ${message.content}`,
     )
-    .join('\n');
+    .join('\n\n');
 
   if (systemPrompt) {
-    return `[/INST] <<SYS>> ${systemPrompt} <</SYS>> [/INST]\n${prompt}`;
+    return `### System Prompt\n\n${systemPrompt}\n\n${prompt}\n\n### Assistant \n`;
   }
 
   return prompt;
