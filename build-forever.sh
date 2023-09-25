@@ -15,10 +15,9 @@ npm install
 # Build the Next.js app for production
 npm run build
 
-# Launch local docker environment
-echo "running docker compose"
-
-docker-compose --env-file .env.local up
-
-
-#npm run start
+if [ "$1" == "production" ]
+then
+    docker-compose up -d
+else
+    docker-compose -f compose-dev.yml up -d
+fi
