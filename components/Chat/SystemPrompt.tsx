@@ -46,7 +46,7 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = 1000;
+    const maxLength = 100_000;
 
     if (value.length > maxLength) {
       alert(
