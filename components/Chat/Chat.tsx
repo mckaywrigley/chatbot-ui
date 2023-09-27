@@ -92,10 +92,22 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       }
 
       const { value, done } = await reader.read();
-      if (done) break;
-
       const chunkValue = decoder.decode(value);
       text += chunkValue;
+
+      if (text.trim().length === 0 && done) {
+        const updatedMessages: Message[] = [
+          ...conversation.messages,
+          {
+            role: 'assistant',
+            content:
+              'Sorry, we are having trouble answering questions at the moment. please wait for some time and try again !',
+          },
+        ];
+        conversation = { ...conversation, messages: updatedMessages };
+        homeDispatch({ field: 'selectedConversation', value: conversation });
+        break;
+      }
 
       if (isFirst) {
         isFirst = false;
@@ -161,10 +173,30 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'messageIsStreaming', value: false });
         const errorMessage = await response.text();
         toast.error(`${errorMessage}. Try Regenerate Response`);
+
+        const updatedMessages: Message[] = [
+          ...updatedConversation.messages,
+          {
+            role: 'assistant',
+            content:
+              'Sorry, we are having trouble answering questions at the moment. please wait for some time and try again !',
+          },
+        ];
+
+        updatedConversation = {
+          ...updatedConversation,
+          messages: updatedMessages,
+        };
+
+        homeDispatch({
+          field: 'selectedConversation',
+          value: updatedConversation,
+        });
+
         return;
       }
 
-      const data = await response.body;
+      const data = response.body;
       if (!data) {
         homeDispatch({ field: 'loading', value: false });
         homeDispatch({ field: 'messageIsStreaming', value: false });
