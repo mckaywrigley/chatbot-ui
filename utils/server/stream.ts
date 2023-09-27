@@ -61,8 +61,6 @@ const cancelRun = async (runID: string) => {
 };
 
 const getStream = async (runID: string) => {
-  throw new Error('Timeout');
-
   const url = `${BASE_URL}${process.env.ENDPOINT_ID}/stream/${runID}`;
 
   const streamResult = await fetch(url, {
