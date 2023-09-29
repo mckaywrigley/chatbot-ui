@@ -109,6 +109,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         break;
       }
 
+      if(done) break;
+
       if (isFirst) {
         isFirst = false;
         const updatedMessages: Message[] = [
