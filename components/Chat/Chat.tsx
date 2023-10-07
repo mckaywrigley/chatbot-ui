@@ -246,11 +246,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       }
     },
     [
-      apiKey,
-      conversations,
-      pluginKeys,
-      selectedConversation,
-      stopConversationRef,
+      apiKey, 
+      conversations, 
+      homeDispatch, 
+      pluginKeys, 
+      selectedConversation, 
+      stopConversationRef
     ],
   );
 
@@ -313,8 +314,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   //     handleSend(currentMessage);
   //     homeDispatch({ field: 'currentMessage', value: undefined });
   //   }
-  // }, [currentMessage]);
-
+  // }, [currentMessage, handleSend, homeDispatch]);
+  
   useEffect(() => {
     throttledScrollDown();
     selectedConversation &&
