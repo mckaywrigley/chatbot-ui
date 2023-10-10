@@ -16,6 +16,9 @@ export interface HomeInitialState {
   folders: FolderInterface[];
   conversations: Conversation[];
   selectedConversation: Conversation | undefined;
+  userRoles: string[];
+  defaultUserRole: string;
+  userRoleError : ErrorMessage | null;
   currentMessage: Message | undefined;
   prompts: Prompt[];
   temperature: number;
@@ -40,6 +43,9 @@ export const initialState: HomeInitialState = {
   folders: [],
   conversations: [],
   selectedConversation: undefined,
+  userRoles: [],
+  defaultUserRole: '',
+  userRoleError: null,
   currentMessage: undefined,
   prompts: [],
   temperature: 1,

@@ -1,7 +1,7 @@
 import { Conversation } from '@/types/chat';
 import { OpenAIModelID, OpenAIModels } from '@/types/openai';
 
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from './const';
+import {DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, DEFAULT_USER_ROLE} from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
   // added model for each conversation (3/20/23)
@@ -49,6 +49,13 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     };
   }
 
+  if (!updatedConversation.userRole) {
+    updatedConversation = {
+      ...updatedConversation,
+      userRole: updatedConversation.userRole || DEFAULT_USER_ROLE,
+    };
+  }
+
   return updatedConversation;
 };
 
@@ -84,6 +91,10 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
       if (!conversation.messages) {
         conversation.messages = [];
+      }
+
+      if (!conversation.userRole) {
+        conversation.userRole = DEFAULT_USER_ROLE;
       }
 
       acc.push(conversation);

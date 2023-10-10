@@ -30,6 +30,7 @@ import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
+import { UserRoleSelect } from './UserRoleSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
@@ -99,6 +100,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           key: apiKey,
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
+          userRole: updatedConversation.userRole,
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -433,6 +435,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                           })
                         }
                       />
+                      <UserRoleSelect />
                     </div>
                   )}
                 </div>

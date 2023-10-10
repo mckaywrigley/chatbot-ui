@@ -13,6 +13,7 @@ export interface ChatBody {
   key: string;
   prompt: string;
   temperature: number;
+  userRole: string
 }
 
 export interface Conversation {
@@ -23,4 +24,5 @@ export interface Conversation {
   prompt: string;
   temperature: number;
   folderId: string | null;
+  userRole: string
 }

@@ -5,25 +5,12 @@ import { useFetch } from '@/hooks/useFetch';
 export interface GetModelsRequestProps {
   key: string;
 }
+export interface GetUserRolesRequestProps {
+  key: string;
+}
 
 const useApiService = () => {
   const fetchService = useFetch();
-
-  // const getModels = useCallback(
-  // 	(
-  // 		params: GetManagementRoutineInstanceDetailedParams,
-  // 		signal?: AbortSignal
-  // 	) => {
-  // 		return fetchService.get<GetManagementRoutineInstanceDetailed>(
-  // 			`/v1/ManagementRoutines/${params.managementRoutineId}/instances/${params.instanceId
-  // 			}?sensorGroupIds=${params.sensorGroupId ?? ''}`,
-  // 			{
-  // 				signal,
-  // 			}
-  // 		);
-  // 	},
-  // 	[fetchService]
-  // );
 
   const getModels = useCallback(
     (params: GetModelsRequestProps, signal?: AbortSignal) => {
@@ -37,9 +24,22 @@ const useApiService = () => {
     },
     [fetchService],
   );
+  const getUserRoles = useCallback(
+      (params: GetUserRolesRequestProps, signal?: AbortSignal) => {
+        return fetchService.post<GetUserRolesRequestProps>(`/api/user_roles`, {
+          body: { key: params.key },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal,
+        });
+      },
+      [fetchService],
+  );
 
   return {
     getModels,
+    getUserRoles,
   };
 };
 

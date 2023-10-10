@@ -15,7 +15,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import {DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, DEFAULT_USER_ROLE} from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -40,6 +40,7 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import {log} from "util";
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -55,6 +56,8 @@ const Home = ({
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
+  const { getUserRoles } = useApiService();
+  const { getUserRolesError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -76,7 +79,7 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error, refetch } = useQuery(
+  const modelQueryResult = useQuery(
     ['GetModels', apiKey, serverSideApiKeyIsSet],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;
@@ -92,14 +95,39 @@ const Home = ({
   );
 
   useEffect(() => {
-    if (data) dispatch({ field: 'models', value: data });
-  }, [data, dispatch]);
+    if (modelQueryResult.data) dispatch({ field: 'models', value: modelQueryResult.data });
+  }, [modelQueryResult.data, dispatch]);
 
   useEffect(() => {
-    dispatch({ field: 'modelError', value: getModelsError(error) });
-  }, [dispatch, error, getModelsError]);
+    dispatch({ field: 'modelError', value: getModelsError(modelQueryResult.error) });
+  }, [dispatch, modelQueryResult.error, getModelsError]);
 
-  // FETCH MODELS ----------------------------------------------
+  const userRolesQueryResults = useQuery(
+      ['GetUserRoles', apiKey, serverSideApiKeyIsSet],
+      ({ signal }) => {
+        if (!apiKey && !serverSideApiKeyIsSet) return null;
+
+        return getUserRoles(
+            {
+              key: apiKey,
+            },
+            signal,
+        );
+      },
+      { enabled: true, refetchOnMount: false },
+  );
+
+  useEffect(() => {
+    console.log(userRolesQueryResults)
+    if (userRolesQueryResults.data) dispatch({ field: 'userRoles', value: userRolesQueryResults.data });
+  }, [userRolesQueryResults.data, dispatch]);
+
+  useEffect(() => {
+    console.log(userRolesQueryResults)
+    dispatch({ field: 'userRoleError', value: getUserRolesError(modelQueryResult.error) });
+  }, [dispatch, userRolesQueryResults.error, getUserRolesError]);
+
+  // FETCH MODELS AND USER ROLES ----------------------------------------------
 
   const handleSelectConversation = (conversation: Conversation) => {
     dispatch({
@@ -194,6 +222,7 @@ const Home = ({
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
+      userRole: lastConversation?.userRole ?? DEFAULT_USER_ROLE
     };
 
     const updatedConversations = [...conversations, newConversation];
