@@ -9,7 +9,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, HIDDEN_SYSTEM_PROMPT } from '@/utils/app/const';
 
 import { Conversation } from '@/types/chat';
 import { Prompt } from '@/types/prompt';
@@ -170,7 +170,7 @@ export const SystemPrompt: FC<Props> = ({
     if (conversation.prompt) {
       setValue(conversation.prompt);
     } else {
-      setValue(DEFAULT_SYSTEM_PROMPT);
+      setValue(DEFAULT_SYSTEM_PROMPT + "\n\n" + HIDDEN_SYSTEM_PROMPT);
     }
   }, [conversation]);
 
@@ -203,11 +203,10 @@ export const SystemPrompt: FC<Props> = ({
           resize: 'none',
           bottom: `${textareaRef?.current?.scrollHeight}px`,
           maxHeight: '300px',
-          overflow: `${
-            textareaRef.current && textareaRef.current.scrollHeight > 400
+          overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
               ? 'auto'
               : 'hidden'
-          }`,
+            }`,
         }}
         placeholder={
           t(`Enter a prompt or type "/" to select a prompt...`) || ''

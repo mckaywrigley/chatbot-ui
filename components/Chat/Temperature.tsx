@@ -1,10 +1,12 @@
-import { FC, useContext, useState } from 'react';
+import React, { FC, useContext, useState, useEffect } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
 import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 import HomeContext from '@/pages/api/home/home.context';
+
+import { useAppInsightsContext, useTrackEvent } from "@microsoft/applicationinsights-react-js";
 
 interface Props {
   label: string;
@@ -15,6 +17,7 @@ export const TemperatureSlider: FC<Props> = ({
   label,
   onChangeTemperature,
 }) => {
+  const appInsights = useAppInsightsContext();
   const {
     state: { conversations },
   } = useContext(HomeContext);
@@ -23,10 +26,15 @@ export const TemperatureSlider: FC<Props> = ({
     lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
   );
   const { t } = useTranslation('chat');
+  const trackTemperatureSlider = useTrackEvent(appInsights, "TemperatureSlider", { temperature });
+  useEffect(() => {
+    trackTemperatureSlider({ temperature });
+  }, [temperature]);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);
     setTemperature(newValue);
     onChangeTemperature(newValue);
+
   };
 
   return (

@@ -156,11 +156,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             if (stopConversationRef.current === true) {
               controller.abort();
               done = true;
+              console.log("Stream aborted early due to stopConversationRef.current being true");
               break;
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
             const chunkValue = decoder.decode(value);
+            // console.log("Received chunk:", chunkValue);
             text += chunkValue;
             if (isFirst) {
               isFirst = false;

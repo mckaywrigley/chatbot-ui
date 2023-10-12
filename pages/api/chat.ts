@@ -1,4 +1,4 @@
-import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, HIDDEN_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, MINIMUM_RESPONSE_TOKENS } from '@/utils/app/const';
 import { OpenAIError, OpenAIStream } from '@/utils/server';
 
 import { ChatBody, Message } from '@/types/chat';
@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     let promptToSend = prompt;
     if (!promptToSend) {
-      promptToSend = DEFAULT_SYSTEM_PROMPT;
+      promptToSend = DEFAULT_SYSTEM_PROMPT + "\n\n" + HIDDEN_SYSTEM_PROMPT;
     }
 
     let temperatureToUse = temperature;
@@ -43,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if ((tokenCount + tokens.length + MINIMUM_RESPONSE_TOKENS) > model.tokenLimit) {
         break;
       }
       tokenCount += tokens.length;
@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
 
 
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
-    return new Response(stream);
+    return new Response(stream, { headers: { "Content-Type": "text/plain" } });
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {

@@ -9,6 +9,7 @@ RUN npm ci
 
 # ---- Build ----
 FROM dependencies AS build
+ARG NEXT_PUBLIC_APP_INSIGHT
 COPY . .
 RUN npm run build
 

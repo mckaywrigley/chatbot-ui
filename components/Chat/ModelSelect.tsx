@@ -1,5 +1,5 @@
 import { IconExternalLink } from '@tabler/icons-react';
-import { useContext } from 'react';
+import { use, useContext } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -7,7 +7,12 @@ import { OpenAIModel } from '@/types/openai';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import React, { useState, useEffect } from "react";
+import { useAppInsightsContext, useTrackEvent } from "@microsoft/applicationinsights-react-js";
+
 export const ModelSelect = () => {
+  const appInsights = useAppInsightsContext();
+
   const { t } = useTranslation('chat');
 
   const {
@@ -15,6 +20,10 @@ export const ModelSelect = () => {
     handleUpdateConversation,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
+  const trackModelSelect = useTrackEvent(appInsights, "ModelSelect", { model: selectedConversation?.model?.id || defaultModelId });
+  useEffect(() => {
+    trackModelSelect({ model: selectedConversation?.model?.id || defaultModelId });
+  }, [selectedConversation?.model?.id, defaultModelId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     selectedConversation &&
@@ -24,6 +33,7 @@ export const ModelSelect = () => {
           (model) => model.id === e.target.value,
         ) as OpenAIModel,
       });
+
   };
 
   return (

@@ -1,7 +1,7 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import { OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION, HIDDEN_SYSTEM_PROMPT } from '../app/const';
 
 import {
   ParsedEvent,
@@ -53,7 +53,7 @@ export const OpenAIStream = async (
       messages: [
         {
           role: 'system',
-          content: systemPrompt,
+          content: systemPrompt + '\n\n' + HIDDEN_SYSTEM_PROMPT,
         },
         ...messages,
       ],
@@ -90,14 +90,23 @@ export const OpenAIStream = async (
           const data = event.data;
 
           try {
+
+            if (data === "[DONE]") {
+              return;
+            }
             const json = JSON.parse(data);
+            if (json.object == "") {
+              return;
+            }
             if (json.choices[0].finish_reason != null) {
               controller.close();
               return;
             }
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
+            if (json.object == "chat.completion.chunk") {
+              const text = json.choices[0].delta.content;
+              const queue = encoder.encode(text);
+              controller.enqueue(queue);
+            }
           } catch (e) {
             controller.error(e);
           }
