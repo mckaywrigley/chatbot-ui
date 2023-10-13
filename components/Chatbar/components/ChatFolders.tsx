@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { FolderInterface } from '@/types/folder';
 
 import HomeContext from '@/pages/api/home/home.context';
+import ChatbarContext from "@/components/Chatbar/Chatbar.context";
 
 import Folder from '@/components/Folder';
 
@@ -13,10 +14,15 @@ interface Props {
 }
 
 export const ChatFolders = ({ searchTerm }: Props) => {
+
   const {
-    state: { folders, conversations },
+    state: { folders },
     handleUpdateConversation,
   } = useContext(HomeContext);
+
+  const {
+    state: { filteredConversations },
+  } = useContext(ChatbarContext);
 
   const handleDrop = (e: any, folder: FolderInterface) => {
     if (e.dataTransfer) {
@@ -30,8 +36,8 @@ export const ChatFolders = ({ searchTerm }: Props) => {
 
   const ChatFolders = (currentFolder: FolderInterface) => {
     return (
-      conversations &&
-      conversations
+      filteredConversations &&
+      filteredConversations
         .filter((conversation) => conversation.folderId)
         .map((conversation, index) => {
           if (conversation.folderId === currentFolder.id) {
