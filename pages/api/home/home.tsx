@@ -12,6 +12,7 @@ import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
 import { loadChatHistory } from '@/services/loadChatService';
 import { loadPromptHistory } from '@/services/loadPromptService';
+import { loadFolderHistory } from "@/services/loadFolderService";
 
 import {
   cleanConversationHistory,
@@ -273,7 +274,7 @@ const Home = ({
       isMounted = false;
     };
   }, [session]);
-  
+
   useEffect(() => {
     localStorage.setItem('user', JSON.stringify(session?.user?.name));
     const settings = getSettings();
@@ -321,13 +322,18 @@ const Home = ({
     if (folders) {
       dispatch({ field: 'folders', value: JSON.parse(folders) });
     }
+    loadFolderHistory().then((folderHistory)=>{
+        let parsedFolderHistory: FolderInterface[] = folders ? JSON.parse(folders) : []
+        if (folderHistory !== '' && folderHistory.length > 0) parsedFolderHistory = JSON.parse(folderHistory);
+        dispatch({ field: 'folders', value: parsedFolderHistory });
+    })
     // Load Prompt History
     loadPromptHistory().then( (promptHistory) => {
       let parsedPromptHistory: Prompt[] = []
       if (promptHistory !== '' && promptHistory.length > 0) parsedPromptHistory = JSON.parse(promptHistory);
       dispatch({ field: 'prompts', value: parsedPromptHistory });
     });
-    
+
     // Load Conversations History Block
     loadChatHistory().then( (chatHistory) => {
       let parsedConversationHistory: Conversation[] = []
