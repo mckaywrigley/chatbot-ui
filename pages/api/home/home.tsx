@@ -318,12 +318,12 @@ const Home = ({
       dispatch({ field: 'showPromptbar', value: showPromptbar === 'true' });
     }
 
-    // const folders = localStorage.getItem('folders');
-    // if (folders) {
-    //   dispatch({ field: 'folders', value: JSON.parse(folders) });
-    // }
+    const folders = localStorage.getItem('folders');
+    if (folders) {
+      dispatch({ field: 'folders', value: JSON.parse(folders) });
+    }
     loadFolderHistory().then((folderHistory)=>{
-       let parsedFolderHistory: FolderInterface[] = []
+        let parsedFolderHistory: FolderInterface[] = folders ? JSON.parse(folders) : []
         if (folderHistory !== '' && folderHistory.length > 0) parsedFolderHistory = JSON.parse(folderHistory);
         dispatch({ field: 'folders', value: parsedFolderHistory });
     })
