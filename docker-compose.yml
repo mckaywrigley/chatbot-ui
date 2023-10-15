@@ -7,3 +7,7 @@ services:
       - 3000:3000
     environment:
       - 'OPENAI_API_KEY='
+build:
+  service_account: "john@16pointsresearch.net"
+  options:
+    logging: NONE
