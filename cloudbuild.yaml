@@ -7,5 +7,4 @@ images:
 
 options:
   logging: NONE
-  serviceAccount: '359883428545@cloudbuild.gserviceaccount.com'
   default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
