@@ -8,7 +8,7 @@ import {
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
-  MutableRefObject,
+  MutableRefObject, SyntheticEvent,
   useCallback,
   useContext,
   useEffect,
@@ -30,6 +30,7 @@ import { VariableModal } from './VariableModal';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
+  onAudioFileUpload: (file: File) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
@@ -39,6 +40,7 @@ interface Props {
 
 export const ChatInput = ({
   onSend,
+  onAudioFileUpload,
   onRegenerate,
   onScrollDownClick,
   stopConversationRef,
@@ -256,6 +258,17 @@ export const ChatInput = ({
     };
   }, []);
 
+  const handleDrop = (droppedElement: any)  => {
+    droppedElement.preventDefault();
+    droppedElement.stopPropagation();
+    if (droppedElement.dataTransfer.files.length > 0) {
+      const file: File = droppedElement.dataTransfer.files[0]
+      if (file.type.toLowerCase().startsWith("audio")) {
+        onAudioFileUpload(file)
+      }
+    }
+  };
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
@@ -333,6 +346,7 @@ export const ChatInput = ({
             onCompositionEnd={() => setIsTyping(false)}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onDrop={handleDrop}
           />
 
           <button
@@ -381,16 +395,16 @@ export const ChatInput = ({
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
         <a
-          href="https://github.com/mckaywrigley/chatbot-ui"
+          href="https://github.com/journey2ai/ai-assist-ui"
           target="_blank"
           rel="noreferrer"
           className="underline"
         >
-          ChatBot UI
+          {t("AI Assistant")}
         </a>
         .{' '}
         {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
+          "AI Assistant is an advanced chatbot kit aiming to support everyday office work.",
         )}
       </div>
     </div>

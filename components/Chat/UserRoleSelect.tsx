@@ -22,18 +22,6 @@ export const UserRoleSelect = () => {
       });
   };
 
-  /*
-  {userRoles.map((role) => (
-            <option
-              key={role}
-              value={role}
-              className="dark:bg-[#343541] dark:text-white"
-            >
-              role
-            </option>
-          ))}
-   */
-
   return (
     <div className="flex flex-col">
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
@@ -56,16 +44,6 @@ export const UserRoleSelect = () => {
                 </option>
             ))}
         </select>
-      </div>
-      <div className="w-full mt-3 text-left text-neutral-700 dark:text-neutral-400 flex items-center">
-        <a
-          href="https://platform.openai.com/account/usage"
-          target="_blank"
-          className="flex items-center"
-        >
-          <IconExternalLink size={18} className={'inline mr-1'} />
-          {t('View Account Usage')}
-        </a>
       </div>
     </div>
   );

@@ -118,12 +118,10 @@ const Home = ({
   );
 
   useEffect(() => {
-    console.log(userRolesQueryResults)
     if (userRolesQueryResults.data) dispatch({ field: 'userRoles', value: userRolesQueryResults.data });
   }, [userRolesQueryResults.data, dispatch]);
 
   useEffect(() => {
-    console.log(userRolesQueryResults)
     dispatch({ field: 'userRoleError', value: getUserRolesError(modelQueryResult.error) });
   }, [dispatch, userRolesQueryResults.error, getUserRolesError]);
 
@@ -389,7 +387,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>{t("AI Assistant")}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
