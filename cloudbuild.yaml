@@ -1,0 +1,11 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/exalted-iridium-397610/chatbotui-gcp', '.']
+
+images:
+- 'gcr.io/exalted-iridium-397610/chatbotui-gcp'
+
+options:
+  logging: NONE
+  serviceAccount: '359883428545@cloudbuild.gserviceaccount.com'
+  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
