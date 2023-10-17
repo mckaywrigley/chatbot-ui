@@ -1,3 +1,5 @@
+import { Mode } from "fs";
+
 export enum Model {
   PhindCodeLlamaV2 = 'PhindCodeLlamaV2',
   SlitherSolAuditor = 'SlitherSolAuditor',
@@ -14,7 +16,9 @@ export interface ChatBody {
   messages: Message[];
   prompt: string;
   temperature: number;
+  model: Model
 }
+
 
 export interface Conversation {
   id: string;

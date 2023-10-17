@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { Message, Model } from '@/types/chat';
 
 import { GenerateParameters, Status, statusSchema } from './schema';
 
@@ -8,15 +8,17 @@ export const LLMStream = async (
   systemPrompt: string,
   parameters: GenerateParameters,
   messages: Message[],
+  model: Model,
 ) => {
-  const runID = await getNewRunID(systemPrompt, parameters, messages);
+  const endpointId = model === Model.PhindCodeLlamaV2 ? process.env.PHIND_CODE_LLAMA_V2_ENDPOINT_ID! : process.env.SLITHER_SOL_AUDITOR_ENDPOINT_ID!;
+  const runID = await getNewRunID(systemPrompt, parameters, messages, endpointId);
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async pull(controller) {
       while (true) {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        const { status, stream } = await getStream(runID);
+        const { status, stream } = await getStream(runID, endpointId);
 
         // If there are new chunks, send them to the client
         if (stream.length > 0) {
@@ -32,7 +34,7 @@ export const LLMStream = async (
       }
     },
     cancel() {
-      const res = cancelRun(runID);
+      const res = cancelRun(runID, endpointId);
       console.log('🦀 Canceled the run: ', res);
     },
   });
@@ -40,8 +42,8 @@ export const LLMStream = async (
   return stream;
 };
 
-const cancelRun = async (runID: string) => {
-  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/cancel/${runID}`;
+const cancelRun = async (runID: string, endpointId: string) => {
+  const url = `${BASE_URL}${endpointId}/cancel/${runID}`;
 
   const runResult = await fetch(url, {
     method: 'POST',
@@ -60,8 +62,8 @@ const cancelRun = async (runID: string) => {
   return status;
 };
 
-const getStream = async (runID: string) => {
-  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/stream/${runID}`;
+const getStream = async (runID: string, endpointId: string) => {
+  const url = `${BASE_URL}${endpointId}/stream/${runID}`;
 
   const streamResult = await fetch(url, {
     method: 'GET',
@@ -89,8 +91,9 @@ const getNewRunID = async (
   systemPrompt: string,
   parameters: GenerateParameters,
   messages: Message[],
+  endpointId: string,
 ) => {
-  const url = `${BASE_URL}${process.env.ENDPOINT_ID}/run`;
+  const url = `${BASE_URL}${endpointId}/run`;
 
   const runResult = await fetch(url, {
     method: 'POST',
