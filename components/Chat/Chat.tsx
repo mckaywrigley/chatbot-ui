@@ -171,7 +171,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         messages: updatedConversation.messages,
         prompt: updatedConversation.prompt,
         temperature: updatedConversation.temperature,
-        model: updatedConversation.modelId,
+        model: modelId,
       };
 
       const controller = new AbortController();

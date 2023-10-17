@@ -11,7 +11,7 @@ export const LLMStream = async (
   model: Model,
 ) => {
   const endpointId = model === Model.PhindCodeLlamaV2 ? process.env.PHIND_CODE_LLAMA_V2_ENDPOINT_ID! : process.env.SLITHER_SOL_AUDITOR_ENDPOINT_ID!;
-  const runID = await getNewRunID(systemPrompt, parameters, messages, endpointId);
+  const runID = await getNewRunID(systemPrompt, parameters, messages, endpointId, model);
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -92,9 +92,13 @@ const getNewRunID = async (
   parameters: GenerateParameters,
   messages: Message[],
   endpointId: string,
+  model: Model,
 ) => {
   const url = `${BASE_URL}${endpointId}/run`;
+  const prompt = generatePrompt(messages, model, systemPrompt)
 
+  console.log(prompt)
+  
   const runResult = await fetch(url, {
     method: 'POST',
     headers: {
@@ -103,33 +107,44 @@ const getNewRunID = async (
     },
     body: JSON.stringify({
       input: {
-        prompt: generatePrompt(messages, systemPrompt),
+        prompt,
         ...parameters,
       },
     }),
   });
 
   if (!runResult.ok) {
+    console.log({result : await runResult.text(), url})
     throw new Error('Failed to get run ID');
   }
 
   const { id } = (await runResult.json()) as { id: string; status: Status };
 
   return id;
-};
+}
 
-const generatePrompt = (messages: Message[], systemPrompt?: string) => {
-  const prompt = messages
-    .map((message) =>
-      message.role === 'user'
-        ? `### User Message \n ${message.content}`
-        : `### Assistant \n ${message.content}`,
-    )
-    .join('\n\n');
-
-  if (systemPrompt) {
-    return `### System Prompt\n\n${systemPrompt}\n\n${prompt}\n\n### Assistant \n`;
-  }
-
-  return prompt;
-};
+const generatePrompt = (messages: Message[], model: Model, systemPrompt?: string) => {
+  let prompt  = '';
+  switch(model) {
+    case Model.PhindCodeLlamaV2:
+       prompt = messages
+        .map((message) =>
+          message.role === 'user'
+            ? `### User Message \n ${message.content}`
+            : `### Assistant \n ${message.content}`,
+        )
+        .join('\n\n');
+        return `### System Prompt\n\n${systemPrompt}\n\n${prompt}\n\n### Assistant \n`;
+    case Model.SlitherSolAuditor:
+       prompt = messages
+        .map((message) =>
+          message.role === 'user'
+            ? `### INSTRUCTION\n\nList all the vulnerabilities from the following source code\n\n ### INPUT\n\n${message.content}`
+            : `### Response\n\n${message.content}`,
+        )
+        .join('\n\n');
+      return `Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n${prompt}\n\n### Response\n\n`;
+    default: 
+      throw new Error(`Invalid model. ${model} is not supported`)
+    }
+} ;
