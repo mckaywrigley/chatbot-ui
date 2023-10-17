@@ -52,6 +52,7 @@ const Home = () => {
       selectedConversation,
       prompts,
       temperature,
+      model,
     },
     dispatch,
   } = contextValue;
@@ -145,6 +146,7 @@ const Home = () => {
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
+      modelId: lastConversation?.modelId ?? model,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -290,7 +292,6 @@ const Home = () => {
               onNewConversation={handleNewConversation}
             />
           </div>
-
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             <Chatbar />
 

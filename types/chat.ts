@@ -1,3 +1,8 @@
+export enum Model {
+  PhindCodeLlamaV2 = 'PhindCodeLlamaV2',
+  SlitherSolAuditor = 'SlitherSolAuditor',
+}
+
 export interface Message {
   role: Role;
   content: string;
@@ -18,4 +23,5 @@ export interface Conversation {
   prompt: string;
   temperature: number;
   folderId: string | null;
+  modelId: Model
 }

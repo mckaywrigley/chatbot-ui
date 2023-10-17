@@ -1,4 +1,6 @@
-import { Conversation, Message } from '@/types/chat';
+import { DEFAULT_MODEL } from '@/utils/app/const';
+
+import { Conversation, Message, Model } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
@@ -14,6 +16,7 @@ export interface HomeInitialState {
   selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
   prompts: Prompt[];
+  model: Model;
   temperature: number;
   showChatbar: boolean;
   showPromptbar: boolean;
@@ -32,6 +35,7 @@ export const initialState: HomeInitialState = {
   selectedConversation: undefined,
   currentMessage: undefined,
   prompts: [],
+  model: DEFAULT_MODEL,
   temperature: 1,
   showPromptbar: true,
   showChatbar: true,
