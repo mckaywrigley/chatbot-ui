@@ -23,5 +23,5 @@ export interface Conversation {
   prompt: string;
   temperature: number;
   folderId: string | null;
-  modelId: Model
+  modelId: Model;
 }
