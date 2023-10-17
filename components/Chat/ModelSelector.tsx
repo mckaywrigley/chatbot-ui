@@ -42,7 +42,9 @@ const ModelSelector = ({
         {Object.values(Model)
           .filter((value) => typeof value === 'string')
           .map((model) => (
-            <option value={model}>{model}</option>
+            <option key={model} value={model}>
+              {model}
+            </option>
           ))}
       </select>
     </div>
