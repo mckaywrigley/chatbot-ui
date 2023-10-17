@@ -32,7 +32,7 @@ export const Chatbar = () => {
   });
 
   const {
-    state: { conversations, showChatbar, folders },
+    state: { conversations, showChatbar, folders, modelId: model },
     dispatch: homeDispatch,
     handleCreateFolder,
     handleNewConversation,
@@ -174,7 +174,7 @@ export const Chatbar = () => {
           chatDispatch({ field: 'searchTerm', value: searchTerm })
         }
         toggleOpen={handleToggleChatbar}
-        handleCreateItem={handleNewConversation}
+        handleCreateItem={() => handleNewConversation(model)}
         handleCreateFolder={() =>
           filteredConversations.length &&
           handleCreateFolder(t('New folder'), 'chat')

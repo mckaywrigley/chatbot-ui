@@ -16,7 +16,7 @@ export interface HomeInitialState {
   selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
   prompts: Prompt[];
-  model: Model;
+  modelId: Model;
   temperature: number;
   showChatbar: boolean;
   showPromptbar: boolean;
@@ -35,7 +35,7 @@ export const initialState: HomeInitialState = {
   selectedConversation: undefined,
   currentMessage: undefined,
   prompts: [],
-  model: DEFAULT_MODEL,
+  modelId: DEFAULT_MODEL,
   temperature: 1,
   showPromptbar: true,
   showChatbar: true,

@@ -1,4 +1,4 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -19,10 +19,8 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
-import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { IQGPTLogo } from './IQGPTLogo';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 import ModelSelector from './ModelSelector';
@@ -37,18 +35,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: {
-      selectedConversation,
-      conversations,
-      apiKey,
-      loading,
-      prompts,
-      model,
-    },
+    state: { selectedConversation, conversations, apiKey, loading, prompts },
     handleUpdateConversation,
+    handleUpdateModel,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
-
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showScrollDownButton, setShowScrollDownButton] =
@@ -345,12 +336,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             </div>
             <div className="flex h-full flex-col space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600">
               <ModelSelector
-                onChangeModel={(model) =>
+                onChangeModel={(model) => {
+                  handleUpdateModel(model);
                   handleUpdateConversation(selectedConversation, {
-                    key: 'model',
+                    key: 'modelId',
                     value: model,
-                  })
-                }
+                  });
+                }}
               />
               <SystemPrompt
                 conversation={selectedConversation}
