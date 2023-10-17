@@ -35,7 +35,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, conversations, apiKey, loading, prompts },
+    state: {
+      selectedConversation,
+      conversations,
+      apiKey,
+      loading,
+      prompts,
+      modelId,
+    },
     handleUpdateConversation,
     handleUpdateModel,
     dispatch: homeDispatch,
@@ -368,7 +375,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         ) : (
           <>
             <div className="sticky top-0 z-10 flex justify-center border-b border-gray-300 dark:border-gray-600 bg-gray-100 py-2 text-sm text-gray-500 dark:bg-gray-700 dark:text-gray-200">
-              Model: {selectedConversation?.modelId} | Temp :{' '}
+              Model: {selectedConversation?.modelId || modelId} | Temp :{' '}
               {selectedConversation?.temperature} |
               <button
                 className="ml-2 cursor-pointer hover:opacity-50"
