@@ -15,7 +15,7 @@ import { useTranslation } from 'next-i18next';
 import { saveConversation, saveConversations } from '@/utils/app/conversation';
 import { throttle } from '@/utils/data/throttle';
 
-import { ChatBody, Conversation, Message } from '@/types/chat';
+import { ChatBody, Conversation, Message, Model } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -352,16 +352,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   });
                 }}
               />
-              <SystemPrompt
-                conversation={selectedConversation}
-                prompts={prompts}
-                onChangePrompt={(prompt) =>
-                  handleUpdateConversation(selectedConversation, {
-                    key: 'prompt',
-                    value: prompt,
-                  })
-                }
-              />
+              {modelId !== Model.SlitherSolAuditor && (
+                <SystemPrompt
+                  conversation={selectedConversation}
+                  prompts={prompts}
+                  onChangePrompt={(prompt) =>
+                    handleUpdateConversation(selectedConversation, {
+                      key: 'prompt',
+                      value: prompt,
+                    })
+                  }
+                />
+              )}
               <TemperatureSlider
                 label={t('Temperature')}
                 onChangeTemperature={(temperature) =>
