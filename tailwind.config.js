@@ -58,8 +58,8 @@ module.exports = {
   },
   plugins: [
     function ({ addVariant }) {
-      addVariant('children', '& > *')
+      addVariant('children', '& > *');
     },
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
   ],
-}
+};

@@ -1,4 +1,4 @@
-import { IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconClearAll } from '@tabler/icons-react';
 import {
   MutableRefObject,
   memo,
@@ -19,12 +19,11 @@ import { ChatBody, Conversation, Message } from '@/types/chat';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
-import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { IQGPTLogo } from './IQGPTLogo';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
+import ModelSelector from './ModelSelector';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
@@ -36,11 +35,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, conversations, apiKey, loading, prompts },
+    state: {
+      selectedConversation,
+      conversations,
+      apiKey,
+      loading,
+      prompts,
+      modelId,
+    },
     handleUpdateConversation,
+    handleUpdateModel,
     dispatch: homeDispatch,
   } = useContext(HomeContext);
-
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showScrollDownButton, setShowScrollDownButton] =
@@ -109,7 +115,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         break;
       }
 
-      if(done) break;
+      if (done) break;
 
       if (isFirst) {
         isFirst = false;
@@ -165,6 +171,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         messages: updatedConversation.messages,
         prompt: updatedConversation.prompt,
         temperature: updatedConversation.temperature,
+        model: modelId,
       };
 
       const controller = new AbortController();
@@ -336,6 +343,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               </span>
             </div>
             <div className="flex h-full flex-col space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600">
+              <ModelSelector
+                onChangeModel={(model) => {
+                  handleUpdateModel(model);
+                  handleUpdateConversation(selectedConversation, {
+                    key: 'modelId',
+                    value: model,
+                  });
+                }}
+              />
               <SystemPrompt
                 conversation={selectedConversation}
                 prompts={prompts}
@@ -360,7 +376,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         ) : (
           <>
             <div className="sticky top-0 z-10 flex justify-center border-b border-gray-300 dark:border-gray-600 bg-gray-100 py-2 text-sm text-gray-500 dark:bg-gray-700 dark:text-gray-200">
-              SOL IQGPT | Temp : {selectedConversation?.temperature} |
+              Model: {selectedConversation?.modelId || modelId} | Temp :{' '}
+              {selectedConversation?.temperature} |
               <button
                 className="ml-2 cursor-pointer hover:opacity-50"
                 onClick={onClearAll}

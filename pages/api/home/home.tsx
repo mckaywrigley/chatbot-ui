@@ -21,7 +21,7 @@ import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, Model } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
@@ -45,13 +45,12 @@ const Home = () => {
 
   const {
     state: {
-      apiKey,
       lightMode,
       folders,
       conversations,
       selectedConversation,
       prompts,
-      temperature,
+      modelId,
     },
     dispatch,
   } = contextValue;
@@ -135,9 +134,8 @@ const Home = () => {
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
+  const handleNewConversation = (modelId: Model) => {
     const lastConversation = conversations[conversations.length - 1];
-
     const newConversation: Conversation = {
       id: uuidv4(),
       name: t('New Conversation'),
@@ -145,6 +143,7 @@ const Home = () => {
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
+      modelId: modelId,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -174,6 +173,10 @@ const Home = () => {
 
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
+  };
+
+  const handleUpdateModel = (model: string) => {
+    dispatch({ field: 'modelId', value: model });
   };
 
   // EFFECTS  --------------------------------------------
@@ -269,6 +272,7 @@ const Home = () => {
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
+        handleUpdateModel,
       }}
     >
       <Head>
@@ -287,10 +291,9 @@ const Home = () => {
           <div className="fixed top-0 w-full sm:hidden">
             <Navbar
               selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
+              onNewConversation={() => handleNewConversation(modelId)}
             />
           </div>
-
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             <Chatbar />
 

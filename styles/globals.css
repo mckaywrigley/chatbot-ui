@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-  @apply outline-none focus-visible:ring-2 focus:ring-blue-600  
+* {
+  @apply outline-none focus:ring-blue-600 focus-visible:ring-2;
 }
 
 ::-webkit-scrollbar-track {
@@ -33,7 +33,7 @@
 }
 
 html {
-  @apply bg-gray-800
+  @apply bg-gray-800;
 }
 
 @media (max-width: 720px) {

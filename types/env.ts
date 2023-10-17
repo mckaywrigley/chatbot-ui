@@ -1,4 +1,5 @@
 export interface ProcessEnv {
-  ENDPOINT_ID: string;
+  PHIND_CODE_LLAMA_V2_ENDPOINT_ID: string;
+  SLITHER_SOL_AUDITOR_ENDPOINT_ID: string;
   NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT: string;
 }
