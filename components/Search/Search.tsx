@@ -1,23 +1,13 @@
-import { IconX } from '@tabler/icons-react';
-import { FC } from 'react';
-
 import { useTranslation } from 'next-i18next';
+import { IconX } from '@tabler/icons-react';
 
-interface Props {
+interface SearchProps {
   placeholder: string;
   searchTerm: string;
   onSearch: (searchTerm: string) => void;
 }
-const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
+const Search = ({ placeholder, searchTerm, onSearch }: SearchProps) => {
   const { t } = useTranslation('sidebar');
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearch(e.target.value);
-  };
-
-  const clearSearch = () => {
-    onSearch('');
-  };
 
   return (
     <div className="relative flex items-center">
@@ -26,14 +16,14 @@ const Search: FC<Props> = ({ placeholder, searchTerm, onSearch }) => {
         type="text"
         placeholder={t(placeholder) || ''}
         value={searchTerm}
-        onChange={handleSearchChange}
+        onChange={e => onSearch(e.target.value)}
       />
 
       {searchTerm && (
         <IconX
           className="absolute right-4 cursor-pointer text-neutral-300 hover:text-neutral-400"
           size={18}
-          onClick={clearSearch}
+          onClick={_ => onSearch('')}
         />
       )}
     </div>

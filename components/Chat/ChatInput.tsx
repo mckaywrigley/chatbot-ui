@@ -18,23 +18,23 @@ import {
     ChangeEvent
 } from 'react';
 
-import {useTranslation} from 'next-i18next';
+import { useTranslation } from 'next-i18next';
 import mammoth from 'mammoth';
-import {readFile, utils as XLSXUtils, read} from 'xlsx';
-import {PDFDocument} from 'pdf-lib';
+import { readFile, utils as XLSXUtils, read } from 'xlsx';
+import { PDFDocument } from 'pdf-lib';
 import * as pdfjs from 'pdfjs-dist';
-import {Tooltip as ReactTooltip} from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
-import {Message} from '@/types/chat';
-import {Plugin} from '@/types/plugin';
-import {Prompt} from '@/types/prompt';
+import { Message } from '@/types/chat';
+import { Plugin } from '@/types/plugin';
+import { Prompt } from '@/types/prompt';
 
 import HomeContext from '@/pages/api/home/home.context';
 
-import {PluginSelect} from './PluginSelect';
-import {PromptList} from './PromptList';
-import {VariableModal} from './VariableModal';
-import {IconArrowUp} from '@tabler/icons-react';
+import { PluginSelect } from './PluginSelect';
+import { PromptList } from './PromptList';
+import { VariableModal } from './VariableModal';
+import { IconArrowUp } from '@tabler/icons-react';
 
 interface Props {
     onSend: (message: Message, plugin: Plugin | null) => void;
@@ -48,15 +48,15 @@ interface Props {
 }
 
 export const ChatInput = ({
-                              onSend,
-                              onRegenerate,
-                              onScrollDownClick,
-                              onScrollUpClick,
-                              stopConversationRef,
-                              textareaRef,
-                              showScrollDownButton,
-                              showScrollUpButton,
-                          }: Props) => {
+    onSend,
+    onRegenerate,
+    onScrollDownClick,
+    onScrollUpClick,
+    stopConversationRef,
+    textareaRef,
+    showScrollDownButton,
+    showScrollUpButton,
+}: Props) => {
 
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -80,12 +80,12 @@ export const ChatInput = ({
             let fileContent = '';
 
             if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                const result = await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()});
+                const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
                 fileContent = result.value;
             } else if (file.type === 'application/pdf') {
                 const pdfBytes = await file.arrayBuffer();
                 const pdfDoc = await PDFDocument.load(pdfBytes);
-                const pdfjsDoc = await pdfjs.getDocument({data: pdfBytes}).promise;
+                const pdfjsDoc = await pdfjs.getDocument({ data: pdfBytes }).promise;
 
                 for (let pageNum = 1; pageNum <= pdfjsDoc.numPages; pageNum++) {
                     const pdfPage = await pdfjsDoc.getPage(pageNum);
@@ -100,7 +100,7 @@ export const ChatInput = ({
             } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
                 const fileData = await file.arrayBuffer();
                 const data = new Uint8Array(fileData);
-                const workbook = read(data, {type: 'array'});
+                const workbook = read(data, { type: 'array' });
 
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
@@ -116,7 +116,7 @@ export const ChatInput = ({
             }
 
             if (fileContent) {
-                onSend({role: 'user', content: fileContent}, plugin);
+                onSend({ role: 'user', content: fileContent }, plugin);
             }
             e.target.value = '';
 
@@ -126,10 +126,10 @@ export const ChatInput = ({
         }
     };
 
-    const {t} = useTranslation('chat');
+    const { t } = useTranslation('chat');
 
     const {
-        state: {selectedConversation, messageIsStreaming, prompts},
+        state: { selectedConversation, messageIsStreaming, prompts },
 
         dispatch: homeDispatch,
     } = useContext(HomeContext);
@@ -158,7 +158,7 @@ export const ChatInput = ({
             alert(
                 t(
                     `Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
-                    {maxLength, valueLength: value.length},
+                    { maxLength, valueLength: value.length },
                 ),
             );
             return;
@@ -178,7 +178,7 @@ export const ChatInput = ({
             return;
         }
 
-        onSend({role: 'user', content}, plugin);
+        onSend({ role: 'user', content }, plugin);
         setContent('');
         setPlugin(null);
 
@@ -314,9 +314,8 @@ export const ChatInput = ({
         if (textareaRef && textareaRef.current) {
             textareaRef.current.style.height = 'inherit';
             textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-            textareaRef.current.style.overflow = `${
-                textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-            }`;
+            textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+                }`;
         }
     }, [content]);
 
@@ -347,7 +346,7 @@ export const ChatInput = ({
                         className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
                         onClick={handleStopConversation}
                     >
-                        <IconPlayerStop size={16}/> {t('Stop Generating')}
+                        <IconPlayerStop size={16} /> {t('Stop Generating')}
                     </button>
                 )}
 
@@ -358,7 +357,7 @@ export const ChatInput = ({
                             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
                             onClick={onRegenerate}
                         >
-                            <IconRepeat size={16}/> {t('Regenerate response')}
+                            <IconRepeat size={16} /> {t('Regenerate response')}
                         </button>
                     )}
 
@@ -371,7 +370,7 @@ export const ChatInput = ({
                         onKeyDown={(e) => {
                         }}
                     >
-                        {plugin ? <IconBrandGoogle size={20}/> : <IconBolt size={20}/>}
+                        {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
                     </button>
 
                     {showPluginSelect && (
@@ -404,11 +403,10 @@ export const ChatInput = ({
                             resize: 'none',
                             bottom: `${textareaRef?.current?.scrollHeight}px`,
                             maxHeight: '400px',
-                            overflow: `${
-                                textareaRef.current && textareaRef.current.scrollHeight > 400
-                                    ? 'auto'
-                                    : 'hidden'
-                            }`,
+                            overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+                                ? 'auto'
+                                : 'hidden'
+                                }`,
                         }}
                         placeholder={
                             t('Type a message or type "/" to select a prompt...') || ''
@@ -432,7 +430,7 @@ export const ChatInput = ({
                                 <div
                                     className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
                             ) : (
-                                <IconSend size={18}/>
+                                <IconSend size={18} />
                             )}
                         </button>
                         <button
@@ -440,9 +438,9 @@ export const ChatInput = ({
                             type="button"
                             className="right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
                         >
-                            <IconUpload size="20"/>
+                            <IconUpload size="20" />
                             <input type="file" accept=".pdf, .docx, .xlsx" onChange={handleFileUpload}
-                                   style={{left: '27px'}}/>
+                                style={{ left: '27px' }} />
                         </button>
                     </div>
 
@@ -452,7 +450,7 @@ export const ChatInput = ({
                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
                                 onClick={onScrollDownClick}
                             >
-                                <IconArrowDown size={18}/>
+                                <IconArrowDown size={18} />
                             </button>
                         </div>
                     )}
@@ -463,7 +461,7 @@ export const ChatInput = ({
                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
                                 onClick={onScrollUpClick}
                             >
-                                <IconArrowUp size={18}/>
+                                <IconArrowUp size={18} />
                             </button>
                         </div>
                     )}
