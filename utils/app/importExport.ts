@@ -100,7 +100,7 @@ export const exportData = () => {
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `sol_iqgpt_history_${currentDate()}.json`;
+  link.download = `iq_code_history_${currentDate()}.json`;
   link.href = url;
   link.style.display = 'none';
   document.body.appendChild(link);

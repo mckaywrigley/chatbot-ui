@@ -339,7 +339,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             <div className="flex items-center gap-2 justify-center">
               <IQGPTLogo className="w-14 h-14 mt-1" />
               <span className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                Sol IQGPT
+                IQ Code
               </span>
             </div>
             <div className="flex h-full flex-col space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600">

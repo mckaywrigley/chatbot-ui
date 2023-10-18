@@ -1,1 +1,1 @@
-# Sol IQGPT
+# IQ Code

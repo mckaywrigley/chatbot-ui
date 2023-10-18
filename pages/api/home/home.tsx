@@ -276,7 +276,7 @@ const Home = () => {
       }}
     >
       <Head>
-        <title>Sol IQGPT</title>
+        <title>IQ Code</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"

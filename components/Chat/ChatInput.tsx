@@ -342,7 +342,7 @@ export const ChatInput = ({
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
         {t(
-          'Sol IQGPT is an a project from IQ.Wiki to generate smart contract code from natural language.',
+          'IQ Code is an a project from IQ.Wiki to generate smart contract code from natural language.',
         )}
       </div>
     </div>
