@@ -403,20 +403,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                           Important: Large Language Models (LLMs) can hallucinate and generate toxic content.  By default, you should distrust & verify all content.
                         </div>
                       </div>
-                      {/* <div className="text-center text-gray-500 dark:text-gray-400">
-                        <div className="mb-2">
-                          ChatDoD is managed by the     <a
-                            href="https://www.dds.mil/"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            Defense Digital Service
-                          </a>.
-                        </div>
-                     
-                      
-                      </div> */}
+                   
                     </div>
                     )}
                   </div>
