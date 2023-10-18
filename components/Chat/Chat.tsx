@@ -1,4 +1,4 @@
-import {IconClearAll, IconSettings} from '@tabler/icons-react';
+import { IconClearAll, IconSettings } from '@tabler/icons-react';
 import {
     MutableRefObject,
     memo,
@@ -10,37 +10,37 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 
-import {useTranslation} from 'next-i18next';
+import { useTranslation } from 'next-i18next';
 
-import {getEndpoint} from '@/utils/app/api';
+import { getEndpoint } from '@/utils/app/api';
 import {
     saveConversation,
     saveConversations,
     updateConversation,
 } from '@/utils/app/conversation';
-import {throttle} from '@/utils/data/throttle';
+import { throttle } from '@/utils/data/throttle';
 
-import {ChatBody, Conversation, Message} from '@/types/chat';
-import {Plugin} from '@/types/plugin';
+import { ChatBody, Conversation, Message } from '@/types/chat';
+import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
 import Spinner from '../Spinner';
-import {ChatInput} from './ChatInput';
-import {ChatLoader} from './ChatLoader';
-import {ErrorMessageDiv} from './ErrorMessageDiv';
-import {ModelSelect} from './ModelSelect';
-import {SystemPrompt} from './SystemPrompt';
-import {TemperatureSlider} from './Temperature';
-import {MemoizedChatMessage} from './MemoizedChatMessage';
-import {Session} from 'next-auth';
+import { ChatInput } from './ChatInput';
+import { ChatLoader } from './ChatLoader';
+import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { ModelSelect } from './ModelSelect';
+import { SystemPrompt } from './SystemPrompt';
+import { TemperatureSlider } from './Temperature';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
+import { Session } from 'next-auth';
 
 interface Props {
     stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat = memo(({stopConversationRef}: Props) => {
-    const {t} = useTranslation('chat');
+export const Chat = memo(({ stopConversationRef }: Props) => {
+    const { t } = useTranslation('chat');
 
     const {
         state: {
@@ -94,8 +94,8 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     field: 'selectedConversation',
                     value: updatedConversation,
                 });
-                homeDispatch({field: 'loading', value: true});
-                homeDispatch({field: 'messageIsStreaming', value: true});
+                homeDispatch({ field: 'loading', value: true });
+                homeDispatch({ field: 'messageIsStreaming', value: true });
                 const chatBody: ChatBody = {
                     model: updatedConversation.model,
                     messages: updatedConversation.messages,
@@ -128,20 +128,20 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     body,
                 });
                 if (!response.ok) {
-                    homeDispatch({field: 'loading', value: false});
-                    homeDispatch({field: 'messageIsStreaming', value: false});
+                    homeDispatch({ field: 'loading', value: false });
+                    homeDispatch({ field: 'messageIsStreaming', value: false });
                     toast.error(response.statusText);
                     return;
                 }
                 const data = response.body;
                 if (!data) {
-                    homeDispatch({field: 'loading', value: false});
-                    homeDispatch({field: 'messageIsStreaming', value: false});
+                    homeDispatch({ field: 'loading', value: false });
+                    homeDispatch({ field: 'messageIsStreaming', value: false });
                     return;
                 }
                 if (!plugin) {
                     if (updatedConversation.messages.length === 1) {
-                        const {content} = message;
+                        const { content } = message;
                         const customName =
                             content.length > 30 ? content.substring(0, 30) + '...' : content;
                         updatedConversation = {
@@ -149,7 +149,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                             name: customName,
                         };
                     }
-                    homeDispatch({field: 'loading', value: false});
+                    homeDispatch({ field: 'loading', value: false });
                     const reader = data.getReader();
                     const decoder = new TextDecoder();
                     let done = false;
@@ -161,7 +161,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                             done = true;
                             break;
                         }
-                        const {value, done: doneReading} = await reader.read();
+                        const { value, done: doneReading } = await reader.read();
                         done = doneReading;
                         const chunkValue = decoder.decode(value);
                         text += chunkValue;
@@ -169,7 +169,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                             isFirst = false;
                             const updatedMessages: Message[] = [
                                 ...updatedConversation.messages,
-                                {role: 'assistant', content: chunkValue},
+                                { role: 'assistant', content: chunkValue },
                             ];
                             updatedConversation = {
                                 ...updatedConversation,
@@ -212,14 +212,14 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     if (updatedConversations.length === 0) {
                         updatedConversations.push(updatedConversation);
                     }
-                    homeDispatch({field: 'conversations', value: updatedConversations});
+                    homeDispatch({ field: 'conversations', value: updatedConversations });
                     saveConversations(updatedConversations);
-                    homeDispatch({field: 'messageIsStreaming', value: false});
+                    homeDispatch({ field: 'messageIsStreaming', value: false });
                 } else {
-                    const {answer} = await response.json();
+                    const { answer } = await response.json();
                     const updatedMessages: Message[] = [
                         ...updatedConversation.messages,
-                        {role: 'assistant', content: answer},
+                        { role: 'assistant', content: answer },
                     ];
                     updatedConversation = {
                         ...updatedConversation,
@@ -245,10 +245,10 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                         key: 'messages',
                         value: updatedMessages,
                     });
-                    homeDispatch({field: 'conversations', value: updatedConversations});
+                    homeDispatch({ field: 'conversations', value: updatedConversations });
                     saveConversations(updatedConversations);
-                    homeDispatch({field: 'loading', value: false});
-                    homeDispatch({field: 'messageIsStreaming', value: false});
+                    homeDispatch({ field: 'loading', value: false });
+                    homeDispatch({ field: 'messageIsStreaming', value: false });
                 }
             }
         },
@@ -263,14 +263,14 @@ export const Chat = memo(({stopConversationRef}: Props) => {
 
     const scrollToBottom = useCallback(() => {
         if (autoScrollEnabled) {
-            messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             textareaRef.current?.focus();
         }
     }, [autoScrollEnabled]);
 
     const handleScroll = () => {
         if (chatContainerRef.current) {
-            const {scrollTop, scrollHeight, clientHeight} =
+            const { scrollTop, scrollHeight, clientHeight } =
                 chatContainerRef.current;
             const bottomTolerance = 30;
             if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
@@ -308,7 +308,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
     };
 
     const handleSettings = () => {
-        setShowSettings(!showSettings);
+        setShowSettings(p => !p);
         handleScrollUp()
     };
 
@@ -347,9 +347,9 @@ export const Chat = memo(({stopConversationRef}: Props) => {
             selectedConversation?.messages?.length >= 2
         ) {
             selectedConversation &&
-            setCurrentMessage(
-                selectedConversation.messages[selectedConversation.messages.length - 2],
-            );
+                setCurrentMessage(
+                    selectedConversation.messages[selectedConversation.messages.length - 2],
+                );
         }
         selectedConversation
     }, [selectedConversation, throttledScrollDown]);
@@ -419,7 +419,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     </div>
                 </div>
             ) : modelError ? (
-                <ErrorMessageDiv error={modelError}/>
+                <ErrorMessageDiv error={modelError} />
             ) : (
                 <>
                     <div
@@ -432,45 +432,45 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                             <>
                                 <div className="h-[calc(100vh-162px)]">
                                     <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-                                    <div
-                                        className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                                        {models.length === 0 ? (
-                                            <div>
-                                                <Spinner size="16px" className="mx-auto"/>
+                                        <div
+                                            className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
+                                            {models.length === 0 ? (
+                                                <div>
+                                                    <Spinner size="16px" className="mx-auto" />
+                                                </div>
+                                            ) : (
+                                                'Chatbot UI'
+                                            )}
+                                        </div>
+
+                                        {models.length > 0 && (
+                                            <div
+                                                className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
+                                                <ModelSelect />
+
+                                                <SystemPrompt
+                                                    conversation={selectedConversation}
+                                                    prompts={prompts}
+                                                    onChangePrompt={(prompt) =>
+                                                        handleUpdateConversation(selectedConversation, {
+                                                            key: 'prompt',
+                                                            value: prompt,
+                                                        })
+                                                    }
+                                                />
+
+                                                <TemperatureSlider
+                                                    label={t('Temperature')}
+                                                    onChangeTemperature={(temperature) =>
+                                                        handleUpdateConversation(selectedConversation, {
+                                                            key: 'temperature',
+                                                            value: temperature,
+                                                        })
+                                                    }
+                                                />
                                             </div>
-                                        ) : (
-                                            'Chatbot UI'
                                         )}
                                     </div>
-
-                                    {models.length > 0 && (
-                                        <div
-                                            className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                                            <ModelSelect/>
-
-                                            <SystemPrompt
-                                                conversation={selectedConversation}
-                                                prompts={prompts}
-                                                onChangePrompt={(prompt) =>
-                                                    handleUpdateConversation(selectedConversation, {
-                                                        key: 'prompt',
-                                                        value: prompt,
-                                                    })
-                                                }
-                                            />
-
-                                            <TemperatureSlider
-                                                label={t('Temperature')}
-                                                onChangeTemperature={(temperature) =>
-                                                    handleUpdateConversation(selectedConversation, {
-                                                        key: 'temperature',
-                                                        value: temperature,
-                                                    })
-                                                }
-                                            />
-                                        </div>
-                                    )}
-                                </div>
                                 </div>
                             </>
                         ) : (
@@ -480,16 +480,16 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                                     {t('Model')}: {selectedConversation?.model?.name} | {t('Temp')}
                                     : {selectedConversation?.temperature} |
                                     <button
-                                        className="ml-2 cursor-pointer hover:opacity-50"
+                                        className={`ml-2 cursor-pointer hover:opacity-50 ${showSettings ? "text-[#3498db] border-[.1px] border-[#3498db80] rounded-full" : "text-current"}`}
                                         onClick={handleSettings}
                                     >
-                                        <IconSettings size={18}/>
+                                        <IconSettings size={18} />
                                     </button>
                                     <button
                                         className="ml-2 cursor-pointer hover:opacity-50"
                                         onClick={onClearAll}
                                     >
-                                        <IconClearAll size={18}/>
+                                        <IconClearAll size={18} />
                                     </button>
                                 </div>
                                 {showSettings && (
@@ -497,8 +497,8 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                                         className="flex flex-col space-y-10 md:mx-auto md:max-w-xl md:gap-6 md:py-3 md:pt-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
                                         <div
                                             className="flex h-full flex-col space-y-4 border-b border-neutral-200 p-4 dark:border-neutral-600 md:rounded-lg md:border">
-                                            <ModelSelect/>
-                                           {selectedConversation != undefined && (
+                                            <ModelSelect />
+                                            {selectedConversation != undefined && (
                                                 <TemperatureSlider
                                                     label={t('Temperature')}
                                                     onChangeTemperature={(temperature) =>
@@ -528,7 +528,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                                         }}
                                     />
                                 ))}
-                                {loading && <ChatLoader/>}
+                                {loading && <ChatLoader />}
 
                                 <div
                                     className="h-[162px] bg-white dark:bg-[#343541]"
@@ -557,6 +557,7 @@ export const Chat = memo(({stopConversationRef}: Props) => {
                     />
                 </>
             )}
+
         </div>
     );
 });
