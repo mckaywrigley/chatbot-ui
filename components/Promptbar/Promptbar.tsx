@@ -6,9 +6,8 @@ import { OpenAIModels } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { PromptFolders } from './components/PromptFolders';
 import { Prompts } from './components/Prompts';
-import { PromptbarSettings } from './components/PromptbarSettings';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
-import { v4 as uuidv4 } from 'uuid';
+import { createPrompt, deletePrompt, getUpdatedPrompt, updatePrompt } from './helpers/helpers';
 import HomeContext from '@/pages/api/home/home.context';
 import Sidebar from '../Sidebar';
 import PromptbarContext from './PromptBar.context';
@@ -37,42 +36,17 @@ const Promptbar = () => {
   };
 
   const handlePrompt = (updater: Function) => {
-    return (prompt?:Prompt) => {
-      const updatedPrompts = updater(prompt);
-
+    return (prompt?: Prompt) => {
+      const updatedPrompts = updater({ prompts, defaultModelId, OpenAIModels, prompt });
       homeDispatch({ field: 'prompts', value: updatedPrompts });
       savePrompts(updatedPrompts);
     }
   }
 
-  const createPrompt = () => {
-    if (defaultModelId) {
-      const newPrompt: Prompt = {
-        id: uuidv4(),
-        name: `Prompt ${prompts.length + 1}`,
-        description: '',
-        content: '',
-        model: OpenAIModels[defaultModelId],
-        folderId: null,
-      };
-
-      return [...prompts, newPrompt];
-    }
-  };
-  const deletePrompt = (prompt: Prompt) =>  prompts.filter((p) => p.id !== prompt.id)
-  const updatePrompt = (prompt: Prompt) => prompts.map(p => (p.id === prompt.id) ? prompt: p)
   const handleDrop = (e: any) => {
-    if (e.dataTransfer) {
-      const prompt = JSON.parse(e.dataTransfer.getData('prompt'));
-
-      const updatedPrompt = {
-        ...prompt,
-        folderId: e.target.dataset.folderId,
-      };
-
-      handlePrompt(updatePrompt)(updatedPrompt);
-      e.target.style.background = 'none';
-    }
+    const updatedPrompt = getUpdatedPrompt(e)
+    handlePrompt(updatePrompt)(updatedPrompt);
+    e.target.style.background = 'none';
   };
 
   useEffect(() => {
