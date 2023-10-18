@@ -348,7 +348,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [messagesEndRef]);
 
   return (
-    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#FFF]">
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
           <div className="text-center text-4xl font-bold text-black dark:text-white">
@@ -439,7 +439,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               </>
             ) : (
               <>
-                <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#FFF] dark:text-neutral-200">
                   {t('Model')}: {selectedConversation?.model.name} | {t('Temp')}
                   : {selectedConversation?.temperature} |
                   <button
@@ -481,15 +481,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
                 {loading && <ChatLoader />}
 
-                <div
+                {/* <div
                   className="h-[162px] bg-white dark:bg-[#343541]"
                   ref={messagesEndRef}
-                />
+                /> */}
               </>
             )}
           </div>
 
-          <ChatInput
+          {/* <ChatInput
             stopConversationRef={stopConversationRef}
             textareaRef={textareaRef}
             onSend={(message, plugin) => {
@@ -503,7 +503,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               }
             }}
             showScrollDownButton={showScrollDownButton}
-          />
+          /> */}
         </>
       )}
     </div>

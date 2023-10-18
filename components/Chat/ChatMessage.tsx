@@ -128,8 +128,8 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     <div
       className={`group md:px-4 ${
         message.role === 'assistant'
-          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#444654] dark:text-gray-100'
-          : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#343541] dark:text-gray-100'
+          ? 'border-b border-black/10 bg-gray-50 text-gray-800 dark:border-gray-900/50 dark:bg-[#FFF] dark:text-black-100'
+          : 'border-b border-black/10 bg-white text-gray-800 dark:border-gray-900/50 dark:bg-[#FFF] dark:text-black-100'
       }`}
       style={{ overflowWrap: 'anywhere' }}
     >
@@ -142,7 +142,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
           )}
         </div>
 
-        <div className="prose mt-[-2px] w-full dark:prose-invert">
+        <div className="prose mt-[-2px] w-full dark:text-black-100">
           {message.role === 'user' ? (
             <div className="flex w-full">
               {isEditing ? (
@@ -185,7 +185,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   </div>
                 </div>
               ) : (
-                <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
+                <div className="prose whitespace-pre-wrap dark:text-black-100 flex-1">
                   {message.content}
                 </div>
               )}
@@ -210,7 +210,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
           ) : (
             <div className="flex flex-row">
               <MemoizedReactMarkdown
-                className="prose dark:prose-invert flex-1"
+                className="prose dark:text-black-100 flex-1"
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeMathjax]}
                 components={{
