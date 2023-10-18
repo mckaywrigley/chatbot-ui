@@ -125,7 +125,7 @@ const Promptbar = () => {
         handleUpdatePrompt,
       }}
     >
-      <Sidebar<Prompt>
+      {/* <Sidebar<Prompt>
         side={'right'}
         isOpen={showPromptbar}
         addItemButtonTitle={t('New prompt')}
@@ -144,7 +144,7 @@ const Promptbar = () => {
         handleCreateItem={handleCreatePrompt}
         handleCreateFolder={() => handleCreateFolder(t('New folder'), 'prompt')}
         handleDrop={handleDrop}
-      />
+      /> */}
     </PromptbarContext.Provider>
   );
 };

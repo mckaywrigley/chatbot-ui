@@ -44,11 +44,11 @@ export const ChatbarSettings = () => {
 
       <Import onImport={handleImportConversations} />
 
-      <SidebarButton
+      {/* <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => handleExportData()}
-      />
+      /> */}
 
       <SidebarButton
         text={t('Settings')}

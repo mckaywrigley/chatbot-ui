@@ -61,7 +61,7 @@ const Sidebar = <T,>({
       >
         <div className="flex items-center">
           <button
-            className="text-sidebar flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
+            className="text-sidebar flex w-full flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
             onClick={() => {
               handleCreateItem();
               handleSearchTerm('');
@@ -71,18 +71,18 @@ const Sidebar = <T,>({
             {addItemButtonTitle}
           </button>
 
-          <button
+          {/* <button
             className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
             onClick={handleCreateFolder}
           >
             <IconFolderPlus size={16} />
-          </button>
+          </button> */}
         </div>
-        <Search
+        {/* <Search
           placeholder={t('Search...') || ''}
           searchTerm={searchTerm}
           onSearch={handleSearchTerm}
-        />
+        /> */}
 
         <div className="flex-grow overflow-auto">
           {items?.length > 0 && (
