@@ -1,3 +1,41 @@
+# Handle Multiple Azure Deployments via Proxy Server 
+
+1. Clone Repo 
+
+```shell
+git clone https://github.com/BerriAI/litellm.git
+```
+
+2. Add Azure/OpenAI deployments to `secrets_template.toml`
+
+```python
+[model."gpt-3.5-turbo"]
+model_list = [{ # list of model deployments 
+    "model_name": "gpt-3.5-turbo", # openai model name 
+    "litellm_params": { # params for litellm completion/embedding call 
+        "model": "azure/chatgpt-v-2", 
+        "api_key": os.getenv("AZURE_API_KEY"),
+        "api_version": os.getenv("AZURE_API_VERSION"),
+        "api_base": os.getenv("AZURE_API_BASE")
+    },
+    "tpm": 240000,
+    "rpm": 1800
+}, {
+    "model_name": "gpt-3.5-turbo", # openai model name 
+    "litellm_params": { # params for litellm completion/embedding call 
+        "model": "gpt-3.5-turbo", 
+        "api_key": os.getenv("OPENAI_API_KEY"),
+    },
+    "tpm": 1000000,
+    "rpm": 9000
+}]
+```
+
+3. Run with Docker Image
+```shell
+docker build -t litellm . && docker run -p 8000:8000 litellm
+```
+
 # Chatbot UI
 
 ## News
