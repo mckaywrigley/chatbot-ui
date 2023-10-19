@@ -86,6 +86,53 @@ npm run dev
 
 You should be able to start chatting.
 
+## Handle Multiple Azure Deployments via OpenAI Proxy Server ([Docs](https://docs.litellm.ai/docs/routing))
+Use [LiteLLM's](https://github.com/BerriAI/litellm) OpenAI proxy server to handle multiple azure deployments, behind 1 fixed endpoint.
+
+1. Clone Repo 
+
+```shell
+git clone https://github.com/BerriAI/litellm.git
+```
+
+2. Add Azure/OpenAI deployments to `secrets_template.toml`
+
+```python
+[model."gpt-3.5-turbo"] # model name passed in /chat/completion call or `litellm --model gpt-3.5-turbo`
+model_list = [{ # list of model deployments 
+    "model_name": "gpt-3.5-turbo", # openai model name 
+    "litellm_params": { # params for litellm completion/embedding call 
+        "model": "azure/chatgpt-v-2", 
+        "api_key": "my-azure-api-key-1",
+        "api_version": "my-azure-api-version-1",
+        "api_base": "my-azure-api-base-1"
+    },
+    "tpm": 240000,
+    "rpm": 1800
+}, {
+    "model_name": "gpt-3.5-turbo", # openai model name 
+    "litellm_params": { # params for litellm completion/embedding call 
+        "model": "gpt-3.5-turbo", 
+        "api_key": "sk-...",
+    },
+    "tpm": 1000000,
+    "rpm": 9000
+}]
+```
+
+3. Run with Docker Image
+```shell
+docker build -t litellm . && docker run -p 8000:8000 litellm
+
+## OpenAI Compatible Endpoint at: http://0.0.0.0:8000
+```
+
+**replace openai base**
+
+```python
+OPENAI_API_HOST = "http://0.0.0.0:8000"
+```
+
 ## Configuration
 
 When deploying the application, the following environment variables can be set:
