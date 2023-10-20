@@ -32,7 +32,7 @@ export const OpenAIStream = async (
 ) => {
   let url = `${OPENAI_API_HOST}/v1/chat/completions`;
   if (OPENAI_API_TYPE === 'azure') {
-    url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${OPENAI_API_VERSION}`;
+    url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID || model.id}/chat/completions?api-version=${OPENAI_API_VERSION}`;
   }
   const res = await fetch(url, {
     headers: {
@@ -91,7 +91,15 @@ export const OpenAIStream = async (
           const data = event.data;
 
           try {
+            if (data == '[DONE]') {
+              // The data returned is not JSON, then skip this.
+              return;
+            }
             const json = JSON.parse(data);
+            if (!json.choices || !json.choices.length || json.choices.length < 0) {
+              // If no choices are available, then skip this.
+              return;
+            }
             if (json.choices[0].finish_reason != null) {
               controller.close();
               return;

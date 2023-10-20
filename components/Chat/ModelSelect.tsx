@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { OpenAIModel } from '@/types/openai';
 
 import HomeContext from '@/pages/api/home/home.context';
+import {OPENAI_API_TYPE} from "@/utils/app/const";
 
 export const ModelSelect = () => {
   const { t } = useTranslation('chat');
@@ -26,6 +27,17 @@ export const ModelSelect = () => {
       });
   };
 
+  // If a Model Name isn't available, then use the Model ID instead.
+  const getModelText = (model: OpenAIModel) => {
+      if (OPENAI_API_TYPE === 'azure' && model.name && model.id && model.name.toLowerCase() != model.id.toLowerCase()) {
+          // If using Azure, and the model name and ID aren't the same, then add the model ID to help distinguish the differences between the models.
+          // This can help when there are multiple models with the same name.
+          return model.name + ' [' + model.id + ']';
+      } else {
+          return model.name || model.id;
+      }
+  }
+
   return (
     <div className="flex flex-col">
       <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
@@ -45,8 +57,8 @@ export const ModelSelect = () => {
               className="dark:bg-[#343541] dark:text-white"
             >
               {model.id === defaultModelId
-                ? `Default (${model.name})`
-                : model.name}
+                ? `Default (${getModelText(model)})`
+                : getModelText(model)}
             </option>
           ))}
         </select>
