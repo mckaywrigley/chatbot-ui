@@ -6,6 +6,8 @@ import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import { Slider } from '@mui/material';
+
 interface Props {
   label: string;
   onChangeTemperature: (temperature: number) => void;
@@ -23,11 +25,17 @@ export const TemperatureSlider: FC<Props> = ({
     lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
   );
   const { t } = useTranslation('chat');
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  /* const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);
     setTemperature(newValue);
     onChangeTemperature(newValue);
-  };
+  }; */
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    const newTemperature = typeof newValue === 'number' ? newValue : newValue[0];
+    setTemperature(newTemperature);
+    onChangeTemperature(newTemperature);
+  };  
 
   return (
     <div className="flex flex-col">
@@ -42,12 +50,23 @@ export const TemperatureSlider: FC<Props> = ({
       <span className="mt-2 mb-1 text-center text-neutral-900 dark:text-neutral-100">
         {temperature.toFixed(1)}
       </span>
-      <input
+      {/* <input
         className="cursor-pointer slider"
         type="range"
         min={0}
         max={1}
         step={0.1}
+        value={temperature}
+        onChange={handleChange}
+      /> */}
+      <Slider
+        aria-label="Temperature"
+        defaultValue={0.8}
+        step={0.1}
+        min={0}
+        max={1}
+        marks
+        color="warning"
         value={temperature}
         onChange={handleChange}
       />
