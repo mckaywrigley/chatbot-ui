@@ -1,4 +1,5 @@
 import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { IconExternalLink } from '@tabler/icons-react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -89,7 +90,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
 
             <button
               type="button"
-              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+              className="w-full px-4 py-2 my-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
               onClick={() => {
                 handleSave();
                 onClose();
@@ -97,6 +98,22 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             >
               {t('Save')}
             </button>
+            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
+              {t('Account Details')}
+            </div>
+        <a
+          href="https://platform.openai.com/account/usage"
+          target="_blank"
+          className="flex items-center mh-orange-text"
+        >
+          <IconExternalLink size={18} className={'inline mr-1'} />
+          {t('View Account Usage')}
+        </a> 
+
+         
+        {/* <button className="flex items-center view-account-usage-btn" onClick={handleClick}>      
+            {t('View Account Usage')}
+          </button>  */}
           </div>
         </div>
       </div>

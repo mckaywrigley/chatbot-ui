@@ -439,13 +439,19 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                                                     <Spinner size="16px" className="mx-auto" />
                                                 </div>
                                             ) : (
-                                                <span><span className="orange-m">m</span>AI Assistant</span>
+                                                // <span><span className="orange-m">m</span>AI Assistant</span>
+                                                // <span><span className="orange-m">Chat</span>Mart</span>
+                            <span className='logo-img'><img src="/images/mh_logo.png" alt="Logo" className='bg-[#f0f0f0] py-4 px-5 logo-img' style={{ transform: 'scale(0.7)' }} /> 
+
+                        
+
+                            </span> 
                                             )}
                                         </div>
 
                                         {models.length > 0 && (
                                             <div
-                                                className="flex app-card h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
+                                                className="flex app-card h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-600">
                                                 <ModelSelect />
 
                                                 <SystemPrompt
