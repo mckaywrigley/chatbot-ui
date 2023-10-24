@@ -11,6 +11,16 @@
   border-radius: 10px;
 }
 
+::-webkit-slider-thumb {
+  color: black !important;
+  background-color: black !important;
+}
+
+::-webkit-progress-value {
+  color: black !important;
+  background-color: black !important;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background-color: #aaa;
 }
@@ -29,8 +39,41 @@
 }
 
 html {
-  background: #202123;
+  background: #0e3a90;
+
 }
+.mai-assistant {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 3rem;
+}
+
+.app-card {
+  color: black !important;
+  background: linear-gradient(to bottom, #BFD865, #000);
+}
+.orange-m {
+  color: #E96424 !important;
+  font-style: italic !important;
+}
+.view-account-usage-btn {
+  background-color: #E96424 !important;
+  color: white !important;
+  padding: 8px 8px !important;
+  border-radius: .375rem;
+}
+
+.flex , .text-sidebar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+}
+.text-sidebar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 20px;
+}
+
+
+
 
 @media (max-width: 720px) {
   pre {
@@ -55,6 +98,10 @@ pre:has(div.codeblock) {
   position: relative;
   overflow: hidden;
   display: inline-block;
+  background-color: #E96424;
+  padding: 0.4rem;
+  border-radius: 0 0.375rem 0.375rem 0;
+  color: white;
 }
 
 .btn {
@@ -75,3 +122,4 @@ pre:has(div.codeblock) {
   top: 0;
   opacity: 0;
 }
+

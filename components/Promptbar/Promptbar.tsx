@@ -93,6 +93,7 @@ const Promptbar = () => {
         handleDrop={handleDrop}
         foldersCount={folders.filter((folder) => folder.type === 'prompt').length}
       />
+        {/* <img src="/images/mh_logo.png" alt="Logo" style={{  position: 'absolute', top: 600, left: 590, transform: 'scale(0.1)' }} /> */}
     </PromptbarContext.Provider>
   );
 };
