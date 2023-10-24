@@ -423,7 +423,7 @@ export const ChatInput = ({
 
                         <button
                             data-tooltip-id="my-tooltip-2"
-                            className="right-2 top-2 rounded-sm p-1  bg-[#8CB23F] opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:hover:text-neutral-200"
+                            className="right-2 top-2 rounded-sm p-1 hover:bg-neutral-"
                             onClick={handleSend}
                         >
                             {messageIsStreaming ? (
@@ -436,7 +436,7 @@ export const ChatInput = ({
                         <button
                             data-tooltip-id="my-tooltip-3"
                             type="button"
-                            className="right-2 top-2 rounded-sm p-1 text-neutral-800  bg-[#8CB23F] opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+                            className="right-2 top-2 rounded-sm p-1 hover:bg-neutral- cursor-pointer"
                         >
                             <IconUpload size="20" />
                             <input type="file" accept=".pdf, .docx, .xlsx" onChange={handleFileUpload}
