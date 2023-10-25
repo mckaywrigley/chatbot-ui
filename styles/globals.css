@@ -111,7 +111,6 @@ pre:has(div.codeblock) {
   position: relative;
   overflow: hidden;
   display: inline-block;
-  background-color: #8CB23F;
   padding: 0.4rem;
   border-radius: 0 0.375rem 0.375rem 0;
   color: white;

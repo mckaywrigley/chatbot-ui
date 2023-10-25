@@ -428,7 +428,7 @@ export const ChatInput = ({
             onKeyDown={handleKeyDown}
           />
 
-          <div className="upload-btn-wrapper">
+          <div className="upload-btn-wrapper" style={{backgroundColor: styles.uploadBtnColor}}>
             <button
               data-tooltip-id="my-tooltip-2"
               className={`right-2 top-2 rounded-sm p-1 hover:bg-neutral-`}
