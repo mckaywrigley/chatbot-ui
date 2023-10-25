@@ -402,7 +402,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>MAIKO</title>
+        <title>{styles.appTitle}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"

@@ -34,6 +34,7 @@ import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
+import styles from '@/styles/brandStylesConfig';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -439,7 +440,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         </div>
                       ) : (
                         <span className="logo-img">
-                          <span>M<span className="orange-m">AI</span>KO</span>
+                          <span>{styles.titleSeg1}<span style={{color: styles.sliderColor, fontStyle: 'italic'}}>{styles.titleColorSeg}</span>{styles.titleSeg2}</span>
                         </span>
                       )}
                     </div>

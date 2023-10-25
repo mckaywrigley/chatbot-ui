@@ -10,7 +10,13 @@ const styles = {
   uploadBtnColor: mhOrange,
   sliderColor: mhOrange,
   favicon: '/chatMart.ico',
-  companyLogo: 'images/mh_logo.png'
+  companyLogo: 'images/mh_logo.png',
+  appTitle: 'MAIKO',
+
+  // The segments will be displayed in order, colored segment will take sliderColor, atleast one value is required to display the title
+  titleSeg1: 'M',
+  titleColorSeg: 'AI',
+  titleSeg2: 'KO'
   };
 
 export default styles;
