@@ -48,6 +48,8 @@ import { useSession } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]"
 
+import styles from '../../../styles/brandStylesConfig'
+
 interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
@@ -400,13 +402,13 @@ const Home = ({
       }}
     >
       <Head>
-        <title>mAI Assistant</title>
+        <title>MAIKO</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={styles.favicon} />
       </Head>
       {selectedConversation && (
         <main

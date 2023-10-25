@@ -9,6 +9,8 @@ import {
 
 import Search from '../Search';
 
+import styles from '../../styles/brandStylesConfig'
+
 interface Props<T> {
   isOpen: boolean;
   addItemButtonTitle: string;
@@ -40,7 +42,7 @@ const Sidebar = <T,>({
   handleCreateItem,
   handleCreateFolder,
   handleDrop,
-  foldersCount
+  foldersCount,
 }: Props<T>) => {
   const { t } = useTranslation('promptbar');
 
@@ -50,8 +52,8 @@ const Sidebar = <T,>({
 
   const highlightDrop = (e: any) => {
     e.target.style.background = '#343541';
-    e.target.style.height = '42px'
-    e.target.style.borderRadius = '8px'
+    e.target.style.height = '42px';
+    e.target.style.borderRadius = '8px';
   };
 
   const removeHighlight = (e: any) => {
@@ -61,11 +63,11 @@ const Sidebar = <T,>({
   return isOpen ? (
     <div>
       <div
-        className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-[#283893] p-2 text-[14px] transition-all sm:relative sm:top-0`}
+        className={`fixed top-0 ${side}-0 z-40 flex h-full w-[260px] flex-none flex-col space-y-2 bg-brand-sidebar p-2 text-[14px] transition-all sm:relative sm:top-0`}
       >
         <div className="flex items-center my-5">
           <button
-            className="text-sidebar bg-[#F69241] flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10"
+            className={`text-sidebar bg-brand-chatBtn flex w-[190px] flex-shrink-0 cursor-pointer select-none items-center gap-3 rounded-md border border-white/20 p-3 text-white transition-colors duration-200 hover:bg-gray-500/10`}
             onClick={() => {
               handleCreateItem();
               handleSearchTerm('');
@@ -76,7 +78,7 @@ const Sidebar = <T,>({
           </button>
 
           <button
-            className="ml-2 flex flex-shrink-0 cursor-pointer bg-[#F69241] items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
+            className={`ml-2 flex flex-shrink-0 cursor-pointer bg-brand-chatBtn items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10`}
             onClick={handleCreateFolder}
           >
             <IconFolderPlus size={16} />
@@ -115,6 +117,14 @@ const Sidebar = <T,>({
           )}
         </div>
         {footerComponent}
+        {side == 'right' ? (
+          <img
+            src={styles.companyLogo}
+            alt="Logo"
+            className="bg-[#f0f0f0] py-4 px-5 logo-img"
+            style={{ transform: 'scale(0.7)' }}
+          />
+        ) : null}
       </div>
 
       <CloseSidebarButton onClick={toggleOpen} side={side} />
