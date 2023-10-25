@@ -7,6 +7,7 @@ import { DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import HomeContext from '@/pages/api/home/home.context';
 
 import { Slider } from '@mui/material';
+import styles from '@/styles/brandStylesConfig';
 
 interface Props {
   label: string;
@@ -39,10 +40,10 @@ export const TemperatureSlider: FC<Props> = ({
 
   return (
     <div className="flex flex-col">
-      <label className="mb-2 text-left text-neutral-700 dark:text-neutral-400">
+      <label className="mb-2 text-left text-neutral-800 dark:text-neutral-200">
         {label}
       </label>
-      <span className="text-[18px] text-white text-sm">
+      <span className="text-[18px] text-black/80 dark:text-white/50 text-sm">
         {t(
           'Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.',
         )}
@@ -66,7 +67,7 @@ export const TemperatureSlider: FC<Props> = ({
         min={0}
         max={1}
         marks
-        color="warning"
+        style={{ color: styles.sliderColor }}
         value={temperature}
         onChange={handleChange}
       />
