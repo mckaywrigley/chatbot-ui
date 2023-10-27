@@ -1,5 +1,5 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
 import { IconExternalLink } from '@tabler/icons-react';
+import { FC, useContext, useEffect, useReducer, useRef } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
@@ -10,6 +10,7 @@ import { getSettings, saveSettings } from '@/utils/app/settings';
 import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
+import styles from '@/styles/brandStylesConfig';
 
 interface Props {
   open: boolean;
@@ -78,7 +79,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             </div>
 
             <select
-              className="w-full cursor-pointer bg-transparent p-2 text-neutral-700 dark:text-neutral-200"
+              className="w-full cursor-pointer bg-transparent p-2 text-neutral-800 dark:text-neutral-500"
               value={state.theme}
               onChange={(event) =>
                 dispatch({ field: 'theme', value: event.target.value })
@@ -101,17 +102,17 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
               {t('Account Details')}
             </div>
-        <a
-          href="https://platform.openai.com/account/usage"
-          target="_blank"
-          className="flex items-center mh-orange-text"
-        >
-          <IconExternalLink size={18} className={'inline mr-1'} />
-          {t('View Account Usage')}
-        </a> 
+            <a
+              href="https://platform.openai.com/account/usage"
+              target="_blank"
+              className="flex items-center"
+              style={{color: styles.uploadBtnColor}}
+            >
+              <IconExternalLink size={18} className={'inline mr-1'} />
+              {t('View Account Usage')}
+            </a>
 
-         
-        {/* <button className="flex items-center view-account-usage-btn" onClick={handleClick}>      
+            {/* <button className="flex items-center view-account-usage-btn" onClick={handleClick}>      
             {t('View Account Usage')}
           </button>  */}
           </div>
