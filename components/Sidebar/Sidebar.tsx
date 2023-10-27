@@ -10,6 +10,7 @@ import {
 import Search from '../Search';
 
 import styles from '../../styles/brandStylesConfig'
+import Link from 'next/link';
 
 interface Props<T> {
   isOpen: boolean;
@@ -118,12 +119,14 @@ const Sidebar = <T,>({
         </div>
         {footerComponent}
         {side == 'right' ? (
+          <Link href={styles.companyLink}>
           <img
             src={styles.companyLogo}
-            alt="Logo"
+            alt={`${styles.companyName} Logo`}
             className="bg-[#f0f0f0] py-4 px-5 logo-img"
             style={{ transform: 'scale(0.7)' }}
           />
+          </Link>
         ) : null}
       </div>
 
