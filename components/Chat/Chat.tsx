@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 
 import { Session } from 'next-auth';
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -19,6 +20,7 @@ import {
   saveConversations,
   updateConversation,
 } from '@/utils/app/conversation';
+import { getSettings } from '@/utils/app/settings';
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
@@ -26,6 +28,7 @@ import { Plugin } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import mascot from '../../public/images/MAIKOmascot.png'
 import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
@@ -379,8 +382,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     };
   }, [messagesEndRef]);
 
+  const theme = getSettings().theme
+
   return (
-    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-hidden" style={{background: theme == 'dark' ? 'rgba(52,53,65,.9)' : ''}}>
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
           <div className="text-center text-4xl font-bold text-black dark:text-white">
@@ -431,6 +436,17 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           >
             {selectedConversation?.messages?.length === 0 ? (
               <>
+                  <Image
+                    src={mascot.src}
+                    style={{
+                      objectFit: 'contain',
+                      objectPosition: 'center',
+                      zIndex: -1,
+                      opacity: theme == 'dark' ? .4 : 0.2,
+                    }}
+                    fill={true}
+                    alt="MAIKO shark"
+                  />
                 <div className="h-[calc(100vh-162px)]">
                   <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
                     <div className="text-center font-semibold text-gray-800 mai-assistant dark:text-gray-100">
@@ -440,13 +456,24 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         </div>
                       ) : (
                         <span className="logo-img">
-                          <span>{styles.titleSeg1}<span style={{color: styles.sliderColor, fontStyle: 'italic'}}>{styles.titleColorSeg}</span>{styles.titleSeg2}{/* {styles.tm} */}</span>
+                          <span>
+                            {styles.titleSeg1}
+                            <span
+                              style={{
+                                color: styles.sliderColor,
+                                fontStyle: 'italic',
+                              }}
+                            >
+                              {styles.titleColorSeg}
+                            </span>
+                            {styles.titleSeg2}
+                            {/* {styles.tm} */}
+                          </span>
                         </span>
                       )}
                     </div>
-
                     {models.length > 0 && (
-                      <div className="flex app-card h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-600">
+                      <div className="flex app-card h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-600" style={{backgroundColor: getSettings().theme == 'dark' ? 'rgba(45,55,72, .6)' : 'rgba(255,255,255, .2)'}}>
                         <ModelSelect />
 
                         <SystemPrompt

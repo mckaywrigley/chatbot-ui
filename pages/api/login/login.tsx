@@ -10,12 +10,14 @@ import Image from 'next/image';
 import mh_logo from '../../../assets/images/mh_logo.png';
 import styles from '../../../styles/brandStylesConfig';
 import { authOptions } from '../auth/[...nextauth]';
+import mascot from '../../../assets/images/MAIKOmascot.png'
 
 const LogIn = () => {
   const { data: session } = useSession();
 
   return (
     <div className="h-screen flex items-center justify-center">
+      <Image src={mascot.src} style={{objectFit: 'contain', objectPosition: 'center', zIndex: -1, opacity: .2}} fill={true} alt='mascot'/>
       <div className="bg-white p-5 rounded-md flex flex-col items-center justify-center w-[320px]">
         <div className="flex flex-col text-center items-center">
           {/* <div className="text-3xl">
