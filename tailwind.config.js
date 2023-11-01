@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+import brand from './styles/brandStylesConfig'
+
 module.exports = {
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
@@ -7,7 +10,13 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      backgroundColor: {
+        'brand-sidebar': brand.sidebarColor,
+        'brand-chatBtn': brand.chatBtnColor,
+        'brand-submitBtn': brand.submitBtnColor
+      },
+    },
   },
   variants: {
     extend: {

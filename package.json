@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 8443",
+    "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "vitest",
@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.15",
     "@tabler/icons-react": "^2.9.0",
     "eventsource-parser": "^0.1.0",
     "file-saver": "^2.0.5",

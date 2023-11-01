@@ -11,6 +11,16 @@
   border-radius: 10px;
 }
 
+::-webkit-slider-thumb {
+  color: black !important;
+  background-color: black !important;
+}
+
+::-webkit-progress-value {
+  color: black !important;
+  background-color: black !important;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background-color: #aaa;
 }
@@ -28,9 +38,49 @@
   height: 6px;
 }
 
-html {
-  background: #202123;
+/* html {
+  background: #fff ;
+} */
+.mai-assistant {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 3rem;
 }
+
+.app-card {
+  color: black !important;
+  /* background-color: rgba(45,55,72, .2) !important; */
+}
+/* .set {
+
+  background: linear-gradient(to bottom, #BFD865, #000);
+} */
+
+
+/* .orange-m {
+  color: #E96424 !important;
+  font-style: italic !important;
+}
+.mh-orange-text {
+  color: #E96424 !important;
+} */
+
+.view-account-usage-btn {
+  background-color: #d38460 !important;
+  color: white !important;
+  padding: 8px 8px !important;
+  border-radius: .375rem;
+}
+.logo-img {
+  border-radius: .375rem;
+}
+.flex , .text-sidebar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
+
 
 @media (max-width: 720px) {
   pre {
@@ -55,6 +105,9 @@ pre:has(div.codeblock) {
   position: relative;
   overflow: hidden;
   display: inline-block;
+  padding: 0.4rem;
+  border-radius: 0 0.375rem 0.375rem 0;
+  color: white;
 }
 
 .btn {
@@ -75,3 +128,4 @@ pre:has(div.codeblock) {
   top: 0;
   opacity: 0;
 }
+
