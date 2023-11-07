@@ -45,12 +45,14 @@ interface Props {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
+  openAiKey: string;
 }
 
 const Home = ({
   serverSideApiKeyIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
+  openAiKey,
 }: Props) => {
   const { t } = useTranslation('chat');
   const { getModels } = useApiService();
@@ -263,7 +265,7 @@ const Home = ({
     const apiKey = localStorage.getItem('apiKey');
 
     if (serverSideApiKeyIsSet) {
-      dispatch({ field: 'apiKey', value: '' });
+      dispatch({ field: 'apiKey', value: openAiKey });
 
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
@@ -404,6 +406,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ) &&
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
+  const openAiKey = process.env.OPENAI_API_KEY
+  console.debug('[home] [Line 409]: openaiKey', openAiKey);
 
   let serverSidePluginKeysSet = false;
 
@@ -419,6 +423,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
       serverSidePluginKeysSet,
+      openAiKey,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',
