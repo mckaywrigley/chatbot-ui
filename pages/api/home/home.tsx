@@ -92,7 +92,7 @@ const Home = ({
   );
 
   useEffect(() => {
-    if (data) dispatch({ field: 'models', value: data });
+    // if (data) dispatch({ field: 'models', value: data });
   }, [data, dispatch]);
 
   useEffect(() => {

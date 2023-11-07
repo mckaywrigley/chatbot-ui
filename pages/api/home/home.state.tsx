@@ -1,7 +1,7 @@
 import { Conversation, Message } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -29,6 +29,7 @@ export interface HomeInitialState {
   serverSidePluginKeysSet: boolean;
 }
 
+const models = Object.values(OpenAIModels)
 export const initialState: HomeInitialState = {
   apiKey: '',
   loading: false,
@@ -36,7 +37,7 @@ export const initialState: HomeInitialState = {
   lightMode: 'dark',
   messageIsStreaming: false,
   modelError: null,
-  models: [],
+  models,
   folders: [],
   conversations: [],
   selectedConversation: undefined,
