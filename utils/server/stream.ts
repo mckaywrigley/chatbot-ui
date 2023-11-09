@@ -139,11 +139,11 @@ const generatePrompt = (messages: Message[], model: Model, systemPrompt?: string
        prompt = messages
         .map((message) =>
           message.role === 'user'
-            ? `### INSTRUCTION\n\nList all the vulnerabilities from the following source code\n\n ### INPUT\n\n${message.content}`
-            : `### Response\n\n${message.content}`,
+            ? `### Question\nListList all vulnerabilities in the given smart contract in order of severity\n\n ${message.content}`
+            : `### Answer\n${message.content}`,
         )
         .join('\n\n');
-      return `Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n${prompt}\n\n### Response\n\n`;
+      return `${prompt}\n\n### Answer\n\n`;
     default: 
       throw new Error(`Invalid model. ${model} is not supported`)
     }

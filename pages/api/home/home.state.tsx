@@ -35,7 +35,10 @@ export const initialState: HomeInitialState = {
   selectedConversation: undefined,
   currentMessage: undefined,
   prompts: [],
-  modelId: DEFAULT_MODEL,
+  modelId:
+    typeof localStorage !== 'undefined'
+      ? (localStorage.getItem('CURRENT_MODEL') as Model)
+      : DEFAULT_MODEL,
   temperature: 1,
   showPromptbar: true,
   showChatbar: true,

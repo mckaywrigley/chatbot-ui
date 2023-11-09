@@ -5,7 +5,7 @@ const generateParametersSchema = z
     temperature: z.number(),
     top_p: z.number(),
     top_k: z.number(),
-    max_new_tokens: z.number(),
+    max_tokens: z.number(),
     token_repetition_penalty: z.number(),
     token_repetition_range: z.number(),
     token_repetition_decay: z.number(),

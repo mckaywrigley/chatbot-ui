@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { DEFAULT_MODEL } from '@/utils/app/const';
 
@@ -18,11 +18,14 @@ const ModelSelector = ({
   const lastConversation = conversations[conversations.length - 1];
 
   const [value, setValue] = useState<Model>(
-    lastConversation?.modelId || DEFAULT_MODEL,
+    lastConversation?.modelId || typeof localStorage !== 'undefined'
+      ? (localStorage.getItem('CURRENT_MODEL') as Model)
+      : DEFAULT_MODEL,
   );
 
   const handleOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = event.target.value as unknown as Model;
+    localStorage.setItem('CURRENT_MODEL', newValue);
     setValue(newValue);
     onChangeModel(newValue);
   };
