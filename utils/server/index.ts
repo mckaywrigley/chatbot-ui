@@ -162,25 +162,22 @@ async function runThread(threadId: string) {
 }
 
 
-
-
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
   temperature: number,
   key: string,
   messages: Message[],
-  role: string,
 ) => {
   console.log('OpenAIStream called with:', { model, systemPrompt, temperature, messages });
   
-  const threadId = await createThread([
-    {
-      role: 'user',
-      content: systemPrompt,
-    },
-    ...messages,
-  ]);
+  // Extracting the last user message
+  const lastUserMessage = messages.filter(msg => msg.role === 'user').pop();
+
+  // Create a thread with only the last user message, if it exists
+  const threadId = lastUserMessage 
+    ? await createThread([lastUserMessage])
+    : await createThread([]); // Or handle the case when there's no user message differently
 
   const runData = await runThread(threadId);
 
@@ -194,7 +191,7 @@ export const OpenAIStream = async (
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      const queue = encoder.encode(runData); // Use runData directly
+      const queue = encoder.encode(runData);
       controller.enqueue(queue);
       controller.close();
     },
