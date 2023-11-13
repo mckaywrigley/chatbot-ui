@@ -18,7 +18,7 @@ export class OpenAIError extends Error {
 }
 
 const API_KEY = process.env.OPENAI_API_KEY;
-const ASSISTANT_ID = 'asst_r9UryYvlKp6phPKXeg6rYPf6';
+const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
 
 async function createThread(messages: Message[]): Promise<string> {
 
@@ -150,7 +150,7 @@ async function runThread(threadId: string) {
     // Extracting text from assistant messages
     const assistantMessages = messagesData.data
       .filter((msg: { role: string; }) => msg.role === 'assistant')
-      .map(msg => msg.content.map(content => content.text?.value).join(' '))
+      .map((msg: { content: { text: { value: any; }; }[]; }) => msg.content.map((content: { text: { value: any; }; }) => content.text?.value).join(' '))
       .join('\n');
 
     console.log('Extracted assistant messages:', assistantMessages);
