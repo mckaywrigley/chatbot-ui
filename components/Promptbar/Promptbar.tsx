@@ -28,7 +28,7 @@ const Promptbar = () => {
   });
 
   const {
-    state: { prompts, defaultModelId, showPromptbar },
+    state: { prompts, folders, defaultModelId, showPromptbar },
     dispatch: homeDispatch,
     handleCreateFolder,
   } = useContext(HomeContext);
@@ -130,12 +130,14 @@ const Promptbar = () => {
         isOpen={showPromptbar}
         addItemButtonTitle={t('New prompt')}
         itemComponent={
-          <Prompts
+          filteredPrompts?.length ? <Prompts
             prompts={filteredPrompts.filter((prompt) => !prompt.folderId)}
-          />
+          /> : null
         }
-        folderComponent={<PromptFolders />}
-        items={filteredPrompts}
+        folderComponent={
+          folders.filter((f) => f.type === 'prompt')?.length
+            ? <PromptFolders /> : null
+        }
         searchTerm={searchTerm}
         handleSearchTerm={(searchTerm: string) =>
           promptDispatch({ field: 'searchTerm', value: searchTerm })

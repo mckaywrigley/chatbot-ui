@@ -223,9 +223,14 @@ export const Chatbar = () => {
         side={'left'}
         isOpen={showChatbar}
         addItemButtonTitle={t('New chat')}
-        itemComponent={<Conversations conversations={filteredConversations} />}
-        folderComponent={<ChatFolders searchTerm={searchTerm} />}
-        items={filteredConversations}
+        itemComponent={
+          filteredConversations?.length
+            ? <Conversations conversations={filteredConversations} /> : null
+        }
+        folderComponent={
+          folders.filter((f) => f.type === 'chat')?.length
+            ? <ChatFolders searchTerm={searchTerm} /> : null
+        }
         searchTerm={searchTerm}
         handleSearchTerm={(searchTerm: string) =>
           chatDispatch({ field: 'searchTerm', value: searchTerm })

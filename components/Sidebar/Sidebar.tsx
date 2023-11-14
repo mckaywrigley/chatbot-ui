@@ -13,7 +13,6 @@ interface Props<T> {
   isOpen: boolean;
   addItemButtonTitle: string;
   side: 'left' | 'right';
-  items: T[];
   itemComponent: ReactNode;
   folderComponent: ReactNode;
   footerComponent?: ReactNode;
@@ -29,7 +28,6 @@ const Sidebar = <T,>({
   isOpen,
   addItemButtonTitle,
   side,
-  items,
   itemComponent,
   folderComponent,
   footerComponent,
@@ -85,13 +83,13 @@ const Sidebar = <T,>({
         />
 
         <div className="flex-grow overflow-auto">
-          {items?.length > 0 && (
+          {folderComponent ? (
             <div className="flex border-b border-white/20 pb-2">
               {folderComponent}
             </div>
-          )}
+          ) : null}
 
-          {items?.length > 0 ? (
+          {itemComponent ? (
             <div
               className="pt-2"
               onDrop={handleDrop}
