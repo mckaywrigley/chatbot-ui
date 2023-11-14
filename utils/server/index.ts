@@ -51,12 +51,12 @@ export const OpenAIStream = async (
     body: JSON.stringify({
       ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
       messages: [
-        {
+        systemPrompt ? {
           role: 'system',
           content: systemPrompt,
-        },
+        } : null,
         ...messages,
-      ],
+      ].filter(Boolean),
       max_tokens: 1000,
       temperature: temperature,
       stream: true,
