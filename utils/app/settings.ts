@@ -4,7 +4,8 @@ const STORAGE_KEY = 'settings';
 
 export const getSettings = (): Settings => {
   let settings: Settings = {
-    theme: 'dark',
+    // theme: 'dark',
+    theme: 'light',
   };
   const settingsJson = localStorage.getItem(STORAGE_KEY);
   if (settingsJson) {
