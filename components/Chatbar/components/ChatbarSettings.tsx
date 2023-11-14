@@ -9,6 +9,7 @@ import { SettingDialog } from '@/components/Settings/SettingDialog';
 
 import { Import } from '../../Settings/Import';
 import { Key } from '../../Settings/Key';
+import { AccessCode } from '../../Settings/AccessCode';
 import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
@@ -21,8 +22,10 @@ export const ChatbarSettings = () => {
   const {
     state: {
       apiKey,
+      accessCode,
       lightMode,
       serverSideApiKeyIsSet,
+      serverSideAccessCodeIsSet,
       serverSidePluginKeysSet,
       conversations,
     },
@@ -34,6 +37,7 @@ export const ChatbarSettings = () => {
     handleImportConversations,
     handleExportData,
     handleApiKeyChange,
+    handleAccessCodeChange,
   } = useContext(ChatbarContext);
 
   return (
@@ -58,6 +62,10 @@ export const ChatbarSettings = () => {
 
       {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+      ) : null}
+
+      {serverSideAccessCodeIsSet ? (
+        <AccessCode accessCode={accessCode} onAccessCodeChange={handleAccessCodeChange} />
       ) : null}
 
       {!serverSidePluginKeysSet ? <PluginKeys /> : null}

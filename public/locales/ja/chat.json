@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAIのAPIキーが必要です",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "左下のサイドバーでOpenAIのAPIキーを設定してください",
+  "Please set your Access Code in the bottom left of the sidebar.": "サイドバーの左下にアクセスコードを設定してください",
   "Stop Generating": "回答をストップ",
   "Prompt limit is {{maxLength}} characters": "プロンプトの文字数は{{maxLength}}文字までです",
   "System Prompt": "システムのプロンプト",

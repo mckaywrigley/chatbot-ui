@@ -11,6 +11,7 @@ export interface ChatBody {
   model: OpenAIModel;
   messages: Message[];
   key: string;
+  code: string;
   prompt: string;
   temperature: number;
 }

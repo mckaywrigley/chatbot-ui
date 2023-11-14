@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "מפתח openAI API",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "עליך להזין את המפתח האישי שלך בצידו השמאלי התחתון של תפריט הניווט.",
+  "Please set your Access Code in the bottom left of the sidebar.": "אנא הגדר את קוד הגישה שלך בפינה השמאלית התחתונה של סרגל הצד.",
   "Stop Generating": "עצור תהליך הפקת התשובה",
   "Prompt limit is {{maxLength}} characters": "אורך התשובה מוגבל ל {{maxLength}} תווים",
   "System Prompt": "הגדרת בסיס לכל תשובה של המערכת",

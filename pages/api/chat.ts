@@ -15,7 +15,11 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt, temperature } = (await req.json()) as ChatBody;
+    const { model, messages, key, code, prompt, temperature } = (await req.json()) as ChatBody;
+
+    if (process.env.ACCESS_CODE && code !== process.env.ACCESS_CODE) {
+      return new Response('Unauthorized', { status: 401 });
+    }
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(

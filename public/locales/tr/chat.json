@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAI API Anahtarı Gerekli",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Lütfen OpenAI API anahtarınızı yan çubuğun sol altınan'dan ayarlayın.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Lütfen Erişim Kodunuzu kenar çubuğunun sol alt kısmına ayarlayın.",
   "Stop Generating": "Durdur",
   "Prompt limit is {{maxLength}} characters": "Prompt sınırı {{maxLength}} karakterdir",
   "System Prompt": "Sistem Prompt",

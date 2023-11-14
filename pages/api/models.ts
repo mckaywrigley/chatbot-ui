@@ -8,9 +8,14 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { key } = (await req.json()) as {
+    const { key, code } = (await req.json()) as {
       key: string;
+      code: string;
     };
+
+    if (process.env.ACCESS_CODE && code !== process.env.ACCESS_CODE) {
+      return new Response('Unauthorized', { status: 401 });
+    }
 
     let url = `${OPENAI_API_HOST}/v1/models`;
     if (OPENAI_API_TYPE === 'azure') {

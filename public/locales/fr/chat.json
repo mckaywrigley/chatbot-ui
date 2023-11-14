@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "Clé API OpenAI requise",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Veuillez saisir votre clé API OpenAI dans le coin inférieur gauche de la barre latérale.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Veuillez définir votre code d'accès en bas à gauche de la barre latérale.",
   "Stop Generating": "Interrompre la génération",
   "Prompt limit is {{maxLength}} characters": "La limite du prompt est de {{maxLength}} caractères",
   "System Prompt": "Prompt du système",

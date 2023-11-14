@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "Cal la clau d'API d'OpenAI",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Si us plau, introdueix la teva clau d'API d'OpenAI a la cantonada inferior esquerra de la barra lateral.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Si us plau, configureu el vostre codi d'accés a la part inferior esquerra de la barra lateral.",
   "Stop Generating": "Parar de generar",
   "Prompt limit is {{maxLength}} characters": "El límit del missatge és de {{maxLength}} caràcters",
   "System Prompt": "Missatge del sistema",

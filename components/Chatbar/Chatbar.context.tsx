@@ -18,6 +18,7 @@ export interface ChatbarContextProps {
   handlePluginKeyChange: (pluginKey: PluginKey) => void;
   handleClearPluginKey: (pluginKey: PluginKey) => void;
   handleApiKeyChange: (apiKey: string) => void;
+  handleAccessCodeChange: (accessCode: string) => void;
 }
 
 const ChatbarContext = createContext<ChatbarContextProps>(undefined!);

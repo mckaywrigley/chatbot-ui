@@ -55,6 +55,15 @@ export const Chatbar = () => {
     [homeDispatch],
   );
 
+  const handleAccessCodeChange = useCallback(
+    (accessCode: string) => {
+      homeDispatch({ field: 'accessCode', value: accessCode });
+
+      localStorage.setItem('accessCode', accessCode);
+    },
+    [homeDispatch],
+  );
+
   const handlePluginKeyChange = (pluginKey: PluginKey) => {
     if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
       const updatedPluginKeys = pluginKeys.map((key) => {
@@ -217,6 +226,7 @@ export const Chatbar = () => {
         handlePluginKeyChange,
         handleClearPluginKey,
         handleApiKeyChange,
+        handleAccessCodeChange,
       }}
     >
       <Sidebar<Conversation>

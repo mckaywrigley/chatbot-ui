@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAI API යතුර අවශ්‍යයි",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "කරුණාකර ඔබේ OpenAI API යතුර පැති තීරුවේ පහළ වම්පසින් සකසන්න.",
+  "Please set your Access Code in the bottom left of the sidebar.": "කරුණාකර ඔබේ ප්‍රවේශ කේතය පැති තීරුවේ පහළ වම්පස සකසන්න.",
   "Stop Generating": "උත්පාදනය නවත්වන්න",
   "Prompt limit is {{maxLength}} characters": "වචන සීමාව අනුලකුණු {{maxLength}} කි",
   "System Prompt": "පද්ධති ඉඟිය",

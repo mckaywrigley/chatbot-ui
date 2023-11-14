@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": " (أوبن أيه أي) OpenAI API Key (مطلوب (مفتاح واجهة برمجة تطبيقات  ",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "يرجى تعيين مفتاح واجهة برمجة تطبيقات أوبن أيه أي الخاص بك في الجزء السفلي الأيسر من الشريط الجانبي",
+  "Please set your Access Code in the bottom left of the sidebar.": "يرجى تعيين رمز الوصول الخاص بك في الجزء السفلي الأيسر من الشريط الجانبي",
   "Stop Generating": "إيقاف التوليد",
   "Prompt limit is {{maxLength}} characters": "حرفًا {{maxLength}} حد المطالبة هو",
   "System Prompt": "مطالبة النظام",

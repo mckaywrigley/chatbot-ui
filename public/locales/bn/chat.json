@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAI API key বাধ্যতামূলক",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "দয়া করে আপনার OpenAI API key বামে সাইডবারের নিচের দিকে সেট করুন।",
+  "Please set your Access Code in the bottom left of the sidebar.": "সাইডবারের নীচে বাম দিকে আপনার অ্যাক্সেস কোড সেট করুন",
   "Stop Generating": "বার্তা জেনারেট করা বন্ধ করুন",
   "Prompt limit is {{maxLength}} characters": "নির্দেশনা (বার্তা) সীমা সর্বোচ্চ {{maxLength}} অক্ষর",
   "System Prompt": "সিস্টেম নির্দেশনা (বার্তা)",

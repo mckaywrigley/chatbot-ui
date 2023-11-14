@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAI API-avain tarvitaan",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Ole hyvä ja aseta OpenAI API-avaimesi sivupalkin vasemmassa alareunassa.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Aseta pääsykoodisi sivupalkin vasempaan alakulmaan.",
   "Stop Generating": "Lopeta generointi",
   "Prompt limit is {{maxLength}} characters": "Promptin maksimipituus on {{maxLength}} merkkiä",
   "System Prompt": "System prompt",

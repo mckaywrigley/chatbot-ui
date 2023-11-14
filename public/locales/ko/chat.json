@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "OpenAI API 키가 필요합니다",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "사이드바 왼쪽 하단에 OpenAI API 키를 설정하세요.",
+  "Please set your Access Code in the bottom left of the sidebar.": "사이드바 왼쪽 하단에서 액세스 코드를 설정하세요.",
   "Stop Generating": "생성 중지",
   "Prompt limit is {{maxLength}} characters": "프롬프트 제한은 {{maxLength}}자입니다",
   "System Prompt": "시스템 프롬트",

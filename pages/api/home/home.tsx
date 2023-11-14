@@ -43,12 +43,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
+  serverSideAccessCodeIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
 
 const Home = ({
   serverSideApiKeyIsSet,
+  serverSideAccessCodeIsSet,
   serverSidePluginKeysSet,
   defaultModelId,
 }: Props) => {
@@ -64,6 +66,7 @@ const Home = ({
   const {
     state: {
       apiKey,
+      accessCode,
       lightMode,
       folders,
       conversations,
@@ -77,13 +80,15 @@ const Home = ({
   const stopConversationRef = useRef<boolean>(false);
 
   const { data, error, refetch } = useQuery(
-    ['GetModels', apiKey, serverSideApiKeyIsSet],
+    ['GetModels', apiKey, accessCode, serverSideApiKeyIsSet, serverSideAccessCodeIsSet],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;
+      if (!accessCode && serverSideAccessCodeIsSet) return null;
 
       return getModels(
         {
           key: apiKey,
+          code: accessCode,
         },
         signal,
       );
@@ -241,12 +246,17 @@ const Home = ({
         field: 'serverSideApiKeyIsSet',
         value: serverSideApiKeyIsSet,
       });
+    serverSideAccessCodeIsSet &&
+      dispatch({
+        field: 'serverSideAccessCodeIsSet',
+        value: serverSideAccessCodeIsSet,
+      });
     serverSidePluginKeysSet &&
       dispatch({
         field: 'serverSidePluginKeysSet',
         value: serverSidePluginKeysSet,
       });
-  }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
+  }, [defaultModelId, serverSideApiKeyIsSet, serverSideAccessCodeIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
 
@@ -267,6 +277,15 @@ const Home = ({
       localStorage.removeItem('apiKey');
     } else if (apiKey) {
       dispatch({ field: 'apiKey', value: apiKey });
+    }
+
+    const accessCode = localStorage.getItem('accessCode');
+    if (!serverSideAccessCodeIsSet) {
+      dispatch({ field: 'accessCode', value: '' });
+
+      localStorage.removeItem('accessCode');
+    } else if (accessCode) {
+      dispatch({ field: 'accessCode', value: accessCode });
     }
 
     const pluginKeys = localStorage.getItem('pluginKeys');
@@ -344,6 +363,7 @@ const Home = ({
     defaultModelId,
     dispatch,
     serverSideApiKeyIsSet,
+    serverSideAccessCodeIsSet,
     serverSidePluginKeysSet,
   ]);
 
@@ -416,6 +436,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+      serverSideAccessCodeIsSet: !!process.env.ACCESS_CODE,
       defaultModelId,
       serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [

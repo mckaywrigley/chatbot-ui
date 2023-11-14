@@ -12,8 +12,12 @@ import jsdom, { JSDOM } from 'jsdom';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
-    const { messages, key, model, googleAPIKey, googleCSEId } =
+    const { messages, key, code, model, googleAPIKey, googleCSEId } =
       req.body as GoogleBody;
+
+    if (process.env.ACCESS_CODE && code !== process.env.ACCESS_CODE) {
+      return new Response('Unauthorized', { status: 401 });
+    }
 
     const userMessage = messages[messages.length - 1];
     const query = encodeURIComponent(userMessage.content.trim());

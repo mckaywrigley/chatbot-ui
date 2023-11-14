@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "Необходим ключ OpenAI",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Пожалуйста введите API-ключ OpenAI в левом нижнем углу",
+  "Please set your Access Code in the bottom left of the sidebar.": "Пожалуйста, установите свой код доступа в левом нижнем углу боковой панели",
   "Stop Generating": "Прекратить",
   "Prompt limit is {{maxLength}} characters": "Лимит сообщения на символы: {{maxLength}} символов",
   "System Prompt": "Системное сообщение",

@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "ఒపెన్ ఎయి ఐ API కీ అవసరం",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "దయచేసి మీ OpenAI API కీని సైడ్ బార్ యొక్క దిగువ ఎడమ భాగంలో సెట్ చేయండి.",
+  "Please set your Access Code in the bottom left of the sidebar.": "దయచేసి మీ యాక్సెస్ కోడ్‌ను సైడ్‌బార్ దిగువ ఎడమవైపున సెట్ చేయండి.",
   "Stop Generating": "జెనరేట్ చేస్తున్న ప్రక్రియ నిలిపేయి",
   "Prompt limit is {{maxLength}} characters": "ప్రాంప్ట్(సంకేతం) పరిమితి {{maxLength}} అక్షరాలు మాత్రమే",
   "System Prompt": "సిస్టమ్ ప్రాంప్ట్",

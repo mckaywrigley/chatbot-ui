@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "Memerlukan Kunci API OpenAI",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Silakan atur kunci API OpenAI Anda di bagian kiri bawah bilah sisi.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Silakan atur Kode Akses Anda di kiri bawah sidebar.",
   "Stop Generating": "Berhenti Menghasilkan",
   "Prompt limit is {{maxLength}} characters": "Batas karakter untuk prompt adalah {{maxLength}} karakter",
   "System Prompt": "Prompt Sistem",

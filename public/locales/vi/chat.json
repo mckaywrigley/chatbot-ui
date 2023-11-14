@@ -1,6 +1,7 @@
 {
   "OpenAI API Key Required": "Yêu cầu nhập API Key từ tài khoản OpenAI",
   "Please set your OpenAI API key in the bottom left of the sidebar.": "Vui lòng nhập API Key từ tài khoản OpenAI của bạn vào ô dưới cùng của thanh bên trái.",
+  "Please set your Access Code in the bottom left of the sidebar.": "Vui lòng đặt Mã truy cập của bạn ở phía dưới bên trái của thanh bên.",
   "Stop Generating": "Dừng tạo",
   "Prompt limit is {{maxLength}} characters": "Giới hạn Prompt là {{maxLength}} ký tự",
   "System Prompt": "Prompt hệ thống",
