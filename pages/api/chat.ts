@@ -41,7 +41,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      const tokens = encoding.encode(message.content);
+      const tokens = encoding.encode(message.content[0].text);
 
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
         break;
