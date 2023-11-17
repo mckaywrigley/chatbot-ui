@@ -2,6 +2,7 @@ import {
   IconArrowDown,
   IconBolt,
   IconBrandGoogle,
+  IconPhoto,
   IconPlayerStop,
   IconRepeat,
   IconSend,
@@ -62,6 +63,26 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);  
+  
+  const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {  
+    const file = e.target.files?.[0];  
+  
+    if (file) {  
+      const reader = new FileReader();  
+      reader.onloadend = () => {  
+        const base64Image = reader.result;  
+        setContent((prevContent) => {  
+          return prevContent ? `${prevContent}\n${base64Image}` : `${base64Image}`;  
+        });  
+      };  
+      reader.readAsDataURL(file);  
+    }  
+  };  
+
+  const handleImageInputClick = () => {  
+    imageInputRef.current?.click();  
+  };  
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -310,10 +331,24 @@ export const ChatInput = ({
               />
             </div>
           )}
+          <input  
+        ref={imageInputRef}  
+        type="file"  
+        accept="image/*"  
+        style={{ display: 'none' }}  
+        onChange={handleImageInputChange}  
+      />  
+  
+      <button  
+        className="absolute left-10 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"  
+        onClick={handleImageInputClick}  
+      >
+         <IconPhoto size={20} />
+      </button>  
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-20 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-20"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
