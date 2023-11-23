@@ -54,7 +54,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const stream = await OpenAIStream(model, promptToSend, temperatureToUse, key, messagesToSend);
 
-    return new Response(stream);
+    var resp = new Response(stream);
+
+    // let proxy services like nginx or argo tunnel know about pass the chunk immediately
+    // similar to nginx option `proxy_buffering off;`
+    resp.headers.set('Content-Type', 'text/event-stream');
+
+    return resp;
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
