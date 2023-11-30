@@ -1,3 +1,4 @@
+import { Assistant, Run, Thread } from '@/types/assistant';
 import { Conversation, Message } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
@@ -7,6 +8,10 @@ import { Prompt } from '@/types/prompt';
 
 export interface HomeInitialState {
   apiKey: string;
+  assistant: Assistant | null;
+  selectedThread: Thread | undefined;
+  threads: Thread[];
+  lastestRun: Run | undefined;
   pluginKeys: PluginKey[];
   loading: boolean;
   lightMode: 'light' | 'dark';
@@ -31,6 +36,10 @@ export interface HomeInitialState {
 
 export const initialState: HomeInitialState = {
   apiKey: '',
+  assistant: null,
+  selectedThread: undefined,
+  threads: [],
+  lastestRun: undefined,
   loading: false,
   pluginKeys: [],
   lightMode: 'dark',

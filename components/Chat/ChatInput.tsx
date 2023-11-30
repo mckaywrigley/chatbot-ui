@@ -35,6 +35,7 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
+  disabled?: boolean;
 }
 
 export const ChatInput = ({
@@ -44,6 +45,7 @@ export const ChatInput = ({
   stopConversationRef,
   textareaRef,
   showScrollDownButton,
+  disabled
 }: Props) => {
   const { t } = useTranslation('chat');
 
@@ -312,6 +314,7 @@ export const ChatInput = ({
           )}
 
           <textarea
+            disabled={disabled}
             ref={textareaRef}
             className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
             style={{

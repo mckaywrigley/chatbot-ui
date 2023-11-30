@@ -43,6 +43,7 @@
     "@types/uuid": "^9.0.1",
     "@vitest/coverage-c8": "^0.29.7",
     "autoprefixer": "^10.4.14",
+    "dotenv": "^16.3.1",
     "endent": "^2.1.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",

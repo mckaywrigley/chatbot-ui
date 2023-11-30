@@ -405,11 +405,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'Chatbot UI'
+                      'Sparkski'
                     )}
                   </div>
 
-                  {models.length > 0 && (
+                  {/*models.length > 0 && (
                     <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                       <ModelSelect />
 
@@ -434,7 +434,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         }
                       />
                     </div>
-                  )}
+                      )*/}
                 </div>
               </>
             ) : (

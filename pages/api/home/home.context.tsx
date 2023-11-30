@@ -2,15 +2,21 @@ import { Dispatch, createContext } from 'react';
 
 import { ActionType } from '@/hooks/useCreateReducer';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 
 import { HomeInitialState } from './home.state';
+import { Thread } from '@/types/assistant';
 
 export interface HomeContextProps {
   state: HomeInitialState;
   dispatch: Dispatch<ActionType<HomeInitialState>>;
+  handleCreateNewAssistant: () => Promise<void>;
+  handleCreateNewThread: (messages?: Message[]) => Promise<void>;
+  handleUpdateThread: (thread: Thread, data: KeyValuePair) => void;
+  handleCreateRun: (message?: Message) => Promise<boolean>;
+  handlePollRun: (runId: string) => Promise<void>;
   handleNewConversation: () => void;
   handleCreateFolder: (name: string, type: FolderType) => void;
   handleDeleteFolder: (folderId: string) => void;

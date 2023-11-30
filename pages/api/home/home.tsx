@@ -25,7 +25,7 @@ import { saveFolders } from '@/utils/app/folders';
 import { savePrompts } from '@/utils/app/prompts';
 import { getSettings } from '@/utils/app/settings';
 
-import { Conversation } from '@/types/chat';
+import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
@@ -40,6 +40,11 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import AssistantChat from '@/components/Assistants/AssistantChat';
+import { saveAssistant } from '@/utils/app/assistants';
+import { saveThread, updateThread } from '@/utils/app/thread';
+import { Assistant, Thread } from '@/types/assistant';
+import { saveRun } from '@/utils/app/run';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -64,6 +69,9 @@ const Home = ({
   const {
     state: {
       apiKey,
+      assistant,
+      selectedThread,
+      threads,
       lightMode,
       folders,
       conversations,
@@ -98,6 +106,106 @@ const Home = ({
   useEffect(() => {
     dispatch({ field: 'modelError', value: getModelsError(error) });
   }, [dispatch, error, getModelsError]);
+
+  // FETCH ASSISTANT -------------------------------------------
+
+  const handleCreateNewAssistant = async () => {
+    try {
+      const assistantResponse = await fetch('/api/assistant', {
+        method: 'POST',
+      });
+
+      const assistant = await assistantResponse.json();
+      dispatch({ field: 'assistant', value: assistant });
+
+      saveAssistant(assistant);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleCreateNewThread = async (messages?: Message[]) => {
+    try {
+      const threadResponse = await fetch('/api/assistant/thread', {
+        method: 'POST',
+        body: JSON.stringify({
+          messages
+        })
+      });
+
+      const threadId = await threadResponse.json();
+      const thread: Thread = {
+        id: threadId,
+        messages: messages || []
+      };
+
+      const { single, all } = updateThread(thread, [...threads, thread]);
+
+      dispatch({ field: 'selectedThread', value: single });
+      dispatch({ field: 'threads', value: all });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleUpdateThread = async (thread: Thread, data: KeyValuePair) => {
+    try {
+      const updatedThread = {
+        ...thread,
+        [data.key]: data.value,
+      };
+
+      const { single, all } = updateThread(updatedThread, threads);
+
+      dispatch({ field: 'selectedThread', value: single });
+      dispatch({ field: 'threads', value: all });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleCreateRun = async (message?: Message) => {
+    try {
+      const runResponse = await fetch(`/api/assistant/thread/${selectedThread?.id}/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          assistant_id: assistant?.id,
+          message
+        })
+      });
+
+      const runData = await runResponse.json();
+
+      dispatch({ field: 'lastestRun', value: runData });
+      saveRun(runData);
+
+      message && await handleUpdateThread(selectedThread!, {
+        key: 'messages',
+        value: [...selectedThread!.messages, message]
+      });
+
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
+
+  const handlePollRun = async (runId: string) => {
+    try {
+      const runResponse = await fetch(`/api/assistant/thread/${selectedThread?.id}/run/${runId}`);
+
+      const runData = await runResponse.json();
+
+      dispatch({ field: 'lastestRun', value: runData });
+      saveRun(runData);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   // FETCH MODELS ----------------------------------------------
 
@@ -269,6 +377,40 @@ const Home = ({
       dispatch({ field: 'apiKey', value: apiKey });
     }
 
+    const assistant = localStorage.getItem('selectedAssistant');
+
+    if (assistant) {
+      const parsedAssistant: Assistant = JSON.parse(assistant);
+      fetch(`/api/assistant/${parsedAssistant.id}`).then((res) => { 
+        if (res.ok) {
+          dispatch({ field: 'assistant', value: parsedAssistant });
+        } else {
+          localStorage.removeItem('selectedAssistant');
+        }
+      });
+    }
+
+    const selectedThread = localStorage.getItem('selectedThread');
+
+    if (selectedThread) {
+      const parsedThread: Thread = JSON.parse(selectedThread);
+      fetch(`/api/assistant/thread/${parsedThread.id}`).then((res) => { 
+        if (res.ok) {
+          dispatch({ field: 'selectedThread', value: parsedThread });
+        } else {
+          localStorage.removeItem('selectedThread');
+          // TODO: potentially update threadHistory
+          handleCreateNewThread();
+        }
+      });
+    }
+
+    const threads = localStorage.getItem('threadHistory');
+
+    if (threads) {
+      dispatch({ field: 'threads', value: JSON.parse(threads) });
+    }
+
     const pluginKeys = localStorage.getItem('pluginKeys');
     if (serverSidePluginKeysSet) {
       dispatch({ field: 'pluginKeys', value: [] });
@@ -351,6 +493,11 @@ const Home = ({
     <HomeContext.Provider
       value={{
         ...contextValue,
+        handleCreateNewAssistant,
+        handleCreateNewThread,
+        handleUpdateThread,
+        handleCreateRun,
+        handlePollRun,
         handleNewConversation,
         handleCreateFolder,
         handleDeleteFolder,
@@ -360,8 +507,8 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
+        <title>Sparkski</title>
+        <meta name="description" content="Learn what makes you tick." />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
@@ -380,13 +527,14 @@ const Home = ({
           </div>
 
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
-            <Chatbar />
+            {/* <Chatbar /> */}
 
             <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
+              {/* <Chat stopConversationRef={stopConversationRef} /> */}
+              <AssistantChat stopConversationRef={stopConversationRef} />
             </div>
 
-            <Promptbar />
+            {/* <Promptbar /> */}
           </div>
         </main>
       )}
