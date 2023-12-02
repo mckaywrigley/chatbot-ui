@@ -114,6 +114,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const runData = await response.json();
 
+    if (runData.error) {
+      res.status(400).json({ error: 'Invalid thread_id' });
+      return;
+    }
+
     res.status(200).json(runData);
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });

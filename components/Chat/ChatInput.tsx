@@ -5,6 +5,7 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconMicrophone
 } from '@tabler/icons-react';
 import {
   KeyboardEvent,
@@ -64,8 +65,59 @@ export const ChatInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
+  const [recording, setRecording] = useState(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+
+  const handleStartRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = mediaRecorder;
+
+    mediaRecorderRef.current.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunksRef.current.push(e.data);
+      }
+    };
+
+    mediaRecorderRef.current.onstop = async () => {
+      await handleSubmitAudio();
+    };
+
+    mediaRecorderRef.current.start();
+    setRecording(true);
+  }
+
+  const handleStopRecording = async () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+  };
+
+  const handleSubmitAudio = async () => {
+    const audioBlob = new Blob(chunksRef.current, { type: 'audio/mp3' });
+    
+    const formData = new FormData();
+    formData.append('audioFile', audioBlob, 'audio.mp3');
+
+    const res = await fetch('/api/stt', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setContent(data.transcription);
+      textareaRef.current?.focus();
+    }
+
+    chunksRef.current = [];
+  };
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -282,7 +334,7 @@ export const ChatInput = ({
           )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
-          <button
+          {/* <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
@@ -311,6 +363,28 @@ export const ChatInput = ({
                 }}
               />
             </div>
+          )} */}
+
+          {!recording && (
+            <button
+              disabled={disabled}
+              className={`absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 ${disabled ? "" : "hover:bg-neutral-200 hover:text-neutral-900"} dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200`}
+              onClick={async () => await handleStartRecording()}
+              onKeyDown={(e) => {}}
+            >
+              <IconMicrophone size={20} />
+            </button>
+          )}
+
+          {recording && (
+            <button
+              disabled={disabled}
+              className={`absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 ${disabled ? "" : "hover:bg-neutral-200 hover:text-neutral-900"} dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200`}
+              onClick={async () => await handleStopRecording()}
+              onKeyDown={(e) => {}}
+            >
+              <IconPlayerStop size={20} />
+            </button>
           )}
 
           <textarea
@@ -339,7 +413,8 @@ export const ChatInput = ({
           />
 
           <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            disabled={disabled}
+            className={`absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 ${disabled ? "" : "hover:bg-neutral-200 hover:text-neutral-900"} dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200`}
             onClick={handleSend}
           >
             {messageIsStreaming ? (

@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name: 'Sparkski',
         model: 'gpt-4-1106-preview',
         // description: "",
-        instructions: "You are Sparkski. Your main objective is to understand a user's interests and get a sense of what they are passionate about. Ask them questions about the things they like to think about/discuss and what they like to do in their free time. The interaction with the user should be conversational and not feel like an interview; be sure to introduce your yourself and ask the user's name first and wait for them to reply. Once you have a good mental model of the user, describe their personality and interests in your own words in 1-2 paragraphs.",
+        instructions: process.env.DEFAULT_ASSISTANT_INSTRUCTION ?? "",
         // tools: ["retrieval"]
       }),
     });
