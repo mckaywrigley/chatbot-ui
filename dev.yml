@@ -1,0 +1,6 @@
+type: node
+up:
+  - node:
+      version: 18.15.0
+commands:
+  server: npm run dev
