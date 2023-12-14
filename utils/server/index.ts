@@ -53,11 +53,11 @@ export const OpenAIStream = async (
       messages: [
         {
           role: 'system',
-          content: systemPrompt,
+          content: [{type:"text", text: systemPrompt}],
         },
         ...messages,
       ],
-      max_tokens: 1000,
+      max_tokens: 4096,
       temperature: temperature,
       stream: true,
     }),
@@ -92,7 +92,7 @@ export const OpenAIStream = async (
           if (data !== '[DONE]') {
             try {
               const json = JSON.parse(data);
-              if (json.choices[0].finish_reason != null) {
+              if (json.choices[0].finish_reason != null || json.choices[0].finish_details != null) {
                 controller.close();
                 return;
               }

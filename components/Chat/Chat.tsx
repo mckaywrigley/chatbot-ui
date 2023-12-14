@@ -139,8 +139,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!plugin) {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
+            var textContent = content.filter(c => c.type == "text").map(c => c.text).join();
             const customName =
-              content.length > 30 ? content.substring(0, 30) + '...' : content;
+              textContent.length > 30 ? textContent.substring(0, 30) + '...' : textContent;
             updatedConversation = {
               ...updatedConversation,
               name: customName,
@@ -166,7 +167,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               isFirst = false;
               const updatedMessages: Message[] = [
                 ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
+                { role: 'assistant', content: [{type: "text", text: chunkValue}] },
               ];
               updatedConversation = {
                 ...updatedConversation,
@@ -182,7 +183,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                   if (index === updatedConversation.messages.length - 1) {
                     return {
                       ...message,
-                      content: text,
+                      content: [{type:"text", text}],
                     };
                   }
                   return message;

@@ -103,8 +103,9 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
 
   const copyOnClick = () => {
     if (!navigator.clipboard) return;
-
-    navigator.clipboard.writeText(message.content).then(() => {
+    var content = message.content;
+    var textContent = content.filter(c => c.type == "text").map(c => c.text).join();
+    navigator.clipboard.writeText(textContent).then(() => {
       setMessageCopied(true);
       setTimeout(() => {
         setMessageCopied(false);
@@ -150,7 +151,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   <textarea
                     ref={textareaRef}
                     className="w-full resize-none whitespace-pre-wrap border-none dark:bg-[#343541]"
-                    value={messageContent}
+                    value={messageContent.filter(c => c.type == "text").map(c => c.text).join()}
                     onChange={handleInputChange}
                     onKeyDown={handlePressEnter}
                     onCompositionStart={() => setIsTyping(true)}
@@ -169,7 +170,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                     <button
                       className="h-[40px] rounded-md bg-blue-500 px-4 py-1 text-sm font-medium text-white enabled:hover:bg-blue-600 disabled:opacity-50"
                       onClick={handleEditMessage}
-                      disabled={messageContent.trim().length <= 0}
+                      disabled={messageContent.filter(c => c.type == "text").length <= 0}
                     >
                       {t('Save & Submit')}
                     </button>
@@ -186,7 +187,14 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                 </div>
               ) : (
                 <div className="prose whitespace-pre-wrap dark:prose-invert flex-1">
-                  {message.content}
+                  <div>
+                    {messageContent.filter(c => c.type == "text").map(c => c.text).join()}
+                  </div>
+                  <div className="flex flex-wrap justify-center">  
+                    {messageContent.filter(c => c.type === "image_url").map((c, index) => (  
+                      <img key={index} src={c.image_url?.url} alt="Message Content" className="max-w-full h-auto my-2" style={{objectFit: "contain"}} />  
+                    ))}  
+                  </div>  
                 </div>
               )}
 
@@ -261,7 +269,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
                   },
                 }}
               >
-                {`${message.content}${
+                {`${messageContent.filter(c => c.type == "text").map(c => c.text).join()}${
                   messageIsStreaming && messageIndex == (selectedConversation?.messages.length ?? 0) - 1 ? '`▍`' : ''
                 }`}
               </MemoizedReactMarkdown>

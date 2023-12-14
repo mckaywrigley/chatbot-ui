@@ -2,7 +2,17 @@ import { OpenAIModel } from './openai';
 
 export interface Message {
   role: Role;
-  content: any[];
+  content: Content[];
+}
+
+export interface Content{
+  type: string;
+  text?: string;
+  image_url?: ImageUrl;
+}
+
+export interface ImageUrl{
+  url: string;
 }
 
 export type Role = 'assistant' | 'user';

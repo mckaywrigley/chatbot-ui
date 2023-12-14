@@ -19,7 +19,7 @@ import {
 
 import { useTranslation } from 'next-i18next';
 
-import { Message } from '@/types/chat';
+import { Content, Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -132,9 +132,9 @@ export const ChatInput = ({
       return;
     }
 
-    var messageContent:any[] = [{"type": "text", "text": content}];
+    var messageContent:Content[] = [{"type": "text", "text": content}];
     if(images && images.length >0){
-      var imageMessages = images.map(image => { return {"type": "image_url", "image_url":{"url": image}}});
+      var imageMessages = images.map(image => { return {type: "image_url", image_url:{"url": image}}});
       messageContent = [...messageContent, ...imageMessages]
     }
 
