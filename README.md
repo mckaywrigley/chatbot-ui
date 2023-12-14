@@ -2,11 +2,7 @@
 
 ## News
 
-Chatbot UI 2.0 is out as an updated, hosted product!
-
-Check out [Takeoff Chat](https://www.takeoffchat.com/).
-
-Open source version coming soon!
+V2 update coming soon...
 
 ## About
 
