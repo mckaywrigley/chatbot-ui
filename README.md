@@ -2,7 +2,17 @@
 
 ## News
 
-V2 update coming soon...
+Chatbot UI 2.0 will launch on December 28th, 2023.
+
+See a [preview](https://x.com/mckaywrigley/status/1738273242283151777?s=20).
+
+This repo will be completely overhauled with the updated codebase.
+
+The old codebase will be available in a new repo.
+
+There will be several hours of downtime on ChatbotUI.com while the new version is deployed.
+
+We recommend exporting your data before the update!
 
 ## About
 
