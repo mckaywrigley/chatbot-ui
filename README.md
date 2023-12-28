@@ -2,7 +2,7 @@
 
 ## News
 
-Chatbot UI 2.0 will launch on January 3rd, 2023.
+Chatbot UI 2.0 will launch on January 3rd, 2024.
 
 See a [preview](https://x.com/mckaywrigley/status/1738273242283151777?s=20).
 
