@@ -18,8 +18,6 @@ We recommend exporting your data before the update!
 
 Chatbot UI is an open source chat UI for AI models.
 
-See a [demo](https://twitter.com/mckaywrigley/status/1640380021423603713?s=46&t=AowqkodyK6B4JccSOxSPew).
-
 ![Chatbot UI](./public/screenshots/screenshot-0402023.jpg)
 
 ## Updates
@@ -33,13 +31,32 @@ Expect frequent improvements.
 - [ ] Sharing
 - [ ] "Bots"
 
-## Deploy
+## Local Development
+**Setup Local .env.local**
+```
+$ cd chatbot-ui
+$ cp .env.local.example .env.local
+```
+ - Add an auth application to your github for localhost login capability
+ - Add your local environment variables to the .env.local
+ - Once you have your .env.local file set move on to launching the application locally.
 
-**Vercel**
+**Following are the commands for local development**
+```
+$ cd chatbot-ui
+$ ./build-local.sh
+$ docker-compose --env-file .env.local up
+```
 
-Host your own live version of Chatbot UI with Vercel.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmckaywrigley%2Fchatbot-ui)
+## Deploy Live Server
+**Following are the commands for deployment**
+```
+$ git clone git@github.com:MicroHealthLLC/chatbot-ui.git
+$ cd chatbot-ui/deployment
+$ chmod +x deploy-prod.sh 
+$ ./deploy-prod.sh
+```
 
 **Docker**
 
@@ -65,6 +82,11 @@ git clone https://github.com/mckaywrigley/chatbot-ui.git
 ```
 
 **2. Install Dependencies**
+
+```bash
+nvm install 20
+nvm install node
+```
 
 ```bash
 npm i
@@ -107,8 +129,12 @@ When deploying the application, the following environment variables can be set:
 | DEFAULT_MODEL                     | `gpt-3.5-turbo`                | The default model to use on new conversations, for Azure use `gpt-35-turbo`                                                               |
 | NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT | [see here](utils/app/const.ts) | The default system prompt to use on new conversations                                                                                     |
 | NEXT_PUBLIC_DEFAULT_TEMPERATURE   | 1                              | The default temperature to use on new conversations                                                                                       |
-| GOOGLE_API_KEY                    |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
 | GOOGLE_CSE_ID                     |                                | See [Custom Search JSON API documentation][GCSE]                                                                                          |
+| NEXTAUTH_SECRET                     |                                | Your secret for [next-auth authentication][NEXT_AUTH]                                                                                         |
+| GITHUB_ID                    |                                | See [Github OAuth API documentation][GITHUB_AUTH]                                                                                          |
+| GITHUB_SECRET                    |                                | See [Github OAuth API documentation][GITHUB_AUTH]                                                                                          |
+| GOOGLE_AUTH_ID                    |                                | See [Google OAuth API documentation][GOOGLE_AUTH]                                                                                          |
+GOOGLE_AUTH_SECRET                  |                                | See [Google OAuth API documentation][GOOGLE_AUTH]                                                                                          |
 
 If you do not provide an OpenAI API key with `OPENAI_API_KEY`, users will have to provide their own key.
 
@@ -119,3 +145,9 @@ If you don't have an OpenAI API key, you can get one [here](https://platform.ope
 If you have any questions, feel free to reach out to Mckay on [Twitter](https://twitter.com/mckaywrigley).
 
 [GCSE]: https://developers.google.com/custom-search/v1/overview
+
+[GITHUB_AUTH]: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+
+[GOOGLE_AUTH]: https://developers.google.com/identity/protocols/oauth2
+
+[NEXT_AUTH]: https://next-auth.js.org/configuration/options

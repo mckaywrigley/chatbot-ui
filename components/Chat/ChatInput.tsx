@@ -5,8 +5,11 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconUpload,
 } from '@tabler/icons-react';
+import { IconArrowUp } from '@tabler/icons-react';
 import {
+  ChangeEvent,
   KeyboardEvent,
   MutableRefObject,
   useCallback,
@@ -15,6 +18,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 import { useTranslation } from 'next-i18next';
 
@@ -28,23 +32,110 @@ import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 
+import mammoth from 'mammoth';
+import { PDFDocument } from 'pdf-lib';
+import * as pdfjs from 'pdfjs-dist';
+import { utils as XLSXUtils, read, readFile } from 'xlsx';
+import styles from '@/styles/brandStylesConfig';
+
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
   onRegenerate: () => void;
   onScrollDownClick: () => void;
+  onScrollUpClick: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
+  showScrollUpButton: boolean;
 }
 
 export const ChatInput = ({
   onSend,
   onRegenerate,
   onScrollDownClick,
+  onScrollUpClick,
   stopConversationRef,
   textareaRef,
   showScrollDownButton,
+  showScrollUpButton,
 }: Props) => {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target?.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+    const allowedFormats = [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ];
+    if (!allowedFormats.includes(file.type)) {
+      alert(
+        'Invalid file format. Only PDF, Word, and Excel files are allowed.',
+      );
+      return;
+    }
+
+    try {
+      let fileContent = '';
+
+      if (
+        file.type ===
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        const result = await mammoth.extractRawText({
+          arrayBuffer: await file.arrayBuffer(),
+        });
+        fileContent = result.value;
+      } else if (file.type === 'application/pdf') {
+        const pdfBytes = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pdfjsDoc = await pdfjs.getDocument({ data: pdfBytes }).promise;
+
+        for (let pageNum = 1; pageNum <= pdfjsDoc.numPages; pageNum++) {
+          const pdfPage = await pdfjsDoc.getPage(pageNum);
+          const textContent = await pdfPage.getTextContent();
+
+          for (const textItem of textContent.items) {
+            if ('str' in textItem && textItem.str) {
+              fileContent += textItem.str;
+            }
+          }
+        }
+      } else if (
+        file.type ===
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
+        const fileData = await file.arrayBuffer();
+        const data = new Uint8Array(fileData);
+        const workbook = read(data, { type: 'array' });
+
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const excelContent = XLSXUtils.sheet_to_json(worksheet);
+
+        excelContent.forEach((row: any) => {
+          Object.values(row).forEach((cellValue: any) => {
+            if (cellValue) {
+              fileContent += cellValue + ' ';
+            }
+          });
+        });
+      }
+
+      if (fileContent) {
+        onSend({ role: 'user', content: fileContent }, plugin);
+      }
+      e.target.value = '';
+    } catch (error) {
+      console.error('Error reading file:', error);
+      alert('An error occurred while reading the file.');
+    }
+  };
+
   const { t } = useTranslation('chat');
 
   const {
@@ -270,6 +361,7 @@ export const ChatInput = ({
 
         {!messageIsStreaming &&
           selectedConversation &&
+          selectedConversation.messages &&
           selectedConversation.messages.length > 0 && (
             <button
               className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
@@ -279,8 +371,9 @@ export const ChatInput = ({
             </button>
           )}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+        <div className="chat-textarea-display relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
+            data-tooltip-id="my-tooltip-1"
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
@@ -313,7 +406,7 @@ export const ChatInput = ({
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
+            className="m-0 resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -335,16 +428,32 @@ export const ChatInput = ({
             onKeyDown={handleKeyDown}
           />
 
-          <button
-            className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-            onClick={handleSend}
-          >
-            {messageIsStreaming ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
-            ) : (
-              <IconSend size={18} />
-            )}
-          </button>
+          <div className="upload-btn-wrapper" style={{backgroundColor: styles.uploadBtnColor}}>
+            <button
+              data-tooltip-id="my-tooltip-2"
+              className={`right-2 top-2 rounded-sm p-1 hover:bg-neutral-`}
+              onClick={handleSend}
+            >
+              {messageIsStreaming ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
+              ) : (
+                <IconSend size={18} />
+              )}
+            </button>
+            <button
+              data-tooltip-id="my-tooltip-3"
+              type="button"
+              className="right-2 top-2 rounded-sm p-1 hover:bg-neutral- cursor-pointer"
+            >
+              <IconUpload size="20" />
+              <input
+                type="file"
+                accept=".pdf, .docx, .xlsx"
+                onChange={handleFileUpload}
+                style={{ left: '27px' }}
+              />
+            </button>
+          </div>
 
           {showScrollDownButton && (
             <div className="absolute bottom-12 right-0 lg:bottom-0 lg:-right-10">
@@ -353,6 +462,17 @@ export const ChatInput = ({
                 onClick={onScrollDownClick}
               >
                 <IconArrowDown size={18} />
+              </button>
+            </div>
+          )}
+
+          {showScrollUpButton && (
+            <div className="absolute bottom-12 right-0 lg:bottom-0 lg:-right-10">
+              <button
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-300 text-gray-800 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-neutral-200"
+                onClick={onScrollUpClick}
+              >
+                <IconArrowUp size={18} />
               </button>
             </div>
           )}
@@ -393,6 +513,13 @@ export const ChatInput = ({
           "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
         )}
       </div>
+      <ReactTooltip
+        id="my-tooltip-1"
+        place="bottom"
+        content="Change Results AI"
+      />
+      <ReactTooltip id="my-tooltip-2" place="bottom" content="Get Results" />
+      <ReactTooltip id="my-tooltip-3" place="bottom" content="Upload File" />
     </div>
   );
 };

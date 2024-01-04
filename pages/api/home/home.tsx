@@ -10,6 +10,9 @@ import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
 import useApiService from '@/services/useApiService';
+import { loadChatHistory } from '@/services/loadChatService';
+import { loadPromptHistory } from '@/services/loadPromptService';
+import { loadFolderHistory } from "@/services/loadFolderService";
 
 import {
   cleanConversationHistory,
@@ -40,6 +43,12 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+
+import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]"
+
+import styles from '../../../styles/brandStylesConfig'
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -249,8 +258,27 @@ const Home = ({
   }, [defaultModelId, serverSideApiKeyIsSet, serverSidePluginKeysSet]);
 
   // ON LOAD --------------------------------------------
+  const { data: session } = useSession();
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchChatHistory = async () => {
+      if (isMounted && session?.user?.name) {
+        localStorage.setItem('user', JSON.stringify(session?.user?.name));
+      }
+    };
+
+    fetchChatHistory();
+
+    // Cleanup function to stop the loop when the component is unmounted
+    return () => {
+      isMounted = false;
+    };
+  }, [session]);
+
+  useEffect(() => {
+    localStorage.setItem('user', JSON.stringify(session?.user?.name));
     const settings = getSettings();
     if (settings.theme) {
       dispatch({
@@ -296,23 +324,29 @@ const Home = ({
     if (folders) {
       dispatch({ field: 'folders', value: JSON.parse(folders) });
     }
+    loadFolderHistory().then((folderHistory)=>{
+        let parsedFolderHistory: FolderInterface[] = folders ? JSON.parse(folders) : []
+        if (folderHistory !== '' && folderHistory.length > 0) parsedFolderHistory = JSON.parse(folderHistory);
+        dispatch({ field: 'folders', value: parsedFolderHistory });
+    })
+    // Load Prompt History
+    loadPromptHistory().then( (promptHistory) => {
+      let parsedPromptHistory: Prompt[] = []
+      if (promptHistory !== '' && promptHistory.length > 0) parsedPromptHistory = JSON.parse(promptHistory);
+      dispatch({ field: 'prompts', value: parsedPromptHistory });
+    });
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      dispatch({ field: 'prompts', value: JSON.parse(prompts) });
-    }
+    // Load Conversations History Block
+    loadChatHistory().then( (chatHistory) => {
+      let parsedConversationHistory: Conversation[] = []
+      if (chatHistory !== '' && chatHistory.length > 0) parsedConversationHistory = JSON.parse(chatHistory);
+        const cleanedConversationHistory = cleanConversationHistory(
+          parsedConversationHistory,
+        );
+        dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    });
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
-
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
-    }
-
+    // const conversationHistory = localStorage.getItem('conversationHistory');
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
       const parsedSelectedConversation: Conversation =
@@ -345,7 +379,15 @@ const Home = ({
     dispatch,
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
+    session
   ]);
+
+  //AUTH SESSION ---------------------------------------------
+
+  // const { data: session } = useSession();
+
+  if(!session) return <div>Please Login</div>
+  localStorage.setItem('user', JSON.stringify(session?.user?.name))
 
   return (
     <HomeContext.Provider
@@ -360,13 +402,13 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>{styles.appTitle}</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href={styles.favicon} />
       </Head>
       {selectedConversation && (
         <main
@@ -395,7 +437,9 @@ const Home = ({
 };
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const {locale} = ctx;
+
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       Object.values(OpenAIModelID).includes(
@@ -413,6 +457,23 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     serverSidePluginKeysSet = true;
   }
 
+  const session = await getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+
+  if(!session){
+      return {
+          redirect: {
+            destination: '/auth/login',
+            permanent: false,
+          },
+        }
+  }
+
+  if (session.user) session.user = replaceUndefinedWithNullHash(session.user);
+
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
@@ -426,6 +487,18 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'promptbar',
         'settings',
       ])),
+      session
     },
   };
 };
+
+function replaceUndefinedWithNullHash(obj: unknown) {
+  const newObj: { [key: string]: unknown } = {}; // Use type assertion
+
+  for (const [key, value] of Object.entries(obj as { [key: string]: unknown })) {
+    newObj[key] = value === undefined ? null : value;
+  }
+
+  return newObj;
+}
+

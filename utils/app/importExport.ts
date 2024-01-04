@@ -15,21 +15,16 @@ import { cleanConversationHistory } from './clean';
 export function isExportFormatV1(obj: any): obj is ExportFormatV1 {
   return Array.isArray(obj);
 }
-
 export function isExportFormatV2(obj: any): obj is ExportFormatV2 {
   return !('version' in obj) && 'folders' in obj && 'history' in obj;
 }
-
 export function isExportFormatV3(obj: any): obj is ExportFormatV3 {
   return obj.version === 3;
 }
-
 export function isExportFormatV4(obj: any): obj is ExportFormatV4 {
   return obj.version === 4;
 }
-
 export const isLatestExportFormat = isExportFormatV4;
-
 export function cleanData(data: SupportedExportFormats): LatestExportFormat {
   if (isExportFormatV1(data)) {
     return {
@@ -39,7 +34,6 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
       prompts: [],
     };
   }
-
   if (isExportFormatV2(data)) {
     return {
       version: 4,
@@ -52,18 +46,14 @@ export function cleanData(data: SupportedExportFormats): LatestExportFormat {
       prompts: [],
     };
   }
-
   if (isExportFormatV3(data)) {
     return { ...data, version: 4, prompts: [] };
   }
-
   if (isExportFormatV4(data)) {
     return data;
   }
-
   throw new Error('Unsupported data format');
 }
-
 function currentDate() {
   const date = new Date();
   const month = date.getMonth() + 1;
@@ -71,54 +61,41 @@ function currentDate() {
   return `${month}-${day}`;
 }
 
-export const exportData = () => {
-  let history = localStorage.getItem('conversationHistory');
-  let folders = localStorage.getItem('folders');
-  let prompts = localStorage.getItem('prompts');
-
-  if (history) {
-    history = JSON.parse(history);
-  }
-
-  if (folders) {
-    folders = JSON.parse(folders);
-  }
-
-  if (prompts) {
-    prompts = JSON.parse(prompts);
-  }
-
-  const data = {
-    version: 4,
-    history: history || [],
-    folders: folders || [],
-    prompts: prompts || [],
-  } as LatestExportFormat;
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json',
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = `chatbot_ui_history_${currentDate()}.json`;
-  link.href = url;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+export const exportDataXLSX = () => {
+  const selectedConversation = JSON.parse(
+    localStorage.getItem('selectedConversation')!,
+  );
+  const FileSaver = require('file-saver');
+  const XLSX = require('xlsx');
+  const worksheet = XLSX.utils.json_to_sheet(selectedConversation['messages']);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  FileSaver.saveAs(blob, `${selectedConversation.name}.xlsx`);
 };
-
+export const exportDataDoc = () => {
+  const conversation = JSON.parse(
+    localStorage.getItem('selectedConversation')!,
+  );
+  const FileSaver = require('file-saver');
+  const parsedConversation = conversation;
+  const messages = parsedConversation.messages;
+  let docContent = '';
+  messages.forEach((message: any) => {
+    docContent += `${message['role']} ${message.content}\n\n`;
+  });
+  const blob = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
+  FileSaver.saveAs(blob, `${parsedConversation.name}.doc`);
+};
 export const importData = (
   data: SupportedExportFormats,
 ): LatestExportFormat => {
   const { history, folders, prompts } = cleanData(data);
-
   const oldConversations = localStorage.getItem('conversationHistory');
   const oldConversationsParsed = oldConversations
     ? JSON.parse(oldConversations)
     : [];
-
   const newHistory: Conversation[] = [
     ...oldConversationsParsed,
     ...history,
@@ -135,7 +112,6 @@ export const importData = (
   } else {
     localStorage.removeItem('selectedConversation');
   }
-
   const oldFolders = localStorage.getItem('folders');
   const oldFoldersParsed = oldFolders ? JSON.parse(oldFolders) : [];
   const newFolders: FolderInterface[] = [
@@ -146,7 +122,6 @@ export const importData = (
       index === self.findIndex((f) => f.id === folder.id),
   );
   localStorage.setItem('folders', JSON.stringify(newFolders));
-
   const oldPrompts = localStorage.getItem('prompts');
   const oldPromptsParsed = oldPrompts ? JSON.parse(oldPrompts) : [];
   const newPrompts: Prompt[] = [...oldPromptsParsed, ...prompts].filter(
@@ -154,7 +129,6 @@ export const importData = (
       index === self.findIndex((p) => p.id === prompt.id),
   );
   localStorage.setItem('prompts', JSON.stringify(newPrompts));
-
   return {
     version: 4,
     history: newHistory,

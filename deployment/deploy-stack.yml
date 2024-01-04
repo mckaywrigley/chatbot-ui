@@ -1,0 +1,17 @@
+version: '3.6'
+
+services:
+  chatgpt:
+    image: chatgpt-ui:latest
+    ports:
+      - 3000:3000
+    environment:
+      - OPENAI_API_KEY=
+      - NEXTAUTH_SECRET=
+      - GITHUB_ID=
+      - GITHUB_SECRET=
+      - NEXT_PUBLIC_AZURE_AD_CLIENT_ID=
+      - NEXT_PUBLIC_AZURE_AD_CLIENT_SECRET=
+      - NEXT_PUBLIC_AZURE_AD_TENANT_ID=
+      - NEXTAUTH_URL=https:\\gpt.microhealthllc.com
+      - DEFAULT_MODEL=gpt-3.5-turbo
