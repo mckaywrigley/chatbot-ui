@@ -61,7 +61,7 @@ export const ChatInput = ({
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [historyPromptIndex, setHistoryPromptIndex] = useState<number>();
   const [historyPromptIndexIncrement, setHistoryPromptIndexIncrement] = useState<1 | 0 | -1>(0)
-  const [promptsHistory, setPromptsHistory] = useState<string[]>([..._promptsHistory].reverse());
+  const [promptsHistory, setPromptsHistory] = useState<string[]>([]);
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -73,6 +73,10 @@ export const ChatInput = ({
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
+
+  useEffect(() => {
+    setPromptsHistory([..._promptsHistory].reverse())
+  }, [_promptsHistory])
 
   useEffect(() => {
     if (!promptsHistory.length) {
