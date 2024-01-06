@@ -35,6 +35,7 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
   showScrollDownButton: boolean;
+  promptsHistory: string[];
 }
 
 export const ChatInput = ({
@@ -44,6 +45,7 @@ export const ChatInput = ({
   stopConversationRef,
   textareaRef,
   showScrollDownButton,
+  promptsHistory: _promptsHistory
 }: Props) => {
   const { t } = useTranslation('chat');
 
@@ -57,6 +59,9 @@ export const ChatInput = ({
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
+  const [historyPromptIndex, setHistoryPromptIndex] = useState<number>();
+  const [historyPromptIndexIncrement, setHistoryPromptIndexIncrement] = useState<1 | 0 | -1>(0)
+  const [promptsHistory, setPromptsHistory] = useState<string[]>([..._promptsHistory].reverse());
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -68,6 +73,30 @@ export const ChatInput = ({
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
+
+  useEffect(() => {
+    if (!promptsHistory.length) {
+      return;
+    }
+    if (historyPromptIndexIncrement === 0) { 
+      return;
+    }
+
+    const shouldSaveCurrentPrompt = historyPromptIndex === undefined && promptsHistory?.[0] && promptsHistory?.[0] !== content;
+    const expectedHistoryIndex = historyPromptIndex === undefined ? 0 : historyPromptIndex + historyPromptIndexIncrement;
+
+    const newHistory = [
+      ...(shouldSaveCurrentPrompt ? [content || ''] : []),
+      ...promptsHistory
+    ];
+    const selectedIndex = shouldSaveCurrentPrompt ? expectedHistoryIndex + 1 : expectedHistoryIndex;
+    const boundedIndex = Math.max(Math.min(selectedIndex, newHistory.length - 1), 0);
+
+    setContent(newHistory[boundedIndex]);
+    setPromptsHistory(newHistory);
+    setHistoryPromptIndex(boundedIndex);
+    setHistoryPromptIndexIncrement(0);
+  }, [historyPromptIndexIncrement]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -162,12 +191,20 @@ export const ChatInput = ({
       } else {
         setActivePromptIndex(0);
       }
-    } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    } else if (e.key === '/' && e.metaKey) {
-      e.preventDefault();
-      setShowPluginSelect(!showPluginSelect);
+    } else { 
+      if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      } else if (e.key === '/' && e.metaKey) {
+        e.preventDefault();
+        setShowPluginSelect(!showPluginSelect);
+      } else if (e.key === 'ArrowDown' && e.shiftKey) {
+        e.preventDefault();
+        setHistoryPromptIndexIncrement(-1);
+      } else if (e.key === 'ArrowUp' && e.shiftKey) {
+        e.preventDefault();
+        setHistoryPromptIndexIncrement(1);
+      } 
     }
   };
 
