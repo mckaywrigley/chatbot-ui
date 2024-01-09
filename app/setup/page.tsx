@@ -181,16 +181,7 @@ export default function SetupPage() {
             stepNum={currentStep}
             stepTitle="Set API Keys"
             onShouldProceed={handleShouldProceed}
-            showNextButton={
-              !!(
-                openaiAPIKey ||
-                azureOpenaiAPIKey ||
-                anthropicAPIKey ||
-                googleGeminiAPIKey ||
-                mistralAPIKey ||
-                perplexityAPIKey
-              )
-            }
+            showNextButton={true}
             showBackButton={true}
           >
             <APIStep
