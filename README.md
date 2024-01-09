@@ -73,6 +73,10 @@ You will also need to to fill in the values for project_url
 npm run chat
 ```
 
+### 7. Deploy on sealos
+
+[![](https://raw.githubusercontent.com/labring-actions/templates/main/Deploy-on-Sealos.svg)](https://cloud.sealos.io/?openapp=system-template%3FtemplateName%3Dchatbot-ui)
+
 ## Contributing
 
 We are working on a guide for contributing.
