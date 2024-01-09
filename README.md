@@ -36,6 +36,8 @@ brew install supabase/tap/supabase
 
 2. Start Supabase
 
+Prerequisite: Docker needs to be installed and running. For installation, visit the [official docs](https://docs.docker.com/get-docker/).
+
 ```bash
 supabase start
 ```
