@@ -10,7 +10,7 @@ View the latest demo [here](https://twitter.com/mckaywrigley).
 
 ## Support
 
-If you find Chatbot UI useful, please consider [sponsoring](https://github.com/mckaywrigley?tab=sponsoring) me :)
+If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me :)
 
 ## Quickstart
 
