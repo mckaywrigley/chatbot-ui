@@ -12,7 +12,7 @@ View the latest demo [here](https://twitter.com/mckaywrigley).
 
 If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me :)
 
-## Quickstart
+## Local Quickstart
 
 ### 1. Clone the repo
 
@@ -28,13 +28,17 @@ npm install
 
 ### 3. Install Supabase & run locally
 
-1. Install Supabase CLI
+1. Install Docker
+
+You will need to install Docker to run Supabase locally. You can download it [here](https://docs.docker.com/get-docker) for free.
+
+2. Install Supabase CLI
 
 ```bash
 brew install supabase/tap/supabase
 ```
 
-2. Start Supabase
+3. Start Supabase
 
 ```bash
 supabase start
@@ -72,6 +76,10 @@ You will also need to to fill in the values for project_url
 ```bash
 npm run chat
 ```
+
+## Hosted Quickstart
+
+Check back soon!
 
 ## Contributing
 

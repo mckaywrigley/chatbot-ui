@@ -86,11 +86,13 @@ interface ChatbotUIContext {
   newMessageFiles: ChatFile[]
   newMessageImages: MessageImage[]
   showFilesDisplay: boolean
+  useRetrieval: boolean
   setChatFiles: Dispatch<SetStateAction<ChatFile[]>>
   setChatImages: Dispatch<SetStateAction<MessageImage[]>>
   setNewMessageFiles: Dispatch<SetStateAction<ChatFile[]>>
   setNewMessageImages: Dispatch<SetStateAction<MessageImage[]>>
   setShowFilesDisplay: Dispatch<SetStateAction<boolean>>
+  setUseRetrieval: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -176,9 +178,11 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   newMessageFiles: [],
   newMessageImages: [],
   showFilesDisplay: false,
+  useRetrieval: false,
   setChatFiles: () => {},
   setChatImages: () => {},
   setNewMessageFiles: () => {},
   setNewMessageImages: () => {},
-  setShowFilesDisplay: () => {}
+  setShowFilesDisplay: () => {},
+  setUseRetrieval: () => {}
 })

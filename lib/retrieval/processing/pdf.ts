@@ -8,37 +8,28 @@ export const processPdf = async (pdf: Blob): Promise<FileItemChunk[]> => {
   const docs = await loader.load()
 
   let chunks: FileItemChunk[] = []
-
   let content = ""
   let tokens = 0
-  const overlapSize = 50
 
-  // Concatenate all the text together
   let allText = docs.map(doc => doc.pageContent).join(" ")
+  const words = allText.split(" ")
 
-  // Split the text into chunks, filtering out empty strings
-  const textChunks = allText.split(/\s+/).filter(chunk => chunk.length > 0)
-
-  for (let i = 0; i < textChunks.length; i++) {
-    const chunkTokens = encode(textChunks[i]).length
-
-    if (tokens + chunkTokens > TOKEN_LIMIT) {
-      // Push the current chunk
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i]
+    const chunkTokens = encode(word).length
+    if (tokens + chunkTokens <= TOKEN_LIMIT) {
+      content += word + " "
+      tokens += chunkTokens
+    } else {
       chunks.push({
         content: content.trim(),
         tokens
       })
-
-      // Start new chunk with overlap from previous chunk
-      content = content.slice(-overlapSize) + " " + textChunks[i] + " "
-      tokens = encode(content).length
-    } else {
-      content += textChunks[i] + " "
-      tokens += chunkTokens
+      content = word + " "
+      tokens = chunkTokens
     }
   }
 
-  // Push the last chunk if it's not empty
   if (content.trim() !== "") {
     chunks.push({
       content: content.trim(),

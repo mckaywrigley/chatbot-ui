@@ -4,9 +4,7 @@ import { useContext } from "react"
 
 export const usePromptAndCommand = () => {
   const {
-    selectedChat,
     chatFiles,
-    setChatFiles,
     setNewMessageFiles,
     userInput,
     setUserInput,
@@ -14,7 +12,8 @@ export const usePromptAndCommand = () => {
     setIsPromptPickerOpen,
     setIsAtPickerOpen,
     setSlashCommand,
-    setAtCommand
+    setAtCommand,
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -47,6 +46,7 @@ export const usePromptAndCommand = () => {
   const handleSelectUserFile = async (file: Tables<"files">) => {
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
+    setUseRetrieval(true)
 
     setNewMessageFiles(prev => [
       ...prev,

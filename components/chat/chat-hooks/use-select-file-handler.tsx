@@ -23,7 +23,8 @@ export const useSelectFileHandler = () => {
     setNewMessageImages,
     setNewMessageFiles,
     setShowFilesDisplay,
-    setFiles
+    setFiles,
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const [filesToAccept, setFilesToAccept] = useState(ACCEPTED_FILE_TYPES)
@@ -47,6 +48,7 @@ export const useSelectFileHandler = () => {
 
   const handleSelectDeviceFile = (file: File) => {
     setShowFilesDisplay(true)
+    setUseRetrieval(true)
 
     if (file) {
       let reader = new FileReader()

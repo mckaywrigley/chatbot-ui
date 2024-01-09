@@ -44,7 +44,8 @@ export const useChatHandler = () => {
     newMessageFiles,
     chatFileItems,
     setChatFileItems,
-    setToolInUse
+    setToolInUse,
+    useRetrieval
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -112,7 +113,7 @@ export const useChatHandler = () => {
 
     let retrievedFileItems: Tables<"file_items">[] = []
 
-    if (newMessageFiles.length > 0 || chatFiles.length > 0) {
+    if ((newMessageFiles.length > 0 || chatFiles.length > 0) && useRetrieval) {
       setToolInUse("retrieval")
 
       retrievedFileItems = await handleRetrieval(
@@ -140,7 +141,8 @@ export const useChatHandler = () => {
         ? [...chatMessages]
         : [...chatMessages, tempUserChatMessage],
       assistant: selectedChat?.assistant_id ? selectedAssistant : null,
-      messageFileItems: retrievedFileItems
+      messageFileItems: retrievedFileItems,
+      chatFileItems: chatFileItems
     }
 
     let generatedText = ""
@@ -211,7 +213,6 @@ export const useChatHandler = () => {
     setFirstTokenReceived(false)
     setUserInput("")
     setNewMessageImages([])
-    setNewMessageFiles([])
   }
 
   const handleSendEdit = async (
