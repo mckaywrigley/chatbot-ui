@@ -1,6 +1,8 @@
 import { LLM, LLMID } from "@/types";
 
 export function GET(): Promise<Response> {
+    if (process.env.NODE_ENV !== "production") {
+
   return new Promise((resolve, reject) => {
     fetch(process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags")
       .then(response => {
@@ -27,4 +29,5 @@ export function GET(): Promise<Response> {
         reject(error);
       });
   });
+}
 }
