@@ -4,8 +4,9 @@ import { Label } from "@/components/ui/label"
 import { FILE_DESCRIPTION_MAX, FILE_NAME_MAX } from "@/db/limits"
 import { getFileFromStorage } from "@/db/storage/files"
 import { Tables } from "@/supabase/types"
-import { FC, useState } from "react"
+import { FC, useContext, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
+import { ChatbotUIContext } from "@/context/context"
 
 interface FileItemProps {
   file: Tables<"files">
@@ -14,6 +15,7 @@ interface FileItemProps {
 export const FileItem: FC<FileItemProps> = ({ file }) => {
   const [name, setName] = useState(file.name)
   const [description, setDescription] = useState(file.description)
+  const { setNewMessageFiles } = useContext(ChatbotUIContext)
 
   const getLinkAndView = async () => {
     const link = await getFileFromStorage(file.file_path)
@@ -21,52 +23,64 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   }
 
   return (
-    <SidebarItem
-      item={file}
-      contentType="files"
-      icon={<FileIcon type={file.type} size={30} />}
-      updateState={{ name }}
-      renderInputs={() => (
-        <>
-          <div
-            className="cursor-pointer underline hover:opacity-50"
-            onClick={getLinkAndView}
-          >
-            View {file.name}
-          </div>
+    <div className="flex flex-row">
+      <SidebarItem
+        item={file}
+        contentType="files"
+        icon={<FileIcon type={file.type} size={30} />}
+        updateState={{ name }}
+        renderInputs={() => (
+          <>
+            <div
+              className="cursor-pointer underline hover:opacity-50"
+              onClick={getLinkAndView}
+            >
+              View {file.name}
+            </div>
 
-          <div className="flex flex-col justify-between">
-            <div>{file.type}</div>
+            <div className="flex flex-col justify-between">
+              <div>{file.type}</div>
 
-            <div>{formatFileSize(file.size)}</div>
+              <div>{formatFileSize(file.size)}</div>
 
-            <div>{file.tokens.toLocaleString()} tokens</div>
-          </div>
+              <div>{file.tokens.toLocaleString()} tokens</div>
+            </div>
 
-          <div className="space-y-1">
-            <Label>Name</Label>
+            <div className="space-y-1">
+              <Label>Name</Label>
 
-            <Input
-              placeholder="File name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={FILE_NAME_MAX}
-            />
-          </div>
+              <Input
+                placeholder="File name..."
+                value={name}
+                onChange={e => setName(e.target.value)}
+                maxLength={FILE_NAME_MAX}
+              />
+            </div>
 
-          <div className="space-y-1">
-            <Label>Description</Label>
+            <div className="space-y-1">
+              <Label>Description</Label>
 
-            <Input
-              placeholder="File description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={FILE_DESCRIPTION_MAX}
-            />
-          </div>
-        </>
-      )}
-    />
+              <Input
+                placeholder="File description..."
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                maxLength={FILE_DESCRIPTION_MAX}
+              />
+            </div>
+          </>
+        )}
+      />
+      <span
+        className="mt-3 hover:cursor-pointer"
+        onClick={e => {
+          e.stopPropagation()
+          // @ts-expect-error
+          setNewMessageFiles(prev => [...prev, file])
+        }}
+      >
+        Use
+      </span>
+    </div>
   )
 }
 
