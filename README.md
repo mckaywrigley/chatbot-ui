@@ -46,7 +46,7 @@ supabase start
 
 ### 4. Install Ollama (for local models)
 
-Follow the instructions [here](https://github.com/jmorganca/ollama#macos)
+Follow the instructions [here](https://github.com/jmorganca/ollama#macos).
 
 ### 5. Fill in secrets
 
