@@ -1,5 +1,4 @@
 import { ChatbotUIContext } from "@/context/context"
-import { getChatFilesByChatId } from "@/db/chat-files"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { cn } from "@/lib/utils"
 import {
@@ -24,9 +23,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const {
-    selectedChat,
     userInput,
-    setChatFiles,
     chatMessages,
     isGenerating,
     selectedPreset,
@@ -54,36 +51,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchChatFiles()
-    }
-
-    fetchData()
-  }, [selectedChat])
-
-  useEffect(() => {
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
-
-  const fetchChatFiles = async () => {
-    if (!selectedChat) return
-
-    const chatFiles = await getChatFilesByChatId(selectedChat.id)
-
-    setChatFiles(
-      chatFiles.files.map(file => {
-        return {
-          id: file.id,
-          name: file.name,
-          type: file.type,
-          data: "",
-          file: null
-        }
-      })
-    )
-  }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && !event.shiftKey) {

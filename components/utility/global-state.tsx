@@ -101,6 +101,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [newMessageFiles, setNewMessageFiles] = useState<ChatFile[]>([])
   const [newMessageImages, setNewMessageImages] = useState<MessageImage[]>([])
   const [showFilesDisplay, setShowFilesDisplay] = useState<boolean>(false)
+  const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
 
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
@@ -337,11 +338,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         newMessageFiles,
         newMessageImages,
         showFilesDisplay,
+        useRetrieval,
         setChatFiles,
         setChatImages,
         setNewMessageFiles,
         setNewMessageImages,
-        setShowFilesDisplay
+        setShowFilesDisplay,
+        setUseRetrieval
       }}
     >
       {children}

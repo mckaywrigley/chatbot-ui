@@ -1,7 +1,9 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getFileFromStorage } from "@/db/storage/files"
+import useHotkey from "@/lib/hooks/use-hotkey"
 import { ChatFile, MessageImage } from "@/types"
 import {
+  IconCircleFilled,
   IconFileFilled,
   IconFileTypePdf,
   IconLoader2,
@@ -11,10 +13,14 @@ import Image from "next/image"
 import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
+import { WithTooltip } from "../ui/with-tooltip"
 
 interface ChatFilesDisplayProps {}
 
 export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
+  useHotkey("f", () => setShowFilesDisplay(prev => !prev))
+  useHotkey("e", () => setUseRetrieval(prev => !prev))
+
   const {
     files,
     newMessageImages,
@@ -22,14 +28,34 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     newMessageFiles,
     setNewMessageFiles,
     setShowFilesDisplay,
-    showFilesDisplay
+    showFilesDisplay,
+    chatFiles,
+    chatImages,
+    setChatImages,
+    setChatFiles,
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const [selectedFile, setSelectedFile] = useState<ChatFile | null>(null)
   const [selectedImage, setSelectedImage] = useState<MessageImage | null>(null)
   const [showPreview, setShowPreview] = useState(false)
 
-  const combinedNewMessageFiles = [...newMessageFiles, ...newMessageImages]
+  const combinedImages = [
+    ...newMessageImages.filter(
+      image =>
+        !chatImages.some(chatImage => chatImage.messageId === image.messageId)
+    ),
+    ...chatImages
+  ]
+
+  const combinedChatFiles = [
+    ...newMessageFiles.filter(
+      file => !chatFiles.some(chatFile => chatFile.id === file.id)
+    ),
+    ...chatFiles
+  ]
+
+  const combinedMessageFiles = [...combinedImages, ...combinedChatFiles]
 
   const getLinkAndView = async (file: ChatFile) => {
     const fileRecord = files.find(f => f.id === file.id)
@@ -40,7 +66,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     window.open(link, "_blank")
   }
 
-  return showFilesDisplay && combinedNewMessageFiles.length > 0 ? (
+  return showFilesDisplay && combinedMessageFiles.length > 0 ? (
     <>
       {showPreview && selectedImage && (
         <FilePreview
@@ -67,20 +93,24 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       )}
 
       <div className="space-y-5">
-        <div className="flex w-full justify-center">
+        <div className="flex w-full justify-center space-x-2">
           <Button
-            className="h-[24px] text-xs"
+            className="w-[100px]] h-[24px] text-xs"
             onClick={() => setShowFilesDisplay(false)}
           >
             Hide files
           </Button>
+
+          {(chatFiles.length > 0 || newMessageFiles.length > 0) && (
+            <RetrievalToggle />
+          )}
         </div>
 
         <div className="overflow-auto">
           <div className="flex flex-wrap gap-6 truncate pt-2">
-            {newMessageImages.map(image => (
+            {combinedImages.map((image, index) => (
               <div
-                key={image.messageId}
+                key={index}
                 className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50"
               >
                 <Image
@@ -111,15 +141,18 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                         f => f.messageId !== image.messageId
                       )
                     )
+                    setChatImages(
+                      chatImages.filter(f => f.messageId !== image.messageId)
+                    )
                   }}
                 />
               </div>
             ))}
 
-            {newMessageFiles.map(file =>
+            {combinedChatFiles.map((file, index) =>
               file.id === "loading" ? (
                 <div
-                  key={file.id}
+                  key={index}
                   className="relative flex h-[64px] items-center space-x-4 rounded-xl border-2 px-4 py-3"
                 >
                   <div className="rounded bg-blue-500 p-2">
@@ -168,6 +201,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                       setNewMessageFiles(
                         newMessageFiles.filter(f => f.id !== file.id)
                       )
+                      setChatFiles(chatFiles.filter(f => f.id !== file.id))
                     }}
                   />
                 </div>
@@ -178,16 +212,48 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       </div>
     </>
   ) : (
-    combinedNewMessageFiles.length > 0 && (
-      <div className="mb-4 flex w-full justify-center">
+    combinedMessageFiles.length > 0 && (
+      <div className="mb-4 flex w-full justify-center space-x-2">
         <Button
           className="h-[24px] text-xs"
           onClick={() => setShowFilesDisplay(true)}
         >
-          View {combinedNewMessageFiles.length} file
-          {combinedNewMessageFiles.length > 1 ? "s" : ""}
+          View {combinedMessageFiles.length} file
+          {combinedMessageFiles.length > 1 ? "s" : ""}
         </Button>
+
+        <RetrievalToggle />
       </div>
     )
+  )
+}
+
+const RetrievalToggle = ({}) => {
+  const { useRetrieval, setUseRetrieval } = useContext(ChatbotUIContext)
+  return (
+    <WithTooltip
+      delayDuration={300}
+      side="top"
+      display={
+        <div>
+          {useRetrieval
+            ? "File retrieval is enabled for the selected files for this message. Click to disable."
+            : "Click to enable file retrieval for this message."}
+        </div>
+      }
+      trigger={
+        <Button
+          className="h-[24px] w-[100px] justify-between text-xs"
+          onClick={() => setUseRetrieval(prev => !prev)}
+        >
+          <IconCircleFilled
+            className={useRetrieval ? "text-green-500" : "text-red-500"}
+            size={12}
+          />
+
+          <div className="ml-1">{useRetrieval ? "Enabled" : "Disabled"}</div>
+        </Button>
+      }
+    />
   )
 }

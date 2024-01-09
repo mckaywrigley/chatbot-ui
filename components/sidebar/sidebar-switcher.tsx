@@ -1,6 +1,7 @@
 import { ContentType } from "@/types"
 import {
   IconAdjustmentsHorizontal,
+  IconFile,
   IconMessage,
   IconPencil
 } from "@tabler/icons-react"
@@ -40,12 +41,11 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        {/* TODO */}
-        {/* <SidebarSwitchItem
+        <SidebarSwitchItem
           icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
           contentType="files"
           onContentTypeChange={onContentTypeChange}
-        /> */}
+        />
 
         {/* TODO */}
         {/* <SidebarSwitchItem

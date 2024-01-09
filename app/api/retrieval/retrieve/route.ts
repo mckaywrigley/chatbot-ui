@@ -20,7 +20,9 @@ export async function POST(request: Request) {
 
     const profile = await getServerProfile()
 
-    checkApiKey(profile.openai_api_key, "OpenAI")
+    if (embeddingsProvider === "openai") {
+      checkApiKey(profile.openai_api_key, "OpenAI")
+    }
 
     let chunks: any[] = []
 
@@ -54,15 +56,15 @@ export async function POST(request: Request) {
     } else if (embeddingsProvider === "local") {
       const localEmbedding = await generateLocalEmbedding(userInput)
 
-      const { data: localFileItems, error: localError } =
+      const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {
           query_embedding: localEmbedding as any,
           match_count: MATCH_COUNT,
           file_ids: fileIds
         })
 
-      if (localError) {
-        throw localError
+      if (localFileItemsError) {
+        throw localFileItemsError
       }
 
       chunks = localFileItems

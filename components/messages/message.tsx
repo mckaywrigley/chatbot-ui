@@ -207,7 +207,7 @@ export const Message: FC<MessageProps> = ({
                       <div className="flex animate-pulse items-center space-x-2">
                         <IconFileText size={20} />
 
-                        <div>Reading documents...</div>
+                        <div>Searching files...</div>
                       </div>
                     )
                   default:
@@ -233,14 +233,14 @@ export const Message: FC<MessageProps> = ({
             <div>Sources</div>
 
             <div className="mt-2 grid grid-cols-2 gap-2">
-              {fileItems.map(fileItem => {
+              {fileItems.map((fileItem, index) => {
                 const parentFile = files.find(
                   file => file.id === fileItem.file_id
                 )
 
                 return (
                   <div
-                    key={fileItem.id}
+                    key={index}
                     className="border-primary flex cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
                     onClick={() => {
                       setSelectedFileItem(fileItem)

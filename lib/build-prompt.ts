@@ -34,29 +34,13 @@ export async function buildFinalMessages(
   profile: Tables<"profiles">,
   chatImages: MessageImage[]
 ) {
-  // retrievalText = retrievedFileItems
-  //       .map(item => {
-  //         const parentFile = [...newMessageFiles, ...chatFiles].find(
-  //           file => file.id === item.file_id
-  //         )
-
-  //         return `<BEGIN SOURCE: ${parentFile?.name.toLocaleUpperCase()}>\n${
-  //           item.content
-  //         }\n</END SOURCE>`
-  //       })
-  //       .join("\n\n")
-
-  //   let completeMessageContent = retrievalText
-  //   ? `${messageContent}\n\nYou may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
-  //   : messageContent
-  // console.log("\n\n\ncompleteMessageContent:\n", completeMessageContent)
-
   const {
     chatSettings,
     workspaceInstructions,
     chatMessages,
     assistant,
-    messageFileItems
+    messageFileItems,
+    chatFileItems
   } = payload
 
   const BUILT_PROMPT = buildBasePrompt(
@@ -66,21 +50,53 @@ export async function buildFinalMessages(
     assistant
   )
 
-  let finalMessages = []
-
-  let usedTokens = 0
   const TOKEN_LIMIT = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
-  let REMAINING_TOKENS = TOKEN_LIMIT - PROMPT_TOKENS
 
+  let remainingTokens = TOKEN_LIMIT - PROMPT_TOKENS
+
+  let usedTokens = 0
   usedTokens += PROMPT_TOKENS
 
-  for (let i = chatMessages.length - 1; i >= 0; i--) {
-    const message = chatMessages[i].message
+  const processedChatMessages = chatMessages.map((chatMessage, index) => {
+    const nextChatMessage = chatMessages[index + 1]
+
+    if (nextChatMessage === undefined) {
+      return chatMessage
+    }
+
+    const nextChatMessageFileItems = nextChatMessage.fileItems
+
+    if (nextChatMessageFileItems.length > 0) {
+      const findFileItems = nextChatMessageFileItems
+        .map(fileItemId =>
+          chatFileItems.find(chatFileItem => chatFileItem.id === fileItemId)
+        )
+        .filter(item => item !== undefined) as Tables<"file_items">[]
+
+      const retrievalText = buildRetrievalText(findFileItems)
+
+      return {
+        message: {
+          ...chatMessage.message,
+          content:
+            `${chatMessage.message.content}\n\n${retrievalText}` as string
+        },
+        fileItems: []
+      }
+    }
+
+    return chatMessage
+  })
+
+  let finalMessages = []
+
+  for (let i = processedChatMessages.length - 1; i >= 0; i--) {
+    const message = processedChatMessages[i].message
     const messageTokens = encode(message.content).length
 
-    if (messageTokens <= REMAINING_TOKENS) {
-      REMAINING_TOKENS -= messageTokens
+    if (messageTokens <= remainingTokens) {
+      remainingTokens -= messageTokens
       usedTokens += messageTokens
       finalMessages.unshift(message)
     } else {
@@ -92,18 +108,18 @@ export async function buildFinalMessages(
     chat_id: "",
     content: BUILT_PROMPT,
     created_at: "",
-    id: chatMessages.length + "",
+    id: processedChatMessages.length + "",
     image_paths: [],
     model: payload.chatSettings.model,
     role: "system",
-    sequence_number: chatMessages.length,
+    sequence_number: processedChatMessages.length,
     updated_at: "",
     user_id: ""
   }
 
   finalMessages.unshift(tempSystemMessage)
 
-  return finalMessages.map(message => {
+  finalMessages = finalMessages.map(message => {
     let content
 
     if (message.image_paths.length > 0) {
@@ -140,6 +156,27 @@ export async function buildFinalMessages(
       content
     }
   })
+
+  if (messageFileItems.length > 0) {
+    const retrievalText = buildRetrievalText(messageFileItems)
+
+    finalMessages[finalMessages.length - 1] = {
+      ...finalMessages[finalMessages.length - 1],
+      content: `${
+        finalMessages[finalMessages.length - 1].content
+      }\n\n${retrievalText}`
+    }
+  }
+
+  return finalMessages
+}
+
+function buildRetrievalText(fileItems: Tables<"file_items">[]) {
+  const retrievalText = fileItems
+    .map(item => `<BEGIN SOURCE>\n${item.content}\n</END SOURCE>`)
+    .join("\n\n")
+
+  return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
 }
 
 export async function buildGoogleGeminiFinalMessages(
