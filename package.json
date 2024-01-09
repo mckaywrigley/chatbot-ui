@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "chat": "supabase start && npm run update && npm run dev",
+    "chat": "supabase start && npm run dev",
     "restart": "supabase stop && npm run chat",
     "update": "git pull && npm run db-migrate up && npm run db-types",
     "prepare": "husky install",
