@@ -123,7 +123,6 @@ export const useSelectFileHandler = () => {
               selectedWorkspace.id,
               chatSettings.embeddingsProvider
             )
-            console.log("createdFile", createdFile)
 
             setFiles(prev => [...prev, createdFile])
 

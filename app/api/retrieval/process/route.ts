@@ -23,8 +23,6 @@ export async function POST(req: Request) {
 
     const profile = await getServerProfile()
 
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
     const formData = await req.formData()
 
     const file = formData.get("file") as File
@@ -34,6 +32,10 @@ export async function POST(req: Request) {
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
     const fileExtension = file.name.split(".").pop()?.toLowerCase()
+
+    if (embeddingsProvider === "openai") {
+      checkApiKey(profile.openai_api_key, "OpenAI")
+    }
 
     let chunks: FileItemChunk[] = []
 
@@ -45,7 +47,6 @@ export async function POST(req: Request) {
         chunks = await processDoc(blob)
         break
       case "docx":
-        console.log("docx")
         chunks = await processDocX(blob)
         break
       case "html":
@@ -58,7 +59,6 @@ export async function POST(req: Request) {
         chunks = await processMarkdown(blob)
         break
       case "pdf":
-        console.log("pdf")
         chunks = await processPdf(blob)
         break
       case "txt":
@@ -99,13 +99,6 @@ export async function POST(req: Request) {
       embeddings = await Promise.all(embeddingPromises)
     }
 
-    console.log(
-      embeddings[0],
-      "embeddings",
-      embeddingsProvider,
-      embeddings.length
-    )
-
     const file_items = chunks.map((chunk, index) => ({
       file_id,
       user_id: profile.user_id,
@@ -121,13 +114,7 @@ export async function POST(req: Request) {
           : null
     }))
 
-    const { data: fileItemData, error: fileItemError } = await supabaseAdmin
-      .from("file_items")
-      .upsert(file_items)
-
-    if (fileItemError) {
-      console.log("fileItemError", fileItemError)
-    }
+    await supabaseAdmin.from("file_items").upsert(file_items)
 
     const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
 

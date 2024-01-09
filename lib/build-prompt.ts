@@ -59,8 +59,6 @@ export async function buildFinalMessages(
     messageFileItems
   } = payload
 
-  console.log("messageFileItems:\n", messageFileItems)
-
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",

@@ -114,7 +114,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const messageFileItems = await Promise.all(messageFileItemPromises)
 
     const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
-    console.log("uniqueFileItems", uniqueFileItems)
     setChatFileItems(uniqueFileItems)
 
     const fetchedChatMessages = fetchedMessages.map(message => {
@@ -127,7 +126,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
           )
       }
     })
-    console.log("fetchedChatMessages", fetchedChatMessages)
 
     setChatMessages(fetchedChatMessages)
   }

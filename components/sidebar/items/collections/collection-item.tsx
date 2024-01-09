@@ -28,7 +28,6 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       const collectionFiles = await getCollectionFilesByCollectionId(
         collection.id
       )
-      console.log("collectionFiles", collectionFiles)
       const files = collectionFiles.files
       setSelectedCollectionFiles(files)
     }

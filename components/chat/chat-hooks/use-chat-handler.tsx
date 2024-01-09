@@ -121,8 +121,6 @@ export const useChatHandler = () => {
         chatFiles,
         chatSettings!.embeddingsProvider
       )
-
-      console.log("retrievedFileItems", retrievedFileItems)
     }
 
     const { tempUserChatMessage, tempAssistantChatMessage } =
