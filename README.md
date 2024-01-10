@@ -78,13 +78,15 @@ Get the required values by running:
 supabase status
 ```
 
+Note: Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`
+
 Now go to your `.env.local` file and fill in the values.
 
 #### 2. SQL setup
 
 In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
 
-- `project_url` (line 53): This can remain unchanged if you don't change your `config.toml` file
+- `project_url` (line 53): `http://supabase_kong_chatbotui:8000` (default) can remain unchanged if you don't change your `project_id` in the `config.toml` file
 - `service_role_key` (line 54): You got this value from running `supabase status`
 
 This prevents issues with storage files not being deleted properly.
