@@ -58,7 +58,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
 
         <TextareaAutosize
           className="bg-background border-input border-2"
-          placeholder="Send a message..."
+          placeholder="Send a message... (Use @ to reference files, / to reference prompts)"
           onValueChange={prompt => {
             onChangeChatSettings({ ...chatSettings, prompt })
           }}
