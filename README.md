@@ -128,6 +128,8 @@ You can view your backend GUI at [http://localhost:54323/project/default/editor]
 
 Follow these steps to get your own Chatbot UI instance running in the cloud.
 
+Video tutorial coming soon.
+
 ### 1. Follow local quickstart
 
 Repeat steps 1-4 in "Local Quickstart" above.
