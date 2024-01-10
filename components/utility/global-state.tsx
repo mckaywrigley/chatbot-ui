@@ -107,7 +107,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    if (window.location.hostname === "localhost") {
+    if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
       fetchOllamaModels()
     }
 
