@@ -12,6 +12,12 @@ View the latest demo [here](https://x.com/mckaywrigley/status/173827324228315177
 
 If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
 
+## Legacy Code
+
+Chatbot UI was recently updated to its 2.0 version.
+
+The code for 1.0 can be found on the `legacy` branch.
+
 ## Local Quickstart
 
 Follow these steps to get your own Chatbot UI instance running locally.
