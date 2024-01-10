@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-# export PATH="/home/timyang/.nvm/versions/node/v21.5.0/bin:$PATH"
 
 . "$(dirname -- "$0")/_/husky.sh"
 
