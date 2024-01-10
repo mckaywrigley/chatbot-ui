@@ -111,6 +111,8 @@ npm run chat
 
 Your local instance of Chatbot UI should now be running at [http://localhost:3000](http://localhost:3000).
 
+You can view your backend GUI at [http://localhost:54323/project/default/editor](http://localhost:54323/project/default/editor).
+
 ## Hosted Quickstart
 
 Follow these steps to get your own Chatbot UI instance running in the cloud.
