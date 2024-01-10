@@ -1,33 +1,31 @@
-import { LLM, LLMID } from "@/types";
+import { LLM, LLMID } from "@/types"
 
-export function GET(): Promise<Response> {
-    if (process.env.NODE_ENV !== "production") {
-
-  return new Promise((resolve, reject) => {
-    fetch(process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags")
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Ollama server is not responding.`);
+export async function GET(): Promise<Response> {
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
+      )
+      if (!response.ok) {
+        throw new Error(`Ollama server is not responding.`)
+      }
+      const data = await response.json()
+      const localModels = data.models.map((model: any) => {
+        const newModel: LLM = {
+          modelId: model.name as LLMID,
+          modelName: model.name,
+          provider: "ollama",
+          hostedId: model.name,
+          platformLink: "https://ollama.ai/library",
+          imageInput: false
         }
-        return response.json();
+        return newModel
       })
-      .then(data => {
-        const localModels = data.models.map((model: any) => {
-          const newModel: LLM = {
-            modelId: model.name as LLMID,
-            modelName: model.name,
-            provider: "ollama",
-            hostedId: model.name,
-            platformLink: "https://ollama.ai/library",
-            imageInput: false
-          };
-          return newModel;
-        });
-        resolve(new Response(JSON.stringify({ localModels })));
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
-}
+      return new Response(JSON.stringify({ localModels }))
+    } catch (error) {
+      throw error
+    }
+  } else {
+    return new Response(JSON.stringify({ localModels: [] }))
+  }
 }
