@@ -56,8 +56,17 @@ You will need to install Docker to run Supabase locally. You can download it [he
 
 #### 2. Install Supabase CLI
 
+**MacOS/Linux**
+
 ```bash
 brew install supabase/tap/supabase
+```
+
+**Window**
+
+```bash
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
 ```
 
 #### 3. Start Supabase
