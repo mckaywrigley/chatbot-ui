@@ -10,7 +10,7 @@ import {
   IconX
 } from "@tabler/icons-react"
 import Image from "next/image"
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useState, useEffect } from "react"
 import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -65,6 +65,12 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     const link = await getFileFromStorage(fileRecord.file_path)
     window.open(link, "_blank")
   }
+
+  useEffect(() => {
+    if (newMessageImages.length > 0) {
+      setShowFilesDisplay(true)
+    }
+  }, [newMessageImages, setShowFilesDisplay])
 
   return showFilesDisplay && combinedMessageFiles.length > 0 ? (
     <>
