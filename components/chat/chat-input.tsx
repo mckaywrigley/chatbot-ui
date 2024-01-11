@@ -1,12 +1,13 @@
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
   IconCirclePlus,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -34,7 +35,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isPromptPickerOpen,
     setIsPromptPickerOpen,
     isAtPickerOpen,
-    setFocusFile
+    setFocusFile,
+    newMessageImages,
+    setNewMessageImages,
+    chatSettings
   } = useContext(ChatbotUIContext)
 
   const {
@@ -43,6 +47,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
+
+  const [isTextareaFocused, setTextareaFocused] = useState(false)
 
   const { handleInputChange } = usePromptAndCommand()
 
@@ -71,6 +77,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (event.key === "Tab" && isAtPickerOpen) {
       event.preventDefault()
       setFocusFile(!focusFile)
+    }
+  }
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    const imagesAllowed = LLM_LIST.find(
+      llm => llm.modelId === chatSettings?.model
+    )?.imageInput
+    if (!imagesAllowed) return
+
+    const items = event.clipboardData.items
+    for (const item of items) {
+      if (item.type.indexOf("image") === 0) {
+        const file = item.getAsFile()
+        if (!file) return
+        handleSelectDeviceFile(file)
+      }
     }
   }
 
@@ -112,6 +134,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           minRows={1}
           maxRows={20}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
