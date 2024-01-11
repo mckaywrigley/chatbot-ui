@@ -1,5 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
   IconCirclePlus,
@@ -14,7 +15,6 @@ import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
-import { MessageImage } from "@/types/message-image"
 
 interface ChatInputProps {}
 
@@ -37,7 +37,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isAtPickerOpen,
     setFocusFile,
     newMessageImages,
-    setNewMessageImages
+    setNewMessageImages,
+    chatSettings
   } = useContext(ChatbotUIContext)
 
   const {
@@ -61,51 +62,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
 
-  useEffect(() => {
-    const textarea = chatInputRef.current
-    if (textarea) {
-      const handleFocus = () => setTextareaFocused(true)
-      const handleBlur = () => setTextareaFocused(false)
-      const handlePaste = (event: ClipboardEvent) => {
-        if (event.clipboardData && event.clipboardData.files.length) {
-          const fileObject = event.clipboardData.files[0]
-
-          if (fileObject.type.startsWith("image/")) {
-            const reader = new FileReader()
-
-            reader.onload = (e: ProgressEvent<FileReader>) => {
-              if (e.target && e.target.result) {
-                const base64 = e.target.result as string
-
-                const image: MessageImage = {
-                  messageId: Date.now().toString(),
-                  base64: base64,
-                  path: "",
-                  url: "",
-                  file: fileObject
-                }
-
-                setNewMessageImages(prevImages => [...prevImages, image])
-              }
-            }
-
-            reader.readAsDataURL(fileObject)
-          }
-        }
-      }
-
-      textarea.addEventListener("focus", handleFocus)
-      textarea.addEventListener("blur", handleBlur)
-      textarea.addEventListener("paste", handlePaste)
-
-      return () => {
-        textarea.removeEventListener("focus", handleFocus)
-        textarea.removeEventListener("blur", handleBlur)
-        textarea.removeEventListener("paste", handlePaste)
-      }
-    }
-  }, [chatInputRef, isTextareaFocused, setNewMessageImages])
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
@@ -121,6 +77,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (event.key === "Tab" && isAtPickerOpen) {
       event.preventDefault()
       setFocusFile(!focusFile)
+    }
+  }
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    const imagesAllowed = LLM_LIST.find(
+      llm => llm.modelId === chatSettings?.model
+    )?.imageInput
+    if (!imagesAllowed) return
+
+    const items = event.clipboardData.items
+    for (const item of items) {
+      if (item.type.indexOf("image") === 0) {
+        const file = item.getAsFile()
+        if (!file) return
+        handleSelectDeviceFile(file)
+      }
     }
   }
 
@@ -162,6 +134,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           minRows={1}
           maxRows={20}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
