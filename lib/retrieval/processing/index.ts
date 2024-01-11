@@ -1,1 +1,1 @@
-export const TOKEN_LIMIT = 1000
+export const CHUNK_SIZE = 1000

@@ -14,6 +14,7 @@ import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
+import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 
 interface ChatFilesDisplayProps {}
 
@@ -92,7 +93,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       )}
 
       <div className="space-y-5">
-        <div className="flex w-full justify-center space-x-2">
+        <div className="flex w-full items-center justify-center space-x-2">
           <Button
             className="w-[100px]] h-[24px] text-xs"
             onClick={() => setShowFilesDisplay(false)}
@@ -212,7 +213,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     </>
   ) : (
     combinedMessageFiles.length > 0 && (
-      <div className="mb-4 flex w-full justify-center space-x-2">
+      <div className="mb-4 flex w-full items-center justify-center space-x-2">
         <Button
           className="h-[24px] text-xs"
           onClick={() => setShowFilesDisplay(true)}
@@ -228,31 +229,39 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 }
 
 const RetrievalToggle = ({}) => {
-  const { useRetrieval, setUseRetrieval } = useContext(ChatbotUIContext)
-  return (
-    <WithTooltip
-      delayDuration={300}
-      side="top"
-      display={
-        <div>
-          {useRetrieval
-            ? "File retrieval is enabled for the selected files for this message. Click to disable."
-            : "Click to enable file retrieval for this message."}
-        </div>
-      }
-      trigger={
-        <Button
-          className="h-[24px] w-[100px] justify-between text-xs"
-          onClick={() => setUseRetrieval(prev => !prev)}
-        >
-          <IconCircleFilled
-            className={useRetrieval ? "text-green-500" : "text-red-500"}
-            size={12}
-          />
+  const { useRetrieval, setUseRetrieval, sourceCount } =
+    useContext(ChatbotUIContext)
 
-          <div className="ml-1">{useRetrieval ? "Enabled" : "Disabled"}</div>
-        </Button>
-      }
-    />
+  return (
+    <div className="flex items-center">
+      <WithTooltip
+        delayDuration={300}
+        side="top"
+        display={
+          <div>
+            {useRetrieval
+              ? "File retrieval is enabled on the selected files for this message. Click to disable."
+              : "Click to enable file retrieval for this message."}
+          </div>
+        }
+        trigger={
+          <Button
+            className="h-[24px] w-[120px] text-xs"
+            onClick={() => setUseRetrieval(prev => !prev)}
+          >
+            <IconCircleFilled
+              className={useRetrieval ? "text-green-500" : "text-red-500"}
+              size={12}
+            />
+
+            <div className="ml-1">
+              {useRetrieval ? `Enabled (${sourceCount})` : "Disabled"}
+            </div>
+          </Button>
+        }
+      />
+
+      <ChatRetrievalSettings />
+    </div>
   )
 }

@@ -45,7 +45,8 @@ export const useChatHandler = () => {
     chatFileItems,
     setChatFileItems,
     setToolInUse,
-    useRetrieval
+    useRetrieval,
+    sourceCount
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -120,7 +121,8 @@ export const useChatHandler = () => {
         userInput,
         newMessageFiles,
         chatFiles,
-        chatSettings!.embeddingsProvider
+        chatSettings!.embeddingsProvider,
+        sourceCount
       )
     }
 

@@ -55,14 +55,16 @@ export const handleRetrieval = async (
   userInput: string,
   newMessageFiles: ChatFile[],
   chatFiles: ChatFile[],
-  embeddingsProvider: "openai" | "local"
+  embeddingsProvider: "openai" | "local",
+  sourceCount: number
 ) => {
   const response = await fetch("/api/retrieval/retrieve", {
     method: "POST",
     body: JSON.stringify({
       userInput,
       fileIds: [...newMessageFiles, ...chatFiles].map(file => file.id),
-      embeddingsProvider
+      embeddingsProvider,
+      sourceCount
     })
   })
 

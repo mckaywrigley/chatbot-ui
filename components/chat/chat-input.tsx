@@ -132,7 +132,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}
-          maxRows={20}
+          maxRows={18}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
         />

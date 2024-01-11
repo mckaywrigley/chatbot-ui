@@ -6,10 +6,11 @@ import OpenAI from "openai"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider } = json as {
+  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
     embeddingsProvider: "openai" | "local"
+    sourceCount: number
   }
 
   try {
@@ -25,8 +26,6 @@ export async function POST(request: Request) {
     }
 
     let chunks: any[] = []
-
-    const MATCH_COUNT = 100
 
     if (embeddingsProvider === "openai") {
       const openai = new OpenAI({
@@ -44,7 +43,7 @@ export async function POST(request: Request) {
       const { data: openaiFileItems, error: openaiError } =
         await supabaseAdmin.rpc("match_file_items_openai", {
           query_embedding: openaiEmbedding as any,
-          match_count: MATCH_COUNT,
+          match_count: sourceCount,
           file_ids: fileIds
         })
 
@@ -59,7 +58,7 @@ export async function POST(request: Request) {
       const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {
           query_embedding: localEmbedding as any,
-          match_count: MATCH_COUNT,
+          match_count: sourceCount,
           file_ids: fileIds
         })
 
@@ -70,21 +69,11 @@ export async function POST(request: Request) {
       chunks = localFileItems
     }
 
-    const totalTokenCount = chunks?.reduce(
-      (total, chunk) => total + chunk.tokens,
-      0
+    const mostSimilarChunks = chunks?.sort(
+      (a, b) => b.similarity - a.similarity
     )
 
-    const topThreeSimilar = chunks
-      ?.sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 3)
-
-    const tokenCountTopThree = topThreeSimilar?.reduce(
-      (total, chunk) => total + chunk.tokens,
-      0
-    )
-
-    return new Response(JSON.stringify({ results: topThreeSimilar }), {
+    return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })
   } catch (error: any) {

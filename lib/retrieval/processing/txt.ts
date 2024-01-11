@@ -1,6 +1,6 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { TOKEN_LIMIT } from "."
+import { CHUNK_SIZE } from "."
 
 export const processTxt = async (txt: Blob): Promise<FileItemChunk[]> => {
   const fileBuffer = Buffer.from(await txt.arrayBuffer())
@@ -18,7 +18,7 @@ export const processTxt = async (txt: Blob): Promise<FileItemChunk[]> => {
     content += textChunks[i] + "\n"
     tokens += encode(textChunks[i]).length
 
-    if (tokens >= TOKEN_LIMIT) {
+    if (tokens >= CHUNK_SIZE) {
       chunks.push({ content, tokens })
 
       content = ""

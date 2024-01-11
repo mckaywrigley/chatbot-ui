@@ -1,6 +1,6 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { TOKEN_LIMIT } from "."
+import { CHUNK_SIZE } from "."
 
 export const processMarkdown = async (
   markdown: Blob
@@ -21,7 +21,7 @@ export const processMarkdown = async (
     content += textChunks[i] + "\n"
     tokens += encode(textChunks[i]).length
 
-    if (tokens >= TOKEN_LIMIT) {
+    if (tokens >= CHUNK_SIZE) {
       chunks.push({ content, tokens })
 
       content = ""
