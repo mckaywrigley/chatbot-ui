@@ -16,7 +16,7 @@ import {
   IconUser
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState, useEffect } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Avatar, AvatarImage } from "../ui/avatar"
@@ -37,6 +37,8 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
+
+import { VALID_KEYS } from "@/app/api/retrieval/keys/route"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const { profile, setProfile } = useContext(ChatbotUIContext)
@@ -95,6 +97,56 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [perplexityAPIKey, setPerplexityAPIKey] = useState(
     profile?.perplexity_api_key || ""
   )
+
+  const [isEnvOpenai, setIsEnvOpenai] = useState(false)
+  const [isEnvAnthropic, setIsEnvAnthropic] = useState(false)
+  const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
+  const [isEnvMistral, setIsEnvMistral] = useState(false)
+  const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
+
+  useEffect(() => {
+    async function fetchKeys() {
+      const keys = Object.values(VALID_KEYS)
+
+      keys.forEach(async key => {
+        const response = await fetch("/api/retrieval/keys", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ key })
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          switch (key) {
+            case "OPENAI_API_KEY":
+              setIsEnvOpenai(data.isUsing)
+              break
+            case "ANTHROPIC_API_KEY":
+              setIsEnvAnthropic(data.isUsing)
+              break
+            case "GOOGLE_GEMINI_API_KEY":
+              setIsEnvGoogleGemini(data.isUsing)
+              break
+            case "MISTRAL_API_KEY":
+              setIsEnvMistral(data.isUsing)
+              break
+            case "PERPLEXITY_API_KEY":
+              setIsEnvPerplexity(data.isUsing)
+              break
+            default:
+              console.warn("Unhandled key type:", key)
+              break
+          }
+        } else {
+          console.error("Failed to fetch key status:", key)
+        }
+      })
+    }
+
+    fetchKeys()
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -362,6 +414,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   placeholder={
                     useAzureOpenai ? "Azure OpenAI API Key" : "OpenAI API Key"
                   }
+                  disabled={isEnvOpenai && !useAzureOpenai}
                   type="password"
                   value={useAzureOpenai ? azureOpenaiAPIKey : openaiAPIKey}
                   onChange={e =>
@@ -426,6 +479,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                       <Input
                         placeholder="OpenAI Organization ID (optional)"
+                        disabled={isEnvOpenai}
                         type="password"
                         value={openaiOrgID}
                         onChange={e => setOpenaiOrgID(e.target.value)}
@@ -441,6 +495,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <Input
                   placeholder="Anthropic API Key"
                   type="password"
+                  disabled={isEnvAnthropic}
                   value={anthropicAPIKey}
                   onChange={e => setAnthropicAPIKey(e.target.value)}
                 />
@@ -452,6 +507,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <Input
                   placeholder="Google Gemini API Key"
                   type="password"
+                  disabled={isEnvGoogleGemini}
                   value={googleGeminiAPIKey}
                   onChange={e => setGoogleGeminiAPIKey(e.target.value)}
                 />
@@ -463,6 +519,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <Input
                   placeholder="Mistral API Key"
                   type="password"
+                  disabled={isEnvMistral}
                   value={mistralAPIKey}
                   onChange={e => setMistralAPIKey(e.target.value)}
                 />
@@ -474,6 +531,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <Input
                   placeholder="Perplexity API Key"
                   type="password"
+                  disabled={isEnvPerplexity}
                   value={perplexityAPIKey}
                   onChange={e => setPerplexityAPIKey(e.target.value)}
                 />
