@@ -19,13 +19,25 @@ export const useScroll = () => {
     if (!isGenerating && userScrolled) {
       setUserScrolled(false)
     }
-  }, [isGenerating])
+  }, [isGenerating, userScrolled])
+
+  const scrollToBottom = useCallback(() => {
+    isAutoScrolling.current = true
+
+    setTimeout(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "instant" })
+      }
+
+      isAutoScrolling.current = false
+    }, 0)
+  }, [])
 
   useEffect(() => {
     if (isGenerating && !userScrolled) {
       scrollToBottom()
     }
-  }, [chatMessages])
+  }, [chatMessages, isGenerating, scrollToBottom, userScrolled])
 
   const handleScroll = useCallback((e: any) => {
     const bottom =
@@ -50,18 +62,6 @@ export const useScroll = () => {
     if (messagesStartRef.current) {
       messagesStartRef.current.scrollIntoView({ behavior: "instant" })
     }
-  }, [])
-
-  const scrollToBottom = useCallback(() => {
-    isAutoScrolling.current = true
-
-    setTimeout(() => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "instant" })
-      }
-
-      isAutoScrolling.current = false
-    }, 0)
   }, [])
 
   return {
