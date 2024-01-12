@@ -206,7 +206,8 @@ export const useChatHandler = () => {
       isRegeneration,
       retrievedFileItems,
       setChatMessages,
-      setChatFileItems
+      setChatFileItems,
+      setChatImages
     )
 
     setIsGenerating(false)

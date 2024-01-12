@@ -12,16 +12,7 @@ import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 interface AnnouncementsProps {}
 
 export const Announcements: FC<AnnouncementsProps> = () => {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([
-    {
-      id: "1",
-      title: "Chat Settings Sidebar",
-      content: "It's now easier to change your chat settings during a chat!",
-      read: false,
-      link: "https://www.loom.com/share/ec9c1c58315942568488fc8b72034935?sid=ddf030eb-fb35-418c-9d62-9cd1e8c1b5ea",
-      date: "8/23/23"
-    }
-  ])
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
 
   useEffect(() => {
     // Load announcements from local storage

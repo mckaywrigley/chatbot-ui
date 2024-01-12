@@ -40,12 +40,11 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
   const [selectedImage, setSelectedImage] = useState<MessageImage | null>(null)
   const [showPreview, setShowPreview] = useState(false)
 
-  const combinedImages = [
+  const messageImages = [
     ...newMessageImages.filter(
       image =>
         !chatImages.some(chatImage => chatImage.messageId === image.messageId)
-    ),
-    ...chatImages
+    )
   ]
 
   const combinedChatFiles = [
@@ -55,7 +54,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     ...chatFiles
   ]
 
-  const combinedMessageFiles = [...combinedImages, ...combinedChatFiles]
+  const combinedMessageFiles = [...messageImages, ...combinedChatFiles]
 
   const getLinkAndView = async (file: ChatFile) => {
     const fileRecord = files.find(f => f.id === file.id)
@@ -108,7 +107,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
         <div className="overflow-auto">
           <div className="flex flex-wrap gap-6 truncate pt-2">
-            {combinedImages.map((image, index) => (
+            {messageImages.map((image, index) => (
               <div
                 key={index}
                 className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50"

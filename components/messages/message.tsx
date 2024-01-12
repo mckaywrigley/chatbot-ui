@@ -89,7 +89,11 @@ export const Message: FC<MessageProps> = ({
 
   const handleRegenerate = async () => {
     setIsGenerating(true)
-    await handleSendMessage(editedMessage, chatMessages, true)
+    await handleSendMessage(
+      editedMessage || chatMessages[chatMessages.length - 2].message.content,
+      chatMessages,
+      true
+    )
   }
 
   const handleStartEdit = () => {
@@ -278,7 +282,9 @@ export const Message: FC<MessageProps> = ({
 
         <div className="mt-3 flex flex-wrap gap-2">
           {message.image_paths.map((path, index) => {
-            const item = chatImages.find(image => image.path === path)
+            const item = chatImages.find(
+              image => image.messageId === message.id
+            )
 
             return (
               <Image

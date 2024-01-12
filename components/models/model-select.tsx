@@ -28,7 +28,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   selectedModelId,
   onSelectModel
 }) => {
-  const { profile } = useContext(ChatbotUIContext)
+  const { profile, availableLocalModels } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -72,6 +72,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   if (!profile) return null
 
   const isLocked = isModelLocked(SELECTED_MODEL.provider, profile)
+  const usingLocalModels = availableLocalModels.length > 0
 
   return (
     <DropdownMenu
@@ -124,10 +125,13 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         align="start"
       >
         <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
-          <TabsList defaultValue="hosted" className="grid grid-cols-2">
-            <TabsTrigger value="hosted">Hosted</TabsTrigger>
-            <TabsTrigger value="local">Local</TabsTrigger>
-          </TabsList>
+          {usingLocalModels && (
+            <TabsList defaultValue="hosted" className="grid grid-cols-2">
+              <TabsTrigger value="hosted">Hosted</TabsTrigger>
+
+              <TabsTrigger value="local">Local</TabsTrigger>
+            </TabsList>
+          )}
         </Tabs>
 
         <Input
