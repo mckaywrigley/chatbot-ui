@@ -14,7 +14,6 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     isAtPickerOpen,
     setIsAtPickerOpen,
     atCommand,
-
     focusPrompt,
     focusFile
   } = useContext(ChatbotUIContext)
