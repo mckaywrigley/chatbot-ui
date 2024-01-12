@@ -1,11 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next"
-
 export type KeyTypeT =
   | "OPENAI_API_KEY"
   | "ANTHROPIC_API_KEY"
   | "GOOGLE_GEMINI_API_KEY"
   | "MISTRAL_API_KEY"
   | "PERPLEXITY_API_KEY"
+  | "AZURE_OPENAI_API_KEY"
 
 // returns true if the key is found in the environment variables
 function isUsingEnvironmentKey(type: KeyTypeT) {
@@ -16,7 +15,8 @@ export enum VALID_KEYS {
   ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY",
   GOOGLE_GEMINI_API_KEY = "GOOGLE_GEMINI_API_KEY",
   MISTRAL_API_KEY = "MISTRAL_API_KEY",
-  PERPLEXITY_API_KEY = "PERPLEXITY_API_KEY"
+  PERPLEXITY_API_KEY = "PERPLEXITY_API_KEY",
+  AZURE_OPENAI_API_KEY = "AZURE_OPENAI_API_KEY"
 }
 
 export async function POST(request: Request) {

@@ -103,6 +103,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
   const [isEnvMistral, setIsEnvMistral] = useState(false)
   const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
+  const [isEnvAzureOpenai, setIsEnvAzureOpenai] = useState(false)
 
   useEffect(() => {
     async function fetchKeys() {
@@ -134,6 +135,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               break
             case "PERPLEXITY_API_KEY":
               setIsEnvPerplexity(data.isUsing)
+              break
+            case "AZURE_OPENAI_API_KEY":
+              setIsEnvAzureOpenai(data.isUsing)
               break
             default:
               console.warn("Unhandled key type:", key)
@@ -414,7 +418,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   placeholder={
                     useAzureOpenai ? "Azure OpenAI API Key" : "OpenAI API Key"
                   }
-                  disabled={isEnvOpenai && !useAzureOpenai}
+                  disabled={
+                    useAzureOpenai
+                      ? isEnvAzureOpenai
+                      : isEnvOpenai && !useAzureOpenai
+                  }
                   type="password"
                   value={useAzureOpenai ? azureOpenaiAPIKey : openaiAPIKey}
                   onChange={e =>
@@ -433,6 +441,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                       <Input
                         placeholder="https://your-endpoint.openai.azure.com"
+                        disabled={
+                          process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT
+                            ? true
+                            : false
+                        }
                         type="password"
                         value={azureOpenaiEndpoint}
                         onChange={e => setAzureOpenaiEndpoint(e.target.value)}
@@ -445,6 +458,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <Input
                         placeholder="Azure OpenAI GPT-3.5 Turbo ID"
                         type="password"
+                        disabled={
+                          process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID
+                            ? true
+                            : false
+                        }
                         value={azureOpenai35TurboID}
                         onChange={e => setAzureOpenai35TurboID(e.target.value)}
                       />
@@ -456,6 +474,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <Input
                         placeholder="Azure OpenAI GPT-4.5 Turbo ID"
                         type="password"
+                        disabled={
+                          process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID
+                            ? true
+                            : false
+                        }
                         value={azureOpenai45TurboID}
                         onChange={e => setAzureOpenai45TurboID(e.target.value)}
                       />
@@ -467,6 +490,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <Input
                         placeholder="Azure OpenAI GPT-4.5 Vision ID"
                         type="password"
+                        disabled={
+                          process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID
+                            ? true
+                            : false
+                        }
                         value={azureOpenai45VisionID}
                         onChange={e => setAzureOpenai45VisionID(e.target.value)}
                       />
