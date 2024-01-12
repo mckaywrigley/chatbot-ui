@@ -507,7 +507,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                       <Input
                         placeholder="OpenAI Organization ID (optional)"
-                        disabled={isEnvOpenai}
+                        disabled={
+                          process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION_ID
+                            ? true
+                            : false
+                        }
                         type="password"
                         value={openaiOrgID}
                         onChange={e => setOpenaiOrgID(e.target.value)}
