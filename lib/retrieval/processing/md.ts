@@ -1,6 +1,7 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processMarkdown = async (
   markdown: Blob
@@ -10,8 +11,8 @@ export const processMarkdown = async (
   const textContent = textDecoder.decode(fileBuffer)
 
   const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-    chunkSize: 4000,
-    chunkOverlap: 0
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP
   })
 
   const splitDocs = await splitter.createDocuments([textContent])

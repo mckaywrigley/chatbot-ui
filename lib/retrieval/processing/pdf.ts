@@ -2,6 +2,7 @@ import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { PDFLoader } from "langchain/document_loaders/fs/pdf"
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processPdf = async (pdf: Blob): Promise<FileItemChunk[]> => {
   const loader = new PDFLoader(pdf)
@@ -9,8 +10,8 @@ export const processPdf = async (pdf: Blob): Promise<FileItemChunk[]> => {
   let completeText = docs.map(doc => doc.pageContent).join(" ")
 
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 4000,
-    chunkOverlap: 400
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP
   })
   const splitDocs = await splitter.createDocuments([completeText])
 
