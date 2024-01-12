@@ -1,6 +1,7 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { TOKEN_LIMIT } from "."
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processMarkdown = async (
   markdown: Blob
@@ -9,28 +10,22 @@ export const processMarkdown = async (
   const textDecoder = new TextDecoder("utf-8")
   const textContent = textDecoder.decode(fileBuffer)
 
+  const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP
+  })
+
+  const splitDocs = await splitter.createDocuments([textContent])
+
   let chunks: FileItemChunk[] = []
 
-  let content = ""
-  let tokens = 0
+  for (let i = 0; i < splitDocs.length; i++) {
+    const doc = splitDocs[i]
 
-  // TODO: change splitter
-  const textChunks = textContent.split("\n") || []
-
-  for (let i = 0; i < textChunks.length; i++) {
-    content += textChunks[i] + "\n"
-    tokens += encode(textChunks[i]).length
-
-    if (tokens >= TOKEN_LIMIT) {
-      chunks.push({ content, tokens })
-
-      content = ""
-      tokens = 0
-    }
-  }
-
-  if (content !== "") {
-    chunks.push({ content, tokens: encode(content).length })
+    chunks.push({
+      content: doc.pageContent,
+      tokens: encode(doc.pageContent).length
+    })
   }
 
   return chunks

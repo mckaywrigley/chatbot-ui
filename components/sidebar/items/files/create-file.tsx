@@ -1,3 +1,4 @@
+import { ACCEPTED_FILE_TYPES } from "@/components/chat/chat-hooks/use-select-file-handler"
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,8 +18,6 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
-  const ALLOWED_FILES = ["pdf"]
 
   const handleSelectedFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -60,7 +59,7 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
             <Input
               type="file"
               onChange={handleSelectedFile}
-              accept={ALLOWED_FILES.map(file => `.${file}`).join(",")}
+              accept={ACCEPTED_FILE_TYPES}
             />
           </div>
 

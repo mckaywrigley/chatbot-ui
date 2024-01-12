@@ -50,10 +50,10 @@ export async function buildFinalMessages(
     assistant
   )
 
-  const TOKEN_LIMIT = chatSettings.contextLength
+  const CHUNK_SIZE = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
 
-  let remainingTokens = TOKEN_LIMIT - PROMPT_TOKENS
+  let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
 
   let usedTokens = 0
   usedTokens += PROMPT_TOKENS
@@ -197,9 +197,9 @@ export async function buildGoogleGeminiFinalMessages(
   let finalMessages = []
 
   let usedTokens = 0
-  const TOKEN_LIMIT = chatSettings.contextLength
+  const CHUNK_SIZE = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
-  let REMAINING_TOKENS = TOKEN_LIMIT - PROMPT_TOKENS
+  let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
 
   usedTokens += PROMPT_TOKENS
 

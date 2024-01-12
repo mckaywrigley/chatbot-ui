@@ -2,7 +2,6 @@ import {
   IconFile,
   IconFileText,
   IconFileTypeCsv,
-  IconFileTypeDoc,
   IconFileTypeDocx,
   IconFileTypePdf,
   IconJson,
@@ -23,8 +22,6 @@ export const FileIcon: FC<FileIconProps> = ({ type, size = 32 }) => {
     return <IconFileTypePdf size={size} />
   } else if (type.includes("csv")) {
     return <IconFileTypeCsv size={size} />
-  } else if (type.includes("doc")) {
-    return <IconFileTypeDoc size={size} />
   } else if (type.includes("docx")) {
     return <IconFileTypeDocx size={size} />
   } else if (type.includes("plain")) {
