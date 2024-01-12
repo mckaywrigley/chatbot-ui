@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     checkApiKey(profile.openai_api_key, "OpenAI")
 
     const openai = new OpenAI({
+      baseURL: profile.openai_api_base || "https://api.openai.com",
       apiKey: profile.openai_api_key || "",
       organization: profile.openai_organization_id
     })

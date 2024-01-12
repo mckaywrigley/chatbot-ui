@@ -6,14 +6,11 @@ import OpenAI from "openai"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
+  const { userInput, fileIds, embeddingsProvider } = json as {
     userInput: string
     fileIds: string[]
     embeddingsProvider: "openai" | "local"
-    sourceCount: number
   }
-
-  const uniqueFileIds = [...new Set(fileIds)]
 
   try {
     const supabaseAdmin = createClient<Database>(
@@ -29,8 +26,11 @@ export async function POST(request: Request) {
 
     let chunks: any[] = []
 
+    const MATCH_COUNT = 100
+
     if (embeddingsProvider === "openai") {
       const openai = new OpenAI({
+        baseURL: profile.openai_api_base || "https://api.openai.com",
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id
       })
@@ -45,8 +45,8 @@ export async function POST(request: Request) {
       const { data: openaiFileItems, error: openaiError } =
         await supabaseAdmin.rpc("match_file_items_openai", {
           query_embedding: openaiEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
+          match_count: MATCH_COUNT,
+          file_ids: fileIds
         })
 
       if (openaiError) {
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
       const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {
           query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
+          match_count: MATCH_COUNT,
+          file_ids: fileIds
         })
 
       if (localFileItemsError) {
@@ -71,11 +71,21 @@ export async function POST(request: Request) {
       chunks = localFileItems
     }
 
-    const mostSimilarChunks = chunks?.sort(
-      (a, b) => b.similarity - a.similarity
+    const totalTokenCount = chunks?.reduce(
+      (total, chunk) => total + chunk.tokens,
+      0
     )
 
-    return new Response(JSON.stringify({ results: mostSimilarChunks }), {
+    const topThreeSimilar = chunks
+      ?.sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 3)
+
+    const tokenCountTopThree = topThreeSimilar?.reduce(
+      (total, chunk) => total + chunk.tokens,
+      0
+    )
+
+    return new Response(JSON.stringify({ results: topThreeSimilar }), {
       status: 200
     })
   } catch (error: any) {

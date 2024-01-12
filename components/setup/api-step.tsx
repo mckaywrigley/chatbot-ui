@@ -5,6 +5,7 @@ import { Button } from "../ui/button"
 
 interface APIStepProps {
   openaiAPIKey: string
+  openaiAPIBase: string
   openaiOrgID: string
   azureOpenaiAPIKey: string
   azureOpenaiEndpoint: string
@@ -17,6 +18,7 @@ interface APIStepProps {
   perplexityAPIKey: string
   useAzureOpenai: boolean
   onOpenaiAPIKeyChange: (value: string) => void
+  onOpenaiAPIBaseChange: (value: string) => void
   onOpenaiOrgIDChange: (value: string) => void
   onAzureOpenaiAPIKeyChange: (value: string) => void
   onAzureOpenaiEndpointChange: (value: string) => void
@@ -32,6 +34,7 @@ interface APIStepProps {
 
 export const APIStep: FC<APIStepProps> = ({
   openaiAPIKey,
+  openaiAPIBase,
   openaiOrgID,
   azureOpenaiAPIKey,
   azureOpenaiEndpoint,
@@ -44,6 +47,7 @@ export const APIStep: FC<APIStepProps> = ({
   perplexityAPIKey,
   useAzureOpenai,
   onOpenaiAPIKeyChange,
+  onOpenaiAPIBaseChange,
   onOpenaiOrgIDChange,
   onAzureOpenaiAPIKeyChange,
   onAzureOpenaiEndpointChange,
@@ -135,6 +139,16 @@ export const APIStep: FC<APIStepProps> = ({
           </>
         ) : (
           <>
+            <div className="space-y-1">
+              <Label>OpenAI Base URL</Label>
+
+              <Input
+                placeholder="OpenAI BaseURL (optional)"
+                type="text"
+                defaultValue={openaiAPIBase}
+                onChange={e => onOpenaiAPIBaseChange(e.target.value)}
+              />
+            </div>
             <div className="space-y-1">
               <Label>OpenAI Organization ID</Label>
 

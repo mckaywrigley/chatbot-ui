@@ -1,11 +1,12 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import {
-  processCSV,
-  processJSON,
-  processMarkdown,
-  processPdf,
-  processTxt
-} from "@/lib/retrieval/processing"
+import { processCSV } from "@/lib/retrieval/processing/csv"
+import { processDoc } from "@/lib/retrieval/processing/doc"
+import { processDocX } from "@/lib/retrieval/processing/docx"
+import { processHTML } from "@/lib/retrieval/processing/html"
+import { processJSON } from "@/lib/retrieval/processing/json"
+import { processMarkdown } from "@/lib/retrieval/processing/md"
+import { processPdf } from "@/lib/retrieval/processing/pdf"
+import { processTxt } from "@/lib/retrieval/processing/txt"
 import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
@@ -42,6 +43,15 @@ export async function POST(req: Request) {
       case "csv":
         chunks = await processCSV(blob)
         break
+      case "doc":
+        chunks = await processDoc(blob)
+        break
+      case "docx":
+        chunks = await processDocX(blob)
+        break
+      case "html":
+        chunks = await processHTML(blob)
+        break
       case "json":
         chunks = await processJSON(blob)
         break
@@ -64,6 +74,7 @@ export async function POST(req: Request) {
 
     if (embeddingsProvider === "openai") {
       const openai = new OpenAI({
+        baseURL: profile.openai_api_base || "https://api.openai.com",
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id
       })

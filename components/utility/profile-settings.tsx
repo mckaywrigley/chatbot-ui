@@ -65,6 +65,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [openaiAPIKey, setOpenaiAPIKey] = useState(
     profile?.openai_api_key || ""
   )
+  const [openaiAPIBase, setOpenaiAPIBase] = useState(
+    profile?.openai_api_base || ""
+  )
   const [openaiOrgID, setOpenaiOrgID] = useState(
     profile?.openai_organization_id || ""
   )
@@ -121,6 +124,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       image_url: profileImageUrl,
       image_path: profileImagePath,
       openai_api_key: openaiAPIKey,
+      openai_api_base: openaiAPIBase,
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
       google_gemini_api_key: googleGeminiAPIKey,
@@ -421,6 +425,16 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 ) : (
                   <>
+                  <div className="space-y-1">
+                      <Label>OpenAI BaseURL</Label>
+
+                      <Input
+                        placeholder="OpenAI BaseURL"
+                        type="text"
+                        value={openaiAPIBase}
+                        onChange={e => setOpenaiAPIBase(e.target.value)}
+                      />
+                    </div>
                     <div className="space-y-1">
                       <Label>OpenAI Organization ID</Label>
 
