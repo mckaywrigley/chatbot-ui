@@ -119,6 +119,8 @@ export const useSelectFileHandler = () => {
             )
           )
 
+          reader.onloadend = null
+
           return
         } else {
           // Use readAsArrayBuffer for PDFs and readAsText for other types
