@@ -48,7 +48,9 @@ export const useChatHandler = () => {
     setChatFileItems,
     setToolInUse,
     useRetrieval,
-    sourceCount
+    sourceCount,
+    setIsPromptPickerOpen,
+    setIsAtPickerOpen
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -67,6 +69,8 @@ export const useChatHandler = () => {
     setNewMessageFiles([])
     setNewMessageImages([])
     setShowFilesDisplay(false)
+    setIsPromptPickerOpen(false)
+    setIsAtPickerOpen(false)
 
     router.push("/chat")
   }
@@ -91,6 +95,8 @@ export const useChatHandler = () => {
     try {
       setUserInput("")
       setIsGenerating(true)
+      setIsPromptPickerOpen(false)
+      setIsAtPickerOpen(false)
 
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
