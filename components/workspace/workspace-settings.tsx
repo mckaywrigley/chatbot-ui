@@ -46,14 +46,14 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   )
 
   const [defaultChatSettings, setDefaultChatSettings] = useState({
-    model: selectedWorkspace!.default_model,
-    prompt: selectedWorkspace!.default_prompt,
-    temperature: selectedWorkspace!.default_temperature,
-    contextLength: selectedWorkspace!.default_context_length,
-    includeProfileContext: selectedWorkspace!.include_profile_context,
+    model: selectedWorkspace?.default_model,
+    prompt: selectedWorkspace?.default_prompt,
+    temperature: selectedWorkspace?.default_temperature,
+    contextLength: selectedWorkspace?.default_context_length,
+    includeProfileContext: selectedWorkspace?.include_profile_context,
     includeWorkspaceInstructions:
-      selectedWorkspace!.include_workspace_instructions,
-    embeddingsProvider: selectedWorkspace!.embeddings_provider
+      selectedWorkspace?.include_workspace_instructions,
+    embeddingsProvider: selectedWorkspace?.embeddings_provider
   })
 
   const handleSave = async () => {
@@ -74,18 +74,28 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         defaultChatSettings.includeWorkspaceInstructions
     })
 
-    setChatSettings({
-      model: defaultChatSettings.model as LLMID,
-      prompt: defaultChatSettings.prompt,
-      temperature: defaultChatSettings.temperature,
-      contextLength: defaultChatSettings.contextLength,
-      includeProfileContext: defaultChatSettings.includeProfileContext,
-      includeWorkspaceInstructions:
-        defaultChatSettings.includeWorkspaceInstructions,
-      embeddingsProvider: defaultChatSettings.embeddingsProvider as
-        | "openai"
-        | "local"
-    })
+    if (
+      defaultChatSettings.model &&
+      defaultChatSettings.prompt &&
+      defaultChatSettings.temperature &&
+      defaultChatSettings.contextLength &&
+      defaultChatSettings.includeProfileContext &&
+      defaultChatSettings.includeWorkspaceInstructions &&
+      defaultChatSettings.embeddingsProvider
+    ) {
+      setChatSettings({
+        model: defaultChatSettings.model as LLMID,
+        prompt: defaultChatSettings.prompt,
+        temperature: defaultChatSettings.temperature,
+        contextLength: defaultChatSettings.contextLength,
+        includeProfileContext: defaultChatSettings.includeProfileContext,
+        includeWorkspaceInstructions:
+          defaultChatSettings.includeWorkspaceInstructions,
+        embeddingsProvider: defaultChatSettings.embeddingsProvider as
+          | "openai"
+          | "local"
+      })
+    }
 
     setSelectedWorkspace(updatedWorkspace)
     setWorkspaces(workspaces => {
