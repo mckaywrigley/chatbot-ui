@@ -119,25 +119,27 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         })
 
         if (response.ok) {
-          const data = await response.json()
+          const { isUsing } = (await response.json()) as {
+            isUsing: boolean
+          }
           switch (key) {
             case "OPENAI_API_KEY":
-              setIsEnvOpenai(data.isUsing)
+              setIsEnvOpenai(isUsing)
               break
             case "ANTHROPIC_API_KEY":
-              setIsEnvAnthropic(data.isUsing)
+              setIsEnvAnthropic(isUsing)
               break
             case "GOOGLE_GEMINI_API_KEY":
-              setIsEnvGoogleGemini(data.isUsing)
+              setIsEnvGoogleGemini(isUsing)
               break
             case "MISTRAL_API_KEY":
-              setIsEnvMistral(data.isUsing)
+              setIsEnvMistral(isUsing)
               break
             case "PERPLEXITY_API_KEY":
-              setIsEnvPerplexity(data.isUsing)
+              setIsEnvPerplexity(isUsing)
               break
             case "AZURE_OPENAI_API_KEY":
-              setIsEnvAzureOpenai(data.isUsing)
+              setIsEnvAzureOpenai(isUsing)
               break
             default:
               console.warn("Unhandled key type:", key)

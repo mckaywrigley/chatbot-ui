@@ -19,6 +19,15 @@ export enum VALID_KEYS {
   AZURE_OPENAI_API_KEY = "AZURE_OPENAI_API_KEY"
 }
 
+function createResponse(data: object, status: number): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+}
+
 export async function POST(request: Request) {
   const json = await request.json()
   const { key } = json as {
@@ -26,28 +35,13 @@ export async function POST(request: Request) {
   }
 
   if (!key) {
-    return new Response(JSON.stringify({ error: "Key type is required" }), {
-      status: 400,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+    return createResponse({ error: "Key type is required" }, 400)
   }
 
   if (!(key in VALID_KEYS)) {
-    return new Response(JSON.stringify({ error: "Invalid key type" }), {
-      status: 400,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+    return createResponse({ error: "Invalid key type" }, 400)
   }
 
   const isUsing = isUsingEnvironmentKey(key as KeyTypeT)
-  return new Response(JSON.stringify({ isUsing }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
+  return createResponse({ isUsing }, 200)
 }
