@@ -57,6 +57,7 @@ export const getFileWorkspacesByFileId = async (fileId: string) => {
   return file
 }
 
+// For non-docx files
 export const createFile = async (
   file: File,
   fileRecord: TablesInsert<"files">,
@@ -97,6 +98,63 @@ export const createFile = async (
   const response = await fetch("/api/retrieval/process", {
     method: "POST",
     body: formData
+  })
+
+  if (!response.ok) {
+    toast.error("Failed to process file.")
+    await deleteFile(createdFile.id)
+  }
+
+  const fetchedFile = await getFileById(createdFile.id)
+
+  return fetchedFile
+}
+
+// // Handle docx files
+export const createDocXFile = async (
+  text: string,
+  file: File,
+  fileRecord: TablesInsert<"files">,
+  workspace_id: string,
+  embeddingsProvider: "openai" | "local"
+) => {
+  const { data: createdFile, error } = await supabase
+    .from("files")
+    .insert([fileRecord])
+    .select("*")
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  await createFileWorkspace({
+    user_id: createdFile.user_id,
+    file_id: createdFile.id,
+    workspace_id
+  })
+
+  const filePath = await uploadFile(file, {
+    name: createdFile.name,
+    user_id: createdFile.user_id,
+    file_id: createdFile.name
+  })
+
+  await updateFile(createdFile.id, {
+    file_path: filePath
+  })
+
+  const response = await fetch("/api/retrieval/process/docx", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: text,
+      fileId: createdFile.id,
+      embeddingsProvider,
+      fileExtension: "docx"
+    })
   })
 
   if (!response.ok) {
