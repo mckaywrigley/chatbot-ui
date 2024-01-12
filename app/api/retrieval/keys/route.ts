@@ -1,22 +1,9 @@
-export type KeyTypeT =
-  | "OPENAI_API_KEY"
-  | "ANTHROPIC_API_KEY"
-  | "GOOGLE_GEMINI_API_KEY"
-  | "MISTRAL_API_KEY"
-  | "PERPLEXITY_API_KEY"
-  | "AZURE_OPENAI_API_KEY"
+import { KeyTypeT } from "@/types/key-type"
+import { VALID_KEYS } from "@/types/valid-keys"
 
 // returns true if the key is found in the environment variables
 function isUsingEnvironmentKey(type: KeyTypeT) {
   return Boolean(process.env[type])
-}
-export enum VALID_KEYS {
-  OPENAI_API_KEY = "OPENAI_API_KEY",
-  ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY",
-  GOOGLE_GEMINI_API_KEY = "GOOGLE_GEMINI_API_KEY",
-  MISTRAL_API_KEY = "MISTRAL_API_KEY",
-  PERPLEXITY_API_KEY = "PERPLEXITY_API_KEY",
-  AZURE_OPENAI_API_KEY = "AZURE_OPENAI_API_KEY"
 }
 
 function createResponse(data: object, status: number): Response {

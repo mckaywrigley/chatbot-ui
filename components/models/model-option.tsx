@@ -13,7 +13,7 @@ interface ModelOptionProps {
 
 export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
   const { profile } = useContext(ChatbotUIContext)
-  const [isLocked, setIsLocked] = useState<Boolean | null>(null)
+  const [isLocked, setIsLocked] = useState<Boolean>(true)
 
   useEffect(() => {
     async function setup() {

@@ -38,7 +38,7 @@ import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
-import { VALID_KEYS } from "@/app/api/retrieval/keys/route"
+import { VALID_KEYS } from "@/types/valid-keys"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const { profile, setProfile } = useContext(ChatbotUIContext)

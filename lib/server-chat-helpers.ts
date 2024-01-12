@@ -1,7 +1,7 @@
 import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import { VALID_KEYS } from "@/app/api/retrieval/keys/route"
+import { VALID_KEYS } from "@/types/valid-keys"
 
 export async function getServerProfile() {
   const cookieStore = cookies()

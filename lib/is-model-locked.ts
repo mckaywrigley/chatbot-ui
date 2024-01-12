@@ -1,6 +1,6 @@
 import { Tables } from "@/supabase/types"
 import { ModelProvider } from "@/types"
-import { VALID_KEYS } from "@/app/api/retrieval/keys/route"
+import { VALID_KEYS } from "@/types/valid-keys"
 
 export const isModelLocked = async (
   provider: ModelProvider,
