@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { COLLECTION_DESCRIPTION_MAX, COLLECTION_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { CollectionFile } from "@/types"
@@ -16,23 +15,19 @@ interface CollectionItemProps {
 export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   const [name, setName] = useState(collection.name)
   const [description, setDescription] = useState(collection.description)
-  const [selectedCollectionFiles, setSelectedCollectionFiles] = useState<
-    CollectionFile[]
-  >([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const collectionFiles = await getCollectionFilesByCollectionId(
-        collection.id
-      )
-      const files = collectionFiles.files
-      setSelectedCollectionFiles(files)
-    }
+    const fetchData = async () => {}
 
     fetchData()
   }, [])
 
-  const handleFileSelect = (file: CollectionFile) => {
+  const handleFileSelect = (
+    file: CollectionFile,
+    setSelectedCollectionFiles: React.Dispatch<
+      React.SetStateAction<CollectionFile[]>
+    >
+  ) => {
     setSelectedCollectionFiles(prevState => {
       const isFileAlreadySelected = prevState.find(
         selectedFile => selectedFile.id === file.id
@@ -51,46 +46,75 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       contentType="collections"
       icon={<IconBooks size={30} />}
       updateState={{
-        collectionFilesToAdd: [],
-        collectionFilesToRemove: [],
         name,
-        description,
-        image_path: ""
+        description
       }}
-      renderInputs={() => (
-        <>
-          <div className="space-y-1">
-            <Label>Files</Label>
+      renderInputs={(renderState: {
+        startingCollectionFiles: CollectionFile[]
+        setStartingCollectionFiles: React.Dispatch<
+          React.SetStateAction<CollectionFile[]>
+        >
+        selectedCollectionFiles: CollectionFile[]
+        setSelectedCollectionFiles: React.Dispatch<
+          React.SetStateAction<CollectionFile[]>
+        >
+      }) => {
+        return (
+          <>
+            <div className="space-y-1">
+              <Label>Files</Label>
 
-            <CollectionFilePicker
-              selectedCollectionFiles={selectedCollectionFiles}
-              onCollectionFileSelect={handleFileSelect}
-            />
-          </div>
+              <CollectionFilePicker
+                selectedCollectionFiles={
+                  renderState.selectedCollectionFiles.length === 0
+                    ? renderState.startingCollectionFiles
+                    : [
+                        ...renderState.startingCollectionFiles.filter(
+                          startingFile =>
+                            !renderState.selectedCollectionFiles.some(
+                              selectedFile =>
+                                selectedFile.id === startingFile.id
+                            )
+                        ),
+                        ...renderState.selectedCollectionFiles.filter(
+                          selectedFile =>
+                            !renderState.startingCollectionFiles.some(
+                              startingFile =>
+                                startingFile.id === selectedFile.id
+                            )
+                        )
+                      ]
+                }
+                onCollectionFileSelect={file =>
+                  handleFileSelect(file, renderState.setSelectedCollectionFiles)
+                }
+              />
+            </div>
 
-          <div className="space-y-1">
-            <Label>Name</Label>
+            <div className="space-y-1">
+              <Label>Name</Label>
 
-            <Input
-              placeholder="Collection name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={COLLECTION_NAME_MAX}
-            />
-          </div>
+              <Input
+                placeholder="Collection name..."
+                value={name}
+                onChange={e => setName(e.target.value)}
+                maxLength={COLLECTION_NAME_MAX}
+              />
+            </div>
 
-          <div className="space-y-1">
-            <Label>Description</Label>
+            <div className="space-y-1">
+              <Label>Description</Label>
 
-            <Input
-              placeholder="Collection description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={COLLECTION_DESCRIPTION_MAX}
-            />
-          </div>
-        </>
-      )}
+              <Input
+                placeholder="Collection description..."
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                maxLength={COLLECTION_DESCRIPTION_MAX}
+              />
+            </div>
+          </>
+        )
+      }}
     />
   )
 }

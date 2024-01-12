@@ -45,8 +45,6 @@ export const usePromptAndCommand = () => {
   }
 
   const handleSelectUserFile = async (file: Tables<"files">) => {
-    console.log("file", file)
-
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
