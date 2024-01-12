@@ -7,7 +7,7 @@ import {
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useRef } from "react"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -36,8 +36,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isAtPickerOpen,
     setFocusFile,
-    newMessageImages,
-    setNewMessageImages,
     chatSettings
   } = useContext(ChatbotUIContext)
 
@@ -47,8 +45,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
-
-  const [isTextareaFocused, setTextareaFocused] = useState(false)
 
   const { handleInputChange } = usePromptAndCommand()
 
@@ -128,7 +124,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Send a message... (Use @ to reference files, / to reference prompts)"
+          placeholder={`Ask anything. Type "@" for files. Type "/" for prompts.`}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

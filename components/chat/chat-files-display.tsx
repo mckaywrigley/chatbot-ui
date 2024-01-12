@@ -1,6 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getFileFromStorage } from "@/db/storage/files"
 import useHotkey from "@/lib/hooks/use-hotkey"
+import { cn } from "@/lib/utils"
 import { ChatFile, MessageImage } from "@/types"
 import {
   IconCircleFilled,
@@ -98,21 +99,23 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       )}
 
       <div className="space-y-2">
-        <div className="flex w-full items-center justify-center space-x-2">
+        <div className="flex w-full items-center justify-center">
           <Button
-            className="w-[100px]] h-[24px] text-xs"
+            className="flex h-[32px] w-[140px] space-x-2"
             onClick={() => setShowFilesDisplay(false)}
           >
-            Hide files
-          </Button>
-
-          {(chatFiles.length > 0 || newMessageFiles.length > 0) && (
             <RetrievalToggle />
-          )}
+
+            <div>Hide files</div>
+
+            <div onClick={e => e.stopPropagation()}>
+              <ChatRetrievalSettings />
+            </div>
+          </Button>
         </div>
 
         <div className="overflow-auto">
-          <div className="flex flex-wrap gap-6 truncate pt-2">
+          <div className="flex flex-wrap gap-2 truncate pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
@@ -225,53 +228,56 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     combinedMessageFiles.length > 0 && (
       <div className="mb-4 flex w-full items-center justify-center space-x-2">
         <Button
-          className="h-[24px] text-xs"
+          className="flex h-[32px] w-[140px] space-x-2"
           onClick={() => setShowFilesDisplay(true)}
         >
-          View {combinedMessageFiles.length} file
-          {combinedMessageFiles.length > 1 ? "s" : ""}
-        </Button>
+          <RetrievalToggle />
 
-        <RetrievalToggle />
+          <div>
+            {" "}
+            View {combinedMessageFiles.length} file
+            {combinedMessageFiles.length > 1 ? "s" : ""}
+          </div>
+
+          <div onClick={e => e.stopPropagation()}>
+            <ChatRetrievalSettings />
+          </div>
+        </Button>
       </div>
     )
   )
 }
 
 const RetrievalToggle = ({}) => {
-  const { useRetrieval, setUseRetrieval, sourceCount } =
-    useContext(ChatbotUIContext)
+  const { useRetrieval, setUseRetrieval } = useContext(ChatbotUIContext)
 
   return (
     <div className="flex items-center">
       <WithTooltip
-        delayDuration={300}
+        delayDuration={0}
         side="top"
         display={
           <div>
             {useRetrieval
-              ? "File retrieval is enabled on the selected files for this message. Click to disable."
-              : "Click to enable file retrieval for this message."}
+              ? "File retrieval is enabled on the selected files for this message. Click the indicator to disable."
+              : "Click the indicator to enable file retrieval for this message."}
           </div>
         }
         trigger={
-          <Button
-            className="h-[24px] w-[120px] text-xs"
-            onClick={() => setUseRetrieval(prev => !prev)}
-          >
-            <IconCircleFilled
-              className={useRetrieval ? "text-green-500" : "text-red-500"}
-              size={12}
-            />
-
-            <div className="ml-1">
-              {useRetrieval ? `Enabled (${sourceCount})` : "Disabled"}
-            </div>
-          </Button>
+          <IconCircleFilled
+            className={cn(
+              "p-1",
+              useRetrieval ? "text-green-500" : "text-red-500",
+              useRetrieval ? "hover:text-green-200" : "hover:text-red-200"
+            )}
+            size={24}
+            onClick={e => {
+              e.stopPropagation()
+              setUseRetrieval(prev => !prev)
+            }}
+          />
         }
       />
-
-      <ChatRetrievalSettings />
     </div>
   )
 }
