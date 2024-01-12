@@ -1,4 +1,3 @@
-import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
@@ -20,8 +19,6 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   const [selectedCollectionFiles, setSelectedCollectionFiles] = useState<
     CollectionFile[]
   >([])
-  const [selectedImage, setSelectedImage] = useState<File | null>(null)
-  const [imageLink, setImageLink] = useState("")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,11 +51,11 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       contentType="collections"
       icon={<IconBooks size={30} />}
       updateState={{
-        image: selectedImage,
         collectionFilesToAdd: [],
         collectionFilesToRemove: [],
         name,
-        description
+        description,
+        image_path: ""
       }}
       renderInputs={() => (
         <>
@@ -68,19 +65,6 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
             <CollectionFilePicker
               selectedCollectionFiles={selectedCollectionFiles}
               onCollectionFileSelect={handleFileSelect}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Image</Label>
-
-            <ImagePicker
-              src={imageLink}
-              image={selectedImage}
-              onSrcChange={setImageLink}
-              onImageChange={setSelectedImage}
-              width={100}
-              height={100}
             />
           </div>
 

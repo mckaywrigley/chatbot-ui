@@ -22,6 +22,7 @@ import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext, useRef, useState } from "react"
+import { toast } from "sonner"
 
 interface SidebarCreateItemProps {
   isOpen: boolean
@@ -81,7 +82,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       } & Tables<"collections">,
       workspaceId: string
     ) => {
-      const { collectionFiles, image, ...rest } = createState
+      const { collectionFiles, ...rest } = createState
 
       const createdCollection = await createCollection(rest, workspaceId)
 
@@ -142,21 +143,26 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   const handleCreate = async () => {
-    if (!selectedWorkspace) return
+    try {
+      if (!selectedWorkspace) return
 
-    const createFunction = createFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
+      const createFunction = createFunctions[contentType]
+      const setStateFunction = stateUpdateFunctions[contentType]
 
-    if (!createFunction || !setStateFunction) return
+      if (!createFunction || !setStateFunction) return
 
-    setCreating(true)
+      setCreating(true)
 
-    const newItem = await createFunction(createState, selectedWorkspace.id)
+      const newItem = await createFunction(createState, selectedWorkspace.id)
 
-    setStateFunction((prevItems: any) => [...prevItems, newItem])
+      setStateFunction((prevItems: any) => [...prevItems, newItem])
 
-    onOpenChange(false)
-    setCreating(false)
+      onOpenChange(false)
+      setCreating(false)
+    } catch (error) {
+      toast.error(`Error creating ${contentType.slice(0, -1)}. ${error}.`)
+      setCreating(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

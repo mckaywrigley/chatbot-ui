@@ -7,7 +7,7 @@ import {
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useRef } from "react"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -36,8 +36,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isAtPickerOpen,
     setFocusFile,
-    newMessageImages,
-    setNewMessageImages,
     chatSettings
   } = useContext(ChatbotUIContext)
 
@@ -47,8 +45,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
-
-  const [isTextareaFocused, setTextareaFocused] = useState(false)
 
   const { handleInputChange } = usePromptAndCommand()
 

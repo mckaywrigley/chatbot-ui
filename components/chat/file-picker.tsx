@@ -25,7 +25,8 @@ export const FilePicker: FC<FilePickerProps> = ({
   onSelectCollection,
   isFocused
 }) => {
-  const { files, collections } = useContext(ChatbotUIContext)
+  const { files, collections, chatFiles, newMessageFiles } =
+    useContext(ChatbotUIContext)
 
   useEffect(() => {
     firstFileRef.current?.focus()
