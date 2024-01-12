@@ -1,5 +1,4 @@
 export * from "./csv"
-export * from "./doc"
 export * from "./docx"
 export * from "./json"
 export * from "./md"

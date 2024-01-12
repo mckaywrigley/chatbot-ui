@@ -13,6 +13,8 @@ export async function POST(request: Request) {
     sourceCount: number
   }
 
+  const uniqueFileIds = [...new Set(fileIds)]
+
   try {
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
         await supabaseAdmin.rpc("match_file_items_openai", {
           query_embedding: openaiEmbedding as any,
           match_count: sourceCount,
-          file_ids: fileIds
+          file_ids: uniqueFileIds
         })
 
       if (openaiError) {
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
         await supabaseAdmin.rpc("match_file_items_local", {
           query_embedding: localEmbedding as any,
           match_count: sourceCount,
-          file_ids: fileIds
+          file_ids: uniqueFileIds
         })
 
       if (localFileItemsError) {
