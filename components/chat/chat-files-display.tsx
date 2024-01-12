@@ -6,7 +6,6 @@ import {
   IconCircleFilled,
   IconFileFilled,
   IconFileTypeCsv,
-  IconFileTypeDoc,
   IconFileTypeDocx,
   IconFileTypePdf,
   IconFileTypeTxt,
@@ -193,8 +192,6 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                           return <IconJson />
                         case "csv":
                           return <IconFileTypeCsv />
-                        case "doc":
-                          return <IconFileTypeDoc />
                         case "docx":
                           return <IconFileTypeDocx />
                         default:
