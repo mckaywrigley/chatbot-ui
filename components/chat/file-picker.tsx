@@ -25,7 +25,8 @@ export const FilePicker: FC<FilePickerProps> = ({
   onSelectCollection,
   isFocused
 }) => {
-  const { files, collections } = useContext(ChatbotUIContext)
+  const { files, collections, chatFiles, newMessageFiles } =
+    useContext(ChatbotUIContext)
 
   useEffect(() => {
     firstFileRef.current?.focus()
@@ -60,16 +61,22 @@ export const FilePicker: FC<FilePickerProps> = ({
   }
 
   const getKeyDownHandler =
-    (index: number) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+    (index: number, type: "file" | "collection", item: any) =>
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Backspace") {
         e.preventDefault()
       } else if (e.key === "Enter") {
         e.preventDefault()
-        handleSelectFile(filteredFiles[index])
+
+        if (type === "file") {
+          handleSelectFile(item)
+        } else {
+          handleSelectCollection(item)
+        }
       } else if (
         e.key === "Tab" &&
         !e.shiftKey &&
-        index === filteredFiles.length
+        index === filteredFiles.length + filteredCollections.length - 1
       ) {
         e.preventDefault()
         firstFileRef.current?.focus()
@@ -99,7 +106,13 @@ export const FilePicker: FC<FilePickerProps> = ({
                       handleSelectCollection(item)
                     }
                   }}
-                  onKeyDown={getKeyDownHandler(index)}
+                  onKeyDown={e =>
+                    getKeyDownHandler(
+                      index,
+                      "type" in item ? "file" : "collection",
+                      item
+                    )(e)
+                  }
                 >
                   {"type" in item ? (
                     <FileIcon type={(item as Tables<"files">).type} size={32} />

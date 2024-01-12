@@ -8,17 +8,21 @@ interface ChatCommandInputProps {}
 
 export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   const {
+    newMessageFiles,
     chatFiles,
     slashCommand,
     isAtPickerOpen,
     setIsAtPickerOpen,
     atCommand,
-
     focusPrompt,
     focusFile
   } = useContext(ChatbotUIContext)
 
-  const { handleSelectPrompt, handleSelectUserFile } = usePromptAndCommand()
+  const {
+    handleSelectPrompt,
+    handleSelectUserFile,
+    handleSelectUserCollection
+  } = usePromptAndCommand()
 
   return (
     <>
@@ -32,10 +36,12 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         isOpen={isAtPickerOpen}
         searchQuery={atCommand}
         onOpenChange={setIsAtPickerOpen}
-        selectedFileIds={chatFiles.map(file => file.id)}
+        selectedFileIds={[...newMessageFiles, ...chatFiles].map(
+          file => file.id
+        )}
         selectedCollectionIds={[]}
         onSelectFile={handleSelectUserFile}
-        onSelectCollection={() => {}}
+        onSelectCollection={handleSelectUserCollection}
         isFocused={focusFile}
       />
     </>
