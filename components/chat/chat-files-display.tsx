@@ -5,8 +5,14 @@ import { ChatFile, MessageImage } from "@/types"
 import {
   IconCircleFilled,
   IconFileFilled,
+  IconFileTypeCsv,
+  IconFileTypeDoc,
+  IconFileTypeDocx,
   IconFileTypePdf,
+  IconFileTypeTxt,
+  IconJson,
   IconLoader2,
+  IconMarkdown,
   IconX
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -92,7 +98,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         />
       )}
 
-      <div className="space-y-5">
+      <div className="space-y-2">
         <div className="flex w-full items-center justify-center space-x-2">
           <Button
             className="w-[100px]] h-[24px] text-xs"
@@ -179,6 +185,18 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                       switch (fileExtension) {
                         case "pdf":
                           return <IconFileTypePdf />
+                        case "markdown":
+                          return <IconMarkdown />
+                        case "txt":
+                          return <IconFileTypeTxt />
+                        case "json":
+                          return <IconJson />
+                        case "csv":
+                          return <IconFileTypeCsv />
+                        case "doc":
+                          return <IconFileTypeDoc />
+                        case "docx":
+                          return <IconFileTypeDocx />
                         default:
                           return <IconFileFilled />
                       }
@@ -187,11 +205,6 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
                   <div className="truncate text-sm">
                     <div className="truncate">{file.name}</div>
-                    <div className="truncate opacity-50">
-                      {file.type.includes("/")
-                        ? file.type.split("/")[1].toUpperCase()
-                        : file.type.toUpperCase()}
-                    </div>
                   </div>
 
                   <IconX

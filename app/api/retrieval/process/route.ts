@@ -1,12 +1,13 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { processCSV } from "@/lib/retrieval/processing/csv"
-import { processDoc } from "@/lib/retrieval/processing/doc"
-import { processDocX } from "@/lib/retrieval/processing/docx"
-import { processHTML } from "@/lib/retrieval/processing/html"
-import { processJSON } from "@/lib/retrieval/processing/json"
-import { processMarkdown } from "@/lib/retrieval/processing/md"
-import { processPdf } from "@/lib/retrieval/processing/pdf"
-import { processTxt } from "@/lib/retrieval/processing/txt"
+import {
+  processCSV,
+  processDoc,
+  processDocX,
+  processJSON,
+  processMarkdown,
+  processPdf,
+  processTxt
+} from "@/lib/retrieval/processing"
 import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
@@ -48,9 +49,6 @@ export async function POST(req: Request) {
         break
       case "docx":
         chunks = await processDocX(blob)
-        break
-      case "html":
-        chunks = await processHTML(blob)
         break
       case "json":
         chunks = await processJSON(blob)

@@ -285,10 +285,10 @@ export const Message: FC<MessageProps> = ({
                           })()}
                         </div>
 
-                        <div className="w-fit space-y-1 text-wrap text-xs">
-                          <div>{parentFile?.name}</div>
+                        <div className="w-fit space-y-1 truncate text-wrap text-xs">
+                          <div className="truncate">{parentFile?.name}</div>
 
-                          <div className="text-xs opacity-50">
+                          <div className="truncate text-xs opacity-50">
                             {fileItem.content.substring(0, 60)}...
                           </div>
                         </div>

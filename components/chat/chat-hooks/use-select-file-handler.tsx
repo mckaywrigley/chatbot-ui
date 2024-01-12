@@ -5,14 +5,13 @@ import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
 
 export const ACCEPTED_FILE_TYPES = [
-  // "text/csv", // TODO: Add support for CSVs
+  "text/csv",
   // "application/msword", // TODO: Add support for DOCs
   // "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // TODO: Add support for DOCXs
-  // "text/html", // TODO: Add support for HTML
-  // "application/json", // TODO: Add support for JSON
-  // "text/markdown", // TODO: Add support for Markdown
-  "application/pdf"
-  // "text/plain" // TODO: Add support for TXT
+  "application/json",
+  "text/markdown",
+  "application/pdf",
+  "text/plain"
 ].join(",")
 
 export const useSelectFileHandler = () => {
