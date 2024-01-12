@@ -17,6 +17,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   const [name, setName] = useState(file.name)
   const [description, setDescription] = useState(file.description)
   const { setNewMessageFiles } = useContext(ChatbotUIContext)
+  const [showUseFile, setShowUseFile] = useState(false)
 
   const getLinkAndView = async () => {
     const link = await getFileFromStorage(file.file_path)
@@ -24,11 +25,34 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   }
 
   return (
-    <div className="flex flex-row">
+    <div
+      className="m-0 p-0"
+      onMouseEnter={() => setShowUseFile(true)}
+      onMouseLeave={() => setShowUseFile(false)}
+    >
       <SidebarItem
         item={file}
         contentType="files"
-        icon={<FileIcon type={file.type} size={30} />}
+        icon={
+          showUseFile ? (
+            <span
+              className="text-white"
+              onClick={e => {
+                e.stopPropagation()
+                const chatFile = {
+                  id: file.id,
+                  name: file.name,
+                  type: file.type
+                } as ChatFile
+                setNewMessageFiles(prev => [...prev, chatFile])
+              }}
+            >
+              Use
+            </span>
+          ) : (
+            <FileIcon type={file.type} size={30} />
+          )
+        }
         updateState={{ name }}
         renderInputs={() => (
           <>
@@ -71,20 +95,6 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
           </>
         )}
       />
-      <span
-        className="mt-3 hover:cursor-pointer"
-        onClick={e => {
-          e.stopPropagation()
-          const chatFile = {
-            id: file.id,
-            name: file.name,
-            type: file.type
-          } as ChatFile
-          setNewMessageFiles(prev => [...prev, chatFile])
-        }}
-      >
-        Use
-      </span>
     </div>
   )
 }
