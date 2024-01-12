@@ -7,6 +7,7 @@ import { Tables } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
 import { ChatbotUIContext } from "@/context/context"
+import { ChatFile } from "@/types"
 
 interface FileItemProps {
   file: Tables<"files">
@@ -74,8 +75,12 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
         className="mt-3 hover:cursor-pointer"
         onClick={e => {
           e.stopPropagation()
-          // @ts-expect-error
-          setNewMessageFiles(prev => [...prev, file])
+          const chatFile = {
+            id: file.id,
+            name: file.name,
+            type: file.type
+          } as ChatFile
+          setNewMessageFiles(prev => [...prev, chatFile])
         }}
       >
         Use
