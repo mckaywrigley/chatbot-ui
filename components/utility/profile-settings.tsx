@@ -16,7 +16,7 @@ import {
   IconUser
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState, useEffect } from "react"
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Avatar, AvatarImage } from "../ui/avatar"
@@ -38,6 +38,7 @@ import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
+import { cn } from "@/lib/utils"
 import { VALID_KEYS } from "@/types/valid-keys"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
@@ -122,6 +123,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           const { isUsing } = (await response.json()) as {
             isUsing: boolean
           }
+
           switch (key) {
             case "OPENAI_API_KEY":
               setIsEnvOpenai(isUsing)
@@ -402,12 +404,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
-                  <div>
-                    {useAzureOpenai ? "Azure OpenAI API Key" : "OpenAI API Key"}
-                  </div>
+                  {useAzureOpenai
+                    ? isEnvAzureOpenai
+                      ? ""
+                      : "Azure OpenAI API Key"
+                    : isEnvOpenai
+                      ? ""
+                      : "OpenAI API Key"}
 
                   <Button
-                    className="ml-3 h-[18px] w-[130px] text-[11px]"
+                    className={cn(
+                      "h-[18px] w-[130px] text-[11px]",
+                      (useAzureOpenai && !isEnvAzureOpenai) ||
+                        (!useAzureOpenai && !isEnvOpenai)
+                        ? "ml-3"
+                        : "mb-3"
+                    )}
                     onClick={() => setUseAzureOpenai(!useAzureOpenai)}
                   >
                     {useAzureOpenai
@@ -416,159 +428,219 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </Button>
                 </Label>
 
-                <Input
-                  placeholder={
-                    useAzureOpenai ? "Azure OpenAI API Key" : "OpenAI API Key"
-                  }
-                  disabled={
-                    useAzureOpenai
-                      ? isEnvAzureOpenai
-                      : isEnvOpenai && !useAzureOpenai
-                  }
-                  type="password"
-                  value={useAzureOpenai ? azureOpenaiAPIKey : openaiAPIKey}
-                  onChange={e =>
-                    useAzureOpenai
-                      ? setAzureOpenaiAPIKey(e.target.value)
-                      : setOpenaiAPIKey(e.target.value)
-                  }
-                />
+                {useAzureOpenai ? (
+                  <>
+                    {isEnvAzureOpenai ? (
+                      <Label>Azure OpenAI API key set by admin.</Label>
+                    ) : (
+                      <Input
+                        placeholder="Azure OpenAI API Key"
+                        type="password"
+                        value={azureOpenaiAPIKey}
+                        onChange={e => setAzureOpenaiAPIKey(e.target.value)}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isEnvOpenai ? (
+                      <Label>OpenAI API key set by admin.</Label>
+                    ) : (
+                      <Input
+                        placeholder="OpenAI API Key"
+                        type="password"
+                        value={openaiAPIKey}
+                        onChange={e => setOpenaiAPIKey(e.target.value)}
+                      />
+                    )}
+                  </>
+                )}
               </div>
 
               <div className="ml-8 space-y-3">
                 {useAzureOpenai ? (
                   <>
-                    <div className="space-y-1">
-                      <Label>Azure OpenAI Endpoint</Label>
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT ? (
+                          <Label className="text-xs">
+                            Azure OpenAI Endpoint set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure OpenAI Endpoint</Label>
 
-                      <Input
-                        placeholder="https://your-endpoint.openai.azure.com"
-                        disabled={
-                          process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT
-                            ? true
-                            : false
-                        }
-                        type="password"
-                        value={azureOpenaiEndpoint}
-                        onChange={e => setAzureOpenaiEndpoint(e.target.value)}
-                      />
-                    </div>
+                            <Input
+                              placeholder="https://your-endpoint.openai.azure.com"
+                              type="password"
+                              value={azureOpenaiEndpoint}
+                              onChange={e =>
+                                setAzureOpenaiEndpoint(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
 
-                    <div className="space-y-1">
-                      <Label>Azure OpenAI GPT-3.5 Turbo ID</Label>
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID ? (
+                          <Label className="text-xs">
+                            Azure OpenAI GPT-3.5 Turbo ID set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure OpenAI GPT-3.5 Turbo ID</Label>
 
-                      <Input
-                        placeholder="Azure OpenAI GPT-3.5 Turbo ID"
-                        type="password"
-                        disabled={
-                          process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID
-                            ? true
-                            : false
-                        }
-                        value={azureOpenai35TurboID}
-                        onChange={e => setAzureOpenai35TurboID(e.target.value)}
-                      />
-                    </div>
+                            <Input
+                              placeholder="Azure OpenAI GPT-3.5 Turbo ID"
+                              type="password"
+                              value={azureOpenai35TurboID}
+                              onChange={e =>
+                                setAzureOpenai35TurboID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
 
-                    <div className="space-y-1">
-                      <Label>Azure OpenAI GPT-4.5 Turbo ID</Label>
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID ? (
+                          <Label className="text-xs">
+                            Azure OpenAI GPT-4.5 Turbo ID set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure OpenAI GPT-4.5 Turbo ID</Label>
 
-                      <Input
-                        placeholder="Azure OpenAI GPT-4.5 Turbo ID"
-                        type="password"
-                        disabled={
-                          process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID
-                            ? true
-                            : false
-                        }
-                        value={azureOpenai45TurboID}
-                        onChange={e => setAzureOpenai45TurboID(e.target.value)}
-                      />
-                    </div>
+                            <Input
+                              placeholder="Azure OpenAI GPT-4.5 Turbo ID"
+                              type="password"
+                              value={azureOpenai45TurboID}
+                              onChange={e =>
+                                setAzureOpenai45TurboID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
 
-                    <div className="space-y-1">
-                      <Label>Azure OpenAI GPT-4.5 Vision ID</Label>
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID ? (
+                          <Label className="text-xs">
+                            Azure OpenAI GPT-4.5 Vision ID set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure OpenAI GPT-4.5 Vision ID</Label>
 
-                      <Input
-                        placeholder="Azure OpenAI GPT-4.5 Vision ID"
-                        type="password"
-                        disabled={
-                          process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID
-                            ? true
-                            : false
-                        }
-                        value={azureOpenai45VisionID}
-                        onChange={e => setAzureOpenai45VisionID(e.target.value)}
-                      />
-                    </div>
+                            <Input
+                              placeholder="Azure OpenAI GPT-4.5 Vision ID"
+                              type="password"
+                              value={azureOpenai45VisionID}
+                              onChange={e =>
+                                setAzureOpenai45VisionID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
                   </>
                 ) : (
                   <>
                     <div className="space-y-1">
-                      <Label>OpenAI Organization ID</Label>
+                      {!!process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION_ID ? (
+                        <Label className="text-xs">
+                          OpenAI Organization ID set by admin.
+                        </Label>
+                      ) : (
+                        <>
+                          <Label>OpenAI Organization ID</Label>
 
-                      <Input
-                        placeholder="OpenAI Organization ID (optional)"
-                        disabled={
-                          process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION_ID
-                            ? true
-                            : false
-                        }
-                        type="password"
-                        value={openaiOrgID}
-                        onChange={e => setOpenaiOrgID(e.target.value)}
-                      />
+                          <Input
+                            placeholder="OpenAI Organization ID (optional)"
+                            disabled={
+                              !!process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION_ID
+                            }
+                            type="password"
+                            value={openaiOrgID}
+                            onChange={e => setOpenaiOrgID(e.target.value)}
+                          />
+                        </>
+                      )}
                     </div>
                   </>
                 )}
               </div>
 
               <div className="space-y-1">
-                <Label>Anthropic API Key</Label>
-
-                <Input
-                  placeholder="Anthropic API Key"
-                  type="password"
-                  disabled={isEnvAnthropic}
-                  value={anthropicAPIKey}
-                  onChange={e => setAnthropicAPIKey(e.target.value)}
-                />
+                {isEnvAnthropic ? (
+                  <Label>Anthropic API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Anthropic API Key</Label>
+                    <Input
+                      placeholder="Anthropic API Key"
+                      type="password"
+                      value={anthropicAPIKey}
+                      onChange={e => setAnthropicAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
 
               <div className="space-y-1">
-                <Label>Google Gemini API Key</Label>
-
-                <Input
-                  placeholder="Google Gemini API Key"
-                  type="password"
-                  disabled={isEnvGoogleGemini}
-                  value={googleGeminiAPIKey}
-                  onChange={e => setGoogleGeminiAPIKey(e.target.value)}
-                />
+                {isEnvGoogleGemini ? (
+                  <Label>Google Gemini API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Google Gemini API Key</Label>
+                    <Input
+                      placeholder="Google Gemini API Key"
+                      type="password"
+                      value={googleGeminiAPIKey}
+                      onChange={e => setGoogleGeminiAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
 
               <div className="space-y-1">
-                <Label>Mistral API Key</Label>
-
-                <Input
-                  placeholder="Mistral API Key"
-                  type="password"
-                  disabled={isEnvMistral}
-                  value={mistralAPIKey}
-                  onChange={e => setMistralAPIKey(e.target.value)}
-                />
+                {isEnvMistral ? (
+                  <Label>Mistral API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Mistral API Key</Label>
+                    <Input
+                      placeholder="Mistral API Key"
+                      type="password"
+                      value={mistralAPIKey}
+                      onChange={e => setMistralAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
 
               <div className="space-y-1">
-                <Label>Perplexity API Key</Label>
-
-                <Input
-                  placeholder="Perplexity API Key"
-                  type="password"
-                  disabled={isEnvPerplexity}
-                  value={perplexityAPIKey}
-                  onChange={e => setPerplexityAPIKey(e.target.value)}
-                />
+                {isEnvPerplexity ? (
+                  <Label>Perplexity API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Perplexity API Key</Label>
+                    <Input
+                      placeholder="Perplexity API Key"
+                      type="password"
+                      value={perplexityAPIKey}
+                      onChange={e => setPerplexityAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
             </TabsContent>
           </Tabs>

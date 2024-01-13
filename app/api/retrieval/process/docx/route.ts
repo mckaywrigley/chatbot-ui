@@ -1,6 +1,6 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { processDocX } from "@/lib/retrieval/processing"
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"

@@ -1,19 +1,7 @@
+import { isUsingEnvironmentKey } from "@/lib/envs"
+import { createResponse } from "@/lib/server/server-utils"
 import { KeyTypeT } from "@/types/key-type"
 import { VALID_KEYS } from "@/types/valid-keys"
-
-// returns true if the key is found in the environment variables
-function isUsingEnvironmentKey(type: KeyTypeT) {
-  return Boolean(process.env[type])
-}
-
-function createResponse(data: object, status: number): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-}
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -30,5 +18,6 @@ export async function POST(request: Request) {
   }
 
   const isUsing = isUsingEnvironmentKey(key as KeyTypeT)
+
   return createResponse({ isUsing }, 200)
 }
