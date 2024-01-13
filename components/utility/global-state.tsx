@@ -248,10 +248,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       const response = await fetch(
         process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
       )
+
       if (!response.ok) {
         throw new Error(`Ollama server is not responding.`)
       }
+
       const data = await response.json()
+
       const localModels = data.models.map((model: any) => ({
         modelId: model.name as LLMID,
         modelName: model.name,
