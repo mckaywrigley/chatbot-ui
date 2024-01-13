@@ -1,32 +1,30 @@
-export const consumeReadableStream = async (
-  stream: ReadableStream<Uint8Array> | null,
-  callback: (chunk: any) => void,
+export async function consumeReadableStream<T>(
+  stream: ReadableStream<T>,
+  callback: (chunk: T) => Promise<void>,
   signal: AbortSignal
-) => {
-  const reader = stream?.getReader()
-  const decoder = new TextDecoder()
+): Promise<void> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
 
-  if (reader) {
-    try {
-      while (true) {
-        if (signal.aborted) {
-          break
-        }
+  signal.addEventListener('abort', () => reader.cancel(), { once: true });
 
-        const { done, value } = await reader.read()
-
-        if (done) {
-          break
-        }
-
-        if (value) {
-          callback(decoder.decode(value))
-        }
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
       }
-    } catch (error) {
-      console.error("Error consuming stream:", error)
-    } finally {
-      reader.releaseLock()
+      if (value) {
+        callback(decoder.decode(value));
+      }
     }
+  } catch (error) {
+    if (signal.aborted) {
+      console.error('Stream reading was aborted:', error);
+    } else {
+      console.error('Error consuming stream:', error);
+    }
+  } finally {
+    reader.releaseLock();
   }
-}
+};
