@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "outDir": "out",
+    "sourceMap": true,
     "plugins": [
       {
         "name": "next"
