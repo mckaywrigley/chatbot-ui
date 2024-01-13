@@ -67,7 +67,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
         e.preventDefault()
         handleSelectPrompt(filteredPrompts[index])
       } else if (
-        e.key === "Tab" &&
+        (e.key === "Tab" || e.key === "ArrowDown") &&
         !e.shiftKey &&
         index === filteredPrompts.length - 1
       ) {
