@@ -1,11 +1,9 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
-import { ChatSettings, MessageImage } from "@/types"
+import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-import { Images, ImageGenerateParams } from "openai/resources/images"
-import { ChatbotUIContext } from "@/context/context"
 
 export const runtime = "edge"
 
