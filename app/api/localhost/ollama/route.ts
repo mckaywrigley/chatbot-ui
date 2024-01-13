@@ -1,7 +1,10 @@
 import { LLM, LLMID } from "@/types"
 
 export async function GET(): Promise<Response> {
-  if (process.env.NODE_ENV !== "production") {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_OLLAMA_URL
+  ) {
     try {
       const response = await fetch(
         process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
