@@ -12,6 +12,10 @@ View the latest demo [here](https://x.com/mckaywrigley/status/173827324228315177
 
 Check back soon for an official hosted version of Chatbot UI.
 
+## Official Desktop App
+
+Check back soon for an official desktop app for Chatbot UI. Just click download & start chatting - no setup required.
+
 ## Support
 
 If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
