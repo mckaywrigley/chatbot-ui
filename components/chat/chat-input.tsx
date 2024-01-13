@@ -65,12 +65,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleSendMessage(userInput, chatMessages, false)
     }
 
-    if (event.key === "Tab" && isPromptPickerOpen) {
+    if (
+      isPromptPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
       event.preventDefault()
       setFocusPrompt(!focusPrompt)
     }
 
-    if (event.key === "Tab" && isAtPickerOpen) {
+    if (
+      isAtPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
       event.preventDefault()
       setFocusFile(!focusFile)
     }

@@ -244,10 +244,27 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const fetchOllamaModels = async () => {
     setLoading(true)
 
-    const response = await fetch("/api/localhost/ollama")
-    const data = await response.json()
-    const localModels: LLM[] = data.localModels
-    setAvailableLocalModels(localModels)
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
+      )
+      if (!response.ok) {
+        throw new Error(`Ollama server is not responding.`)
+      }
+      const data = await response.json()
+      const localModels = data.models.map((model: any) => ({
+        modelId: model.name as LLMID,
+        modelName: model.name,
+        provider: "ollama",
+        hostedId: model.name,
+        platformLink: "https://ollama.ai/library",
+        imageInput: false
+      }))
+
+      setAvailableLocalModels(localModels)
+    } catch (error) {
+      console.warn("Error fetching Ollama models: " + error)
+    }
 
     setLoading(false)
   }
