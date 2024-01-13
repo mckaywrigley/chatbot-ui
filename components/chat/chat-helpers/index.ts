@@ -62,7 +62,8 @@ export const handleRetrieval = async (
     body: JSON.stringify({
       userInput,
       fileIds: [...newMessageFiles, ...chatFiles].map(file => file.id),
-      embeddingsProvider
+      embeddingsProvider,
+      embeddingsCount: 5
     })
   })
 
