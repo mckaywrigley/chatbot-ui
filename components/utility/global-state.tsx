@@ -101,7 +101,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [newMessageFiles, setNewMessageFiles] = useState<ChatFile[]>([])
   const [newMessageImages, setNewMessageImages] = useState<MessageImage[]>([])
   const [showFilesDisplay, setShowFilesDisplay] = useState<boolean>(false)
+
+  // RETIEVAL STORE
   const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
+  const [sourceCount, setSourceCount] = useState<number>(4)
 
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
@@ -241,10 +244,30 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const fetchOllamaModels = async () => {
     setLoading(true)
 
-    const response = await fetch("/api/localhost/ollama")
-    const data = await response.json()
-    const localModels: LLM[] = data.localModels
-    setAvailableLocalModels(localModels)
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
+      )
+
+      if (!response.ok) {
+        throw new Error(`Ollama server is not responding.`)
+      }
+
+      const data = await response.json()
+
+      const localModels = data.models.map((model: any) => ({
+        modelId: model.name as LLMID,
+        modelName: model.name,
+        provider: "ollama",
+        hostedId: model.name,
+        platformLink: "https://ollama.ai/library",
+        imageInput: false
+      }))
+
+      setAvailableLocalModels(localModels)
+    } catch (error) {
+      console.warn("Error fetching Ollama models: " + error)
+    }
 
     setLoading(false)
   }
@@ -338,13 +361,17 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         newMessageFiles,
         newMessageImages,
         showFilesDisplay,
-        useRetrieval,
         setChatFiles,
         setChatImages,
         setNewMessageFiles,
         setNewMessageImages,
         setShowFilesDisplay,
-        setUseRetrieval
+
+        // RETRIEVAL STORE
+        useRetrieval,
+        sourceCount,
+        setUseRetrieval,
+        setSourceCount
       }}
     >
       {children}

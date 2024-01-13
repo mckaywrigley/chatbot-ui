@@ -18,6 +18,11 @@ import {
 } from "@/db/assistants"
 import { updateChat } from "@/db/chats"
 import {
+  createCollectionFile,
+  deleteCollectionFile,
+  getCollectionFilesByCollectionId
+} from "@/db/collection-files"
+import {
   createCollectionWorkspaces,
   deleteCollectionWorkspace,
   getCollectionWorkspacesByCollectionId,
@@ -43,15 +48,17 @@ import {
 } from "@/db/prompts"
 import { uploadAssistantImage } from "@/db/storage/assistant-images"
 import { Tables, TablesUpdate } from "@/supabase/types"
-import { ContentType, DataItemType } from "@/types"
+import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
   item: DataItemType
   contentType: ContentType
   children: React.ReactNode
-  renderInputs: () => JSX.Element
+  renderInputs: (renderState: any) => JSX.Element
   updateState: any
 }
 
@@ -83,17 +90,59 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     Tables<"workspaces">[]
   >([])
 
+  // Collections Render State
+  const [startingCollectionFiles, setStartingCollectionFiles] = useState<
+    CollectionFile[]
+  >([])
+  const [selectedCollectionFiles, setSelectedCollectionFiles] = useState<
+    CollectionFile[]
+  >([])
+
   useEffect(() => {
     if (isOpen) {
       const fetchData = async () => {
-        const workspaces = await fetchSelectedWorkspaces()
-        setStartingWorkspaces(workspaces)
-        setSelectedWorkspaces(workspaces)
+        if (workspaces.length > 1) {
+          const workspaces = await fetchSelectedWorkspaces()
+          setStartingWorkspaces(workspaces)
+          setSelectedWorkspaces(workspaces)
+        }
+
+        const fetchDataFunction = fetchDataFunctions[contentType]
+        if (!fetchDataFunction) return
+        await fetchDataFunction(item.id)
       }
 
       fetchData()
     }
   }, [isOpen])
+
+  const renderState = {
+    chats: null,
+    presets: null,
+    prompts: null,
+    files: null,
+    collections: {
+      startingCollectionFiles,
+      setStartingCollectionFiles,
+      selectedCollectionFiles,
+      setSelectedCollectionFiles
+    },
+    assistants: null
+  }
+
+  const fetchDataFunctions = {
+    chats: null,
+    presets: null,
+    prompts: null,
+    files: null,
+    collections: async (collectionId: string) => {
+      const collectionFiles =
+        await getCollectionFilesByCollectionId(collectionId)
+      setStartingCollectionFiles(collectionFiles.files)
+      setSelectedCollectionFiles([])
+    },
+    assistants: null
+  }
 
   const fetchWorkpaceFunctions = {
     chats: null,
@@ -235,13 +284,35 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         collectionFilesToRemove: string[]
       } & TablesUpdate<"assistants">
     ) => {
-      const { image, collectionFilesToAdd, collectionFilesToRemove, ...rest } =
-        updateState
+      if (!profile) return
 
-      // add files
-      // remove files
+      const { ...rest } = updateState
 
-      // TODO deletes image
+      const filesToAdd = selectedCollectionFiles.filter(
+        selectedFile =>
+          !startingCollectionFiles.some(
+            startingFile => startingFile.id === selectedFile.id
+          )
+      )
+
+      const filesToRemove = startingCollectionFiles.filter(startingFile =>
+        selectedCollectionFiles.some(
+          selectedFile => selectedFile.id === startingFile.id
+        )
+      )
+
+      for (const file of filesToAdd) {
+        await createCollectionFile({
+          user_id: item.user_id,
+          collection_id: collectionId,
+          file_id: file.id
+        })
+      }
+
+      for (const file of filesToRemove) {
+        await deleteCollectionFile(collectionId, file.id)
+      }
+
       const updatedCollection = await updateCollection(collectionId, rest)
 
       await handleWorkspaceUpdates(
@@ -265,7 +336,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
       const updatedAssistant = await updateAssistant(assistantId, rest)
 
-      // TODO deletes
       if (image) {
         await uploadAssistantImage(updatedAssistant, image)
       }
@@ -293,20 +363,26 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   const handleUpdate = async () => {
-    const updateFunction = updateFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
+    try {
+      const updateFunction = updateFunctions[contentType]
+      const setStateFunction = stateUpdateFunctions[contentType]
 
-    if (!updateFunction || !setStateFunction) return
+      if (!updateFunction || !setStateFunction) return
 
-    const updatedItem = await updateFunction(item.id, updateState)
+      const updatedItem = await updateFunction(item.id, updateState)
 
-    setStateFunction((prevItems: any) =>
-      prevItems.map((prevItem: any) =>
-        prevItem.id === item.id ? updatedItem : prevItem
+      setStateFunction((prevItems: any) =>
+        prevItems.map((prevItem: any) =>
+          prevItem.id === item.id ? updatedItem : prevItem
+        )
       )
-    )
 
-    setIsOpen(false)
+      setIsOpen(false)
+
+      toast.success(`${contentType.slice(0, -1)} updated successfully`)
+    } catch (error) {
+      toast.error(`Error updating ${contentType.slice(0, -1)}. ${error}`)
+    }
   }
 
   const handleSelectWorkspace = (workspace: Tables<"workspaces">) => {
@@ -360,7 +436,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
             </div>
           )}
 
-          {renderInputs()}
+          {renderInputs(renderState[contentType])}
         </div>
 
         <DialogFooter className="mt-2 flex justify-between">

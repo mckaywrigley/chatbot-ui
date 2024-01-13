@@ -1,4 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
+import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { Tables } from "@/supabase/types"
 import { useContext } from "react"
 
@@ -48,16 +49,55 @@ export const usePromptAndCommand = () => {
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
 
-    setNewMessageFiles(prev => [
-      ...prev,
-      ...chatFiles,
-      {
-        id: file.id,
-        name: file.name,
-        type: file.type,
-        file: null
+    setNewMessageFiles(prev => {
+      const fileAlreadySelected =
+        prev.some(prevFile => prevFile.id === file.id) ||
+        chatFiles.some(chatFile => chatFile.id === file.id)
+
+      if (!fileAlreadySelected) {
+        return [
+          ...prev,
+          {
+            id: file.id,
+            name: file.name,
+            type: file.type,
+            file: null
+          }
+        ]
       }
-    ])
+      return prev
+    })
+
+    setUserInput(userInput.replace(/@[^ ]*$/, ""))
+  }
+
+  const handleSelectUserCollection = async (
+    collection: Tables<"collections">
+  ) => {
+    setShowFilesDisplay(true)
+    setIsAtPickerOpen(false)
+    setUseRetrieval(true)
+
+    const collectionFiles = await getCollectionFilesByCollectionId(
+      collection.id
+    )
+
+    setNewMessageFiles(prev => {
+      const newFiles = collectionFiles.files
+        .filter(
+          file =>
+            !prev.some(prevFile => prevFile.id === file.id) &&
+            !chatFiles.some(chatFile => chatFile.id === file.id)
+        )
+        .map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+
+      return [...prev, ...newFiles]
+    })
 
     setUserInput(userInput.replace(/@[^ ]*$/, ""))
   }
@@ -65,6 +105,7 @@ export const usePromptAndCommand = () => {
   return {
     handleInputChange,
     handleSelectPrompt,
-    handleSelectUserFile
+    handleSelectUserFile,
+    handleSelectUserCollection
   }
 }

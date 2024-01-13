@@ -1,6 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { WORKSPACE_INSTRUCTIONS_MAX } from "@/db/limits"
 import { updateWorkspace } from "@/db/workspaces"
+import { LLMID } from "@/types"
 import { IconHome, IconSettings } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -24,8 +25,13 @@ import { DeleteWorkspace } from "./delete-workspace"
 interface WorkspaceSettingsProps {}
 
 export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
-  const { profile, selectedWorkspace, setSelectedWorkspace, setWorkspaces } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    selectedWorkspace,
+    setSelectedWorkspace,
+    setWorkspaces,
+    setChatSettings
+  } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -67,6 +73,29 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       include_workspace_instructions:
         defaultChatSettings.includeWorkspaceInstructions
     })
+
+    if (
+      defaultChatSettings.model &&
+      defaultChatSettings.prompt &&
+      defaultChatSettings.temperature &&
+      defaultChatSettings.contextLength &&
+      defaultChatSettings.includeProfileContext &&
+      defaultChatSettings.includeWorkspaceInstructions &&
+      defaultChatSettings.embeddingsProvider
+    ) {
+      setChatSettings({
+        model: defaultChatSettings.model as LLMID,
+        prompt: defaultChatSettings.prompt,
+        temperature: defaultChatSettings.temperature,
+        contextLength: defaultChatSettings.contextLength,
+        includeProfileContext: defaultChatSettings.includeProfileContext,
+        includeWorkspaceInstructions:
+          defaultChatSettings.includeWorkspaceInstructions,
+        embeddingsProvider: defaultChatSettings.embeddingsProvider as
+          | "openai"
+          | "local"
+      })
+    }
 
     setSelectedWorkspace(updatedWorkspace)
     setWorkspaces(workspaces => {

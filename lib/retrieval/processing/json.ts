@@ -1,34 +1,33 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { TOKEN_LIMIT } from "."
+import { JSONLoader } from "langchain/document_loaders/fs/json"
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processJSON = async (json: Blob): Promise<FileItemChunk[]> => {
-  const fileBuffer = Buffer.from(await json.arrayBuffer())
-  const textDecoder = new TextDecoder("utf-8")
-  const textContent = textDecoder.decode(fileBuffer)
+  const loader = new JSONLoader(json)
+  const docs = await loader.load()
+  let completeText = docs.map(doc => doc.pageContent).join(" ")
+
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP
+  })
+  const splitDocs = await splitter.createDocuments([completeText])
 
   let chunks: FileItemChunk[] = []
 
-  let content = ""
-  let tokens = 0
+  splitDocs.forEach(doc => {
+    const docTokens = encode(doc.pageContent).length
+  })
 
-  // TODO: change splitter
-  const textChunks = textContent.split("\n") || []
+  for (let i = 0; i < splitDocs.length; i++) {
+    const doc = splitDocs[i]
 
-  for (let i = 0; i < textChunks.length; i++) {
-    content += textChunks[i] + "\n"
-    tokens += encode(textChunks[i]).length
-
-    if (tokens >= TOKEN_LIMIT) {
-      chunks.push({ content, tokens })
-
-      content = ""
-      tokens = 0
-    }
-  }
-
-  if (content !== "") {
-    chunks.push({ content, tokens: encode(content).length })
+    chunks.push({
+      content: doc.pageContent,
+      tokens: encode(doc.pageContent).length
+    })
   }
 
   return chunks

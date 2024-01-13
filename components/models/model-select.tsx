@@ -37,6 +37,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<"hosted" | "local">("hosted")
 
+  const [isLocked, setIsLocked] = useState<Boolean>(true)
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -44,6 +46,17 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       }, 100) // FIX: hacky
     }
   }, [isOpen])
+
+  useEffect(() => {
+    const checkModelLock = async () => {
+      if (SELECTED_MODEL && profile) {
+        const locked = await isModelLocked(SELECTED_MODEL.provider, profile)
+        setIsLocked(locked)
+      }
+    }
+
+    checkModelLock()
+  }, [profile])
 
   const handleSelectModel = (modelId: LLMID) => {
     onSelectModel(modelId)
@@ -71,7 +84,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   if (!SELECTED_MODEL) return null
   if (!profile) return null
 
-  const isLocked = isModelLocked(SELECTED_MODEL.provider, profile)
   const usingLocalModels = availableLocalModels.length > 0
 
   return (
