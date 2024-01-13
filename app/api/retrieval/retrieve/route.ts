@@ -4,8 +4,6 @@ import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
-const DEFAULT_EMBEDDINGS_COUNT = 3
-
 export async function POST(request: Request) {
   const json = await request.json()
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
