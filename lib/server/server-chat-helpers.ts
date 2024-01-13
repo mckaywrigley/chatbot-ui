@@ -1,7 +1,7 @@
-import { Database } from "@/supabase/types"
+import { Database, Tables } from "@/supabase/types"
+import { VALID_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import { VALID_KEYS } from "@/types/valid-keys"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -32,12 +32,12 @@ export async function getServerProfile() {
     throw new Error("Profile not found")
   }
 
-  addApiKeysToProfile(profile)
+  const profileWithKeys = addApiKeysToProfile(profile)
 
-  return profile
+  return profileWithKeys
 }
 
-function addApiKeysToProfile(profile: any) {
+function addApiKeysToProfile(profile: Tables<"profiles">) {
   // map VALID_KEYS to profile attributes
   const apiKeys = {
     [VALID_KEYS.OPENAI_API_KEY]: "openai_api_key",
@@ -50,9 +50,11 @@ function addApiKeysToProfile(profile: any) {
 
   for (const [envKey, profileKey] of Object.entries(apiKeys)) {
     if (process.env[envKey]) {
-      profile[profileKey] = process.env[envKey]
+      ;(profile as any)[profileKey] = process.env[envKey]
     }
   }
+
+  return profile
 }
 
 export function checkApiKey(apiKey: string | null, keyName: string) {

@@ -59,11 +59,13 @@ export const useSelectFileHandler = () => {
       if (file.type.includes("image")) {
         reader.readAsDataURL(file)
       } else if (ACCEPTED_FILE_TYPES.split(",").includes(file.type)) {
-        if (simplifiedFileType === "vnd.adobe.pdf") {
+        if (simplifiedFileType.includes("vnd.adobe.pdf")) {
           simplifiedFileType = "pdf"
         } else if (
-          simplifiedFileType ===
-          "vnd.openxmlformats-officedocument.wordprocessingml.document"
+          simplifiedFileType.includes(
+            "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+              "docx"
+          )
         ) {
           simplifiedFileType = "docx"
         }
@@ -80,8 +82,10 @@ export const useSelectFileHandler = () => {
 
         // Handle docx files
         if (
-          file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          file.type.includes(
+            "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+              "docx"
+          )
         ) {
           const arrayBuffer = await file.arrayBuffer()
           const result = await mammoth.extractRawText({
