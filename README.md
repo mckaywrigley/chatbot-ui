@@ -220,6 +220,7 @@ In environment variables, add the following from the values you got above:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_OLLAMA_URL` (only needed when using local Ollama models; default: `http://localhost:11434`)
 
 Click "Deploy" and wait for your frontend to deploy.
 
