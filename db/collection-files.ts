@@ -52,3 +52,18 @@ export const createCollectionFiles = async (
 
   return createdCollectionFiles
 }
+
+export const deleteCollectionFile = async (
+  collectionId: string,
+  fileId: string
+) => {
+  const { error } = await supabase
+    .from("collection_files")
+    .delete()
+    .eq("collection_id", collectionId)
+    .eq("file_id", fileId)
+
+  if (error) throw new Error(error.message)
+
+  return true
+}

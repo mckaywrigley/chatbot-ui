@@ -1,31 +1,30 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
+import { CSVLoader } from "langchain/document_loaders/fs/csv"
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processCSV = async (csv: Blob): Promise<FileItemChunk[]> => {
-  const fileBuffer = Buffer.from(await csv.arrayBuffer())
-  const textDecoder = new TextDecoder("utf-8")
-  const textContent = textDecoder.decode(fileBuffer)
+  const loader = new CSVLoader(csv)
+  const docs = await loader.load()
+  let completeText = docs.map(doc => doc.pageContent).join("\n\n")
 
-  const rows = textContent.split("\n")
-  const headerRow = rows[0]
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP,
+    separators: ["\n\n"]
+  })
+  const splitDocs = await splitter.createDocuments([completeText])
 
   let chunks: FileItemChunk[] = []
 
-  let content = ""
-  let tokens = 0
-  let metadata = { row: 0 }
+  for (let i = 0; i < splitDocs.length; i++) {
+    const doc = splitDocs[i]
 
-  for (let i = 1; i < rows.length; i++) {
-    // Check if row exists
-    if (rows[i]) {
-      const rowContent = rows[i]
-
-      content += headerRow + "\n" + rowContent
-      tokens += encode(content).length
-      metadata = { row: i }
-
-      chunks.push({ content, tokens })
-    }
+    chunks.push({
+      content: doc.pageContent,
+      tokens: encode(doc.pageContent).length
+    })
   }
 
   return chunks

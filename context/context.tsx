@@ -86,13 +86,17 @@ interface ChatbotUIContext {
   newMessageFiles: ChatFile[]
   newMessageImages: MessageImage[]
   showFilesDisplay: boolean
-  useRetrieval: boolean
   setChatFiles: Dispatch<SetStateAction<ChatFile[]>>
   setChatImages: Dispatch<SetStateAction<MessageImage[]>>
   setNewMessageFiles: Dispatch<SetStateAction<ChatFile[]>>
   setNewMessageImages: Dispatch<SetStateAction<MessageImage[]>>
   setShowFilesDisplay: Dispatch<SetStateAction<boolean>>
+
+  // RETRIEVAL STORE
+  useRetrieval: boolean
+  sourceCount: number
   setUseRetrieval: Dispatch<SetStateAction<boolean>>
+  setSourceCount: Dispatch<SetStateAction<number>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -178,11 +182,16 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   newMessageFiles: [],
   newMessageImages: [],
   showFilesDisplay: false,
-  useRetrieval: false,
+
   setChatFiles: () => {},
   setChatImages: () => {},
   setNewMessageFiles: () => {},
   setNewMessageImages: () => {},
   setShowFilesDisplay: () => {},
-  setUseRetrieval: () => {}
+
+  // RETRIEVAL STORE
+  useRetrieval: false,
+  sourceCount: 4,
+  setUseRetrieval: () => {},
+  setSourceCount: () => {}
 })

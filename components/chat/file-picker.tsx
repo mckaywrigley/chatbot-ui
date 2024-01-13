@@ -70,11 +70,16 @@ export const FilePicker: FC<FilePickerProps> = ({
         e.preventDefault()
       } else if (e.key === "Enter") {
         e.preventDefault()
-        handleSelectFile(filteredFiles[index])
+
+        if (type === "file") {
+          handleSelectFile(item)
+        } else {
+          handleSelectCollection(item)
+        }
       } else if (
         (e.key === "Tab" || e.key === "ArrowDown") &&
         !e.shiftKey &&
-        index === filteredFiles.length
+        index === filteredFiles.length + filteredCollections.length - 1
       ) {
         e.preventDefault()
         itemsRef.current[0]?.focus()
@@ -119,7 +124,13 @@ export const FilePicker: FC<FilePickerProps> = ({
                       handleSelectCollection(item)
                     }
                   }}
-                  onKeyDown={getKeyDownHandler(index)}
+                  onKeyDown={e =>
+                    getKeyDownHandler(
+                      index,
+                      "type" in item ? "file" : "collection",
+                      item
+                    )(e)
+                  }
                 >
                   {"type" in item ? (
                     <FileIcon type={(item as Tables<"files">).type} size={32} />

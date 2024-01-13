@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLMID, MessageImage } from "@/types"
 import {
+  IconCaretDownFilled,
+  IconCaretRightFilled,
   IconCircleFilled,
   IconFileFilled,
   IconFileText,
@@ -71,6 +73,8 @@ export const Message: FC<MessageProps> = ({
   const [showFileItemPreview, setShowFileItemPreview] = useState(false)
   const [selectedFileItem, setSelectedFileItem] =
     useState<Tables<"file_items"> | null>(null)
+
+  const [viewSources, setViewSources] = useState(false)
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content)
@@ -234,49 +238,66 @@ export const Message: FC<MessageProps> = ({
 
         {fileItems.length > 0 && (
           <div className="mt-6 text-lg font-bold">
-            <div>Sources</div>
+            {!viewSources ? (
+              <div
+                className="flex cursor-pointer items-center hover:opacity-50"
+                onClick={() => setViewSources(true)}
+              >
+                View {fileItems.length} Sources{" "}
+                <IconCaretRightFilled className="ml-1" />
+              </div>
+            ) : (
+              <>
+                <div
+                  className="flex cursor-pointer items-center hover:opacity-50"
+                  onClick={() => setViewSources(false)}
+                >
+                  Sources <IconCaretDownFilled className="ml-1" />
+                </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {fileItems.map((fileItem, index) => {
-                const parentFile = files.find(
-                  file => file.id === fileItem.file_id
-                )
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {fileItems.map((fileItem, index) => {
+                    const parentFile = files.find(
+                      file => file.id === fileItem.file_id
+                    )
 
-                return (
-                  <div
-                    key={index}
-                    className="border-primary flex cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
-                    onClick={() => {
-                      setSelectedFileItem(fileItem)
-                      setShowFileItemPreview(true)
-                    }}
-                  >
-                    <div className="rounded bg-blue-500 p-2">
-                      {(() => {
-                        let fileExtension = parentFile?.type.includes("/")
-                          ? parentFile.type.split("/")[1]
-                          : parentFile?.type
+                    return (
+                      <div
+                        key={index}
+                        className="border-primary flex cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
+                        onClick={() => {
+                          setSelectedFileItem(fileItem)
+                          setShowFileItemPreview(true)
+                        }}
+                      >
+                        <div className="rounded bg-blue-500 p-2">
+                          {(() => {
+                            let fileExtension = parentFile?.type.includes("/")
+                              ? parentFile.type.split("/")[1]
+                              : parentFile?.type
 
-                        switch (fileExtension) {
-                          case "pdf":
-                            return <IconFileTypePdf />
-                          default:
-                            return <IconFileFilled />
-                        }
-                      })()}
-                    </div>
+                            switch (fileExtension) {
+                              case "pdf":
+                                return <IconFileTypePdf />
+                              default:
+                                return <IconFileFilled />
+                            }
+                          })()}
+                        </div>
 
-                    <div className="w-fit space-y-1 text-wrap text-sm">
-                      <div className="">{parentFile?.name}</div>
+                        <div className="w-fit space-y-1 truncate text-wrap text-xs">
+                          <div className="truncate">{parentFile?.name}</div>
 
-                      <div className="text-xs opacity-50">
-                        {fileItem.content.substring(0, 70)}...
+                          <div className="truncate text-xs opacity-50">
+                            {fileItem.content.substring(0, 60)}...
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
         )}
 
