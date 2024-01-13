@@ -62,7 +62,8 @@ export const FilePicker: FC<FilePickerProps> = ({
   }
 
   const getKeyDownHandler =
-    (index: number) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+    (index: number, type: "file" | "collection", item: any) =>
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Escape") {
         e.preventDefault()
         setIsAtPickerOpen(false)
