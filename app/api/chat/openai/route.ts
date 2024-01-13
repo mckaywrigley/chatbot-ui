@@ -16,7 +16,11 @@ export async function POST(request: Request) {
 
   const latestMessage = messages[messages.length - 1].content
 
-  if (latestMessage.startsWith("Generate an image")) {
+  async function generateImage(
+    latestMessage: string,
+    messages: any[],
+    chatSettings: ChatSettings
+  ) {
     try {
       const profile = await getServerProfile()
 
@@ -74,7 +78,9 @@ export async function POST(request: Request) {
         status: errorCode
       })
     }
-  } else {
+  }
+
+  async function createCompletion(messages: any[], chatSettings: ChatSettings) {
     try {
       const profile = await getServerProfile()
 
@@ -105,5 +111,11 @@ export async function POST(request: Request) {
         status: errorCode
       })
     }
+  }
+
+  if (latestMessage.startsWith("Generate an image")) {
+    return generateImage(latestMessage, messages, chatSettings)
+  } else {
+    return createCompletion(messages, chatSettings)
   }
 }
