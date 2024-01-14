@@ -106,11 +106,11 @@ export const Announcements: FC<AnnouncementsProps> = () => {
                         <div className="text-sm font-medium leading-none">
                           {a.title}
                         </div>
-                        <div className="text-muted-foreground text-xs leading-snug">
+                        <div className="text-xs leading-snug text-muted-foreground">
                           {a.date}
                         </div>
                       </div>
-                      <div className="text-muted-foreground mt-3 text-sm leading-snug">
+                      <div className="mt-3 text-sm leading-snug text-muted-foreground">
                         {a.content}
                       </div>
 
@@ -147,7 +147,7 @@ export const Announcements: FC<AnnouncementsProps> = () => {
                   Mark All as Read
                 </Button>
               ) : (
-                <div className="text-muted-foreground text-sm leading-snug">
+                <div className="text-sm leading-snug text-muted-foreground">
                   You are all caught up!
                   {announcements.length > 0 && (
                     <div

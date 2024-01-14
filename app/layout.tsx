@@ -34,7 +34,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <body className={inter.className}>
         <Providers attribute="class" defaultTheme="dark">
           <Toaster richColors position="top-center" duration={2000} />
-          <div className="bg-background text-foreground flex h-screen flex-col items-center">
+          <div className="flex h-screen flex-col items-center bg-background text-foreground">
             {session ? <GlobalState>{children}</GlobalState> : children}
           </div>
         </Providers>

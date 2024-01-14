@@ -148,7 +148,7 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
                 size={ICON_SIZE}
               />
 
@@ -168,7 +168,7 @@ export const Message: FC<MessageProps> = ({
                     />
                   ) : (
                     <IconRobotFace
-                      className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                      className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
                       size={ICON_SIZE}
                     />
                   )
@@ -185,7 +185,7 @@ export const Message: FC<MessageProps> = ({
                 </Avatar>
               ) : (
                 <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                  className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
                   size={ICON_SIZE}
                 />
               )}
@@ -264,7 +264,7 @@ export const Message: FC<MessageProps> = ({
                     return (
                       <div
                         key={index}
-                        className="border-primary flex cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
+                        className="flex cursor-pointer items-center space-x-4 rounded-xl border border-primary px-4 py-3 hover:opacity-50"
                         onClick={() => {
                           setSelectedFileItem(fileItem)
                           setShowFileItemPreview(true)

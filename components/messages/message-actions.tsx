@@ -46,7 +46,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
   }, [showCheckmark])
 
   return (isLast && isGenerating) || isEditing ? null : (
-    <div className="text-muted-foreground flex items-center space-x-2">
+    <div className="flex items-center space-x-2 text-muted-foreground">
       {/* {((isAssistant && isHovering) || isLast) && (
         <WithTooltip
           delayDuration={1000}

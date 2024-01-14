@@ -48,7 +48,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent focus:bg-accent flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        "flex w-full cursor-pointer items-center rounded p-2 hover:bg-accent hover:opacity-50 focus:bg-accent focus:outline-none",
         isActive && "bg-accent"
       )}
       tabIndex={0}
@@ -66,7 +66,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+            className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
             size={30}
           />
         )

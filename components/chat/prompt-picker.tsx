@@ -119,7 +119,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
   return (
     <>
       {isPromptPickerOpen && (
-        <div className="bg-background flex flex-col space-y-1 rounded-xl border-2 p-2 text-sm">
+        <div className="flex flex-col space-y-1 rounded-xl border-2 bg-background p-2 text-sm">
           {showPromptVariables ? (
             <Dialog
               open={showPromptVariables}
@@ -175,7 +175,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
                 key={prompt.id}
                 ref={index === 0 ? firstPromptRef : null}
                 tabIndex={0}
-                className="hover:bg-accent focus:bg-accent flex cursor-pointer flex-col rounded p-2 focus:outline-none"
+                className="flex cursor-pointer flex-col rounded p-2 hover:bg-accent focus:bg-accent focus:outline-none"
                 onClick={() => handleSelectPrompt(prompt)}
                 onKeyDown={getKeyDownHandler(index)}
               >

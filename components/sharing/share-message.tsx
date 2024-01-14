@@ -19,7 +19,7 @@ export const ShareMessage: FC<MessageProps> = ({ username, message }) => {
   const ICON_SIZE = 28
   const icon = isUser ? (
     <IconMoodSmile
-      className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+      className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
       size={ICON_SIZE}
     />
   ) : (

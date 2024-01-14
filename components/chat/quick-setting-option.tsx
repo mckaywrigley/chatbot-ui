@@ -39,7 +39,7 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
           />
         ) : (
           <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+            className="rounded border-[1px] border-primary bg-primary p-1 text-secondary"
             size={32}
           />
         )}
