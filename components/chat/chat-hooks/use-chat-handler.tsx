@@ -32,6 +32,7 @@ export const useChatHandler = () => {
     setSelectedChat,
     setChats,
     availableLocalModels,
+    availableOpenRouterModels,
     abortController,
     setAbortController,
     chatSettings,
@@ -101,9 +102,11 @@ export const useChatHandler = () => {
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
 
-      const modelData = [...LLM_LIST, ...availableLocalModels].find(
-        llm => llm.modelId === chatSettings?.model
-      )
+      const modelData = [
+        ...LLM_LIST,
+        ...availableLocalModels,
+        ...availableOpenRouterModels
+      ].find(llm => llm.modelId === chatSettings?.model)
 
       validateChatSettings(
         chatSettings,

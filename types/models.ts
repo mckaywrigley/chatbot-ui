@@ -6,3 +6,4 @@ export type ModelProvider =
   | "llama"
   | "perplexity"
   | "ollama"
+  | "openrouter"

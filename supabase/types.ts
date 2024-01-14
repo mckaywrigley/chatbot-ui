@@ -632,6 +632,68 @@ export interface Database {
           }
         ]
       }
+      functions: {
+        Row: {
+          assistantsId: string
+          description: string | null
+          folder_id: string | null
+          id: number
+          name: string
+          parameters: Json
+          toolsId: number
+          workspacesId: string
+        }
+        Insert: {
+          assistantsId: string
+          description?: string | null
+          folder_id?: string | null
+          id?: number
+          name: string
+          parameters: Json
+          toolsId: number
+          workspacesId: string
+        }
+        Update: {
+          assistantsId?: string
+          description?: string | null
+          folder_id?: string | null
+          id?: number
+          name?: string
+          parameters?: Json
+          toolsId?: number
+          workspacesId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "functions_assistantsId_fkey"
+            columns: ["assistantsId"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "functions_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "functions_toolsId_fkey"
+            columns: ["toolsId"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "functions_workspacesId_fkey"
+            columns: ["workspacesId"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       message_file_items: {
         Row: {
           created_at: string
@@ -866,6 +928,7 @@ export interface Database {
           mistral_api_key: string | null
           openai_api_key: string | null
           openai_organization_id: string | null
+          openrouter_api_key: string | null
           perplexity_api_key: string | null
           profile_context: string
           updated_at: string | null
@@ -891,6 +954,7 @@ export interface Database {
           mistral_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
+          openrouter_api_key?: string | null
           perplexity_api_key?: string | null
           profile_context: string
           updated_at?: string | null
@@ -916,6 +980,7 @@ export interface Database {
           mistral_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
+          openrouter_api_key?: string | null
           perplexity_api_key?: string | null
           profile_context?: string
           updated_at?: string | null
@@ -1023,6 +1088,48 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      tools: {
+        Row: {
+          assistantsId: string
+          description: string | null
+          id: number
+          name: string
+          parameters: Json
+          workspacesId: string
+        }
+        Insert: {
+          assistantsId: string
+          description?: string | null
+          id?: number
+          name: string
+          parameters: Json
+          workspacesId: string
+        }
+        Update: {
+          assistantsId?: string
+          description?: string | null
+          id?: number
+          name?: string
+          parameters?: Json
+          workspacesId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tools_assistantsId_fkey"
+            columns: ["assistantsId"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tools_workspacesId_fkey"
+            columns: ["workspacesId"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           }
         ]
@@ -1443,4 +1550,3 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
   ? Database["public"]["Enums"][PublicEnumNameOrOptions]
   : never
-

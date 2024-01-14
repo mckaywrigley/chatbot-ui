@@ -51,6 +51,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // MODELS STORE
   const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
+  const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
+    LLM[]
+  >([])
 
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
@@ -110,6 +113,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
+    fetchOpenRouterModels()
     if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
       fetchOllamaModels()
     }
@@ -241,6 +245,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
+  // fetch ollama models
   const fetchOllamaModels = async () => {
     setLoading(true)
 
@@ -267,6 +272,36 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setAvailableLocalModels(localModels)
     } catch (error) {
       console.warn("Error fetching Ollama models: " + error)
+    }
+
+    setLoading(false)
+  }
+  // fetch open router models
+  const fetchOpenRouterModels = async () => {
+    setLoading(true)
+
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/models")
+
+      if (!response.ok) {
+        throw new Error(`Open Router server is not responding.`)
+      }
+
+      const { data } = await response.json()
+
+      const openRouterModels = data.map((model: any) => ({
+        modelId: model.id as LLMID,
+        modelName: model.id,
+        provider: "openrouter",
+        hostedId: model.name,
+        platformLink: "https://openrouter.dev",
+        imageInput: false,
+        maxContext: model.context_length
+      }))
+
+      setAvailableOpenRouterModels(openRouterModels)
+    } catch (error) {
+      console.warn("Error fetching Open Router models: " + error)
     }
 
     setLoading(false)
@@ -304,6 +339,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // MODELS STORE
         availableLocalModels,
         setAvailableLocalModels,
+        availableOpenRouterModels,
+        setAvailableOpenRouterModels,
 
         // WORKSPACE STORE
         selectedWorkspace,

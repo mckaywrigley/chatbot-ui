@@ -99,12 +99,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.perplexity_api_key || ""
   )
 
+  const [openrouterAPIKey, setOpenrouterAPIKey] = useState(
+    profile?.openrouter_api_key || ""
+  )
+
   const [isEnvOpenai, setIsEnvOpenai] = useState(false)
   const [isEnvAnthropic, setIsEnvAnthropic] = useState(false)
   const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
   const [isEnvMistral, setIsEnvMistral] = useState(false)
   const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
   const [isEnvAzureOpenai, setIsEnvAzureOpenai] = useState(false)
+  const [isEnvOpenrouter, setIsEnvOpenrouter] = useState(false)
 
   useEffect(() => {
     async function fetchKeys() {
@@ -142,6 +147,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               break
             case "AZURE_OPENAI_API_KEY":
               setIsEnvAzureOpenai(isUsing)
+              break
+            case "OPENROUTER_API_KEY":
+              setIsEnvOpenrouter(isUsing)
               break
             default:
               console.warn("Unhandled key type:", key)
@@ -191,7 +199,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_endpoint: azureOpenaiEndpoint,
       azure_openai_35_turbo_id: azureOpenai35TurboID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
-      azure_openai_45_vision_id: azureOpenai45VisionID
+      azure_openai_45_vision_id: azureOpenai45VisionID,
+      openrouter_api_key: openrouterAPIKey
     })
     setProfile(updatedProfile)
 
@@ -641,6 +650,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                     />
                   </>
                 )}
+              </div>
+
+              {/* openRouter */}
+              <div className="space-y-1">
+                <Label>OpenRouter API Key</Label>
+                <Input
+                  placeholder="OpenRouter API Key"
+                  type="password"
+                  value={openrouterAPIKey}
+                  onChange={e => setOpenrouterAPIKey(e.target.value)}
+                />
               </div>
             </TabsContent>
           </Tabs>
