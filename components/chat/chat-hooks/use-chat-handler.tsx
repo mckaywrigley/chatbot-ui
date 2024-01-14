@@ -1,4 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
+import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload } from "@/types"
@@ -199,6 +200,18 @@ export const useChatHandler = () => {
           setChats,
           setChatFiles
         )
+      } else {
+        const updatedChat = await updateChat(currentChat.id, {
+          updated_at: new Date().toISOString()
+        })
+
+        setChats(prevChats => {
+          const updatedChats = prevChats.map(prevChat =>
+            prevChat.id === updatedChat.id ? updatedChat : prevChat
+          )
+
+          return updatedChats
+        })
       }
 
       await handleCreateMessages(
