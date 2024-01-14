@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "chat": "supabase start && npm run db-types && npm run dev",
-    "chat:dev": "npm run db-types && npm run dev",
     "restart": "supabase stop && npm run chat",
     "update": "git pull && npm run db-migrate up && npm run db-types",
     "prepare": "husky install",
