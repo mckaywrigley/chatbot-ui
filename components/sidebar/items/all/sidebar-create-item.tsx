@@ -11,7 +11,7 @@ import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
 import { createCollectionFiles } from "@/db/collection-files"
 import { createCollection } from "@/db/collections"
-import { createFile } from "@/db/files"
+import { createFileBasedOnExtension } from "@/db/files"
 import { createPreset } from "@/db/presets"
 import { createPrompt } from "@/db/prompts"
 import {
@@ -65,8 +65,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (!selectedWorkspace) return
 
       const { file, ...rest } = createState
-
-      const createdFile = await createFile(
+    
+      const createdFile = await createFileBasedOnExtension(
         file,
         rest,
         workspaceId,
