@@ -107,7 +107,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
     selectedAssistant
   } = useContext(ChatbotUIContext)
 
-  function findOpenRouterModel(modelId: string): any {
+  function findOpenRouterModel(modelId: string) {
     return availableOpenRouterModels.find(model => model.modelId === modelId)
   }
 

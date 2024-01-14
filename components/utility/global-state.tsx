@@ -23,7 +23,8 @@ import {
   ChatSettings,
   LLM,
   LLMID,
-  MessageImage
+  MessageImage,
+  OpenRouterLLM
 } from "@/types"
 import { AssistantImage } from "@/types/assistant-image"
 import { useRouter } from "next/navigation"
@@ -289,15 +290,21 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       const { data } = await response.json()
 
-      const openRouterModels = data.map((model: any) => ({
-        modelId: model.id as LLMID,
-        modelName: model.id,
-        provider: "openrouter",
-        hostedId: model.name,
-        platformLink: "https://openrouter.dev",
-        imageInput: false,
-        maxContext: model.context_length
-      }))
+      const openRouterModels = data.map(
+        (model: {
+          id: string
+          name: string
+          context_length: number
+        }): OpenRouterLLM => ({
+          modelId: model.id as LLMID,
+          modelName: model.id,
+          provider: "openrouter",
+          hostedId: model.name,
+          platformLink: "https://openrouter.dev",
+          imageInput: false,
+          maxContext: model.context_length
+        })
+      )
 
       setAvailableOpenRouterModels(openRouterModels)
     } catch (error) {
