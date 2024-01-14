@@ -107,6 +107,8 @@ Note: Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`
 
 Now go to your `.env.local` file and fill in the values.
 
+If the environment variable is set, it will disable the input in the user settings.
+
 #### 2. SQL setup
 
 In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
@@ -225,6 +227,14 @@ In environment variables, add the following from the values you got above:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_OLLAMA_URL` (only needed when using local Ollama models; default: `http://localhost:11434`)
+
+You can also add API keys as environment variables.
+- `OPENAI_API_KEY`
+- `AZURE_OPENAI_API_KEY`
+- `NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT`
+- `NEXT_PUBLIC_AZURE_GPT_45_VISION_ID`
+
+For the full list of environment variables, refer to the '.env.local.example' file. If the environment variables are set for API keys, it will disable the input in the user settings.
 
 Click "Deploy" and wait for your frontend to deploy.
 
