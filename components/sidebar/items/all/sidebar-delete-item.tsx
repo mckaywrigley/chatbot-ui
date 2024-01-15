@@ -113,10 +113,10 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
 
       <DialogContent onKeyDown={handleKeyDown}>
         <DialogHeader>
-          <DialogTitle>Delete {contentType}</DialogTitle>
+          <DialogTitle>Delete {contentType.slice(0, -1)}</DialogTitle>
 
           <DialogDescription>
-            Are you sure you want to delete this {contentType.slice(0, -1)}?
+            Are you sure you want to delete {item.name}?
           </DialogDescription>
         </DialogHeader>
 

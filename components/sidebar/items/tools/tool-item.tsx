@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
@@ -59,10 +60,30 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
           <div className="space-y-1">
             <Label>Schema</Label>
 
-            <Input
-              placeholder="Tool schema..."
+            <TextareaAutosize
+              placeholder={`paths": {
+                "/location": {
+                  "get": {
+                    "description": "Get temperature for a specific location",
+                    "operationId": "GetCurrentWeather",
+                    "parameters": [
+                      {
+                        "name": "location",
+                        "in": "query",
+                        "description": "The city and state to retrieve the weather for",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "deprecated": false
+                  }
+                }
+              },`}
               value={schema}
-              onChange={e => setSchema(e.target.value)}
+              onValueChange={setSchema}
+              minRows={20}
             />
           </div>
         </>

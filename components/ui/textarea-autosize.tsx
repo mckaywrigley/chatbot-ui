@@ -36,7 +36,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
         className
       )}
       minRows={minRows}
-      maxRows={maxRows}
+      maxRows={minRows > maxRows ? minRows : maxRows}
       placeholder={placeholder}
       value={value}
       onChange={event => onValueChange(event.target.value)}
