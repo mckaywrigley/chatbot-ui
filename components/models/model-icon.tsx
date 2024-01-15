@@ -111,7 +111,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     default:
-      if (!modelId) {
+      if (!modelId || modelId.includes("/")) {
         return <IconSparkles size={width} />
       } else if (modelId.includes("llama")) {
         return (
