@@ -59,7 +59,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       setSelectedAssistant(assistant)
 
       router.push(`/chat/${createdChat.id}`)
-    }
+    },
+    tools: async (item: any) => {}
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

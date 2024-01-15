@@ -18,6 +18,7 @@ import {
   getAssistantImageFromStorage,
   uploadAssistantImage
 } from "@/db/storage/assistant-images"
+import { createTool } from "@/db/tools"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { ContentType } from "@/types"
@@ -47,7 +48,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setAssistantImages
+    setAssistantImages,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -130,7 +132,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       }
 
       return updatedAssistant
-    }
+    },
+    tools: createTool
   }
 
   const stateUpdateFunctions = {
@@ -139,7 +142,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleCreate = async () => {

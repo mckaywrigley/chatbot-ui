@@ -47,6 +47,12 @@ import {
   updatePrompt
 } from "@/db/prompts"
 import { uploadAssistantImage } from "@/db/storage/assistant-images"
+import {
+  createToolWorkspaces,
+  deleteToolWorkspace,
+  getToolWorkspacesByToolId,
+  updateTool
+} from "@/db/tools"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -77,7 +83,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -127,7 +134,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       selectedCollectionFiles,
       setSelectedCollectionFiles
     },
-    assistants: null
+    assistants: null,
+    tools: null
   }
 
   const fetchDataFunctions = {
@@ -141,7 +149,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setStartingCollectionFiles(collectionFiles.files)
       setSelectedCollectionFiles([])
     },
-    assistants: null
+    assistants: null,
+    tools: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -164,6 +173,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     assistants: async (assistantId: string) => {
       const item = await getAssistantWorkspacesByAssistantId(assistantId)
+      return item.workspaces
+    },
+    tools: async (toolId: string) => {
+      const item = await getToolWorkspacesByToolId(toolId)
       return item.workspaces
     }
   }
@@ -350,6 +363,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedAssistant
+    },
+    tools: async (toolId: string, updateState: TablesUpdate<"tools">) => {
+      const updatedTool = await updateTool(toolId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        toolId,
+        deleteToolWorkspace,
+        createToolWorkspaces as any,
+        "tool_id"
+      )
+
+      return updatedTool
     }
   }
 
@@ -359,7 +386,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleUpdate = async () => {

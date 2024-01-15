@@ -5,6 +5,7 @@ import { updateCollection } from "@/db/collections"
 import { updateFile } from "@/db/files"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
+import { updateTool } from "@/db/tools"
 import { ContentType, DataItemType } from "@/types"
 import { IconCheck, IconShare2 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
@@ -39,7 +40,8 @@ export const ShareMenu: FC<ShareMenuProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setSelectedChat
+    setSelectedChat,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const updateFunctions = {
@@ -48,7 +50,8 @@ export const ShareMenu: FC<ShareMenuProps> = ({
     prompts: updatePrompt,
     files: updateFile,
     collections: updateCollection,
-    assistants: updateAssistant
+    assistants: updateAssistant,
+    tools: updateTool
   }
 
   const stateUpdateFunctions = {
@@ -57,7 +60,8 @@ export const ShareMenu: FC<ShareMenuProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleShareChange = async (shareStatus: ShareStatus) => {

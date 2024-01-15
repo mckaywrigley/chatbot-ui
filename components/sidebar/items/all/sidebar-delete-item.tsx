@@ -16,6 +16,7 @@ import { deleteFile } from "@/db/files"
 import { deletePreset } from "@/db/presets"
 import { deletePrompt } from "@/db/prompts"
 import { deleteFileFromStorage } from "@/db/storage/files"
+import { deleteTool } from "@/db/tools"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType } from "@/types"
 import { FC, useContext, useRef, useState } from "react"
@@ -35,7 +36,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -64,6 +66,9 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
       setChats(prevState =>
         prevState.filter(chat => chat.assistant_id !== assistant.id)
       )
+    },
+    tools: async (tool: Tables<"tools">) => {
+      await deleteTool(tool.id)
     }
   }
 
@@ -73,7 +78,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleDelete = async () => {

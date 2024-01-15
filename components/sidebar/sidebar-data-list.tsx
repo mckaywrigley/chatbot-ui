@@ -5,6 +5,7 @@ import { updateCollection } from "@/db/collections"
 import { updateFile } from "@/db/files"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
+import { updateTool } from "@/db/tools"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
@@ -17,6 +18,7 @@ import { FileItem } from "./items/files/file-item"
 import { Folder } from "./items/folders/folder-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
+import { ToolItem } from "./items/tools/tool-item"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -76,6 +78,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           />
         )
 
+      case "tools":
+        return <ToolItem key={item.id} tool={item as Tables<"tools">} />
+
       default:
         return null
     }
@@ -126,7 +131,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     prompts: updatePrompt,
     files: updateFile,
     collections: updateCollection,
-    assistants: updateAssistant
+    assistants: updateAssistant,
+    tools: updateTool
   }
 
   const stateUpdateFunctions = {
@@ -135,7 +141,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setAssistants
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {
