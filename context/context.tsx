@@ -36,9 +36,8 @@ interface ChatbotUIContext {
   // MODELS STORE
   availableLocalModels: LLM[]
   setAvailableLocalModels: Dispatch<SetStateAction<LLM[]>>
-
   availableOpenRouterModels: OpenRouterLLM[]
-  setAvailableOpenRouterModels: Dispatch<SetStateAction<LLM[]>>
+  setAvailableOpenRouterModels: Dispatch<SetStateAction<OpenRouterLLM[]>>
 
   // WORKSPACE STORE
   selectedWorkspace: Tables<"workspaces"> | null

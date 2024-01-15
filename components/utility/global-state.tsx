@@ -29,6 +29,7 @@ import {
 import { AssistantImage } from "@/types/assistant-image"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -53,7 +54,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // MODELS STORE
   const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
   const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
-    LLM[]
+    OpenRouterLLM[]
   >([])
 
   // WORKSPACE STORE
@@ -277,7 +278,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
     setLoading(false)
   }
-  // fetch open router models
+
   const fetchOpenRouterModels = async () => {
     setLoading(true)
 
@@ -285,7 +286,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       const response = await fetch("https://openrouter.ai/api/v1/models")
 
       if (!response.ok) {
-        throw new Error(`Open Router server is not responding.`)
+        throw new Error(`OpenRouter server is not responding.`)
       }
 
       const { data } = await response.json()
@@ -308,7 +309,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       setAvailableOpenRouterModels(openRouterModels)
     } catch (error) {
-      console.warn("Error fetching Open Router models: " + error)
+      console.error("Error fetching Open Router models: " + error)
+      toast.error("Error fetching Open Router models: " + error)
     }
 
     setLoading(false)
