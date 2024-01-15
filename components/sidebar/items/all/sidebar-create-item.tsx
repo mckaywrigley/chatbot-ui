@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle
+} from "@/components/ui/sheet"
 import { ChatbotUIContext } from "@/context/context"
 import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
@@ -18,6 +18,7 @@ import {
   getAssistantImageFromStorage,
   uploadAssistantImage
 } from "@/db/storage/assistant-images"
+import { createTool } from "@/db/tools"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { ContentType } from "@/types"
@@ -47,7 +48,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setAssistantImages
+    setAssistantImages,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -105,32 +107,37 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       const createdAssistant = await createAssistant(rest, workspaceId)
 
-      const filePath = await uploadAssistantImage(createdAssistant, image)
+      let updatedAssistant = createdAssistant
 
-      const updatedAssistant = await updateAssistant(createdAssistant.id, {
-        image_path: filePath
-      })
+      if (image) {
+        const filePath = await uploadAssistantImage(createdAssistant, image)
 
-      const url = (await getAssistantImageFromStorage(filePath)) || ""
+        const updatedAssistant = await updateAssistant(createdAssistant.id, {
+          image_path: filePath
+        })
 
-      if (url) {
-        const response = await fetch(url)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
+        const url = (await getAssistantImageFromStorage(filePath)) || ""
 
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: updatedAssistant.id,
-            path: filePath,
-            base64,
-            url
-          }
-        ])
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: updatedAssistant.id,
+              path: filePath,
+              base64,
+              url
+            }
+          ])
+        }
       }
 
       return updatedAssistant
-    }
+    },
+    tools: createTool
   }
 
   const stateUpdateFunctions = {
@@ -139,7 +146,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleCreate = async () => {
@@ -173,17 +181,24 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent onKeyDown={handleKeyDown}>
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Create {contentType.slice(0, -1)}
-          </DialogTitle>
-        </DialogHeader>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+      <SheetContent
+        className="flex flex-col justify-between"
+        side="left"
+        onKeyDown={handleKeyDown}
+      >
+        <div className="grow">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-bold">
+              Create{" "}
+              {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
+            </SheetTitle>
+          </SheetHeader>
 
-        <div className="space-y-3">{renderInputs()}</div>
+          <div className="mt-4 space-y-3">{renderInputs()}</div>
+        </div>
 
-        <DialogFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mt-2 flex justify-between">
           <div className="flex grow justify-end space-x-2">
             <Button
               disabled={creating}
@@ -197,8 +212,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

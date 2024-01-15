@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
 import { AssignWorkspaces } from "@/components/workspace/assign-workspaces"
 import { ChatbotUIContext } from "@/context/context"
 import {
@@ -47,6 +47,12 @@ import {
   updatePrompt
 } from "@/db/prompts"
 import { uploadAssistantImage } from "@/db/storage/assistant-images"
+import {
+  createToolWorkspaces,
+  deleteToolWorkspace,
+  getToolWorkspacesByToolId,
+  updateTool
+} from "@/db/tools"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -77,7 +83,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -127,7 +134,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       selectedCollectionFiles,
       setSelectedCollectionFiles
     },
-    assistants: null
+    assistants: null,
+    tools: null
   }
 
   const fetchDataFunctions = {
@@ -141,7 +149,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setStartingCollectionFiles(collectionFiles.files)
       setSelectedCollectionFiles([])
     },
-    assistants: null
+    assistants: null,
+    tools: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -164,6 +173,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     assistants: async (assistantId: string) => {
       const item = await getAssistantWorkspacesByAssistantId(assistantId)
+      return item.workspaces
+    },
+    tools: async (toolId: string) => {
+      const item = await getToolWorkspacesByToolId(toolId)
       return item.workspaces
     }
   }
@@ -350,6 +363,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedAssistant
+    },
+    tools: async (toolId: string, updateState: TablesUpdate<"tools">) => {
+      const updatedTool = await updateTool(toolId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        toolId,
+        deleteToolWorkspace,
+        createToolWorkspaces as any,
+        "tool_id"
+      )
+
+      return updatedTool
     }
   }
 
@@ -359,7 +386,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleUpdate = async () => {
@@ -409,37 +437,43 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>{children}</SheetTrigger>
 
-      <DialogContent onKeyDown={handleKeyDown}>
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Edit {contentType.slice(0, -1)}
-          </DialogTitle>
-        </DialogHeader>
+      <SheetContent
+        className="flex flex-col justify-between"
+        side="left"
+        onKeyDown={handleKeyDown}
+      >
+        <div className="grow">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-bold">
+              Edit {contentType.slice(0, -1)}
+            </SheetTitle>
+          </SheetHeader>
 
-        {/* TODO */}
-        {/* <div className="absolute right-4 top-4">
+          {/* TODO */}
+          {/* <div className="absolute right-4 top-4">
           <ShareMenu item={item} contentType={contentType} />
         </div> */}
 
-        <div className="space-y-3">
-          {workspaces.length > 1 && (
-            <div className="space-y-1">
-              <Label>Assigned Workspaces</Label>
+          <div className="mt-4 space-y-3">
+            {workspaces.length > 1 && (
+              <div className="space-y-1">
+                <Label>Assigned Workspaces</Label>
 
-              <AssignWorkspaces
-                selectedWorkspaces={selectedWorkspaces}
-                onSelectWorkspace={handleSelectWorkspace}
-              />
-            </div>
-          )}
+                <AssignWorkspaces
+                  selectedWorkspaces={selectedWorkspaces}
+                  onSelectWorkspace={handleSelectWorkspace}
+                />
+              </div>
+            )}
 
-          {renderInputs(renderState[contentType])}
+            {renderInputs(renderState[contentType])}
+          </div>
         </div>
 
-        <DialogFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mt-2 flex justify-between">
           <SidebarDeleteItem item={item} contentType={contentType} />
 
           <div className="flex grow justify-end space-x-2">
@@ -451,8 +485,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               Save
             </Button>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

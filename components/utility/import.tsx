@@ -5,6 +5,7 @@ import { createCollections } from "@/db/collections"
 import { createFiles } from "@/db/files"
 import { createPresets } from "@/db/presets"
 import { createPrompts } from "@/db/prompts"
+import { createTools } from "@/db/tools"
 import { IconUpload, IconX } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -31,7 +32,8 @@ export const Import: FC<ImportProps> = ({}) => {
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -46,13 +48,15 @@ export const Import: FC<ImportProps> = ({}) => {
     files: number
     collections: number
     assistants: number
+    tools: number
   }>({
     chats: 0,
     presets: 0,
     prompts: 0,
     files: 0,
     collections: 0,
-    assistants: 0
+    assistants: 0,
+    tools: 0
   })
 
   const stateUpdateFunctions = {
@@ -61,7 +65,8 @@ export const Import: FC<ImportProps> = ({}) => {
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleSelectFiles = async (e: any) => {
@@ -132,7 +137,8 @@ export const Import: FC<ImportProps> = ({}) => {
       prompts: 0,
       files: 0,
       collections: 0,
-      assistants: 0
+      assistants: 0,
+      tools: 0
     })
     setIsOpen(false)
   }
@@ -147,7 +153,8 @@ export const Import: FC<ImportProps> = ({}) => {
       prompts: [],
       files: [],
       collections: [],
-      assistants: []
+      assistants: [],
+      tools: []
     }
 
     importList.forEach(item => {
@@ -169,7 +176,8 @@ export const Import: FC<ImportProps> = ({}) => {
       assistants: await createAssistants(
         saveData.assistants,
         selectedWorkspace.id
-      )
+      ),
+      tools: await createTools(saveData.tools, selectedWorkspace.id)
     }
 
     Object.keys(createdItems).forEach(key => {
@@ -189,7 +197,8 @@ export const Import: FC<ImportProps> = ({}) => {
       prompts: 0,
       files: 0,
       collections: 0,
-      assistants: 0
+      assistants: 0,
+      tools: 0
     })
     setIsOpen(false)
   }
