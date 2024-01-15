@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
 import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FC, useState } from "react"
+import { FC, useRef, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
+import useClickAway from "@/lib/hooks/use-click-away"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -67,6 +68,11 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     localStorage.setItem("showSidebar", String(!showSidebar))
   }
 
+  const sideBarRef = useRef(null)
+  useClickAway(sideBarRef, () => {
+    handleToggleSidebar()
+  })
+
   return (
     <div className="flex h-full w-full">
       <CommandK />
@@ -97,6 +103,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       >
         {showSidebar && (
           <Tabs
+            ref={sideBarRef}
             className="flex h-full"
             value={contentType}
             onValueChange={tabValue => {
