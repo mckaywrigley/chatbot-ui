@@ -22,7 +22,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   const promptFolders = folders.filter(folder => folder.type === "prompts")
   const filesFolders = folders.filter(folder => folder.type === "files")
   const collectionFolders = folders.filter(
-    folder => folder.type === "collection"
+    folder => folder.type === "collections"
   )
   const assistantFolders = folders.filter(
     folder => folder.type === "assistants"
