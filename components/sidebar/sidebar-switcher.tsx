@@ -1,12 +1,10 @@
 import { ContentType } from "@/types"
 import {
   IconAdjustmentsHorizontal,
-  IconBolt,
   IconBooks,
   IconFile,
   IconMessage,
-  IconPencil,
-  IconRobotFace
+  IconPencil
 } from "@tabler/icons-react"
 import { FC } from "react"
 import { TabsList } from "../ui/tabs"
@@ -56,7 +54,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
+        {/* <SidebarSwitchItem
           icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
           contentType="assistants"
           onContentTypeChange={onContentTypeChange}
@@ -66,7 +64,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
           contentType="tools"
           onContentTypeChange={onContentTypeChange}
-        />
+        /> */}
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">
