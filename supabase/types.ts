@@ -1175,8 +1175,10 @@ export interface Database {
           folder_id: string | null
           id: string
           name: string
+          schema: Json
           sharing: string
           updated_at: string | null
+          url: string
           user_id: string
         }
         Insert: {
@@ -1185,8 +1187,10 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name: string
+          schema: Json
           sharing?: string
           updated_at?: string | null
+          url: string
           user_id: string
         }
         Update: {
@@ -1195,8 +1199,10 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name?: string
+          schema?: Json
           sharing?: string
           updated_at?: string | null
+          url?: string
           user_id?: string
         }
         Relationships: [

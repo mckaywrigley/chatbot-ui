@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { TOOL_NAME_MAX } from "@/db/limits"
+import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
 import { FC, useState } from "react"
@@ -13,13 +13,15 @@ interface ToolItemProps {
 export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [name, setName] = useState(tool.name)
   const [description, setDescription] = useState(tool.description)
+  const [url, setUrl] = useState(tool.url)
+  const [schema, setSchema] = useState(tool.schema as string)
 
   return (
     <SidebarItem
       item={tool}
       contentType="tools"
       icon={<IconBolt size={30} />}
-      updateState={{ name, description }}
+      updateState={{ name, description, url, schema }}
       renderInputs={() => (
         <>
           <div className="space-y-1">
@@ -33,8 +35,8 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
+          <div className="space-y-1">
+            <Label>Description</Label>
 
             <Input
               placeholder="Tool description..."
@@ -42,7 +44,27 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
             />
-          </div> */}
+          </div>
+
+          <div className="space-y-1">
+            <Label>URL</Label>
+
+            <Input
+              placeholder="Tool url..."
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Schema</Label>
+
+            <Input
+              placeholder="Tool schema..."
+              value={schema}
+              onChange={e => setSchema(e.target.value)}
+            />
+          </div>
         </>
       )}
     />

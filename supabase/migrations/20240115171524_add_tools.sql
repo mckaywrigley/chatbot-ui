@@ -21,7 +21,9 @@ CREATE TABLE IF NOT EXISTS tools (
 
     -- REQUIRED
     description TEXT NOT NULL CHECK (char_length(description) <= 500),
-    name TEXT NOT NULL CHECK (char_length(name) <= 100)
+    name TEXT NOT NULL CHECK (char_length(name) <= 100),
+    schema JSONB NOT NULL,
+    url TEXT NOT NULL CHECK (char_length(url) <= 1000)
 );
 
 -- INDEXES --

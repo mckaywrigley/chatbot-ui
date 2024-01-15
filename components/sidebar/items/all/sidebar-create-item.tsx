@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle
+} from "@/components/ui/sheet"
 import { ChatbotUIContext } from "@/context/context"
 import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
@@ -181,17 +181,24 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent onKeyDown={handleKeyDown}>
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Create {contentType.slice(0, -1)}
-          </DialogTitle>
-        </DialogHeader>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+      <SheetContent
+        className="flex flex-col justify-between"
+        side="left"
+        onKeyDown={handleKeyDown}
+      >
+        <div className="grow">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-bold">
+              Create{" "}
+              {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
+            </SheetTitle>
+          </SheetHeader>
 
-        <div className="space-y-3">{renderInputs()}</div>
+          <div className="mt-4 space-y-3">{renderInputs()}</div>
+        </div>
 
-        <DialogFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mt-2 flex justify-between">
           <div className="flex grow justify-end space-x-2">
             <Button
               disabled={creating}
@@ -205,8 +212,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

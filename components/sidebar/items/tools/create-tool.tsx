@@ -1,8 +1,9 @@
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
-import { TOOL_NAME_MAX } from "@/db/limits"
+import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
@@ -16,6 +17,8 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [url, setUrl] = useState("")
+  const [schema, setSchema] = useState("")
 
   if (!profile || !selectedWorkspace) return null
 
@@ -26,7 +29,9 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
         {
           user_id: profile.user_id,
           name,
-          description
+          description,
+          url,
+          schema
         } as TablesInsert<"tools">
       }
       isOpen={isOpen}
@@ -43,8 +48,8 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
+          <div className="space-y-1">
+            <Label>Description</Label>
 
             <Input
               placeholder="Tool description..."
@@ -52,7 +57,47 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
             />
-          </div> */}
+          </div>
+
+          <div className="space-y-1">
+            <Label>URL</Label>
+
+            <Input
+              placeholder="Tool url..."
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Schema</Label>
+
+            <TextareaAutosize
+              placeholder={`paths": {
+                "/location": {
+                  "get": {
+                    "description": "Get temperature for a specific location",
+                    "operationId": "GetCurrentWeather",
+                    "parameters": [
+                      {
+                        "name": "location",
+                        "in": "query",
+                        "description": "The city and state to retrieve the weather for",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "deprecated": false
+                  }
+                }
+              },`}
+              value={schema}
+              onValueChange={setSchema}
+              minRows={20}
+            />
+          </div>
         </>
       )}
       onOpenChange={onOpenChange}
