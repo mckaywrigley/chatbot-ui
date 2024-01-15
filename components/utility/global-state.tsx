@@ -242,6 +242,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   const fetchOllamaModels = async () => {
+    if (!process.env.NEXT_PUBLIC_OLLAMA_URL) {
+      return
+    }
+
     setLoading(true)
 
     try {
