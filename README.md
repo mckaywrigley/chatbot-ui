@@ -26,10 +26,6 @@ Chatbot UI was recently updated to its 2.0 version.
 
 The code for 1.0 can be found on the `legacy` branch.
 
-## 1 Click Quick Start
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/k-kit/chatbot-ui)
-
 ## Local Quickstart
 
 Follow these steps to get your own Chatbot UI instance running locally.
