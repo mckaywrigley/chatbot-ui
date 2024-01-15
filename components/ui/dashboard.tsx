@@ -70,7 +70,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   const sideBarRef = useRef(null)
   useClickAway(sideBarRef, () => {
-    handleToggleSidebar()
+    if (showSidebar) {
+      handleToggleSidebar()
+    }
   })
 
   return (
