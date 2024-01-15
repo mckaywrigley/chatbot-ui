@@ -124,7 +124,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (!selectedWorkspace) {
+    const isInChat = window?.location?.pathname === "/chat"
+
+    if (!selectedWorkspace && !isInChat) {
       setLoading(false)
       return
     }
@@ -142,7 +144,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setNewMessageImages([])
     setShowFilesDisplay(false)
 
-    fetchData(selectedWorkspace.id)
+    if (selectedWorkspace?.id) {
+      fetchData(selectedWorkspace.id)
+    }
   }, [selectedWorkspace])
 
   const fetchStartingData = async () => {
