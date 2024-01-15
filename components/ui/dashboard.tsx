@@ -68,23 +68,27 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div
+      className={cn("flex h-full w-full", showSidebar && "overflow-x-scroll")}
+    >
       <CommandK />
 
-      <Button
-        className={cn(
-          "absolute left-[4px] top-[50%] z-10 h-[32px] w-[32px] cursor-pointer"
-        )}
-        style={{
-          marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-          transform: showSidebar ? "rotate(180deg)" : "rotate(0deg)"
-        }}
-        variant="ghost"
-        size="icon"
-        onClick={handleToggleSidebar}
-      >
-        <IconChevronCompactRight size={24} />
-      </Button>
+      <div className="relative">
+        <Button
+          className={cn(
+            "absolute left-[4px] top-[50%] z-10 h-[32px] w-[32px] cursor-pointer"
+          )}
+          style={{
+            marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
+            transform: showSidebar ? "rotate(180deg)" : "rotate(0deg)"
+          }}
+          variant="ghost"
+          size="icon"
+          onClick={handleToggleSidebar}
+        >
+          <IconChevronCompactRight size={24} />
+        </Button>
+      </div>
 
       <div
         className={cn("border-r-2 duration-200 dark:border-none")}
