@@ -1,4 +1,5 @@
 import { ModelIcon } from "@/components/models/model-icon"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
@@ -16,8 +17,12 @@ interface ChatItemProps {
 }
 
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
-  const { selectedChat, availableLocalModels, assistantImages } =
-    useContext(ChatbotUIContext)
+  const {
+    selectedChat,
+    availableLocalModels,
+    assistantImages,
+    availableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const router = useRouter()
   const params = useParams()
@@ -36,9 +41,11 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     }
   }
 
-  const MODEL_DATA = [...LLM_LIST, ...availableLocalModels].find(
-    llm => llm.modelId === chat.model
-  ) as LLM
+  const MODEL_DATA = [
+    ...LLM_LIST,
+    ...availableLocalModels,
+    ...availableOpenRouterModels
+  ].find(llm => llm.modelId === chat.model) as LLM
 
   const assistantImage = assistantImages.find(
     image => image.assistantId === chat.assistant_id
@@ -71,7 +78,13 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         )
       ) : (
-        <ModelIcon modelId={MODEL_DATA?.modelId} height={30} width={30} />
+        <WithTooltip
+          delayDuration={200}
+          display={<div>{MODEL_DATA?.modelName}</div>}
+          trigger={
+            <ModelIcon modelId={MODEL_DATA?.modelId} height={30} width={30} />
+          }
+        />
       )}
 
       <div className="ml-3 flex-1 truncate text-sm font-semibold">

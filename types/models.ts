@@ -3,6 +3,6 @@ export type ModelProvider =
   | "google"
   | "anthropic"
   | "mistral"
-  | "llama"
   | "perplexity"
   | "ollama"
+  | "openrouter"

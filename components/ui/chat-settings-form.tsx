@@ -3,7 +3,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { ChatSettings } from "@/types"
+import { ChatSettings, LLM } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { ModelSelect } from "../models/model-select"
@@ -100,12 +100,22 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
   onChangeChatSettings,
   showTooltip
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const {
+    profile,
+    selectedWorkspace,
+    availableOpenRouterModels,
+    selectedAssistant
+  } = useContext(ChatbotUIContext)
+
+  function findOpenRouterModel(modelId: string) {
+    return availableOpenRouterModels.find(model => model.modelId === modelId)
+  }
 
   const MODEL_LIMITS = CHAT_SETTING_LIMITS[chatSettings.model] || {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 1,
-    MAX_CONTEXT_LENGTH: 4096
+    MAX_CONTEXT_LENGTH:
+      findOpenRouterModel(chatSettings.model)?.maxContext || 4096
   }
 
   return (

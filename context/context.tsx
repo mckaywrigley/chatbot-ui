@@ -1,5 +1,12 @@
 import { Tables } from "@/supabase/types"
-import { ChatFile, ChatMessage, ChatSettings, LLM, MessageImage } from "@/types"
+import {
+  ChatFile,
+  ChatMessage,
+  ChatSettings,
+  LLM,
+  MessageImage,
+  OpenRouterLLM
+} from "@/types"
 import { AssistantImage } from "@/types/assistant-image"
 import { Dispatch, SetStateAction, createContext } from "react"
 
@@ -29,6 +36,8 @@ interface ChatbotUIContext {
   // MODELS STORE
   availableLocalModels: LLM[]
   setAvailableLocalModels: Dispatch<SetStateAction<LLM[]>>
+  availableOpenRouterModels: OpenRouterLLM[]
+  setAvailableOpenRouterModels: Dispatch<SetStateAction<OpenRouterLLM[]>>
 
   // WORKSPACE STORE
   selectedWorkspace: Tables<"workspaces"> | null
@@ -125,6 +134,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // MODELS STORE
   availableLocalModels: [],
   setAvailableLocalModels: () => {},
+  availableOpenRouterModels: [],
+  setAvailableOpenRouterModels: () => {},
 
   // WORKSPACE STORE
   selectedWorkspace: null,
