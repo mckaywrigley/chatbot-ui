@@ -58,7 +58,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
           contentType="assistants"
           onContentTypeChange={onContentTypeChange}
-        />
+        />gi
 
         <SidebarSwitchItem
           icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
