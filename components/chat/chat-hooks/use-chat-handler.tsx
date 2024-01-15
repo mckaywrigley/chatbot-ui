@@ -5,9 +5,6 @@ import { ChatMessage, ChatPayload } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
-import { uploadMessageImage } from "@/db/storage/message-images"
-import { v4 as uuidv4 } from "uuid"
-
 import {
   createTempMessages,
   handleCreateChat,
@@ -179,50 +176,6 @@ export const useChatHandler = () => {
         setToolInUse
       )
     }
-
-    // if (generatedText.includes("blob.core.windows.net")) {
-    // if (true) {
-    //   const imgUrl = "https://www.gravatar.com/avatar/b71b0868d3d0042a1b98c955277394dd?s=64&d=identicon&r=PG"
-    //   let filePath = `309dd966-f37e-42b3-82ff-885d8f11d86e/501d2164-2aaa-4a1a-a012-22c468ccd0e5/f2749761-54d7-43a5-a326-59e39912080b//${uuidv4()}`
-
-    //   const response = await fetch(imgUrl);
-    //   if (!response.ok) {
-    //       throw new Error(`Failed to fetch image (status ${response.status})`);
-    //   }
-    //   const blob = await response.blob();
-    //   const filename = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
-    //   const file = new File([blob], filename, { type: "image" });
-
-    //   // uploadMessageImage(filePath, file).catch(error => {
-    //   //   console.error(`Failed to upload image at ${filePath}:`, error)
-    //   //   return null
-    //   // })
-
-    //   // chatMessages[1].message.image_paths = [filePath]
-
-    //   const reader = new FileReader();
-    //   reader.readAsDataURL(file)
-    //   reader.onloadend = async function () {
-    //     if (file.type.includes("image")) {
-    //       // Create a temp url for the image file
-    //       const imageUrl = URL.createObjectURL(file)
-    //       console.log(reader.result)
-    //       console.log(imageUrl)
-    //       // This is a temporary image for display purposes in the chat input
-    //       setNewMessageImages(prev => [
-    //         ...prev,
-    //         {
-    //           messageId: "temp",
-    //           path: imageUrl,
-    //           base64: reader.result, // base64 image
-    //           url: imageUrl,
-    //           file
-    //         }
-    //       ])
-    //     }
-    //   };
-
-    // }
 
     if (!currentChat) {
       currentChat = await handleCreateChat(

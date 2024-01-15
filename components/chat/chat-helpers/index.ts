@@ -291,35 +291,6 @@ export const processResponse = async (
       try {
         contentToAdd = isHosted ? chunk : JSON.parse(chunk).message.content
         fullText += contentToAdd
-
-        // if (contentToAdd.includes("blob.core.windows.net")) {
-
-        //   // Upload each image (stored in newMessageImages) for the user message to message_images bucket
-        //   const uploadPromises = response.
-        //   .filter(obj => obj.file !== null)
-        //   .map(obj => {
-        //     let filePath = `${profile.user_id}/${currentChat.id}/${
-        //       createdMessages[0].id
-        //     }/${uuidv4()}`
-
-        //     return uploadMessageImage(filePath, obj.file as File).catch(error => {
-        //       console.error(`Failed to upload image at ${filePath}:`, error)
-        //       return null
-        //     })
-        //   })
-
-        // const paths = (await Promise.all(uploadPromises)).filter(
-        //   Boolean
-        // ) as string[]
-
-        // setChatImages(prevImages => [
-        //   ...prevImages,
-        //   ...newMessageImages.map(obj => ({
-        //     ...obj,
-        //     messageId: createdMessages[0].id
-        //   }))
-
-        // }
       } catch (error) {
         console.error("Error parsing JSON:", error)
       }
