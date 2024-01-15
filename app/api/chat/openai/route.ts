@@ -113,7 +113,10 @@ export async function POST(request: Request) {
     }
   }
 
-  if (latestMessage.startsWith("Generate an image")) {
+  if (
+    typeof latestMessage === "string" &&
+    latestMessage.startsWith("Generate an image")
+  ) {
     return generateImage(latestMessage, messages, chatSettings)
   } else {
     return createCompletion(messages, chatSettings)
