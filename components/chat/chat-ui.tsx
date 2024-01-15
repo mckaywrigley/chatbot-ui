@@ -189,9 +189,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     })
   }
 
-  // if (loading) {
-  //   return <Loading />
-  // }
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <div className="relative flex h-full flex-col items-center">
