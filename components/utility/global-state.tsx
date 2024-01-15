@@ -119,6 +119,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     const isInChat = window?.location?.pathname === "/chat"
+
     if (!selectedWorkspace && !isInChat) {
       setLoading(false)
       return
