@@ -107,28 +107,32 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       const createdAssistant = await createAssistant(rest, workspaceId)
 
-      const filePath = await uploadAssistantImage(createdAssistant, image)
+      let updatedAssistant = createdAssistant
 
-      const updatedAssistant = await updateAssistant(createdAssistant.id, {
-        image_path: filePath
-      })
+      if (image) {
+        const filePath = await uploadAssistantImage(createdAssistant, image)
 
-      const url = (await getAssistantImageFromStorage(filePath)) || ""
+        const updatedAssistant = await updateAssistant(createdAssistant.id, {
+          image_path: filePath
+        })
 
-      if (url) {
-        const response = await fetch(url)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
+        const url = (await getAssistantImageFromStorage(filePath)) || ""
 
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: updatedAssistant.id,
-            path: filePath,
-            base64,
-            url
-          }
-        ])
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: updatedAssistant.id,
+              path: filePath,
+              base64,
+              url
+            }
+          ])
+        }
       }
 
       return updatedAssistant

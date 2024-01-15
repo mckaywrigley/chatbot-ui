@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
+import { TOOL_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
 import { FC, useState } from "react"
@@ -33,7 +33,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>Description (optional)</Label>
 
             <Input
@@ -42,7 +42,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
             />
-          </div>
+          </div> */}
         </>
       )}
     />

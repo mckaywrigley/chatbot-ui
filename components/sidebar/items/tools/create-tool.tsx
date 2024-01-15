@@ -2,7 +2,7 @@ import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
+import { TOOL_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
@@ -43,7 +43,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>Description (optional)</Label>
 
             <Input
@@ -52,7 +52,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
             />
-          </div>
+          </div> */}
         </>
       )}
       onOpenChange={onOpenChange}

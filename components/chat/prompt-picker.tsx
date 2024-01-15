@@ -20,7 +20,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
   const { prompts, isPromptPickerOpen, setIsPromptPickerOpen } =
     useContext(ChatbotUIContext)
 
-  const firstPromptRef = useRef<HTMLDivElement>(null)
+  const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   const [promptVariables, setPromptVariables] = useState<
     {
@@ -30,6 +30,12 @@ export const PromptPicker: FC<PromptPickerProps> = ({
     }[]
   >([])
   const [showPromptVariables, setShowPromptVariables] = useState(false)
+
+  useEffect(() => {
+    if (isFocused && itemsRef.current[0]) {
+      itemsRef.current[0].focus()
+    }
+  }, [isFocused])
 
   const filteredPrompts = prompts.filter(prompt =>
     prompt.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -72,7 +78,20 @@ export const PromptPicker: FC<PromptPickerProps> = ({
         index === filteredPrompts.length - 1
       ) {
         e.preventDefault()
-        firstPromptRef.current?.focus()
+        itemsRef.current[0]?.focus()
+      } else if (e.key === "ArrowUp" && !e.shiftKey && index === 0) {
+        // go to last element if arrow up is pressed on first element
+        e.preventDefault()
+        itemsRef.current[itemsRef.current.length - 1]?.focus()
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        const prevIndex =
+          index - 1 >= 0 ? index - 1 : itemsRef.current.length - 1
+        itemsRef.current[prevIndex]?.focus()
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault()
+        const nextIndex = index + 1 < itemsRef.current.length ? index + 1 : 0
+        itemsRef.current[nextIndex]?.focus()
       }
     }
 
@@ -111,10 +130,6 @@ export const PromptPicker: FC<PromptPickerProps> = ({
       handleSubmitPromptVariables()
     }
   }
-
-  useEffect(() => {
-    firstPromptRef.current?.focus()
-  }, [isFocused])
 
   return (
     <>
@@ -173,7 +188,9 @@ export const PromptPicker: FC<PromptPickerProps> = ({
             filteredPrompts.map((prompt, index) => (
               <div
                 key={prompt.id}
-                ref={index === 0 ? firstPromptRef : null}
+                ref={ref => {
+                  itemsRef.current[index] = ref
+                }}
                 tabIndex={0}
                 className="hover:bg-accent focus:bg-accent flex cursor-pointer flex-col rounded p-2 focus:outline-none"
                 onClick={() => handleSelectPrompt(prompt)}
