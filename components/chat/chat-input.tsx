@@ -7,7 +7,7 @@ import {
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -22,6 +22,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
+
+  const [isTyping, setIsTyping] = useState<boolean>(false)
 
   const {
     userInput,
@@ -58,8 +60,24 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
 
+  useEffect(() => {
+    const textarea = chatInputRef.current
+    if (textarea) {
+      const handleCompositionStart = () => setIsTyping(true)
+      const handleCompositionEnd = () => setIsTyping(false)
+
+      textarea.addEventListener("compositionstart", handleCompositionStart)
+      textarea.addEventListener("compositionend", handleCompositionEnd)
+
+      return () => {
+        textarea.removeEventListener("compositionstart", handleCompositionStart)
+        textarea.removeEventListener("compositionend", handleCompositionEnd)
+      }
+    }
+  }, [chatInputRef])
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (!isTyping && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
       handleSendMessage(userInput, chatMessages, false)
