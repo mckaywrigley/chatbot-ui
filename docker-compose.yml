@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  chatbot-build-ui:
+    build: .
+    network_mode: "host"
+    expose:
+      - 3000
+    env_file:
+      - .env.local
+    depends_on:
+      - ollama
+      
+  ollama:
+    container_name: ollama
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    # Configure your GPU settings or comment below for CPU
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0,2']
+              capabilities: [gpu]
+
+volumes:
+  ollama:

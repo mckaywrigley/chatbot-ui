@@ -161,6 +161,7 @@ export const handleLocalChat = async (
     {
       model: chatSettings.model,
       messages: formattedMessages,
+      stream: false, // error loading data as stream, set to false until bug fix Issue# #1088
       options: {
         temperature: payload.chatSettings.temperature
       }
