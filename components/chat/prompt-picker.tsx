@@ -5,20 +5,20 @@ import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Label } from "../ui/label"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
-interface PromptPickerProps {
-  searchQuery: string
-  onSelect: (prompt: Tables<"prompts">) => void
-  isFocused: boolean
-}
+interface PromptPickerProps {}
 
-export const PromptPicker: FC<PromptPickerProps> = ({
-  searchQuery,
-  onSelect,
-  isFocused
-}) => {
-  const { prompts, isPromptPickerOpen, setIsPromptPickerOpen } =
-    useContext(ChatbotUIContext)
+export const PromptPicker: FC<PromptPickerProps> = ({}) => {
+  const {
+    prompts,
+    isPromptPickerOpen,
+    setIsPromptPickerOpen,
+    focusPrompt,
+    slashCommand
+  } = useContext(ChatbotUIContext)
+
+  const { handleSelectPrompt } = usePromptAndCommand()
 
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -32,20 +32,20 @@ export const PromptPicker: FC<PromptPickerProps> = ({
   const [showPromptVariables, setShowPromptVariables] = useState(false)
 
   useEffect(() => {
-    if (isFocused && itemsRef.current[0]) {
+    if (focusPrompt && itemsRef.current[0]) {
       itemsRef.current[0].focus()
     }
-  }, [isFocused])
+  }, [focusPrompt])
 
   const filteredPrompts = prompts.filter(prompt =>
-    prompt.name.toLowerCase().includes(searchQuery.toLowerCase())
+    prompt.name.toLowerCase().includes(slashCommand.toLowerCase())
   )
 
   const handleOpenChange = (isOpen: boolean) => {
     setIsPromptPickerOpen(isOpen)
   }
 
-  const handleSelectPrompt = (prompt: Tables<"prompts">) => {
+  const callSelectPrompt = (prompt: Tables<"prompts">) => {
     const regex = /\{\{.*?\}\}/g
     const matches = prompt.content.match(regex)
 
@@ -59,7 +59,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
       setPromptVariables(newPromptVariables)
       setShowPromptVariables(true)
     } else {
-      onSelect(prompt)
+      handleSelectPrompt(prompt)
       handleOpenChange(false)
     }
   }
@@ -71,7 +71,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
         handleOpenChange(false)
       } else if (e.key === "Enter") {
         e.preventDefault()
-        handleSelectPrompt(filteredPrompts[index])
+        callSelectPrompt(filteredPrompts[index])
       } else if (
         (e.key === "Tab" || e.key === "ArrowDown") &&
         !e.shiftKey &&
@@ -111,7 +111,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({
       content: newPromptContent
     }
 
-    onSelect(newPrompt)
+    handleSelectPrompt(newPrompt)
     handleOpenChange(false)
     setShowPromptVariables(false)
     setPromptVariables([])
@@ -193,10 +193,11 @@ export const PromptPicker: FC<PromptPickerProps> = ({
                 }}
                 tabIndex={0}
                 className="hover:bg-accent focus:bg-accent flex cursor-pointer flex-col rounded p-2 focus:outline-none"
-                onClick={() => handleSelectPrompt(prompt)}
+                onClick={() => callSelectPrompt(prompt)}
                 onKeyDown={getKeyDownHandler(index)}
               >
                 <div className="font-bold">{prompt.name}</div>
+
                 <div className="truncate text-sm opacity-80">
                   {prompt.content}
                 </div>

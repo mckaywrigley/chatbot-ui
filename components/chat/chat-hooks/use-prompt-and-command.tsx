@@ -14,14 +14,18 @@ export const usePromptAndCommand = () => {
     setIsAtPickerOpen,
     setSlashCommand,
     setAtCommand,
-    setUseRetrieval
+    setUseRetrieval,
+    setToolCommand,
+    setIsToolPickerOpen
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
     const slashTextRegex = /\/([^ ]*)$/
     const atTextRegex = /@([^ ]*)$/
+    const toolTextRegex = /!([^ ]*)$/
     const slashMatch = value.match(slashTextRegex)
     const atMatch = value.match(atTextRegex)
+    const toolMatch = value.match(toolTextRegex)
 
     if (slashMatch) {
       setIsPromptPickerOpen(true)
@@ -29,22 +33,30 @@ export const usePromptAndCommand = () => {
     } else if (atMatch) {
       setIsAtPickerOpen(true)
       setAtCommand(atMatch[1])
+    } else if (toolMatch) {
+      setIsToolPickerOpen(true)
+      setToolCommand(toolMatch[1])
     } else {
       setIsPromptPickerOpen(false)
       setIsAtPickerOpen(false)
       setSlashCommand("")
       setAtCommand("")
+      setIsToolPickerOpen(false)
+      setToolCommand("")
     }
 
     setUserInput(value)
   }
 
   const handleSelectPrompt = (prompt: Tables<"prompts">) => {
+    console.log("prompt", prompt, prompt.content)
     setIsPromptPickerOpen(false)
     setUserInput(userInput.replace(/\/[^ ]*$/, "") + prompt.content)
   }
 
   const handleSelectUserFile = async (file: Tables<"files">) => {
+    console.log("file", file)
+
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
@@ -74,6 +86,8 @@ export const usePromptAndCommand = () => {
   const handleSelectUserCollection = async (
     collection: Tables<"collections">
   ) => {
+    console.log("collection", collection)
+
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
@@ -102,10 +116,18 @@ export const usePromptAndCommand = () => {
     setUserInput(userInput.replace(/@[^ ]*$/, ""))
   }
 
+  const handleSelectTool = (tool: Tables<"tools">) => {
+    console.log("tool", tool)
+
+    setIsToolPickerOpen(false)
+    setUserInput(userInput.replace(/![^ ]*$/, "") + tool.name)
+  }
+
   return {
     handleInputChange,
     handleSelectPrompt,
     handleSelectUserFile,
-    handleSelectUserCollection
+    handleSelectUserCollection,
+    handleSelectTool
   }
 }

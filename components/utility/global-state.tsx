@@ -98,8 +98,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [slashCommand, setSlashCommand] = useState("")
   const [isAtPickerOpen, setIsAtPickerOpen] = useState(false)
   const [atCommand, setAtCommand] = useState("")
+  const [isToolPickerOpen, setIsToolPickerOpen] = useState(false)
+  const [toolCommand, setToolCommand] = useState("")
   const [focusPrompt, setFocusPrompt] = useState(false)
   const [focusFile, setFocusFile] = useState(false)
+  const [focusTool, setFocusTool] = useState(false)
   const [toolInUse, setToolInUse] = useState<"none" | "retrieval">("none")
 
   // ATTACHMENTS STORE
@@ -402,14 +405,20 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         slashCommand,
         isAtPickerOpen,
         atCommand,
+        isToolPickerOpen,
+        toolCommand,
         focusPrompt,
         focusFile,
+        focusTool,
         setIsPromptPickerOpen,
         setSlashCommand,
         setIsAtPickerOpen,
         setAtCommand,
+        setIsToolPickerOpen,
+        setToolCommand,
         setFocusPrompt,
         setFocusFile,
+        setFocusTool,
 
         // ATTACHMENT STORE
         chatFiles,

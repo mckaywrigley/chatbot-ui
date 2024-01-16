@@ -82,14 +82,20 @@ interface ChatbotUIContext {
   slashCommand: string
   isAtPickerOpen: boolean
   atCommand: string
+  isToolPickerOpen: boolean
+  toolCommand: string
   focusPrompt: boolean
   focusFile: boolean
+  focusTool: boolean
   setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
   setSlashCommand: Dispatch<SetStateAction<string>>
   setIsAtPickerOpen: Dispatch<SetStateAction<boolean>>
   setAtCommand: Dispatch<SetStateAction<string>>
+  setIsToolPickerOpen: Dispatch<SetStateAction<boolean>>
+  setToolCommand: Dispatch<SetStateAction<string>>
   setFocusPrompt: Dispatch<SetStateAction<boolean>>
   setFocusFile: Dispatch<SetStateAction<boolean>>
+  setFocusTool: Dispatch<SetStateAction<boolean>>
 
   // ATTACHMENTS STORE
   chatFiles: ChatFile[]
@@ -172,14 +178,20 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   slashCommand: "",
   isAtPickerOpen: false,
   atCommand: "",
+  isToolPickerOpen: false,
+  toolCommand: "",
   focusPrompt: false,
   focusFile: false,
+  focusTool: false,
   setIsPromptPickerOpen: () => {},
   setSlashCommand: () => {},
   setIsAtPickerOpen: () => {},
   setAtCommand: () => {},
+  setIsToolPickerOpen: () => {},
+  setToolCommand: () => {},
   setFocusPrompt: () => {},
   setFocusFile: () => {},
+  setFocusTool: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,

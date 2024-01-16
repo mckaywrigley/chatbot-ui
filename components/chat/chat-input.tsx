@@ -34,6 +34,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     focusPrompt,
     setFocusPrompt,
     focusFile,
+    focusTool,
+    setFocusTool,
+    isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
     isAtPickerOpen,
@@ -102,6 +105,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       event.preventDefault()
       setFocusFile(!focusFile)
     }
+
+    if (
+      isToolPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
+      event.preventDefault()
+      setFocusTool(!focusTool)
+    }
   }
 
   const handlePaste = (event: React.ClipboardEvent) => {
@@ -152,7 +165,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={`Ask anything. Type "@" for files. Type "/" for prompts.`}
+          placeholder={`Ask anything. Type "/" for prompts, "@" for files, and "!" for tools.`}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

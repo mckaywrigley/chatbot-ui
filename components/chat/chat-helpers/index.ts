@@ -219,7 +219,8 @@ export const handleHostedChat = async (
     `/api/chat/${provider}`,
     {
       chatSettings: payload.chatSettings,
-      messages: formattedMessages
+      messages: formattedMessages,
+      tools: []
     },
     true,
     newAbortController,
