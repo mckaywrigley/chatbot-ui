@@ -655,15 +655,20 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
 
-              {/* openRouter */}
               <div className="space-y-1">
-                <Label>OpenRouter API Key</Label>
-                <Input
-                  placeholder="OpenRouter API Key"
-                  type="password"
-                  value={openrouterAPIKey}
-                  onChange={e => setOpenrouterAPIKey(e.target.value)}
-                />
+                {isEnvOpenrouter ? (
+                  <Label>OpenRouter API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>OpenRouter API Key</Label>
+                    <Input
+                      placeholder="OpenRouter API Key"
+                      type="password"
+                      value={openrouterAPIKey}
+                      onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
             </TabsContent>
           </Tabs>
