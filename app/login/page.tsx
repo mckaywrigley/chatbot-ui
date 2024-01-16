@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,6 +8,10 @@ import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
+
+export const metadata: Metadata = {
+  title: "Log in",
+}
 
 export default async function Login({
   searchParams
