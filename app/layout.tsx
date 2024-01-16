@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import { Toaster } from "@/components/ui/sonner"
 import { GlobalState } from "@/components/utility/global-state"
 import { Providers } from "@/components/utility/providers"
@@ -12,6 +13,13 @@ const inter = Inter({ subsets: ["latin"] })
 
 interface RootLayoutProps {
   children: ReactNode
+}
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s - Chatbot UI",
+    default: "Chatbot UI"
+  }
 }
 
 export default async function RootLayout({ children }: RootLayoutProps) {
