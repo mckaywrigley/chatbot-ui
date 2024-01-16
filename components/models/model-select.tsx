@@ -50,8 +50,15 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
   useEffect(() => {
     const checkModelLock = async () => {
+      const isUsingAzure = profile?.use_azure_openai
+
       if (SELECTED_MODEL && profile) {
-        const locked = await isModelLocked(SELECTED_MODEL.provider, profile)
+        const locked = await isModelLocked(
+          SELECTED_MODEL.provider === "openai" && isUsingAzure
+            ? "azure"
+            : SELECTED_MODEL.provider,
+          profile
+        )
         setIsLocked(locked)
       }
     }
@@ -86,8 +93,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     model => model.modelId === selectedModelId
   )
 
-  if (!SELECTED_MODEL) return null
-  if (!profile) return null
+  if (!SELECTED_MODEL || !profile) return null
 
   const usingLocalModels = availableLocalModels.length > 0
 
