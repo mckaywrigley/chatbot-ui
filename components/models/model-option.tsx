@@ -18,7 +18,13 @@ export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
   useEffect(() => {
     async function setup() {
       if (!profile) return null
-      const locked = await isModelLocked(model.provider, profile)
+
+      const isUsingAzure = profile?.use_azure_openai
+
+      const locked = await isModelLocked(
+        model.provider === "openai" && isUsingAzure ? "azure" : model.provider,
+        profile
+      )
 
       setIsLocked(locked)
     }
