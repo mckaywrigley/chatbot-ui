@@ -171,7 +171,7 @@ Follow prompt to enter model name to download.  This will download the model usi
 
 **CAUTION** If you have ollama already running on your system you will need to adjust your ports in the Dockerfile and the env.local to the port of your choice for the Docker ollama instance.
 
-Work-In-Progress to fully automate the local instance of ollama with the Makefile.  If ollama is already installed and serving models, it will work just finish.  There is an error to start ollama from teh script to run `ollama serve`
+Work-In-Progress to fully automate the local instance of ollama with the Makefile.  If ollama is already installed and serving models, it will work just finish.  There is an error to start ollama from the script to run `ollama serve`.
 
 ```bash
 make start-chatbot-local
