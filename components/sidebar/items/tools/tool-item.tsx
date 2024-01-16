@@ -61,26 +61,42 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             <Label>Schema</Label>
 
             <TextareaAutosize
-              placeholder={`paths": {
-                "/location": {
-                  "get": {
-                    "description": "Get temperature for a specific location",
-                    "operationId": "GetCurrentWeather",
-                    "parameters": [
-                      {
-                        "name": "location",
-                        "in": "query",
-                        "description": "The city and state to retrieve the weather for",
-                        "required": true,
-                        "schema": {
-                          "type": "string"
-                        }
-                      }
-                    ],
-                    "deprecated": false
+              placeholder={`{
+                "openapi": "3.1.0",
+                "info": {
+                  "title": "Get weather data",
+                  "description": "Retrieves current weather data for a location.",
+                  "version": "v1.0.0"
+                },
+                "servers": [
+                  {
+                    "url": "https://weather.example.com"
                   }
+                ],
+                "paths": {
+                  "/location": {
+                    "get": {
+                      "description": "Get temperature for a specific location",
+                      "operationId": "GetCurrentWeather",
+                      "parameters": [
+                        {
+                          "name": "location",
+                          "in": "query",
+                          "description": "The city and state to retrieve the weather for",
+                          "required": true,
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "deprecated": false
+                    }
+                  }
+                },
+                "components": {
+                  "schemas": {}
                 }
-              },`}
+              }`}
               value={schema}
               onValueChange={setSchema}
               minRows={20}
