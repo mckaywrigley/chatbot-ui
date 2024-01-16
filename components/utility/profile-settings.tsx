@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase/browser-client"
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,
+  IconFileDownload,
   IconLoader2,
   IconLogout,
   IconUser
@@ -38,8 +39,10 @@ import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
+import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
 import { cn } from "@/lib/utils"
 import { VALID_KEYS } from "@/types/valid-keys"
+import { WithTooltip } from "../ui/with-tooltip"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const { profile, setProfile } = useContext(ChatbotUIContext)
@@ -652,22 +655,44 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
 
-              {/* openRouter */}
               <div className="space-y-1">
-                <Label>OpenRouter API Key</Label>
-                <Input
-                  placeholder="OpenRouter API Key"
-                  type="password"
-                  value={openrouterAPIKey}
-                  onChange={e => setOpenrouterAPIKey(e.target.value)}
-                />
+                {isEnvOpenrouter ? (
+                  <Label>OpenRouter API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>OpenRouter API Key</Label>
+                    <Input
+                      placeholder="OpenRouter API Key"
+                      type="password"
+                      value={openrouterAPIKey}
+                      onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
               </div>
             </TabsContent>
           </Tabs>
         </div>
 
         <div className="mt-6 flex items-center">
-          <ThemeSwitcher />
+          <div className="flex items-center space-x-1">
+            <ThemeSwitcher />
+
+            <WithTooltip
+              display={
+                <div>
+                  Download Chatbot UI 1.0 data as JSON. Import coming soon!
+                </div>
+              }
+              trigger={
+                <IconFileDownload
+                  className="cursor-pointer hover:opacity-50"
+                  size={32}
+                  onClick={exportLocalStorageAsJSON}
+                />
+              }
+            />
+          </div>
 
           <div className="ml-auto space-x-2">
             <Button variant="ghost" onClick={() => setIsOpen(false)}>

@@ -106,6 +106,13 @@ export const ShareItem: FC<ShareItemProps> = ({
         }
         break
 
+      case "tools":
+        data = {
+          ...data,
+          name: item.name
+        }
+        break
+
       default:
         break
     }

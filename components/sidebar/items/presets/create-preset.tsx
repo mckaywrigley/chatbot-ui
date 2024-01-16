@@ -3,7 +3,7 @@ import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { PRESET_DESCRIPTION_MAX, PRESET_NAME_MAX } from "@/db/limits"
+import { PRESET_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
@@ -67,7 +67,7 @@ export const CreatePreset: FC<CreatePresetProps> = ({
             />
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>Description (optional)</Label>
 
             <Input
@@ -76,7 +76,7 @@ export const CreatePreset: FC<CreatePresetProps> = ({
               onChange={e => setDescription(e.target.value)}
               maxLength={PRESET_DESCRIPTION_MAX}
             />
-          </div>
+          </div> */}
 
           <ChatSettingsForm
             chatSettings={presetChatSettings as any}

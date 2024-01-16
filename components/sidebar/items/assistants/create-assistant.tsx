@@ -4,7 +4,7 @@ import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
+import { ASSISTANT_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useEffect, useState } from "react"
 
@@ -74,7 +74,33 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
       renderInputs={() => (
         <>
           <div className="space-y-1">
-            <Label>Image</Label>
+            <Label>Name</Label>
+
+            <Input
+              placeholder="Assistant name..."
+              value={name}
+              onChange={e => setName(e.target.value)}
+              maxLength={ASSISTANT_NAME_MAX}
+            />
+          </div>
+
+          {/* <div className="space-y-1">
+            <Label>Description (optional)</Label>
+
+            <Input
+              placeholder="Assistant description..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={ASSISTANT_DESCRIPTION_MAX}
+            />
+          </div> */}
+
+          <div className="space-y-1 pt-2">
+            <Label className="flex space-x-1">
+              <div>Image</div>
+
+              <div className="text-xs">(optional)</div>
+            </Label>
 
             <ImagePicker
               src={imageLink}
@@ -86,27 +112,11 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             />
           </div>
 
-          <div className="space-y-1">
-            <Label>Name</Label>
-
-            <Input
-              placeholder="Assistant name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={ASSISTANT_NAME_MAX}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Description (optional)</Label>
-
-            <Input
-              placeholder="Assistant description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={ASSISTANT_DESCRIPTION_MAX}
-            />
-          </div>
+          <ChatSettingsForm
+            chatSettings={assistantChatSettings as any}
+            onChangeChatSettings={setAssistantChatSettings}
+            useAdvancedDropdown={true}
+          />
 
           <div className="space-y-1">
             <Label>Files</Label>
@@ -119,12 +129,6 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
 
             <div>Coming soon...</div>
           </div>
-
-          <ChatSettingsForm
-            chatSettings={assistantChatSettings as any}
-            onChangeChatSettings={setAssistantChatSettings}
-            useAdvancedDropdown={true}
-          />
         </>
       )}
       onOpenChange={onOpenChange}

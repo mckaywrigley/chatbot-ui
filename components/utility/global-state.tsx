@@ -13,6 +13,7 @@ import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getProfileByUserId } from "@/db/profile"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
+import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { supabase } from "@/lib/supabase/browser-client"
@@ -49,6 +50,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [folders, setFolders] = useState<Tables<"folders">[]>([])
   const [presets, setPresets] = useState<Tables<"presets">[]>([])
   const [prompts, setPrompts] = useState<Tables<"prompts">[]>([])
+  const [tools, setTools] = useState<Tables<"tools">[]>([])
   const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
 
   // MODELS STORE
@@ -248,10 +250,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
     setPrompts(promptData.prompts)
 
+    const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
+    setTools(toolData.tools)
+
     setLoading(false)
   }
 
-  // fetch ollama models
   const fetchOllamaModels = async () => {
     setLoading(true)
 
@@ -339,6 +343,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         folders,
         presets,
         prompts,
+        tools,
         workspaces,
         setAssistants,
         setCollections,
@@ -347,6 +352,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setFolders,
         setPresets,
         setPrompts,
+        setTools,
         setWorkspaces,
 
         // MODELS STORE

@@ -53,7 +53,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
             <Label>Prompt</Label>
 
             <TextareaAutosize
-              placeholder="Prompt..."
+              placeholder="Prompt content..."
               value={content}
               onValueChange={setContent}
               minRows={6}

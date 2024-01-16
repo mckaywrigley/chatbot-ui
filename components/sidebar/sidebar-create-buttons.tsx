@@ -10,13 +10,16 @@ import { CreateCollection } from "./items/collections/create-collection"
 import { CreateFile } from "./items/files/create-file"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
+import { CreateTool } from "./items/tools/create-tool"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
+  hasData: boolean
 }
 
 export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
-  contentType
+  contentType,
+  hasData
 }) => {
   const { profile, selectedWorkspace, folders, setFolders } =
     useContext(ChatbotUIContext)
@@ -27,6 +30,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingFile, setIsCreatingFile] = useState(false)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
+  const [isCreatingTool, setIsCreatingTool] = useState(false)
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -74,6 +78,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           setIsCreatingAssistant(true)
         }
 
+      case "tools":
+        return async () => {
+          setIsCreatingTool(true)
+        }
+
       default:
         break
     }
@@ -88,9 +97,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           contentType.slice(1, contentType.length - 1)}
       </Button>
 
-      <Button className="h-[36px] w-[36px] p-1" onClick={handleCreateFolder}>
-        <IconFolderPlus size={20} />
-      </Button>
+      {hasData && (
+        <Button className="h-[36px] w-[36px] p-1" onClick={handleCreateFolder}>
+          <IconFolderPlus size={20} />
+        </Button>
+      )}
 
       {isCreatingPrompt && (
         <CreatePrompt
@@ -122,6 +133,10 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           isOpen={isCreatingAssistant}
           onOpenChange={setIsCreatingAssistant}
         />
+      )}
+
+      {isCreatingTool && (
+        <CreateTool isOpen={isCreatingTool} onOpenChange={setIsCreatingTool} />
       )}
     </div>
   )

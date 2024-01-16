@@ -35,7 +35,8 @@ export const AddToWorkspace: FC<AddToWorkspaceProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -149,6 +150,13 @@ export const AddToWorkspace: FC<AddToWorkspaceProps> = ({
       )
 
       return createdAssistant
+    },
+    tools: async (
+      item: Tables<"tools">,
+      workspaceId: string,
+      userId: string
+    ) => {
+      // TODO
     }
   }
 
@@ -158,7 +166,8 @@ export const AddToWorkspace: FC<AddToWorkspaceProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools
   }
 
   const handleAddToWorkspace = async (workspaceId: string) => {

@@ -27,13 +27,13 @@ export const FilePicker: FC<FilePickerProps> = ({
 }) => {
   const { files, collections, setIsAtPickerOpen } = useContext(ChatbotUIContext)
 
+  const itemsRef = useRef<(HTMLDivElement | null)[]>([])
+
   useEffect(() => {
     if (isFocused && itemsRef.current[0]) {
       itemsRef.current[0].focus()
     }
   }, [isFocused])
-
-  const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   const filteredFiles = files.filter(
     file =>
