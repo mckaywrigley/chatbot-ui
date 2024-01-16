@@ -99,6 +99,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
+      e.stopPropagation()
       buttonRef.current?.click()
     }
   }
