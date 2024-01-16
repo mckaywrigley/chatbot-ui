@@ -18,8 +18,8 @@ interface RootLayoutProps {
 export const metadata: Metadata = {
   title: {
     template: "%s - Chatbot UI",
-    default: "Chatbot UI",
-  },
+    default: "Chatbot UI"
+  }
 }
 
 export default async function RootLayout({ children }: RootLayoutProps) {
