@@ -19,7 +19,7 @@ export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
     async function setup() {
       if (!profile) return null
 
-      const isUsingAzure = profile?.use_azure_openai
+      const isUsingAzure = profile?.use_azure_openai 
 
       const locked = await isModelLocked(
         model.provider === "openai" && isUsingAzure ? "azure" : model.provider,
