@@ -7,7 +7,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { AssistantRetrievalItem } from "@/types"
 import {
   IconBooks,
   IconChevronDown,
@@ -17,8 +16,10 @@ import { FileIcon } from "lucide-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 
 interface AssistantRetrievalSelectProps {
-  selectedAssistantRetrievalItems: AssistantRetrievalItem[]
-  onAssistantRetrievalItemsSelect: (item: AssistantRetrievalItem) => void
+  selectedAssistantRetrievalItems: Tables<"files">[] | Tables<"collections">[]
+  onAssistantRetrievalItemsSelect: (
+    item: Tables<"files"> | Tables<"collections">
+  ) => void
 }
 
 export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
@@ -42,8 +43,7 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
   }, [isOpen])
 
   const handleItemSelect = (item: Tables<"files"> | Tables<"collections">) => {
-    console.log(item)
-    // onAssistantRetrievalItemsSelect(item)
+    onAssistantRetrievalItemsSelect(item)
   }
 
   if (!files || !collections) return null
@@ -93,9 +93,11 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
             item.name.toLowerCase().includes(search.toLowerCase())
           )
           .map(item => (
-            <AssistantRetrievalItem
+            <AssistantRetrievalItemOption
               key={item.id}
-              contentType={item.type ? "files" : "collections"}
+              contentType={
+                item.hasOwnProperty("type") ? "files" : "collections"
+              }
               item={item as Tables<"files"> | Tables<"collections">}
               selected={selectedAssistantRetrievalItems.some(
                 selectedAssistantRetrieval =>
@@ -114,7 +116,7 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
               ) && file.name.toLowerCase().includes(search.toLowerCase())
           )
           .map(file => (
-            <AssistantRetrievalItem
+            <AssistantRetrievalItemOption
               key={file.id}
               item={file}
               contentType="files"
@@ -135,7 +137,7 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
               ) && collection.name.toLowerCase().includes(search.toLowerCase())
           )
           .map(collection => (
-            <AssistantRetrievalItem
+            <AssistantRetrievalItemOption
               key={collection.id}
               contentType="collections"
               item={collection}
@@ -151,14 +153,14 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
   )
 }
 
-interface AssistantRetrievalItemProps {
+interface AssistantRetrievalOptionItemProps {
   contentType: "files" | "collections"
   item: Tables<"files"> | Tables<"collections">
   selected: boolean
   onSelect: (item: Tables<"files"> | Tables<"collections">) => void
 }
 
-const AssistantRetrievalItem: FC<AssistantRetrievalItemProps> = ({
+const AssistantRetrievalItemOption: FC<AssistantRetrievalOptionItemProps> = ({
   contentType,
   item,
   selected,

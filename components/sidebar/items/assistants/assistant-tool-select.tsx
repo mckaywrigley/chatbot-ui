@@ -40,8 +40,7 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
   }, [isOpen])
 
   const handleToolSelect = (tool: Tables<"tools">) => {
-    console.log(tool)
-    // onAssistantToolsSelect(item)
+    onAssistantToolsSelect(tool)
   }
 
   if (!tools) return null
