@@ -327,7 +327,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
-      ></div>
+      />
     </>
   )
 }

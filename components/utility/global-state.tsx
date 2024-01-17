@@ -71,6 +71,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedAssistant, setSelectedAssistant] =
     useState<Tables<"assistants"> | null>(null)
   const [assistantImages, setAssistantImages] = useState<AssistantImage[]>([])
+  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([])
 
   // PASSIVE CHAT STORE
   const [userInput, setUserInput] = useState<string>("")
@@ -124,9 +125,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     fetchOpenRouterModels()
+
     if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
       fetchOllamaModels()
     }
+
+    // fetchOpenaiAssistants()
 
     fetchStartingData()
   }, [])
@@ -330,6 +334,22 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
+  const fetchOpenaiAssistants = async () => {
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/assistants/openai")
+
+      const data = await response.json()
+
+      setOpenaiAssistants(data.assistants)
+    } catch (error) {
+      console.warn("Error fetching OpenAI assistants: " + error)
+    }
+
+    setLoading(false)
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -378,8 +398,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // ASSISTANT STORE
         selectedAssistant,
         assistantImages,
+        openaiAssistants,
         setSelectedAssistant,
         setAssistantImages,
+        setOpenaiAssistants,
 
         // PASSIVE CHAT STORE
         userInput,

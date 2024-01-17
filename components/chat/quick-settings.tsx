@@ -4,6 +4,7 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
+import OpenAI from "openai"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
@@ -29,7 +30,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     setSelectedPreset,
     setSelectedAssistant,
     setChatSettings,
-    assistantImages
+    assistantImages,
+    openaiAssistants
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -109,7 +111,28 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     ...assistants.map(assistant => ({
       ...assistant,
       contentType: "assistants"
-    }))
+    })),
+    ...(openaiAssistants.map((assistant: OpenAI.Beta.Assistant) => {
+      return {
+        id: assistant.id,
+        folder_id: null,
+        created_at: assistant.created_at.toString(),
+        updated_at: "openai-assistant",
+        sharing: "private",
+        name: assistant.name || "",
+        description: assistant.description || "",
+        image: "",
+        image_path: "",
+        user_id: "",
+        include_profile_context: false,
+        include_workspace_instructions: false,
+        context_length: 0,
+        model: assistant.model,
+        prompt: assistant.instructions || "",
+        temperature: 0,
+        embeddings_provider: "openai"
+      }
+    }) as Tables<"assistants">[])
   ]
 
   const selectedAssistantImage = selectedPreset

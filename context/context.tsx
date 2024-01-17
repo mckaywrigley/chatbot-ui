@@ -52,8 +52,10 @@ interface ChatbotUIContext {
   // ASSISTANT STORE
   selectedAssistant: Tables<"assistants"> | null
   assistantImages: AssistantImage[]
+  openaiAssistants: any[]
   setSelectedAssistant: Dispatch<SetStateAction<Tables<"assistants"> | null>>
   setAssistantImages: Dispatch<SetStateAction<AssistantImage[]>>
+  setOpenaiAssistants: Dispatch<SetStateAction<any[]>>
 
   // PASSIVE CHAT STORE
   userInput: string
@@ -162,8 +164,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // ASSISTANT STORE
   selectedAssistant: null,
   assistantImages: [],
+  openaiAssistants: [],
   setSelectedAssistant: () => {},
   setAssistantImages: () => {},
+  setOpenaiAssistants: () => {},
 
   // PASSIVE CHAT STORE
   userInput: "",
@@ -211,7 +215,6 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   newMessageFiles: [],
   newMessageImages: [],
   showFilesDisplay: false,
-
   setChatFiles: () => {},
   setChatImages: () => {},
   setNewMessageFiles: () => {},
