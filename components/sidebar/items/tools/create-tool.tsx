@@ -59,7 +59,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>URL</Label>
 
             <Input
@@ -67,7 +67,27 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               value={url}
               onChange={e => setUrl(e.target.value)}
             />
-          </div>
+          </div> */}
+
+          {/* <div className="space-y-3 pt-4 pb-3">
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Web Browsing</Label>
+            </div>
+
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Image Generation</Label>
+            </div>
+
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Code Interpreter</Label>
+            </div>
+          </div> */}
 
           <div className="space-y-1">
             <Label>Schema</Label>

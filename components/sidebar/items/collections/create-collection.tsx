@@ -30,6 +30,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
       const isFileAlreadySelected = prevState.find(
         selectedFile => selectedFile.id === file.id
       )
+
       if (isFileAlreadySelected) {
         return prevState.filter(selectedFile => selectedFile.id !== file.id)
       } else {

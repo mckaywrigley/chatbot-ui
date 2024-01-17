@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { ASSISTANT_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
+import { AssistantRetrievalItem } from "@/types"
 import { FC, useContext, useEffect, useState } from "react"
+import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
+import { AssistantToolSelect } from "./assistant-tool-select"
 
 interface CreateAssistantProps {
   isOpen: boolean
@@ -32,6 +35,11 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   })
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imageLink, setImageLink] = useState("")
+  const [selectedAssistantRetrievalItems, setSelectedAssistantRetrievalItems] =
+    useState<AssistantRetrievalItem[]>([])
+  const [selectedAssistantToolItems, setSelectedAssistantToolItems] = useState<
+    Tables<"tools">[]
+  >([])
 
   useEffect(() => {
     setAssistantChatSettings(prevSettings => {
@@ -46,6 +54,22 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
       }
     })
   }, [name])
+
+  const handleRetrievalItemSelect = (item: AssistantRetrievalItem) => {
+    setSelectedAssistantRetrievalItems(prevState => {
+      const isItemAlreadySelected = prevState.find(
+        selectedItem => selectedItem.id === item.id
+      )
+
+      if (isItemAlreadySelected) {
+        return prevState.filter(selectedItem => selectedItem.id !== item.id)
+      } else {
+        return [...prevState, item]
+      }
+    })
+  }
+
+  const handleToolSelect = (item: Tables<"tools">) => {}
 
   if (!profile) return null
   if (!selectedWorkspace) return null
@@ -107,16 +131,22 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             useAdvancedDropdown={true}
           />
 
-          <div className="space-y-1">
-            <Label>Files</Label>
+          <div className="space-y-1 pt-2">
+            <Label>File & Collections</Label>
 
-            <div>Coming soon...</div>
+            <AssistantRetrievalSelect
+              selectedAssistantRetrievalItems={selectedAssistantRetrievalItems}
+              onAssistantRetrievalItemsSelect={handleRetrievalItemSelect}
+            />
           </div>
 
           <div className="space-y-1">
             <Label>Tools</Label>
 
-            <div>Coming soon...</div>
+            <AssistantToolSelect
+              selectedAssistantTools={selectedAssistantToolItems}
+              onAssistantToolsSelect={handleToolSelect}
+            />
           </div>
         </>
       )}
