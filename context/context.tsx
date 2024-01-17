@@ -71,11 +71,9 @@ interface ChatbotUIContext {
   abortController: AbortController | null
   firstTokenReceived: boolean
   isGenerating: boolean
-  toolInUse: "none" | "retrieval"
   setAbortController: Dispatch<SetStateAction<AbortController | null>>
   setFirstTokenReceived: Dispatch<SetStateAction<boolean>>
   setIsGenerating: Dispatch<SetStateAction<boolean>>
-  setToolInUse: Dispatch<SetStateAction<"none" | "retrieval">>
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
@@ -114,6 +112,12 @@ interface ChatbotUIContext {
   sourceCount: number
   setUseRetrieval: Dispatch<SetStateAction<boolean>>
   setSourceCount: Dispatch<SetStateAction<number>>
+
+  // TOOL STORE
+  selectedTool: Tables<"tools"> | null
+  setSelectedTool: Dispatch<SetStateAction<Tables<"tools"> | null>>
+  toolInUse: string
+  setToolInUse: Dispatch<SetStateAction<string>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -197,11 +201,9 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   isGenerating: false,
   firstTokenReceived: false,
   abortController: null,
-  toolInUse: "none",
   setIsGenerating: () => {},
   setFirstTokenReceived: () => {},
   setAbortController: () => {},
-  setToolInUse: () => {},
 
   // ATTACHMENTS STORE
   chatFiles: [],
@@ -220,5 +222,11 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   useRetrieval: false,
   sourceCount: 4,
   setUseRetrieval: () => {},
-  setSourceCount: () => {}
+  setSourceCount: () => {},
+
+  // TOOL STORE
+  selectedTool: null,
+  setSelectedTool: () => {},
+  toolInUse: "none",
+  setToolInUse: () => {}
 })

@@ -103,7 +103,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [focusPrompt, setFocusPrompt] = useState(false)
   const [focusFile, setFocusFile] = useState(false)
   const [focusTool, setFocusTool] = useState(false)
-  const [toolInUse, setToolInUse] = useState<"none" | "retrieval">("none")
 
   // ATTACHMENTS STORE
   const [chatFiles, setChatFiles] = useState<ChatFile[]>([])
@@ -115,6 +114,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // RETIEVAL STORE
   const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
   const [sourceCount, setSourceCount] = useState<number>(4)
+
+  // TOOL STORE
+  const [selectedTool, setSelectedTool] = useState<Tables<"tools"> | null>(null)
+  const [toolInUse, setToolInUse] = useState<string>("none")
 
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
@@ -394,11 +397,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         abortController,
         firstTokenReceived,
         isGenerating,
-        toolInUse,
         setAbortController,
         setFirstTokenReceived,
         setIsGenerating,
-        setToolInUse,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,
@@ -436,7 +437,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         useRetrieval,
         sourceCount,
         setUseRetrieval,
-        setSourceCount
+        setSourceCount,
+
+        // TOOL STORE
+        selectedTool,
+        setSelectedTool,
+        toolInUse,
+        setToolInUse
       }}
     >
       {children}

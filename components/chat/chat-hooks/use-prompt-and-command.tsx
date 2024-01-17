@@ -16,7 +16,8 @@ export const usePromptAndCommand = () => {
     setAtCommand,
     setUseRetrieval,
     setToolCommand,
-    setIsToolPickerOpen
+    setIsToolPickerOpen,
+    setSelectedTool
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -117,10 +118,9 @@ export const usePromptAndCommand = () => {
   }
 
   const handleSelectTool = (tool: Tables<"tools">) => {
-    console.log("tool", tool)
-
     setIsToolPickerOpen(false)
-    setUserInput(userInput.replace(/![^ ]*$/, "") + tool.name)
+    setUserInput(userInput.replace(/![^ ]*$/, ""))
+    setSelectedTool(tool)
   }
 
   return {

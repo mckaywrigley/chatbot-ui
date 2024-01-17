@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     messages: any[]
   }
 
+  console.log("messages", messages)
+
   try {
     const profile = await getServerProfile()
 

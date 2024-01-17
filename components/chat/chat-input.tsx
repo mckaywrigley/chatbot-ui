@@ -3,6 +3,7 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
+  IconBolt,
   IconCirclePlus,
   IconPlayerStopFilled,
   IconSend
@@ -41,7 +42,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isAtPickerOpen,
     setFocusFile,
-    chatSettings
+    chatSettings,
+    selectedTool,
+    setSelectedTool
   } = useContext(ChatbotUIContext)
 
   const {
@@ -136,6 +139,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   return (
     <>
       <ChatFilesDisplay />
+
+      {selectedTool && (
+        <div
+          className="mt-2 flex justify-center"
+          onClick={() => setSelectedTool(null)}
+        >
+          <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-500 px-3 py-1 hover:opacity-50">
+            <IconBolt size={20} />
+
+            <div>Using {selectedTool.name} on message</div>
+          </div>
+        </div>
+      )}
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">

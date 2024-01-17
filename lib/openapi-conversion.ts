@@ -1,3 +1,5 @@
+import OpenAI from "openai"
+
 interface Parameter {
   name: string
   in: string
@@ -25,24 +27,6 @@ interface OpenAPIData {
       }[]
     }[]
   }[]
-}
-
-interface AIFunction {
-  type: string
-  function: {
-    name: string
-    description: string
-    parameters: {
-      type: string
-      properties: {
-        [key: string]: {
-          type: string
-          description: string
-        }
-      }
-      required: string[]
-    }
-  }
 }
 
 export const extractOpenapiData = (schema: string): OpenAPIData => {
@@ -96,7 +80,7 @@ export const extractOpenapiData = (schema: string): OpenAPIData => {
 }
 
 export const openapiDataToFunctions = (data: OpenAPIData) => {
-  let functions: AIFunction[] = []
+  let functions: OpenAI.Chat.Completions.ChatCompletionTool[] = []
 
   data.routes.map(route => {
     route.methods.map(method => {
@@ -108,12 +92,13 @@ export const openapiDataToFunctions = (data: OpenAPIData) => {
           type: param.schema.type,
           description: param.description
         }
+
         if (param.required) {
           required.push(param.name)
         }
       })
 
-      const functionObject = {
+      functions.push({
         type: "function",
         function: {
           name: method.operationId,
@@ -124,10 +109,9 @@ export const openapiDataToFunctions = (data: OpenAPIData) => {
             required: required
           }
         }
-      }
-
-      functions.push(functionObject)
+      })
     })
   })
+
   return functions
 }
