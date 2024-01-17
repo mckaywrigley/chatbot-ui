@@ -71,6 +71,21 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
 
   const handleToolSelect = (item: Tables<"tools">) => {}
 
+  const checkIfModelIsToolCompatible = () => {
+    if (!assistantChatSettings.model) return false
+
+    const compatibleModels = [
+      "gpt-4-1106-preview",
+      "gpt-4-vision-preview",
+      "gpt-3.5-turbo-1106"
+    ]
+    const isModelCompatible = compatibleModels.includes(
+      assistantChatSettings.model
+    )
+
+    return isModelCompatible
+  }
+
   if (!profile) return null
   if (!selectedWorkspace) return null
 
@@ -140,14 +155,20 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             />
           </div>
 
-          <div className="space-y-1">
-            <Label>Tools</Label>
+          {checkIfModelIsToolCompatible() ? (
+            <div className="space-y-1">
+              <Label>Tools</Label>
 
-            <AssistantToolSelect
-              selectedAssistantTools={selectedAssistantToolItems}
-              onAssistantToolsSelect={handleToolSelect}
-            />
-          </div>
+              <AssistantToolSelect
+                selectedAssistantTools={selectedAssistantToolItems}
+                onAssistantToolsSelect={handleToolSelect}
+              />
+            </div>
+          ) : (
+            <div className="pt-1 font-semibold">
+              Model is not compatible with tools.
+            </div>
+          )}
         </>
       )}
       onOpenChange={onOpenChange}
