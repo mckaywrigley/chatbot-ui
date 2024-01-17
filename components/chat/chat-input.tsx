@@ -148,7 +148,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-500 px-3 py-1 hover:opacity-50">
             <IconBolt size={20} />
 
-            <div>Using {selectedTool.name} on message</div>
+            <div>Using {selectedTool.name}</div>
           </div>
         </div>
       )}
@@ -181,7 +181,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={`Ask anything. Type "/" for prompts, "@" for files, and "!" for tools.`}
+          placeholder={`Ask anything. Type "/" for prompts, "@" for files, and "#" for tools.`}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

@@ -23,7 +23,7 @@ export const usePromptAndCommand = () => {
   const handleInputChange = (value: string) => {
     const slashTextRegex = /\/([^ ]*)$/
     const atTextRegex = /@([^ ]*)$/
-    const toolTextRegex = /!([^ ]*)$/
+    const toolTextRegex = /#([^ ]*)$/
     const slashMatch = value.match(slashTextRegex)
     const atMatch = value.match(atTextRegex)
     const toolMatch = value.match(toolTextRegex)
@@ -50,14 +50,11 @@ export const usePromptAndCommand = () => {
   }
 
   const handleSelectPrompt = (prompt: Tables<"prompts">) => {
-    console.log("prompt", prompt, prompt.content)
     setIsPromptPickerOpen(false)
     setUserInput(userInput.replace(/\/[^ ]*$/, "") + prompt.content)
   }
 
   const handleSelectUserFile = async (file: Tables<"files">) => {
-    console.log("file", file)
-
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
@@ -87,8 +84,6 @@ export const usePromptAndCommand = () => {
   const handleSelectUserCollection = async (
     collection: Tables<"collections">
   ) => {
-    console.log("collection", collection)
-
     setShowFilesDisplay(true)
     setIsAtPickerOpen(false)
     setUseRetrieval(true)
@@ -119,7 +114,7 @@ export const usePromptAndCommand = () => {
 
   const handleSelectTool = (tool: Tables<"tools">) => {
     setIsToolPickerOpen(false)
-    setUserInput(userInput.replace(/![^ ]*$/, ""))
+    setUserInput(userInput.replace(/#[^ ]*$/, ""))
     setSelectedTool(tool)
   }
 

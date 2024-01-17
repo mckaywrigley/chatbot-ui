@@ -6,7 +6,7 @@ import { CollectionFile } from "@/types"
 import { IconBooks } from "@tabler/icons-react"
 import { FC, useEffect, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
-import { CollectionFilePicker } from "./collection-file-picker"
+import { CollectionFileSelect } from "./collection-file-select"
 
 interface CollectionItemProps {
   collection: Tables<"collections">
@@ -64,7 +64,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
             <div className="space-y-1">
               <Label>Files</Label>
 
-              <CollectionFilePicker
+              <CollectionFileSelect
                 selectedCollectionFiles={
                   renderState.selectedCollectionFiles.length === 0
                     ? renderState.startingCollectionFiles

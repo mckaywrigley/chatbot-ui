@@ -78,6 +78,8 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen(false)
     setIsAtPickerOpen(false)
 
+    setSelectedTool(null)
+
     router.push("/chat")
   }
 

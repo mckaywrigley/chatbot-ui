@@ -11,12 +11,12 @@ import { CollectionFile } from "@/types"
 import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 
-interface CollectionFilePickerProps {
+interface CollectionFileSelectProps {
   selectedCollectionFiles: CollectionFile[]
   onCollectionFileSelect: (file: CollectionFile) => void
 }
 
-export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
+export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
   selectedCollectionFiles,
   onCollectionFileSelect
 }) => {

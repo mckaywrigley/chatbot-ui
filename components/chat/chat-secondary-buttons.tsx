@@ -15,6 +15,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
     <>
       {selectedChat && (
         <WithTooltip
+          delayDuration={200}
           display={<div>Start a new chat</div>}
           trigger={
             <div className="mt-1">

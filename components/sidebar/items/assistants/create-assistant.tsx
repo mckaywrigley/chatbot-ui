@@ -84,17 +84,6 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
-
-            <Input
-              placeholder="Assistant description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={ASSISTANT_DESCRIPTION_MAX}
-            />
-          </div> */}
-
           <div className="space-y-1 pt-2">
             <Label className="flex space-x-1">
               <div>Image</div>
