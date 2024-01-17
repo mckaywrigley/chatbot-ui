@@ -10,7 +10,7 @@ export const getAssistantCollectionsByAssistantId = async (
       `
         id, 
         name, 
-        collections ( id, name, type )
+        collections (*)
       `
     )
     .eq("id", assistantId)

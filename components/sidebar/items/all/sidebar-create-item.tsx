@@ -111,10 +111,6 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     ) => {
       const { image, files, collections, tools, ...rest } = createState
 
-      console.log("files", files)
-      console.log("collections", collections)
-      console.log("tools", tools)
-
       const createdAssistant = await createAssistant(rest, workspaceId)
 
       let updatedAssistant = createdAssistant

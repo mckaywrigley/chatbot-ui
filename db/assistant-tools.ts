@@ -8,7 +8,7 @@ export const getAssistantToolsByAssistantId = async (assistantId: string) => {
       `
         id, 
         name, 
-        tools ( id, name, type )
+        tools (*)
       `
     )
     .eq("id", assistantId)

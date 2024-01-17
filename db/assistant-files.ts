@@ -8,7 +8,7 @@ export const getAssistantFilesByAssistantId = async (assistantId: string) => {
       `
         id, 
         name, 
-        files ( id, name, type )
+        files (*)
       `
     )
     .eq("id", assistantId)
