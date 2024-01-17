@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const { text, fileId, embeddingsProvider, fileExtension } = json as {
     text: string
     fileId: string
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider: "openai" | "local" | "azure"
     fileExtension: string
   }
 
@@ -26,7 +26,13 @@ export async function POST(req: Request) {
 
     if (embeddingsProvider === "openai") {
       checkApiKey(profile.openai_api_key, "OpenAI")
+    } else if (embeddingsProvider === "azure") {
+      checkApiKey(profile.azure_openai_api_key, "Azure")
     }
+
+    const ENDPOINT = profile.azure_openai_endpoint
+    const KEY = profile.azure_openai_api_key
+    const DEPLOYMENT_ID = "text-embedding-ada-002"
 
     let chunks: FileItemChunk[] = []
 
@@ -67,6 +73,22 @@ export async function POST(req: Request) {
       })
 
       embeddings = await Promise.all(embeddingPromises)
+    } else if (embeddingsProvider === "azure") {
+      const azureOpenai = new OpenAI({
+        apiKey: KEY || "",
+        baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
+        defaultQuery: { "api-version": "2023-05-15" },
+        defaultHeaders: { "api-key": KEY }
+      })
+
+      const response = await azureOpenai.embeddings.create({
+        model: "text-embedding-ada-002",
+        input: chunks.map(chunk => chunk.content)
+      })
+
+      embeddings = response.data.map((item: any) => {
+        return item.embedding
+      })
     }
 
     const file_items = chunks.map((chunk, index) => ({
@@ -80,6 +102,10 @@ export async function POST(req: Request) {
           : null,
       local_embedding:
         embeddingsProvider === "local"
+          ? ((embeddings[index] || null) as any)
+          : null,
+      azure_embedding:
+        embeddingsProvider === "azure"
           ? ((embeddings[index] || null) as any)
           : null
     }))

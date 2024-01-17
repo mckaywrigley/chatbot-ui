@@ -185,7 +185,10 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       contextLength: chat.context_length,
       includeProfileContext: chat.include_profile_context,
       includeWorkspaceInstructions: chat.include_workspace_instructions,
-      embeddingsProvider: chat.embeddings_provider as "openai" | "local"
+      embeddingsProvider: chat.embeddings_provider as
+        | "openai"
+        | "local"
+        | "azure"
     })
   }
 

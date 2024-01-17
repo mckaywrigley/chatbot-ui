@@ -19,6 +19,7 @@ create table file_items (
   content TEXT NOT NULL,
   local_embedding vector(384), -- 384 works for local w/ Xenova/all-MiniLM-L6-v2
   openai_embedding vector(1536), -- 1536 for OpenAI
+  azure_embedding vector(1536), -- 1536 for Azure
   tokens INT NOT NULL
 );
 
@@ -32,6 +33,8 @@ CREATE INDEX file_items_embedding_idx ON file_items
 CREATE INDEX file_items_local_embedding_idx ON file_items
   USING hnsw (local_embedding vector_cosine_ops);
 
+CREATE INDEX file_items_azure_embedding_idx ON file_items
+  USING hnsw (azure_embedding vector_cosine_ops);
 
 -- RLS
 
@@ -112,6 +115,35 @@ begin
   from file_items
   where (file_id = ANY(file_ids))
   order by file_items.openai_embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+
+create function match_file_items_azure (
+  query_embedding vector(1536),
+  match_count int DEFAULT null,
+  file_ids UUID[] DEFAULT null
+) returns table (
+  id UUID,
+  file_id UUID,
+  content TEXT,
+  tokens INT,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    file_id,
+    content,
+    tokens,
+    1 - (file_items.azure_embedding <=> query_embedding) as similarity
+  from file_items
+  where (file_id = ANY(file_ids))
+  order by file_items.azure_embedding <=> query_embedding
   limit match_count;
 end;
 $$;

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider: "openai" | "local" | "azure"
     sourceCount: number
   }
 
@@ -25,7 +25,13 @@ export async function POST(request: Request) {
 
     if (embeddingsProvider === "openai") {
       checkApiKey(profile.openai_api_key, "OpenAI")
+    } else if (embeddingsProvider === "azure") {
+      checkApiKey(profile.azure_openai_api_key, "Azure")
     }
+
+    const ENDPOINT = profile.azure_openai_endpoint
+    const KEY = profile.azure_openai_api_key
+    const DEPLOYMENT_ID = "text-embedding-ada-002"
 
     let chunks: any[] = []
 
@@ -69,6 +75,33 @@ export async function POST(request: Request) {
       }
 
       chunks = localFileItems
+    } else if (embeddingsProvider === "azure") {
+      const azureOpenai = new OpenAI({
+        apiKey: KEY || "",
+        baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
+        defaultQuery: { "api-version": "2023-05-15" },
+        defaultHeaders: { "api-key": KEY }
+      })
+
+      const response = await azureOpenai.embeddings.create({
+        model: "text-embedding-ada-002",
+        input: userInput
+      })
+
+      const azureEmbedding = response.data.map(item => item.embedding)[0]
+
+      const { data: azureFileItems, error: azureFileItemsError } =
+        await supabaseAdmin.rpc("match_file_items_azure", {
+          query_embedding: azureEmbedding as any,
+          match_count: sourceCount,
+          file_ids: uniqueFileIds
+        })
+
+      if (azureFileItemsError) {
+        throw azureFileItemsError
+      }
+
+      chunks = azureFileItems
     }
 
     const mostSimilarChunks = chunks?.sort(

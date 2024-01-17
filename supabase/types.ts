@@ -518,6 +518,7 @@ export interface Database {
       }
       file_items: {
         Row: {
+          azure_embedding: string | null
           content: string
           created_at: string
           file_id: string
@@ -530,6 +531,7 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          azure_embedding?: string | null
           content: string
           created_at?: string
           file_id: string
@@ -542,6 +544,7 @@ export interface Database {
           user_id: string
         }
         Update: {
+          azure_embedding?: string | null
           content?: string
           created_at?: string
           file_id?: string
@@ -1329,6 +1332,20 @@ export interface Database {
           object_path: string
         }
         Returns: Record<string, unknown>
+      }
+      match_file_items_azure: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+          file_ids?: string[]
+        }
+        Returns: {
+          id: string
+          file_id: string
+          content: string
+          tokens: number
+          similarity: number
+        }[]
       }
       match_file_items_local: {
         Args: {
