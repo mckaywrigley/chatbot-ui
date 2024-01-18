@@ -9,6 +9,7 @@ import { SidebarUpdateItem } from "./sidebar-update-item"
 
 interface SidebarItemProps {
   item: DataItemType
+  isTyping: boolean
   contentType: ContentType
   icon: React.ReactNode
   updateState: any
@@ -20,7 +21,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   contentType,
   updateState,
   renderInputs,
-  icon
+  icon,
+  isTyping
 }) => {
   const { selectedWorkspace, setChats, setSelectedAssistant } =
     useContext(ChatbotUIContext)
@@ -83,6 +85,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   return (
     <SidebarUpdateItem
       item={item}
+      isTyping={isTyping}
       contentType={contentType}
       updateState={updateState}
       renderInputs={renderInputs}

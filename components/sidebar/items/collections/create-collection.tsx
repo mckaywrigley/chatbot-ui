@@ -20,6 +20,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [selectedCollectionFiles, setSelectedCollectionFiles] = useState<
     CollectionFile[]
@@ -58,6 +59,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
         } as TablesInsert<"collections">
       }
       isOpen={isOpen}
+      isTyping={isTyping}
       onOpenChange={onOpenChange}
       renderInputs={() => (
         <>

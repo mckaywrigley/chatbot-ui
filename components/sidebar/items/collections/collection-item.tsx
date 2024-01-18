@@ -14,6 +14,7 @@ interface CollectionItemProps {
 
 export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   const [name, setName] = useState(collection.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(collection.description)
 
   const handleFileSelect = (
@@ -38,6 +39,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   return (
     <SidebarItem
       item={collection}
+      isTyping={isTyping}
       contentType="collections"
       icon={<IconBooks size={30} />}
       updateState={{

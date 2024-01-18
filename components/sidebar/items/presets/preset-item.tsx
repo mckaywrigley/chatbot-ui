@@ -13,6 +13,7 @@ interface PresetItemProps {
 
 export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
   const [name, setName] = useState(preset.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(preset.description)
   const [presetChatSettings, setPresetChatSettings] = useState({
     model: preset.model,
@@ -26,6 +27,7 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
   return (
     <SidebarItem
       item={preset}
+      isTyping={isTyping}
       contentType="presets"
       icon={
         <ModelIcon modelId={presetChatSettings.model} height={30} width={30} />

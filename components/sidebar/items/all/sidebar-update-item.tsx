@@ -76,6 +76,7 @@ import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
+  isTyping: boolean
   item: DataItemType
   contentType: ContentType
   children: React.ReactNode
@@ -88,7 +89,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   contentType,
   children,
   renderInputs,
-  updateState
+  updateState,
+  isTyping
 }) => {
   const {
     workspaces,
@@ -531,6 +533,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       const setStateFunction = stateUpdateFunctions[contentType]
 
       if (!updateFunction || !setStateFunction) return
+      if (isTyping) return // Prevent update while typing
 
       const updatedItem = await updateFunction(item.id, updateState)
 
@@ -565,7 +568,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       buttonRef.current?.click()
     }

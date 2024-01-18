@@ -37,6 +37,8 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
     }
   }, [focusPrompt])
 
+  const [isTyping, setIsTyping] = useState(false)
+
   const filteredPrompts = prompts.filter(prompt =>
     prompt.name.toLowerCase().includes(slashCommand.toLowerCase())
   )
@@ -125,7 +127,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
   const handleKeydownPromptVariables = (
     e: React.KeyboardEvent<HTMLDivElement>
   ) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSubmitPromptVariables()
     }
@@ -160,6 +162,8 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
                         }}
                         minRows={3}
                         maxRows={5}
+                        onCompositionStart={() => setIsTyping(true)}
+                        onCompositionEnd={() => setIsTyping(false)}
                       />
                     </div>
                   ))}

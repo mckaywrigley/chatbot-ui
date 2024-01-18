@@ -66,22 +66,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
 
-  useEffect(() => {
-    const textarea = chatInputRef.current
-    if (textarea) {
-      const handleCompositionStart = () => setIsTyping(true)
-      const handleCompositionEnd = () => setIsTyping(false)
-
-      textarea.addEventListener("compositionstart", handleCompositionStart)
-      textarea.addEventListener("compositionend", handleCompositionEnd)
-
-      return () => {
-        textarea.removeEventListener("compositionstart", handleCompositionStart)
-        textarea.removeEventListener("compositionend", handleCompositionEnd)
-      }
-    }
-  }, [chatInputRef])
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
@@ -198,6 +182,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           maxRows={18}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
+          onCompositionStart={() => setIsTyping(true)}
+          onCompositionEnd={() => setIsTyping(false)}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">

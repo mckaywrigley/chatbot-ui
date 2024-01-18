@@ -22,6 +22,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [assistantChatSettings, setAssistantChatSettings] = useState({
     model: selectedWorkspace?.default_model,
@@ -130,6 +131,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
         } as TablesInsert<"assistants">
       }
       isOpen={isOpen}
+      isTyping={isTyping}
       renderInputs={() => (
         <>
           <div className="space-y-1">

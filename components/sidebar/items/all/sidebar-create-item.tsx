@@ -30,6 +30,7 @@ import { toast } from "sonner"
 
 interface SidebarCreateItemProps {
   isOpen: boolean
+  isTyping: boolean
   onOpenChange: (isOpen: boolean) => void
   contentType: ContentType
   renderInputs: () => JSX.Element
@@ -41,7 +42,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   onOpenChange,
   contentType,
   renderInputs,
-  createState
+  createState,
+  isTyping
 }) => {
   const {
     selectedWorkspace,
@@ -181,6 +183,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const handleCreate = async () => {
     try {
       if (!selectedWorkspace) return
+      if (isTyping) return // Prevent creation while typing
 
       const createFunction = createFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
@@ -202,7 +205,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       buttonRef.current?.click()
     }
