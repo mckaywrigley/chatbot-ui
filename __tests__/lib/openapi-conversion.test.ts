@@ -83,8 +83,6 @@ describe("openapiDataToFunctions", () => {
     const result = extractOpenapiData(validSchema)
     const functions = openapiDataToFunctions(result)
 
-    console.log(JSON.stringify(functions, null, 2))
-
     expect(functions).toHaveLength(2)
     expect(functions[0].function.name).toBe("GetCurrentWeather")
     expect(functions[0].function.description).toBe(

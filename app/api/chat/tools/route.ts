@@ -58,15 +58,6 @@ export async function POST(request: Request) {
       })
     }
 
-    console.log("allTools", allTools)
-    console.log("\n\n\n")
-
-    console.log("allRouteMaps", allRouteMaps)
-    console.log("\n\n\n")
-
-    console.log("schemaDetails", schemaDetails)
-    console.log("\n\n\n")
-
     const firstResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
@@ -82,12 +73,6 @@ export async function POST(request: Request) {
         const functionCall = toolCall.function
         const functionName = functionCall.name
         const parsedArgs = JSON.parse(toolCall.function.arguments)
-
-        console.log("functionName", functionName)
-        console.log("\n\n\n")
-
-        console.log("parsedArgs", parsedArgs)
-        console.log("\n\n\n")
 
         // Find the schema detail that contains the function name
         const schemaDetail = schemaDetails.find(detail =>

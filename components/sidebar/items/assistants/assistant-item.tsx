@@ -188,7 +188,13 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          <ChatSettingsForm
+            chatSettings={assistantChatSettings as any}
+            onChangeChatSettings={setAssistantChatSettings}
+            useAdvancedDropdown={true}
+          />
+
+          <div className="space-y-1 pt-2">
             <Label>Files & Collections</Label>
 
             <AssistantRetrievalSelect
@@ -277,12 +283,6 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
               }
             />
           </div>
-
-          <ChatSettingsForm
-            chatSettings={assistantChatSettings as any}
-            onChangeChatSettings={setAssistantChatSettings}
-            useAdvancedDropdown={true}
-          />
         </>
       )}
     />

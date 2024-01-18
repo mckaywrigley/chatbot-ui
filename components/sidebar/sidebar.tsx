@@ -1,7 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
-import OpenAI from "openai"
 import { FC, useContext } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
 import { TabsContent } from "../ui/tabs"
@@ -23,8 +22,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     files,
     collections,
     assistants,
-    tools,
-    openaiAssistants
+    tools
   } = useContext(ChatbotUIContext)
 
   const chatFolders = folders.filter(folder => folder.type === "chats")
@@ -91,32 +89,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
             case "assistants":
               return renderSidebarContent(
                 "assistants",
-                [
-                  ...assistants,
-                  ...(openaiAssistants.map(
-                    (assistant: OpenAI.Beta.Assistant) => {
-                      return {
-                        id: assistant.id,
-                        folder_id: null,
-                        created_at: assistant.created_at.toString(),
-                        updated_at: "openai-assistant",
-                        sharing: "private",
-                        name: assistant.name || "",
-                        description: assistant.description || "",
-                        image: "",
-                        image_path: "",
-                        user_id: "",
-                        include_profile_context: false,
-                        include_workspace_instructions: false,
-                        context_length: 0,
-                        model: assistant.model,
-                        prompt: assistant.instructions || "",
-                        temperature: 0,
-                        embeddings_provider: "openai"
-                      }
-                    }
-                  ) as Tables<"assistants">[])
-                ],
+                assistants,
                 assistantFolders
               )
 
