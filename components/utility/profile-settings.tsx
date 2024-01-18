@@ -89,6 +89,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [azureOpenai45VisionID, setAzureOpenai45VisionID] = useState(
     profile?.azure_openai_45_vision_id || ""
   )
+  const [azureEmbeddingsID, setAzureEmbeddingsID] = useState(
+    profile?.azure_openai_embeddings_id || ""
+  )
   const [anthropicAPIKey, setAnthropicAPIKey] = useState(
     profile?.anthropic_api_key || ""
   )
@@ -203,6 +206,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_35_turbo_id: azureOpenai35TurboID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
+      azure_openai_embeddings_id: azureEmbeddingsID,
       openrouter_api_key: openrouterAPIKey
     })
     setProfile(updatedProfile)
@@ -557,6 +561,29 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                               value={azureOpenai45VisionID}
                               onChange={e =>
                                 setAzureOpenai45VisionID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
+
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_EMBEDDINGS_ID ? (
+                          <Label className="text-xs">
+                            Azure OpenAI Embeddings ID set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure OpenAI Embeddings ID</Label>
+
+                            <Input
+                              placeholder="Azure OpenAI Embeddings ID"
+                              type="password"
+                              value={azureEmbeddingsID}
+                              onChange={e =>
+                                setAzureEmbeddingsID(e.target.value)
                               }
                             />
                           </>

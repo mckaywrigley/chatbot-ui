@@ -992,6 +992,7 @@ export interface Database {
           azure_openai_45_turbo_id: string | null
           azure_openai_45_vision_id: string | null
           azure_openai_api_key: string | null
+          azure_openai_embeddings_id: string | null
           azure_openai_endpoint: string | null
           bio: string
           created_at: string
@@ -1018,6 +1019,7 @@ export interface Database {
           azure_openai_45_turbo_id?: string | null
           azure_openai_45_vision_id?: string | null
           azure_openai_api_key?: string | null
+          azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
           bio: string
           created_at?: string
@@ -1044,6 +1046,7 @@ export interface Database {
           azure_openai_45_turbo_id?: string | null
           azure_openai_45_vision_id?: string | null
           azure_openai_api_key?: string | null
+          azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
           bio?: string
           created_at?: string
