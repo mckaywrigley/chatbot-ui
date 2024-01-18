@@ -16,6 +16,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [url, setUrl] = useState("")
   const [schema, setSchema] = useState("")
@@ -35,6 +36,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
         } as TablesInsert<"tools">
       }
       isOpen={isOpen}
+      isTyping={isTyping}
       renderInputs={() => (
         <>
           <div className="space-y-1">
