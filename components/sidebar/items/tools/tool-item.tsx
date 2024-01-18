@@ -13,6 +13,7 @@ interface ToolItemProps {
 
 export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [name, setName] = useState(tool.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
   const [url, setUrl] = useState(tool.url)
   const [schema, setSchema] = useState(tool.schema as string)
@@ -20,6 +21,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   return (
     <SidebarItem
       item={tool}
+      isTyping={isTyping}
       contentType="tools"
       icon={<IconBolt size={30} />}
       updateState={{ name, description, url, schema }}
