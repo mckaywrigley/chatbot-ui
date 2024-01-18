@@ -34,11 +34,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     assistants,
     setSelectedAssistant,
     setChatFileItems,
-    chatFiles,
     setChatFiles,
     setShowFilesDisplay,
-    setUseRetrieval,
-    selectedAssistant
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -75,10 +73,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       setLoading(false)
     }
   }, [])
-
-  useEffect(() => {
-    console.log("selectedAssistant", selectedAssistant)
-  }, [selectedAssistant])
 
   const fetchMessages = async () => {
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)

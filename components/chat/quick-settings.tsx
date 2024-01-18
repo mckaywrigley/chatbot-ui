@@ -30,7 +30,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     setSelectedAssistant,
     setChatSettings,
     assistantImages,
-    openaiAssistants
+    setChatFiles
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -53,6 +53,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     if (contentType === "assistants") {
       setSelectedAssistant(item as Tables<"assistants">)
       console.log(item)
+      // get files/collections
+      // get tools
       setSelectedPreset(null)
     } else if (contentType === "presets") {
       setSelectedPreset(item as Tables<"presets">)

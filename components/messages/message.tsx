@@ -60,7 +60,6 @@ export const Message: FC<MessageProps> = ({
     chatImages,
     assistantImages,
     toolInUse,
-    selectedTool,
     files
   } = useContext(ChatbotUIContext)
 
@@ -234,7 +233,7 @@ export const Message: FC<MessageProps> = ({
                       <div className="flex animate-pulse items-center space-x-2">
                         <IconBolt size={20} />
 
-                        <div>Using {selectedTool?.name}...</div>
+                        <div>Using {toolInUse}...</div>
                       </div>
                     )
                 }

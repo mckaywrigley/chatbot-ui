@@ -117,7 +117,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [sourceCount, setSourceCount] = useState<number>(4)
 
   // TOOL STORE
-  const [selectedTool, setSelectedTool] = useState<Tables<"tools"> | null>(null)
+  const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
   const [toolInUse, setToolInUse] = useState<string>("none")
 
   // THIS COMPONENT
@@ -462,8 +462,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setSourceCount,
 
         // TOOL STORE
-        selectedTool,
-        setSelectedTool,
+        selectedTools,
+        setSelectedTools,
         toolInUse,
         setToolInUse
       }}

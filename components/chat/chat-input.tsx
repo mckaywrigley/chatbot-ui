@@ -43,8 +43,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isAtPickerOpen,
     setFocusFile,
     chatSettings,
-    selectedTool,
-    setSelectedTool
+    selectedTools,
+    setSelectedTools
   } = useContext(ChatbotUIContext)
 
   const {
@@ -140,18 +140,28 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     <>
       <ChatFilesDisplay />
 
-      {selectedTool && (
-        <div
-          className="mt-2 flex justify-center"
-          onClick={() => setSelectedTool(null)}
-        >
-          <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-500 px-3 py-1 hover:opacity-50">
-            <IconBolt size={20} />
+      <div className="flex flex-wrap justify-center gap-2">
+        {selectedTools &&
+          selectedTools.map((tool, index) => (
+            <div
+              key={index}
+              className="mt-2 flex justify-center"
+              onClick={() =>
+                setSelectedTools(
+                  selectedTools.filter(
+                    selectedTool => selectedTool.id !== tool.id
+                  )
+                )
+              }
+            >
+              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">
+                <IconBolt size={20} />
 
-            <div>Using {selectedTool.name}</div>
-          </div>
-        </div>
-      )}
+                <div>{tool.name}</div>
+              </div>
+            </div>
+          ))}
+      </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">

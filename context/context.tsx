@@ -116,8 +116,8 @@ interface ChatbotUIContext {
   setSourceCount: Dispatch<SetStateAction<number>>
 
   // TOOL STORE
-  selectedTool: Tables<"tools"> | null
-  setSelectedTool: Dispatch<SetStateAction<Tables<"tools"> | null>>
+  selectedTools: Tables<"tools">[]
+  setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   toolInUse: string
   setToolInUse: Dispatch<SetStateAction<string>>
 }
@@ -228,8 +228,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setSourceCount: () => {},
 
   // TOOL STORE
-  selectedTool: null,
-  setSelectedTool: () => {},
+  selectedTools: [],
+  setSelectedTools: () => {},
   toolInUse: "none",
   setToolInUse: () => {}
 })

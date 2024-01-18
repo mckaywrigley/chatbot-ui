@@ -34,7 +34,7 @@ export const useChatHandler = () => {
     selectedWorkspace,
     setSelectedChat,
     setChats,
-    setSelectedTool,
+    setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
     abortController,
@@ -56,7 +56,7 @@ export const useChatHandler = () => {
     sourceCount,
     setIsPromptPickerOpen,
     setIsAtPickerOpen,
-    selectedTool
+    selectedTools
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -78,7 +78,8 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen(false)
     setIsAtPickerOpen(false)
 
-    setSelectedTool(null)
+    setSelectedTools([])
+    setToolInUse("none")
 
     router.push("/chat")
   }
@@ -167,8 +168,8 @@ export const useChatHandler = () => {
 
       let generatedText = ""
 
-      if (selectedTool) {
-        setToolInUse(selectedTool.name)
+      if (selectedTools) {
+        setToolInUse("tools") // TODO
 
         const formattedMessages = await buildFinalMessages(
           payload,
@@ -184,12 +185,12 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            schema: selectedTool.schema
+            toolSchemas: selectedTools.map(tool => tool.schema)
           })
         })
 
         setToolInUse("none")
-        setSelectedTool(null)
+        setSelectedTools([])
 
         generatedText = await processResponse(
           response,

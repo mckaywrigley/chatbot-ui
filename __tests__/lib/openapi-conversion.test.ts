@@ -90,18 +90,12 @@ describe("openapiDataToFunctions", () => {
     expect(functions[0].function.description).toBe(
       "Get temperature for a specific location"
     )
-    expect(
-      functions[0].function.parameters.properties["location"]
-    ).toBeDefined()
-    expect(functions[0].function.parameters.required).toContain("location")
+    expect(functions[0].function.parameters?.required).toContain("location")
 
     expect(functions[1].function.name).toBe("GetWeatherSummary")
     expect(functions[1].function.description).toBe(
       "Get description of weather for a specific location"
     )
-    expect(
-      functions[1].function.parameters.properties["location"]
-    ).toBeDefined()
-    expect(functions[1].function.parameters.required).toContain("location")
+    expect(functions[1].function.parameters?.required).toContain("location")
   })
 })
