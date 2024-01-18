@@ -997,6 +997,7 @@ export interface Database {
           bio: string
           created_at: string
           display_name: string
+          email: string | null
           google_gemini_api_key: string | null
           has_onboarded: boolean
           id: string
@@ -1024,6 +1025,7 @@ export interface Database {
           bio: string
           created_at?: string
           display_name: string
+          email?: string | null
           google_gemini_api_key?: string | null
           has_onboarded?: boolean
           id?: string
@@ -1051,6 +1053,7 @@ export interface Database {
           bio?: string
           created_at?: string
           display_name?: string
+          email?: string | null
           google_gemini_api_key?: string | null
           has_onboarded?: boolean
           id?: string
@@ -1270,6 +1273,21 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      users: {
+        Row: {
+          email: string | null
+          id: number
+        }
+        Insert: {
+          email?: string | null
+          id?: number
+        }
+        Update: {
+          email?: string | null
+          id?: number
+        }
+        Relationships: []
       }
       workspaces: {
         Row: {

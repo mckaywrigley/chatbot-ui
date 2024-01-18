@@ -50,7 +50,15 @@ export default async function Login({
     })
 
     if (error) {
-      return redirect(`/login?message=${error.message}`)
+      const { count, error } = await supabase
+        .from("users")
+        .select("*", { count: "exact", head: true })
+        .eq("email", email)
+      if (!count) {
+        return redirect("/login?message=User does not exist")
+      } else {
+        return redirect("/login?message=Incorrect password")
+      }
     }
 
     return redirect("/chat")
@@ -63,6 +71,12 @@ export default async function Login({
     const password = formData.get("password") as string
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
+
+    if (password.length < 8) {
+      return redirect(
+        "/login?message=Password length must be 8 characters or more"
+      )
+    }
 
     const { error } = await supabase.auth.signUp({
       email,
