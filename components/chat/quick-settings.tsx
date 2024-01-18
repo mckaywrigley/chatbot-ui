@@ -1,4 +1,8 @@
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
+import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
+import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
@@ -29,13 +33,17 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     setSelectedPreset,
     setSelectedAssistant,
     setChatSettings,
-    assistantImages
+    assistantImages,
+    setChatFiles,
+    setSelectedTools,
+    setShowFilesDisplay
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -45,12 +53,46 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     }
   }, [isOpen])
 
-  const handleSelectQuickSetting = (
+  const handleSelectQuickSetting = async (
     item: Tables<"presets"> | Tables<"assistants">,
     contentType: "presets" | "assistants"
   ) => {
     if (contentType === "assistants") {
       setSelectedAssistant(item as Tables<"assistants">)
+
+      setLoading(true)
+
+      let allFiles = []
+
+      const assistantFiles = (await getAssistantFilesByAssistantId(item.id))
+        .files
+      allFiles = [...assistantFiles]
+      const assistantCollections = (
+        await getAssistantCollectionsByAssistantId(item.id)
+      ).collections
+      for (const collection of assistantCollections) {
+        const collectionFiles = (
+          await getCollectionFilesByCollectionId(collection.id)
+        ).files
+        allFiles = [...allFiles, ...collectionFiles]
+      }
+      const assistantTools = (await getAssistantToolsByAssistantId(item.id))
+        .tools
+
+      setSelectedTools(assistantTools)
+      setChatFiles(
+        allFiles.map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+      )
+
+      if (allFiles.length > 0) setShowFilesDisplay(true)
+
+      setLoading(false)
+
       setSelectedPreset(null)
     } else if (contentType === "presets") {
       setSelectedPreset(item as Tables<"presets">)
@@ -126,8 +168,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         setSearch("")
       }}
     >
-      <DropdownMenuTrigger className="max-w-[300px]" asChild>
-        <Button variant="ghost" className="flex space-x-3 text-xl">
+      <DropdownMenuTrigger asChild className="max-w-[400px]" disabled={loading}>
+        <Button variant="ghost" className="flex space-x-3 text-lg">
           {selectedPreset && (
             <ModelIcon modelId={selectedPreset.model} width={32} height={32} />
           )}
@@ -138,25 +180,33 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                 className="rounded"
                 src={selectedAssistantImage}
                 alt="Assistant"
-                width={32}
-                height={32}
+                width={28}
+                height={28}
               />
             ) : (
               <IconRobotFace
                 className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                size={32}
+                size={28}
               />
             ))}
 
-          <div className="overflow-hidden text-ellipsis">
-            {isModified && (selectedPreset || selectedAssistant) && "Modified "}
+          {loading ? (
+            <div className="animate-pulse">Loading assistant...</div>
+          ) : (
+            <>
+              <div className="overflow-hidden text-ellipsis">
+                {isModified &&
+                  (selectedPreset || selectedAssistant) &&
+                  "Modified "}
 
-            {selectedPreset?.name ||
-              selectedAssistant?.name ||
-              "Quick Settings"}
-          </div>
+                {selectedPreset?.name ||
+                  selectedAssistant?.name ||
+                  "Quick Settings"}
+              </div>
 
-          <IconChevronDown className="ml-1" />
+              <IconChevronDown className="ml-1" />
+            </>
+          )}
         </Button>
       </DropdownMenuTrigger>
 
@@ -171,7 +221,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
             <Input
               ref={inputRef}
               className="w-full"
-              placeholder="Search presets..."
+              placeholder="Search..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.stopPropagation()}

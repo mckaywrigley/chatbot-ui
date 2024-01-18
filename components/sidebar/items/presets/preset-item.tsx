@@ -54,17 +54,6 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
-
-            <Input
-              placeholder="Preset description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={PRESET_DESCRIPTION_MAX}
-            />
-          </div> */}
-
           <ChatSettingsForm
             chatSettings={presetChatSettings as any}
             onChangeChatSettings={setPresetChatSettings}

@@ -47,7 +47,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>URL</Label>
 
             <Input
@@ -55,32 +55,68 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
               value={url}
               onChange={e => setUrl(e.target.value)}
             />
-          </div>
+          </div> */}
+
+          {/* <div className="space-y-3 pt-4 pb-3">
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Web Browsing</Label>
+            </div>
+
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Image Generation</Label>
+            </div>
+
+            <div className="space-x-2 flex items-center">
+              <Checkbox />
+
+              <Label>Code Interpreter</Label>
+            </div>
+          </div> */}
 
           <div className="space-y-1">
             <Label>Schema</Label>
 
             <TextareaAutosize
-              placeholder={`paths": {
-                "/location": {
-                  "get": {
-                    "description": "Get temperature for a specific location",
-                    "operationId": "GetCurrentWeather",
-                    "parameters": [
-                      {
-                        "name": "location",
-                        "in": "query",
-                        "description": "The city and state to retrieve the weather for",
-                        "required": true,
-                        "schema": {
-                          "type": "string"
-                        }
-                      }
-                    ],
-                    "deprecated": false
+              placeholder={`{
+                "openapi": "3.1.0",
+                "info": {
+                  "title": "Get weather data",
+                  "description": "Retrieves current weather data for a location.",
+                  "version": "v1.0.0"
+                },
+                "servers": [
+                  {
+                    "url": "https://weather.example.com"
                   }
+                ],
+                "paths": {
+                  "/location": {
+                    "get": {
+                      "description": "Get temperature for a specific location",
+                      "operationId": "GetCurrentWeather",
+                      "parameters": [
+                        {
+                          "name": "location",
+                          "in": "query",
+                          "description": "The city and state to retrieve the weather for",
+                          "required": true,
+                          "schema": {
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "deprecated": false
+                    }
+                  }
+                },
+                "components": {
+                  "schemas": {}
                 }
-              },`}
+              }`}
               value={schema}
               onValueChange={setSchema}
               minRows={20}

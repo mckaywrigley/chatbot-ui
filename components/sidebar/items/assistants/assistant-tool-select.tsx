@@ -4,23 +4,26 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { FileIcon } from "@/components/ui/file-icon"
 import { Input } from "@/components/ui/input"
 import { ChatbotUIContext } from "@/context/context"
-import { CollectionFile } from "@/types"
-import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
+import { Tables } from "@/supabase/types"
+import {
+  IconBolt,
+  IconChevronDown,
+  IconCircleCheckFilled
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 
-interface CollectionFilePickerProps {
-  selectedCollectionFiles: CollectionFile[]
-  onCollectionFileSelect: (file: CollectionFile) => void
+interface AssistantToolSelectProps {
+  selectedAssistantTools: Tables<"tools">[]
+  onAssistantToolsSelect: (tool: Tables<"tools">) => void
 }
 
-export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
-  selectedCollectionFiles,
-  onCollectionFileSelect
+export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
+  selectedAssistantTools,
+  onAssistantToolsSelect
 }) => {
-  const { files } = useContext(ChatbotUIContext)
+  const { tools } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -36,11 +39,11 @@ export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
     }
   }, [isOpen])
 
-  const handleFileSelect = (file: CollectionFile) => {
-    onCollectionFileSelect(file)
+  const handleToolSelect = (tool: Tables<"tools">) => {
+    onAssistantToolsSelect(tool)
   }
 
-  if (!files) return null
+  if (!tools) return null
 
   return (
     <DropdownMenu
@@ -61,7 +64,7 @@ export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
         >
           <div className="flex items-center">
             <div className="ml-2 flex items-center">
-              {selectedCollectionFiles.length} files selected
+              {selectedAssistantTools.length} tools selected
             </div>
           </div>
 
@@ -76,42 +79,45 @@ export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
       >
         <Input
           ref={inputRef}
-          placeholder="Search files..."
+          placeholder="Search tools..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           onKeyDown={e => e.stopPropagation()}
         />
 
-        {selectedCollectionFiles
-          .filter(file =>
-            file.name.toLowerCase().includes(search.toLowerCase())
+        {selectedAssistantTools
+          .filter(item =>
+            item.name.toLowerCase().includes(search.toLowerCase())
           )
-          .map(file => (
-            <CollectionFileItem
-              key={file.id}
-              file={file}
-              selected={selectedCollectionFiles.some(
-                selectedCollectionFile => selectedCollectionFile.id === file.id
+          .map(tool => (
+            <AssistantToolItem
+              key={tool.id}
+              tool={tool}
+              selected={selectedAssistantTools.some(
+                selectedAssistantRetrieval =>
+                  selectedAssistantRetrieval.id === tool.id
               )}
-              onSelect={handleFileSelect}
+              onSelect={handleToolSelect}
             />
           ))}
 
-        {files
+        {tools
           .filter(
-            file =>
-              !selectedCollectionFiles.some(
-                selectedCollectionFile => selectedCollectionFile.id === file.id
-              ) && file.name.toLowerCase().includes(search.toLowerCase())
+            tool =>
+              !selectedAssistantTools.some(
+                selectedAssistantRetrieval =>
+                  selectedAssistantRetrieval.id === tool.id
+              ) && tool.name.toLowerCase().includes(search.toLowerCase())
           )
-          .map(file => (
-            <CollectionFileItem
-              key={file.id}
-              file={file}
-              selected={selectedCollectionFiles.some(
-                selectedCollectionFile => selectedCollectionFile.id === file.id
+          .map(tool => (
+            <AssistantToolItem
+              key={tool.id}
+              tool={tool}
+              selected={selectedAssistantTools.some(
+                selectedAssistantRetrieval =>
+                  selectedAssistantRetrieval.id === tool.id
               )}
-              onSelect={handleFileSelect}
+              onSelect={handleToolSelect}
             />
           ))}
       </DropdownMenuContent>
@@ -119,19 +125,19 @@ export const CollectionFilePicker: FC<CollectionFilePickerProps> = ({
   )
 }
 
-interface CollectionFileItemProps {
-  file: CollectionFile
+interface AssistantToolItemProps {
+  tool: Tables<"tools">
   selected: boolean
-  onSelect: (file: CollectionFile) => void
+  onSelect: (tool: Tables<"tools">) => void
 }
 
-const CollectionFileItem: FC<CollectionFileItemProps> = ({
-  file,
+const AssistantToolItem: FC<AssistantToolItemProps> = ({
+  tool,
   selected,
   onSelect
 }) => {
   const handleSelect = () => {
-    onSelect(file)
+    onSelect(tool)
   }
 
   return (
@@ -141,10 +147,10 @@ const CollectionFileItem: FC<CollectionFileItemProps> = ({
     >
       <div className="flex grow items-center truncate">
         <div className="mr-2 min-w-[24px]">
-          <FileIcon type={file.type} size={24} />
+          <IconBolt size={24} />
         </div>
 
-        <div className="truncate">{file.name}</div>
+        <div className="truncate">{tool.name}</div>
       </div>
 
       {selected && (

@@ -52,8 +52,10 @@ interface ChatbotUIContext {
   // ASSISTANT STORE
   selectedAssistant: Tables<"assistants"> | null
   assistantImages: AssistantImage[]
+  openaiAssistants: any[]
   setSelectedAssistant: Dispatch<SetStateAction<Tables<"assistants"> | null>>
   setAssistantImages: Dispatch<SetStateAction<AssistantImage[]>>
+  setOpenaiAssistants: Dispatch<SetStateAction<any[]>>
 
   // PASSIVE CHAT STORE
   userInput: string
@@ -71,25 +73,29 @@ interface ChatbotUIContext {
   abortController: AbortController | null
   firstTokenReceived: boolean
   isGenerating: boolean
-  toolInUse: "none" | "retrieval"
   setAbortController: Dispatch<SetStateAction<AbortController | null>>
   setFirstTokenReceived: Dispatch<SetStateAction<boolean>>
   setIsGenerating: Dispatch<SetStateAction<boolean>>
-  setToolInUse: Dispatch<SetStateAction<"none" | "retrieval">>
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
   slashCommand: string
   isAtPickerOpen: boolean
   atCommand: string
+  isToolPickerOpen: boolean
+  toolCommand: string
   focusPrompt: boolean
   focusFile: boolean
+  focusTool: boolean
   setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
   setSlashCommand: Dispatch<SetStateAction<string>>
   setIsAtPickerOpen: Dispatch<SetStateAction<boolean>>
   setAtCommand: Dispatch<SetStateAction<string>>
+  setIsToolPickerOpen: Dispatch<SetStateAction<boolean>>
+  setToolCommand: Dispatch<SetStateAction<string>>
   setFocusPrompt: Dispatch<SetStateAction<boolean>>
   setFocusFile: Dispatch<SetStateAction<boolean>>
+  setFocusTool: Dispatch<SetStateAction<boolean>>
 
   // ATTACHMENTS STORE
   chatFiles: ChatFile[]
@@ -108,6 +114,12 @@ interface ChatbotUIContext {
   sourceCount: number
   setUseRetrieval: Dispatch<SetStateAction<boolean>>
   setSourceCount: Dispatch<SetStateAction<number>>
+
+  // TOOL STORE
+  selectedTools: Tables<"tools">[]
+  setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
+  toolInUse: string
+  setToolInUse: Dispatch<SetStateAction<string>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -152,8 +164,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // ASSISTANT STORE
   selectedAssistant: null,
   assistantImages: [],
+  openaiAssistants: [],
   setSelectedAssistant: () => {},
   setAssistantImages: () => {},
+  setOpenaiAssistants: () => {},
 
   // PASSIVE CHAT STORE
   userInput: "",
@@ -172,24 +186,28 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   slashCommand: "",
   isAtPickerOpen: false,
   atCommand: "",
+  isToolPickerOpen: false,
+  toolCommand: "",
   focusPrompt: false,
   focusFile: false,
+  focusTool: false,
   setIsPromptPickerOpen: () => {},
   setSlashCommand: () => {},
   setIsAtPickerOpen: () => {},
   setAtCommand: () => {},
+  setIsToolPickerOpen: () => {},
+  setToolCommand: () => {},
   setFocusPrompt: () => {},
   setFocusFile: () => {},
+  setFocusTool: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,
   firstTokenReceived: false,
   abortController: null,
-  toolInUse: "none",
   setIsGenerating: () => {},
   setFirstTokenReceived: () => {},
   setAbortController: () => {},
-  setToolInUse: () => {},
 
   // ATTACHMENTS STORE
   chatFiles: [],
@@ -197,7 +215,6 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   newMessageFiles: [],
   newMessageImages: [],
   showFilesDisplay: false,
-
   setChatFiles: () => {},
   setChatImages: () => {},
   setNewMessageFiles: () => {},
@@ -208,5 +225,11 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   useRetrieval: false,
   sourceCount: 4,
   setUseRetrieval: () => {},
-  setSourceCount: () => {}
+  setSourceCount: () => {},
+
+  // TOOL STORE
+  selectedTools: [],
+  setSelectedTools: () => {},
+  toolInUse: "none",
+  setToolInUse: () => {}
 })

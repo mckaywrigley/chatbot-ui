@@ -3,6 +3,7 @@ import { FC, useContext } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { FilePicker } from "./file-picker"
 import { PromptPicker } from "./prompt-picker"
+import { ToolPicker } from "./tool-picker"
 
 interface ChatCommandInputProps {}
 
@@ -18,19 +19,12 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     focusFile
   } = useContext(ChatbotUIContext)
 
-  const {
-    handleSelectPrompt,
-    handleSelectUserFile,
-    handleSelectUserCollection
-  } = usePromptAndCommand()
+  const { handleSelectUserFile, handleSelectUserCollection } =
+    usePromptAndCommand()
 
   return (
     <>
-      <PromptPicker
-        searchQuery={slashCommand}
-        onSelect={handleSelectPrompt}
-        isFocused={focusPrompt}
-      />
+      <PromptPicker />
 
       <FilePicker
         isOpen={isAtPickerOpen}
@@ -44,6 +38,8 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         onSelectCollection={handleSelectUserCollection}
         isFocused={focusFile}
       />
+
+      <ToolPicker />
     </>
   )
 }

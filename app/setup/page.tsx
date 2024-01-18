@@ -267,6 +267,7 @@ export default function SetupPage() {
 
         const profile = await getProfileByUserId(user.id)
         setProfile(profile)
+        setUsername(profile.username)
 
         if (!profile.has_onboarded) {
           setLoading(false)

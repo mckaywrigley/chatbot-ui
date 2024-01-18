@@ -7,6 +7,9 @@ import {
   SheetTitle
 } from "@/components/ui/sheet"
 import { ChatbotUIContext } from "@/context/context"
+import { createAssistantCollections } from "@/db/assistant-collections"
+import { createAssistantFiles } from "@/db/assistant-files"
+import { createAssistantTools } from "@/db/assistant-tools"
 import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
 import { createCollectionFiles } from "@/db/collection-files"
@@ -100,10 +103,13 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     assistants: async (
       createState: {
         image: File
+        files: Tables<"files">[]
+        collections: Tables<"collections">[]
+        tools: Tables<"tools">[]
       } & Tables<"assistants">,
       workspaceId: string
     ) => {
-      const { image, ...rest } = createState
+      const { image, files, collections, tools, ...rest } = createState
 
       const createdAssistant = await createAssistant(rest, workspaceId)
 
@@ -134,6 +140,28 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
           ])
         }
       }
+
+      const assistantFiles = files.map(file => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        file_id: file.id
+      }))
+
+      const assistantCollections = collections.map(collection => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        collection_id: collection.id
+      }))
+
+      const assistantTools = tools.map(tool => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        tool_id: tool.id
+      }))
+
+      await createAssistantFiles(assistantFiles)
+      await createAssistantCollections(assistantCollections)
+      await createAssistantTools(assistantTools)
 
       return updatedAssistant
     },

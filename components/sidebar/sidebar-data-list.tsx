@@ -37,7 +37,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -142,7 +143,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     files: setFiles,
     collections: setCollections,
     assistants: setAssistants,
-    tools: setAssistants
+    tools: setTools
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {
@@ -327,7 +328,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
-      ></div>
+      />
     </>
   )
 }

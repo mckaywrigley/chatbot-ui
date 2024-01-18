@@ -71,6 +71,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedAssistant, setSelectedAssistant] =
     useState<Tables<"assistants"> | null>(null)
   const [assistantImages, setAssistantImages] = useState<AssistantImage[]>([])
+  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([])
 
   // PASSIVE CHAT STORE
   const [userInput, setUserInput] = useState<string>("")
@@ -98,9 +99,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [slashCommand, setSlashCommand] = useState("")
   const [isAtPickerOpen, setIsAtPickerOpen] = useState(false)
   const [atCommand, setAtCommand] = useState("")
+  const [isToolPickerOpen, setIsToolPickerOpen] = useState(false)
+  const [toolCommand, setToolCommand] = useState("")
   const [focusPrompt, setFocusPrompt] = useState(false)
   const [focusFile, setFocusFile] = useState(false)
-  const [toolInUse, setToolInUse] = useState<"none" | "retrieval">("none")
+  const [focusTool, setFocusTool] = useState(false)
 
   // ATTACHMENTS STORE
   const [chatFiles, setChatFiles] = useState<ChatFile[]>([])
@@ -113,14 +116,21 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
   const [sourceCount, setSourceCount] = useState<number>(4)
 
+  // TOOL STORE
+  const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
+  const [toolInUse, setToolInUse] = useState<string>("none")
+
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     fetchOpenRouterModels()
+
     if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
       fetchOllamaModels()
     }
+
+    // fetchOpenaiAssistants()
 
     fetchStartingData()
   }, [])
@@ -324,6 +334,22 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
+  const fetchOpenaiAssistants = async () => {
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/assistants/openai")
+
+      const data = await response.json()
+
+      setOpenaiAssistants(data.assistants)
+    } catch (error) {
+      console.warn("Error fetching OpenAI assistants: " + error)
+    }
+
+    setLoading(false)
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -372,8 +398,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // ASSISTANT STORE
         selectedAssistant,
         assistantImages,
+        openaiAssistants,
         setSelectedAssistant,
         setAssistantImages,
+        setOpenaiAssistants,
 
         // PASSIVE CHAT STORE
         userInput,
@@ -391,25 +419,29 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         abortController,
         firstTokenReceived,
         isGenerating,
-        toolInUse,
         setAbortController,
         setFirstTokenReceived,
         setIsGenerating,
-        setToolInUse,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,
         slashCommand,
         isAtPickerOpen,
         atCommand,
+        isToolPickerOpen,
+        toolCommand,
         focusPrompt,
         focusFile,
+        focusTool,
         setIsPromptPickerOpen,
         setSlashCommand,
         setIsAtPickerOpen,
         setAtCommand,
+        setIsToolPickerOpen,
+        setToolCommand,
         setFocusPrompt,
         setFocusFile,
+        setFocusTool,
 
         // ATTACHMENT STORE
         chatFiles,
@@ -427,7 +459,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         useRetrieval,
         sourceCount,
         setUseRetrieval,
-        setSourceCount
+        setSourceCount,
+
+        // TOOL STORE
+        selectedTools,
+        setSelectedTools,
+        toolInUse,
+        setToolInUse
       }}
     >
       {children}
