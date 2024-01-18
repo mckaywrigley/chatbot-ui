@@ -9,6 +9,9 @@ start-chatbot-local: install-ollama install-supabase start-supabase generate-db-
 
 ### Setup Commands ###
 
+build:
+	docker compose build
+
 install-supabase:
 	./scripts/install_supabase.sh
 
@@ -77,3 +80,6 @@ remove-db:
 
 remove-all: remove-chatbot remove-db
 	@echo "Removing and shutting down frontend and database servers..."
+
+rebuild: remove-all build start-chatbot-docker
+	@echo "Rebuilding the deployment..."

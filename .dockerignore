@@ -1,2 +1,12 @@
 node_modules
 test-results
+# .env
+# .env*
+
+docker*
+
+scripts/
+
+.github
+
+__tests__
