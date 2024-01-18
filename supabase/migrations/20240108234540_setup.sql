@@ -8,20 +8,20 @@ create extension vector with schema extensions;
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = now(); 
-    RETURN NEW; 
+    NEW.updated_at = now();
+    RETURN NEW;
 END;
 $$ language 'plpgsql';
 
 -- Function to delete a message and all following messages
 CREATE OR REPLACE FUNCTION delete_message_including_and_after(
-    p_user_id UUID, 
-    p_chat_id UUID, 
+    p_user_id UUID,
+    p_chat_id UUID,
     p_sequence_number INT
 )
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM messages 
+    DELETE FROM messages
     WHERE user_id = p_user_id AND chat_id = p_chat_id AND sequence_number >= p_sequence_number;
 END;
 $$ LANGUAGE plpgsql;
@@ -50,8 +50,8 @@ LANGUAGE 'plpgsql'
 SECURITY DEFINER
 AS $$
 DECLARE
-  project_url TEXT := 'http://supabase_kong_chatbotui:8000';
-  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'; -- full access needed for http request to storage
+  project_url TEXT := 'https://gotrauwdgyikvwqyhaob.supabase.co';
+  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJhdXdkZ3lpa3Z3cXloYW9iIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNTYwMjMyNCwiZXhwIjoyMDIxMTc4MzI0fQ.5Jj_Ig14FoTGqgaZVjmnpGyVkNZppBL8uCydWjjExAk'; -- full access needed for http request to storage
   url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
 BEGIN
   SELECT
