@@ -34,7 +34,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     assistants,
     setSelectedAssistant,
     setChatFileItems,
-    chatFiles,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval

@@ -4,9 +4,9 @@ import { COLLECTION_DESCRIPTION_MAX, COLLECTION_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { CollectionFile } from "@/types"
 import { IconBooks } from "@tabler/icons-react"
-import { FC, useEffect, useState } from "react"
+import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
-import { CollectionFilePicker } from "./collection-file-picker"
+import { CollectionFileSelect } from "./collection-file-select"
 
 interface CollectionItemProps {
   collection: Tables<"collections">
@@ -14,13 +14,8 @@ interface CollectionItemProps {
 
 export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   const [name, setName] = useState(collection.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(collection.description)
-
-  useEffect(() => {
-    const fetchData = async () => {}
-
-    fetchData()
-  }, [])
 
   const handleFileSelect = (
     file: CollectionFile,
@@ -32,6 +27,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       const isFileAlreadySelected = prevState.find(
         selectedFile => selectedFile.id === file.id
       )
+
       if (isFileAlreadySelected) {
         return prevState.filter(selectedFile => selectedFile.id !== file.id)
       } else {
@@ -43,6 +39,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
   return (
     <SidebarItem
       item={collection}
+      isTyping={isTyping}
       contentType="collections"
       icon={<IconBooks size={30} />}
       updateState={{
@@ -64,7 +61,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
             <div className="space-y-1">
               <Label>Files</Label>
 
-              <CollectionFilePicker
+              <CollectionFileSelect
                 selectedCollectionFiles={
                   renderState.selectedCollectionFiles.length === 0
                     ? renderState.startingCollectionFiles

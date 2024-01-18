@@ -11,6 +11,21 @@ import {
 import { AssignWorkspaces } from "@/components/workspace/assign-workspaces"
 import { ChatbotUIContext } from "@/context/context"
 import {
+  createAssistantCollection,
+  deleteAssistantCollection,
+  getAssistantCollectionsByAssistantId
+} from "@/db/assistant-collections"
+import {
+  createAssistantFile,
+  deleteAssistantFile,
+  getAssistantFilesByAssistantId
+} from "@/db/assistant-files"
+import {
+  createAssistantTool,
+  deleteAssistantTool,
+  getAssistantToolsByAssistantId
+} from "@/db/assistant-tools"
+import {
   createAssistantWorkspaces,
   deleteAssistantWorkspace,
   getAssistantWorkspacesByAssistantId,
@@ -61,6 +76,7 @@ import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
+  isTyping: boolean
   item: DataItemType
   contentType: ContentType
   children: React.ReactNode
@@ -73,7 +89,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   contentType,
   children,
   renderInputs,
-  updateState
+  updateState,
+  isTyping
 }) => {
   const {
     workspaces,
@@ -105,6 +122,24 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     CollectionFile[]
   >([])
 
+  // Assistants Render State
+  const [startingAssistantFiles, setStartingAssistantFiles] = useState<
+    Tables<"files">[]
+  >([])
+  const [startingAssistantCollections, setStartingAssistantCollections] =
+    useState<Tables<"collections">[]>([])
+  const [startingAssistantTools, setStartingAssistantTools] = useState<
+    Tables<"tools">[]
+  >([])
+  const [selectedAssistantFiles, setSelectedAssistantFiles] = useState<
+    Tables<"files">[]
+  >([])
+  const [selectedAssistantCollections, setSelectedAssistantCollections] =
+    useState<Tables<"collections">[]>([])
+  const [selectedAssistantTools, setSelectedAssistantTools] = useState<
+    Tables<"tools">[]
+  >([])
+
   useEffect(() => {
     if (isOpen) {
       const fetchData = async () => {
@@ -134,7 +169,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       selectedCollectionFiles,
       setSelectedCollectionFiles
     },
-    assistants: null,
+    assistants: {
+      startingAssistantFiles,
+      setStartingAssistantFiles,
+      startingAssistantCollections,
+      setStartingAssistantCollections,
+      startingAssistantTools,
+      setStartingAssistantTools,
+      selectedAssistantFiles,
+      setSelectedAssistantFiles,
+      selectedAssistantCollections,
+      setSelectedAssistantCollections,
+      selectedAssistantTools,
+      setSelectedAssistantTools
+    },
     tools: null
   }
 
@@ -149,7 +197,21 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setStartingCollectionFiles(collectionFiles.files)
       setSelectedCollectionFiles([])
     },
-    assistants: null,
+    assistants: async (assistantId: string) => {
+      const assistantFiles = await getAssistantFilesByAssistantId(assistantId)
+      setStartingAssistantFiles(assistantFiles.files)
+
+      const assistantCollections =
+        await getAssistantCollectionsByAssistantId(assistantId)
+      setStartingAssistantCollections(assistantCollections.collections)
+
+      const assistantTools = await getAssistantToolsByAssistantId(assistantId)
+      setStartingAssistantTools(assistantTools.tools)
+
+      setSelectedAssistantFiles([])
+      setSelectedAssistantCollections([])
+      setSelectedAssistantTools([])
+    },
     tools: null
   }
 
@@ -291,11 +353,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     collections: async (
       collectionId: string,
-      updateState: {
-        image: File
-        collectionFilesToAdd: string[]
-        collectionFilesToRemove: string[]
-      } & TablesUpdate<"assistants">
+      updateState: TablesUpdate<"assistants">
     ) => {
       if (!profile) return
 
@@ -342,10 +400,89 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     assistants: async (
       assistantId: string,
       updateState: {
+        assistantId: string
         image: File
       } & TablesUpdate<"assistants">
     ) => {
       const { image, ...rest } = updateState
+
+      const filesToAdd = selectedAssistantFiles.filter(
+        selectedFile =>
+          !startingAssistantFiles.some(
+            startingFile => startingFile.id === selectedFile.id
+          )
+      )
+
+      const filesToRemove = startingAssistantFiles.filter(startingFile =>
+        selectedAssistantFiles.some(
+          selectedFile => selectedFile.id === startingFile.id
+        )
+      )
+
+      for (const file of filesToAdd) {
+        await createAssistantFile({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          file_id: file.id
+        })
+      }
+
+      for (const file of filesToRemove) {
+        await deleteAssistantFile(assistantId, file.id)
+      }
+
+      const collectionsToAdd = selectedAssistantCollections.filter(
+        selectedCollection =>
+          !startingAssistantCollections.some(
+            startingCollection =>
+              startingCollection.id === selectedCollection.id
+          )
+      )
+
+      const collectionsToRemove = startingAssistantCollections.filter(
+        startingCollection =>
+          selectedAssistantCollections.some(
+            selectedCollection =>
+              selectedCollection.id === startingCollection.id
+          )
+      )
+
+      for (const collection of collectionsToAdd) {
+        await createAssistantCollection({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          collection_id: collection.id
+        })
+      }
+
+      for (const collection of collectionsToRemove) {
+        await deleteAssistantCollection(assistantId, collection.id)
+      }
+
+      const toolsToAdd = selectedAssistantTools.filter(
+        selectedTool =>
+          !startingAssistantTools.some(
+            startingTool => startingTool.id === selectedTool.id
+          )
+      )
+
+      const toolsToRemove = startingAssistantTools.filter(startingTool =>
+        selectedAssistantTools.some(
+          selectedTool => selectedTool.id === startingTool.id
+        )
+      )
+
+      for (const tool of toolsToAdd) {
+        await createAssistantTool({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          tool_id: tool.id
+        })
+      }
+
+      for (const tool of toolsToRemove) {
+        await deleteAssistantTool(assistantId, tool.id)
+      }
 
       const updatedAssistant = await updateAssistant(assistantId, rest)
 
@@ -396,6 +533,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       const setStateFunction = stateUpdateFunctions[contentType]
 
       if (!updateFunction || !setStateFunction) return
+      if (isTyping) return // Prevent update while typing
 
       const updatedItem = await updateFunction(item.id, updateState)
 
@@ -430,7 +568,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       buttonRef.current?.click()
     }

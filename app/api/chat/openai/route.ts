@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     messages: any[]
   }
 
+  console.log("openai messages", messages, "\n\n\n")
+
   try {
     const profile = await getServerProfile()
 

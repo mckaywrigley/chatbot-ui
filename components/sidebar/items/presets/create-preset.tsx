@@ -19,6 +19,7 @@ export const CreatePreset: FC<CreatePresetProps> = ({
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [presetChatSettings, setPresetChatSettings] = useState({
     model: selectedWorkspace?.default_model,
@@ -38,6 +39,7 @@ export const CreatePreset: FC<CreatePresetProps> = ({
     <SidebarCreateItem
       contentType="presets"
       isOpen={isOpen}
+      isTyping={isTyping}
       onOpenChange={onOpenChange}
       createState={
         {
@@ -66,17 +68,6 @@ export const CreatePreset: FC<CreatePresetProps> = ({
               maxLength={PRESET_NAME_MAX}
             />
           </div>
-
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
-
-            <Input
-              placeholder="Preset description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={PRESET_DESCRIPTION_MAX}
-            />
-          </div> */}
 
           <ChatSettingsForm
             chatSettings={presetChatSettings as any}
