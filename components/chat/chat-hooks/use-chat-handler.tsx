@@ -3,7 +3,7 @@ import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
-import { ChatMessage, ChatPayload } from "@/types"
+import { ChatMessage, ChatPayload, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
@@ -56,7 +56,9 @@ export const useChatHandler = () => {
     sourceCount,
     setIsPromptPickerOpen,
     setIsAtPickerOpen,
-    selectedTools
+    selectedTools,
+    selectedPreset,
+    setChatSettings
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -80,6 +82,51 @@ export const useChatHandler = () => {
 
     setSelectedTools([])
     setToolInUse("none")
+
+    if (selectedAssistant) {
+      setChatSettings({
+        model: selectedAssistant.model as LLMID,
+        prompt: selectedAssistant.prompt,
+        temperature: selectedAssistant.temperature,
+        contextLength: selectedAssistant.context_length,
+        includeProfileContext: selectedAssistant.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedAssistant.include_workspace_instructions,
+        embeddingsProvider: selectedAssistant.embeddings_provider as
+          | "openai"
+          | "local"
+      })
+    } else if (selectedPreset) {
+      setChatSettings({
+        model: selectedPreset.model as LLMID,
+        prompt: selectedPreset.prompt,
+        temperature: selectedPreset.temperature,
+        contextLength: selectedPreset.context_length,
+        includeProfileContext: selectedPreset.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedPreset.include_workspace_instructions,
+        embeddingsProvider: selectedPreset.embeddings_provider as
+          | "openai"
+          | "local"
+      })
+    } else if (selectedWorkspace) {
+      setChatSettings({
+        model: (selectedWorkspace.default_model ||
+          "gpt-4-1106-preview") as LLMID,
+        prompt:
+          selectedWorkspace.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature: selectedWorkspace.default_temperature || 0.5,
+        contextLength: selectedWorkspace.default_context_length || 4096,
+        includeProfileContext:
+          selectedWorkspace.include_profile_context || true,
+        includeWorkspaceInstructions:
+          selectedWorkspace.include_workspace_instructions || true,
+        embeddingsProvider:
+          (selectedWorkspace.embeddings_provider as "openai" | "local") ||
+          "openai"
+      })
+    }
 
     router.push("/chat")
   }
@@ -169,7 +216,7 @@ export const useChatHandler = () => {
       let generatedText = ""
 
       if (selectedTools) {
-        setToolInUse("tools") // TODO
+        setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
 
         const formattedMessages = await buildFinalMessages(
           payload,
@@ -190,7 +237,6 @@ export const useChatHandler = () => {
         })
 
         setToolInUse("none")
-        setSelectedTools([])
 
         generatedText = await processResponse(
           response,
