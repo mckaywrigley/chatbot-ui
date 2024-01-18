@@ -15,7 +15,9 @@ export default function ChangePasswordPage() {
       const session = (await supabase.auth.getSession()).data.session
 
       if (!session) {
-        router.push("/login")
+        router.push(
+          "/login?message=Check your email inbox to reset your password"
+        )
       } else {
         setLoading(false)
       }
