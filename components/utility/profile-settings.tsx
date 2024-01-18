@@ -480,11 +480,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT ? (
                           <Label className="text-xs">
-                            Azure OpenAI Endpoint set by admin.
+                            Azure endpoint set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI Endpoint</Label>
+                            <Label>Azure Endpoint</Label>
 
                             <Input
                               placeholder="https://your-endpoint.openai.azure.com"
@@ -503,11 +503,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-3.5 Turbo ID set by admin.
+                            Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-3.5 Turbo ID</Label>
+                            <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
 
                             <Input
                               placeholder="Azure OpenAI GPT-3.5 Turbo ID"
@@ -526,11 +526,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-4.5 Turbo ID set by admin.
+                            Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-4.5 Turbo ID</Label>
+                            <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
 
                             <Input
                               placeholder="Azure OpenAI GPT-4.5 Turbo ID"
@@ -549,11 +549,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-4.5 Vision ID set by admin.
+                            Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-4.5 Vision ID</Label>
+                            <Label>Azure GPT-4.5 Vision Deployment Name</Label>
 
                             <Input
                               placeholder="Azure OpenAI GPT-4.5 Vision ID"
@@ -572,11 +572,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_EMBEDDINGS_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI Embeddings ID set by admin.
+                            Azure Embeddings deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI Embeddings ID</Label>
+                            <Label>Azure Embeddings Deployment Name</Label>
 
                             <Input
                               placeholder="Azure OpenAI Embeddings ID"
