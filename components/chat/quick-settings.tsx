@@ -4,7 +4,6 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
-import OpenAI from "openai"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
@@ -53,6 +52,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
   ) => {
     if (contentType === "assistants") {
       setSelectedAssistant(item as Tables<"assistants">)
+      console.log(item)
       setSelectedPreset(null)
     } else if (contentType === "presets") {
       setSelectedPreset(item as Tables<"presets">)
@@ -111,28 +111,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     ...assistants.map(assistant => ({
       ...assistant,
       contentType: "assistants"
-    })),
-    ...(openaiAssistants.map((assistant: OpenAI.Beta.Assistant) => {
-      return {
-        id: assistant.id,
-        folder_id: null,
-        created_at: assistant.created_at.toString(),
-        updated_at: "openai-assistant",
-        sharing: "private",
-        name: assistant.name || "",
-        description: assistant.description || "",
-        image: "",
-        image_path: "",
-        user_id: "",
-        include_profile_context: false,
-        include_workspace_instructions: false,
-        context_length: 0,
-        model: assistant.model,
-        prompt: assistant.instructions || "",
-        temperature: 0,
-        embeddings_provider: "openai"
-      }
-    }) as Tables<"assistants">[])
+    }))
   ]
 
   const selectedAssistantImage = selectedPreset
@@ -149,8 +128,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         setSearch("")
       }}
     >
-      <DropdownMenuTrigger className="max-w-[300px]" asChild>
-        <Button variant="ghost" className="flex space-x-3 text-xl">
+      <DropdownMenuTrigger className="max-w-[400px]" asChild>
+        <Button variant="ghost" className="flex space-x-3 text-lg">
           {selectedPreset && (
             <ModelIcon modelId={selectedPreset.model} width={32} height={32} />
           )}
@@ -161,13 +140,13 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                 className="rounded"
                 src={selectedAssistantImage}
                 alt="Assistant"
-                width={32}
-                height={32}
+                width={28}
+                height={28}
               />
             ) : (
               <IconRobotFace
                 className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                size={32}
+                size={28}
               />
             ))}
 
