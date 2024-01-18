@@ -510,7 +510,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-3.5 Turbo ID"
+                              placeholder="Azure OpenAI GPT-3.5 Turbo Deployment Name"
                               type="password"
                               value={azureOpenai35TurboID}
                               onChange={e =>
@@ -533,7 +533,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Turbo ID"
+                              placeholder="Azure OpenAI GPT-4.5 Turbo Deployment Name"
                               type="password"
                               value={azureOpenai45TurboID}
                               onChange={e =>
@@ -556,7 +556,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-4.5 Vision Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Vision ID"
+                              placeholder="Azure OpenAI GPT-4.5 Vision Deployment Name"
                               type="password"
                               value={azureOpenai45VisionID}
                               onChange={e =>
@@ -579,7 +579,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure Embeddings Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI Embeddings ID"
+                              placeholder="Azure OpenAI Embeddings Deployment Name"
                               type="password"
                               value={azureEmbeddingsID}
                               onChange={e =>
