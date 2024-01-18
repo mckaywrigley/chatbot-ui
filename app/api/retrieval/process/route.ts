@@ -33,14 +33,12 @@ export async function POST(req: Request) {
     const fileExtension = file.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
-      checkApiKey(profile.openai_api_key, "OpenAI")
-    } else if (embeddingsProvider === "azure") {
-      checkApiKey(profile.azure_openai_api_key, "Azure")
+      if (profile.use_azure_openai) {
+        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+      } else {
+        checkApiKey(profile.openai_api_key, "OpenAI")
+      }
     }
-
-    const ENDPOINT = profile.azure_openai_endpoint
-    const KEY = profile.azure_openai_api_key
-    const DEPLOYMENT_ID = "text-embedding-ada-002"
 
     let chunks: FileItemChunk[] = []
 
@@ -68,12 +66,22 @@ export async function POST(req: Request) {
 
     let embeddings: any = []
 
-    if (embeddingsProvider === "openai") {
-      const openai = new OpenAI({
+    let openai
+    if (profile.use_azure_openai) {
+      openai = new OpenAI({
+        apiKey: profile.azure_openai_api_key || "",
+        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
+        defaultQuery: { "api-version": "2023-07-01-preview" },
+        defaultHeaders: { "api-key": profile.azure_openai_api_key }
+      })
+    } else {
+      openai = new OpenAI({
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id
       })
+    }
 
+    if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
         model: "text-embedding-ada-002",
         input: chunks.map(chunk => chunk.content)
@@ -88,29 +96,13 @@ export async function POST(req: Request) {
           return await generateLocalEmbedding(chunk.content)
         } catch (error) {
           console.error(`Error generating embedding for chunk: ${chunk}`, error)
+
           return null
         }
       })
 
       embeddings = await Promise.all(embeddingPromises)
-    } else if (embeddingsProvider === "azure") {
-      const azureOpenai = new OpenAI({
-        apiKey: KEY || "",
-        baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
-        defaultQuery: { "api-version": "2023-05-15" },
-        defaultHeaders: { "api-key": KEY }
-      })
-
-      const response = await azureOpenai.embeddings.create({
-        model: "text-embedding-ada-002",
-        input: chunks.map(chunk => chunk.content)
-      })
-
-      embeddings = response.data.map((item: any) => {
-        return item.embedding
-      })
     }
-    //console.log("embeddings", embeddings)
 
     const file_items = chunks.map((chunk, index) => ({
       file_id,
@@ -124,18 +116,12 @@ export async function POST(req: Request) {
       local_embedding:
         embeddingsProvider === "local"
           ? ((embeddings[index] || null) as any)
-          : null,
-      azure_embedding:
-        embeddingsProvider === "azure"
-          ? ((embeddings[index] || null) as any)
           : null
     }))
 
-    //console.log('Upserting file items:', file_items);
     await supabaseAdmin.from("file_items").upsert(file_items)
 
     const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
-    console.log("Updating file tokens:", totalTokens)
 
     await supabaseAdmin
       .from("files")
@@ -146,7 +132,6 @@ export async function POST(req: Request) {
       status: 200
     })
   } catch (error: any) {
-    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {

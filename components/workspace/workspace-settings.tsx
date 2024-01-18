@@ -94,7 +94,6 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         embeddingsProvider: defaultChatSettings.embeddingsProvider as
           | "openai"
           | "local"
-          | "azure"
       })
     }
 

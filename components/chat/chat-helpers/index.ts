@@ -55,7 +55,7 @@ export const handleRetrieval = async (
   userInput: string,
   newMessageFiles: ChatFile[],
   chatFiles: ChatFile[],
-  embeddingsProvider: "openai" | "local" | "azure",
+  embeddingsProvider: "openai" | "local",
   sourceCount: number
 ) => {
   const response = await fetch("/api/retrieval/retrieve", {

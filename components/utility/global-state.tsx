@@ -196,10 +196,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         includeWorkspaceInstructions:
           homeWorkspace?.include_workspace_instructions || true,
         embeddingsProvider:
-          (homeWorkspace?.embeddings_provider as
-            | "openai"
-            | "local"
-            | "azure") || "openai"
+          (homeWorkspace?.embeddings_provider as "openai" | "local") || "openai"
       })
     }
   }
