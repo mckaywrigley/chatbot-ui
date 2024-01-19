@@ -2,7 +2,7 @@
 
 "use client"
 
-import Loading from "@/app/loading"
+import Loading from "@/app/[locale]/loading"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantWorkspacesByWorkspaceId } from "@/db/assistants"
 import { getChatsByWorkspaceId } from "@/db/chats"

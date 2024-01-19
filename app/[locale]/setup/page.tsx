@@ -9,14 +9,14 @@ import { TablesUpdate } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
-import { APIStep } from "../../components/setup/api-step"
-import { FinishStep } from "../../components/setup/finish-step"
-import { ProfileStep } from "../../components/setup/profile-step"
+import { APIStep } from "../../../components/setup/api-step"
+import { FinishStep } from "../../../components/setup/finish-step"
+import { ProfileStep } from "../../../components/setup/profile-step"
 import {
   SETUP_STEP_COUNT,
   StepContainer
-} from "../../components/setup/step-container"
-import { WorkspaceStep } from "../../components/setup/workspace-step"
+} from "../../../components/setup/step-container"
+import { WorkspaceStep } from "../../../components/setup/workspace-step"
 
 export default function SetupPage() {
   const { profile, setProfile, setSelectedWorkspace, setWorkspaces } =
