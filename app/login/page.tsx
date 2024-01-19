@@ -99,6 +99,8 @@ export default async function Login({
     if (error) {
       return redirect(`/login?message=${error.message}`)
     }
+
+    return redirect("/login?message=Check email to reset password")
   }
 
   return (
