@@ -1,4 +1,4 @@
-import Loading from "@/app/loading"
+import Loading from "@/app/[locale]/loading"
 import { ContentType } from "@/types"
 import { User } from "@supabase/supabase-js"
 import { IconDownload, IconLock } from "@tabler/icons-react"

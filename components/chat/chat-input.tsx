@@ -9,6 +9,7 @@ import {
   IconSend
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -20,6 +21,8 @@ import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
+  const { t } = useTranslation()
+
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -175,7 +178,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={`Ask anything. Type "/" for prompts, "@" for files, and "#" for tools.`}
+          placeholder={t(
+            `Ask anything. Type "/" for prompts, "@" for files, and "#" for tools.`
+          )}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}
