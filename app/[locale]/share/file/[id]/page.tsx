@@ -54,14 +54,14 @@ export default function ShareFilePage({ params }: ShareFilePageProps) {
 
   if (!file) {
     return (
-      <div className="flex h-full w-full items-center justify-center text-4xl">
+      <div className="flex size-full items-center justify-center text-4xl">
         File not found.
       </div>
     )
   }
 
   return (
-    <div className="flex h-full w-full flex-col p-4">
+    <div className="flex size-full flex-col p-4">
       <ShareHeader session={session} />
 
       <div className="flex flex-1 flex-col items-center justify-center">
