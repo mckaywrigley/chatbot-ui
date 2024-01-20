@@ -8,6 +8,8 @@ export interface ChatSettings {
   contextLength: number
   includeProfileContext: boolean
   includeWorkspaceInstructions: boolean
+  localModelThreads?: number
+  localModelNumGpus?: number
   embeddingsProvider: "openai" | "local"
 }
 
