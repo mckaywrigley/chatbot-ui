@@ -118,35 +118,51 @@ export async function buildFinalMessages(
   }
 
   finalMessages.unshift(tempSystemMessage)
-
   finalMessages = finalMessages.map(message => {
     let content
 
     if (message.image_paths.length > 0) {
-      content = [
-        {
-          type: "text",
-          text: message.content
-        },
-        ...message.image_paths.map(path => {
-          let formedUrl = ""
-
+      if (chatSettings.isLocal) {
+        const base64Images = message.image_paths.map(path => {
           if (path.startsWith("data")) {
-            formedUrl = path
+            return path.split(',')[1];
           } else {
-            const chatImage = chatImages.find(image => image.path === path)
+            const chatImage = chatImages.find(image => image.path === path);
+            return chatImage ? chatImage.base64.split(',')[1] : null;
+          }
+        }).filter(imageBase64 => imageBase64 != null);
+        return {
+          role: message.role,
+          content: message.content,
+          images: base64Images
+        };
+      } else {
+        content = [
+          {
+            type: "text",
+            text: message.content
+          },
+          ...message.image_paths.map(path => {
+            let formedUrl = ""
 
-            if (chatImage) {
-              formedUrl = chatImage.base64
+            if (path.startsWith("data")) {
+              formedUrl = path
+            } else {
+              const chatImage = chatImages.find(image => image.path === path)
+
+              if (chatImage) {
+                formedUrl = chatImage.base64
+              }
             }
-          }
 
-          return {
-            type: "image_url",
-            image_url: formedUrl
-          }
-        })
-      ]
+            return {
+              type: "image_url",
+              image_url: formedUrl
+            }
+          })
+        ]
+      }
+
     } else {
       content = message.content
     }
@@ -162,9 +178,8 @@ export async function buildFinalMessages(
 
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
-      content: `${
-        finalMessages[finalMessages.length - 1].content
-      }\n\n${retrievalText}`
+      content: `${finalMessages[finalMessages.length - 1].content
+        }\n\n${retrievalText}`
     }
   }
 
