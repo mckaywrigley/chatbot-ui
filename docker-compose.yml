@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+  chatbot-build-ui:
+    build: .
+    network_mode: "host"
+    expose:
+      - 3000
+    env_file:
+      - .env.local
+    depends_on:
+      - ollama
+      
+  ollama:
+    container_name: ollama
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    # Configure your GPU settings or comment below for CPU
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0,2']
+              capabilities: [gpu]
+
+volumes:
+  ollama:
+
+
+##### ATTEMPT AT USING SUPABASE DOCKER NETWORK - NEEDS TROUBLESHOOTING WITH FRONTEND ####
+# services:
+#   chatbot-build-ui:
+#       container_name: chatbot-ui
+#       build: .
+#       ports:
+#         - "3000:3000" 
+#       env_file:
+#         - .env.local
+#       depends_on:
+#         - ollama
+#       networks:
+#         - supabase_network_chatbotui  # Connect to the existing network
+
+#   ollama:
+#     container_name: ollama
+#     image: ollama/ollama
+#     volumes:
+#       - /mnt/nas/ollama_models:/root/.ollama
+#     ports:
+#       - "11434:11434"
+#     ## Comment out below if you do not have NVIDIA GPUs.
+#     runtime: nvidia
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - driver: nvidia
+#               device_ids: ['0,2']
+#               capabilities: [gpu]
+#     networks:
+#       - supabase_network_chatbotui  # Connect to the existing network
+
+# networks:
+#   supabase_network_chatbotui:  # Define the existing network
+#     external: true  # Specify that this network already exists
+# volumes:
+#   ollama:
+

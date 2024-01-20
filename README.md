@@ -142,6 +142,41 @@ Your local instance of Chatbot UI should now be running at [http://localhost:300
 
 You can view your backend GUI at [http://localhost:54323/project/default/editor](http://localhost:54323/project/default/editor).
 
+## Local Host Fully Dockerized
+
+This deployment leverages all docker containers with only supabase as the cli to start the backend database
+
+For ease, a Make file and scripts were created to start the process quickly with Docker.
+
+```bash
+make start-chatbot-docker
+```
+
+This will trigger a series of steps to include:
+
+1. Checks for Supabase (Linux/macOS) and installs as required
+2. Starts Supabase backend using chatbot-ui migration scripts and generates types
+3. Starts Docker for Chat UI and ollama instances (using default ports)
+4. Once containers are deployed, ollama will pull a mistral model automatically to get you started
+
+To pull additional models use the makefile:
+
+```bash
+make pull-ollama-docker
+```
+
+Follow prompt to enter model name to download.  This will download the model using the Docker instance of ollama.
+
+**ENV Asssumption** Uses the standard Supabase keys (change as you desire), ollama URL and Supabase URL remain static for standard deployments.
+
+**CAUTION** If you have ollama already running on your system you will need to adjust your ports in the Dockerfile and the env.local to the port of your choice for the Docker ollama instance.
+
+Work-In-Progress to fully automate the local instance of ollama with the Makefile.  If ollama is already installed and serving models, it will work just finish.  There is an error to start ollama from the script to run `ollama serve`.
+
+```bash
+make start-chatbot-local
+```
+
 ## Hosted Quickstart
 
 Follow these steps to get your own Chatbot UI instance running in the cloud.

@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  chatbot-build-ui:
+    build: .
+    network_mode: "host"
+    expose:
+      - 3000
+    env_file:
+      - .env.local
