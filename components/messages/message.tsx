@@ -190,7 +190,7 @@ export const Message: FC<MessageProps> = ({
                   />
                 )
               ) : profile?.image_url ? (
-                <Avatar className={`h-[28px] w-[28px] rounded`}>
+                <Avatar className={`size-[28px] rounded`}>
                   <AvatarImage src={profile?.image_url} />
                 </Avatar>
               ) : (
