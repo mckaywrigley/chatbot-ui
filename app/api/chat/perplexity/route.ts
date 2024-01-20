@@ -1,5 +1,8 @@
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
 
 export const runtime = "edge"
 
@@ -13,51 +16,27 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
-    checkApiKey(profile.anthropic_api_key, "Anthropic")
+    checkApiKey(profile.perplexity_api_key, "Perplexity")
 
-    const response = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${profile.perplexity_api_key}`
-      },
-      body: JSON.stringify({
-        model: chatSettings.model,
-        messages: messages,
-        temperature: chatSettings.temperature,
-        stream: true
-      })
+    // Perplexity is compatible the OpenAI SDK
+    const perplexity = new OpenAI({
+      apiKey: profile.perplexity_api_key || "",
+      baseURL: "https://api.perplexity.ai/"
     })
 
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        if (!response.body) {
-          throw new Error("No response body!")
-        }
-
-        const reader = response.body.getReader()
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            controller.close()
-            break
-          }
-          const chunk = new TextDecoder("utf-8").decode(value)
-
-          const data = chunk.split("data: ")[1]
-          if (data) {
-            const parsedData = JSON.parse(data)
-            const messageContent = parsedData.choices[0].delta.content
-            controller.enqueue(new TextEncoder().encode(messageContent))
-          }
-        }
-      }
+    const response = await perplexity.chat.completions.create({
+      model: chatSettings.model,
+      messages,
+      max_tokens:
+        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+      stream: true
     })
 
-    return new Response(readableStream, {
-      headers: { "Content-Type": "text/plain" }
-    })
+    // Convert the response into a friendly text-stream.
+    const stream = OpenAIStream(response)
+
+    // Respond with the stream
+    return new StreamingTextResponse(stream)
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
