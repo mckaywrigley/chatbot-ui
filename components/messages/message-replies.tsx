@@ -29,7 +29,7 @@ export const MessageReplies: FC<MessageRepliesProps> = ({}) => {
               onClick={() => setIsOpen(true)}
             >
               <IconMessage size={MESSAGE_ICON_SIZE} />
-              <div className="notification-indicator absolute right-[-4px] top-[-4px] flex size-3 items-center justify-center rounded-full bg-red-600 text-[8px] text-white">
+              <div className="notification-indicator absolute right-[-4px] top-[-4px] flex h-3 w-3 items-center justify-center rounded-full bg-red-600 text-[8px] text-white">
                 {1}
               </div>
             </div>
