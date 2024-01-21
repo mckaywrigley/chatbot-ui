@@ -68,12 +68,12 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex size-full">
       <CommandK />
 
       <Button
         className={cn(
-          "absolute left-[4px] top-[50%] z-10 h-[32px] w-[32px] cursor-pointer"
+          "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
         )}
         style={{
           marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
