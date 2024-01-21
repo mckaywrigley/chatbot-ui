@@ -162,7 +162,7 @@ export default function SetupPage() {
             stepNum={currentStep}
             stepTitle="Welcome to Chatbot UI"
             onShouldProceed={handleShouldProceed}
-            showNextButton={!!(displayName && username && usernameAvailable)}
+            showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
           >
             <ProfileStep
