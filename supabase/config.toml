@@ -1,6 +1,6 @@
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-project_id = "chatbotui"
+project_id = "chatbotui-hosted"
 
 [api]
 # Port to use for the API URL.

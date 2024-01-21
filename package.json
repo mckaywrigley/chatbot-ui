@@ -1,6 +1,6 @@
 {
-  "name": "chatbot-ui",
-  "version": "2.0.0",
+  "name": "chatbot-ui-hosted",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "chat": "supabase start && npm run db-types && npm run dev",
