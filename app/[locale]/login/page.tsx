@@ -8,7 +8,7 @@ import { createServerClient } from "@supabase/ssr"
 import { Metadata } from "next"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { get } from '@vercel/edge-config';
+import { get } from "@vercel/edge-config"
 
 export const metadata: Metadata = {
   title: "Login"
@@ -64,10 +64,10 @@ export default async function Login({
     const password = formData.get("password") as string
 
     if (process.env.EMAIL_DOMAIN_WHITELIST || process.env.EDGE_CONFIG) {
-      let patternsString = process.env.EMAIL_DOMAIN_WHITELIST;
+      let patternsString = process.env.EMAIL_DOMAIN_WHITELIST
 
       if (process.env.EDGE_CONFIG)
-        patternsString = await get<string>('EMAIL_DOMAIN_WHITELIST');
+        patternsString = await get<string>("EMAIL_DOMAIN_WHITELIST")
 
       const emailDomainWhitelist = patternsString?.split(",") ?? []
 
@@ -82,10 +82,10 @@ export default async function Login({
     }
 
     if (process.env.EMAIL_WHITELIST || process.env.EDGE_CONFIG) {
-      let patternsString = process.env.EMAIL_WHITELIST;
+      let patternsString = process.env.EMAIL_WHITELIST
 
       if (process.env.EDGE_CONFIG)
-        patternsString = await get<string>('EMAIL_WHITELIST');
+        patternsString = await get<string>("EMAIL_WHITELIST")
 
       const emailWhitelist = patternsString?.split(",") ?? []
 

@@ -444,9 +444,10 @@ export const handleCreateMessages = async (
 
     setChatImages(prevImages => [
       ...prevImages,
-      ...newMessageImages.map(obj => ({
+      ...newMessageImages.map((obj, index) => ({
         ...obj,
-        messageId: createdMessages[0].id
+        messageId: createdMessages[0].id,
+        path: paths[index]
       }))
     ])
 
