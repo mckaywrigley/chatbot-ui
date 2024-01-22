@@ -13,6 +13,7 @@ interface PresetItemProps {
 
 export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
   const [name, setName] = useState(preset.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(preset.description)
   const [presetChatSettings, setPresetChatSettings] = useState({
     model: preset.model,
@@ -26,6 +27,7 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
   return (
     <SidebarItem
       item={preset}
+      isTyping={isTyping}
       contentType="presets"
       icon={
         <ModelIcon modelId={presetChatSettings.model} height={30} width={30} />
@@ -53,17 +55,6 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
               maxLength={PRESET_NAME_MAX}
             />
           </div>
-
-          {/* <div className="space-y-1">
-            <Label>Description (optional)</Label>
-
-            <Input
-              placeholder="Preset description..."
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              maxLength={PRESET_DESCRIPTION_MAX}
-            />
-          </div> */}
 
           <ChatSettingsForm
             chatSettings={presetChatSettings as any}

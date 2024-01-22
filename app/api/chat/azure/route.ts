@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
-    checkApiKey(profile.azure_openai_api_key, "Azure")
+    checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
 
     const ENDPOINT = profile.azure_openai_endpoint
     const KEY = profile.azure_openai_api_key

@@ -1,4 +1,4 @@
-import Loading from "@/app/loading"
+import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { getChatById } from "@/db/chats"
@@ -34,7 +34,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     assistants,
     setSelectedAssistant,
     setChatFileItems,
-    chatFiles,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval
@@ -216,7 +215,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div
-        className="flex h-full w-full flex-col overflow-auto border-b"
+        className="flex size-full flex-col overflow-auto border-b"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />

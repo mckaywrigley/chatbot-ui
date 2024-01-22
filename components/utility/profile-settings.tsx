@@ -89,6 +89,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [azureOpenai45VisionID, setAzureOpenai45VisionID] = useState(
     profile?.azure_openai_45_vision_id || ""
   )
+  const [azureEmbeddingsID, setAzureEmbeddingsID] = useState(
+    profile?.azure_openai_embeddings_id || ""
+  )
   const [anthropicAPIKey, setAnthropicAPIKey] = useState(
     profile?.anthropic_api_key || ""
   )
@@ -170,6 +173,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
+    router.refresh()
     return
   }
 
@@ -203,6 +207,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_35_turbo_id: azureOpenai35TurboID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
+      azure_openai_embeddings_id: azureEmbeddingsID,
       openrouter_api_key: openrouterAPIKey
     })
     setProfile(updatedProfile)
@@ -282,7 +287,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         {profile.image_url ? (
-          <Avatar className="mt-2 h-[34px] w-[34px] cursor-pointer hover:opacity-50">
+          <Avatar className="mt-2 size-[34px] cursor-pointer hover:opacity-50">
             <AvatarImage src={profile.image_url} />
           </Avatar>
         ) : (
@@ -476,11 +481,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT ? (
                           <Label className="text-xs">
-                            Azure OpenAI Endpoint set by admin.
+                            Azure endpoint set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI Endpoint</Label>
+                            <Label>Azure Endpoint</Label>
 
                             <Input
                               placeholder="https://your-endpoint.openai.azure.com"
@@ -499,14 +504,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-3.5 Turbo ID set by admin.
+                            Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-3.5 Turbo ID</Label>
+                            <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-3.5 Turbo ID"
+                              placeholder="Azure OpenAI GPT-3.5 Turbo Deployment Name"
                               type="password"
                               value={azureOpenai35TurboID}
                               onChange={e =>
@@ -522,14 +527,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-4.5 Turbo ID set by admin.
+                            Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-4.5 Turbo ID</Label>
+                            <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Turbo ID"
+                              placeholder="Azure OpenAI GPT-4.5 Turbo Deployment Name"
                               type="password"
                               value={azureOpenai45TurboID}
                               onChange={e =>
@@ -545,18 +550,41 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       <div className="space-y-1">
                         {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID ? (
                           <Label className="text-xs">
-                            Azure OpenAI GPT-4.5 Vision ID set by admin.
+                            Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
                         ) : (
                           <>
-                            <Label>Azure OpenAI GPT-4.5 Vision ID</Label>
+                            <Label>Azure GPT-4.5 Vision Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Vision ID"
+                              placeholder="Azure OpenAI GPT-4.5 Vision Deployment Name"
                               type="password"
                               value={azureOpenai45VisionID}
                               onChange={e =>
                                 setAzureOpenai45VisionID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
+
+                    {
+                      <div className="space-y-1">
+                        {!!process.env.NEXT_PUBLIC_AZURE_EMBEDDINGS_ID ? (
+                          <Label className="text-xs">
+                            Azure Embeddings deployment name set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure Embeddings Deployment Name</Label>
+
+                            <Input
+                              placeholder="Azure OpenAI Embeddings Deployment Name"
+                              type="password"
+                              value={azureEmbeddingsID}
+                              onChange={e =>
+                                setAzureEmbeddingsID(e.target.value)
                               }
                             />
                           </>

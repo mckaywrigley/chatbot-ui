@@ -3,7 +3,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { ChatSettings, LLM } from "@/types"
+import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { ModelSelect } from "../models/model-select"
@@ -236,7 +236,9 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="openai">OpenAI</SelectItem>
+            <SelectItem value="openai">
+              {profile?.use_azure_openai ? "Azure OpenAI" : "OpenAI"}
+            </SelectItem>
 
             {window.location.hostname === "localhost" && (
               <SelectItem value="local">Local</SelectItem>

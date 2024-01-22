@@ -7,6 +7,9 @@ import {
   SheetTitle
 } from "@/components/ui/sheet"
 import { ChatbotUIContext } from "@/context/context"
+import { createAssistantCollections } from "@/db/assistant-collections"
+import { createAssistantFiles } from "@/db/assistant-files"
+import { createAssistantTools } from "@/db/assistant-tools"
 import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChat } from "@/db/chats"
 import { createCollectionFiles } from "@/db/collection-files"
@@ -27,6 +30,7 @@ import { toast } from "sonner"
 
 interface SidebarCreateItemProps {
   isOpen: boolean
+  isTyping: boolean
   onOpenChange: (isOpen: boolean) => void
   contentType: ContentType
   renderInputs: () => JSX.Element
@@ -38,7 +42,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   onOpenChange,
   contentType,
   renderInputs,
-  createState
+  createState,
+  isTyping
 }) => {
   const {
     selectedWorkspace,
@@ -100,10 +105,13 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     assistants: async (
       createState: {
         image: File
+        files: Tables<"files">[]
+        collections: Tables<"collections">[]
+        tools: Tables<"tools">[]
       } & Tables<"assistants">,
       workspaceId: string
     ) => {
-      const { image, ...rest } = createState
+      const { image, files, collections, tools, ...rest } = createState
 
       const createdAssistant = await createAssistant(rest, workspaceId)
 
@@ -135,6 +143,28 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
         }
       }
 
+      const assistantFiles = files.map(file => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        file_id: file.id
+      }))
+
+      const assistantCollections = collections.map(collection => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        collection_id: collection.id
+      }))
+
+      const assistantTools = tools.map(tool => ({
+        user_id: rest.user_id,
+        assistant_id: createdAssistant.id,
+        tool_id: tool.id
+      }))
+
+      await createAssistantFiles(assistantFiles)
+      await createAssistantCollections(assistantCollections)
+      await createAssistantTools(assistantTools)
+
       return updatedAssistant
     },
     tools: createTool
@@ -153,6 +183,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const handleCreate = async () => {
     try {
       if (!selectedWorkspace) return
+      if (isTyping) return // Prevent creation while typing
 
       const createFunction = createFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
@@ -174,7 +205,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       buttonRef.current?.click()
     }

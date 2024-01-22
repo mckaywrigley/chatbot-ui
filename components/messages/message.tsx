@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage } from "@/types"
 import {
+  IconBolt,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
@@ -189,7 +190,7 @@ export const Message: FC<MessageProps> = ({
                   />
                 )
               ) : profile?.image_url ? (
-                <Avatar className={`h-[28px] w-[28px] rounded`}>
+                <Avatar className={`size-[28px] rounded`}>
                   <AvatarImage src={profile?.image_url} />
                 </Avatar>
               ) : (
@@ -228,7 +229,13 @@ export const Message: FC<MessageProps> = ({
                       </div>
                     )
                   default:
-                    return null
+                    return (
+                      <div className="flex animate-pulse items-center space-x-2">
+                        <IconBolt size={20} />
+
+                        <div>Using {toolInUse}...</div>
+                      </div>
+                    )
                 }
               })()}
             </>

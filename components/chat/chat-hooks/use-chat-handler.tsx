@@ -1,8 +1,9 @@
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
+import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
-import { ChatMessage, ChatPayload } from "@/types"
+import { ChatMessage, ChatPayload, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
@@ -13,6 +14,7 @@ import {
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
+  processResponse,
   validateChatSettings
 } from "../chat-helpers"
 
@@ -32,6 +34,7 @@ export const useChatHandler = () => {
     selectedWorkspace,
     setSelectedChat,
     setChats,
+    setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
     abortController,
@@ -52,7 +55,10 @@ export const useChatHandler = () => {
     useRetrieval,
     sourceCount,
     setIsPromptPickerOpen,
-    setIsAtPickerOpen
+    setIsAtPickerOpen,
+    selectedTools,
+    selectedPreset,
+    setChatSettings
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -73,6 +79,54 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsAtPickerOpen(false)
+
+    setSelectedTools([])
+    setToolInUse("none")
+
+    if (selectedAssistant) {
+      setChatSettings({
+        model: selectedAssistant.model as LLMID,
+        prompt: selectedAssistant.prompt,
+        temperature: selectedAssistant.temperature,
+        contextLength: selectedAssistant.context_length,
+        includeProfileContext: selectedAssistant.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedAssistant.include_workspace_instructions,
+        embeddingsProvider: selectedAssistant.embeddings_provider as
+          | "openai"
+          | "local"
+      })
+    } else if (selectedPreset) {
+      setChatSettings({
+        model: selectedPreset.model as LLMID,
+        prompt: selectedPreset.prompt,
+        temperature: selectedPreset.temperature,
+        contextLength: selectedPreset.context_length,
+        includeProfileContext: selectedPreset.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedPreset.include_workspace_instructions,
+        embeddingsProvider: selectedPreset.embeddings_provider as
+          | "openai"
+          | "local"
+      })
+    } else if (selectedWorkspace) {
+      setChatSettings({
+        model: (selectedWorkspace.default_model ||
+          "gpt-4-1106-preview") as LLMID,
+        prompt:
+          selectedWorkspace.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature: selectedWorkspace.default_temperature || 0.5,
+        contextLength: selectedWorkspace.default_context_length || 4096,
+        includeProfileContext:
+          selectedWorkspace.include_profile_context || true,
+        includeWorkspaceInstructions:
+          selectedWorkspace.include_workspace_instructions || true,
+        embeddingsProvider:
+          (selectedWorkspace.embeddings_provider as "openai" | "local") ||
+          "openai"
+      })
+    }
 
     router.push("/chat")
   }
@@ -148,7 +202,7 @@ export const useChatHandler = () => {
           setChatMessages
         )
 
-      const payload: ChatPayload = {
+      let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",
         chatMessages: isRegeneration
@@ -161,34 +215,70 @@ export const useChatHandler = () => {
 
       let generatedText = ""
 
-      if (modelData!.provider === "ollama") {
-        generatedText = await handleLocalChat(
+      if (selectedTools.length > 0) {
+        setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
+
+        const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
-          chatSettings!,
-          tempAssistantChatMessage,
-          isRegeneration,
+          chatImages
+        )
+
+        const response = await fetch("/api/chat/tools", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chatSettings: payload.chatSettings,
+            messages: formattedMessages,
+            toolSchemas: selectedTools.map(tool => tool.schema)
+          })
+        })
+
+        setToolInUse("none")
+
+        generatedText = await processResponse(
+          response,
+          isRegeneration
+            ? payload.chatMessages[payload.chatMessages.length - 1]
+            : tempAssistantChatMessage,
+          true,
           newAbortController,
-          setIsGenerating,
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse
         )
       } else {
-        generatedText = await handleHostedChat(
-          payload,
-          profile!,
-          modelData!,
-          tempAssistantChatMessage,
-          isRegeneration,
-          newAbortController,
-          newMessageImages,
-          chatImages,
-          setIsGenerating,
-          setFirstTokenReceived,
-          setChatMessages,
-          setToolInUse
-        )
+        if (modelData!.provider === "ollama") {
+          generatedText = await handleLocalChat(
+            payload,
+            profile!,
+            chatSettings!,
+            tempAssistantChatMessage,
+            isRegeneration,
+            newAbortController,
+            setIsGenerating,
+            setFirstTokenReceived,
+            setChatMessages,
+            setToolInUse
+          )
+        } else {
+          generatedText = await handleHostedChat(
+            payload,
+            profile!,
+            modelData!,
+            tempAssistantChatMessage,
+            isRegeneration,
+            newAbortController,
+            newMessageImages,
+            chatImages,
+            setIsGenerating,
+            setFirstTokenReceived,
+            setChatMessages,
+            setToolInUse
+          )
+        }
       }
 
       if (!currentChat) {

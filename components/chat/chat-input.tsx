@@ -3,11 +3,13 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
+  IconBolt,
   IconCirclePlus,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -19,6 +21,8 @@ import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
+  const { t } = useTranslation()
+
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -34,11 +38,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     focusPrompt,
     setFocusPrompt,
     focusFile,
+    focusTool,
+    setFocusTool,
+    isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
     isAtPickerOpen,
     setFocusFile,
-    chatSettings
+    chatSettings,
+    selectedTools,
+    setSelectedTools
   } = useContext(ChatbotUIContext)
 
   const {
@@ -59,22 +68,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
-
-  useEffect(() => {
-    const textarea = chatInputRef.current
-    if (textarea) {
-      const handleCompositionStart = () => setIsTyping(true)
-      const handleCompositionEnd = () => setIsTyping(false)
-
-      textarea.addEventListener("compositionstart", handleCompositionStart)
-      textarea.addEventListener("compositionend", handleCompositionEnd)
-
-      return () => {
-        textarea.removeEventListener("compositionstart", handleCompositionStart)
-        textarea.removeEventListener("compositionend", handleCompositionEnd)
-      }
-    }
-  }, [chatInputRef])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
@@ -102,6 +95,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       event.preventDefault()
       setFocusFile(!focusFile)
     }
+
+    if (
+      isToolPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
+      event.preventDefault()
+      setFocusTool(!focusTool)
+    }
   }
 
   const handlePaste = (event: React.ClipboardEvent) => {
@@ -123,6 +126,29 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   return (
     <>
       <ChatFilesDisplay />
+
+      <div className="flex flex-wrap justify-center gap-2">
+        {selectedTools &&
+          selectedTools.map((tool, index) => (
+            <div
+              key={index}
+              className="mt-2 flex justify-center"
+              onClick={() =>
+                setSelectedTools(
+                  selectedTools.filter(
+                    selectedTool => selectedTool.id !== tool.id
+                  )
+                )
+              }
+            >
+              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">
+                <IconBolt size={20} />
+
+                <div>{tool.name}</div>
+              </div>
+            </div>
+          ))}
+      </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
@@ -152,13 +178,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={`Ask anything. Type "@" for files. Type "/" for prompts.`}
+          placeholder={t(
+            `Ask anything. Type "/" for prompts, "@" for files, and "#" for tools.`
+          )}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}
           maxRows={18}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
+          onCompositionStart={() => setIsTyping(true)}
+          onCompositionEnd={() => setIsTyping(false)}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
