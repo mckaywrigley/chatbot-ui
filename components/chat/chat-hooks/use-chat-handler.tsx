@@ -153,6 +153,7 @@ export const useChatHandler = () => {
       setIsGenerating(true)
       setIsPromptPickerOpen(false)
       setIsAtPickerOpen(false)
+      setNewMessageImages([])
 
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
@@ -325,7 +326,6 @@ export const useChatHandler = () => {
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput("")
-      setNewMessageImages([])
     } catch (error) {
       setIsGenerating(false)
       setFirstTokenReceived(false)
