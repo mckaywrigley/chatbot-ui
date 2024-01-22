@@ -4,6 +4,7 @@ import { ChatFile, MessageImage } from "@/types"
 import { IconFileFilled } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC } from "react"
+import { DrawingCanvas } from "../utility/drawing-canvas"
 import { Dialog, DialogContent } from "./dialog"
 
 interface FilePreviewProps {
@@ -31,7 +32,9 @@ export const FilePreview: FC<FilePreviewProps> = ({
           if (type === "image") {
             const imageItem = item as MessageImage
 
-            return (
+            return imageItem.file ? (
+              <DrawingCanvas imageItem={imageItem} />
+            ) : (
               <Image
                 className="rounded"
                 src={imageItem.base64 || imageItem.url}
