@@ -1,8 +1,8 @@
 import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
+import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
-import { getFileById } from "@/db/files"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
@@ -120,33 +120,19 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
     setChatFileItems(uniqueFileItems)
 
-    const uniqueFileIds = [
-      ...new Set(uniqueFileItems.map(item => item.file_id))
-    ]
+    const chatFiles = await getChatFilesByChatId(params.chatid as string)
 
-    if (uniqueFileIds.length > 0) {
-      const fileFetchPromises = uniqueFileIds.map(async fileId => {
-        const file = await getFileById(fileId)
-        return file
-      })
+    setChatFiles(
+      chatFiles.files.map(file => ({
+        id: file.id,
+        name: file.name,
+        type: file.type,
+        file: null
+      }))
+    )
 
-      const files = await Promise.all(fileFetchPromises)
-      setChatFiles(
-        files.map(file => ({
-          id: file.id,
-          name: file.name,
-          type: file.type,
-          file: null
-        }))
-      )
-
-      setUseRetrieval(true)
-      setShowFilesDisplay(true)
-    } else {
-      setUseRetrieval(false)
-      setShowFilesDisplay(false)
-      setChatFiles([])
-    }
+    setUseRetrieval(true)
+    setShowFilesDisplay(true)
 
     const fetchedChatMessages = fetchedMessages.map(message => {
       return {
