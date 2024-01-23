@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS tools (
 
     -- OPTIONAL DETAILS
     custom_headers JSONB,
+    request_in_body BOOLEAN NOT NULL DEFAULT TRUE,
 
     -- REQUIRED
     description TEXT NOT NULL CHECK (char_length(description) <= 500),

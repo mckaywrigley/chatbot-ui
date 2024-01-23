@@ -13,14 +13,19 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, toolSchemas, customHeaders } = json as {
+  const {
+    chatSettings,
+    messages,
+    toolSchemas,
+    customHeaders,
+    isRequestInBody
+  } = json as {
     chatSettings: ChatSettings
     messages: any[]
     toolSchemas: string
     customHeaders: string
+    isRequestInBody: boolean
   }
-
-  console.log(customHeaders)
 
   try {
     const profile = await getServerProfile()
@@ -94,14 +99,15 @@ export async function POST(request: Request) {
         }
 
         // decide with type of request to make
-        const condition = true
         var data = {}
 
-        if (condition) {
+        if (isRequestInBody === true) {
           // if the type is set to body
           var headers = {
             "Content-Type": "application/json"
           }
+
+          //console.log("Request in body")
 
           // check if custom headers are set
           if (customHeaders) {
@@ -123,6 +129,7 @@ export async function POST(request: Request) {
           data = await response.json()
         } else {
           // if the type is set to query
+          //console.log("Request in url")
           const queryParams = new URLSearchParams(parsedArgs).toString()
           const fullUrl = schemaDetail.url + path + "?" + queryParams
           const response = await fetch(fullUrl)

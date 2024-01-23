@@ -22,6 +22,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const [url, setUrl] = useState("")
   const [customHeaders, setCustomHeaders] = useState("")
   const [schema, setSchema] = useState("")
+  const [isRequestInBody, setIsRequestInBody] = useState(true)
 
   if (!profile || !selectedWorkspace) return null
 
@@ -35,7 +36,8 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
           description,
           url,
           custom_headers: customHeaders,
-          schema
+          schema,
+          request_in_body: isRequestInBody
         } as TablesInsert<"tools">
       }
       isOpen={isOpen}
@@ -149,6 +151,34 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               onValueChange={setSchema}
               minRows={20}
             />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Request Type</Label>
+
+            <div className="flex space-x-2">
+              <button
+                className={`rounded-md px-3 py-2 ${
+                  isRequestInBody
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-gray-700"
+                }`}
+                onClick={() => setIsRequestInBody(true)}
+              >
+                Request in Body
+              </button>
+
+              <button
+                className={`rounded-md px-3 py-2 ${
+                  !isRequestInBody
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-gray-700"
+                }`}
+                onClick={() => setIsRequestInBody(false)}
+              >
+                Request in URL
+              </button>
+            </div>
           </div>
         </>
       )}

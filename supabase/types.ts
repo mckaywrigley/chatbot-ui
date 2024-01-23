@@ -1221,6 +1221,7 @@ export interface Database {
         Row: {
           created_at: string
           custom_headers: Json | null
+          request_in_body: boolean
           description: string
           folder_id: string | null
           id: string
@@ -1234,6 +1235,7 @@ export interface Database {
         Insert: {
           created_at?: string
           custom_headers?: Json | null
+          request_in_body: boolean
           description: string
           folder_id?: string | null
           id?: string
@@ -1247,6 +1249,7 @@ export interface Database {
         Update: {
           created_at?: string
           custom_headers?: Json | null
+          request_in_body?: boolean
           description?: string
           folder_id?: string | null
           id?: string
