@@ -61,6 +61,10 @@ export const useChatHandler = () => {
     setChatSettings
   } = useContext(ChatbotUIContext)
 
+  const isLocalModel = (modelCheck: LLMID) => {
+    return availableLocalModels.some(model => model.modelId === modelCheck);
+  }
+
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   const handleNewChat = () => {
@@ -202,7 +206,9 @@ export const useChatHandler = () => {
           isRegeneration,
           setChatMessages
         )
-
+      if (isLocalModel(chatSettings!.model)) {
+        setChatSettings({ ...chatSettings!, isLocal: true })
+      }
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",

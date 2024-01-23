@@ -11,6 +11,7 @@ export interface ChatSettings {
   localModelThreads?: number
   localModelNumGpus?: number
   embeddingsProvider: "openai" | "local"
+  isLocal?: boolean
 }
 
 export interface ChatPayload {
