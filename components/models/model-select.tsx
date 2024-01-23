@@ -36,7 +36,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
-  const [tab, setTab] = useState<"hosted" | "local">("hosted")
+  const [tab, setTab] = useState<"hosted" | "local">(process.env.NEXT_PUBLIC_OLLAMA_URL ? 'local' : 'hosted')
 
   const [isLocked, setIsLocked] = useState<Boolean>(true)
 
@@ -149,7 +149,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       >
         <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
           {usingLocalModels && (
-            <TabsList defaultValue="hosted" className="grid grid-cols-2">
+            <TabsList defaultValue={process.env.NEXT_PUBLIC_OLLAMA_URL ? 'local' : 'hosted'} className="grid grid-cols-2">
               <TabsTrigger value="hosted">Hosted</TabsTrigger>
 
               <TabsTrigger value="local">Local</TabsTrigger>
