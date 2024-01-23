@@ -1220,6 +1220,7 @@ export interface Database {
       tools: {
         Row: {
           created_at: string
+          custom_headers: Json | null
           description: string
           folder_id: string | null
           id: string
@@ -1232,6 +1233,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
+          custom_headers?: Json | null
           description: string
           folder_id?: string | null
           id?: string
@@ -1244,6 +1246,7 @@ export interface Database {
         }
         Update: {
           created_at?: string
+          custom_headers?: Json | null
           description?: string
           folder_id?: string | null
           id?: string
@@ -1393,25 +1396,6 @@ export interface Database {
           similarity: number
         }[]
       }
-      match_file_items_local_all: {
-        Args: {
-          query_embedding: string
-          match_count?: number
-        }
-        Returns: {
-          id: string
-          file_id: string
-          content: string
-          tokens: number
-          similarity: number
-          file_name: string
-          file_type: string
-          file_description: string
-          file_path: string
-          file_size: number
-          file_tokens: number
-        }[]
-      }
       match_file_items_openai: {
         Args: {
           query_embedding: string
@@ -1424,25 +1408,6 @@ export interface Database {
           content: string
           tokens: number
           similarity: number
-        }[]
-      }
-      match_file_items_openai_all: {
-        Args: {
-          query_embedding: string
-          match_count?: number
-        }
-        Returns: {
-          id: string
-          file_id: string
-          content: string
-          tokens: number
-          similarity: number
-          file_name: string
-          file_type: string
-          file_description: string
-          file_path: string
-          file_size: number
-          file_tokens: number
         }[]
       }
       non_private_assistant_exists: {

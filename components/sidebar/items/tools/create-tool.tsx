@@ -1,4 +1,5 @@
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
@@ -19,6 +20,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [url, setUrl] = useState("")
+  const [customHeaders, setCustomHeaders] = useState("")
   const [schema, setSchema] = useState("")
 
   if (!profile || !selectedWorkspace) return null
@@ -32,6 +34,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
           name,
           description,
           url,
+          custom_headers: customHeaders,
           schema
         } as TablesInsert<"tools">
       }
@@ -90,6 +93,17 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               <Label>Code Interpreter</Label>
             </div>
           </div> */}
+
+          <div className="space-y-1">
+            <Label>Custom Headers</Label>
+
+            <TextareaAutosize
+              placeholder={`{"X-api-key": "1234567890"}`}
+              value={customHeaders}
+              onValueChange={setCustomHeaders}
+              minRows={1}
+            />
+          </div>
 
           <div className="space-y-1">
             <Label>Schema</Label>
