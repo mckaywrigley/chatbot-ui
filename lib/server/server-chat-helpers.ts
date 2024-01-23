@@ -50,9 +50,9 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_KEYS.OPENAI_ORGANIZATION_ID]: "openai_organization_id",
 
     [VALID_KEYS.AZURE_OPENAI_ENDPOINT]: "azure_openai_endpoint",
-    [VALID_KEYS.AZURE_GPT_35_TURBO_NAME]: "azure_openai_gpt_35_turbo_id",
-    [VALID_KEYS.AZURE_GPT_45_VISION_NAME]: "azure_openai_gpt_45_vision_id",
-    [VALID_KEYS.AZURE_GPT_45_TURBO_NAME]: "azure_openai_gpt_45_turbo_id",
+    [VALID_KEYS.AZURE_GPT_35_TURBO_NAME]: "azure_openai_35_turbo_id",
+    [VALID_KEYS.AZURE_GPT_45_VISION_NAME]: "azure_openai_45vision_id",
+    [VALID_KEYS.AZURE_GPT_45_TURBO_NAME]: "azure_openai_45_turbo_id",
     [VALID_KEYS.AZURE_EMBEDDINGS_NAME]: "azure_openai_embeddings_id"
   }
 
