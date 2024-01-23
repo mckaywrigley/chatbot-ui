@@ -22,6 +22,9 @@ module.exports = withBundleAnalyzer({
     ]
   },
   experimental: {
-    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
+    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"],
+    serverActions: {
+      allowedOrigins: ["0.0.0.0:3001"]
+    }
   }
 })
