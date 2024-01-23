@@ -162,7 +162,9 @@ export const handleLocalChat = async (
       model: chatSettings.model,
       messages: formattedMessages,
       options: {
-        temperature: payload.chatSettings.temperature
+        temperature: payload.chatSettings.temperature,
+        num_gpu: payload.chatSettings.localModelNumGpus,
+        num_thread: payload.chatSettings.localModelThreads
       }
     },
     false,
@@ -428,9 +430,8 @@ export const handleCreateMessages = async (
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        let filePath = `${profile.user_id}/${currentChat.id}/${
-          createdMessages[0].id
-        }/${uuidv4()}`
+        let filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id
+          }/${uuidv4()}`
 
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)
