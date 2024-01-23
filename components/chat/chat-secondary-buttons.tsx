@@ -19,25 +19,40 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
             delayDuration={200}
             display={
               <div>
-                <div>Chat info</div>
-                <div>{selectedChat.model}</div>
-                <div>{selectedChat.prompt}</div>
+                <div className="text-xl font-bold">Chat Info</div>
 
-                <div>{selectedChat.temperature}</div>
-                <div>{selectedChat.context_length}</div>
+                <div className="mt-2 space-y-2">
+                  <div>Model: {selectedChat.model}</div>
+                  <div>Prompt: {selectedChat.prompt}</div>
 
-                <div>{selectedChat.include_profile_context}</div>
-                <div>{selectedChat.include_workspace_instructions}</div>
+                  <div>Temperature: {selectedChat.temperature}</div>
+                  <div>Context Length: {selectedChat.context_length}</div>
 
-                <div>{selectedChat.embeddings_provider}</div>
+                  <div>
+                    Profile Context:{" "}
+                    {selectedChat.include_profile_context
+                      ? "Enabled"
+                      : "Disabled"}
+                  </div>
+                  <div>
+                    {" "}
+                    Workspace Instructions:{" "}
+                    {selectedChat.include_workspace_instructions
+                      ? "Enabled"
+                      : "Disabled"}
+                  </div>
+
+                  <div>
+                    Embeddings Provider: {selectedChat.embeddings_provider}
+                  </div>
+                </div>
               </div>
             }
             trigger={
               <div className="mt-1">
                 <IconInfoCircle
-                  className="cursor-pointer hover:opacity-50"
+                  className="cursor-default hover:opacity-50"
                   size={24}
-                  onClick={handleNewChat}
                 />
               </div>
             }

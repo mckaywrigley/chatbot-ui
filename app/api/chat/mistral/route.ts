@@ -1,5 +1,8 @@
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
 
 export const runtime = "edge"
 
@@ -15,53 +18,27 @@ export async function POST(request: Request) {
 
     checkApiKey(profile.mistral_api_key, "Mistral")
 
-    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${profile.mistral_api_key}`
-      },
-      body: JSON.stringify({
-        model: chatSettings.model,
-        messages: messages,
-        temperature: chatSettings.temperature,
-        stream: true
-      })
+    // Mistral is compatible the OpenAI SDK
+    const mistral = new OpenAI({
+      apiKey: profile.mistral_api_key || "",
+      baseURL: "https://api.mistral.ai/v1"
     })
 
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        if (!response.body) {
-          throw new Error("No response body!")
-        }
-
-        const reader = response.body.getReader()
-        let isFirstChunk = true
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            controller.close()
-            break
-          }
-          const chunk = new TextDecoder("utf-8").decode(value)
-          const dataParts = chunk.split("data: ")
-          const data =
-            isFirstChunk && dataParts[2] ? dataParts[2] : dataParts[1]
-          if (data) {
-            const parsedData = JSON.parse(data)
-            const messageContent = parsedData.choices[0].delta.content
-            controller.enqueue(new TextEncoder().encode(messageContent))
-          }
-          isFirstChunk = false
-        }
-      }
+    const response = await mistral.chat.completions.create({
+      model: chatSettings.model,
+      messages,
+      max_tokens:
+        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+      stream: true
     })
 
-    return new Response(readableStream, {
-      headers: { "Content-Type": "text/plain" }
-    })
+    // Convert the response into a friendly text-stream.
+    const stream = OpenAIStream(response)
+
+    // Respond with the stream
+    return new StreamingTextResponse(stream)
   } catch (error: any) {
+    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
