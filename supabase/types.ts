@@ -1221,11 +1221,11 @@ export interface Database {
         Row: {
           created_at: string
           custom_headers: Json | null
-          request_in_body: boolean
           description: string
           folder_id: string | null
           id: string
           name: string
+          request_in_body: boolean
           schema: Json
           sharing: string
           updated_at: string | null
@@ -1235,11 +1235,11 @@ export interface Database {
         Insert: {
           created_at?: string
           custom_headers?: Json | null
-          request_in_body: boolean
           description: string
           folder_id?: string | null
           id?: string
           name: string
+          request_in_body?: boolean
           schema: Json
           sharing?: string
           updated_at?: string | null
@@ -1249,11 +1249,11 @@ export interface Database {
         Update: {
           created_at?: string
           custom_headers?: Json | null
-          request_in_body?: boolean
           description?: string
           folder_id?: string | null
           id?: string
           name?: string
+          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
@@ -1399,6 +1399,25 @@ export interface Database {
           similarity: number
         }[]
       }
+      match_file_items_local_all: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          file_id: string
+          content: string
+          tokens: number
+          similarity: number
+          file_name: string
+          file_type: string
+          file_description: string
+          file_path: string
+          file_size: number
+          file_tokens: number
+        }[]
+      }
       match_file_items_openai: {
         Args: {
           query_embedding: string
@@ -1411,6 +1430,25 @@ export interface Database {
           content: string
           tokens: number
           similarity: number
+        }[]
+      }
+      match_file_items_openai_all: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          file_id: string
+          content: string
+          tokens: number
+          similarity: number
+          file_name: string
+          file_type: string
+          file_description: string
+          file_path: string
+          file_size: number
+          file_tokens: number
         }[]
       }
       non_private_assistant_exists: {
