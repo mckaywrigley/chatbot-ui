@@ -97,8 +97,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
   const usingLocalModels = availableLocalModels.length > 0
 
-  console.log("test")
-
   return (
     <DropdownMenu
       open={isOpen}
