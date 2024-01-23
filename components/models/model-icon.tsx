@@ -111,36 +111,6 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     default:
-      if (!modelId || modelId.includes("/")) {
-        return <IconSparkles size={width} />
-      } else if (modelId.includes("llama")) {
-        return (
-          <Image
-            className={cn(
-              "rounded-sm p-1",
-              theme === "dark" ? "bg-white" : "border-[1px] border-black"
-            )}
-            src={meta.src}
-            alt="Mistral"
-            width={width}
-            height={height}
-          />
-        )
-      } else if (modelId.includes("mistral") || modelId.includes("mixtral")) {
-        return (
-          <Image
-            className={cn(
-              "rounded-sm p-1",
-              theme === "dark" ? "bg-white" : "border-[1px] border-black"
-            )}
-            src={mistral.src}
-            alt="Mistral"
-            width={width}
-            height={height}
-          />
-        )
-      } else {
-        return <IconSparkles size={width} />
-      }
+      return <IconSparkles size={width} />
   }
 }

@@ -19,8 +19,6 @@ export async function POST(request: Request) {
     toolSchemas: string
   }
 
-  console.log("tools messages", messages, "\n\n\n")
-
   try {
     const profile = await getServerProfile()
 
@@ -70,8 +68,6 @@ export async function POST(request: Request) {
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
-    console.log("tools messages 2", messages, "\n\n\n")
-
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
@@ -107,8 +103,6 @@ export async function POST(request: Request) {
         })
       }
     }
-
-    console.log("tools messages 3", messages, "\n\n\n")
 
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],

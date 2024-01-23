@@ -240,8 +240,8 @@ You can also add API keys as environment variables.
 
 - `OPENAI_API_KEY`
 - `AZURE_OPENAI_API_KEY`
-- `NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT`
-- `NEXT_PUBLIC_AZURE_GPT_45_VISION_ID`
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_GPT_45_VISION_NAME`
 
 For the full list of environment variables, refer to the '.env.local.example' file. If the environment variables are set for API keys, it will disable the input in the user settings.
 
