@@ -98,20 +98,18 @@ export async function POST(request: Request) {
           throw new Error(`Path for function ${functionName} not found`)
         }
 
-        // decide with type of request to make
-        var data = {}
+        // Decide with type of request to make
+        let data = {}
 
-        if (isRequestInBody === true) {
-          // if the type is set to body
-          var headers = {
+        if (isRequestInBody) {
+          // If the type is set to body
+          let headers = {
             "Content-Type": "application/json"
           }
 
-          //console.log("Request in body")
-
-          // check if custom headers are set
+          // Check if custom headers are set
           if (customHeaders) {
-            var parsedCustomHeaders = JSON.parse(customHeaders)
+            let parsedCustomHeaders = JSON.parse(customHeaders)
 
             headers = {
               ...headers,
@@ -120,16 +118,17 @@ export async function POST(request: Request) {
           }
 
           const fullUrl = schemaDetail.url + path
+
           const requestInit = {
             method: "POST",
             headers: headers,
             body: JSON.stringify(parsedArgs)
           }
+
           const response = await fetch(fullUrl, requestInit)
           data = await response.json()
         } else {
-          // if the type is set to query
-          //console.log("Request in url")
+          // If the type is set to query
           const queryParams = new URLSearchParams(parsedArgs).toString()
           const fullUrl = schemaDetail.url + path + "?" + queryParams
           const response = await fetch(fullUrl)

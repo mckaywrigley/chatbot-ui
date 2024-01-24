@@ -19,10 +19,6 @@ CREATE TABLE IF NOT EXISTS tools (
      --SHARING
     sharing TEXT NOT NULL DEFAULT 'private',
 
-    -- OPTIONAL DETAILS
-    custom_headers JSONB,
-    request_in_body BOOLEAN NOT NULL DEFAULT TRUE,
-
     -- REQUIRED
     description TEXT NOT NULL CHECK (char_length(description) <= 500),
     name TEXT NOT NULL CHECK (char_length(name) <= 100),

@@ -1,7 +1,7 @@
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
@@ -149,36 +149,32 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               }`}
               value={schema}
               onValueChange={setSchema}
-              minRows={20}
+              minRows={15}
             />
           </div>
 
           <div className="space-y-1">
-            <Label>Request Type</Label>
+            <Label>Request in...</Label>
 
-            <div className="flex space-x-2">
-              <button
-                className={`rounded-md px-3 py-2 ${
-                  isRequestInBody
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300 text-gray-700"
-                }`}
-                onClick={() => setIsRequestInBody(true)}
-              >
-                Request in Body
-              </button>
-
-              <button
-                className={`rounded-md px-3 py-2 ${
-                  !isRequestInBody
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300 text-gray-700"
-                }`}
-                onClick={() => setIsRequestInBody(false)}
-              >
-                Request in URL
-              </button>
-            </div>
+            <Tabs
+              defaultValue={isRequestInBody ? "body" : "url"}
+              className="w-[400px]"
+            >
+              <TabsList>
+                <TabsTrigger
+                  value="body"
+                  onClick={() => setIsRequestInBody(true)}
+                >
+                  Body
+                </TabsTrigger>
+                <TabsTrigger
+                  value="url"
+                  onClick={() => setIsRequestInBody(false)}
+                >
+                  URL
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </>
       )}
