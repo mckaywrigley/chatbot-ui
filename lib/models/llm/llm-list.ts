@@ -9,7 +9,14 @@ export const LLM_LIST: LLM[] = [
   ...OPENAI_LLM_LIST,
   ...GOOGLE_LLM_LIST,
   ...MISTRAL_LLM_LIST,
-  // ...LLAMA_LLM_LIST,
   ...PERPLEXITY_LLM_LIST,
   ...ANTHROPIC_LLM_LIST
 ]
+
+export const LLM_LIST_MAP: Record<string, LLM[]> = {
+  openai: OPENAI_LLM_LIST,
+  google: GOOGLE_LLM_LIST,
+  mistral: MISTRAL_LLM_LIST,
+  perplexity: PERPLEXITY_LLM_LIST,
+  anthropic: ANTHROPIC_LLM_LIST
+}
