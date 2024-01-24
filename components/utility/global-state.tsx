@@ -2,7 +2,7 @@
 
 "use client"
 
-import Loading from "@/app/[locale]/loading"
+import { default as Loading } from "@/app/[locale]/loading"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantWorkspacesByWorkspaceId } from "@/db/assistants"
 import { getChatsByWorkspaceId } from "@/db/chats"
@@ -16,6 +16,7 @@ import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+import { fetchHostedModels, fetchOllamaModels } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
 import {
@@ -28,9 +29,9 @@ import {
   OpenRouterLLM
 } from "@/types"
 import { AssistantImage } from "@/types/assistant-image"
+import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
-import { toast } from "sonner"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -54,6 +55,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
 
   // MODELS STORE
+  const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({})
+  const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([])
   const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
   const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
     OpenRouterLLM[]
@@ -122,17 +125,36 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
+  const [fetchingModels, setFetchingModels] = useState<boolean>(true)
 
   useEffect(() => {
-    fetchOpenRouterModels()
+    const fetchData = async () => {
+      setFetchingModels(true)
 
-    if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-      fetchOllamaModels()
+      const profile = await fetchStartingData()
+
+      if (profile) {
+        const data = await fetchHostedModels(profile)
+
+        if (!data) return
+
+        setEnvKeyMap(data.envKeyMap)
+        setAvailableHostedModels(data.hostedModels)
+        setAvailableOpenRouterModels(data.openRouterModels)
+      }
+
+      if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
+        const localModels = await fetchOllamaModels()
+        if (!localModels) return
+        setAvailableLocalModels(localModels)
+      }
+
+      // await fetchOpenaiAssistants()
+
+      setFetchingModels(false)
     }
 
-    // fetchOpenaiAssistants()
-
-    fetchStartingData()
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -157,7 +179,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setShowFilesDisplay(false)
 
     if (selectedWorkspace?.id) {
-      fetchData(selectedWorkspace.id)
+      fetchWorkspaceData(selectedWorkspace.id)
     }
   }, [selectedWorkspace])
 
@@ -198,10 +220,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         embeddingsProvider:
           (homeWorkspace?.embeddings_provider as "openai" | "local") || "openai"
       })
+
+      return profile
     }
   }
 
-  const fetchData = async (workspaceId: string) => {
+  const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)
 
     const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
@@ -266,74 +290,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
-  const fetchOllamaModels = async () => {
-    setLoading(true)
-
-    try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
-      )
-
-      if (!response.ok) {
-        throw new Error(`Ollama server is not responding.`)
-      }
-
-      const data = await response.json()
-
-      const localModels = data.models.map((model: any) => ({
-        modelId: model.name as LLMID,
-        modelName: model.name,
-        provider: "ollama",
-        hostedId: model.name,
-        platformLink: "https://ollama.ai/library",
-        imageInput: false
-      }))
-
-      setAvailableLocalModels(localModels)
-    } catch (error) {
-      console.warn("Error fetching Ollama models: " + error)
-    }
-
-    setLoading(false)
-  }
-
-  const fetchOpenRouterModels = async () => {
-    setLoading(true)
-
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/models")
-
-      if (!response.ok) {
-        throw new Error(`OpenRouter server is not responding.`)
-      }
-
-      const { data } = await response.json()
-
-      const openRouterModels = data.map(
-        (model: {
-          id: string
-          name: string
-          context_length: number
-        }): OpenRouterLLM => ({
-          modelId: model.id as LLMID,
-          modelName: model.id,
-          provider: "openrouter",
-          hostedId: model.name,
-          platformLink: "https://openrouter.dev",
-          imageInput: false,
-          maxContext: model.context_length
-        })
-      )
-
-      setAvailableOpenRouterModels(openRouterModels)
-    } catch (error) {
-      console.error("Error fetching Open Router models: " + error)
-      toast.error("Error fetching Open Router models: " + error)
-    }
-
-    setLoading(false)
-  }
-
   const fetchOpenaiAssistants = async () => {
     setLoading(true)
 
@@ -350,7 +306,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
-  if (loading) {
+  if (loading || fetchingModels) {
     return <Loading />
   }
 
@@ -363,25 +319,29 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // ITEMS STORE
         assistants,
-        collections,
-        chats,
-        files,
-        folders,
-        presets,
-        prompts,
-        tools,
-        workspaces,
         setAssistants,
+        collections,
         setCollections,
+        chats,
         setChats,
+        files,
         setFiles,
+        folders,
         setFolders,
+        presets,
         setPresets,
+        prompts,
         setPrompts,
+        tools,
         setTools,
+        workspaces,
         setWorkspaces,
 
         // MODELS STORE
+        envKeyMap,
+        setEnvKeyMap,
+        availableHostedModels,
+        setAvailableHostedModels,
         availableLocalModels,
         setAvailableLocalModels,
         availableOpenRouterModels,
@@ -397,68 +357,68 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // ASSISTANT STORE
         selectedAssistant,
-        assistantImages,
-        openaiAssistants,
         setSelectedAssistant,
+        assistantImages,
         setAssistantImages,
+        openaiAssistants,
         setOpenaiAssistants,
 
         // PASSIVE CHAT STORE
         userInput,
-        chatMessages,
-        chatSettings,
-        selectedChat,
-        chatFileItems,
         setUserInput,
+        chatMessages,
         setChatMessages,
+        chatSettings,
         setChatSettings,
+        selectedChat,
         setSelectedChat,
+        chatFileItems,
         setChatFileItems,
 
         // ACTIVE CHAT STORE
-        abortController,
-        firstTokenReceived,
         isGenerating,
-        setAbortController,
-        setFirstTokenReceived,
         setIsGenerating,
+        firstTokenReceived,
+        setFirstTokenReceived,
+        abortController,
+        setAbortController,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,
-        slashCommand,
-        isAtPickerOpen,
-        atCommand,
-        isToolPickerOpen,
-        toolCommand,
-        focusPrompt,
-        focusFile,
-        focusTool,
         setIsPromptPickerOpen,
+        slashCommand,
         setSlashCommand,
+        isAtPickerOpen,
         setIsAtPickerOpen,
+        atCommand,
         setAtCommand,
+        isToolPickerOpen,
         setIsToolPickerOpen,
+        toolCommand,
         setToolCommand,
+        focusPrompt,
         setFocusPrompt,
+        focusFile,
         setFocusFile,
+        focusTool,
         setFocusTool,
 
         // ATTACHMENT STORE
         chatFiles,
-        chatImages,
-        newMessageFiles,
-        newMessageImages,
-        showFilesDisplay,
         setChatFiles,
+        chatImages,
         setChatImages,
+        newMessageFiles,
         setNewMessageFiles,
+        newMessageImages,
         setNewMessageImages,
+        showFilesDisplay,
         setShowFilesDisplay,
 
         // RETRIEVAL STORE
         useRetrieval,
-        sourceCount,
         setUseRetrieval,
+        sourceCount,
         setSourceCount,
 
         // TOOL STORE

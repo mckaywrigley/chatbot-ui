@@ -2,7 +2,6 @@
 
 import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
@@ -44,8 +43,6 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         <Label>Model</Label>
 
         <ModelSelect
-          hostedModelOptions={LLM_LIST}
-          localModelOptions={availableLocalModels}
           selectedModelId={chatSettings.model}
           onSelectModel={model => {
             onChangeChatSettings({ ...chatSettings, model })

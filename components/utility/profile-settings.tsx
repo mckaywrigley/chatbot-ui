@@ -17,7 +17,7 @@ import {
   IconUser
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { FC, useCallback, useContext, useEffect, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Avatar, AvatarImage } from "../ui/avatar"
@@ -40,12 +40,21 @@ import { ThemeSwitcher } from "./theme-switcher"
 interface ProfileSettingsProps {}
 
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
+import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
+import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
-import { VALID_KEYS } from "@/types/valid-keys"
+import { OpenRouterLLM } from "@/types"
 import { WithTooltip } from "../ui/with-tooltip"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
-  const { profile, setProfile } = useContext(ChatbotUIContext)
+  const {
+    profile,
+    setProfile,
+    envKeyMap,
+    setAvailableHostedModels,
+    setAvailableOpenRouterModels,
+    availableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
@@ -109,102 +118,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
-  const [isEnvOpenai, setIsEnvOpenai] = useState(false)
-  const [isEnvAnthropic, setIsEnvAnthropic] = useState(false)
-  const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
-  const [isEnvMistral, setIsEnvMistral] = useState(false)
-  const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
-  const [isEnvAzureOpenai, setIsEnvAzureOpenai] = useState(false)
-  const [isEnvOpenrouter, setIsEnvOpenrouter] = useState(false)
-  const [isEnvOpenaiOrgID, setIsEnvOpenaiOrgID] = useState(false)
-  const [isEnvAzureOpenaiAPIKey, setIsEnvAzureOpenaiAPIKey] = useState(false)
-  const [isEnvAzureOpenaiEndpoint, setIsEnvAzureOpenaiEndpoint] =
-    useState(false)
-  const [isEnvAzureOpenai35TurboID, setIsEnvAzureOpenai35TurboID] =
-    useState(false)
-  const [isEnvAzureOpenai45TurboID, setIsEnvAzureOpenai45TurboID] =
-    useState(false)
-  const [isEnvAzureOpenai45VisionID, setIsEnvAzureOpenai45VisionID] =
-    useState(false)
-  const [isEnvAzureEmbeddingsID, setIsEnvAzureEmbeddingsID] = useState(false)
-
-  useEffect(() => {
-    async function fetchKeys() {
-      const keys = Object.values(VALID_KEYS)
-
-      keys.forEach(async key => {
-        const response = await fetch("/api/retrieval/keys", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ key })
-        })
-
-        if (response.ok) {
-          const { isUsing } = (await response.json()) as {
-            isUsing: boolean
-          }
-
-          switch (key) {
-            case "OPENAI_API_KEY":
-              setIsEnvOpenai(isUsing)
-              break
-            case "ANTHROPIC_API_KEY":
-              setIsEnvAnthropic(isUsing)
-              break
-            case "GOOGLE_GEMINI_API_KEY":
-              setIsEnvGoogleGemini(isUsing)
-              break
-            case "MISTRAL_API_KEY":
-              setIsEnvMistral(isUsing)
-              break
-            case "PERPLEXITY_API_KEY":
-              setIsEnvPerplexity(isUsing)
-              break
-            case "AZURE_OPENAI_API_KEY":
-              setIsEnvAzureOpenai(isUsing)
-              break
-            case "OPENROUTER_API_KEY":
-              setIsEnvOpenrouter(isUsing)
-              break
-
-            case "OPENAI_ORGANIZATION_ID":
-              setIsEnvOpenaiOrgID(isUsing)
-              break
-
-            case "AZURE_OPENAI_API_KEY":
-              setIsEnvAzureOpenaiAPIKey(isUsing)
-              break
-            case "AZURE_OPENAI_ENDPOINT":
-              setIsEnvAzureOpenaiEndpoint(isUsing)
-              break
-            case "AZURE_GPT_35_TURBO_NAME":
-              setIsEnvAzureOpenai35TurboID(isUsing)
-              break
-            case "AZURE_GPT_45_TURBO_NAME":
-              setIsEnvAzureOpenai45TurboID(isUsing)
-              break
-            case "AZURE_GPT_45_VISION_NAME":
-              setIsEnvAzureOpenai45VisionID(isUsing)
-              break
-            case "AZURE_EMBEDDINGS_NAME":
-              setIsEnvAzureEmbeddingsID(isUsing)
-              break
-
-            default:
-              console.warn("Unhandled key type:", key)
-              break
-          }
-        } else {
-          console.error("Failed to fetch key status:", key)
-        }
-      })
-    }
-
-    fetchKeys()
-  }, [])
-
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -245,9 +158,69 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_embeddings_id: azureEmbeddingsID,
       openrouter_api_key: openrouterAPIKey
     })
+
     setProfile(updatedProfile)
 
     toast.success("Profile updated!")
+
+    const providers = [
+      "openai",
+      "google",
+      "azure",
+      "anthropic",
+      "mistral",
+      "perplexity",
+      "openrouter"
+    ]
+
+    providers.forEach(async provider => {
+      let providerKey: keyof typeof profile
+
+      if (provider === "google") {
+        providerKey = "google_gemini_api_key"
+      } else if (provider === "azure") {
+        providerKey = "azure_openai_api_key"
+      } else {
+        providerKey = `${provider}_api_key` as keyof typeof profile
+      }
+
+      const models = LLM_LIST_MAP[provider]
+      const envKeyActive = envKeyMap[provider]
+
+      if (!envKeyActive) {
+        const hasApiKey = !!updatedProfile[providerKey]
+
+        if (provider === "openrouter") {
+          if (hasApiKey && availableOpenRouterModels.length === 0) {
+            const openrouterModels: OpenRouterLLM[] =
+              await fetchOpenRouterModels()
+            setAvailableOpenRouterModels(prev => {
+              const newModels = openrouterModels.filter(
+                model =>
+                  !prev.some(prevModel => prevModel.modelId === model.modelId)
+              )
+              return [...prev, ...newModels]
+            })
+          } else {
+            setAvailableOpenRouterModels([])
+          }
+        } else {
+          if (hasApiKey && Array.isArray(models)) {
+            setAvailableHostedModels(prev => {
+              const newModels = models.filter(
+                model =>
+                  !prev.some(prevModel => prevModel.modelId === model.modelId)
+              )
+              return [...prev, ...newModels]
+            })
+          } else if (!hasApiKey && Array.isArray(models)) {
+            setAvailableHostedModels(prev =>
+              prev.filter(model => !models.includes(model))
+            )
+          }
+        }
+      }
+    })
 
     setIsOpen(false)
   }
@@ -457,32 +430,32 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
-                    ? isEnvAzureOpenai
+                    ? envKeyMap["azure"]
                       ? ""
                       : "Azure OpenAI API Key"
-                    : isEnvOpenai
+                    : envKeyMap["openai"]
                       ? ""
                       : "OpenAI API Key"}
 
                   <Button
                     className={cn(
-                      "h-[18px] w-[130px] text-[11px]",
-                      (useAzureOpenai && !isEnvAzureOpenai) ||
-                        (!useAzureOpenai && !isEnvOpenai)
+                      "h-[18px] w-[150px] text-[11px]",
+                      (useAzureOpenai && !envKeyMap["azure"]) ||
+                        (!useAzureOpenai && !envKeyMap["openai"])
                         ? "ml-3"
                         : "mb-3"
                     )}
                     onClick={() => setUseAzureOpenai(!useAzureOpenai)}
                   >
                     {useAzureOpenai
-                      ? "Use Standard OpenAI"
-                      : "Use Azure OpenAI"}
+                      ? "Switch To Standard OpenAI"
+                      : "Switch To Azure OpenAI"}
                   </Button>
                 </Label>
 
                 {useAzureOpenai ? (
                   <>
-                    {isEnvAzureOpenai ? (
+                    {envKeyMap["azure"] ? (
                       <Label>Azure OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -495,7 +468,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 ) : (
                   <>
-                    {isEnvOpenai ? (
+                    {envKeyMap["openai"] ? (
                       <Label>OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -514,7 +487,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <>
                     {
                       <div className="space-y-1">
-                        {isEnvAzureOpenaiEndpoint ? (
+                        {envKeyMap["azure_openai_endpoint"] ? (
                           <Label className="text-xs">
                             Azure endpoint set by admin.
                           </Label>
@@ -536,7 +509,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {isEnvAzureOpenai35TurboID ? (
+                        {envKeyMap["azure_gpt_35_turbo_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
@@ -558,7 +531,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {isEnvAzureOpenai45TurboID ? (
+                        {envKeyMap["azure_gpt_45_turbo_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
@@ -580,7 +553,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {isEnvAzureOpenai45VisionID ? (
+                        {envKeyMap["azure_gpt_45_vision_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
@@ -602,7 +575,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {isEnvAzureEmbeddingsID ? (
+                        {envKeyMap["azure_embeddings_name"] ? (
                           <Label className="text-xs">
                             Azure Embeddings deployment name set by admin.
                           </Label>
@@ -625,7 +598,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 ) : (
                   <>
                     <div className="space-y-1">
-                      {isEnvOpenaiOrgID ? (
+                      {envKeyMap["openai_organization_id"] ? (
                         <Label className="text-xs">
                           OpenAI Organization ID set by admin.
                         </Label>
@@ -650,7 +623,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvAnthropic ? (
+                {envKeyMap["anthropic"] ? (
                   <Label>Anthropic API key set by admin.</Label>
                 ) : (
                   <>
@@ -666,7 +639,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvGoogleGemini ? (
+                {envKeyMap["google"] ? (
                   <Label>Google Gemini API key set by admin.</Label>
                 ) : (
                   <>
@@ -682,7 +655,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvMistral ? (
+                {envKeyMap["mistral"] ? (
                   <Label>Mistral API key set by admin.</Label>
                 ) : (
                   <>
@@ -698,7 +671,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvPerplexity ? (
+                {envKeyMap["perplexity"] ? (
                   <Label>Perplexity API key set by admin.</Label>
                 ) : (
                   <>
@@ -714,7 +687,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvOpenrouter ? (
+                {envKeyMap["openrouter"] ? (
                   <Label>OpenRouter API key set by admin.</Label>
                 ) : (
                   <>
