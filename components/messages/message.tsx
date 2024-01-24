@@ -88,7 +88,7 @@ export const Message: FC<MessageProps> = ({
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
-      document.execCommand('copy')
+      document.execCommand("copy")
       document.body.removeChild(textArea)
     }
   }
