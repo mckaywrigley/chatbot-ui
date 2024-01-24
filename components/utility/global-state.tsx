@@ -54,6 +54,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
 
   // MODELS STORE
+  const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([])
   const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
   const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
     OpenRouterLLM[]
@@ -363,25 +364,27 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // ITEMS STORE
         assistants,
-        collections,
-        chats,
-        files,
-        folders,
-        presets,
-        prompts,
-        tools,
-        workspaces,
         setAssistants,
+        collections,
         setCollections,
+        chats,
         setChats,
+        files,
         setFiles,
+        folders,
         setFolders,
+        presets,
         setPresets,
+        prompts,
         setPrompts,
+        tools,
         setTools,
+        workspaces,
         setWorkspaces,
 
         // MODELS STORE
+        availableHostedModels,
+        setAvailableHostedModels,
         availableLocalModels,
         setAvailableLocalModels,
         availableOpenRouterModels,
@@ -397,68 +400,68 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // ASSISTANT STORE
         selectedAssistant,
-        assistantImages,
-        openaiAssistants,
         setSelectedAssistant,
+        assistantImages,
         setAssistantImages,
+        openaiAssistants,
         setOpenaiAssistants,
 
         // PASSIVE CHAT STORE
         userInput,
-        chatMessages,
-        chatSettings,
-        selectedChat,
-        chatFileItems,
         setUserInput,
+        chatMessages,
         setChatMessages,
+        chatSettings,
         setChatSettings,
+        selectedChat,
         setSelectedChat,
+        chatFileItems,
         setChatFileItems,
 
         // ACTIVE CHAT STORE
-        abortController,
-        firstTokenReceived,
         isGenerating,
-        setAbortController,
-        setFirstTokenReceived,
         setIsGenerating,
+        firstTokenReceived,
+        setFirstTokenReceived,
+        abortController,
+        setAbortController,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,
-        slashCommand,
-        isAtPickerOpen,
-        atCommand,
-        isToolPickerOpen,
-        toolCommand,
-        focusPrompt,
-        focusFile,
-        focusTool,
         setIsPromptPickerOpen,
+        slashCommand,
         setSlashCommand,
+        isAtPickerOpen,
         setIsAtPickerOpen,
+        atCommand,
         setAtCommand,
+        isToolPickerOpen,
         setIsToolPickerOpen,
+        toolCommand,
         setToolCommand,
+        focusPrompt,
         setFocusPrompt,
+        focusFile,
         setFocusFile,
+        focusTool,
         setFocusTool,
 
         // ATTACHMENT STORE
         chatFiles,
-        chatImages,
-        newMessageFiles,
-        newMessageImages,
-        showFilesDisplay,
         setChatFiles,
+        chatImages,
         setChatImages,
+        newMessageFiles,
         setNewMessageFiles,
+        newMessageImages,
         setNewMessageImages,
+        showFilesDisplay,
         setShowFilesDisplay,
 
         // RETRIEVAL STORE
         useRetrieval,
-        sourceCount,
         setUseRetrieval,
+        sourceCount,
         setSourceCount,
 
         // TOOL STORE

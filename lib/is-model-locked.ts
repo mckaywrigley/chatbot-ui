@@ -5,7 +5,7 @@ import { VALID_KEYS } from "@/types/valid-keys"
 export const isModelLocked = async (
   provider: ModelProvider | "azure",
   profile: Tables<"profiles">
-): Promise<Boolean> => {
+) => {
   if (!profile) return false
 
   const key = providerToKeyMap[provider]

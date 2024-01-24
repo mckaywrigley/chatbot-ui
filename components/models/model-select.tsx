@@ -38,7 +38,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<"hosted" | "local">("hosted")
 
-  const [isLocked, setIsLocked] = useState<Boolean>(true)
+  const [isLocked, setIsLocked] = useState(true)
+  const [isAllLocked, setIsAllLocked] = useState(true)
 
   useEffect(() => {
     if (isOpen) {
