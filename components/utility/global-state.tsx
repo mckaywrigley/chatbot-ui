@@ -16,7 +16,11 @@ import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import { fetchHostedModels, fetchOllamaModels } from "@/lib/models/fetch-models"
+import {
+  fetchHostedModels,
+  fetchOllamaModels,
+  fetchOpenRouterModels
+} from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
 import {
@@ -125,12 +129,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // THIS COMPONENT
   const [loading, setLoading] = useState<boolean>(true)
-  const [fetchingModels, setFetchingModels] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchData = async () => {
-      setFetchingModels(true)
-
       const profile = await fetchStartingData()
 
       if (profile) {
@@ -140,7 +141,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         setEnvKeyMap(data.envKeyMap)
         setAvailableHostedModels(data.hostedModels)
-        setAvailableOpenRouterModels(data.openRouterModels)
+
+        if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+          const openRouterModels = await fetchOpenRouterModels()
+          if (!openRouterModels) return
+          setAvailableOpenRouterModels(openRouterModels)
+        }
       }
 
       if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
@@ -150,8 +156,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
 
       // await fetchOpenaiAssistants()
-
-      setFetchingModels(false)
     }
 
     fetchData()
@@ -306,7 +310,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
-  if (loading || fetchingModels) {
+  if (loading) {
     return <Loading />
   }
 

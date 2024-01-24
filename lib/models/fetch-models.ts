@@ -11,8 +11,7 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
       "azure",
       "anthropic",
       "mistral",
-      "perplexity",
-      "openrouter"
+      "perplexity"
     ]
 
     const response = await fetch("/api/keys")
@@ -24,7 +23,6 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
     const data = await response.json()
 
     let modelsToAdd: LLM[] = []
-    let openRouterModels: OpenRouterLLM[] = []
 
     for (const provider of providers) {
       let providerKey: keyof typeof profile
@@ -37,12 +35,7 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
         providerKey = `${provider}_api_key` as keyof typeof profile
       }
 
-      if (
-        (profile?.[providerKey] || data.isUsingEnvKeyMap[provider]) &&
-        provider === "openrouter"
-      ) {
-        openRouterModels = await fetchOpenRouterModels()
-      } else if (profile?.[providerKey] || data.isUsingEnvKeyMap[provider]) {
+      if (profile?.[providerKey] || data.isUsingEnvKeyMap[provider]) {
         const models = LLM_LIST_MAP[provider]
 
         if (Array.isArray(models)) {
@@ -55,8 +48,7 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
 
     return {
       envKeyMap: data.isUsingEnvKeyMap,
-      hostedModels: modelsToAdd,
-      openRouterModels: openRouterModels ? openRouterModels : []
+      hostedModels: modelsToAdd
     }
   } catch (error) {
     console.warn("Error fetching hosted models: " + error)
