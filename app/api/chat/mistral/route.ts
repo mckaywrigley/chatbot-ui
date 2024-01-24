@@ -38,9 +38,17 @@ export async function POST(request: Request) {
     // Respond with the stream
     return new StreamingTextResponse(stream)
   } catch (error: any) {
-    console.error(error)
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "Mistral API Key not found. Please set it in your profile settings."
+    } else if (errorCode === 401) {
+      errorMessage =
+        "Mistral API Key is incorrect. Please fix it in your profile settings."
+    }
+
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })
