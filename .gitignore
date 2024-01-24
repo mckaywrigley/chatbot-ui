@@ -39,4 +39,3 @@ next-env.d.ts
 seed.sql
 .VSCodeCounter
 tool-schemas
-supabase/types.ts
