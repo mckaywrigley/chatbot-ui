@@ -58,7 +58,7 @@ export default async function RootLayout({
             locale={locale}
             resources={resources}
           >
-            <Toaster richColors position="top-center" duration={2000} />
+            <Toaster richColors position="top-center" duration={3000} />
             <div className="bg-background text-foreground flex h-screen flex-col items-center">
               {session ? <GlobalState>{children}</GlobalState> : children}
             </div>
