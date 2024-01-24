@@ -80,7 +80,17 @@ export const Message: FC<MessageProps> = ({
   const [viewSources, setViewSources] = useState(false)
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(message.content)
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(message.content)
+    } else {
+      const textArea = document.createElement("textarea")
+      textArea.value = message.content
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+    }
   }
 
   const handleSendEdit = () => {
