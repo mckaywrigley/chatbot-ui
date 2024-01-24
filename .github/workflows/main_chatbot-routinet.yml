@@ -80,4 +80,7 @@ jobs:
           app-name: 'chatbot-routinet'
           slot-name: 'Production'
           package: .
+
+      - name: 'Delete artifact from deployment job'
+        run: rm -rf release.zip
           
