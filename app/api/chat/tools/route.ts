@@ -13,10 +13,18 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, toolSchemas } = json as {
+  const {
+    chatSettings,
+    messages,
+    toolSchemas,
+    customHeaders,
+    isRequestInBody
+  } = json as {
     chatSettings: ChatSettings
     messages: any[]
     toolSchemas: string
+    customHeaders: string
+    isRequestInBody: boolean
   }
 
   try {
@@ -54,6 +62,7 @@ export async function POST(request: Request) {
         title: convertedSchema.title,
         description: convertedSchema.description,
         url: convertedSchema.url,
+        headers: customHeaders,
         routeMap
       })
     }
@@ -89,11 +98,42 @@ export async function POST(request: Request) {
           throw new Error(`Path for function ${functionName} not found`)
         }
 
-        const queryParams = new URLSearchParams(parsedArgs).toString()
-        const fullUrl = schemaDetail.url + path + "?" + queryParams
+        // Decide with type of request to make
+        let data = {}
 
-        const response = await fetch(fullUrl)
-        const data = await response.json()
+        if (isRequestInBody) {
+          // If the type is set to body
+          let headers = {
+            "Content-Type": "application/json"
+          }
+
+          // Check if custom headers are set
+          if (customHeaders) {
+            let parsedCustomHeaders = JSON.parse(customHeaders)
+
+            headers = {
+              ...headers,
+              ...parsedCustomHeaders
+            }
+          }
+
+          const fullUrl = schemaDetail.url + path
+
+          const requestInit = {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(parsedArgs)
+          }
+
+          const response = await fetch(fullUrl, requestInit)
+          data = await response.json()
+        } else {
+          // If the type is set to query
+          const queryParams = new URLSearchParams(parsedArgs).toString()
+          const fullUrl = schemaDetail.url + path + "?" + queryParams
+          const response = await fetch(fullUrl)
+          data = await response.json()
+        }
 
         messages.push({
           tool_call_id: toolCall.id,
