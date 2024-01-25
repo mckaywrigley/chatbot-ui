@@ -243,6 +243,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 key={folder.id}
                 folder={folder}
                 onUpdateFolder={updateFolder}
+                contentType={contentType}
               >
                 {dataWithFolders
                   .filter(item => item.folder_id === folder.id)
