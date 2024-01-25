@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "future": "cpp"
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
+}
