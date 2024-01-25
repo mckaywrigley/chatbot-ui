@@ -6,3 +6,4 @@ export type ContentType =
   | "collections"
   | "assistants"
   | "tools"
+  | "models"

@@ -215,13 +215,18 @@ export const handleHostedChat = async (
     formattedMessages = await buildFinalMessages(payload, profile, chatImages)
   }
 
+  const apiEndpoint =
+    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+
+  const requestBody = {
+    chatSettings: payload.chatSettings,
+    messages: formattedMessages,
+    customModelId: provider === "custom" ? modelData.hostedId : ""
+  }
+
   const response = await fetchChatResponse(
-    `/api/chat/${provider}`,
-    {
-      chatSettings: payload.chatSettings,
-      messages: formattedMessages,
-      tools: []
-    },
+    apiEndpoint,
+    requestBody,
     true,
     newAbortController,
     setIsGenerating,

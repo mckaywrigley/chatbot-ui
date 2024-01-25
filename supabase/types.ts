@@ -870,6 +870,109 @@ export interface Database {
           }
         ]
       }
+      model_workspaces: {
+        Row: {
+          created_at: string
+          model_id: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          model_id: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          model_id?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_workspaces_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_workspaces_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_workspaces_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      models: {
+        Row: {
+          api_key: string
+          base_url: string
+          created_at: string
+          description: string
+          folder_id: string | null
+          id: string
+          model_id: string
+          name: string
+          sharing: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          base_url: string
+          created_at?: string
+          description: string
+          folder_id?: string | null
+          id?: string
+          model_id: string
+          name: string
+          sharing?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          base_url?: string
+          created_at?: string
+          description?: string
+          folder_id?: string | null
+          id?: string
+          model_id?: string
+          name?: string
+          sharing?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "models_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "models_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       preset_workspaces: {
         Row: {
           created_at: string
