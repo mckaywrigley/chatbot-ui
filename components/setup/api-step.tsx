@@ -75,6 +75,7 @@ export const APIStep: FC<APIStepProps> = ({
           <Button
             className="ml-3 h-[18px] w-[150px] text-[11px]"
             onClick={() => onUseAzureOpenaiChange(!useAzureOpenai)}
+            disabled
           >
             {useAzureOpenai
               ? "Switch To Standard OpenAI"
@@ -93,6 +94,7 @@ export const APIStep: FC<APIStepProps> = ({
               ? onAzureOpenaiAPIKeyChange(e.target.value)
               : onOpenaiAPIKeyChange(e.target.value)
           }
+          disabled
         />
       </div>
 
@@ -107,6 +109,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenaiEndpoint}
                 onChange={e => onAzureOpenaiEndpointChange(e.target.value)}
+                disabled
               />
             </div>
 
@@ -118,6 +121,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenai35TurboID}
                 onChange={e => onAzureOpenai35TurboIDChange(e.target.value)}
+                disabled
               />
             </div>
 
@@ -129,6 +133,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenai45TurboID}
                 onChange={e => onAzureOpenai45TurboIDChange(e.target.value)}
+                disabled
               />
             </div>
 
@@ -140,6 +145,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenai45VisionID}
                 onChange={e => onAzureOpenai45VisionIDChange(e.target.value)}
+                disabled
               />
             </div>
 
@@ -164,6 +170,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={openaiOrgID}
                 onChange={e => onOpenaiOrgIDChange(e.target.value)}
+                disabled
               />
             </div>
           </>
@@ -178,6 +185,7 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={anthropicAPIKey}
           onChange={e => onAnthropicAPIKeyChange(e.target.value)}
+          disabled
         />
       </div>
 
@@ -189,6 +197,7 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={googleGeminiAPIKey}
           onChange={e => onGoogleGeminiAPIKeyChange(e.target.value)}
+          disabled
         />
       </div>
 
@@ -200,6 +209,7 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={mistralAPIKey}
           onChange={e => onMistralAPIKeyChange(e.target.value)}
+          disabled
         />
       </div>
 
@@ -211,6 +221,7 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={perplexityAPIKey}
           onChange={e => onPerplexityAPIKeyChange(e.target.value)}
+          disabled
         />
       </div>
       <div className="space-y-1">
@@ -221,6 +232,7 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={openrouterAPIKey}
           onChange={e => onOpenrouterAPIKeyChange(e.target.value)}
+          disabled
         />
       </div>
     </>

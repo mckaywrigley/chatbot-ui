@@ -31,7 +31,7 @@ export default function SetupPage() {
   const [usernameAvailable, setUsernameAvailable] = useState(true)
 
   // API Step
-  const [useAzureOpenai, setUseAzureOpenai] = useState(false)
+  const [useAzureOpenai, setUseAzureOpenai] = useState(true)
   const [openaiAPIKey, setOpenaiAPIKey] = useState("")
   const [openaiOrgID, setOpenaiOrgID] = useState("")
   const [azureOpenaiAPIKey, setAzureOpenaiAPIKey] = useState("")

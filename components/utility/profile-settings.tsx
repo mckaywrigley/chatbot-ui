@@ -455,7 +455,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                 {useAzureOpenai ? (
                   <>
-                    {envKeyMap["azure"] ? (
+                    {profile?.username!==process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                       <Label>Azure OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -468,7 +468,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 ) : (
                   <>
-                    {envKeyMap["openai"] ? (
+                    {profile?.username!==process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                       <Label>OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -487,7 +487,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <>
                     {
                       <div className="space-y-1">
-                        {envKeyMap["azure_openai_endpoint"] ? (
+                        {profile?.username!==process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure endpoint set by admin.
                           </Label>
@@ -509,7 +509,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {envKeyMap["azure_gpt_35_turbo_name"] ? (
+                        {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
@@ -531,7 +531,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {envKeyMap["azure_gpt_45_turbo_name"] ? (
+                        {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
@@ -553,7 +553,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {envKeyMap["azure_gpt_45_vision_name"] ? (
+                        {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
@@ -575,7 +575,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {envKeyMap["azure_embeddings_name"] ? (
+                        {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure Embeddings deployment name set by admin.
                           </Label>
@@ -598,7 +598,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 ) : (
                   <>
                     <div className="space-y-1">
-                      {envKeyMap["openai_organization_id"] ? (
+                      {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                         <Label className="text-xs">
                           OpenAI Organization ID set by admin.
                         </Label>
@@ -623,7 +623,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {envKeyMap["anthropic"] ? (
+                {isEnvAnthropic && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>Anthropic API key set by admin.</Label>
                 ) : (
                   <>
@@ -639,7 +639,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {envKeyMap["google"] ? (
+                {isEnvGoogleGemini && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
                   <Label>Google Gemini API key set by admin.</Label>
                 ) : (
                   <>
@@ -655,7 +655,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {envKeyMap["mistral"] ? (
+                {isEnvMistral && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
                   <Label>Mistral API key set by admin.</Label>
                 ) : (
                   <>
@@ -671,7 +671,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {envKeyMap["perplexity"] ? (
+                {isEnvPerplexity && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>Perplexity API key set by admin.</Label>
                 ) : (
                   <>
@@ -687,7 +687,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {envKeyMap["openrouter"] ? (
+                {isEnvOpenrouter && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>OpenRouter API key set by admin.</Label>
                 ) : (
                   <>
