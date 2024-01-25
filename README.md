@@ -257,7 +257,7 @@ We are working on a guide for contributing.
 
 We are trying to restrict "Issues" to actual issues related to the codebase.
 
-If you are having issues with things like setup, please refer to "Discussions" below.
+If you are having issues with things like setup, please refer to the "Discussions" page.
 
 Issues unrelated to the codebase will be likely be closed immediately.
 
