@@ -2,6 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { IconCheck, IconCopy, IconEdit, IconRepeat } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
+import { MessageReplies } from "./message-replies"
 
 export const MESSAGE_ICON_SIZE = 18
 
@@ -111,7 +112,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {/* {1 > 0 && isAssistant && <MessageReplies />} */}
+      {1 > 0 && isAssistant && <MessageReplies />}
     </div>
   )
 }

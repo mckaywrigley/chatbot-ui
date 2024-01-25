@@ -13,7 +13,6 @@ import {
   IconFileText,
   IconFileTypePdf,
   IconMoodSmile,
-  IconPencil,
   IconRobotFace
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -26,6 +25,7 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
+import { MessageReply } from "./message-reply"
 
 const ICON_SIZE = 28
 
@@ -66,6 +66,7 @@ export const Message: FC<MessageProps> = ({
   const { handleSendMessage } = useChatHandler()
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
+  const messageContentRef = useRef<HTMLDivElement>(null)
 
   const [isHovering, setIsHovering] = useState(false)
   const [editedMessage, setEditedMessage] = useState(message.content)
@@ -78,6 +79,59 @@ export const Message: FC<MessageProps> = ({
     useState<Tables<"file_items"> | null>(null)
 
   const [viewSources, setViewSources] = useState(false)
+
+  const [showReplyPopup, setShowReplyPopup] = useState(false)
+  const [selectionRange, setSelectionRange] = useState<Range | null>(null)
+
+  useEffect(() => {
+    const handleTextSelection = () => {
+      const selection = window.getSelection()
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        if (range && !range.collapsed) {
+          setSelectionRange(range)
+          setShowReplyPopup(true)
+        } else {
+          setShowReplyPopup(false)
+        }
+      }
+    }
+
+    const handleMouseDown = (event: MouseEvent) => {
+      if (
+        showReplyPopup &&
+        messageContentRef.current?.contains(event.target as Node)
+      ) {
+        setShowReplyPopup(false)
+      }
+    }
+
+    const messageContentElement = messageContentRef.current
+    if (messageContentElement) {
+      messageContentElement.addEventListener("mouseup", handleTextSelection)
+      document.addEventListener("mousedown", handleMouseDown)
+    }
+
+    return () => {
+      if (messageContentElement) {
+        messageContentElement.removeEventListener(
+          "mouseup",
+          handleTextSelection
+        )
+      }
+      document.removeEventListener("mousedown", handleMouseDown)
+    }
+  }, [showReplyPopup])
+
+  useEffect(() => {
+    setEditedMessage(message.content)
+
+    if (isEditing && editInputRef.current) {
+      const input = editInputRef.current
+      input.focus()
+      input.setSelectionRange(input.value.length, input.value.length)
+    }
+  }, [isEditing])
 
   const handleCopy = () => {
     if (navigator.clipboard) {
@@ -117,15 +171,15 @@ export const Message: FC<MessageProps> = ({
     onStartEdit(message)
   }
 
-  useEffect(() => {
-    setEditedMessage(message.content)
-
-    if (isEditing && editInputRef.current) {
-      const input = editInputRef.current
-      input.focus()
-      input.setSelectionRange(input.value.length, input.value.length)
+  const handleReply = () => {
+    if (selectionRange) {
+      const selectedText = selectionRange.toString()
+      // Implement your reply logic here using the selectedText
+      console.log("Reply to:", selectedText)
+      // Hide the popup after replying
+      setShowReplyPopup(false)
     }
-  }, [isEditing])
+  }
 
   const MODEL_DATA = [
     ...LLM_LIST,
@@ -159,66 +213,57 @@ export const Message: FC<MessageProps> = ({
             onRegenerate={handleRegenerate}
           />
         </div>
-        <div className="space-y-3">
-          {message.role === "system" ? (
-            <div className="flex items-center space-x-4">
-              <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
-                size={ICON_SIZE}
-              />
 
-              <div className="text-lg font-semibold">Prompt</div>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-3">
-              {message.role === "assistant" ? (
-                selectedAssistant ? (
-                  selectedAssistantImage ? (
-                    <Image
-                      className="rounded"
-                      src={selectedAssistantImage || ""}
-                      alt="assistant image"
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            {message.role === "assistant" ? (
+              selectedAssistant ? (
+                selectedAssistantImage ? (
+                  <Image
+                    className="rounded"
+                    src={selectedAssistantImage || ""}
+                    alt="assistant image"
+                    height={ICON_SIZE}
+                    width={ICON_SIZE}
+                  />
+                ) : (
+                  <IconRobotFace
+                    className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                    size={ICON_SIZE}
+                  />
+                )
+              ) : (
+                <WithTooltip
+                  display={<div>{MODEL_DATA.modelName}</div>}
+                  trigger={
+                    <ModelIcon
+                      modelId={message.model as LLMID}
                       height={ICON_SIZE}
                       width={ICON_SIZE}
                     />
-                  ) : (
-                    <IconRobotFace
-                      className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                      size={ICON_SIZE}
-                    />
-                  )
-                ) : (
-                  <WithTooltip
-                    display={<div>{MODEL_DATA.modelName}</div>}
-                    trigger={
-                      <ModelIcon
-                        modelId={message.model as LLMID}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
-                    }
-                  />
-                )
-              ) : profile?.image_url ? (
-                <Avatar className={`size-[28px] rounded`}>
-                  <AvatarImage src={profile?.image_url} />
-                </Avatar>
-              ) : (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                  size={ICON_SIZE}
+                  }
                 />
-              )}
+              )
+            ) : profile?.image_url ? (
+              <Avatar className={`size-[28px] rounded`}>
+                <AvatarImage src={profile?.image_url} />
+              </Avatar>
+            ) : (
+              <IconMoodSmile
+                className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                size={ICON_SIZE}
+              />
+            )}
 
-              <div className="font-semibold">
-                {message.role === "assistant"
-                  ? selectedAssistant
-                    ? selectedAssistant?.name
-                    : MODEL_DATA?.modelName
-                  : profile?.display_name ?? profile?.username}
-              </div>
+            <div className="font-semibold">
+              {message.role === "assistant"
+                ? selectedAssistant
+                  ? selectedAssistant?.name
+                  : MODEL_DATA?.modelName
+                : profile?.display_name ?? profile?.username}
             </div>
-          )}
+          </div>
+
           {!firstTokenReceived &&
           isGenerating &&
           isLast &&
@@ -258,7 +303,9 @@ export const Message: FC<MessageProps> = ({
               maxRows={20}
             />
           ) : (
-            <MessageMarkdown content={message.content} />
+            <div ref={messageContentRef}>
+              <MessageMarkdown content={message.content} />
+            </div>
           )}
         </div>
 
@@ -390,6 +437,18 @@ export const Message: FC<MessageProps> = ({
             setSelectedFileItem(null)
           }}
         />
+      )}
+
+      {showReplyPopup && (
+        <div
+          style={{
+            position: "absolute",
+            left: `${selectionRange?.getBoundingClientRect().left ?? 0}px`,
+            top: `${(selectionRange?.getBoundingClientRect().top ?? 0) + window.scrollY - 40}px`
+          }}
+        >
+          <MessageReply replyText={selectionRange?.toString() ?? ""} />
+        </div>
       )}
     </div>
   )
