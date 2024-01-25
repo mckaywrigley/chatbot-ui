@@ -50,6 +50,12 @@ import {
   updateFile
 } from "@/db/files"
 import {
+  createModelWorkspaces,
+  deleteModelWorkspace,
+  getModelWorkspacesByModelId,
+  updateModel
+} from "@/db/models"
+import {
   createPresetWorkspaces,
   deletePresetWorkspace,
   getPresetWorkspacesByPresetId,
@@ -101,7 +107,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setTools
+    setTools,
+    setModels
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -183,7 +190,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       selectedAssistantTools,
       setSelectedAssistantTools
     },
-    tools: null
+    tools: null,
+    models: null
   }
 
   const fetchDataFunctions = {
@@ -212,7 +220,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantCollections([])
       setSelectedAssistantTools([])
     },
-    tools: null
+    tools: null,
+    models: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -239,6 +248,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: async (toolId: string) => {
       const item = await getToolWorkspacesByToolId(toolId)
+      return item.workspaces
+    },
+    models: async (modelId: string) => {
+      const item = await getModelWorkspacesByModelId(modelId)
       return item.workspaces
     }
   }
@@ -514,6 +527,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedTool
+    },
+    models: async (modelId: string, updateState: TablesUpdate<"models">) => {
+      const updatedModel = await updateModel(modelId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        modelId,
+        deleteModelWorkspace,
+        createModelWorkspaces as any,
+        "model_id"
+      )
+
+      return updatedModel
     }
   }
 
@@ -524,7 +551,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     files: setFiles,
     collections: setCollections,
     assistants: setAssistants,
-    tools: setTools
+    tools: setTools,
+    models: setModels
   }
 
   const handleUpdate = async () => {
@@ -589,11 +617,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               Edit {contentType.slice(0, -1)}
             </SheetTitle>
           </SheetHeader>
-
-          {/* TODO */}
-          {/* <div className="absolute right-4 top-4">
-          <ShareMenu item={item} contentType={contentType} />
-        </div> */}
 
           <div className="mt-4 space-y-3">
             {workspaces.length > 1 && (

@@ -9,6 +9,7 @@ import { getChatsByWorkspaceId } from "@/db/chats"
 import { getCollectionWorkspacesByWorkspaceId } from "@/db/collections"
 import { getFileWorkspacesByWorkspaceId } from "@/db/files"
 import { getFoldersByWorkspaceId } from "@/db/folders"
+import { getModelWorkspacesByWorkspaceId } from "@/db/models"
 import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getProfileByUserId } from "@/db/profile"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
@@ -53,6 +54,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [chats, setChats] = useState<Tables<"chats">[]>([])
   const [files, setFiles] = useState<Tables<"files">[]>([])
   const [folders, setFolders] = useState<Tables<"folders">[]>([])
+  const [models, setModels] = useState<Tables<"models">[]>([])
   const [presets, setPresets] = useState<Tables<"presets">[]>([])
   const [prompts, setPrompts] = useState<Tables<"prompts">[]>([])
   const [tools, setTools] = useState<Tables<"tools">[]>([])
@@ -291,6 +293,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
     setTools(toolData.tools)
 
+    const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
+    setModels(modelData.models)
+
     setLoading(false)
   }
 
@@ -332,6 +337,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setFiles,
         folders,
         setFolders,
+        models,
+        setModels,
         presets,
         setPresets,
         prompts,
