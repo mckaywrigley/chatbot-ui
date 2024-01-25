@@ -1,7 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
-import { isModelLocked } from "@/lib/is-model-locked"
 import { LLM, LLMID } from "@/types"
-import { IconCheck, IconChevronDown, IconLock } from "@tabler/icons-react"
+import { IconCheck, IconChevronDown } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import {
@@ -11,25 +10,24 @@ import {
 } from "../ui/dropdown-menu"
 import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { WithTooltip } from "../ui/with-tooltip"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
 
 interface ModelSelectProps {
-  hostedModelOptions: LLM[]
-  localModelOptions: LLM[]
   selectedModelId: string
   onSelectModel: (modelId: LLMID) => void
 }
 
 export const ModelSelect: FC<ModelSelectProps> = ({
-  hostedModelOptions,
-  localModelOptions,
   selectedModelId,
   onSelectModel
 }) => {
-  const { profile, availableLocalModels, availableOpenRouterModels } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    availableHostedModels,
+    availableLocalModels,
+    availableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -37,8 +35,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<"hosted" | "local">("hosted")
-
-  const [isLocked, setIsLocked] = useState<Boolean>(true)
 
   useEffect(() => {
     if (isOpen) {
@@ -48,36 +44,36 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     }
   }, [isOpen])
 
-  useEffect(() => {
-    const checkModelLock = async () => {
-      const isUsingAzure = profile?.use_azure_openai
+  // useEffect(() => {
+  //   const checkModelLock = async () => {
+  //     const isUsingAzure = profile?.use_azure_openai
 
-      if (SELECTED_MODEL && profile) {
-        const locked = await isModelLocked(
-          SELECTED_MODEL.provider === "openai" && isUsingAzure
-            ? "azure"
-            : SELECTED_MODEL.provider,
-          profile
-        )
-        setIsLocked(locked)
-      }
-    }
+  //     if (selectedModel && profile) {
+  //       const locked = await isModelLocked(
+  //         selectedModel.provider === "openai" && isUsingAzure
+  //           ? "azure"
+  //           : selectedModel.provider,
+  //         profile
+  //       )
+  //       setIsLocked(locked)
+  //     }
+  //   }
 
-    checkModelLock()
-  }, [profile])
+  //   checkModelLock()
+  // }, [profile])
 
   const handleSelectModel = (modelId: LLMID) => {
     onSelectModel(modelId)
     setIsOpen(false)
   }
 
-  const ALL_MODELS = [
-    ...hostedModelOptions,
-    ...localModelOptions,
+  const allModels = [
+    ...availableHostedModels,
+    ...availableLocalModels,
     ...availableOpenRouterModels
   ]
 
-  const groupedModels = ALL_MODELS.reduce<Record<string, LLM[]>>(
+  const groupedModels = allModels.reduce<Record<string, LLM[]>>(
     (groups, model) => {
       const key = model.provider
       if (!groups[key]) {
@@ -89,13 +85,11 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     {}
   )
 
-  const SELECTED_MODEL = ALL_MODELS.find(
+  const selectedModel = allModels.find(
     model => model.modelId === selectedModelId
   )
 
   if (!profile) return null
-
-  const usingLocalModels = availableLocalModels.length > 0
 
   return (
     <DropdownMenu
@@ -108,38 +102,38 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       <DropdownMenuTrigger
         className="bg-background w-full justify-start border-2 px-3 py-5"
         asChild
+        disabled={allModels.length === 0}
       >
-        <Button
-          ref={triggerRef}
-          className="flex items-center justify-between"
-          variant="ghost"
-        >
-          <div className="flex items-center">
-            {isLocked ? (
-              <WithTooltip
-                display={
-                  <div>
-                    Save {SELECTED_MODEL?.provider} API key in profile settings
-                    to unlock.
-                  </div>
-                }
-                trigger={<IconLock className="mr-2" size={26} />}
-              />
-            ) : (
-              <ModelIcon
-                modelId={SELECTED_MODEL?.modelId as LLMID}
-                width={26}
-                height={26}
-              />
-            )}
-
-            <div className="ml-2 flex items-center">
-              {SELECTED_MODEL?.modelName}
-            </div>
+        {allModels.length === 0 ? (
+          <div className="rounded text-sm font-bold">
+            Unlock models by entering API keys in your profile settings.
           </div>
+        ) : (
+          <Button
+            ref={triggerRef}
+            className="flex items-center justify-between"
+            variant="ghost"
+          >
+            <div className="flex items-center">
+              {selectedModel ? (
+                <>
+                  <ModelIcon
+                    modelId={selectedModel?.modelId as LLMID}
+                    width={26}
+                    height={26}
+                  />
+                  <div className="ml-2 flex items-center">
+                    {selectedModel?.modelName}
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center">Select a model</div>
+              )}
+            </div>
 
-          <IconChevronDown />
-        </Button>
+            <IconChevronDown />
+          </Button>
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -148,7 +142,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         align="start"
       >
         <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
-          {usingLocalModels && (
+          {availableLocalModels.length > 0 && (
             <TabsList defaultValue="hosted" className="grid grid-cols-2">
               <TabsTrigger value="hosted">Hosted</TabsTrigger>
 

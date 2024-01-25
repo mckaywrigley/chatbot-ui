@@ -1,8 +1,10 @@
 import {
-  extractOpenapiData,
+  extractOpenapiDataBody,
+  extractOpenapiDataUrl,
   openapiDataToFunctions
 } from "@/lib/openapi-conversion"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
@@ -13,10 +15,10 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, toolSchemas } = json as {
+  const { chatSettings, messages, selectedTools } = json as {
     chatSettings: ChatSettings
     messages: any[]
-    toolSchemas: string
+    selectedTools: Tables<"tools">[]
   }
 
   try {
@@ -33,8 +35,13 @@ export async function POST(request: Request) {
     let allRouteMaps = {}
     let schemaDetails = []
 
-    for (const schemaString of toolSchemas) {
-      const convertedSchema = extractOpenapiData(schemaString)
+    for (const selectedTool of selectedTools) {
+      let convertedSchema
+      if (selectedTool.request_in_body) {
+        convertedSchema = extractOpenapiDataBody(selectedTool.schema as string)
+      } else {
+        convertedSchema = extractOpenapiDataUrl(selectedTool.schema as string)
+      }
       const tools = openapiDataToFunctions(convertedSchema) || []
       allTools = allTools.concat(tools)
 
@@ -54,7 +61,9 @@ export async function POST(request: Request) {
         title: convertedSchema.title,
         description: convertedSchema.description,
         url: convertedSchema.url,
-        routeMap
+        headers: selectedTool.custom_headers,
+        routeMap,
+        request_in_body: selectedTool.request_in_body
       })
     }
 
@@ -78,6 +87,7 @@ export async function POST(request: Request) {
         const schemaDetail = schemaDetails.find(detail =>
           Object.values(detail.routeMap).includes(functionName)
         )
+
         if (!schemaDetail) {
           throw new Error(`Function ${functionName} not found in any schema`)
         }
@@ -85,15 +95,53 @@ export async function POST(request: Request) {
         const path = Object.keys(schemaDetail.routeMap).find(
           key => schemaDetail.routeMap[key] === functionName
         )
+
         if (!path) {
           throw new Error(`Path for function ${functionName} not found`)
         }
 
-        const queryParams = new URLSearchParams(parsedArgs).toString()
-        const fullUrl = schemaDetail.url + path + "?" + queryParams
+        // Determine if the request should be in the body or as a query
+        const isRequestInBody = schemaDetail.request_in_body // Moved this line up to the loop
+        let data = {}
 
-        const response = await fetch(fullUrl)
-        const data = await response.json()
+        if (isRequestInBody) {
+          // If the type is set to body
+          let headers = {
+            "Content-Type": "application/json"
+          }
+
+          // Check if custom headers are set
+          const customHeaders = schemaDetail.headers // Moved this line up to the loop
+          // Check if custom headers are set and are of type string
+          if (customHeaders && typeof customHeaders === "string") {
+            let parsedCustomHeaders = JSON.parse(customHeaders) as Record<
+              string,
+              string
+            >
+
+            headers = {
+              ...headers,
+              ...parsedCustomHeaders
+            }
+          }
+
+          const fullUrl = schemaDetail.url + path
+
+          const requestInit = {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(parsedArgs)
+          }
+
+          const response = await fetch(fullUrl, requestInit)
+          data = await response.json()
+        } else {
+          // If the type is set to query
+          const queryParams = new URLSearchParams(parsedArgs).toString()
+          const fullUrl = schemaDetail.url + path + "?" + queryParams
+          const response = await fetch(fullUrl)
+          data = await response.json()
+        }
 
         messages.push({
           tool_call_id: toolCall.id,

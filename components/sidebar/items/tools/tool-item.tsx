@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
@@ -16,7 +17,11 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
   const [url, setUrl] = useState(tool.url)
+  const [customHeaders, setCustomHeaders] = useState(
+    tool.custom_headers as string
+  )
   const [schema, setSchema] = useState(tool.schema as string)
+  const [isRequestInBody, setIsRequestInBody] = useState(tool.request_in_body)
 
   return (
     <SidebarItem
@@ -24,7 +29,14 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
       isTyping={isTyping}
       contentType="tools"
       icon={<IconBolt size={30} />}
-      updateState={{ name, description, url, schema }}
+      updateState={{
+        name,
+        description,
+        url,
+        custom_headers: customHeaders,
+        schema,
+        request_in_body: isRequestInBody
+      }}
       renderInputs={() => (
         <>
           <div className="space-y-1">
@@ -80,6 +92,17 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
           </div> */}
 
           <div className="space-y-1">
+            <Label>Custom Headers</Label>
+
+            <TextareaAutosize
+              placeholder={`{"X-api-key": "1234567890"}`}
+              value={customHeaders}
+              onValueChange={setCustomHeaders}
+              minRows={1}
+            />
+          </div>
+
+          <div className="space-y-1">
             <Label>Schema</Label>
 
             <TextareaAutosize
@@ -121,8 +144,32 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
               }`}
               value={schema}
               onValueChange={setSchema}
-              minRows={20}
+              minRows={15}
             />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Request in...</Label>
+
+            <Tabs
+              defaultValue={isRequestInBody ? "body" : "url"}
+              className="w-[400px]"
+            >
+              <TabsList>
+                <TabsTrigger
+                  value="body"
+                  onClick={() => setIsRequestInBody(true)}
+                >
+                  Body
+                </TabsTrigger>
+                <TabsTrigger
+                  value="url"
+                  onClick={() => setIsRequestInBody(false)}
+                >
+                  URL
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </>
       )}

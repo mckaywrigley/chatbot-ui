@@ -1,8 +1,6 @@
-import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  PROFILE_CONTEXT_MAX,
   PROFILE_DISPLAY_NAME_MAX,
   PROFILE_USERNAME_MAX,
   PROFILE_USERNAME_MIN
@@ -13,34 +11,21 @@ import {
   IconLoader2
 } from "@tabler/icons-react"
 import { FC, useCallback, useState } from "react"
-import ReactTextareaAutosize from "react-textarea-autosize"
 import { LimitDisplay } from "../ui/limit-display"
 
 interface ProfileStepProps {
-  profileContext: string
-  profileImage: File | null
-  profileImageSrc: string
   username: string
   usernameAvailable: boolean
   displayName: string
-  onProfileContextChange: (profileContext: string) => void
-  onProfileImageChange: (image: File) => void
-  onProfileImageChangeSrc: (image: string) => void
   onUsernameAvailableChange: (isAvailable: boolean) => void
   onUsernameChange: (username: string) => void
   onDisplayNameChange: (name: string) => void
 }
 
 export const ProfileStep: FC<ProfileStepProps> = ({
-  profileContext,
-  profileImage,
-  profileImageSrc,
   username,
   usernameAvailable,
   displayName,
-  onProfileContextChange,
-  onProfileImageChange,
-  onProfileImageChangeSrc,
   onUsernameAvailableChange,
   onUsernameChange,
   onDisplayNameChange
@@ -144,19 +129,6 @@ export const ProfileStep: FC<ProfileStepProps> = ({
       </div>
 
       <div className="space-y-1">
-        <Label>Profile Image (optional)</Label>
-
-        <ImagePicker
-          src={profileImageSrc}
-          image={profileImage}
-          height={100}
-          width={100}
-          onSrcChange={onProfileImageChangeSrc}
-          onImageChange={onProfileImageChange}
-        />
-      </div>
-
-      <div className="space-y-1">
         <Label>Chat Display Name</Label>
 
         <Input
@@ -169,28 +141,6 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         <LimitDisplay
           used={displayName.length}
           limit={PROFILE_DISPLAY_NAME_MAX}
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label>
-          What would you like the AI to know about you to provide better
-          responses?
-        </Label>
-
-        <ReactTextareaAutosize
-          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          maxLength={PROFILE_CONTEXT_MAX}
-          minRows={3}
-          maxRows={10}
-          placeholder="Profile context here... (optional)"
-          value={profileContext}
-          onChange={e => onProfileContextChange(e.target.value)}
-        />
-
-        <LimitDisplay
-          used={profileContext.length}
-          limit={PROFILE_CONTEXT_MAX}
         />
       </div>
     </>

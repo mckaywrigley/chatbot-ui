@@ -1220,10 +1220,12 @@ export interface Database {
       tools: {
         Row: {
           created_at: string
+          custom_headers: Json
           description: string
           folder_id: string | null
           id: string
           name: string
+          request_in_body: boolean
           schema: Json
           sharing: string
           updated_at: string | null
@@ -1232,11 +1234,13 @@ export interface Database {
         }
         Insert: {
           created_at?: string
+          custom_headers?: Json
           description: string
           folder_id?: string | null
           id?: string
           name: string
-          schema: Json
+          request_in_body?: boolean
+          schema?: Json
           sharing?: string
           updated_at?: string | null
           url: string
@@ -1244,10 +1248,12 @@ export interface Database {
         }
         Update: {
           created_at?: string
+          custom_headers?: Json
           description?: string
           folder_id?: string | null
           id?: string
           name?: string
+          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null

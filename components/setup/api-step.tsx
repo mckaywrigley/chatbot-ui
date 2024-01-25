@@ -11,6 +11,7 @@ interface APIStepProps {
   azureOpenai35TurboID: string
   azureOpenai45TurboID: string
   azureOpenai45VisionID: string
+  azureOpenaiEmbeddingsID: string
   anthropicAPIKey: string
   googleGeminiAPIKey: string
   mistralAPIKey: string
@@ -25,6 +26,7 @@ interface APIStepProps {
   onAzureOpenai35TurboIDChange: (value: string) => void
   onAzureOpenai45TurboIDChange: (value: string) => void
   onAzureOpenai45VisionIDChange: (value: string) => void
+  onAzureOpenaiEmbeddingsIDChange: (value: string) => void
   onAnthropicAPIKeyChange: (value: string) => void
   onGoogleGeminiAPIKeyChange: (value: string) => void
   onMistralAPIKeyChange: (value: string) => void
@@ -40,6 +42,7 @@ export const APIStep: FC<APIStepProps> = ({
   azureOpenai35TurboID,
   azureOpenai45TurboID,
   azureOpenai45VisionID,
+  azureOpenaiEmbeddingsID,
   anthropicAPIKey,
   googleGeminiAPIKey,
   mistralAPIKey,
@@ -53,6 +56,7 @@ export const APIStep: FC<APIStepProps> = ({
   onAzureOpenai35TurboIDChange,
   onAzureOpenai45TurboIDChange,
   onAzureOpenai45VisionIDChange,
+  onAzureOpenaiEmbeddingsIDChange,
   onAnthropicAPIKeyChange,
   onGoogleGeminiAPIKeyChange,
   onMistralAPIKeyChange,
@@ -69,10 +73,12 @@ export const APIStep: FC<APIStepProps> = ({
           </div>
 
           <Button
-            className="ml-3 h-[18px] w-[130px] text-[11px]"
+            className="ml-3 h-[18px] w-[150px] text-[11px]"
             onClick={() => onUseAzureOpenaiChange(!useAzureOpenai)}
           >
-            {useAzureOpenai ? "Use Standard OpenAI" : "Use Azure OpenAI"}
+            {useAzureOpenai
+              ? "Switch To Standard OpenAI"
+              : "Switch To Azure OpenAI"}
           </Button>
         </Label>
 
@@ -134,6 +140,17 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenai45VisionID}
                 onChange={e => onAzureOpenai45VisionIDChange(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label>Azure OpenAI Embeddings ID</Label>
+
+              <Input
+                placeholder="Azure OpenAI Embeddings ID"
+                type="password"
+                value={azureOpenaiEmbeddingsID}
+                onChange={e => onAzureOpenaiEmbeddingsIDChange(e.target.value)}
               />
             </div>
           </>
