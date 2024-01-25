@@ -8,6 +8,11 @@ interface Parameter {
   schema: { type: string }
 }
 
+interface SchemaDetail {
+  description?: string
+  type: string
+}
+
 interface OpenAPIData {
   title: string
   description: string
@@ -29,7 +34,7 @@ interface OpenAPIData {
   }[]
 }
 
-export const extractOpenapiData = (schema: string): OpenAPIData => {
+export const extractOpenapiDataUrl = (schema: string): OpenAPIData => {
   const schemaObject = JSON.parse(schema)
 
   if (!schemaObject.openapi || schemaObject.openapi !== "3.1.0") {
@@ -64,6 +69,62 @@ export const extractOpenapiData = (schema: string): OpenAPIData => {
         params
       }
     })
+
+    return {
+      path,
+      methods
+    }
+  })
+
+  return {
+    title,
+    description,
+    url,
+    routes
+  }
+}
+
+export const extractOpenapiDataBody = (schemaString: string): OpenAPIData => {
+  const schema = JSON.parse(schemaString)
+
+  if (schema.openapi !== "3.1.0") {
+    throw new Error("Invalid OpenAPI schema. Only version 3.1.0 is supported.")
+  }
+
+  const title = schema.info.title
+  const description = schema.info.description
+  const url = schema.servers[0].url
+
+  const routes = Object.entries(schema.paths).map(([path, pathItem]) => {
+    const methods = Object.entries(pathItem as Record<string, any>).map(
+      ([method, methodData]) => {
+        const params = methodData.requestBody?.content["application/json"]
+          ?.schema?.properties
+          ? Object.entries(
+              methodData.requestBody.content["application/json"].schema
+                .properties
+            ).map(([name, schemaDetail]) => {
+              const detail = schemaDetail as SchemaDetail
+              const required = methodData.requestBody.required || false
+
+              return {
+                name,
+                location: "body",
+                schema: { type: detail.type },
+                required,
+                description: detail.description || ""
+              }
+            })
+          : []
+
+        return {
+          method,
+          operationId: methodData.operationId || "",
+          description: methodData.description || "",
+          params
+        }
+      }
+    )
 
     return {
       path,

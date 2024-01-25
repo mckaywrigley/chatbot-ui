@@ -1,8 +1,10 @@
 import {
-  extractOpenapiData,
+  extractOpenapiDataBody,
+  extractOpenapiDataUrl,
   openapiDataToFunctions
 } from "@/lib/openapi-conversion"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
@@ -13,18 +15,10 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const {
-    chatSettings,
-    messages,
-    toolSchemas,
-    customHeaders,
-    isRequestInBody
-  } = json as {
+  const { chatSettings, messages, selectedTools } = json as {
     chatSettings: ChatSettings
     messages: any[]
-    toolSchemas: string
-    customHeaders: string
-    isRequestInBody: boolean
+    selectedTools: Tables<"tools">[]
   }
 
   try {
@@ -41,8 +35,13 @@ export async function POST(request: Request) {
     let allRouteMaps = {}
     let schemaDetails = []
 
-    for (const schemaString of toolSchemas) {
-      const convertedSchema = extractOpenapiData(schemaString)
+    for (const selectedTool of selectedTools) {
+      let convertedSchema
+      if (selectedTool.request_in_body) {
+        convertedSchema = extractOpenapiDataBody(selectedTool.schema as string)
+      } else {
+        convertedSchema = extractOpenapiDataUrl(selectedTool.schema as string)
+      }
       const tools = openapiDataToFunctions(convertedSchema) || []
       allTools = allTools.concat(tools)
 
@@ -62,8 +61,9 @@ export async function POST(request: Request) {
         title: convertedSchema.title,
         description: convertedSchema.description,
         url: convertedSchema.url,
-        headers: customHeaders,
-        routeMap
+        headers: selectedTool.custom_headers,
+        routeMap,
+        request_in_body: selectedTool.request_in_body
       })
     }
 
@@ -87,6 +87,7 @@ export async function POST(request: Request) {
         const schemaDetail = schemaDetails.find(detail =>
           Object.values(detail.routeMap).includes(functionName)
         )
+
         if (!schemaDetail) {
           throw new Error(`Function ${functionName} not found in any schema`)
         }
@@ -94,11 +95,13 @@ export async function POST(request: Request) {
         const path = Object.keys(schemaDetail.routeMap).find(
           key => schemaDetail.routeMap[key] === functionName
         )
+
         if (!path) {
           throw new Error(`Path for function ${functionName} not found`)
         }
 
-        // Decide with type of request to make
+        // Determine if the request should be in the body or as a query
+        const isRequestInBody = schemaDetail.request_in_body // Moved this line up to the loop
         let data = {}
 
         if (isRequestInBody) {
@@ -108,8 +111,13 @@ export async function POST(request: Request) {
           }
 
           // Check if custom headers are set
-          if (customHeaders) {
-            let parsedCustomHeaders = JSON.parse(customHeaders)
+          const customHeaders = schemaDetail.headers // Moved this line up to the loop
+          // Check if custom headers are set and are of type string
+          if (customHeaders && typeof customHeaders === "string") {
+            let parsedCustomHeaders = JSON.parse(customHeaders) as Record<
+              string,
+              string
+            >
 
             headers = {
               ...headers,

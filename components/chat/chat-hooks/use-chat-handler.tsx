@@ -233,9 +233,7 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            toolSchemas: selectedTools.map(tool => tool.schema),
-            customHeaders: selectedTools.map(tool => tool.custom_headers),
-            isRequestInBody: selectedTools.map(tool => tool.request_in_body)
+            selectedTools
           })
         })
 
