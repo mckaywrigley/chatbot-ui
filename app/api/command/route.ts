@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       ],
       temperature: 0,
       max_tokens:
-        CHAT_SETTING_LIMITS["gpt-4-1106-preview"].MAX_TOKEN_OUTPUT_LENGTH
+        CHAT_SETTING_LIMITS["gpt-4-turbo-preview"].MAX_TOKEN_OUTPUT_LENGTH
       //   response_format: { type: "json_object" }
       //   stream: true
     })
