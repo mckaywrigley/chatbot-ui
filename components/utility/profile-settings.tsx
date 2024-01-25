@@ -12,6 +12,7 @@ import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFileDownload,
+  IconFileUpload,
   IconLoader2,
   IconLogout,
   IconUser
@@ -37,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ThemeSwitcher } from "./theme-switcher"
 
-interface ProfileSettingsProps {}
+interface ProfileSettingsProps { }
 
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
 import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
@@ -45,10 +46,15 @@ import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { OpenRouterLLM } from "@/types"
 import { WithTooltip } from "../ui/with-tooltip"
+import { createFolder } from "@/db/folders"
+import { createChat } from "@/db/chats"
+import { createMessages } from "@/db/messages"
+import { TablesInsert } from "@/supabase/types"
 
-export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
+export const ProfileSettings: FC<ProfileSettingsProps> = ({ }) => {
   const {
     profile,
+    selectedWorkspace,
     setProfile,
     envKeyMap,
     setAvailableHostedModels,
@@ -288,6 +294,104 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       buttonRef.current?.click()
     }
   }
+
+  const importOpenaiConversations = (event: any) => {
+    if (event.target.files && event.target.files[0]) {
+      const fileReader = new FileReader();
+      const { files } = event.target;
+
+      fileReader.readAsText(files[0], "UTF-8");
+      fileReader.onload = async e => {
+        if (!profile) return
+        if (!selectedWorkspace) return
+
+        const content = e.target?.result;
+
+        if (content) {
+          const conversations = JSON.parse(content.toString());
+
+          if (Array.isArray(conversations) && conversations.length > 0) {
+            toast.loading(`Importing ${conversations.length} conversations`);
+
+            const createdFolder = await createFolder({
+              user_id: profile.user_id,
+              workspace_id: selectedWorkspace.id,
+              name: `Import ${new Date()}`,
+              description: "",
+              type: "chats"
+            })
+
+            let messagesToSend: TablesInsert<"messages">[] = [];
+
+            for (let index = 0; index < conversations.length; index++) {
+              const conversation = conversations[index];
+
+              const createdChat = await createChat({
+                user_id: profile.user_id,
+                workspace_id: selectedWorkspace.id,
+                assistant_id: null,
+                context_length: selectedWorkspace.default_context_length,
+                include_profile_context: false,
+                include_workspace_instructions: false,
+                model: selectedWorkspace.default_model,
+                name: conversation.title.substring(0, 100),
+                prompt: selectedWorkspace.default_prompt,
+                temperature: selectedWorkspace.default_temperature,
+                embeddings_provider: selectedWorkspace.embeddings_provider,
+                folder_id: createdFolder.id,
+                created_at: new Date(conversation.create_time).toISOString(),
+                updated_at: new Date(conversation.update_time).toISOString(),
+              })
+
+              let chatMessageCount = 0;
+              Object.keys(conversation.mapping).forEach(key => {
+                const item = conversation.mapping[key];
+
+                const contentType = item.message?.content?.content_type;
+                const authorRole = item.message?.author?.role;
+                if (contentType && authorRole) {
+                  let messageContent = null;
+                  switch (contentType) {
+                    case "text":
+                      messageContent = item.message.content.parts.toString();
+                      break;
+                    case "code":
+                      messageContent = item.message.content.text;
+                      break;
+                    default:
+                      break;
+                  }
+
+                  if (messageContent) {
+                    const messageToSend = {
+                      chat_id: createdChat.id,
+                      user_id: profile.user_id,
+                      content: messageContent,
+                      model: createdChat.model,
+                      role: authorRole,
+                      sequence_number: chatMessageCount,
+                      image_paths: []
+                    };
+                    messagesToSend.push(messageToSend);
+
+                    chatMessageCount = chatMessageCount + 1;
+                  }
+                }
+              })
+            }
+
+            if (messagesToSend.length > 0) {
+              await createMessages(messagesToSend);
+
+              toast.success(`Import done! Created folder ${createdFolder.name} and imported a total of ${conversations.length} chats with ${messagesToSend.length} messages.`)
+            } else {
+              toast.error('Import failed! No messages found.')
+            }
+          }
+        }
+      };
+    }
+  };
 
   if (!profile) return null
 
@@ -721,6 +825,25 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   size={32}
                   onClick={exportLocalStorageAsJSON}
                 />
+              }
+            />
+
+            <WithTooltip
+              display={
+                <div>
+                  Import OpenAI export (conversations.json)
+                </div>
+              }
+              trigger={
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="import">
+                    <IconFileUpload
+                      className="cursor-pointer hover:opacity-50"
+                      size={32}
+                    />
+                  </Label>
+                  <Input id="import" type="file" accept=".json" onChange={importOpenaiConversations} />
+                </div>
               }
             />
           </div>
