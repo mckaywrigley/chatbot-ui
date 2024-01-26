@@ -50,8 +50,8 @@ LANGUAGE 'plpgsql'
 SECURITY DEFINER
 AS $$
 DECLARE
-  project_url TEXT := current_setting('app.project_url');
-  service_role_key TEXT := current_setting('app.service_role_key'); -- full access needed for http request to storage
+  project_url TEXT := current_setting('NEXT_PUBLIC_SUPABASE_URL');
+  service_role_key TEXT := current_setting('SUPABASE_SERVICE_ROLE_KEY'); -- full access needed for http request to storage
   url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
 BEGIN
   SELECT
