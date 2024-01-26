@@ -65,7 +65,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         />
       </div>
 
-      {useAdvancedDropdown ? (
+      {/* {useAdvancedDropdown ? (
         <AdvancedSettings>
           <AdvancedContent
             chatSettings={chatSettings}
@@ -81,7 +81,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
             showTooltip={showTooltip}
           />
         </div>
-      )}
+      )} */}
     </div>
   )
 }
