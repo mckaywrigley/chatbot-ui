@@ -26,6 +26,14 @@ If you are having issues with things like setup, please refer to the "Help" sect
 
 Issues unrelated to the codebase will likely be closed immediately.
 
+## Discussions
+
+We highly encourage you to participate in the "Discussions" tab above!
+
+Discussions are a great place to ask questions, share ideas, and get help.
+
+Odds are if you have a question, someone else has the same question.
+
 ## Legacy Code
 
 Chatbot UI was recently updated to its 2.0 version.
