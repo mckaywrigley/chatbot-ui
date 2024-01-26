@@ -15,7 +15,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
     <>
       {selectedChat && (
         <>
-          <WithTooltip
+          {/* <WithTooltip
             delayDuration={200}
             display={
               <div>
@@ -56,7 +56,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
                 />
               </div>
             }
-          />
+          /> */}
 
           <WithTooltip
             delayDuration={200}
