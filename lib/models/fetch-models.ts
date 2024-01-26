@@ -40,8 +40,6 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
 
         if (Array.isArray(models)) {
           modelsToAdd.push(...models)
-        } else {
-          console.warn(`LLM_LIST_MAP entry for '${provider}' is not an array.`)
         }
       }
     }

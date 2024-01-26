@@ -1,17 +1,10 @@
-import {
-  extractOpenapiDataBody,
-  extractOpenapiDataUrl,
-  openapiDataToFunctions
-} from "@/lib/openapi-conversion"
+import { openapiToFunctions } from "@/lib/openapi-conversion"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
-import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-
-export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -36,20 +29,15 @@ export async function POST(request: Request) {
     let schemaDetails = []
 
     for (const selectedTool of selectedTools) {
-      let convertedSchema
-      if (selectedTool.request_in_body) {
-        convertedSchema = extractOpenapiDataBody(selectedTool.schema as string)
-      } else {
-        convertedSchema = extractOpenapiDataUrl(selectedTool.schema as string)
-      }
-      const tools = openapiDataToFunctions(convertedSchema) || []
+      const convertedSchema = await openapiToFunctions(
+        JSON.parse(selectedTool.schema as string)
+      )
+      const tools = convertedSchema.functions || []
       allTools = allTools.concat(tools)
 
       const routeMap = convertedSchema.routes.reduce(
         (map: Record<string, string>, route) => {
-          route.methods.forEach(method => {
-            map[route.path] = method.operationId
-          })
+          map[route.path.replace(/{(\w+)}/g, ":$1")] = route.operationId
           return map
         },
         {}
@@ -58,9 +46,9 @@ export async function POST(request: Request) {
       allRouteMaps = { ...allRouteMaps, ...routeMap }
 
       schemaDetails.push({
-        title: convertedSchema.title,
-        description: convertedSchema.description,
-        url: convertedSchema.url,
+        title: convertedSchema.info.title,
+        description: convertedSchema.info.description,
+        url: convertedSchema.info.server,
         headers: selectedTool.custom_headers,
         routeMap,
         request_in_body: selectedTool.request_in_body
@@ -81,7 +69,8 @@ export async function POST(request: Request) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
         const functionName = functionCall.name
-        const parsedArgs = JSON.parse(toolCall.function.arguments)
+        const argumentsString = toolCall.function.arguments.trim()
+        const parsedArgs = JSON.parse(argumentsString)
 
         // Find the schema detail that contains the function name
         const schemaDetail = schemaDetails.find(detail =>
@@ -92,9 +81,23 @@ export async function POST(request: Request) {
           throw new Error(`Function ${functionName} not found in any schema`)
         }
 
-        const path = Object.keys(schemaDetail.routeMap).find(
+        const pathTemplate = Object.keys(schemaDetail.routeMap).find(
           key => schemaDetail.routeMap[key] === functionName
         )
+
+        if (!pathTemplate) {
+          throw new Error(`Path for function ${functionName} not found`)
+        }
+
+        const path = pathTemplate.replace(/:(\w+)/g, (_, paramName) => {
+          const value = parsedArgs.parameters[paramName]
+          if (!value) {
+            throw new Error(
+              `Parameter ${paramName} not found for function ${functionName}`
+            )
+          }
+          return encodeURIComponent(value)
+        })
 
         if (!path) {
           throw new Error(`Path for function ${functionName} not found`)
@@ -127,20 +130,40 @@ export async function POST(request: Request) {
 
           const fullUrl = schemaDetail.url + path
 
+          const bodyContent = parsedArgs.requestBody || parsedArgs
+
           const requestInit = {
             method: "POST",
             headers: headers,
-            body: JSON.stringify(parsedArgs)
+            body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
           }
 
           const response = await fetch(fullUrl, requestInit)
-          data = await response.json()
+
+          if (!response.ok) {
+            data = {
+              error: response.statusText
+            }
+          } else {
+            data = await response.json()
+          }
         } else {
           // If the type is set to query
-          const queryParams = new URLSearchParams(parsedArgs).toString()
-          const fullUrl = schemaDetail.url + path + "?" + queryParams
+          const queryParams = new URLSearchParams(
+            parsedArgs.parameters
+          ).toString()
+          const fullUrl =
+            schemaDetail.url + path + (queryParams ? "?" + queryParams : "")
+
           const response = await fetch(fullUrl)
-          data = await response.json()
+
+          if (!response.ok) {
+            data = {
+              error: response.statusText
+            }
+          } else {
+            data = await response.json()
+          }
         }
 
         messages.push({
@@ -162,6 +185,7 @@ export async function POST(request: Request) {
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {
+    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {

@@ -19,7 +19,7 @@
     "format:write": "prettier --write \"{app,lib,db,components,context,types}/**/*.{ts,tsx}\" --cache",
     "format:check": "prettier --check \"{app,lib,db,components,context,types}**/*.{ts,tsx}\" --cache",
     "db-reset": "supabase db reset && npm run db-types",
-    "db-migrate": "supabase migration up",
+    "db-migrate": "supabase migration up && npm run db-types",
     "db-types": "supabase gen types typescript --local > supabase/types.ts",
     "db-pull": "supabase db remote commit",
     "db-push": "supabase db push",
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.12.4",
+    "@apidevtools/json-schema-ref-parser": "^11.1.0",
     "@azure/openai": "^1.0.0-beta.8",
     "@google/generative-ai": "^0.1.3",
     "@hookform/resolvers": "^3.3.2",

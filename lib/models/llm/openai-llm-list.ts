@@ -2,14 +2,14 @@ import { LLM } from "@/types"
 
 const OPENAI_PLATORM_LINK = "https://platform.openai.com/docs/overview"
 
-// OpenAI Models (UPDATED 12/18/23) -----------------------------
+// OpenAI Models (UPDATED 1/25/24) -----------------------------
 
-// GPT-4 Turbo (UPDATED 12/18/23)
+// GPT-4 Turbo (UPDATED 1/25/24)
 const GPT4Turbo: LLM = {
-  modelId: "gpt-4-1106-preview",
+  modelId: "gpt-4-turbo-preview",
   modelName: "GPT-4 Turbo",
   provider: "openai",
-  hostedId: "gpt-4-1106-preview",
+  hostedId: "gpt-4-turbo-preview",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false
 }
@@ -24,12 +24,12 @@ const GPT4Vision: LLM = {
   imageInput: true
 }
 
-// GPT-3.5 Turbo (UPDATED 12/18/23)
+// GPT-3.5 Turbo (UPDATED 1/25/24)
 const GPT3_5Turbo: LLM = {
-  modelId: "gpt-3.5-turbo-1106",
+  modelId: "gpt-3.5-turbo",
   modelName: "GPT-3.5 Turbo",
   provider: "openai",
-  hostedId: "gpt-3.5-turbo-1106",
+  hostedId: "gpt-3.5-turbo",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false
 }
