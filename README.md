@@ -12,13 +12,19 @@ View the latest demo [here](https://x.com/mckaywrigley/status/173827324228315177
 
 Check back soon for an official hosted version of Chatbot UI.
 
-## Official Desktop App
-
-Check back soon for an official desktop app for Chatbot UI. Just click download & start chatting - no setup required.
-
-## Support
+## Sponsor
 
 If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
+
+## Issues
+
+We restrict "Issues" to actual issues related to the codebase.
+
+We're getting escessive amounts of issues that amount to things like feature requests, cloud provider issues, etc.
+
+If you are having issues with things like setup, please refer to the "Help" section in the "Discussions" tab above.
+
+Issues unrelated to the codebase will likely be closed immediately.
 
 ## Legacy Code
 
@@ -33,6 +39,14 @@ In your terminal at the root of your local Chatbot UI repository, run:
 ```bash
 npm run update
 ```
+
+If you run a hosted instance you'll also need to run:
+
+```bash
+npm run db-push
+```
+
+to apply the latest migrations to your live database.
 
 ## Local Quickstart
 
@@ -252,14 +266,6 @@ Once deployed, you should be able to use your hosted instance of Chatbot UI via 
 ## Contributing
 
 We are working on a guide for contributing.
-
-## Issues
-
-We are trying to restrict "Issues" to actual issues related to the codebase.
-
-If you are having issues with things like setup, please refer to the "Discussions" page.
-
-Issues unrelated to the codebase will be likely be closed immediately.
 
 ## Contact
 
