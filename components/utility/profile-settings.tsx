@@ -487,7 +487,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <>
                     {
                       <div className="space-y-1">
-                        {profile?.username!==process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
+                        {profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                           <Label className="text-xs">
                             Azure endpoint set by admin.
                           </Label>
@@ -623,7 +623,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvAnthropic && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
+                {envKeyMap["anthropic"] && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>Anthropic API key set by admin.</Label>
                 ) : (
                   <>
@@ -639,7 +639,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvGoogleGemini && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
+                {envKeyMap["google"] && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
                   <Label>Google Gemini API key set by admin.</Label>
                 ) : (
                   <>
@@ -655,7 +655,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvMistral && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
+                {envKeyMap["mistral"] && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME? (
                   <Label>Mistral API key set by admin.</Label>
                 ) : (
                   <>
@@ -671,7 +671,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvPerplexity && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
+                {envKeyMap["perplexity"] && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>Perplexity API key set by admin.</Label>
                 ) : (
                   <>
@@ -687,7 +687,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvOpenrouter && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
+                {envKeyMap["openrouter"] && profile?.username!=process.env.NEXT_PUBLIC_ADMIN_USERNAME ? (
                   <Label>OpenRouter API key set by admin.</Label>
                 ) : (
                   <>
