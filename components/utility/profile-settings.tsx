@@ -310,7 +310,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow">
+        <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
               <div>User Settings</div>
