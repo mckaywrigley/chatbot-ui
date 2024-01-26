@@ -313,7 +313,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
-              <div>User Settings</div>
+              <div>Settings</div>
 
               <Button
                 tabIndex={-1}
@@ -328,9 +328,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
+            <TabsList className="mt-4 grid w-full grid-cols-1">
               <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="keys">API Keys</TabsTrigger>
+              {/* <TabsTrigger value="keys">API Keys</TabsTrigger> */}
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
@@ -381,7 +381,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label>Profile Image</Label>
 
                 <ImagePicker
@@ -392,7 +392,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   onSrcChange={setProfileImageSrc}
                   onImageChange={setProfileImageFile}
                 />
-              </div>
+              </div> */}
 
               <div className="space-y-1">
                 <Label>Chat Display Name</Label>
@@ -405,7 +405,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label className="text-sm">
                   What would you like the AI to know about you to provide better
                   responses?
@@ -423,10 +423,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   used={profileInstructions.length}
                   limit={PROFILE_CONTEXT_MAX}
                 />
-              </div>
+              </div> */}
             </TabsContent>
 
-            <TabsContent className="mt-4 space-y-4" value="keys">
+            {/* <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
@@ -701,7 +701,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 )}
               </div>
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </div>
 
