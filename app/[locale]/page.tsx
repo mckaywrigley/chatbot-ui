@@ -2,18 +2,17 @@
 
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 import { IconArrowRight } from "@tabler/icons-react"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 
-interface BrandProps {
-  theme?: "dark" | "light"
-}
+export default function HomePage() {
+  const { theme } = useTheme()
 
-export default function HomePage({ theme = "dark" }: BrandProps) {
   return (
     <div className="flex size-full flex-col items-center justify-center">
       <div>
         <ChatbotUISVG
-          theme={theme === "dark" ? "dark" : "light"}
+          theme={theme === "dark" ? "light" : "dark"}
           scale={0.45}
         />
       </div>
