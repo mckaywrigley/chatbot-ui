@@ -51,7 +51,7 @@ export default function SetupPage() {
       const session = (await supabase.auth.getSession()).data.session
 
       if (!session) {
-        router.push("/login")
+        return router.push("/login")
       } else {
         const user = session.user
 
@@ -62,7 +62,7 @@ export default function SetupPage() {
         if (!profile.has_onboarded) {
           setLoading(false)
         } else {
-          router.push("/chat")
+          return router.push("/chat")
         }
       }
     })()
@@ -83,8 +83,7 @@ export default function SetupPage() {
   const handleSaveSetupSetting = async () => {
     const session = (await supabase.auth.getSession()).data.session
     if (!session) {
-      router.push("/login")
-      return
+      return router.push("/login")
     }
 
     const user = session.user
