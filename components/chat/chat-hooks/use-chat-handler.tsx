@@ -129,7 +129,7 @@ export const useChatHandler = () => {
       })
     }
 
-    router.push("/chat")
+    return router.push("/chat")
   }
 
   const handleFocusChatInput = () => {

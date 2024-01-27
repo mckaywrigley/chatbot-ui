@@ -199,8 +199,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setProfile(profile)
 
       if (!profile.has_onboarded) {
-        router.push("/setup")
-        return
+        return router.push("/setup")
       }
 
       const workspaces = await getWorkspacesByUserId(user.id)
