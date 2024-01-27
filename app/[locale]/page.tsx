@@ -4,7 +4,11 @@ import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 import { IconArrowRight } from "@tabler/icons-react"
 import Link from "next/link"
 
-export default function HomePage({ theme = "dark" }) {
+interface BrandProps {
+  theme?: "dark" | "light"
+}
+
+export default function HomePage({ theme = "dark" }: BrandProps) {
   return (
     <div className="flex size-full flex-col items-center justify-center">
       <div>
