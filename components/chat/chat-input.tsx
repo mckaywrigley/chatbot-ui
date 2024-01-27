@@ -4,7 +4,7 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
   IconBolt,
-  IconCirclePlus,
+  IconPaperclip,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
@@ -156,7 +156,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         </div>
 
         <>
-          <IconCirclePlus
+          <IconPaperclip
             className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
             size={32}
             onClick={() => fileInputRef.current?.click()}
