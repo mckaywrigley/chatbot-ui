@@ -26,6 +26,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
 
   switch (modelId as LLMID) {
     case "gpt-4-turbo-preview":
+    case "gpt-4-0125-preview":
     case "gpt-4-vision-preview":
     case "gpt-3.5-turbo":
       return (
