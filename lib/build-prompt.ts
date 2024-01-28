@@ -179,124 +179,124 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
   return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
 }
 
-export async function buildGoogleGeminiFinalMessages(
-  payload: ChatPayload,
-  profile: Tables<"profiles">,
-  messageImageFiles: MessageImage[]
-) {
-  const { chatSettings, workspaceInstructions, chatMessages, assistant } =
-    payload
+// export async function buildGoogleGeminiFinalMessages(
+//   payload: ChatPayload,
+//   profile: Tables<"profiles">,
+//   messageImageFiles: MessageImage[]
+// ) {
+//   const { chatSettings, workspaceInstructions, chatMessages, assistant } =
+//     payload
 
-  const BUILT_PROMPT = buildBasePrompt(
-    chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
-  )
+//   const BUILT_PROMPT = buildBasePrompt(
+//     chatSettings.prompt,
+//     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
+//     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
+//     assistant
+//   )
 
-  let finalMessages = []
+//   let finalMessages = []
 
-  let usedTokens = 0
-  const CHUNK_SIZE = chatSettings.contextLength
-  const PROMPT_TOKENS = encode(chatSettings.prompt).length
-  let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
+//   let usedTokens = 0
+//   const CHUNK_SIZE = chatSettings.contextLength
+//   const PROMPT_TOKENS = encode(chatSettings.prompt).length
+//   let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
 
-  usedTokens += PROMPT_TOKENS
+//   usedTokens += PROMPT_TOKENS
 
-  for (let i = chatMessages.length - 1; i >= 0; i--) {
-    const message = chatMessages[i].message
-    const messageTokens = encode(message.content).length
+//   for (let i = chatMessages.length - 1; i >= 0; i--) {
+//     const message = chatMessages[i].message
+//     const messageTokens = encode(message.content).length
 
-    if (messageTokens <= REMAINING_TOKENS) {
-      REMAINING_TOKENS -= messageTokens
-      usedTokens += messageTokens
-      finalMessages.unshift(message)
-    } else {
-      break
-    }
-  }
+//     if (messageTokens <= REMAINING_TOKENS) {
+//       REMAINING_TOKENS -= messageTokens
+//       usedTokens += messageTokens
+//       finalMessages.unshift(message)
+//     } else {
+//       break
+//     }
+//   }
 
-  let tempSystemMessage: Tables<"messages"> = {
-    chat_id: "",
-    content: BUILT_PROMPT,
-    created_at: "",
-    id: chatMessages.length + "",
-    image_paths: [],
-    model: payload.chatSettings.model,
-    role: "system",
-    sequence_number: chatMessages.length,
-    updated_at: "",
-    user_id: ""
-  }
+//   let tempSystemMessage: Tables<"messages"> = {
+//     chat_id: "",
+//     content: BUILT_PROMPT,
+//     created_at: "",
+//     id: chatMessages.length + "",
+//     image_paths: [],
+//     model: payload.chatSettings.model,
+//     role: "system",
+//     sequence_number: chatMessages.length,
+//     updated_at: "",
+//     user_id: ""
+//   }
 
-  finalMessages.unshift(tempSystemMessage)
+//   finalMessages.unshift(tempSystemMessage)
 
-  let GOOGLE_FORMATTED_MESSAGES = []
+//   let GOOGLE_FORMATTED_MESSAGES = []
 
-  if (chatSettings.model === "gemini-pro") {
-    GOOGLE_FORMATTED_MESSAGES = [
-      {
-        role: "user",
-        parts: finalMessages[0].content
-      },
-      {
-        role: "model",
-        parts: "I will follow your instructions."
-      }
-    ]
+//   if (chatSettings.model === "gemini-pro") {
+//     GOOGLE_FORMATTED_MESSAGES = [
+//       {
+//         role: "user",
+//         parts: finalMessages[0].content
+//       },
+//       {
+//         role: "model",
+//         parts: "I will follow your instructions."
+//       }
+//     ]
 
-    for (let i = 1; i < finalMessages.length; i++) {
-      GOOGLE_FORMATTED_MESSAGES.push({
-        role: finalMessages[i].role === "user" ? "user" : "model",
-        parts: finalMessages[i].content as string
-      })
-    }
+//     for (let i = 1; i < finalMessages.length; i++) {
+//       GOOGLE_FORMATTED_MESSAGES.push({
+//         role: finalMessages[i].role === "user" ? "user" : "model",
+//         parts: finalMessages[i].content as string
+//       })
+//     }
 
-    return GOOGLE_FORMATTED_MESSAGES
-  } else if ((chatSettings.model = "gemini-pro-vision")) {
-    // Gemini Pro Vision doesn't currently support messages
-    async function fileToGenerativePart(file: File) {
-      const base64EncodedDataPromise = new Promise(resolve => {
-        const reader = new FileReader()
+//     return GOOGLE_FORMATTED_MESSAGES
+//   } else if ((chatSettings.model = "gemini-pro-vision")) {
+//     // Gemini Pro Vision doesn't currently support messages
+//     async function fileToGenerativePart(file: File) {
+//       const base64EncodedDataPromise = new Promise(resolve => {
+//         const reader = new FileReader()
 
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result.split(",")[1])
-          }
-        }
+//         reader.onloadend = () => {
+//           if (typeof reader.result === "string") {
+//             resolve(reader.result.split(",")[1])
+//           }
+//         }
 
-        reader.readAsDataURL(file)
-      })
+//         reader.readAsDataURL(file)
+//       })
 
-      return {
-        inlineData: {
-          data: await base64EncodedDataPromise,
-          mimeType: file.type
-        }
-      }
-    }
+//       return {
+//         inlineData: {
+//           data: await base64EncodedDataPromise,
+//           mimeType: file.type
+//         }
+//       }
+//     }
 
-    let prompt = ""
+//     let prompt = ""
 
-    for (let i = 0; i < finalMessages.length; i++) {
-      prompt += `${finalMessages[i].role}:\n${finalMessages[i].content}\n\n`
-    }
+//     for (let i = 0; i < finalMessages.length; i++) {
+//       prompt += `${finalMessages[i].role}:\n${finalMessages[i].content}\n\n`
+//     }
 
-    const files = messageImageFiles.map(file => file.file)
-    const imageParts = await Promise.all(
-      files.map(file =>
-        file ? fileToGenerativePart(file) : Promise.resolve(null)
-      )
-    )
+//     const files = messageImageFiles.map(file => file.file)
+//     const imageParts = await Promise.all(
+//       files.map(file =>
+//         file ? fileToGenerativePart(file) : Promise.resolve(null)
+//       )
+//     )
 
-    // FIX: Hacky until chat messages are supported
-    return [
-      {
-        prompt,
-        imageParts
-      }
-    ]
-  }
+//     // FIX: Hacky until chat messages are supported
+//     return [
+//       {
+//         prompt,
+//         imageParts
+//       }
+//     ]
+//   }
 
-  return finalMessages
-}
+//   return finalMessages
+// }

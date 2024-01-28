@@ -19,7 +19,7 @@ import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   fetchHostedModels,
-  fetchOllamaModels,
+  // fetchOllamaModels,
   fetchOpenRouterModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
@@ -151,11 +151,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         }
       }
 
-      if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-        const localModels = await fetchOllamaModels()
-        if (!localModels) return
-        setAvailableLocalModels(localModels)
-      }
+      // if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
+      //   const localModels = await fetchOllamaModels()
+      //   if (!localModels) return
+      //   setAvailableLocalModels(localModels)
+      // }
 
       // await fetchOpenaiAssistants()
     }

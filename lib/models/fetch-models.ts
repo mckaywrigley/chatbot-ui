@@ -7,11 +7,11 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   try {
     const providers = [
       "openai",
-      "google",
-      "azure",
-      "anthropic",
-      "mistral",
-      "perplexity"
+      // "google",
+      // "azure",
+      // "anthropic",
+      "mistral"
+      // "perplexity"
     ]
 
     const response = await fetch("/api/keys")
@@ -27,13 +27,13 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
     for (const provider of providers) {
       let providerKey: keyof typeof profile
 
-      if (provider === "google") {
-        providerKey = "google_gemini_api_key"
-      } else if (provider === "azure") {
-        providerKey = "azure_openai_api_key"
-      } else {
-        providerKey = `${provider}_api_key` as keyof typeof profile
-      }
+      // if (provider === "google") {
+      //   providerKey = "google_gemini_api_key"
+      // } else if (provider === "azure") {
+      //   providerKey = "azure_openai_api_key"
+      // } else {
+      providerKey = `${provider}_api_key` as keyof typeof profile
+      // }
 
       if (profile?.[providerKey] || data.isUsingEnvKeyMap[provider]) {
         const models = LLM_LIST_MAP[provider]
@@ -53,32 +53,32 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   }
 }
 
-export const fetchOllamaModels = async () => {
-  try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
-    )
+// export const fetchOllamaModels = async () => {
+//   try {
+//     const response = await fetch(
+//       process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
+//     )
 
-    if (!response.ok) {
-      throw new Error(`Ollama server is not responding.`)
-    }
+//     if (!response.ok) {
+//       throw new Error(`Ollama server is not responding.`)
+//     }
 
-    const data = await response.json()
+//     const data = await response.json()
 
-    const localModels: LLM[] = data.models.map((model: any) => ({
-      modelId: model.name as LLMID,
-      modelName: model.name,
-      provider: "ollama",
-      hostedId: model.name,
-      platformLink: "https://ollama.ai/library",
-      imageInput: false
-    }))
+//     const localModels: LLM[] = data.models.map((model: any) => ({
+//       modelId: model.name as LLMID,
+//       modelName: model.name,
+//       provider: "ollama",
+//       hostedId: model.name,
+//       platformLink: "https://ollama.ai/library",
+//       imageInput: false
+//     }))
 
-    return localModels
-  } catch (error) {
-    console.warn("Error fetching Ollama models: " + error)
-  }
-}
+//     return localModels
+//   } catch (error) {
+//     console.warn("Error fetching Ollama models: " + error)
+//   }
+// }
 
 export const fetchOpenRouterModels = async () => {
   try {
