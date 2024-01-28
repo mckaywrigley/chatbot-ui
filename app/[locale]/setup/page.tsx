@@ -61,6 +61,7 @@ export default function SetupPage() {
 
         if (!profile.has_onboarded) {
           setLoading(false)
+          setCurrentStep(3)
         } else {
           router.push("/chat")
         }
@@ -201,7 +202,7 @@ export default function SetupPage() {
             stepTitle="Setup Complete"
             onShouldProceed={handleShouldProceed}
             showNextButton={true}
-            showBackButton={true}
+            showBackButton={false}
           >
             <FinishStep displayName={displayName} />
           </StepContainer>

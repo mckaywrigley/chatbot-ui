@@ -40,8 +40,6 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <Label>Model</Label>
-
         <ModelSelect
           selectedModelId={chatSettings.model}
           onSelectModel={model => {
@@ -50,7 +48,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         />
       </div>
 
-      <div className="space-y-1">
+      {/* <div className="space-y-1">
         <Label>Prompt</Label>
 
         <TextareaAutosize
@@ -63,7 +61,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
           minRows={3}
           maxRows={6}
         />
-      </div>
+      </div> */}
 
       {/* {useAdvancedDropdown ? (
         <AdvancedSettings>

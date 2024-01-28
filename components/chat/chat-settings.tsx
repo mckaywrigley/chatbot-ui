@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { IconAdjustmentsHorizontal } from "@tabler/icons-react"
+import { IconChevronDown } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef } from "react"
 import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
@@ -55,13 +55,13 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
             {fullModel?.modelName || chatSettings.model}
           </div>
 
-          <IconAdjustmentsHorizontal size={28} />
+          <IconChevronDown className="ml-1" />
         </Button>
       </PopoverTrigger>
 
       <PopoverContent
-        className="bg-background border-input relative flex max-h-[calc(100vh-60px)] w-[300px] flex-col space-y-4 overflow-auto rounded-lg border-2 p-6 sm:w-[350px] md:w-[400px] lg:w-[500px] dark:border-none"
-        align="end"
+        className="bg-background border-input relative flex max-h-[calc(100vh-60px)] w-[300px] flex-col space-y-4 overflow-auto rounded-lg border-2 p-6 dark:border-none"
+        align="start"
       >
         <ChatSettingsForm
           chatSettings={chatSettings}
