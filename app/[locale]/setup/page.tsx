@@ -73,24 +73,20 @@ export default function SetupPage() {
         if (!profile.has_onboarded) {
           setLoading(false)
         } else {
-          if (!profile.has_onboarded) {
-            setLoading(false)
-          } else {
-            const data = await fetchHostedModels(profile)
+          const data = await fetchHostedModels(profile)
 
-            if (!data) return
+          if (!data) return
 
-            setEnvKeyMap(data.envKeyMap)
-            setAvailableHostedModels(data.hostedModels)
+          setEnvKeyMap(data.envKeyMap)
+          setAvailableHostedModels(data.hostedModels)
 
-            if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
-              const openRouterModels = await fetchOpenRouterModels()
-              if (!openRouterModels) return
-              setAvailableOpenRouterModels(openRouterModels)
-            }
-
-            return router.push("/chat")
+          if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+            const openRouterModels = await fetchOpenRouterModels()
+            if (!openRouterModels) return
+            setAvailableOpenRouterModels(openRouterModels)
           }
+
+          return router.push("/chat")
         }
       }
     })()
