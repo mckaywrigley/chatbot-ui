@@ -141,48 +141,48 @@ export const createTempMessages = (
   }
 }
 
-// export const handleLocalChat = async (
-//   payload: ChatPayload,
-//   profile: Tables<"profiles">,
-//   chatSettings: ChatSettings,
-//   tempAssistantMessage: ChatMessage,
-//   isRegeneration: boolean,
-//   newAbortController: AbortController,
-//   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-//   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-//   setToolInUse: React.Dispatch<React.SetStateAction<string>>
-// ) => {
-//   const formattedMessages = await buildFinalMessages(payload, profile, [])
+export const handleLocalChat = async (
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  chatSettings: ChatSettings,
+  tempAssistantMessage: ChatMessage,
+  isRegeneration: boolean,
+  newAbortController: AbortController,
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+) => {
+  const formattedMessages = await buildFinalMessages(payload, profile, [])
 
-//   // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
-//   const response = await fetchChatResponse(
-//     process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/chat",
-//     {
-//       model: chatSettings.model,
-//       messages: formattedMessages,
-//       options: {
-//         temperature: payload.chatSettings.temperature
-//       }
-//     },
-//     false,
-//     newAbortController,
-//     setIsGenerating,
-//     setChatMessages
-//   )
+  // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
+  const response = await fetchChatResponse(
+    process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/chat",
+    {
+      model: chatSettings.model,
+      messages: formattedMessages,
+      options: {
+        temperature: payload.chatSettings.temperature
+      }
+    },
+    false,
+    newAbortController,
+    setIsGenerating,
+    setChatMessages
+  )
 
-//   return await processResponse(
-//     response,
-//     isRegeneration
-//       ? payload.chatMessages[payload.chatMessages.length - 1]
-//       : tempAssistantMessage,
-//     false,
-//     newAbortController,
-//     setFirstTokenReceived,
-//     setChatMessages,
-//     setToolInUse
-//   )
-// }
+  return await processResponse(
+    response,
+    isRegeneration
+      ? payload.chatMessages[payload.chatMessages.length - 1]
+      : tempAssistantMessage,
+    false,
+    newAbortController,
+    setFirstTokenReceived,
+    setChatMessages,
+    setToolInUse
+  )
+}
 
 export const handleHostedChat = async (
   payload: ChatPayload,
