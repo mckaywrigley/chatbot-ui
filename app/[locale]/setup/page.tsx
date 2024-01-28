@@ -62,7 +62,8 @@ export default function SetupPage() {
         if (!profile.has_onboarded) {
           setLoading(false)
         } else {
-          return router.push("/chat")
+          router.push("/chat")
+          return router.refresh()
         }
       }
     })()
