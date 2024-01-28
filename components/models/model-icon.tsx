@@ -9,6 +9,7 @@ import { FC, HTMLAttributes } from "react"
 // import { AnthropicSVG } from "../icons/anthropic-svg"
 // import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
+import { HackerAISVG } from "../icons/hackerai-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   modelId: LLMID | string
@@ -43,13 +44,12 @@ export const ModelIcon: FC<ModelIconProps> = ({
     case "mistral-small":
     case "mistral-medium":
       return (
-        <Image
+        <HackerAISVG
           className={cn(
-            "rounded-sm p-1",
+            "rounded-sm bg-[#fff] p-0.5 text-black",
+            props.className,
             theme === "dark" ? "bg-white" : "border-[1px] border-black"
           )}
-          src={mistral.src}
-          alt="Mistral"
           width={width}
           height={height}
         />

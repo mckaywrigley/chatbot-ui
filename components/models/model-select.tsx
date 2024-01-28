@@ -109,7 +109,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       }}
     >
       <DropdownMenuTrigger
-        className="bg-background w-full justify-start border-2 px-3 py-5"
+        className="bg-background w-full justify-start"
         asChild
         disabled={allModels.length === 0}
       >
@@ -118,104 +118,52 @@ export const ModelSelect: FC<ModelSelectProps> = ({
             Unlock models by entering API keys in your profile settings.
           </div>
         ) : (
-          <Button
-            ref={triggerRef}
-            className="flex items-center justify-between"
-            variant="ghost"
-          >
-            <div className="flex items-center">
-              {selectedModel ? (
-                <>
-                  <ModelIcon
-                    modelId={selectedModel?.modelId as LLMID}
-                    width={26}
-                    height={26}
-                  />
-                  <div className="ml-2 flex items-center">
-                    {selectedModel?.modelName}
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center">Select a model</div>
-              )}
-            </div>
+          <div className="max-h-[300px] overflow-auto">
+            {Object.entries(groupedModels).map(([provider, models]) => {
+              const filteredModels = models
+                // Exclude 'openrouter' models
+                .filter(model => model.provider !== "openrouter")
+                .filter(model => {
+                  if (tab === "hosted") return model.provider !== "ollama"
+                  if (tab === "local") return model.provider === "ollama"
+                  if (tab === "openrouter")
+                    return model.provider === "openrouter"
+                })
+                .filter(model =>
+                  model.modelName.toLowerCase().includes(search.toLowerCase())
+                )
+                .sort((a, b) => a.provider.localeCompare(b.provider))
 
-            <IconChevronDown />
-          </Button>
+              if (filteredModels.length === 0) return null
+
+              return (
+                <div key={provider}>
+                  <div className="mb-2">
+                    {filteredModels.map(model => {
+                      return (
+                        <div
+                          key={model.modelId}
+                          className="flex items-center space-x-1"
+                        >
+                          {selectedModelId === model.modelId && (
+                            <IconCheck className="ml-2" size={32} />
+                          )}
+
+                          <ModelOption
+                            key={model.modelId}
+                            model={model}
+                            onSelect={() => handleSelectModel(model.modelId)}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         )}
       </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        className="space-y-2 overflow-auto p-2"
-        style={{ width: triggerRef.current?.offsetWidth }}
-        align="start"
-      >
-        <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
-          {availableLocalModels.length > 0 && (
-            <TabsList defaultValue="hosted" className="grid grid-cols-2">
-              <TabsTrigger value="hosted">Hosted</TabsTrigger>
-
-              <TabsTrigger value="local">Local</TabsTrigger>
-            </TabsList>
-          )}
-        </Tabs>
-
-        <Input
-          ref={inputRef}
-          className="w-full"
-          placeholder="Search models..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-
-        <div className="max-h-[300px] overflow-auto">
-          {Object.entries(groupedModels).map(([provider, models]) => {
-            const filteredModels = models
-              .filter(model => {
-                if (tab === "hosted") return model.provider !== "ollama"
-                if (tab === "local") return model.provider === "ollama"
-                if (tab === "openrouter") return model.provider === "openrouter"
-              })
-              .filter(model =>
-                model.modelName.toLowerCase().includes(search.toLowerCase())
-              )
-              .sort((a, b) => a.provider.localeCompare(b.provider))
-
-            if (filteredModels.length === 0) return null
-
-            return (
-              <div key={provider}>
-                <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-                  {provider === "openai" && profile.use_azure_openai
-                    ? "AZURE OPENAI"
-                    : provider.toLocaleUpperCase()}
-                </div>
-
-                <div className="mb-4">
-                  {filteredModels.map(model => {
-                    return (
-                      <div
-                        key={model.modelId}
-                        className="flex items-center space-x-1"
-                      >
-                        {selectedModelId === model.modelId && (
-                          <IconCheck className="ml-2" size={32} />
-                        )}
-
-                        <ModelOption
-                          key={model.modelId}
-                          model={model}
-                          onSelect={() => handleSelectModel(model.modelId)}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </DropdownMenuContent>
     </DropdownMenu>
   )
 }
