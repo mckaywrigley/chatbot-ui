@@ -198,7 +198,7 @@ export const Message: FC<MessageProps> = ({
                   )
                 ) : (
                   <WithTooltip
-                    display={<div>{MODEL_DATA.modelName}</div>}
+                    display={<div>{MODEL_DATA?.modelName}</div>}
                     trigger={
                       <ModelIcon
                         modelId={message.model as LLMID}
