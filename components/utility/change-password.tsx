@@ -28,7 +28,7 @@ export const ChangePassword: FC<ChangePasswordProps> = () => {
 
     alert("Password changed successfully.")
 
-    router.push("/login")
+    return router.push("/login")
   }
 
   return (

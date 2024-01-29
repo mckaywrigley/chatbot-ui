@@ -3,9 +3,9 @@ import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
-import { ChatMessage, ChatPayload, LLMID } from "@/types"
+import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
-import { useContext, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
@@ -58,10 +58,20 @@ export const useChatHandler = () => {
     setIsAtPickerOpen,
     selectedTools,
     selectedPreset,
-    setChatSettings
+    setChatSettings,
+    models,
+    isPromptPickerOpen,
+    isAtPickerOpen,
+    isToolPickerOpen
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!isPromptPickerOpen || !isAtPickerOpen || !isToolPickerOpen) {
+      chatInputRef.current?.focus()
+    }
+  }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
 
   const handleNewChat = () => {
     setUserInput("")
@@ -128,7 +138,7 @@ export const useChatHandler = () => {
       })
     }
 
-    router.push("/chat")
+    return router.push("/chat")
   }
 
   const handleFocusChatInput = () => {
@@ -159,6 +169,14 @@ export const useChatHandler = () => {
       setAbortController(newAbortController)
 
       const modelData = [
+        ...models.map(model => ({
+          modelId: model.model_id as LLMID,
+          modelName: model.name,
+          provider: "custom" as ModelProvider,
+          hostedId: model.id,
+          platformLink: "",
+          imageInput: false
+        })),
         ...LLM_LIST,
         ...availableLocalModels,
         ...availableOpenRouterModels

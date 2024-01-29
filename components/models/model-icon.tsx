@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import meta from "@/public/providers/meta.png"
 import mistral from "@/public/providers/mistral.png"
 import perplexity from "@/public/providers/perplexity.png"
 import { LLMID } from "@/types"
@@ -25,10 +24,10 @@ export const ModelIcon: FC<ModelIconProps> = ({
 }) => {
   const { theme } = useTheme()
 
-  switch (modelId as string) {
-    case "gpt-4-1106-preview":
+  switch (modelId as LLMID) {
+    case "gpt-4-turbo-preview":
     case "gpt-4-vision-preview":
-    case "gpt-3.5-turbo-1106":
+    case "gpt-3.5-turbo":
       return (
         <OpenAISVG
           className={cn(
@@ -36,21 +35,6 @@ export const ModelIcon: FC<ModelIconProps> = ({
             props.className,
             theme === "dark" ? "bg-white" : "border-[1px] border-black"
           )}
-          width={width}
-          height={height}
-        />
-      )
-    case "llama2-7b":
-    case "llama2-70b":
-      return (
-        <Image
-          className={cn(
-            "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
-          )}
-          style={{ objectFit: "cover" }}
-          src={meta.src}
-          alt="Mistral"
           width={width}
           height={height}
         />

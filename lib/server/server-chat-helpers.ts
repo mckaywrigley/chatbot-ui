@@ -37,7 +37,6 @@ export async function getServerProfile() {
   return profileWithKeys
 }
 
-
 export async function getAdminProfile() {
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
@@ -61,12 +60,11 @@ export async function getAdminProfile() {
   if (!profile) {
     throw new Error("Admin profile not found")
   }
-  
+
   const profileWithKeys = addApiKeysToProfile(profile)
 
   return profileWithKeys
 }
-
 
 function addApiKeysToProfile(profile: Tables<"profiles">) {
   const apiKeys = {
@@ -88,7 +86,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
   }
 
   for (const [envKey, profileKey] of Object.entries(apiKeys)) {
-    if (process.env[envKey]) {
+    if (process.env[envKey] && !(profile as any)[profileKey]) {
       ;(profile as any)[profileKey] = process.env[envKey]
     }
   }

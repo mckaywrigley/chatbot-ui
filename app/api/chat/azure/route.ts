@@ -13,7 +13,6 @@ export async function POST(request: Request) {
 
   try {
     const profile = await getAdminProfile()
-    
     checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
 
     const ENDPOINT = profile.azure_openai_endpoint
@@ -21,10 +20,10 @@ export async function POST(request: Request) {
 
     let DEPLOYMENT_ID = ""
     switch (chatSettings.model) {
-      case "gpt-3.5-turbo-1106":
+      case "gpt-3.5-turbo":
         DEPLOYMENT_ID = profile.azure_openai_35_turbo_id || ""
         break
-      case "gpt-4-1106-preview":
+      case "gpt-4-turbo-preview":
         DEPLOYMENT_ID = profile.azure_openai_45_turbo_id || ""
         break
       case "gpt-4-vision-preview":
