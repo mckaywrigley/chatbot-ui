@@ -5,7 +5,7 @@ import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
-import { useContext, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
@@ -59,10 +59,19 @@ export const useChatHandler = () => {
     selectedTools,
     selectedPreset,
     setChatSettings,
-    models
+    models,
+    isPromptPickerOpen,
+    isAtPickerOpen,
+    isToolPickerOpen
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!isPromptPickerOpen || !isAtPickerOpen || !isToolPickerOpen) {
+      chatInputRef.current?.focus()
+    }
+  }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
 
   const handleNewChat = () => {
     setUserInput("")
