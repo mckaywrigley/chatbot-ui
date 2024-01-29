@@ -273,9 +273,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                         | "Previous Week"
                         | "Older"
                     )
+
                     return (
                       sortedData.length > 0 && (
-                        <div className="pb-2">
+                        <div key={dateCategory} className="pb-2">
                           <div className="text-muted-foreground mb-1 text-sm font-bold">
                             {dateCategory}
                           </div>
