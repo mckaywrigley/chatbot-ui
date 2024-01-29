@@ -35,6 +35,7 @@ import {
 } from "../ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { Switch } from "../ui/switch"
 import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
@@ -118,6 +119,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [advancedSettings, setAdvancedSettings] = useState(
+    profile?.advanced_settings
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -143,6 +148,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       profile_context: profileInstructions,
       image_url: profileImageUrl,
       image_path: profileImagePath,
+      advanced_settings: advancedSettings,
       openai_api_key: openaiAPIKey,
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
@@ -424,8 +430,15 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   limit={PROFILE_CONTEXT_MAX}
                 />
               </div>
-            </TabsContent>
+              <div className="flex items-center space-y-1">
+                <Label className="mr-4">Advanced settings</Label>
 
+                <Switch
+                  checked={advancedSettings ?? false}
+                  onCheckedChange={setAdvancedSettings}
+                />
+              </div>
+            </TabsContent>
             <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
