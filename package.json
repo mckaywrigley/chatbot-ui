@@ -87,7 +87,6 @@
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
     "react-i18next": "^14.0.0",
-    "react-image-crop": "^11.0.1",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-textarea-autosize": "^8.5.3",
