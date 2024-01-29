@@ -229,7 +229,7 @@ Login to Supabase by running:
 supabase login
 ```
 
-Next, link your project by running the following command with the "Project Ref" and "Project ID" you got above:
+Next, link your project by running the following command with the "Project ID" you got above:
 
 ```bash
 supabase link --project-ref <project-id>
