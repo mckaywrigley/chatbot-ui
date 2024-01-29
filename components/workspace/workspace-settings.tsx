@@ -182,7 +182,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                   />
                 </div>
 
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <Label>Description</Label>
 
                   <Input
@@ -190,7 +190,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                   />
-                </div>
+                </div> */}
               </>
 
               <div className="space-y-1">
