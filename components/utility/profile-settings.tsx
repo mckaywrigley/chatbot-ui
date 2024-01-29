@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
-import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import ImagePicker from "../ui/image-picker"
 import { Input } from "../ui/input"
@@ -44,6 +43,7 @@ import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
 import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { OpenRouterLLM } from "@/types"
+import Image from "next/image"
 import { WithTooltip } from "../ui/with-tooltip"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
@@ -295,9 +295,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         {profile.image_url ? (
-          <Avatar className="mt-2 size-[34px] cursor-pointer hover:opacity-50">
-            <AvatarImage src={profile.image_url} />
-          </Avatar>
+          <Image
+            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
+            src={profile.image_url}
+            height={34}
+            width={34}
+            alt={"Image"}
+          />
         ) : (
           <Button size="icon" variant="ghost">
             <IconUser size={SIDEBAR_ICON_SIZE} />
