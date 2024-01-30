@@ -1,12 +1,18 @@
 import { ChatbotUIContext } from "@/context/context"
 import { WORKSPACE_INSTRUCTIONS_MAX } from "@/db/limits"
+import {
+  getWorkspaceImageFromStorage,
+  uploadWorkspaceImage
+} from "@/db/storage/workspace-images"
 import { updateWorkspace } from "@/db/workspaces"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { LLMID } from "@/types"
 import { IconHome, IconSettings } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
+import ImagePicker from "../ui/image-picker"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { LimitDisplay } from "../ui/limit-display"
@@ -30,7 +36,9 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     selectedWorkspace,
     setSelectedWorkspace,
     setWorkspaces,
-    setChatSettings
+    setChatSettings,
+    workspaceImages,
+    setWorkspaceImages
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -38,6 +46,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const [name, setName] = useState(selectedWorkspace?.name || "")
+  const [imageLink, setImageLink] = useState("")
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [description, setDescription] = useState(
     selectedWorkspace?.description || ""
   )
@@ -56,13 +66,47 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     embeddingsProvider: selectedWorkspace?.embeddings_provider
   })
 
+  useEffect(() => {
+    const workspaceImage =
+      workspaceImages.find(
+        image => image.path === selectedWorkspace?.image_path
+      )?.base64 || ""
+
+    setImageLink(workspaceImage)
+  }, [workspaceImages])
+
   const handleSave = async () => {
     if (!selectedWorkspace) return
+
+    let imagePath = ""
+
+    if (selectedImage) {
+      imagePath = await uploadWorkspaceImage(selectedWorkspace, selectedImage)
+
+      const url = (await getWorkspaceImageFromStorage(imagePath)) || ""
+
+      if (url) {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const base64 = await convertBlobToBase64(blob)
+
+        setWorkspaceImages(prev => [
+          ...prev,
+          {
+            workspaceId: selectedWorkspace.id,
+            path: imagePath,
+            base64,
+            url
+          }
+        ])
+      }
+    }
 
     const updatedWorkspace = await updateWorkspace(selectedWorkspace.id, {
       ...selectedWorkspace,
       name,
       description,
+      image_path: imagePath,
       instructions,
       default_model: defaultChatSettings.model,
       default_prompt: defaultChatSettings.prompt,
@@ -127,8 +171,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     }
   }
 
-  if (!selectedWorkspace) return null
-  if (!profile) return null
+  if (!selectedWorkspace || !profile) return null
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -159,7 +202,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
 
             {selectedWorkspace?.is_home && (
               <div className="text-sm font-light">
-                This is your home workspace.
+                This is your home workspace for personal use.
               </div>
             )}
           </SheetHeader>
@@ -191,6 +234,19 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                     onChange={e => setDescription(e.target.value)}
                   />
                 </div> */}
+
+                <div className="space-y-1">
+                  <Label>Image</Label>
+
+                  <ImagePicker
+                    src={imageLink}
+                    image={selectedImage}
+                    onSrcChange={setImageLink}
+                    onImageChange={setSelectedImage}
+                    width={50}
+                    height={50}
+                  />
+                </div>
               </>
 
               <div className="space-y-1">

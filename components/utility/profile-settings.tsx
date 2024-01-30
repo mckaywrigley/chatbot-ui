@@ -390,8 +390,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <ImagePicker
                   src={profileImageSrc}
                   image={profileImageFile}
-                  height={100}
-                  width={100}
+                  height={50}
+                  width={50}
                   onSrcChange={setProfileImageSrc}
                   onImageChange={setProfileImageFile}
                 />
