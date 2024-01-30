@@ -80,7 +80,7 @@ export async function buildFinalMessages(
         message: {
           ...chatMessage.message,
           content:
-            `${chatMessage.message.content}\n\n${retrievalText}` as string
+            `User Query: "${chatMessage.message.content}"\n\nFile Content:\n${retrievalText}` as string
         },
         fileItems: []
       }
@@ -162,9 +162,12 @@ export async function buildFinalMessages(
 
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
-      content: `${
-        finalMessages[finalMessages.length - 1].content
-      }\n\n${retrievalText}`
+      content:
+        `Analyze the following file content in response to the user's query: "${finalMessages[finalMessages.length - 1].content}". ` +
+        `Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. Assess each section for information pertinent to the query.\n\n${retrievalText}\n\n` +
+        `Provide a concise summary of the key information relevant to the user's query. Highlight any ambiguities or multiple perspectives discovered during the analysis. ` +
+        `If the file does not contain relevant information, or if the answer is not clear, state 'I don't know.'\n\n` +
+        `Summary of findings:\n-`
     }
   }
 
@@ -176,7 +179,7 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
     .map(item => `<BEGIN SOURCE>\n${item.content}\n</END SOURCE>`)
     .join("\n\n")
 
-  return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
+  return `${retrievalText}`
 }
 
 // export async function buildGoogleGeminiFinalMessages(
