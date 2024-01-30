@@ -141,16 +141,6 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       })
     }
 
-    setSelectedWorkspace(updatedWorkspace)
-    setWorkspaces(workspaces => {
-      return workspaces.map(workspace => {
-        if (workspace.id === selectedWorkspace.id) {
-          return updatedWorkspace
-        }
-        return workspace
-      })
-    })
-
     setIsOpen(false)
     setSelectedWorkspace(updatedWorkspace)
     setWorkspaces(workspaces => {
@@ -158,6 +148,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         if (workspace.id === selectedWorkspace.id) {
           return updatedWorkspace
         }
+
         return workspace
       })
     })
