@@ -14,6 +14,7 @@ import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getProfileByUserId } from "@/db/profile"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
+import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -31,9 +32,10 @@ import {
   LLM,
   LLMID,
   MessageImage,
-  OpenRouterLLM
+  OpenRouterLLM,
+  WorkspaceImage
 } from "@/types"
-import { AssistantImage } from "@/types/assistant-image"
+import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
@@ -71,6 +73,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
     useState<Tables<"workspaces"> | null>(null)
+  const [workspaceImages, setWorkspaceImages] = useState<WorkspaceImage[]>([])
 
   // PRESET STORE
   const [selectedPreset, setSelectedPreset] =
@@ -204,6 +207,31 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       const workspaces = await getWorkspacesByUserId(user.id)
       setWorkspaces(workspaces)
+
+      for (const workspace of workspaces) {
+        let workspaceImageUrl = ""
+
+        if (workspace.image_path) {
+          workspaceImageUrl =
+            (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
+        }
+
+        if (workspaceImageUrl) {
+          const response = await fetch(workspaceImageUrl)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setWorkspaceImages(prev => [
+            ...prev,
+            {
+              workspaceId: workspace.id,
+              path: workspace.image_path,
+              base64: base64,
+              url: workspaceImageUrl
+            }
+          ])
+        }
+      }
 
       const homeWorkspace = workspaces.find(
         workspace => workspace.is_home === true
@@ -360,6 +388,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // WORKSPACE STORE
         selectedWorkspace,
         setSelectedWorkspace,
+        workspaceImages,
+        setWorkspaceImages,
 
         // PRESET STORE
         selectedPreset,
