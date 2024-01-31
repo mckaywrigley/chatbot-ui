@@ -134,7 +134,7 @@ export async function POST(request: Request) {
 
           const requestInit = {
             method: "POST",
-            headers: headers,
+            headers,
             body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
           }
 
@@ -155,7 +155,18 @@ export async function POST(request: Request) {
           const fullUrl =
             schemaDetail.url + path + (queryParams ? "?" + queryParams : "")
 
-          const response = await fetch(fullUrl)
+          let headers = {}
+
+          // Check if custom headers are set
+          const customHeaders = schemaDetail.headers
+          if (customHeaders && typeof customHeaders === "string") {
+            headers = JSON.parse(customHeaders)
+          }
+
+          const response = await fetch(fullUrl, {
+            method: "GET",
+            headers: headers
+          })
 
           if (!response.ok) {
             data = {

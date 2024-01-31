@@ -1,11 +1,6 @@
-import { canvasPreview } from "@/lib/canvas-preview"
-import { useDebounceEffect } from "@/lib/effects/use-debounce"
 import Image from "next/image"
-import { ChangeEvent, FC, useRef, useState } from "react"
-import ReactCrop, { Crop, PixelCrop } from "react-image-crop"
-import "react-image-crop/dist/ReactCrop.css"
+import { ChangeEvent, FC, useState } from "react"
 import { toast } from "sonner"
-import { Button } from "./button"
 import { Input } from "./input"
 
 interface ImagePickerProps {
@@ -25,21 +20,8 @@ const ImagePicker: FC<ImagePickerProps> = ({
   width = 200,
   height = 200
 }) => {
-  const imgRef = useRef<HTMLImageElement>(null)
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null)
-  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null)
-
   const [previewSrc, setPreviewSrc] = useState<string>(src)
   const [previewImage, setPreviewImage] = useState<File | null>(image)
-  const [isCropping, setIsCropping] = useState(false)
-  const [crop, setCrop] = useState<Crop>({
-    unit: "px",
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100
-  })
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -52,137 +34,53 @@ const ImagePicker: FC<ImagePickerProps> = ({
 
       const url = URL.createObjectURL(file)
 
-      setPreviewSrc(url)
-      setPreviewImage(file)
-      setIsCropping(true)
+      const img = new window.Image()
+      img.src = url
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")
+
+        if (!ctx) {
+          toast.error("Unable to create canvas context.")
+          return
+        }
+
+        const size = Math.min(img.width, img.height)
+        canvas.width = size
+        canvas.height = size
+
+        ctx.drawImage(
+          img,
+          (img.width - size) / 2,
+          (img.height - size) / 2,
+          size,
+          size,
+          0,
+          0,
+          size,
+          size
+        )
+
+        const squareUrl = canvas.toDataURL()
+
+        setPreviewSrc(squareUrl)
+        setPreviewImage(file)
+        onSrcChange(squareUrl)
+        onImageChange(file)
+      }
     }
   }
 
-  const onDownloadCropClick = () => {
-    if (previewImage) {
-      if (!previewCanvasRef.current) {
-        throw new Error("Crop canvas does not exist")
-      }
-
-      previewCanvasRef.current.toBlob(
-        blob => {
-          if (!blob) {
-            throw new Error("Failed to create blob")
-          }
-
-          hiddenAnchorRef.current?.click()
-
-          const url = URL.createObjectURL(blob)
-
-          onSrcChange(url)
-          onImageChange(blob as File)
-          setIsCropping(false)
-          setCrop({
-            unit: "px",
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100
-          })
-        },
-        "image/jpeg",
-        0.25
-      )
-    }
-  }
-
-  const handleCancel = () => {
-    setPreviewSrc(src)
-    setPreviewImage(image)
-    setIsCropping(false)
-    setCrop({
-      unit: "px",
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100
-    })
-  }
-
-  useDebounceEffect(
-    async () => {
-      if (
-        completedCrop?.width &&
-        completedCrop?.height &&
-        imgRef.current &&
-        previewCanvasRef.current
-      ) {
-        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop)
-      }
-    },
-    100,
-    [completedCrop]
-  )
-
-  return isCropping ? (
-    <div>
-      <ReactCrop
-        crop={crop}
-        onChange={setCrop}
-        onComplete={setCompletedCrop}
-        aspect={1}
-      >
-        <Image
-          id="crop-image"
-          ref={imgRef}
-          className="rounded"
-          width={width}
-          height={height}
-          src={previewSrc}
-          alt={"Image"}
-        />
-      </ReactCrop>
-
-      <div className="mt-1 flex space-x-2">
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={onDownloadCropClick}>Confirm</Button>
-      </div>
-
-      {!!completedCrop && (
-        <>
-          <div>
-            <canvas
-              ref={previewCanvasRef}
-              style={{
-                border: "1px solid black",
-                objectFit: "contain",
-                width: completedCrop.width,
-                height: completedCrop.height,
-                position: "absolute",
-                top: "-200vh",
-                visibility: "hidden"
-              }}
-            />
-          </div>
-          <div>
-            <a
-              ref={hiddenAnchorRef}
-              download
-              style={{
-                position: "absolute",
-                top: "-200vh",
-                visibility: "hidden"
-              }}
-            >
-              Hidden download
-            </a>
-          </div>
-        </>
-      )}
-    </div>
-  ) : (
+  return (
     <div>
       {previewSrc && (
         <Image
+          style={{ width: `${width}px`, height: `${width}px` }}
           className="rounded"
-          height={height}
+          height={width}
           width={width}
-          src={src}
+          src={previewSrc}
           alt={"Image"}
         />
       )}

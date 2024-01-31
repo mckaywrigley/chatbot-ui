@@ -21,7 +21,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
               <div>
                 <div className="text-xl font-bold">Chat Info</div>
 
-                <div className="mt-2 space-y-2">
+                <div className="mx-auto mt-2 max-w-xs space-y-2 sm:max-w-sm md:max-w-md lg:max-w-lg">
                   <div>Model: {selectedChat.model}</div>
                   <div>Prompt: {selectedChat.prompt}</div>
 
