@@ -31,6 +31,7 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
           <ModelIcon modelId={item.model} width={32} height={32} />
         ) : image ? (
           <Image
+            style={{ width: "32px", height: "32px" }}
             className="rounded"
             src={image}
             alt="Assistant"
@@ -48,9 +49,9 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
       <div className="ml-4 flex grow flex-col space-y-1">
         <div className="text-md font-bold">{item.name}</div>
 
-        <div className="text-sm font-light">
-          {item.description || "No description."}
-        </div>
+        {item.description && (
+          <div className="text-sm font-light">{item.description}</div>
+        )}
       </div>
 
       <div className="min-w-[40px]">

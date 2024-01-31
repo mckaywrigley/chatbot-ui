@@ -1,4 +1,3 @@
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { Database } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { createClient } from "@supabase/supabase-js"
@@ -42,8 +41,6 @@ export async function POST(request: Request) {
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens:
-        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
       stream: true
     })
 
