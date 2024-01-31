@@ -14,8 +14,6 @@ const buildBasePrompt = (
     fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
   }
 
-  fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
-
   if (profileContext) {
     fullPrompt += `User Info:\n${profileContext}\n\n`
   }
@@ -24,7 +22,9 @@ const buildBasePrompt = (
     fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
   }
 
-  fullPrompt += `User Instructions:\n${prompt}`
+  if (prompt !== "You are a friendly, helpful AI assistant.") {
+    fullPrompt += `User Instructions:\n${prompt}`
+  }
 
   return fullPrompt
 }

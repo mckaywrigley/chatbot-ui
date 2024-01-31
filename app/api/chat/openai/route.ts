@@ -5,6 +5,11 @@ import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
+import {
+  replaceWordsInLastUserMessage,
+  wordReplacements
+} from "@/lib/word-replacer"
+
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
@@ -24,10 +29,39 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
+    replaceWordsInLastUserMessage(messages, wordReplacements)
+
+    const systemMessageContent = `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}`
+    const systemInstructions = "User Instructions:\n"
+    const existingSystemMessageIndex = messages.findIndex(
+      msg => msg.role === "system"
+    )
+
+    if (existingSystemMessageIndex !== -1) {
+      // Existing system message found
+      const existingSystemMessage = messages[existingSystemMessageIndex]
+
+      if (!existingSystemMessage.content.includes(systemInstructions)) {
+        // Append new content if "User Instructions:" is not found
+        existingSystemMessage.content += `${systemMessageContent}` // Added a newline for separation
+      }
+
+      // Move the updated system message to the start
+      messages.unshift(messages.splice(existingSystemMessageIndex, 1)[0])
+    } else {
+      // No system message exists, create a new one
+      messages.unshift({
+        role: "system",
+        content: systemMessageContent
+      })
+    }
+
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
+      // temperature: chatSettings.temperature,
       temperature: 0.4,
+      // max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null,
       max_tokens: 1024,
       stream: true
     })
