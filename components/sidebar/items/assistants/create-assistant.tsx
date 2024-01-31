@@ -4,7 +4,7 @@ import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { ASSISTANT_NAME_MAX } from "@/db/limits"
+import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { FC, useContext, useEffect, useState } from "react"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
@@ -142,6 +142,17 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={ASSISTANT_NAME_MAX}
+            />
+          </div>
+
+          <div className="space-y-1 pt-2">
+            <Label>Description</Label>
+
+            <Input
+              placeholder="Assistant description..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={ASSISTANT_DESCRIPTION_MAX}
             />
           </div>
 

@@ -3,7 +3,7 @@ import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { ASSISTANT_NAME_MAX } from "@/db/limits"
+import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
@@ -38,9 +38,8 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
     const assistantImage =
       assistantImages.find(image => image.path === assistant.image_path)
         ?.base64 || ""
-
     setImageLink(assistantImage)
-  }, [assistantImages])
+  }, [assistant, assistantImages])
 
   const handleFileSelect = (
     file: Tables<"files">,
@@ -112,6 +111,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       icon={
         imageLink ? (
           <Image
+            style={{ width: "30px", height: "30px" }}
             className="rounded"
             src={imageLink}
             alt={assistant.name}
@@ -167,6 +167,28 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       }) => (
         <>
           <div className="space-y-1">
+            <Label>Name</Label>
+
+            <Input
+              placeholder="Assistant name..."
+              value={name}
+              onChange={e => setName(e.target.value)}
+              maxLength={ASSISTANT_NAME_MAX}
+            />
+          </div>
+
+          <div className="space-y-1 pt-2">
+            <Label>Description</Label>
+
+            <Input
+              placeholder="Assistant description..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={ASSISTANT_DESCRIPTION_MAX}
+            />
+          </div>
+
+          <div className="space-y-1">
             <Label>Image</Label>
 
             <ImagePicker
@@ -176,17 +198,6 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
               onImageChange={setSelectedImage}
               width={100}
               height={100}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Name</Label>
-
-            <Input
-              placeholder="Assistant name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={ASSISTANT_NAME_MAX}
             />
           </div>
 
