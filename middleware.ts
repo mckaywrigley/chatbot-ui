@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/middleware"
 import { i18nRouter } from "next-i18n-router"
 import { NextResponse, type NextRequest } from "next/server"
-import { getHomeWorkspaceByUserId } from "./db/workspaces"
 import i18nConfig from "./i18nConfig"
 
 export async function middleware(request: NextRequest) {
@@ -16,13 +15,19 @@ export async function middleware(request: NextRequest) {
     const redirectToChat = session && request.nextUrl.pathname === "/"
 
     if (redirectToChat) {
-      const homeWorkspaceId = await getHomeWorkspaceByUserId(
-        session.data.session?.user.id
-      )
-      console.log("homeWorkspaceId", homeWorkspaceId)
+      const { data: homeWorkspace, error } = await supabase
+        .from("workspaces")
+        .select("*")
+        .eq("user_id", session.data.session?.user.id)
+        .eq("is_home", true)
+        .single()
+
+      if (!homeWorkspace) {
+        throw new Error(error?.message)
+      }
 
       return NextResponse.redirect(
-        new URL(`/${homeWorkspaceId}/chat`, request.url)
+        new URL(`/${homeWorkspace.id}/chat`, request.url)
       )
     }
 
