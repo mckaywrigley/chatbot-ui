@@ -4,6 +4,7 @@ import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import useHotkey from "@/lib/hooks/use-hotkey"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
@@ -163,6 +164,10 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         image => image.path === selectedAssistant?.image_path
       )?.base64 || ""
 
+  const modelDetails = LLM_LIST.find(
+    model => model.modelId === selectedPreset?.model
+  )
+
   return (
     <DropdownMenu
       open={isOpen}
@@ -174,7 +179,11 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       <DropdownMenuTrigger asChild className="max-w-[400px]" disabled={loading}>
         <Button variant="ghost" className="flex space-x-3 text-lg">
           {selectedPreset && (
-            <ModelIcon modelId={selectedPreset.model} width={32} height={32} />
+            <ModelIcon
+              provider={modelDetails?.provider || "custom"}
+              width={32}
+              height={32}
+            />
           )}
 
           {selectedAssistant &&

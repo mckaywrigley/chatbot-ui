@@ -145,6 +145,8 @@ export const Message: FC<MessageProps> = ({
     image => image.path === selectedAssistant?.image_path
   )?.base64
 
+  const modelDetails = LLM_LIST.find(model => model.modelId === message.model)
+
   return (
     <div
       className={cn(
@@ -200,7 +202,7 @@ export const Message: FC<MessageProps> = ({
                     display={<div>{MODEL_DATA?.modelName}</div>}
                     trigger={
                       <ModelIcon
-                        modelId={message.model as LLMID}
+                        provider={modelDetails?.provider || "custom"}
                         height={ICON_SIZE}
                         width={ICON_SIZE}
                       />

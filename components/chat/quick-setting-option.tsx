@@ -1,3 +1,4 @@
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { Tables } from "@/supabase/types"
 import { IconCircleCheckFilled, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
@@ -20,6 +21,8 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
   onSelect,
   image
 }) => {
+  const modelDetails = LLM_LIST.find(model => model.modelId === item.model)
+
   return (
     <DropdownMenuItem
       tabIndex={0}
@@ -28,7 +31,11 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
     >
       <div className="w-[32px]">
         {contentType === "presets" ? (
-          <ModelIcon modelId={item.model} width={32} height={32} />
+          <ModelIcon
+            provider={modelDetails?.provider || "custom"}
+            width={32}
+            height={32}
+          />
         ) : image ? (
           <Image
             style={{ width: "32px", height: "32px" }}
