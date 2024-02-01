@@ -37,7 +37,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-Policy to allow users to read their own files
+-- Policy to allow users to read their own files
 CREATE POLICY "Allow users to read their own files"
 ON storage.objects FOR SELECT
 TO authenticated
