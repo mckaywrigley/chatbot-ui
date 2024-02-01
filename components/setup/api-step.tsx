@@ -157,6 +157,7 @@ export const APIStep: FC<APIStepProps> = ({
                 type="password"
                 value={azureOpenaiEmbeddingsID}
                 onChange={e => onAzureOpenaiEmbeddingsIDChange(e.target.value)}
+                disabled
               />
             </div>
           </>

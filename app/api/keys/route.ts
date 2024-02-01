@@ -12,6 +12,7 @@ export async function GET() {
     mistral: VALID_ENV_KEYS.MISTRAL_API_KEY,
     perplexity: VALID_ENV_KEYS.PERPLEXITY_API_KEY,
     openrouter: VALID_ENV_KEYS.OPENROUTER_API_KEY,
+    zhipu: VALID_ENV_KEYS.ZHIPU_API_KEY,
 
     openai_organization_id: VALID_ENV_KEYS.OPENAI_ORGANIZATION_ID,
 

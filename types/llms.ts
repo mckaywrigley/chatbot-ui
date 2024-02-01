@@ -6,6 +6,7 @@ export type LLMID =
   | AnthropicLLMID
   | MistralLLMID
   | PerplexityLLMID
+  | ZhipuLLMID
 
 // OpenAI Models (UPDATED 1/25/24)
 export type OpenAILLMID =
@@ -33,6 +34,12 @@ export type MistralLLMID =
 export type PerplexityLLMID =
   | "pplx-7b-online" // Perplexity Online 7B
   | "pplx-70b-online" // Perplexity Online 70B
+
+// Zhipu Models
+export type ZhipuLLMID =
+  | "glm-4" // GLM-4
+  | "glm-4v" // GLM-4 Vision
+  | "glm-3-turbo" // GLM-3 Turbo
 
 export interface LLM {
   modelId: LLMID

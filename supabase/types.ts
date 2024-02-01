@@ -1115,6 +1115,7 @@ export interface Database {
           use_azure_openai: boolean
           user_id: string
           username: string
+          zhipu_api_key: string | null
         }
         Insert: {
           anthropic_api_key?: string | null
@@ -1142,6 +1143,7 @@ export interface Database {
           use_azure_openai: boolean
           user_id: string
           username: string
+          zhipu_api_key?: string | null
         }
         Update: {
           anthropic_api_key?: string | null
@@ -1169,6 +1171,7 @@ export interface Database {
           use_azure_openai?: boolean
           user_id?: string
           username?: string
+          zhipu_api_key?: string | null
         }
         Relationships: [
           {

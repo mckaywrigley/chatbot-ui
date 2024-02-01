@@ -74,6 +74,7 @@
     "gpt-tokenizer": "^2.1.2",
     "i18next": "^23.7.16",
     "i18next-resources-to-backend": "^1.2.0",
+    "jsrsasign": "^11.0.0",
     "langchain": "^0.0.213",
     "lucide-react": "^0.292.0",
     "mammoth": "^1.6.0",

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import mistral from "@/public/providers/mistral.png"
 import perplexity from "@/public/providers/perplexity.png"
+import zhipu from "@/public/providers/zhipu.png"
 import { LLMID } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
@@ -89,7 +90,22 @@ export const ModelIcon: FC<ModelIconProps> = ({
             theme === "dark" ? "bg-white" : "border-[1px] border-black"
           )}
           src={perplexity.src}
-          alt="Mistral"
+          alt="Perplexity"
+          width={width}
+          height={height}
+        />
+      )
+    case "glm-4":
+    case "glm-4v":
+    case "glm-3-turbo":
+      return (
+        <Image
+          className={cn(
+            "rounded-sm p-1",
+            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+          )}
+          src={zhipu.src}
+          alt="Zhipu"
           width={width}
           height={height}
         />
