@@ -169,8 +169,3 @@ CREATE POLICY "Allow authenticated update access to own profile images"
 CREATE POLICY "Allow authenticated delete access to own profile images"
     ON storage.objects FOR DELETE TO authenticated
     USING (bucket_id = 'profile_images' AND (storage.foldername(name))[1] = auth.uid()::text);
-
-CREATE POLICY "Allow users to read admin profile"
-ON profiles FOR SELECT
-TO authenticated
-USING (username = 'Riddance');

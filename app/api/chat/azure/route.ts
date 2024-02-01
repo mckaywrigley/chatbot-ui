@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const { chatSettings, messages } = json as ChatAPIPayload
 
   try {
-    const profile = await getAdminProfile()
+    const profile = await getServerProfile()
     checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
 
     const ENDPOINT = profile.azure_openai_endpoint
