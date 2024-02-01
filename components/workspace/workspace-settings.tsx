@@ -199,10 +199,12 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="main">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
-              <TabsTrigger value="main">Main</TabsTrigger>
-              <TabsTrigger value="defaults">Defaults</TabsTrigger>
-            </TabsList>
+            {profile?.advanced_settings && (
+              <TabsList className="mt-4 grid w-full grid-cols-2">
+                <TabsTrigger value="main">Main</TabsTrigger>
+                <TabsTrigger value="defaults">Defaults</TabsTrigger>
+              </TabsList>
+            )}
 
             <TabsContent className="mt-4 space-y-4" value="main">
               <>
@@ -240,24 +242,26 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                 </div>
               </>
 
-              <div className="space-y-1">
-                <Label>
-                  How would you like the AI to respond in this workspace?
-                </Label>
+              {profile?.advanced_settings && (
+                <div className="space-y-1">
+                  <Label>
+                    How would you like the AI to respond in this workspace?
+                  </Label>
 
-                <TextareaAutosize
-                  placeholder="Instructions... (optional)"
-                  value={instructions}
-                  onValueChange={setInstructions}
-                  minRows={5}
-                  maxRows={10}
-                />
+                  <TextareaAutosize
+                    placeholder="Instructions... (optional)"
+                    value={instructions}
+                    onValueChange={setInstructions}
+                    minRows={5}
+                    maxRows={10}
+                  />
 
-                <LimitDisplay
-                  used={instructions.length}
-                  limit={WORKSPACE_INSTRUCTIONS_MAX}
-                />
-              </div>
+                  <LimitDisplay
+                    used={instructions.length}
+                    limit={WORKSPACE_INSTRUCTIONS_MAX}
+                  />
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent className="mt-5" value="defaults">

@@ -1090,6 +1090,7 @@ export interface Database {
       }
       profiles: {
         Row: {
+          advanced_settings: boolean | null
           anthropic_api_key: string | null
           azure_openai_35_turbo_id: string | null
           azure_openai_45_turbo_id: string | null
@@ -1117,6 +1118,7 @@ export interface Database {
           username: string
         }
         Insert: {
+          advanced_settings?: boolean | null
           anthropic_api_key?: string | null
           azure_openai_35_turbo_id?: string | null
           azure_openai_45_turbo_id?: string | null
@@ -1144,6 +1146,7 @@ export interface Database {
           username: string
         }
         Update: {
+          advanced_settings?: boolean | null
           anthropic_api_key?: string | null
           azure_openai_35_turbo_id?: string | null
           azure_openai_45_turbo_id?: string | null

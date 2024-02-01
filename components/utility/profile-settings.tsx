@@ -41,6 +41,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
+import { Switch } from "../ui/switch"
 import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
@@ -117,6 +118,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [advancedSettings, setAdvancedSettings] = useState(
+    profile?.advanced_settings
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -142,6 +147,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       profile_context: profileInstructions,
       image_url: profileImageUrl,
       image_path: profileImagePath,
+      advanced_settings: advancedSettings,
       openai_api_key: openaiAPIKey,
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
@@ -331,10 +337,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="keys">API Keys</TabsTrigger>
-            </TabsList>
+            {profile?.advanced_settings && (
+              <TabsList className="mt-4 grid w-full grid-cols-2">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="keys">API Keys</TabsTrigger>
+              </TabsList>
+            )}
 
             <TabsContent className="mt-4 space-y-4" value="profile">
               <div className="space-y-1">
@@ -427,8 +435,15 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   limit={PROFILE_CONTEXT_MAX}
                 />
               </div>
-            </TabsContent>
+              <div className="flex items-center space-y-1">
+                <Label className="mr-4">Advanced AI interface</Label>
 
+                <Switch
+                  checked={advancedSettings ?? false}
+                  onCheckedChange={setAdvancedSettings}
+                />
+              </div>
+            </TabsContent>
             <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
