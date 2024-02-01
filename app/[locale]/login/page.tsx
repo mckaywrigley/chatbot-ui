@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
+import { get } from "@vercel/edge-config"
 import { Metadata } from "next"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { get } from "@vercel/edge-config"
 
 export const metadata: Metadata = {
   title: "Login"
@@ -34,7 +34,18 @@ export default async function Login({
   const session = (await supabase.auth.getSession()).data.session
 
   if (session) {
-    return redirect("/chat")
+    const { data: homeWorkspace, error } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .eq("is_home", true)
+      .single()
+
+    if (!homeWorkspace) {
+      throw new Error(error.message)
+    }
+
+    return redirect(`/${homeWorkspace.id}/chat`)
   }
 
   const signIn = async (formData: FormData) => {
@@ -54,7 +65,20 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect("/chat")
+    const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("user_id", data.user.id)
+      .eq("is_home", true)
+      .single()
+
+    if (!homeWorkspace) {
+      throw new Error(
+        homeWorkspaceError?.message || "An unexpected error occurred"
+      )
+    }
+
+    return redirect(`/${homeWorkspace.id}/chat`)
   }
 
   const signUp = async (formData: FormData) => {
