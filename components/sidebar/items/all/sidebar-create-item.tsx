@@ -122,7 +122,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (image) {
         const filePath = await uploadAssistantImage(createdAssistant, image)
 
-        const updatedAssistant = await updateAssistant(createdAssistant.id, {
+        updatedAssistant = await updateAssistant(createdAssistant.id, {
           image_path: filePath
         })
 

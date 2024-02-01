@@ -6,8 +6,13 @@ import {
   PROFILE_USERNAME_MIN
 } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
-import { uploadImage } from "@/db/storage/profile-images"
+import { uploadProfileImage } from "@/db/storage/profile-images"
+import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
+import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
+import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { supabase } from "@/lib/supabase/browser-client"
+import { cn } from "@/lib/utils"
+import { OpenRouterLLM } from "@/types"
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,
@@ -16,11 +21,11 @@ import {
   IconLogout,
   IconUser
 } from "@tabler/icons-react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
-import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import ImagePicker from "../ui/image-picker"
 import { Input } from "../ui/input"
@@ -35,16 +40,10 @@ import {
 } from "../ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
-
-import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
-import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
-import { OpenRouterLLM } from "@/types"
-import { WithTooltip } from "../ui/with-tooltip"
 
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const {
@@ -133,7 +132,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     let profileImagePath = ""
 
     if (profileImageFile) {
-      const { path, url } = await uploadImage(profile, profileImageFile)
+      const { path, url } = await uploadProfileImage(profile, profileImageFile)
       profileImageUrl = url ?? profileImageUrl
       profileImagePath = path
     }
@@ -299,9 +298,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         {profile.image_url ? (
-          <Avatar className="mt-2 size-[34px] cursor-pointer hover:opacity-50">
-            <AvatarImage src={profile.image_url} />
-          </Avatar>
+          <Image
+            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
+            src={profile.image_url + "?" + new Date().getTime()}
+            height={34}
+            width={34}
+            alt={"Image"}
+          />
         ) : (
           <Button size="icon" variant="ghost">
             <IconUser size={SIDEBAR_ICON_SIZE} />
@@ -391,8 +394,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <ImagePicker
                   src={profileImageSrc}
                   image={profileImageFile}
-                  height={100}
-                  width={100}
+                  height={50}
+                  width={50}
                   onSrcChange={setProfileImageSrc}
                   onImageChange={setProfileImageFile}
                 />

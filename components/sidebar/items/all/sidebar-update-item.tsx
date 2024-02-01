@@ -67,13 +67,17 @@ import {
   getPromptWorkspacesByPromptId,
   updatePrompt
 } from "@/db/prompts"
-import { uploadAssistantImage } from "@/db/storage/assistant-images"
+import {
+  getAssistantImageFromStorage,
+  uploadAssistantImage
+} from "@/db/storage/assistant-images"
 import {
   createToolWorkspaces,
   deleteToolWorkspace,
   getToolWorkspacesByToolId,
   updateTool
 } from "@/db/tools"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -108,7 +112,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setCollections,
     setAssistants,
     setTools,
-    setModels
+    setModels,
+    setAssistantImages
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -497,10 +502,32 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         await deleteAssistantTool(assistantId, tool.id)
       }
 
-      const updatedAssistant = await updateAssistant(assistantId, rest)
+      let updatedAssistant = await updateAssistant(assistantId, rest)
 
       if (image) {
-        await uploadAssistantImage(updatedAssistant, image)
+        const filePath = await uploadAssistantImage(updatedAssistant, image)
+
+        updatedAssistant = await updateAssistant(assistantId, {
+          image_path: filePath
+        })
+
+        const url = (await getAssistantImageFromStorage(filePath)) || ""
+
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: updatedAssistant.id,
+              path: filePath,
+              base64,
+              url
+            }
+          ])
+        }
       }
 
       await handleWorkspaceUpdates(
@@ -611,7 +638,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow">
+        <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
               Edit {contentType.slice(0, -1)}
