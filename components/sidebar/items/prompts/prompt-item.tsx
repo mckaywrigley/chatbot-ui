@@ -14,10 +14,11 @@ interface PromptItemProps {
 export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
   const [name, setName] = useState(prompt.name)
   const [content, setContent] = useState(prompt.content)
-
+  const [isTyping, setIsTyping] = useState(false)
   return (
     <SidebarItem
       item={prompt}
+      isTyping={isTyping}
       contentType="prompts"
       icon={<IconPencil size={30} />}
       updateState={{ name, content }}
@@ -31,6 +32,8 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={PROMPT_NAME_MAX}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
             />
           </div>
 
@@ -43,6 +46,8 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
               onValueChange={setContent}
               minRows={6}
               maxRows={20}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
             />
           </div>
         </>

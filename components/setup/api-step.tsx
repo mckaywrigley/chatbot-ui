@@ -11,11 +11,15 @@ interface APIStepProps {
   azureOpenai35TurboID: string
   azureOpenai45TurboID: string
   azureOpenai45VisionID: string
+  azureOpenaiEmbeddingsID: string
   anthropicAPIKey: string
   googleGeminiAPIKey: string
   mistralAPIKey: string
   perplexityAPIKey: string
+  zhipuAPIKey: string
   useAzureOpenai: boolean
+  openrouterAPIKey: string
+  onOpenrouterAPIKeyChange: (value: string) => void
   onOpenaiAPIKeyChange: (value: string) => void
   onOpenaiOrgIDChange: (value: string) => void
   onAzureOpenaiAPIKeyChange: (value: string) => void
@@ -23,10 +27,12 @@ interface APIStepProps {
   onAzureOpenai35TurboIDChange: (value: string) => void
   onAzureOpenai45TurboIDChange: (value: string) => void
   onAzureOpenai45VisionIDChange: (value: string) => void
+  onAzureOpenaiEmbeddingsIDChange: (value: string) => void
   onAnthropicAPIKeyChange: (value: string) => void
   onGoogleGeminiAPIKeyChange: (value: string) => void
   onMistralAPIKeyChange: (value: string) => void
   onPerplexityAPIKeyChange: (value: string) => void
+  onZhipuAPIKeyChange: (value: string) => void
   onUseAzureOpenaiChange: (value: boolean) => void
 }
 
@@ -38,10 +44,13 @@ export const APIStep: FC<APIStepProps> = ({
   azureOpenai35TurboID,
   azureOpenai45TurboID,
   azureOpenai45VisionID,
+  azureOpenaiEmbeddingsID,
   anthropicAPIKey,
   googleGeminiAPIKey,
   mistralAPIKey,
   perplexityAPIKey,
+  openrouterAPIKey,
+  zhipuAPIKey,
   useAzureOpenai,
   onOpenaiAPIKeyChange,
   onOpenaiOrgIDChange,
@@ -50,11 +59,14 @@ export const APIStep: FC<APIStepProps> = ({
   onAzureOpenai35TurboIDChange,
   onAzureOpenai45TurboIDChange,
   onAzureOpenai45VisionIDChange,
+  onAzureOpenaiEmbeddingsIDChange,
   onAnthropicAPIKeyChange,
   onGoogleGeminiAPIKeyChange,
   onMistralAPIKeyChange,
   onPerplexityAPIKeyChange,
-  onUseAzureOpenaiChange
+  onZhipuAPIKeyChange,
+  onUseAzureOpenaiChange,
+  onOpenrouterAPIKeyChange
 }) => {
   return (
     <>
@@ -65,10 +77,12 @@ export const APIStep: FC<APIStepProps> = ({
           </div>
 
           <Button
-            className="ml-3 h-[18px] w-[130px] text-[11px]"
+            className="ml-3 h-[18px] w-[150px] text-[11px]"
             onClick={() => onUseAzureOpenaiChange(!useAzureOpenai)}
           >
-            {useAzureOpenai ? "Use Standard OpenAI" : "Use Azure OpenAI"}
+            {useAzureOpenai
+              ? "Switch To Standard OpenAI"
+              : "Switch To Azure OpenAI"}
           </Button>
         </Label>
 
@@ -132,6 +146,17 @@ export const APIStep: FC<APIStepProps> = ({
                 onChange={e => onAzureOpenai45VisionIDChange(e.target.value)}
               />
             </div>
+
+            <div className="space-y-1">
+              <Label>Azure OpenAI Embeddings ID</Label>
+
+              <Input
+                placeholder="Azure OpenAI Embeddings ID"
+                type="password"
+                value={azureOpenaiEmbeddingsID}
+                onChange={e => onAzureOpenaiEmbeddingsIDChange(e.target.value)}
+              />
+            </div>
           </>
         ) : (
           <>
@@ -190,6 +215,26 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={perplexityAPIKey}
           onChange={e => onPerplexityAPIKeyChange(e.target.value)}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label>OpenRouter API Key</Label>
+
+        <Input
+          placeholder="OpenRouter API Key"
+          type="password"
+          value={openrouterAPIKey}
+          onChange={e => onOpenrouterAPIKeyChange(e.target.value)}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label>Zhipu API Key</Label>
+
+        <Input
+          placeholder="OpenRouter API Key"
+          type="password"
+          value={zhipuAPIKey}
+          onChange={e => onZhipuAPIKeyChange(e.target.value)}
         />
       </div>
     </>

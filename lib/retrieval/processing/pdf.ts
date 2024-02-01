@@ -1,48 +1,28 @@
 import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { PDFLoader } from "langchain/document_loaders/fs/pdf"
-import { TOKEN_LIMIT } from "."
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processPdf = async (pdf: Blob): Promise<FileItemChunk[]> => {
   const loader = new PDFLoader(pdf)
   const docs = await loader.load()
+  let completeText = docs.map(doc => doc.pageContent).join(" ")
+
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: CHUNK_SIZE,
+    chunkOverlap: CHUNK_OVERLAP
+  })
+  const splitDocs = await splitter.createDocuments([completeText])
 
   let chunks: FileItemChunk[] = []
 
-  let content = ""
-  let tokens = 0
-  const overlapSize = 50
+  for (let i = 0; i < splitDocs.length; i++) {
+    const doc = splitDocs[i]
 
-  // Concatenate all the text together
-  let allText = docs.map(doc => doc.pageContent).join(" ")
-
-  // Split the text into chunks, filtering out empty strings
-  const textChunks = allText.split(/\s+/).filter(chunk => chunk.length > 0)
-
-  for (let i = 0; i < textChunks.length; i++) {
-    const chunkTokens = encode(textChunks[i]).length
-
-    if (tokens + chunkTokens > TOKEN_LIMIT) {
-      // Push the current chunk
-      chunks.push({
-        content: content.trim(),
-        tokens
-      })
-
-      // Start new chunk with overlap from previous chunk
-      content = content.slice(-overlapSize) + " " + textChunks[i] + " "
-      tokens = encode(content).length
-    } else {
-      content += textChunks[i] + " "
-      tokens += chunkTokens
-    }
-  }
-
-  // Push the last chunk if it's not empty
-  if (content.trim() !== "") {
     chunks.push({
-      content: content.trim(),
-      tokens: encode(content).length
+      content: doc.pageContent,
+      tokens: encode(doc.pageContent).length
     })
   }
 

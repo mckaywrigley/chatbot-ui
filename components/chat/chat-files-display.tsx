@@ -1,20 +1,33 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getFileFromStorage } from "@/db/storage/files"
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { cn } from "@/lib/utils"
 import { ChatFile, MessageImage } from "@/types"
 import {
+  IconCircleFilled,
   IconFileFilled,
+  IconFileTypeCsv,
+  IconFileTypeDocx,
   IconFileTypePdf,
+  IconFileTypeTxt,
+  IconJson,
   IconLoader2,
+  IconMarkdown,
   IconX
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
+import { WithTooltip } from "../ui/with-tooltip"
+import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 
 interface ChatFilesDisplayProps {}
 
 export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
+  useHotkey("f", () => setShowFilesDisplay(prev => !prev))
+  useHotkey("e", () => setUseRetrieval(prev => !prev))
+
   const {
     files,
     newMessageImages,
@@ -22,14 +35,33 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     newMessageFiles,
     setNewMessageFiles,
     setShowFilesDisplay,
-    showFilesDisplay
+    showFilesDisplay,
+    chatFiles,
+    chatImages,
+    setChatImages,
+    setChatFiles,
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const [selectedFile, setSelectedFile] = useState<ChatFile | null>(null)
   const [selectedImage, setSelectedImage] = useState<MessageImage | null>(null)
   const [showPreview, setShowPreview] = useState(false)
 
-  const combinedNewMessageFiles = [...newMessageFiles, ...newMessageImages]
+  const messageImages = [
+    ...newMessageImages.filter(
+      image =>
+        !chatImages.some(chatImage => chatImage.messageId === image.messageId)
+    )
+  ]
+
+  const combinedChatFiles = [
+    ...newMessageFiles.filter(
+      file => !chatFiles.some(chatFile => chatFile.id === file.id)
+    ),
+    ...chatFiles
+  ]
+
+  const combinedMessageFiles = [...messageImages, ...combinedChatFiles]
 
   const getLinkAndView = async (file: ChatFile) => {
     const fileRecord = files.find(f => f.id === file.id)
@@ -40,7 +72,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     window.open(link, "_blank")
   }
 
-  return showFilesDisplay && combinedNewMessageFiles.length > 0 ? (
+  return showFilesDisplay && combinedMessageFiles.length > 0 ? (
     <>
       {showPreview && selectedImage && (
         <FilePreview
@@ -66,21 +98,27 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         />
       )}
 
-      <div className="space-y-5">
-        <div className="flex w-full justify-center">
+      <div className="space-y-2">
+        <div className="flex w-full items-center justify-center">
           <Button
-            className="h-[24px] text-xs"
+            className="flex h-[32px] w-[140px] space-x-2"
             onClick={() => setShowFilesDisplay(false)}
           >
-            Hide files
+            <RetrievalToggle />
+
+            <div>Hide files</div>
+
+            <div onClick={e => e.stopPropagation()}>
+              <ChatRetrievalSettings />
+            </div>
           </Button>
         </div>
 
         <div className="overflow-auto">
-          <div className="flex flex-wrap gap-6 truncate pt-2">
-            {newMessageImages.map(image => (
+          <div className="flex gap-2 overflow-auto pt-2">
+            {messageImages.map((image, index) => (
               <div
-                key={image.messageId}
+                key={index}
                 className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50"
               >
                 <Image
@@ -103,7 +141,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                 />
 
                 <IconX
-                  className="bg-muted-foreground border-primary absolute right-[-6px] top-[-2px] flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
+                  className="bg-muted-foreground border-primary absolute right-[-6px] top-[-2px] flex size-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
                   onClick={e => {
                     e.stopPropagation()
                     setNewMessageImages(
@@ -111,15 +149,18 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                         f => f.messageId !== image.messageId
                       )
                     )
+                    setChatImages(
+                      chatImages.filter(f => f.messageId !== image.messageId)
+                    )
                   }}
                 />
               </div>
             ))}
 
-            {newMessageFiles.map(file =>
+            {combinedChatFiles.map((file, index) =>
               file.id === "loading" ? (
                 <div
-                  key={file.id}
+                  key={index}
                   className="relative flex h-[64px] items-center space-x-4 rounded-xl border-2 px-4 py-3"
                 >
                   <div className="rounded bg-blue-500 p-2">
@@ -146,6 +187,16 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                       switch (fileExtension) {
                         case "pdf":
                           return <IconFileTypePdf />
+                        case "markdown":
+                          return <IconMarkdown />
+                        case "txt":
+                          return <IconFileTypeTxt />
+                        case "json":
+                          return <IconJson />
+                        case "csv":
+                          return <IconFileTypeCsv />
+                        case "docx":
+                          return <IconFileTypeDocx />
                         default:
                           return <IconFileFilled />
                       }
@@ -154,20 +205,16 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
                   <div className="truncate text-sm">
                     <div className="truncate">{file.name}</div>
-                    <div className="truncate opacity-50">
-                      {file.type.includes("/")
-                        ? file.type.split("/")[1].toUpperCase()
-                        : file.type.toUpperCase()}
-                    </div>
                   </div>
 
                   <IconX
-                    className="bg-muted-foreground border-primary absolute right-[-6px] top-[-6px] flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
+                    className="bg-muted-foreground border-primary absolute right-[-6px] top-[-6px] flex size-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
                     onClick={e => {
                       e.stopPropagation()
                       setNewMessageFiles(
                         newMessageFiles.filter(f => f.id !== file.id)
                       )
+                      setChatFiles(chatFiles.filter(f => f.id !== file.id))
                     }}
                   />
                 </div>
@@ -178,16 +225,59 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       </div>
     </>
   ) : (
-    combinedNewMessageFiles.length > 0 && (
-      <div className="mb-4 flex w-full justify-center">
+    combinedMessageFiles.length > 0 && (
+      <div className="mb-4 flex w-full items-center justify-center space-x-2">
         <Button
-          className="h-[24px] text-xs"
+          className="flex h-[32px] w-[140px] space-x-2"
           onClick={() => setShowFilesDisplay(true)}
         >
-          View {combinedNewMessageFiles.length} file
-          {combinedNewMessageFiles.length > 1 ? "s" : ""}
+          <RetrievalToggle />
+
+          <div>
+            {" "}
+            View {combinedMessageFiles.length} file
+            {combinedMessageFiles.length > 1 ? "s" : ""}
+          </div>
+
+          <div onClick={e => e.stopPropagation()}>
+            <ChatRetrievalSettings />
+          </div>
         </Button>
       </div>
     )
+  )
+}
+
+const RetrievalToggle = ({}) => {
+  const { useRetrieval, setUseRetrieval } = useContext(ChatbotUIContext)
+
+  return (
+    <div className="flex items-center">
+      <WithTooltip
+        delayDuration={0}
+        side="top"
+        display={
+          <div>
+            {useRetrieval
+              ? "File retrieval is enabled on the selected files for this message. Click the indicator to disable."
+              : "Click the indicator to enable file retrieval for this message."}
+          </div>
+        }
+        trigger={
+          <IconCircleFilled
+            className={cn(
+              "p-1",
+              useRetrieval ? "text-green-500" : "text-red-500",
+              useRetrieval ? "hover:text-green-200" : "hover:text-red-200"
+            )}
+            size={24}
+            onClick={e => {
+              e.stopPropagation()
+              setUseRetrieval(prev => !prev)
+            }}
+          />
+        }
+      />
+    </div>
   )
 }

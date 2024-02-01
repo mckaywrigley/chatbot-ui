@@ -25,13 +25,15 @@ export const FilePicker: FC<FilePickerProps> = ({
   onSelectCollection,
   isFocused
 }) => {
-  const { files, collections } = useContext(ChatbotUIContext)
+  const { files, collections, setIsAtPickerOpen } = useContext(ChatbotUIContext)
+
+  const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    firstFileRef.current?.focus()
+    if (isFocused && itemsRef.current[0]) {
+      itemsRef.current[0].focus()
+    }
   }, [isFocused])
-
-  const firstFileRef = useRef<HTMLDivElement>(null)
 
   const filteredFiles = files.filter(
     file =>
@@ -60,19 +62,41 @@ export const FilePicker: FC<FilePickerProps> = ({
   }
 
   const getKeyDownHandler =
-    (index: number) => (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === "Backspace") {
+    (index: number, type: "file" | "collection", item: any) =>
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Escape") {
+        e.preventDefault()
+        setIsAtPickerOpen(false)
+      } else if (e.key === "Backspace") {
         e.preventDefault()
       } else if (e.key === "Enter") {
         e.preventDefault()
-        handleSelectFile(filteredFiles[index])
+
+        if (type === "file") {
+          handleSelectFile(item)
+        } else {
+          handleSelectCollection(item)
+        }
       } else if (
-        e.key === "Tab" &&
+        (e.key === "Tab" || e.key === "ArrowDown") &&
         !e.shiftKey &&
-        index === filteredFiles.length
+        index === filteredFiles.length + filteredCollections.length - 1
       ) {
         e.preventDefault()
-        firstFileRef.current?.focus()
+        itemsRef.current[0]?.focus()
+      } else if (e.key === "ArrowUp" && !e.shiftKey && index === 0) {
+        // go to last element if arrow up is pressed on first element
+        e.preventDefault()
+        itemsRef.current[itemsRef.current.length - 1]?.focus()
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        const prevIndex =
+          index - 1 >= 0 ? index - 1 : itemsRef.current.length - 1
+        itemsRef.current[prevIndex]?.focus()
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault()
+        const nextIndex = index + 1 < itemsRef.current.length ? index + 1 : 0
+        itemsRef.current[nextIndex]?.focus()
       }
     }
 
@@ -89,7 +113,9 @@ export const FilePicker: FC<FilePickerProps> = ({
               {[...filteredFiles, ...filteredCollections].map((item, index) => (
                 <div
                   key={item.id}
-                  ref={index === 0 ? firstFileRef : null}
+                  ref={ref => {
+                    itemsRef.current[index] = ref
+                  }}
                   tabIndex={0}
                   className="hover:bg-accent focus:bg-accent flex cursor-pointer items-center rounded p-2 focus:outline-none"
                   onClick={() => {
@@ -99,7 +125,13 @@ export const FilePicker: FC<FilePickerProps> = ({
                       handleSelectCollection(item)
                     }
                   }}
-                  onKeyDown={getKeyDownHandler(index)}
+                  onKeyDown={e =>
+                    getKeyDownHandler(
+                      index,
+                      "type" in item ? "file" : "collection",
+                      item
+                    )(e)
+                  }
                 >
                   {"type" in item ? (
                     <FileIcon type={(item as Tables<"files">).type} size={32} />

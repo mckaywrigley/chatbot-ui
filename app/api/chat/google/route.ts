@@ -1,4 +1,4 @@
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
@@ -63,8 +63,17 @@ export async function POST(request: Request) {
       })
     }
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "Google Gemini API Key not found. Please set it in your profile settings."
+    } else if (errorMessage.toLowerCase().includes("api key not valid")) {
+      errorMessage =
+        "Google Gemini API Key is incorrect. Please fix it in your profile settings."
+    }
+
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

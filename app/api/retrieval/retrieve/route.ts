@@ -1,16 +1,19 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider } = json as {
+  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
     embeddingsProvider: "openai" | "local"
+    sourceCount: number
   }
+
+  const uniqueFileIds = [...new Set(fileIds)]
 
   try {
     const supabaseAdmin = createClient<Database>(
@@ -20,36 +23,44 @@ export async function POST(request: Request) {
 
     const profile = await getServerProfile()
 
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
-    console.log("userInput", userInput)
-    console.log("fileIds", fileIds)
+    if (embeddingsProvider === "openai") {
+      if (profile.use_azure_openai) {
+        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+      } else {
+        checkApiKey(profile.openai_api_key, "OpenAI")
+      }
+    }
 
     let chunks: any[] = []
 
-    const MATCH_COUNT = 100
-
-    if (embeddingsProvider === "openai") {
-      console.log("openai")
-
-      const openai = new OpenAI({
+    let openai
+    if (profile.use_azure_openai) {
+      openai = new OpenAI({
+        apiKey: profile.azure_openai_api_key || "",
+        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
+        defaultQuery: { "api-version": "2023-07-01-preview" },
+        defaultHeaders: { "api-key": profile.azure_openai_api_key }
+      })
+    } else {
+      openai = new OpenAI({
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id
       })
+    }
 
+    if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
-        model: "text-embedding-ada-002",
+        model: "text-embedding-3-small",
         input: userInput
       })
 
       const openaiEmbedding = response.data.map(item => item.embedding)[0]
-      console.log("openaiEmbedding", openaiEmbedding.length)
 
       const { data: openaiFileItems, error: openaiError } =
         await supabaseAdmin.rpc("match_file_items_openai", {
           query_embedding: openaiEmbedding as any,
-          match_count: MATCH_COUNT,
-          file_ids: fileIds
+          match_count: sourceCount,
+          file_ids: uniqueFileIds
         })
 
       if (openaiError) {
@@ -58,44 +69,27 @@ export async function POST(request: Request) {
 
       chunks = openaiFileItems
     } else if (embeddingsProvider === "local") {
-      console.log("local")
-
       const localEmbedding = await generateLocalEmbedding(userInput)
 
-      const { data: localFileItems, error: localError } =
+      const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {
           query_embedding: localEmbedding as any,
-          match_count: MATCH_COUNT,
-          file_ids: fileIds
+          match_count: sourceCount,
+          file_ids: uniqueFileIds
         })
 
-      if (localError) {
-        throw localError
+      if (localFileItemsError) {
+        throw localFileItemsError
       }
 
       chunks = localFileItems
     }
 
-    const totalTokenCount = chunks?.reduce(
-      (total, chunk) => total + chunk.tokens,
-      0
+    const mostSimilarChunks = chunks?.sort(
+      (a, b) => b.similarity - a.similarity
     )
 
-    const topThreeSimilar = chunks
-      ?.sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 3)
-    console.log(topThreeSimilar, "Top 3 most similar:")
-
-    const tokenCountTopThree = topThreeSimilar?.reduce(
-      (total, chunk) => total + chunk.tokens,
-      0
-    )
-
-    console.log("Total token count of all 100 combined:", totalTokenCount)
-
-    console.log("Token count of top 3 most similar:", tokenCountTopThree)
-
-    return new Response(JSON.stringify({ results: topThreeSimilar }), {
+    return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })
   } catch (error: any) {

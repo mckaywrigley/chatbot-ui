@@ -1,6 +1,7 @@
-import Loading from "@/app/loading"
+import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
+import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
@@ -32,7 +33,10 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatImages,
     assistants,
     setSelectedAssistant,
-    setChatFileItems
+    setChatFileItems,
+    setChatFiles,
+    setShowFilesDisplay,
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -114,8 +118,21 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const messageFileItems = await Promise.all(messageFileItemPromises)
 
     const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
-    console.log("uniqueFileItems", uniqueFileItems)
     setChatFileItems(uniqueFileItems)
+
+    const chatFiles = await getChatFilesByChatId(params.chatid as string)
+
+    setChatFiles(
+      chatFiles.files.map(file => ({
+        id: file.id,
+        name: file.name,
+        type: file.type,
+        file: null
+      }))
+    )
+
+    setUseRetrieval(true)
+    setShowFilesDisplay(true)
 
     const fetchedChatMessages = fetchedMessages.map(message => {
       return {
@@ -127,7 +144,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
           )
       }
     })
-    console.log("fetchedChatMessages", fetchedChatMessages)
 
     setChatMessages(fetchedChatMessages)
   }
@@ -178,14 +194,14 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatSecondaryButtons />
       </div>
 
-      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-10 font-bold">
+      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-20 font-bold">
         <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
           {selectedChat?.name || "Chat"}
         </div>
       </div>
 
       <div
-        className="flex h-full w-full flex-col overflow-auto border-b"
+        className="flex size-full flex-col overflow-auto border-b"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />

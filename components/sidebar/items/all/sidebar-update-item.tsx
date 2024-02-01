@@ -1,15 +1,30 @@
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
 import { AssignWorkspaces } from "@/components/workspace/assign-workspaces"
 import { ChatbotUIContext } from "@/context/context"
+import {
+  createAssistantCollection,
+  deleteAssistantCollection,
+  getAssistantCollectionsByAssistantId
+} from "@/db/assistant-collections"
+import {
+  createAssistantFile,
+  deleteAssistantFile,
+  getAssistantFilesByAssistantId
+} from "@/db/assistant-files"
+import {
+  createAssistantTool,
+  deleteAssistantTool,
+  getAssistantToolsByAssistantId
+} from "@/db/assistant-tools"
 import {
   createAssistantWorkspaces,
   deleteAssistantWorkspace,
@@ -17,6 +32,11 @@ import {
   updateAssistant
 } from "@/db/assistants"
 import { updateChat } from "@/db/chats"
+import {
+  createCollectionFile,
+  deleteCollectionFile,
+  getCollectionFilesByCollectionId
+} from "@/db/collection-files"
 import {
   createCollectionWorkspaces,
   deleteCollectionWorkspace,
@@ -30,6 +50,12 @@ import {
   updateFile
 } from "@/db/files"
 import {
+  createModelWorkspaces,
+  deleteModelWorkspace,
+  getModelWorkspacesByModelId,
+  updateModel
+} from "@/db/models"
+import {
   createPresetWorkspaces,
   deletePresetWorkspace,
   getPresetWorkspacesByPresetId,
@@ -41,17 +67,30 @@ import {
   getPromptWorkspacesByPromptId,
   updatePrompt
 } from "@/db/prompts"
-import { uploadAssistantImage } from "@/db/storage/assistant-images"
+import {
+  getAssistantImageFromStorage,
+  uploadAssistantImage
+} from "@/db/storage/assistant-images"
+import {
+  createToolWorkspaces,
+  deleteToolWorkspace,
+  getToolWorkspacesByToolId,
+  updateTool
+} from "@/db/tools"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
-import { ContentType, DataItemType } from "@/types"
+import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
+  isTyping: boolean
   item: DataItemType
   contentType: ContentType
   children: React.ReactNode
-  renderInputs: () => JSX.Element
+  renderInputs: (renderState: any) => JSX.Element
   updateState: any
 }
 
@@ -60,7 +99,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   contentType,
   children,
   renderInputs,
-  updateState
+  updateState,
+  isTyping
 }) => {
   const {
     workspaces,
@@ -70,7 +110,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setPrompts,
     setFiles,
     setCollections,
-    setAssistants
+    setAssistants,
+    setTools,
+    setModels,
+    setAssistantImages
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -83,17 +126,108 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     Tables<"workspaces">[]
   >([])
 
+  // Collections Render State
+  const [startingCollectionFiles, setStartingCollectionFiles] = useState<
+    CollectionFile[]
+  >([])
+  const [selectedCollectionFiles, setSelectedCollectionFiles] = useState<
+    CollectionFile[]
+  >([])
+
+  // Assistants Render State
+  const [startingAssistantFiles, setStartingAssistantFiles] = useState<
+    Tables<"files">[]
+  >([])
+  const [startingAssistantCollections, setStartingAssistantCollections] =
+    useState<Tables<"collections">[]>([])
+  const [startingAssistantTools, setStartingAssistantTools] = useState<
+    Tables<"tools">[]
+  >([])
+  const [selectedAssistantFiles, setSelectedAssistantFiles] = useState<
+    Tables<"files">[]
+  >([])
+  const [selectedAssistantCollections, setSelectedAssistantCollections] =
+    useState<Tables<"collections">[]>([])
+  const [selectedAssistantTools, setSelectedAssistantTools] = useState<
+    Tables<"tools">[]
+  >([])
+
   useEffect(() => {
     if (isOpen) {
       const fetchData = async () => {
-        const workspaces = await fetchSelectedWorkspaces()
-        setStartingWorkspaces(workspaces)
-        setSelectedWorkspaces(workspaces)
+        if (workspaces.length > 1) {
+          const workspaces = await fetchSelectedWorkspaces()
+          setStartingWorkspaces(workspaces)
+          setSelectedWorkspaces(workspaces)
+        }
+
+        const fetchDataFunction = fetchDataFunctions[contentType]
+        if (!fetchDataFunction) return
+        await fetchDataFunction(item.id)
       }
 
       fetchData()
     }
   }, [isOpen])
+
+  const renderState = {
+    chats: null,
+    presets: null,
+    prompts: null,
+    files: null,
+    collections: {
+      startingCollectionFiles,
+      setStartingCollectionFiles,
+      selectedCollectionFiles,
+      setSelectedCollectionFiles
+    },
+    assistants: {
+      startingAssistantFiles,
+      setStartingAssistantFiles,
+      startingAssistantCollections,
+      setStartingAssistantCollections,
+      startingAssistantTools,
+      setStartingAssistantTools,
+      selectedAssistantFiles,
+      setSelectedAssistantFiles,
+      selectedAssistantCollections,
+      setSelectedAssistantCollections,
+      selectedAssistantTools,
+      setSelectedAssistantTools
+    },
+    tools: null,
+    models: null
+  }
+
+  const fetchDataFunctions = {
+    chats: null,
+    presets: null,
+    prompts: null,
+    files: null,
+    collections: async (collectionId: string) => {
+      const collectionFiles =
+        await getCollectionFilesByCollectionId(collectionId)
+      setStartingCollectionFiles(collectionFiles.files)
+      setSelectedCollectionFiles([])
+    },
+    assistants: async (assistantId: string) => {
+      const assistantFiles = await getAssistantFilesByAssistantId(assistantId)
+      setStartingAssistantFiles(assistantFiles.files)
+
+      const assistantCollections =
+        await getAssistantCollectionsByAssistantId(assistantId)
+      setStartingAssistantCollections(assistantCollections.collections)
+
+      const assistantTools = await getAssistantToolsByAssistantId(assistantId)
+      setStartingAssistantTools(assistantTools.tools)
+
+      setSelectedAssistantFiles([])
+      setSelectedAssistantCollections([])
+      setSelectedAssistantTools([])
+    },
+    tools: null,
+    models: null
+  }
 
   const fetchWorkpaceFunctions = {
     chats: null,
@@ -115,6 +249,14 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     assistants: async (assistantId: string) => {
       const item = await getAssistantWorkspacesByAssistantId(assistantId)
+      return item.workspaces
+    },
+    tools: async (toolId: string) => {
+      const item = await getToolWorkspacesByToolId(toolId)
+      return item.workspaces
+    },
+    models: async (modelId: string) => {
+      const item = await getModelWorkspacesByModelId(modelId)
       return item.workspaces
     }
   }
@@ -229,19 +371,37 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     collections: async (
       collectionId: string,
-      updateState: {
-        image: File
-        collectionFilesToAdd: string[]
-        collectionFilesToRemove: string[]
-      } & TablesUpdate<"assistants">
+      updateState: TablesUpdate<"assistants">
     ) => {
-      const { image, collectionFilesToAdd, collectionFilesToRemove, ...rest } =
-        updateState
+      if (!profile) return
 
-      // add files
-      // remove files
+      const { ...rest } = updateState
 
-      // TODO deletes image
+      const filesToAdd = selectedCollectionFiles.filter(
+        selectedFile =>
+          !startingCollectionFiles.some(
+            startingFile => startingFile.id === selectedFile.id
+          )
+      )
+
+      const filesToRemove = startingCollectionFiles.filter(startingFile =>
+        selectedCollectionFiles.some(
+          selectedFile => selectedFile.id === startingFile.id
+        )
+      )
+
+      for (const file of filesToAdd) {
+        await createCollectionFile({
+          user_id: item.user_id,
+          collection_id: collectionId,
+          file_id: file.id
+        })
+      }
+
+      for (const file of filesToRemove) {
+        await deleteCollectionFile(collectionId, file.id)
+      }
+
       const updatedCollection = await updateCollection(collectionId, rest)
 
       await handleWorkspaceUpdates(
@@ -258,16 +418,116 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     assistants: async (
       assistantId: string,
       updateState: {
+        assistantId: string
         image: File
       } & TablesUpdate<"assistants">
     ) => {
       const { image, ...rest } = updateState
 
-      const updatedAssistant = await updateAssistant(assistantId, rest)
+      const filesToAdd = selectedAssistantFiles.filter(
+        selectedFile =>
+          !startingAssistantFiles.some(
+            startingFile => startingFile.id === selectedFile.id
+          )
+      )
 
-      // TODO deletes
+      const filesToRemove = startingAssistantFiles.filter(startingFile =>
+        selectedAssistantFiles.some(
+          selectedFile => selectedFile.id === startingFile.id
+        )
+      )
+
+      for (const file of filesToAdd) {
+        await createAssistantFile({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          file_id: file.id
+        })
+      }
+
+      for (const file of filesToRemove) {
+        await deleteAssistantFile(assistantId, file.id)
+      }
+
+      const collectionsToAdd = selectedAssistantCollections.filter(
+        selectedCollection =>
+          !startingAssistantCollections.some(
+            startingCollection =>
+              startingCollection.id === selectedCollection.id
+          )
+      )
+
+      const collectionsToRemove = startingAssistantCollections.filter(
+        startingCollection =>
+          selectedAssistantCollections.some(
+            selectedCollection =>
+              selectedCollection.id === startingCollection.id
+          )
+      )
+
+      for (const collection of collectionsToAdd) {
+        await createAssistantCollection({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          collection_id: collection.id
+        })
+      }
+
+      for (const collection of collectionsToRemove) {
+        await deleteAssistantCollection(assistantId, collection.id)
+      }
+
+      const toolsToAdd = selectedAssistantTools.filter(
+        selectedTool =>
+          !startingAssistantTools.some(
+            startingTool => startingTool.id === selectedTool.id
+          )
+      )
+
+      const toolsToRemove = startingAssistantTools.filter(startingTool =>
+        selectedAssistantTools.some(
+          selectedTool => selectedTool.id === startingTool.id
+        )
+      )
+
+      for (const tool of toolsToAdd) {
+        await createAssistantTool({
+          user_id: item.user_id,
+          assistant_id: assistantId,
+          tool_id: tool.id
+        })
+      }
+
+      for (const tool of toolsToRemove) {
+        await deleteAssistantTool(assistantId, tool.id)
+      }
+
+      let updatedAssistant = await updateAssistant(assistantId, rest)
+
       if (image) {
-        await uploadAssistantImage(updatedAssistant, image)
+        const filePath = await uploadAssistantImage(updatedAssistant, image)
+
+        updatedAssistant = await updateAssistant(assistantId, {
+          image_path: filePath
+        })
+
+        const url = (await getAssistantImageFromStorage(filePath)) || ""
+
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: updatedAssistant.id,
+              path: filePath,
+              base64,
+              url
+            }
+          ])
+        }
       }
 
       await handleWorkspaceUpdates(
@@ -280,6 +540,34 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedAssistant
+    },
+    tools: async (toolId: string, updateState: TablesUpdate<"tools">) => {
+      const updatedTool = await updateTool(toolId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        toolId,
+        deleteToolWorkspace,
+        createToolWorkspaces as any,
+        "tool_id"
+      )
+
+      return updatedTool
+    },
+    models: async (modelId: string, updateState: TablesUpdate<"models">) => {
+      const updatedModel = await updateModel(modelId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        modelId,
+        deleteModelWorkspace,
+        createModelWorkspaces as any,
+        "model_id"
+      )
+
+      return updatedModel
     }
   }
 
@@ -289,24 +577,33 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     prompts: setPrompts,
     files: setFiles,
     collections: setCollections,
-    assistants: setAssistants
+    assistants: setAssistants,
+    tools: setTools,
+    models: setModels
   }
 
   const handleUpdate = async () => {
-    const updateFunction = updateFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
+    try {
+      const updateFunction = updateFunctions[contentType]
+      const setStateFunction = stateUpdateFunctions[contentType]
 
-    if (!updateFunction || !setStateFunction) return
+      if (!updateFunction || !setStateFunction) return
+      if (isTyping) return // Prevent update while typing
 
-    const updatedItem = await updateFunction(item.id, updateState)
+      const updatedItem = await updateFunction(item.id, updateState)
 
-    setStateFunction((prevItems: any) =>
-      prevItems.map((prevItem: any) =>
-        prevItem.id === item.id ? updatedItem : prevItem
+      setStateFunction((prevItems: any) =>
+        prevItems.map((prevItem: any) =>
+          prevItem.id === item.id ? updatedItem : prevItem
+        )
       )
-    )
 
-    setIsOpen(false)
+      setIsOpen(false)
+
+      toast.success(`${contentType.slice(0, -1)} updated successfully`)
+    } catch (error) {
+      toast.error(`Error updating ${contentType.slice(0, -1)}. ${error}`)
+    }
   }
 
   const handleSelectWorkspace = (workspace: Tables<"workspaces">) => {
@@ -326,44 +623,45 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isTyping && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       buttonRef.current?.click()
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>{children}</SheetTrigger>
 
-      <DialogContent onKeyDown={handleKeyDown}>
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Edit {contentType.slice(0, -1)}
-          </DialogTitle>
-        </DialogHeader>
+      <SheetContent
+        className="flex min-w-[450px] flex-col justify-between"
+        side="left"
+        onKeyDown={handleKeyDown}
+      >
+        <div className="grow overflow-auto">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-bold">
+              Edit {contentType.slice(0, -1)}
+            </SheetTitle>
+          </SheetHeader>
 
-        {/* TODO */}
-        {/* <div className="absolute right-4 top-4">
-          <ShareMenu item={item} contentType={contentType} />
-        </div> */}
+          <div className="mt-4 space-y-3">
+            {workspaces.length > 1 && (
+              <div className="space-y-1">
+                <Label>Assigned Workspaces</Label>
 
-        <div className="space-y-3">
-          {workspaces.length > 1 && (
-            <div className="space-y-1">
-              <Label>Assigned Workspaces</Label>
+                <AssignWorkspaces
+                  selectedWorkspaces={selectedWorkspaces}
+                  onSelectWorkspace={handleSelectWorkspace}
+                />
+              </div>
+            )}
 
-              <AssignWorkspaces
-                selectedWorkspaces={selectedWorkspaces}
-                onSelectWorkspace={handleSelectWorkspace}
-              />
-            </div>
-          )}
-
-          {renderInputs()}
+            {renderInputs(renderState[contentType])}
+          </div>
         </div>
 
-        <DialogFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mt-2 flex justify-between">
           <SidebarDeleteItem item={item} contentType={contentType} />
 
           <div className="flex grow justify-end space-x-2">
@@ -375,8 +673,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               Save
             </Button>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

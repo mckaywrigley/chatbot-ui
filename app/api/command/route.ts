@@ -1,5 +1,5 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import OpenAI from "openai"
 
 export const runtime = "edge"
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       ],
       temperature: 0,
       max_tokens:
-        CHAT_SETTING_LIMITS["gpt-4-1106-preview"].MAX_TOKEN_OUTPUT_LENGTH
+        CHAT_SETTING_LIMITS["gpt-4-turbo-preview"].MAX_TOKEN_OUTPUT_LENGTH
       //   response_format: { type: "json_object" }
       //   stream: true
     })

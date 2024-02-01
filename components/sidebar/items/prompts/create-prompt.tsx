@@ -17,7 +17,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
   onOpenChange
 }) => {
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
-
+  const [isTyping, setIsTyping] = useState(false)
   const [name, setName] = useState("")
   const [content, setContent] = useState("")
 
@@ -28,6 +28,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
     <SidebarCreateItem
       contentType="prompts"
       isOpen={isOpen}
+      isTyping={isTyping}
       onOpenChange={onOpenChange}
       createState={
         {
@@ -46,6 +47,8 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={PROMPT_NAME_MAX}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
             />
           </div>
 
@@ -53,11 +56,13 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
             <Label>Prompt</Label>
 
             <TextareaAutosize
-              placeholder="Prompt..."
+              placeholder="Prompt content..."
               value={content}
               onValueChange={setContent}
               minRows={6}
               maxRows={20}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
             />
           </div>
         </>

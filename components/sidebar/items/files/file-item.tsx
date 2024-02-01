@@ -13,6 +13,7 @@ interface FileItemProps {
 
 export const FileItem: FC<FileItemProps> = ({ file }) => {
   const [name, setName] = useState(file.name)
+  const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(file.description)
 
   const getLinkAndView = async () => {
@@ -23,6 +24,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
   return (
     <SidebarItem
       item={file}
+      isTyping={isTyping}
       contentType="files"
       icon={<FileIcon type={file.type} size={30} />}
       updateState={{ name }}

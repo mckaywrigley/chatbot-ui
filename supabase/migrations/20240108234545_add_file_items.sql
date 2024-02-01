@@ -32,7 +32,6 @@ CREATE INDEX file_items_embedding_idx ON file_items
 CREATE INDEX file_items_local_embedding_idx ON file_items
   USING hnsw (local_embedding vector_cosine_ops);
 
-
 -- RLS
 
 ALTER TABLE file_items ENABLE ROW LEVEL SECURITY;

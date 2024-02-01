@@ -1,5 +1,7 @@
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
 
 export const runtime = "edge"
 
@@ -13,54 +15,35 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
-    checkApiKey(profile.anthropic_api_key, "Anthropic")
+    checkApiKey(profile.perplexity_api_key, "Perplexity")
 
-    const response = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${profile.perplexity_api_key}`
-      },
-      body: JSON.stringify({
-        model: chatSettings.model,
-        messages: messages,
-        temperature: chatSettings.temperature,
-        stream: true
-      })
+    // Perplexity is compatible the OpenAI SDK
+    const perplexity = new OpenAI({
+      apiKey: profile.perplexity_api_key || "",
+      baseURL: "https://api.perplexity.ai/"
     })
 
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        if (!response.body) {
-          throw new Error("No response body!")
-        }
-
-        const reader = response.body.getReader()
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            controller.close()
-            break
-          }
-          const chunk = new TextDecoder("utf-8").decode(value)
-
-          const data = chunk.split("data: ")[1]
-          if (data) {
-            const parsedData = JSON.parse(data)
-            const messageContent = parsedData.choices[0].delta.content
-            controller.enqueue(new TextEncoder().encode(messageContent))
-          }
-        }
-      }
+    const response = await perplexity.chat.completions.create({
+      model: chatSettings.model,
+      messages,
+      stream: true
     })
 
-    return new Response(readableStream, {
-      headers: { "Content-Type": "text/plain" }
-    })
+    const stream = OpenAIStream(response)
+
+    return new StreamingTextResponse(stream)
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "Perplexity API Key not found. Please set it in your profile settings."
+    } else if (errorCode === 401) {
+      errorMessage =
+        "Perplexity API Key is incorrect. Please fix it in your profile settings."
+    }
+
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

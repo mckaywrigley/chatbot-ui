@@ -17,6 +17,7 @@ export interface ChatPayload {
   chatMessages: ChatMessage[]
   assistant: Tables<"assistants"> | null
   messageFileItems: Tables<"file_items">[]
+  chatFileItems: Tables<"file_items">[]
 }
 
 export interface ChatAPIPayload {

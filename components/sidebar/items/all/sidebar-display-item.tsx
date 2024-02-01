@@ -9,10 +9,11 @@ import { SidebarUpdateItem } from "./sidebar-update-item"
 
 interface SidebarItemProps {
   item: DataItemType
+  isTyping: boolean
   contentType: ContentType
   icon: React.ReactNode
   updateState: any
-  renderInputs: () => JSX.Element
+  renderInputs: (renderState: any) => JSX.Element
 }
 
 export const SidebarItem: FC<SidebarItemProps> = ({
@@ -20,7 +21,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   contentType,
   updateState,
   renderInputs,
-  icon
+  icon,
+  isTyping
 }) => {
   const { selectedWorkspace, setChats, setSelectedAssistant } =
     useContext(ChatbotUIContext)
@@ -58,8 +60,10 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       setChats(prevState => [createdChat, ...prevState])
       setSelectedAssistant(assistant)
 
-      router.push(`/chat/${createdChat.id}`)
-    }
+      return router.push(`/chat/${createdChat.id}`)
+    },
+    tools: async (item: any) => {},
+    models: async (item: any) => {}
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -82,6 +86,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   return (
     <SidebarUpdateItem
       item={item}
+      isTyping={isTyping}
       contentType={contentType}
       updateState={updateState}
       renderInputs={renderInputs}

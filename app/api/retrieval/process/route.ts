@@ -1,13 +1,12 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { processCSV } from "@/lib/retrieval/processing/csv"
-import { processDoc } from "@/lib/retrieval/processing/doc"
-import { processDocX } from "@/lib/retrieval/processing/docx"
-import { processHTML } from "@/lib/retrieval/processing/html"
-import { processJSON } from "@/lib/retrieval/processing/json"
-import { processMarkdown } from "@/lib/retrieval/processing/md"
-import { processPdf } from "@/lib/retrieval/processing/pdf"
-import { processTxt } from "@/lib/retrieval/processing/txt"
-import { checkApiKey, getServerProfile } from "@/lib/server-chat-helpers"
+import {
+  processCSV,
+  processJSON,
+  processMarkdown,
+  processPdf,
+  processTxt
+} from "@/lib/retrieval/processing"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
@@ -23,8 +22,6 @@ export async function POST(req: Request) {
 
     const profile = await getServerProfile()
 
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
     const formData = await req.formData()
 
     const file = formData.get("file") as File
@@ -35,21 +32,19 @@ export async function POST(req: Request) {
     const blob = new Blob([fileBuffer])
     const fileExtension = file.name.split(".").pop()?.toLowerCase()
 
+    if (embeddingsProvider === "openai") {
+      if (profile.use_azure_openai) {
+        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+      } else {
+        checkApiKey(profile.openai_api_key, "OpenAI")
+      }
+    }
+
     let chunks: FileItemChunk[] = []
 
     switch (fileExtension) {
       case "csv":
         chunks = await processCSV(blob)
-        break
-      case "doc":
-        chunks = await processDoc(blob)
-        break
-      case "docx":
-        console.log("docx")
-        chunks = await processDocX(blob)
-        break
-      case "html":
-        chunks = await processHTML(blob)
         break
       case "json":
         chunks = await processJSON(blob)
@@ -58,7 +53,6 @@ export async function POST(req: Request) {
         chunks = await processMarkdown(blob)
         break
       case "pdf":
-        console.log("pdf")
         chunks = await processPdf(blob)
         break
       case "txt":
@@ -72,14 +66,24 @@ export async function POST(req: Request) {
 
     let embeddings: any = []
 
-    if (embeddingsProvider === "openai") {
-      const openai = new OpenAI({
+    let openai
+    if (profile.use_azure_openai) {
+      openai = new OpenAI({
+        apiKey: profile.azure_openai_api_key || "",
+        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
+        defaultQuery: { "api-version": "2023-07-01-preview" },
+        defaultHeaders: { "api-key": profile.azure_openai_api_key }
+      })
+    } else {
+      openai = new OpenAI({
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id
       })
+    }
 
+    if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
-        model: "text-embedding-ada-002",
+        model: "text-embedding-3-small",
         input: chunks.map(chunk => chunk.content)
       })
 
@@ -92,19 +96,13 @@ export async function POST(req: Request) {
           return await generateLocalEmbedding(chunk.content)
         } catch (error) {
           console.error(`Error generating embedding for chunk: ${chunk}`, error)
+
           return null
         }
       })
 
       embeddings = await Promise.all(embeddingPromises)
     }
-
-    console.log(
-      embeddings[0],
-      "embeddings",
-      embeddingsProvider,
-      embeddings.length
-    )
 
     const file_items = chunks.map((chunk, index) => ({
       file_id,
@@ -121,13 +119,7 @@ export async function POST(req: Request) {
           : null
     }))
 
-    const { data: fileItemData, error: fileItemError } = await supabaseAdmin
-      .from("file_items")
-      .upsert(file_items)
-
-    if (fileItemError) {
-      console.log("fileItemError", fileItemError)
-    }
+    await supabaseAdmin.from("file_items").upsert(file_items)
 
     const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
 
@@ -140,7 +132,6 @@ export async function POST(req: Request) {
       status: 200
     })
   } catch (error: any) {
-    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
