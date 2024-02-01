@@ -436,7 +436,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
               <div className="flex items-center space-y-1">
-                <Label className="mr-4">Advanced settings</Label>
+                <Label className="mr-4">Advanced AI interface</Label>
 
                 <Switch
                   checked={advancedSettings ?? false}

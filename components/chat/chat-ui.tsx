@@ -36,7 +36,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
-    setUseRetrieval
+    setUseRetrieval,
+    profile
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -191,7 +192,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        <ChatSecondaryButtons />
+        {profile?.advanced_settings && <ChatSecondaryButtons />}
       </div>
 
       <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-20 font-bold">
