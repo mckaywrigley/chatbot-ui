@@ -40,6 +40,11 @@ seed.sql
 .VSCodeCounter
 tool-schemas
 
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
+
 # idea
 .idea
 .vscode

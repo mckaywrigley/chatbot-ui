@@ -127,7 +127,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               {selectedModel ? (
                 <>
                   <ModelIcon
-                    modelId={selectedModel?.modelId as LLMID}
+                    provider={selectedModel?.provider}
                     width={26}
                     height={26}
                   />
