@@ -1393,7 +1393,6 @@ export interface Database {
           description: string
           embeddings_provider: string
           id: string
-          image_path: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
           instructions: string
@@ -1412,7 +1411,6 @@ export interface Database {
           description: string
           embeddings_provider: string
           id?: string
-          image_path?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
           instructions: string
@@ -1431,7 +1429,6 @@ export interface Database {
           description?: string
           embeddings_provider?: string
           id?: string
-          image_path?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
           instructions?: string
@@ -1529,12 +1526,6 @@ export interface Database {
         Returns: boolean
       }
       non_private_file_exists: {
-        Args: {
-          p_name: string
-        }
-        Returns: boolean
-      }
-      non_private_workspace_exists: {
         Args: {
           p_name: string
         }
