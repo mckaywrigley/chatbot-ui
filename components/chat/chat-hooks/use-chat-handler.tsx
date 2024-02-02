@@ -73,6 +73,12 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
 
+  useEffect(() => {
+    if (!isPromptPickerOpen || !isAtPickerOpen || !isToolPickerOpen) {
+      chatInputRef.current?.focus()
+    }
+  }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
+
   const handleNewChat = async () => {
     if (!selectedWorkspace) return
 

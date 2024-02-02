@@ -16,6 +16,7 @@ interface APIStepProps {
   googleGeminiAPIKey: string
   mistralAPIKey: string
   perplexityAPIKey: string
+  zhipuAPIKey: string
   useAzureOpenai: boolean
   openrouterAPIKey: string
   onOpenrouterAPIKeyChange: (value: string) => void
@@ -31,6 +32,7 @@ interface APIStepProps {
   onGoogleGeminiAPIKeyChange: (value: string) => void
   onMistralAPIKeyChange: (value: string) => void
   onPerplexityAPIKeyChange: (value: string) => void
+  onZhipuAPIKeyChange: (value: string) => void
   onUseAzureOpenaiChange: (value: boolean) => void
 }
 
@@ -48,6 +50,7 @@ export const APIStep: FC<APIStepProps> = ({
   mistralAPIKey,
   perplexityAPIKey,
   openrouterAPIKey,
+  zhipuAPIKey,
   useAzureOpenai,
   onOpenaiAPIKeyChange,
   onOpenaiOrgIDChange,
@@ -61,6 +64,7 @@ export const APIStep: FC<APIStepProps> = ({
   onGoogleGeminiAPIKeyChange,
   onMistralAPIKeyChange,
   onPerplexityAPIKeyChange,
+  onZhipuAPIKeyChange,
   onUseAzureOpenaiChange,
   onOpenrouterAPIKeyChange
 }) => {
@@ -221,6 +225,16 @@ export const APIStep: FC<APIStepProps> = ({
           type="password"
           value={openrouterAPIKey}
           onChange={e => onOpenrouterAPIKeyChange(e.target.value)}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label>Zhipu API Key</Label>
+
+        <Input
+          placeholder="OpenRouter API Key"
+          type="password"
+          value={zhipuAPIKey}
+          onChange={e => onZhipuAPIKeyChange(e.target.value)}
         />
       </div>
     </>

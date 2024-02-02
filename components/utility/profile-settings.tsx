@@ -117,6 +117,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [zhipuAPIKey, setZhipuAPIKey] = useState(profile?.zhipu_api_key || "")
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -148,6 +150,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       google_gemini_api_key: googleGeminiAPIKey,
       mistral_api_key: mistralAPIKey,
       perplexity_api_key: perplexityAPIKey,
+      zhipu_api_key: zhipuAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
@@ -169,7 +172,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       "anthropic",
       "mistral",
       "perplexity",
-      "openrouter"
+      "openrouter",
+      "zhipu"
     ]
 
     providers.forEach(async provider => {
@@ -700,6 +704,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={openrouterAPIKey}
                       onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["zhipu"] ? (
+                  <Label>Zhipu API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Zhipu API Key</Label>
+                    <Input
+                      placeholder="Zhipu API Key"
+                      type="password"
+                      value={zhipuAPIKey}
+                      onChange={e => setZhipuAPIKey(e.target.value)}
                     />
                   </>
                 )}

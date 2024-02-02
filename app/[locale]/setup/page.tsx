@@ -59,6 +59,7 @@ export default function SetupPage() {
   const [mistralAPIKey, setMistralAPIKey] = useState("")
   const [perplexityAPIKey, setPerplexityAPIKey] = useState("")
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState("")
+  const [zhipuAPIKey, setZhipuAPIKey] = useState("")
 
   useEffect(() => {
     ;(async () => {
@@ -131,6 +132,7 @@ export default function SetupPage() {
       mistral_api_key: mistralAPIKey,
       perplexity_api_key: perplexityAPIKey,
       openrouter_api_key: openrouterAPIKey,
+      zhipu_api_key: zhipuAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
@@ -201,6 +203,7 @@ export default function SetupPage() {
               googleGeminiAPIKey={googleGeminiAPIKey}
               mistralAPIKey={mistralAPIKey}
               perplexityAPIKey={perplexityAPIKey}
+              zhipuAPIKey={zhipuAPIKey}
               useAzureOpenai={useAzureOpenai}
               onOpenaiAPIKeyChange={setOpenaiAPIKey}
               onOpenaiOrgIDChange={setOpenaiOrgID}
@@ -214,6 +217,7 @@ export default function SetupPage() {
               onGoogleGeminiAPIKeyChange={setGoogleGeminiAPIKey}
               onMistralAPIKeyChange={setMistralAPIKey}
               onPerplexityAPIKeyChange={setPerplexityAPIKey}
+              onZhipuAPIKeyChange={setZhipuAPIKey}
               onUseAzureOpenaiChange={setUseAzureOpenai}
               openrouterAPIKey={openrouterAPIKey}
               onOpenrouterAPIKeyChange={setOpenrouterAPIKey}
