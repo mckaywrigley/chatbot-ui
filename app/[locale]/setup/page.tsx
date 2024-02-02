@@ -150,7 +150,7 @@ export default function SetupPage() {
     setSelectedWorkspace(homeWorkspace!)
     setWorkspaces(workspaces)
 
-    router.refresh()
+    return router.push(`/${homeWorkspace?.id}/chat`)
   }
 
   const renderStep = (stepNum: number) => {

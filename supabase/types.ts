@@ -1274,44 +1274,6 @@ export interface Database {
           }
         ]
       }
-      public_profiles: {
-        Row: {
-          bio: string
-          created_at: string
-          id: string
-          image_path: string
-          image_url: string
-          updated_at: string | null
-          username: string
-        }
-        Insert: {
-          bio: string
-          created_at?: string
-          id: string
-          image_path: string
-          image_url: string
-          updated_at?: string | null
-          username: string
-        }
-        Update: {
-          bio?: string
-          created_at?: string
-          id?: string
-          image_path?: string
-          image_url?: string
-          updated_at?: string | null
-          username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       tool_workspaces: {
         Row: {
           created_at: string
