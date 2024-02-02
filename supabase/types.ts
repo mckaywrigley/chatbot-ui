@@ -1274,6 +1274,56 @@ export interface Database {
           }
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          canceled_at: string | null
+          created_at: string
+          customer_id: string
+          ended_at: string | null
+          id: string
+          start_date: string | null
+          status: string
+          subscription_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          customer_id: string
+          ended_at?: string | null
+          id?: string
+          start_date?: string | null
+          status: string
+          subscription_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          customer_id?: string
+          ended_at?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          subscription_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       tool_workspaces: {
         Row: {
           created_at: string

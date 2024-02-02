@@ -17,6 +17,9 @@ interface ChatbotUIContext {
   profile: Tables<"profiles"> | null
   setProfile: Dispatch<SetStateAction<Tables<"profiles"> | null>>
 
+  // SUBSCRIPTION STORE
+  subscription: Tables<"subscriptions"> | null
+
   // ITEMS STORE
   assistants: Tables<"assistants">[]
   setAssistants: Dispatch<SetStateAction<Tables<"assistants">[]>>
@@ -136,6 +139,9 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // PROFILE STORE
   profile: null,
   setProfile: () => {},
+
+  // SUBSCRIPTION STORE
+  subscription: null,
 
   // ITEMS STORE
   assistants: [],

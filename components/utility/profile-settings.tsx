@@ -42,6 +42,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
+import { SubscriptionTab } from "./profile-tabs/subscription-tab"
 
 interface ProfileSettingsProps {}
 
@@ -331,8 +332,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-1">
+            <TabsList className="mt-4 grid w-full grid-cols-2">
               <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="subscription">Subscription</TabsTrigger>
               {/* <TabsTrigger value="keys">API Keys</TabsTrigger> */}
             </TabsList>
 
@@ -428,6 +430,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div> */}
             </TabsContent>
+
+            <SubscriptionTab value="subscription" />
 
             {/* <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">

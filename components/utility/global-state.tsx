@@ -15,6 +15,7 @@ import { getProfileByUserId } from "@/db/profile"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
+import { getSubscriptionByUserId } from "@/db/subscriptions"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -49,6 +50,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // PROFILE STORE
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null)
+
+  // SUBSCRIPTION STORE
+  const [subscription, setSubscription] =
+    useState<Tables<"subscriptions"> | null>(null)
 
   // ITEMS STORE
   const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
@@ -205,6 +210,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return router.push("/setup")
       }
 
+      const subscription = await getSubscriptionByUserId(user.id)
+      setSubscription(subscription)
+
       const workspaces = await getWorkspacesByUserId(user.id)
       setWorkspaces(workspaces)
 
@@ -352,6 +360,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // PROFILE STORE
         profile,
         setProfile,
+
+        // SUBSCRIPTION STORE
+        subscription,
 
         // ITEMS STORE
         assistants,
