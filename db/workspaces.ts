@@ -34,9 +34,8 @@ export const getWorkspacesByUserId = async (userId: string) => {
   const { data: workspaces, error } = await supabase
     .from("workspaces")
     .select("*")
-    .eq("user_id", userId)
+    .or(`user_id.eq.${userId},sharing.neq.private`)
     .order("created_at", { ascending: false })
-
   if (!workspaces) {
     throw new Error(error.message)
   }
