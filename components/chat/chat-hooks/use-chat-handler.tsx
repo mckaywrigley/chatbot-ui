@@ -1,7 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { getHomeWorkspaceByUserId } from "@/db/workspaces"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
@@ -75,7 +74,7 @@ export const useChatHandler = () => {
   }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
 
   const handleNewChat = async () => {
-    if (!profile) return
+    if (!selectedWorkspace) return
 
     setUserInput("")
     setChatMessages([])
@@ -141,8 +140,7 @@ export const useChatHandler = () => {
       })
     }
 
-    const homeWorkspaceId = await getHomeWorkspaceByUserId(profile?.user_id)
-    return router.push(`/${homeWorkspaceId}/chat`)
+    return router.push(`/${selectedWorkspace.id}/chat`)
   }
 
   const handleFocusChatInput = () => {
