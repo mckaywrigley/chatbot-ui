@@ -57,7 +57,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
 
             <Link
               className="cursor-pointer hover:opacity-50"
-              href="/help"
+              href="/aboutus"
               target="_blank"
               rel="noopener noreferrer"
             >
