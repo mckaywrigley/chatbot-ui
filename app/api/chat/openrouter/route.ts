@@ -1,6 +1,5 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { ErrorResponse, ErrorResponseSchema } from "@/types/error-response"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 import OpenAI from "openai"
@@ -36,18 +35,14 @@ export async function POST(request: Request) {
     const stream = OpenAIStream(response)
 
     return new StreamingTextResponse(stream)
-  } catch (e: ErrorResponse | any) {
-    const { error } = await ErrorResponseSchema.parseAsync(e).catch(e => {
-      // If the error is not an ErrorResponse try pulling the error code and message from the standard error object, otherwise return default error
-      return ErrorResponseSchema.parse({
-        error: {
-          message: e.message,
-          code: e.status
-        }
-      })
-    })
-    const errorCode = error.code
-    const errorMessage = error.message
+  } catch (error: any) {
+    let errorMessage = error.message || "An unexpected error occurred"
+    const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "OpenRouter API Key not found. Please set it in your profile settings."
+    }
 
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

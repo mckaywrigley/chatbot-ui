@@ -8,6 +8,7 @@ import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
 import { CreateFile } from "./items/files/create-file"
+import { CreateModel } from "./items/models/create-model"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
@@ -31,6 +32,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
   const [isCreatingTool, setIsCreatingTool] = useState(false)
+  const [isCreatingModel, setIsCreatingModel] = useState(false)
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -81,6 +83,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       case "tools":
         return async () => {
           setIsCreatingTool(true)
+        }
+
+      case "models":
+        return async () => {
+          setIsCreatingModel(true)
         }
 
       default:
@@ -137,6 +144,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
 
       {isCreatingTool && (
         <CreateTool isOpen={isCreatingTool} onOpenChange={setIsCreatingTool} />
+      )}
+
+      {isCreatingModel && (
+        <CreateModel
+          isOpen={isCreatingModel}
+          onOpenChange={setIsCreatingModel}
+        />
       )}
     </div>
   )

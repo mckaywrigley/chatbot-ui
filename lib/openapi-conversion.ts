@@ -1,117 +1,93 @@
-import OpenAI from "openai"
-
-interface Parameter {
-  name: string
-  in: string
-  description: string
-  required: boolean
-  schema: { type: string }
-}
+import $RefParser from "@apidevtools/json-schema-ref-parser"
 
 interface OpenAPIData {
-  title: string
-  description: string
-  url: string
+  info: {
+    title: string
+    description: string
+    server: string
+  }
   routes: {
     path: string
-    methods: {
-      method: string
-      description: string
-      operationId: string
-      params: {
-        name: string
-        location: string
-        description: string
-        required: boolean
-        schema: { type: string }
-      }[]
-    }[]
+    method: string
+    operationId: string
   }[]
+  functions: any
 }
 
-export const extractOpenapiData = (schema: string): OpenAPIData => {
-  const schemaObject = JSON.parse(schema)
+export const openapiToFunctions = async (
+  openapiSpec: any
+): Promise<OpenAPIData> => {
+  const functions: any[] = [] // Define a proper type for function objects
+  const routes: { path: string; method: string; operationId: string }[] = []
 
-  if (!schemaObject.openapi || schemaObject.openapi !== "3.1.0") {
-    throw new Error("Invalid OpenAPI schema. Only version 3.1.0 is supported.")
-  }
-
-  const title = schemaObject.info.title
-  const description = schemaObject.info.description
-  const url = schemaObject.servers[0].url
-
-  const paths = schemaObject.paths
-  const routes = Object.keys(paths).map(path => {
-    const methods = Object.keys(paths[path]).map(method => {
-      const { description, operationId, parameters } = paths[path][method]
-
-      const params = parameters.map((param: Parameter) => {
-        const { name, in: location, description, required, schema } = param
-
-        return {
-          name,
-          location,
-          description,
-          required,
-          schema
-        }
-      })
-
-      return {
-        method,
-        description,
-        operationId,
-        params
-      }
-    })
-
-    return {
-      path,
-      methods
+  for (const [path, methods] of Object.entries(openapiSpec.paths)) {
+    // Check if methods is an object
+    if (typeof methods !== "object" || methods === null) {
+      continue // Skip this iteration if methods is not an object
     }
-  })
 
-  return {
-    title,
-    description,
-    url,
-    routes
-  }
-}
+    for (const [method, specWithRef] of Object.entries(
+      methods as Record<string, any>
+    )) {
+      // 1. Resolve JSON references.
+      const spec: any = await $RefParser.dereference(specWithRef)
 
-export const openapiDataToFunctions = (data: OpenAPIData) => {
-  let functions: OpenAI.Chat.Completions.ChatCompletionTool[] = []
+      // 2. Extract a name for the functions.
+      const functionName = spec.operationId
 
-  data.routes.map(route => {
-    route.methods.map(method => {
-      let properties: any = {}
-      let required: string[] = []
+      // 3. Extract a description and parameters.
+      const desc = spec.description || spec.summary || ""
 
-      method.params.map(param => {
-        properties[param.name] = {
-          type: param.schema.type,
-          description: param.description
+      const schema: { type: string; properties: any; required?: string[] } = {
+        type: "object",
+        properties: {}
+      }
+
+      const reqBody = spec.requestBody?.content?.["application/json"]?.schema
+      if (reqBody) {
+        schema.properties.requestBody = reqBody
+      }
+
+      const params = spec.parameters || []
+      if (params.length > 0) {
+        const paramProperties = params.reduce((acc: any, param: any) => {
+          if (param.schema) {
+            acc[param.name] = param.schema
+          }
+          return acc
+        }, {})
+
+        schema.properties.parameters = {
+          type: "object",
+          properties: paramProperties
         }
-
-        if (param.required) {
-          required.push(param.name)
-        }
-      })
+      }
 
       functions.push({
         type: "function",
         function: {
-          name: method.operationId,
-          description: method.description,
-          parameters: {
-            type: "object",
-            properties: properties,
-            required: required
-          }
+          name: functionName,
+          description: desc,
+          parameters: schema
         }
       })
-    })
-  })
 
-  return functions
+      // Add route information to the routes array
+      routes.push({
+        path,
+        method,
+        operationId: functionName
+      })
+    }
+  }
+
+  return {
+    info: {
+      title: openapiSpec.info.title,
+      description: openapiSpec.info.description,
+      server: openapiSpec.servers[0].url
+    },
+    routes,
+    functions
+  }
 }
