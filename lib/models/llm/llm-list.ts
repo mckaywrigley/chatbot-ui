@@ -15,6 +15,7 @@ export const LLM_LIST: LLM[] = [
 
 export const LLM_LIST_MAP: Record<string, LLM[]> = {
   openai: OPENAI_LLM_LIST,
+  azure: OPENAI_LLM_LIST,
   google: GOOGLE_LLM_LIST,
   mistral: MISTRAL_LLM_LIST,
   perplexity: PERPLEXITY_LLM_LIST,

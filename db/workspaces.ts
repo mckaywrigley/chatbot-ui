@@ -1,6 +1,21 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 
+export const getHomeWorkspaceByUserId = async (userId: string) => {
+  const { data: homeWorkspace, error } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("is_home", true)
+    .single()
+
+  if (!homeWorkspace) {
+    throw new Error(error.message)
+  }
+
+  return homeWorkspace.id
+}
+
 export const getWorkspaceById = async (workspaceId: string) => {
   const { data: workspace, error } = await supabase
     .from("workspaces")
