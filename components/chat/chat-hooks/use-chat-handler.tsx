@@ -17,6 +17,10 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
+import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
+import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
+import { getCollectionFilesByCollectionId } from "@/db/collection-files"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -108,6 +112,37 @@ export const useChatHandler = () => {
           | "openai"
           | "local"
       })
+
+      let allFiles = []
+
+      const assistantFiles = (
+        await getAssistantFilesByAssistantId(selectedAssistant.id)
+      ).files
+      allFiles = [...assistantFiles]
+      const assistantCollections = (
+        await getAssistantCollectionsByAssistantId(selectedAssistant.id)
+      ).collections
+      for (const collection of assistantCollections) {
+        const collectionFiles = (
+          await getCollectionFilesByCollectionId(collection.id)
+        ).files
+        allFiles = [...allFiles, ...collectionFiles]
+      }
+      const assistantTools = (
+        await getAssistantToolsByAssistantId(selectedAssistant.id)
+      ).tools
+
+      setSelectedTools(assistantTools)
+      setChatFiles(
+        allFiles.map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+      )
+
+      if (allFiles.length > 0) setShowFilesDisplay(true)
     } else if (selectedPreset) {
       setChatSettings({
         model: selectedPreset.model as LLMID,
