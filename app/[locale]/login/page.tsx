@@ -212,6 +212,17 @@ export default async function Login({
           >
             Sign Up
           </Button>
+          <div className="text-muted-foreground mt-1 flex justify-center text-sm">
+            By using HackerGPT, you agree to our&nbsp;
+            <a
+              href="/terms"
+              target="_blank"
+              className="text-primary underline hover:opacity-80"
+            >
+              Terms of Use
+            </a>
+            .
+          </div>
 
           <div className="text-muted-foreground mt-1 flex justify-center text-sm">
             <span className="mr-1">Forgot your password?</span>
