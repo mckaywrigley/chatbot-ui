@@ -71,13 +71,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   }, [])
 
   useEffect(() => {
-    const isInChat = window?.location?.pathname === "/chat"
-
-    if (!selectedWorkspace && !isInChat) {
-      setLoading(false)
-      return
-    }
-
     ;(async () => await fetchWorkspaceData(workspaceId))()
 
     setUserInput("")

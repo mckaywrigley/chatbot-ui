@@ -121,17 +121,20 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [toolInUse, setToolInUse] = useState<string>("none")
 
   useEffect(() => {
-    const fetchData = async () => {
+    ;(async () => {
       const profile = await fetchStartingData()
 
       if (profile) {
-        const data = await fetchHostedModels(profile)
-        if (!data) return
+        const hostedModelRes = await fetchHostedModels(profile)
+        if (!hostedModelRes) return
 
-        setEnvKeyMap(data.envKeyMap)
-        setAvailableHostedModels(data.hostedModels)
+        setEnvKeyMap(hostedModelRes.envKeyMap)
+        setAvailableHostedModels(hostedModelRes.hostedModels)
 
-        if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+        if (
+          profile["openrouter_api_key"] ||
+          hostedModelRes.envKeyMap["openrouter"]
+        ) {
           const openRouterModels = await fetchOpenRouterModels()
           if (!openRouterModels) return
           setAvailableOpenRouterModels(openRouterModels)
@@ -143,9 +146,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         if (!localModels) return
         setAvailableLocalModels(localModels)
       }
-    }
-
-    fetchData()
+    })()
   }, [])
 
   const fetchStartingData = async () => {
