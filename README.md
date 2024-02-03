@@ -1,20 +1,13 @@
-# Chatbot UI
+# HackerGPT
 
-The open-source AI chat app for everyone.
+HackerGPT is your indispensable digital companion in the world of hacking. Crafted with the unique needs of bug bounty hunters in mind, this AI-powered assistant stands at the forefront of hacking knowledge and assistance. Equipped with an extensive database of hacking techniques, tools, and strategies, HackerGPT is more than just an information resource—it's an active participant in your hacking journey. Whether you're a beginner looking to learn the ropes or a seasoned professional seeking deeper insights, HackerGPT is your ally in navigating the ever-changing landscape of hacking challenges.
 
-<img src="./public/readme/screenshot.png" alt="Chatbot UI" width="600">
+## How does HackerGPT work?
 
-## Demo
+When you ask a question, it's sent to our server. We verify user authenticity and manage your question quota based on whether you're a free or plus user. We then search our database for information that closely matches your question. For questions not in English, we translate them to find relevant information from our database. If a strong match is found, it's incorporated into the AI's response process. Your question is then securely passed to OpenAI or OpenRouter for processing, with no personal information sent. Responses vary based on the module:
 
-View the latest demo [here](https://x.com/mckaywrigley/status/1738273242283151777?s=20).
-
-## Official Hosted Version
-
-Check back soon for an official hosted version of Chatbot UI.
-
-## Sponsor
-
-If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
+- **HackerGPT**: A tuned version of Mixtral 8x7B with semantic search on our data.
+- **GPT-4 Turbo**: The latest and greatest from OpenAI, paired with our unique prompt.
 
 ## Issues
 
@@ -33,12 +26,6 @@ We highly encourage you to participate in the "Discussions" tab above!
 Discussions are a great place to ask questions, share ideas, and get help.
 
 Odds are if you have a question, someone else has the same question.
-
-## Legacy Code
-
-Chatbot UI was recently updated to its 2.0 version.
-
-The code for 1.0 can be found on the `legacy` branch.
 
 ## Updating
 
@@ -275,6 +262,6 @@ Once deployed, you should be able to use your hosted instance of Chatbot UI via 
 
 We are working on a guide for contributing.
 
-## Contact
+## License
 
-Message Mckay on [Twitter/X](https://twitter.com/mckaywrigley)
+Licensed under the [GNU General Public License v3.0](https://github.com/Hacker-GPT/hackergpt-2v/blob/main/license)
