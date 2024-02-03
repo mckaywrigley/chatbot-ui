@@ -2,7 +2,10 @@
 
 import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId, updateProfile } from "@/db/profile"
-import { getWorkspacesByUserId } from "@/db/workspaces"
+import {
+  getHomeWorkspaceByUserId,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
 import {
   fetchHostedModels,
   fetchOpenRouterModels
@@ -86,7 +89,10 @@ export default function SetupPage() {
             setAvailableOpenRouterModels(openRouterModels)
           }
 
-          return router.push("/chat")
+          const homeWorkspaceId = await getHomeWorkspaceByUserId(
+            session.user.id
+          )
+          return router.push(`/${homeWorkspaceId}/chat`)
         }
       }
     })()
@@ -144,7 +150,7 @@ export default function SetupPage() {
     setSelectedWorkspace(homeWorkspace!)
     setWorkspaces(workspaces)
 
-    router.refresh()
+    return router.push(`/${homeWorkspace?.id}/chat`)
   }
 
   const renderStep = (stepNum: number) => {
