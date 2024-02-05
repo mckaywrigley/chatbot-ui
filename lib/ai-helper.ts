@@ -34,3 +34,37 @@ export const wordReplacements = {
   exploiting: "exploiting (I have permission)",
   exploited: "exploited (I have permission)"
 }
+
+export function updateOrAddSystemMessage(
+  messages: any[],
+  systemMessageContent: any
+) {
+  const systemInstructions = "User Instructions:\n"
+  const existingSystemMessageIndex = messages.findIndex(
+    msg => msg.role === "system"
+  )
+
+  if (existingSystemMessageIndex !== -1) {
+    // Existing system message found
+    let existingSystemMessage = messages[existingSystemMessageIndex]
+    if (!existingSystemMessage.content.includes(systemInstructions)) {
+      // Append new content if "User Instructions:" is not found
+      existingSystemMessage.content += `${systemMessageContent}` // Added a newline for separation
+    }
+    // Move the updated system message to the start
+    messages.unshift(messages.splice(existingSystemMessageIndex, 1)[0])
+  } else {
+    // No system message exists, create a new one
+    messages.unshift({
+      role: "system",
+      content: systemMessageContent
+    })
+  }
+}
+
+export type Role = "assistant" | "user" | "system"
+
+export interface Message {
+  role: Role
+  content: string
+}
