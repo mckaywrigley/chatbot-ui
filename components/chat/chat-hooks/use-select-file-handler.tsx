@@ -16,6 +16,7 @@ export const ACCEPTED_FILE_TYPES = [
 
 export const useSelectFileHandler = () => {
   const {
+    availableLocalModels,
     selectedWorkspace,
     profile,
     chatSettings,
@@ -34,14 +35,17 @@ export const useSelectFileHandler = () => {
 
   const handleFilesToAccept = () => {
     const model = chatSettings?.model
-    const FULL_MODEL = LLM_LIST.find(llm => llm.modelId === model)
+    const FULL_MODEL_PROVIDER = LLM_LIST.find(llm => llm.modelId === model)
+    const FULL_MODEL_LOCAL = availableLocalModels.find(
+      llm => llm.modelId === model
+    )
+    const isLocalModel = FULL_MODEL_PROVIDER ? false : true
+    const FULL_MODEL = FULL_MODEL_PROVIDER || FULL_MODEL_LOCAL
 
     if (!FULL_MODEL) return
 
     setFilesToAccept(
-      FULL_MODEL.imageInput
-        ? `${ACCEPTED_FILE_TYPES},image/*`
-        : ACCEPTED_FILE_TYPES
+      isLocalModel && FULL_MODEL.imageInput ? "image/*" : FULL_MODEL.imageInput ? `${ACCEPTED_FILE_TYPES},image/*` : ACCEPTED_FILE_TYPES
     )
   }
 
@@ -64,7 +68,7 @@ export const useSelectFileHandler = () => {
         } else if (
           simplifiedFileType.includes(
             "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
+            "docx"
           )
         ) {
           simplifiedFileType = "docx"
@@ -84,7 +88,7 @@ export const useSelectFileHandler = () => {
         if (
           file.type.includes(
             "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
+            "docx"
           )
         ) {
           const arrayBuffer = await file.arrayBuffer()
@@ -114,11 +118,11 @@ export const useSelectFileHandler = () => {
             prev.map(item =>
               item.id === "loading"
                 ? {
-                    id: createdFile.id,
-                    name: createdFile.name,
-                    type: createdFile.type,
-                    file: file
-                  }
+                  id: createdFile.id,
+                  name: createdFile.name,
+                  type: createdFile.type,
+                  file: file
+                }
                 : item
             )
           )
@@ -175,11 +179,11 @@ export const useSelectFileHandler = () => {
               prev.map(item =>
                 item.id === "loading"
                   ? {
-                      id: createdFile.id,
-                      name: createdFile.name,
-                      type: createdFile.type,
-                      file: file
-                    }
+                    id: createdFile.id,
+                    name: createdFile.name,
+                    type: createdFile.type,
+                    file: file
+                  }
                   : item
               )
             )
