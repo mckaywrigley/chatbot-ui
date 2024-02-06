@@ -18,9 +18,9 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 
-interface ChatInputProps {}
+interface ChatInputProps { }
 
-export const ChatInput: FC<ChatInputProps> = ({}) => {
+export const ChatInput: FC<ChatInputProps> = ({ }) => {
   const { t } = useTranslation()
 
   useHotkey("l", () => {
@@ -47,7 +47,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setFocusFile,
     chatSettings,
     selectedTools,
-    setSelectedTools
+    setSelectedTools,
+    availableLocalModels,
   } = useContext(ChatbotUIContext)
 
   const {
@@ -106,11 +107,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       setFocusTool(!focusTool)
     }
   }
+  const FULL_MODEL_PROVIDER = LLM_LIST.find(llm => llm.modelId === chatSettings?.model)
+  const FULL_MODEL_LOCAL = availableLocalModels.find(
+    llm => llm.modelId === chatSettings?.model
+  )
+  const FULL_MODEL = FULL_MODEL_PROVIDER || FULL_MODEL_LOCAL
+  const imagesAllowed = FULL_MODEL!.imageInput
 
   const handlePaste = (event: React.ClipboardEvent) => {
-    const imagesAllowed = LLM_LIST.find(
-      llm => llm.modelId === chatSettings?.model
-    )?.imageInput
     if (!imagesAllowed) return
 
     const items = event.clipboardData.items
@@ -155,25 +159,28 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           <ChatCommandInput />
         </div>
 
-        <>
-          <IconCirclePlus
-            className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
-          />
+        {
+          imagesAllowed &&
+          <>
+            <IconCirclePlus
+              className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
+              size={32}
+              onClick={() => fileInputRef.current?.click()}
+            />
 
-          {/* Hidden input to select files from device */}
-          <Input
-            ref={fileInputRef}
-            className="hidden"
-            type="file"
-            onChange={e => {
-              if (!e.target.files) return
-              handleSelectDeviceFile(e.target.files[0])
-            }}
-            accept={filesToAccept}
-          />
-        </>
+            {/* Hidden input to select files from device */}
+            <Input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              onChange={e => {
+                if (!e.target.files) return
+                handleSelectDeviceFile(e.target.files[0])
+              }}
+              accept={filesToAccept}
+            />
+          </>
+        }
 
         <TextareaAutosize
           textareaRef={chatInputRef}
