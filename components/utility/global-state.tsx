@@ -286,7 +286,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         provider: "ollama",
         hostedId: model.name,
         platformLink: "https://ollama.ai/library",
-        imageInput: false
+        imageInput: model.details.families?.includes("clip") ?? false
       }))
 
       setAvailableLocalModels(localModels)
