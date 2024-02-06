@@ -2,36 +2,25 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { Tables } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 
 // Import via bare specifier thanks to the import_map.json file.
 import Stripe from "stripe"
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-const stripe = new Stripe(process.env.STRIPE_API_KEY as string, {
-  // This is needed to use the Fetch API rather than relying on the Node http
-  // package.
-  apiVersion: "2023-10-16",
-  httpClient: Stripe.createFetchHttpClient()
-})
-// This is needed in order to use the Web Crypto API in Deno.
-const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
 export const runtime = "edge"
 
 export async function POST(request: Request) {
   const signature = request.headers.get("Stripe-Signature")
 
+  // This is needed in order to use the Web Crypto API in Deno.
+  const cryptoProvider = Stripe.createSubtleCryptoProvider()
+
   // First step is to verify the event. The .text() method must be used as the
   // verification relies on the raw request body rather than the parsed JSON.
   const body = await request.text()
   let receivedEvent
   try {
+    const stripe = getStripe()
     receivedEvent = await stripe.webhooks.constructEventAsync(
       body,
       signature!,
@@ -95,9 +84,24 @@ function unixToDateString(unix: number | null): string | null {
   return new Date(unix * 1000).toISOString()
 }
 
+function getStripe() {
+  return new Stripe(process.env.STRIPE_API_KEY as string, {
+    // This is needed to use the Fetch API rather than relying on the Node http
+    // package.
+    apiVersion: "2023-10-16",
+    httpClient: Stripe.createFetchHttpClient()
+  })
+}
+
 async function upsertSubscription(subscriptionId: string, customerId: string) {
   console.log("upsertSubscription", subscriptionId, customerId)
 
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const stripe = getStripe()
   const customer = await stripe.customers.retrieve(customerId)
   if (!customer || customer.deleted) {
     throw new Error("No customer found. customerId: " + customerId)
@@ -137,6 +141,10 @@ async function upsertSubscription(subscriptionId: string, customerId: string) {
 
 async function deleteSubscription(subscription: Stripe.Subscription) {
   console.log("deleteSubscription", subscription.id)
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   return supabaseAdmin
     .from("subscriptions")
     .delete()
