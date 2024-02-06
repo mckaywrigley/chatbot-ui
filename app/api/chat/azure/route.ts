@@ -1,4 +1,3 @@
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatAPIPayload } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
@@ -21,10 +20,10 @@ export async function POST(request: Request) {
 
     let DEPLOYMENT_ID = ""
     switch (chatSettings.model) {
-      case "gpt-3.5-turbo-1106":
+      case "gpt-3.5-turbo":
         DEPLOYMENT_ID = profile.azure_openai_35_turbo_id || ""
         break
-      case "gpt-4-1106-preview":
+      case "gpt-4-turbo-preview":
         DEPLOYMENT_ID = profile.azure_openai_45_turbo_id || ""
         break
       case "gpt-4-vision-preview":
@@ -48,7 +47,7 @@ export async function POST(request: Request) {
     const azureOpenai = new OpenAI({
       apiKey: KEY,
       baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
-      defaultQuery: { "api-version": "2023-07-01-preview" },
+      defaultQuery: { "api-version": "2023-12-01-preview" },
       defaultHeaders: { "api-key": KEY }
     })
 
@@ -56,8 +55,7 @@ export async function POST(request: Request) {
       model: DEPLOYMENT_ID as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens:
-        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+      max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null, // TODO: Fix
       stream: true
     })
 

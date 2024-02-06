@@ -2,11 +2,16 @@
 
 import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId, updateProfile } from "@/db/profile"
-import { uploadImage } from "@/db/storage/profile-images"
-import { getWorkspacesByUserId, updateWorkspace } from "@/db/workspaces"
+import {
+  getHomeWorkspaceByUserId,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
+import {
+  fetchHostedModels,
+  fetchOpenRouterModels
+} from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesUpdate } from "@/supabase/types"
-import { ChatSettings } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
 import { APIStep } from "../../../components/setup/api-step"
@@ -16,11 +21,17 @@ import {
   SETUP_STEP_COUNT,
   StepContainer
 } from "../../../components/setup/step-container"
-import { WorkspaceStep } from "../../../components/setup/workspace-step"
 
 export default function SetupPage() {
-  const { profile, setProfile, setSelectedWorkspace, setWorkspaces } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    setProfile,
+    setWorkspaces,
+    setSelectedWorkspace,
+    setEnvKeyMap,
+    setAvailableHostedModels,
+    setAvailableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
@@ -29,12 +40,9 @@ export default function SetupPage() {
   const [currentStep, setCurrentStep] = useState(1)
 
   // Profile Step
-  const [profileContext, setProfileContext] = useState("")
   const [displayName, setDisplayName] = useState("")
   const [username, setUsername] = useState(profile?.username || "")
   const [usernameAvailable, setUsernameAvailable] = useState(true)
-  const [profileImageSrc, setProfileImageSrc] = useState("")
-  const [profileImage, setProfileImage] = useState<File | null>(null)
 
   // API Step
   const [useAzureOpenai, setUseAzureOpenai] = useState(false)
@@ -45,23 +53,50 @@ export default function SetupPage() {
   const [azureOpenai35TurboID, setAzureOpenai35TurboID] = useState("")
   const [azureOpenai45TurboID, setAzureOpenai45TurboID] = useState("")
   const [azureOpenai45VisionID, setAzureOpenai45VisionID] = useState("")
+  const [azureOpenaiEmbeddingsID, setAzureOpenaiEmbeddingsID] = useState("")
   const [anthropicAPIKey, setAnthropicAPIKey] = useState("")
   const [googleGeminiAPIKey, setGoogleGeminiAPIKey] = useState("")
   const [mistralAPIKey, setMistralAPIKey] = useState("")
   const [perplexityAPIKey, setPerplexityAPIKey] = useState("")
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState("")
 
-  // Workspace Step
-  const [workspaceInstructions, setWorkspaceInstructions] = useState("")
-  const [defaultChatSettings, setDefaultChatSettings] = useState<ChatSettings>({
-    model: "gpt-4-1106-preview",
-    prompt: "You are a friendly, helpful AI assistant.",
-    temperature: 0.5,
-    contextLength: 4096,
-    includeProfileContext: true,
-    includeWorkspaceInstructions: true,
-    embeddingsProvider: "openai"
-  })
+  useEffect(() => {
+    ;(async () => {
+      const session = (await supabase.auth.getSession()).data.session
+
+      if (!session) {
+        return router.push("/login")
+      } else {
+        const user = session.user
+
+        const profile = await getProfileByUserId(user.id)
+        setProfile(profile)
+        setUsername(profile.username)
+
+        if (!profile.has_onboarded) {
+          setLoading(false)
+        } else {
+          const data = await fetchHostedModels(profile)
+
+          if (!data) return
+
+          setEnvKeyMap(data.envKeyMap)
+          setAvailableHostedModels(data.hostedModels)
+
+          if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+            const openRouterModels = await fetchOpenRouterModels()
+            if (!openRouterModels) return
+            setAvailableOpenRouterModels(openRouterModels)
+          }
+
+          const homeWorkspaceId = await getHomeWorkspaceByUserId(
+            session.user.id
+          )
+          return router.push(`/${homeWorkspaceId}/chat`)
+        }
+      }
+    })()
+  }, [])
 
   const handleShouldProceed = (proceed: boolean) => {
     if (proceed) {
@@ -76,25 +111,19 @@ export default function SetupPage() {
   }
 
   const handleSaveSetupSetting = async () => {
-    if (!profile) return
-
-    let profileImageUrl = ""
-    let profileImagePath = ""
-
-    if (profileImage) {
-      const { path, url } = await uploadImage(profile, profileImage)
-      profileImageUrl = url
-      profileImagePath = path
+    const session = (await supabase.auth.getSession()).data.session
+    if (!session) {
+      return router.push("/login")
     }
+
+    const user = session.user
+    const profile = await getProfileByUserId(user.id)
 
     const updateProfilePayload: TablesUpdate<"profiles"> = {
       ...profile,
       has_onboarded: true,
       display_name: displayName,
       username,
-      profile_context: profileContext,
-      image_url: profileImageUrl,
-      image_path: profileImageUrl,
       openai_api_key: openaiAPIKey,
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
@@ -107,42 +136,21 @@ export default function SetupPage() {
       azure_openai_endpoint: azureOpenaiEndpoint,
       azure_openai_35_turbo_id: azureOpenai35TurboID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
-      azure_openai_45_vision_id: azureOpenai45VisionID
+      azure_openai_45_vision_id: azureOpenai45VisionID,
+      azure_openai_embeddings_id: azureOpenaiEmbeddingsID
     }
 
     const updatedProfile = await updateProfile(profile.id, updateProfilePayload)
-
     setProfile(updatedProfile)
-
-    const updateHomeWorkspacePayload: TablesUpdate<"workspaces"> = {
-      default_context_length: defaultChatSettings.contextLength,
-      default_model: defaultChatSettings.model,
-      default_prompt: defaultChatSettings.prompt,
-      default_temperature: defaultChatSettings.temperature,
-      include_profile_context: defaultChatSettings.includeProfileContext,
-      include_workspace_instructions:
-        defaultChatSettings.includeWorkspaceInstructions,
-      instructions: workspaceInstructions,
-      embeddings_provider: defaultChatSettings.embeddingsProvider
-    }
 
     const workspaces = await getWorkspacesByUserId(profile.user_id)
     const homeWorkspace = workspaces.find(w => w.is_home)
 
     // There will always be a home workspace
-    const updatedWorkspace = await updateWorkspace(
-      homeWorkspace!.id,
-      updateHomeWorkspacePayload
-    )
+    setSelectedWorkspace(homeWorkspace!)
+    setWorkspaces(workspaces)
 
-    setSelectedWorkspace(updatedWorkspace)
-    setWorkspaces(
-      workspaces.map(workspace =>
-        workspace.id === updatedWorkspace.id ? updatedWorkspace : workspace
-      )
-    )
-
-    router.push("/chat")
+    return router.push(`/${homeWorkspace?.id}/chat`)
   }
 
   const renderStep = (stepNum: number) => {
@@ -155,19 +163,13 @@ export default function SetupPage() {
             stepNum={currentStep}
             stepTitle="Welcome to Chatbot UI"
             onShouldProceed={handleShouldProceed}
-            showNextButton={!!(displayName && username && usernameAvailable)}
+            showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
           >
             <ProfileStep
-              profileContext={profileContext}
-              profileImageSrc={profileImageSrc}
-              profileImage={profileImage}
               username={username}
               usernameAvailable={usernameAvailable}
               displayName={displayName}
-              onProfileContextChange={setProfileContext}
-              onProfileImageChangeSrc={setProfileImageSrc}
-              onProfileImageChange={setProfileImage}
               onUsernameAvailableChange={setUsernameAvailable}
               onUsernameChange={setUsername}
               onDisplayNameChange={setDisplayName}
@@ -181,7 +183,7 @@ export default function SetupPage() {
           <StepContainer
             stepDescription="Enter API keys for each service you'd like to use."
             stepNum={currentStep}
-            stepTitle="Set API Keys"
+            stepTitle="Set API Keys (optional)"
             onShouldProceed={handleShouldProceed}
             showNextButton={true}
             showBackButton={true}
@@ -194,6 +196,7 @@ export default function SetupPage() {
               azureOpenai35TurboID={azureOpenai35TurboID}
               azureOpenai45TurboID={azureOpenai45TurboID}
               azureOpenai45VisionID={azureOpenai45VisionID}
+              azureOpenaiEmbeddingsID={azureOpenaiEmbeddingsID}
               anthropicAPIKey={anthropicAPIKey}
               googleGeminiAPIKey={googleGeminiAPIKey}
               mistralAPIKey={mistralAPIKey}
@@ -206,6 +209,7 @@ export default function SetupPage() {
               onAzureOpenai35TurboIDChange={setAzureOpenai35TurboID}
               onAzureOpenai45TurboIDChange={setAzureOpenai45TurboID}
               onAzureOpenai45VisionIDChange={setAzureOpenai45VisionID}
+              onAzureOpenaiEmbeddingsIDChange={setAzureOpenaiEmbeddingsID}
               onAnthropicAPIKeyChange={setAnthropicAPIKey}
               onGoogleGeminiAPIKeyChange={setGoogleGeminiAPIKey}
               onMistralAPIKeyChange={setMistralAPIKey}
@@ -217,28 +221,8 @@ export default function SetupPage() {
           </StepContainer>
         )
 
-      // Workspace Step
-      case 3:
-        return (
-          <StepContainer
-            stepDescription="Select the default settings for your home workspace."
-            stepNum={currentStep}
-            stepTitle="Create Workspace"
-            onShouldProceed={handleShouldProceed}
-            showNextButton={true}
-            showBackButton={true}
-          >
-            <WorkspaceStep
-              chatSettings={defaultChatSettings}
-              workspaceInstructions={workspaceInstructions}
-              onChatSettingsChange={setDefaultChatSettings}
-              onWorkspaceInstructionsChange={setWorkspaceInstructions}
-            />
-          </StepContainer>
-        )
-
       // Finish Step
-      case 4:
+      case 3:
         return (
           <StepContainer
             stepDescription="You are all set up!"
@@ -255,28 +239,6 @@ export default function SetupPage() {
         return null
     }
   }
-
-  useEffect(() => {
-    ;(async () => {
-      const session = (await supabase.auth.getSession()).data.session
-
-      if (!session) {
-        router.push("/login")
-      } else {
-        const user = session.user
-
-        const profile = await getProfileByUserId(user.id)
-        setProfile(profile)
-        setUsername(profile.username)
-
-        if (!profile.has_onboarded) {
-          setLoading(false)
-        } else {
-          router.push("/chat")
-        }
-      }
-    })()
-  }, [])
 
   if (loading) {
     return null

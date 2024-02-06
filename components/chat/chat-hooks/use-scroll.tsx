@@ -1,5 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { useCallback, useContext, useEffect, useRef, useState } from "react"
+import { type UIEventHandler, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 export const useScroll = () => {
   const { isGenerating, chatMessages } = useContext(ChatbotUIContext)
@@ -27,13 +27,14 @@ export const useScroll = () => {
     }
   }, [chatMessages])
 
-  const handleScroll = useCallback((e: any) => {
+  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback((e) => {
+    const target = e.target as HTMLDivElement;
     const bottom =
-      Math.round(e.target.scrollHeight) - Math.round(e.target.scrollTop) ===
-      Math.round(e.target.clientHeight)
+      Math.round(target.scrollHeight) - Math.round(target.scrollTop) ===
+      Math.round(target.clientHeight)
     setIsAtBottom(bottom)
 
-    const top = e.target.scrollTop === 0
+    const top = target.scrollTop === 0
     setIsAtTop(top)
 
     if (!bottom && !isAutoScrolling.current) {
@@ -42,7 +43,7 @@ export const useScroll = () => {
       setUserScrolled(false)
     }
 
-    const isOverflow = e.target.scrollHeight > e.target.clientHeight
+    const isOverflow = target.scrollHeight > target.clientHeight
     setIsOverflowing(isOverflow)
   }, [])
 

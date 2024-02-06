@@ -1,4 +1,3 @@
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
@@ -15,8 +14,6 @@ export async function POST(request: Request) {
     messages: any[]
   }
 
-  console.log("openai messages", messages, "\n\n\n")
-
   try {
     const profile = await getServerProfile()
 
@@ -31,8 +28,7 @@ export async function POST(request: Request) {
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens:
-        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+      max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null, // TODO: Fix
       stream: true
     })
 
@@ -40,8 +36,17 @@ export async function POST(request: Request) {
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+
+    if (errorMessage.toLowerCase().includes("api key not found")) {
+      errorMessage =
+        "OpenAI API Key not found. Please set it in your profile settings."
+    } else if (errorMessage.toLowerCase().includes("incorrect api key")) {
+      errorMessage =
+        "OpenAI API Key is incorrect. Please fix it in your profile settings."
+    }
+
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
+import { get } from "@vercel/edge-config"
 import { Metadata } from "next"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
@@ -33,7 +34,18 @@ export default async function Login({
   const session = (await supabase.auth.getSession()).data.session
 
   if (session) {
-    return redirect("/chat")
+    const { data: homeWorkspace, error } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .eq("is_home", true)
+      .single()
+
+    if (!homeWorkspace) {
+      throw new Error(error.message)
+    }
+
+    return redirect(`/${homeWorkspace.id}/chat`)
   }
 
   const signIn = async (formData: FormData) => {
@@ -53,7 +65,20 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect("/chat")
+    const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("user_id", data.user.id)
+      .eq("is_home", true)
+      .single()
+
+    if (!homeWorkspace) {
+      throw new Error(
+        homeWorkspaceError?.message || "An unexpected error occurred"
+      )
+    }
+
+    return redirect(`/${homeWorkspace.id}/chat`)
   }
 
   const signUp = async (formData: FormData) => {
@@ -61,6 +86,40 @@ export default async function Login({
 
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+
+    if (process.env.EMAIL_DOMAIN_WHITELIST || process.env.EDGE_CONFIG) {
+      let patternsString = process.env.EMAIL_DOMAIN_WHITELIST
+
+      if (process.env.EDGE_CONFIG)
+        patternsString = await get<string>("EMAIL_DOMAIN_WHITELIST")
+
+      const emailDomainWhitelist = patternsString?.split(",") ?? []
+
+      if (
+        emailDomainWhitelist.length > 0 &&
+        !emailDomainWhitelist.includes(email.split("@")[1])
+      ) {
+        return redirect(
+          `/login?message=Email ${email} is not allowed to sign up.`
+        )
+      }
+    }
+
+    if (process.env.EMAIL_WHITELIST || process.env.EDGE_CONFIG) {
+      let patternsString = process.env.EMAIL_WHITELIST
+
+      if (process.env.EDGE_CONFIG)
+        patternsString = await get<string>("EMAIL_WHITELIST")
+
+      const emailWhitelist = patternsString?.split(",") ?? []
+
+      if (emailWhitelist.length > 0 && !emailWhitelist.includes(email)) {
+        return redirect(
+          `/login?message=Email ${email} is not allowed to sign up.`
+        )
+      }
+    }
+
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 

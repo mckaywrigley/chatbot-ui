@@ -60,9 +60,10 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       setChats(prevState => [createdChat, ...prevState])
       setSelectedAssistant(assistant)
 
-      router.push(`/chat/${createdChat.id}`)
+      return router.push(`/${selectedWorkspace.id}/chat/${createdChat.id}`)
     },
-    tools: async (item: any) => {}
+    tools: async (item: any) => {},
+    models: async (item: any) => {}
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
