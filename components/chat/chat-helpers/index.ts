@@ -513,6 +513,7 @@ export const createSimpleAssistantMessage = async (
 
   // Create the assistant message in the database.
   const createdMessages = await createMessages([finalAssistantMessage])
+  console.log("createdMessages", { createdMessages })
 
   // Create a ChatMessage object for updating the state.
   const newAssistantChatMessage: ChatMessage = {
@@ -522,4 +523,7 @@ export const createSimpleAssistantMessage = async (
 
   // Update the chat messages state with the new assistant message.
   setChatMessages(prevMessages => [...prevMessages, newAssistantChatMessage])
+
+  // return the new assistant message id
+  return createdMessages[0].chat_id
 }

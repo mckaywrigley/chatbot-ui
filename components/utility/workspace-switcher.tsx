@@ -30,7 +30,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     setWorkspaces
   } = useContext(ChatbotUIContext)
 
-  const { handleCreateNewChat, handleNewChat } = useChatHandler()
+  const { handleCreateNewChat } = useChatHandler()
 
   const router = useRouter()
 
@@ -64,14 +64,12 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     })
 
     setWorkspaces([...workspaces, createdWorkspace])
-
     setSelectedWorkspace(createdWorkspace)
-
     setOpen(false)
     // Create a new chat for the created workspace with a default message from the assistant
-    await handleCreateNewChat(createdWorkspace)
+    const newMessageId = await handleCreateNewChat(createdWorkspace)
 
-    return router.push(`/${createdWorkspace.id}/chat`)
+    return router.push(`/${createdWorkspace.id}/chat/${newMessageId}`)
   }
 
   const getWorkspaceName = (workspaceId: string) => {

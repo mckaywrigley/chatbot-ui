@@ -392,12 +392,13 @@ export const useChatHandler = () => {
       ...availableOpenRouterModels
     ].find(llm => llm.modelId === chatSettings?.model)
 
-    await createSimpleAssistantMessage(
+    const newMessageId = await createSimpleAssistantMessage(
       newWorkspaceChat,
       profile!,
       modelData!,
       setChatMessages
     )
+    return newMessageId
   }
 
   const handleSendEdit = async (
