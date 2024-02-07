@@ -1,16 +1,8 @@
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
-import { IconCheck, IconChevronDown } from "@tabler/icons-react"
+import { IconCircle, IconCircleCheck } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { Button } from "../ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from "../ui/dropdown-menu"
-import { Input } from "../ui/input"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { ModelIcon } from "./model-icon"
+import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { ModelOption } from "./model-option"
 
 interface ModelSelectProps {
@@ -82,7 +74,24 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     ...availableOpenRouterModels
   ]
 
-  const groupedModels = allModels.reduce<Record<string, LLM[]>>(
+  const sortedModels = [...allModels].sort((a, b) => {
+    // Prioritize 'mistral' to appear first
+    if (a.provider === "mistral" && b.provider !== "mistral") return -1
+    if (b.provider === "mistral" && a.provider !== "mistral") return 1
+
+    // Then prioritize 'openai'
+    if (a.provider === "openai" && b.provider !== "openai") return -1
+    if (b.provider === "openai" && a.provider !== "openai") return 1
+
+    // Finally, sort alphabetically by provider name, or any other criteria you see fit
+    return (
+      a.provider.localeCompare(b.provider) ||
+      a.modelName.localeCompare(b.modelName)
+    )
+  })
+
+  // Group the sorted models by provider
+  const groupedSortedModels = sortedModels.reduce<Record<string, LLM[]>>(
     (groups, model) => {
       const key = model.provider
       if (!groups[key]) {
@@ -92,10 +101,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       return groups
     },
     {}
-  )
-
-  const selectedModel = allModels.find(
-    model => model.modelId === selectedModelId
   )
 
   if (!profile) return null
@@ -119,9 +124,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
           </div>
         ) : (
           <div className="max-h-[300px] overflow-auto">
-            {Object.entries(groupedModels).map(([provider, models]) => {
+            {Object.entries(groupedSortedModels).map(([provider, models]) => {
               const filteredModels = models
-                // Exclude 'openrouter' models
                 .filter(model => model.provider !== "openrouter")
                 .filter(model => {
                   if (tab === "hosted") return model.provider !== "ollama"
@@ -132,31 +136,29 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                 .filter(model =>
                   model.modelName.toLowerCase().includes(search.toLowerCase())
                 )
-                .sort((a, b) => a.provider.localeCompare(b.provider))
 
               if (filteredModels.length === 0) return null
 
               return (
                 <div key={provider}>
                   <div className="mb-2">
-                    {filteredModels.map(model => {
-                      return (
-                        <div
-                          key={model.modelId}
-                          className="flex items-center space-x-1"
-                        >
-                          {selectedModelId === model.modelId && (
-                            <IconCheck className="ml-2" size={32} />
-                          )}
-
-                          <ModelOption
-                            key={model.modelId}
-                            model={model}
-                            onSelect={() => handleSelectModel(model.modelId)}
-                          />
-                        </div>
-                      )
-                    })}
+                    {filteredModels.map(model => (
+                      <div
+                        key={model.modelId}
+                        className="hover:bg-accent flex w-full cursor-pointer items-center justify-between space-x-3 truncate rounded p-2 hover:opacity-50"
+                        onClick={() => handleSelectModel(model.modelId)}
+                      >
+                        <ModelOption
+                          model={model}
+                          onSelect={() => handleSelectModel(model.modelId)}
+                        />
+                        {selectedModelId === model.modelId ? (
+                          <IconCircleCheck className="" size={28} />
+                        ) : (
+                          <IconCircle className="opacity-50" size={28} />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )

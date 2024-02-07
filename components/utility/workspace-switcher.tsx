@@ -46,7 +46,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     const createdWorkspace = await createWorkspace({
       user_id: selectedWorkspace.user_id,
       default_context_length: selectedWorkspace.default_context_length,
-      default_model: selectedWorkspace.default_model,
+      default_model: "mistral-medium",
       default_prompt: selectedWorkspace.default_prompt,
       default_temperature: selectedWorkspace.default_temperature,
       description: "",

@@ -121,13 +121,12 @@ export const useChatHandler = () => {
       })
     } else if (selectedWorkspace) {
       setChatSettings({
-        model: (selectedWorkspace.default_model ||
-          "gpt-4-1106-preview") as LLMID,
+        model: "mistral-medium" as LLMID,
         prompt:
           selectedWorkspace.default_prompt ||
           "You are a friendly, helpful AI assistant.",
-        temperature: selectedWorkspace.default_temperature || 0.5,
-        contextLength: selectedWorkspace.default_context_length || 4096,
+        temperature: selectedWorkspace.default_temperature || 0.4,
+        contextLength: selectedWorkspace.default_context_length || 1024,
         includeProfileContext:
           selectedWorkspace.include_profile_context || true,
         includeWorkspaceInstructions:

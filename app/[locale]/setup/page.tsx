@@ -123,7 +123,7 @@ export default function SetupPage() {
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
       google_gemini_api_key: googleGeminiAPIKey,
-      mistral_api_key: mistralAPIKey,
+      mistral_api_key: openrouterAPIKey,
       perplexity_api_key: perplexityAPIKey,
       openrouter_api_key: openrouterAPIKey,
       use_azure_openai: useAzureOpenai,

@@ -94,11 +94,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [userInput, setUserInput] = useState<string>("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
-    model: "gpt-4-turbo-preview",
+    model: "mistral-medium",
     prompt: "You are a helpful AI assistant.",
-    temperature: 0.5,
-    contextLength: 4000,
-    includeProfileContext: true,
+    temperature: 0.4,
+    contextLength: 1024,
+    includeProfileContext: false,
     includeWorkspaceInstructions: true,
     embeddingsProvider: "openai"
   })
@@ -249,12 +249,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setSelectedWorkspace(homeWorkspace!)
 
       setChatSettings({
-        model: (homeWorkspace?.default_model || "gpt-4-1106-preview") as LLMID,
+        model: "mistral-medium" as LLMID,
         prompt:
           homeWorkspace?.default_prompt ||
           "You are a friendly, helpful AI assistant.",
-        temperature: homeWorkspace?.default_temperature || 0.5,
-        contextLength: homeWorkspace?.default_context_length || 4096,
+        temperature: homeWorkspace?.default_temperature || 0.4,
+        contextLength: homeWorkspace?.default_context_length || 1024,
         includeProfileContext: homeWorkspace?.include_profile_context || true,
         includeWorkspaceInstructions:
           homeWorkspace?.include_workspace_instructions || true,

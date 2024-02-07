@@ -10,7 +10,7 @@ interface ModelOptionProps {
 export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
   return (
     <div
-      className="hover:bg-accent flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2 hover:opacity-50"
+      className="flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2"
       onClick={onSelect}
     >
       <div className="flex items-center space-x-2">

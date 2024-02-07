@@ -22,7 +22,7 @@ export const CreatePreset: FC<CreatePresetProps> = ({
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
   const [presetChatSettings, setPresetChatSettings] = useState({
-    model: selectedWorkspace?.default_model,
+    model: "mistral-medium",
     prompt: selectedWorkspace?.default_prompt,
     temperature: selectedWorkspace?.default_temperature,
     contextLength: selectedWorkspace?.default_context_length,
