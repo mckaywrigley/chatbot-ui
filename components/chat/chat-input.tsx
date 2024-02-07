@@ -112,13 +112,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       setFocusTool(!focusTool)
     }
 
-    //use shift+up and shift+down to navigate through chat history
-    if (event.key === "ArrowUp" && event.shiftKey) {
+    //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
+    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToPreviousUserMessage()
     }
 
-    if (event.key === "ArrowDown" && event.shiftKey) {
+    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToNextUserMessage()
     }
