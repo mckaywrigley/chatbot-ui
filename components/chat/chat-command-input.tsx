@@ -39,7 +39,7 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         isFocused={focusFile}
       />
 
-      <ToolPicker />
+      {/* <ToolPicker /> */}
     </>
   )
 }
