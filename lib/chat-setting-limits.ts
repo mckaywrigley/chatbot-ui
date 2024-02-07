@@ -8,34 +8,6 @@ type ChatSettingLimits = {
 }
 
 export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
-  // ANTHROPIC MODELS
-  // "claude-2.1": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.0,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
-  //   MAX_CONTEXT_LENGTH: 200000
-  // },
-  // "claude-instant-1.2": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.0,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
-  //   MAX_CONTEXT_LENGTH: 100000
-  // },
-
-  // GOOGLE MODELS
-  // "gemini-pro": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.0,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 2048,
-  //   MAX_CONTEXT_LENGTH: 30720
-  // },
-  // "gemini-pro-vision": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.0,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
-  //   MAX_CONTEXT_LENGTH: 12288
-  // },
-
   // MISTRAL MODELS
   "mistral-tiny": {
     MIN_TEMPERATURE: 0.0,
@@ -82,18 +54,4 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 4096,
     MAX_CONTEXT_LENGTH: 8192
   }
-
-  // PERPLEXITY MODELS
-  // "pplx-7b-online": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.99,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
-  //   MAX_CONTEXT_LENGTH: 4096
-  // },
-  // "pplx-70b-online": {
-  //   MIN_TEMPERATURE: 0.0,
-  //   MAX_TEMPERATURE: 1.99,
-  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
-  //   MAX_CONTEXT_LENGTH: 4096
-  // }
 }

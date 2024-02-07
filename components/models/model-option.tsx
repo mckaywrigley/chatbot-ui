@@ -1,4 +1,4 @@
-import { LLM, LLMID } from "@/types"
+import { LLM } from "@/types"
 import { FC } from "react"
 import { ModelIcon } from "./model-icon"
 
@@ -14,7 +14,7 @@ export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
       onClick={onSelect}
     >
       <div className="flex items-center space-x-2">
-        <ModelIcon modelId={model.modelId as LLMID} width={28} height={28} />
+        <ModelIcon provider={model.provider} width={28} height={28} />
 
         <div className="text-sm font-semibold">{model.modelName}</div>
       </div>

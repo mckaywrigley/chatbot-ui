@@ -18,6 +18,7 @@ interface ChatItemProps {
 
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const {
+    selectedWorkspace,
     selectedChat,
     availableLocalModels,
     assistantImages,
@@ -31,7 +32,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const itemRef = useRef<HTMLDivElement>(null)
 
   const handleClick = () => {
-    return router.push(`/chat/${chat.id}`)
+    if (!selectedWorkspace) return
+    return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -82,7 +84,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           delayDuration={200}
           display={<div>{MODEL_DATA?.modelName}</div>}
           trigger={
-            <ModelIcon modelId={MODEL_DATA?.modelId} height={30} width={30} />
+            <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
           }
         />
       )}
