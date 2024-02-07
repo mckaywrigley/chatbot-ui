@@ -1,9 +1,10 @@
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
-import { IconCircle, IconCircleCheck } from "@tabler/icons-react"
+import { IconCircle, IconCircleCheck, IconLock } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { ModelOption } from "./model-option"
+import { PlanDialog } from "../utility/plan-dialog"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -15,12 +16,15 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   onSelectModel
 }) => {
   const {
+    subscription,
     profile,
     models,
     availableHostedModels,
     availableLocalModels,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+  const [showPlanDialog, setShowPlanDialog] = useState(false)
+  const isPremium = subscription !== null
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -145,15 +149,20 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                     {filteredModels.map(model => (
                       <div
                         key={model.modelId}
-                        className="hover:bg-accent flex w-full cursor-pointer items-center justify-between space-x-3 truncate rounded p-2 hover:opacity-50"
-                        onClick={() => handleSelectModel(model.modelId)}
+                        className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-2"
+                        onClick={() => {
+                          if (!isPremium && model.provider === "openai") {
+                            setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
+                          } else {
+                            handleSelectModel(model.modelId) // Allow selection for premium users or non-OpenAI models
+                          }
+                        }}
                       >
-                        <ModelOption
-                          model={model}
-                          onSelect={() => handleSelectModel(model.modelId)}
-                        />
+                        <ModelOption model={model} onSelect={() => {}} />
                         {selectedModelId === model.modelId ? (
                           <IconCircleCheck className="" size={28} />
+                        ) : !isPremium && model.provider === "openai" ? (
+                          <IconLock className="opacity-50" size={28} />
                         ) : (
                           <IconCircle className="opacity-50" size={28} />
                         )}
@@ -166,6 +175,11 @@ export const ModelSelect: FC<ModelSelectProps> = ({
           </div>
         )}
       </DropdownMenuTrigger>
+      <PlanDialog
+        showIcon={false}
+        open={showPlanDialog}
+        onOpenChange={setShowPlanDialog}
+      />
     </DropdownMenu>
   )
 }
