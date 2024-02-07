@@ -11,6 +11,7 @@ import { cookies } from "next/headers"
 import { ReactNode } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import "./globals.css"
+import { GlobalAlertDialog } from "./global-alert-dialog"
 
 const inter = Inter({ subsets: ["latin"] })
 const APP_NAME = "HackerGPT"
@@ -101,6 +102,7 @@ export default async function RootLayout({
             <div className="bg-background text-foreground flex h-screen flex-col items-center">
               {session ? <GlobalState>{children}</GlobalState> : children}
             </div>
+            <GlobalAlertDialog />
           </TranslationsProvider>
         </Providers>
         <Analytics />

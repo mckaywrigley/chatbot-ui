@@ -15,6 +15,7 @@ import preparePineconeQuery from "@/lib/models/prepare-pinecone-query"
 import queryPineconeVectorStore from "@/lib/models/query-pinecone"
 
 import llmConfig from "@/lib/models/llm/llm-config"
+import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 
 class APIError extends Error {
   code: any
@@ -122,6 +123,15 @@ export async function POST(request: Request) {
     }
 
     try {
+      // rate limit check
+      const rateLimitCheckResult = await checkRatelimitOnApi(
+        profile.user_id,
+        "hackergpt"
+      )
+      if (rateLimitCheckResult !== null) {
+        return rateLimitCheckResult.response
+      }
+
       const res = await fetch(openRouterUrl, {
         method: "POST",
         headers: openRouterHeaders,

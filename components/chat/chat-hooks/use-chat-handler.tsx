@@ -17,9 +17,11 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
+import { useAlertContext } from "@/context/alert-context"
 
 export const useChatHandler = () => {
   const router = useRouter()
+  const { dispatch: alertDispatch } = useAlertContext()
 
   const {
     userInput,
@@ -281,7 +283,8 @@ export const useChatHandler = () => {
             setIsGenerating,
             setFirstTokenReceived,
             setChatMessages,
-            setToolInUse
+            setToolInUse,
+            alertDispatch
           )
         } else {
           generatedText = await handleHostedChat(
@@ -296,7 +299,8 @@ export const useChatHandler = () => {
             setIsGenerating,
             setFirstTokenReceived,
             setChatMessages,
-            setToolInUse
+            setToolInUse,
+            alertDispatch
           )
         }
       }

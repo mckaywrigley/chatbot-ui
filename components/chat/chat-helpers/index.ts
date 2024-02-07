@@ -1,5 +1,6 @@
 // Only used in use-chat-handler.tsx to keep it clean
 
+import { AlertAction } from "@/context/alert-context"
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
@@ -151,7 +152,8 @@ export const handleLocalChat = async (
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  alertDispatch: React.Dispatch<AlertAction>
 ) => {
   const formattedMessages = await buildFinalMessages(payload, profile, [])
 
@@ -168,7 +170,8 @@ export const handleLocalChat = async (
     false,
     newAbortController,
     setIsGenerating,
-    setChatMessages
+    setChatMessages,
+    alertDispatch
   )
 
   return await processResponse(
@@ -196,7 +199,8 @@ export const handleHostedChat = async (
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  alertDispatch: React.Dispatch<AlertAction>
 ) => {
   const provider =
     modelData.provider === "openai" && profile.use_azure_openai
@@ -230,7 +234,8 @@ export const handleHostedChat = async (
     true,
     newAbortController,
     setIsGenerating,
-    setChatMessages
+    setChatMessages,
+    alertDispatch
   )
 
   return await processResponse(
@@ -252,7 +257,8 @@ export const fetchChatResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  alertDispatch: React.Dispatch<AlertAction>
 ) => {
   const response = await fetch(url, {
     method: "POST",
@@ -268,8 +274,15 @@ export const fetchChatResponse = async (
     }
 
     const errorData = await response.json()
-
-    toast.error(errorData.message)
+    if (response.status === 429 && errorData && errorData.timeRemaining) {
+      alertDispatch({
+        type: "SHOW",
+        payload: { message: errorData.message, title: "Usage Cap Error" }
+      })
+    } else {
+      const errorData = await response.json()
+      toast.error(errorData.message)
+    }
 
     setIsGenerating(false)
     setChatMessages(prevMessages => prevMessages.slice(0, -2))

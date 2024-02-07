@@ -6,10 +6,12 @@ import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 import {
-  updateOrAddSystemMessage,
   replaceWordsInLastUserMessage,
+  updateOrAddSystemMessage,
   wordReplacements
 } from "@/lib/ai-helper"
+
+import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -35,6 +37,15 @@ export async function POST(request: Request) {
     const systemMessageContent = `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}`
 
     updateOrAddSystemMessage(messages, systemMessageContent)
+
+    // rate limit check
+    const rateLimitCheckResult = await checkRatelimitOnApi(
+      profile.user_id,
+      chatSettings.model
+    )
+    if (rateLimitCheckResult !== null) {
+      return rateLimitCheckResult.response
+    }
 
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
