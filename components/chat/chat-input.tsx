@@ -17,6 +17,7 @@ import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
+import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 
 interface ChatInputProps {}
 
@@ -61,6 +62,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 
+  const {
+    setNewMessageContentToNextUserMessage,
+    setNewMessageContentToPreviousUserMessage
+  } = useChatHistoryHandler()
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -104,6 +110,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     ) {
       event.preventDefault()
       setFocusTool(!focusTool)
+    }
+
+    //use shift+up and shift+down to navigate through chat history
+    if (event.key === "ArrowUp" && event.shiftKey) {
+      event.preventDefault()
+      setNewMessageContentToPreviousUserMessage()
+    }
+
+    if (event.key === "ArrowDown" && event.shiftKey) {
+      event.preventDefault()
+      setNewMessageContentToNextUserMessage()
     }
   }
 
