@@ -9,7 +9,7 @@ import {
   replaceWordsInLastUserMessage,
   wordReplacements
 } from "@/lib/ai-helper"
-import { cleanMessagesFromWarnings } from "@/lib/models/clean-messages"
+// import { cleanMessagesFromWarnings } from "@/lib/models/clean-messages"
 import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
 import preparePineconeQuery from "@/lib/models/prepare-pinecone-query"
 import queryPineconeVectorStore from "@/lib/models/query-pinecone"
@@ -53,7 +53,8 @@ export async function POST(request: Request) {
       "Content-Type": "application/json"
     }
 
-    const cleanedMessages = await cleanMessagesFromWarnings(messages)
+    // const cleanedMessages = await cleanMessagesFromWarnings(messages)
+    const cleanedMessages = messages
 
     let systemMessage: Message = {
       role: "system",
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
 
     const model1 = llmConfig.models.default
     const model2 = llmConfig.models.hackerGPT
-    const selectedModel = Math.random() < 0.66 ? model1 : model2
+    const selectedModel = Math.random() < 0.8 ? model1 : model2
 
     const requestBody = {
       model: selectedModel,
