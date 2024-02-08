@@ -96,7 +96,9 @@ function _getLimit(model: string, isPremium: boolean): number {
 
 async function _addRequest(key: string) {
   const timestamp = Date.now()
+  const timeWindowMinutes = Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
   await getRedis().zadd(key, { score: timestamp, member: timestamp })
+  await getRedis().expire(key, 60 * timeWindowMinutes)
 }
 
 function _getFixedModelName(model: string): string {
