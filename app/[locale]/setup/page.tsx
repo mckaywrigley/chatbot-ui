@@ -7,8 +7,8 @@ import {
   getWorkspacesByUserId
 } from "@/db/workspaces"
 import {
-  fetchHostedModels,
-  fetchOpenRouterModels
+  fetchHostedModels
+  // fetchOpenRouterModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesUpdate } from "@/supabase/types"
@@ -84,11 +84,11 @@ export default function SetupPage() {
           setEnvKeyMap(data.envKeyMap)
           setAvailableHostedModels(data.hostedModels)
 
-          if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
-            const openRouterModels = await fetchOpenRouterModels()
-            if (!openRouterModels) return
-            setAvailableOpenRouterModels(openRouterModels)
-          }
+          // if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+          //   const openRouterModels = await fetchOpenRouterModels()
+          //   if (!openRouterModels) return
+          //   setAvailableOpenRouterModels(openRouterModels)
+          // }
 
           const homeWorkspaceId = await getHomeWorkspaceByUserId(
             session.user.id

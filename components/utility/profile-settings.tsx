@@ -8,7 +8,7 @@ import {
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
+// import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
 import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { supabase } from "@/lib/supabase/browser-client"
 import { cn } from "@/lib/utils"
@@ -191,19 +191,19 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         const hasApiKey = !!updatedProfile[providerKey]
 
         if (provider === "openrouter") {
-          if (hasApiKey && availableOpenRouterModels.length === 0) {
-            const openrouterModels: OpenRouterLLM[] =
-              await fetchOpenRouterModels()
-            setAvailableOpenRouterModels(prev => {
-              const newModels = openrouterModels.filter(
-                model =>
-                  !prev.some(prevModel => prevModel.modelId === model.modelId)
-              )
-              return [...prev, ...newModels]
-            })
-          } else {
-            setAvailableOpenRouterModels([])
-          }
+          // if (hasApiKey && availableOpenRouterModels.length === 0) {
+          //   const openrouterModels: OpenRouterLLM[] =
+          //     await fetchOpenRouterModels()
+          //   setAvailableOpenRouterModels(prev => {
+          //     const newModels = openrouterModels.filter(
+          //       model =>
+          //         !prev.some(prevModel => prevModel.modelId === model.modelId)
+          //     )
+          //     return [...prev, ...newModels]
+          //   })
+          // } else {
+          setAvailableOpenRouterModels([])
+          // }
         } else {
           if (hasApiKey && Array.isArray(models)) {
             setAvailableHostedModels(prev => {

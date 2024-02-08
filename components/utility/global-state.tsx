@@ -9,9 +9,9 @@ import { getSubscriptionByUserId } from "@/db/subscriptions"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
-  fetchHostedModels,
+  fetchHostedModels
   // fetchOllamaModels,
-  fetchOpenRouterModels
+  // fetchOpenRouterModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
@@ -136,14 +136,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setEnvKeyMap(hostedModelRes.envKeyMap)
         setAvailableHostedModels(hostedModelRes.hostedModels)
 
-        if (
-          profile["openrouter_api_key"] ||
-          hostedModelRes.envKeyMap["openrouter"]
-        ) {
-          const openRouterModels = await fetchOpenRouterModels()
-          if (!openRouterModels) return
-          setAvailableOpenRouterModels(openRouterModels)
-        }
+        // if (
+        //   profile["openrouter_api_key"] ||
+        //   hostedModelRes.envKeyMap["openrouter"]
+        // ) {
+        //   const openRouterModels = await fetchOpenRouterModels()
+        //   if (!openRouterModels) return
+        //   setAvailableOpenRouterModels(openRouterModels)
+        // }
       }
 
       //   if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
