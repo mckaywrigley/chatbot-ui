@@ -81,39 +81,31 @@ export default async function Login({
     return redirect(`/${homeWorkspace.id}/chat`)
   }
 
+  const getEnvVarOrEdgeConfigValue = async (name: string) => {
+    "use server"
+    if (process.env.EDGE_CONFIG) {
+      return await get<string>(name)
+    }
+
+    return process.env[name]
+  }
+
   const signUp = async (formData: FormData) => {
     "use server"
 
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-    if (process.env.EMAIL_DOMAIN_WHITELIST || process.env.EDGE_CONFIG) {
-      let patternsString = process.env.EMAIL_DOMAIN_WHITELIST
+    const emailDomainWhitelistPatternsString = await getEnvVarOrEdgeConfigValue("EMAIL_DOMAIN_WHITELIST")
+    const emailDomainWhitelist = emailDomainWhitelistPatternsString?.trim() ? emailDomainWhitelistPatternsString?.split(",") : [];
+    const emailWhitelistPatternsString = await getEnvVarOrEdgeConfigValue("EMAIL_WHITELIST")
+    const emailWhitelist = emailWhitelistPatternsString?.trim() ? emailWhitelistPatternsString?.split(",") : [];
 
-      if (process.env.EDGE_CONFIG)
-        patternsString = await get<string>("EMAIL_DOMAIN_WHITELIST")
-
-      const emailDomainWhitelist = patternsString?.split(",") ?? []
-
-      if (
-        emailDomainWhitelist.length > 0 &&
-        !emailDomainWhitelist.includes(email.split("@")[1])
-      ) {
-        return redirect(
-          `/login?message=Email ${email} is not allowed to sign up.`
-        )
-      }
-    }
-
-    if (process.env.EMAIL_WHITELIST || process.env.EDGE_CONFIG) {
-      let patternsString = process.env.EMAIL_WHITELIST
-
-      if (process.env.EDGE_CONFIG)
-        patternsString = await get<string>("EMAIL_WHITELIST")
-
-      const emailWhitelist = patternsString?.split(",") ?? []
-
-      if (emailWhitelist.length > 0 && !emailWhitelist.includes(email)) {
+    // If there are whitelist patterns, check if the email is allowed to sign up
+    if(emailDomainWhitelist.length > 0 || emailWhitelist.length > 0) {
+      const domainMatch = emailDomainWhitelist?.includes(email.split("@")[1])
+      const emailMatch = emailWhitelist?.includes(email)
+      if(!domainMatch && !emailMatch) {
         return redirect(
           `/login?message=Email ${email} is not allowed to sign up.`
         )
