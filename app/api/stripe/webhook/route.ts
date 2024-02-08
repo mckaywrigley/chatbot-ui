@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     console.error(err.message)
     return new Response(err.message, { status: 400 })
   }
-  console.log(`🔔 Event received: ${receivedEvent.id} ${receivedEvent.type}`)
+  // console.log(`🔔 Event received: ${receivedEvent.id} ${receivedEvent.type}`)
 
   // Reference:
   // https://stripe.com/docs/billing/subscriptions/build-subscriptions
