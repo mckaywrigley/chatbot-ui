@@ -50,9 +50,13 @@ export async function buildFinalMessages(
     assistant
   )
 
-  const CHUNK_SIZE = chatSettings.contextLength
+  let CHUNK_SIZE = chatSettings.contextLength
+  if (chatSettings.model === "gpt-4-turbo-preview") {
+    CHUNK_SIZE = 8192
+  } else if (chatSettings.model === "mistral-medium") {
+    CHUNK_SIZE = 4096
+  }
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
-
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
 
   let usedTokens = 0
