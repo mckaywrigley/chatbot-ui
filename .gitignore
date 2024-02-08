@@ -42,8 +42,14 @@ tool-schemas
 
 sw.js
 sw.js.map
+workbox-*.js
 workbox-*.js.map
 worker-*.js
 
+# editor
+.vscode
+.idea
+
 # Sentry Config File
 .sentryclirc
+
