@@ -169,8 +169,12 @@ export default async function Login({
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 
+    const origin = headers().get("origin")
     const { error, data } = await supabase.auth.signInWithOAuth({
-      provider: "google"
+      provider: "google",
+      options: {
+        redirectTo: `${origin}/auth/callback?next=/chat`
+      }
     })
 
     console.log(data)

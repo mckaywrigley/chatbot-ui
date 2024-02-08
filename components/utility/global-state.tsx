@@ -164,6 +164,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setProfile(profile)
 
       if (!profile.has_onboarded) {
+        setLoading(false)
         return router.push("/setup")
       }
 
