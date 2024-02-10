@@ -133,9 +133,11 @@ Get the required values by running:
 supabase status
 ```
 
-Note: Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`
-
 Now go to your `.env.local` file and fill in the values.
+
+Note 1: Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`.
+
+Note 2: If you want to connect to OpenAI services, you will need to set `NEXT_PUBLIC_OPENAI_ORGANIZATION_ID`.
 
 If the environment variable is set, it will disable the input in the user settings.
 
