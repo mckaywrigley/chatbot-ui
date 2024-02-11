@@ -15,7 +15,7 @@ export const uploadFile = async (
     throw new Error(`File must be less than ${SIZE_LIMIT / 1000000}MB`)
   }
 
-  const filePath = `${payload.user_id}/${Buffer.from(payload.file_id).toString('base64')}`;
+  const filePath = `${payload.user_id}/${Buffer.from(payload.file_id).toString("base64")}`
 
   const { error } = await supabase.storage
     .from("files")
@@ -24,8 +24,8 @@ export const uploadFile = async (
     })
 
   if (error) {
-    console.log(`Error uploading file with path: ${filePath}`, error);
-    throw new Error("Error uploading file");
+    console.log(`Error uploading file with path: ${filePath}`, error)
+    throw new Error("Error uploading file")
   }
 
   return filePath

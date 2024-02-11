@@ -12,7 +12,7 @@ import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
-import { ChatCommandInput } from "./chat-command-input"
+import { ChhashtagCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
@@ -30,6 +30,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
 
   const {
+    isAssistantPickerOpen,
+    focusAssistant,
+    setFocusAssistant,
     userInput,
     chatMessages,
     isGenerating,
@@ -43,7 +46,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
-    isAtPickerOpen,
+    isFilePickerOpen,
     setFocusFile,
     chatSettings,
     selectedTools,
@@ -87,7 +90,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
 
     if (
-      isAtPickerOpen &&
+      isFilePickerOpen &&
       (event.key === "Tab" ||
         event.key === "ArrowUp" ||
         event.key === "ArrowDown")
@@ -104,6 +107,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     ) {
       event.preventDefault()
       setFocusTool(!focusTool)
+    }
+
+    if (
+      isAssistantPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
+      event.preventDefault()
+      setFocusAssistant(!focusAssistant)
     }
   }
 
@@ -152,7 +165,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
-          <ChatCommandInput />
+          <ChhashtagCommandInput />
         </div>
 
         <>
@@ -179,7 +192,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(
-            `Ask anything. Type "/" for prompts, "#" for files, and "!" for tools.`
+            `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
           )}
           onValueChange={handleInputChange}
           value={userInput}

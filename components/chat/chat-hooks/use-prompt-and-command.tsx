@@ -11,39 +11,49 @@ export const usePromptAndCommand = () => {
     setUserInput,
     setShowFilesDisplay,
     setIsPromptPickerOpen,
-    setIsAtPickerOpen,
+    setIsFilePickerOpen,
     setSlashCommand,
-    setAtCommand,
+    setHashtagCommand,
     setUseRetrieval,
     setToolCommand,
     setIsToolPickerOpen,
-    setSelectedTools
+    setSelectedTools,
+    setAtCommand,
+    setIsAssistantPickerOpen,
+    setSelectedAssistant
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
+    const atTextRegex = /@([^ ]*)$/
     const slashTextRegex = /\/([^ ]*)$/
-    const atTextRegex = /#([^ ]*)$/
+    const hashtagTextRegex = /#([^ ]*)$/
     const toolTextRegex = /!([^ ]*)$/
-    const slashMatch = value.match(slashTextRegex)
     const atMatch = value.match(atTextRegex)
+    const slashMatch = value.match(slashTextRegex)
+    const hashtagMatch = value.match(hashtagTextRegex)
     const toolMatch = value.match(toolTextRegex)
 
-    if (slashMatch) {
+    if (atMatch) {
+      setIsAssistantPickerOpen(true)
+      setAtCommand(atMatch[1])
+    } else if (slashMatch) {
       setIsPromptPickerOpen(true)
       setSlashCommand(slashMatch[1])
-    } else if (atMatch) {
-      setIsAtPickerOpen(true)
-      setAtCommand(atMatch[1])
+    } else if (hashtagMatch) {
+      setIsFilePickerOpen(true)
+      setHashtagCommand(hashtagMatch[1])
     } else if (toolMatch) {
       setIsToolPickerOpen(true)
       setToolCommand(toolMatch[1])
     } else {
       setIsPromptPickerOpen(false)
-      setIsAtPickerOpen(false)
-      setSlashCommand("")
-      setAtCommand("")
+      setIsFilePickerOpen(false)
       setIsToolPickerOpen(false)
+      setIsAssistantPickerOpen(false)
+      setSlashCommand("")
+      setHashtagCommand("")
       setToolCommand("")
+      setAtCommand("")
     }
 
     setUserInput(value)
@@ -56,7 +66,7 @@ export const usePromptAndCommand = () => {
 
   const handleSelectUserFile = async (file: Tables<"files">) => {
     setShowFilesDisplay(true)
-    setIsAtPickerOpen(false)
+    setIsFilePickerOpen(false)
     setUseRetrieval(true)
 
     setNewMessageFiles(prev => {
@@ -85,7 +95,7 @@ export const usePromptAndCommand = () => {
     collection: Tables<"collections">
   ) => {
     setShowFilesDisplay(true)
-    setIsAtPickerOpen(false)
+    setIsFilePickerOpen(false)
     setUseRetrieval(true)
 
     const collectionFiles = await getCollectionFilesByCollectionId(
@@ -118,11 +128,18 @@ export const usePromptAndCommand = () => {
     setSelectedTools(prev => [...prev, tool])
   }
 
+  const handleSelectAssistant = (assistant: Tables<"assistants">) => {
+    setIsAssistantPickerOpen(false)
+    setUserInput(userInput.replace(/@[^ ]*$/, ""))
+    setSelectedAssistant(assistant)
+  }
+
   return {
     handleInputChange,
     handleSelectPrompt,
     handleSelectUserFile,
     handleSelectUserCollection,
-    handleSelectTool
+    handleSelectTool,
+    handleSelectAssistant
   }
 }
