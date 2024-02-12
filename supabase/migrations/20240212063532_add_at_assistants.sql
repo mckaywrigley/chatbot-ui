@@ -1,0 +1,1 @@
+ALTER TABLE messages ADD COLUMN assistant_id NOT NULL REFERENCES assistants(id) ON DELETE CASCADE;
