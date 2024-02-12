@@ -220,7 +220,8 @@ export const useChatHandler = () => {
           chatSettings!,
           b64Images,
           isRegeneration,
-          setChatMessages
+          setChatMessages,
+          selectedAssistant
         )
 
       let payload: ChatPayload = {
@@ -340,7 +341,8 @@ export const useChatHandler = () => {
         retrievedFileItems,
         setChatMessages,
         setChatFileItems,
-        setChatImages
+        setChatImages,
+        selectedAssistant
       )
 
       setIsGenerating(false)

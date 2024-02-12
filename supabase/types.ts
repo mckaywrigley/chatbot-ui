@@ -818,6 +818,7 @@ export interface Database {
       }
       messages: {
         Row: {
+          assistant_id: string | null
           chat_id: string
           content: string
           created_at: string
@@ -830,6 +831,7 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          assistant_id?: string | null
           chat_id: string
           content: string
           created_at?: string
@@ -842,6 +844,7 @@ export interface Database {
           user_id: string
         }
         Update: {
+          assistant_id?: string | null
           chat_id?: string
           content?: string
           created_at?: string
@@ -854,6 +857,13 @@ export interface Database {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_chat_id_fkey"
             columns: ["chat_id"]

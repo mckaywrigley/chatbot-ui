@@ -1,6 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { IconRobotFace } from "@tabler/icons-react"
+import Image from "next/image"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
@@ -9,6 +10,7 @@ interface AssistantPickerProps {}
 export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const {
     assistants,
+    assistantImages,
     focusAssistant,
     atCommand,
     isAssistantPickerOpen,
@@ -92,7 +94,21 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                   }
                   onKeyDown={getKeyDownHandler(index)}
                 >
-                  <IconRobotFace size={32} />
+                  {item.image_path ? (
+                    <Image
+                      src={
+                        assistantImages.find(
+                          image => image.path === item.image_path
+                        )?.url || ""
+                      }
+                      alt={item.name}
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <IconRobotFace size={32} />
+                  )}
 
                   <div className="ml-3 flex flex-col">
                     <div className="font-bold">{item.name}</div>

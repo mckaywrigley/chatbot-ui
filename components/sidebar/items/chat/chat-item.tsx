@@ -67,6 +67,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       {chat.assistant_id ? (
         assistantImage ? (
           <Image
+            style={{ width: "30px", height: "30px" }}
             className="rounded"
             src={assistantImage}
             alt="Assistant image"

@@ -1,6 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { Tables } from "@/supabase/types"
+import { LLMID } from "@/types"
 import { useContext } from "react"
 
 export const usePromptAndCommand = () => {
@@ -20,7 +21,8 @@ export const usePromptAndCommand = () => {
     setSelectedTools,
     setAtCommand,
     setIsAssistantPickerOpen,
-    setSelectedAssistant
+    setSelectedAssistant,
+    setChatSettings
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -132,6 +134,16 @@ export const usePromptAndCommand = () => {
     setIsAssistantPickerOpen(false)
     setUserInput(userInput.replace(/@[^ ]*$/, ""))
     setSelectedAssistant(assistant)
+
+    setChatSettings({
+      model: assistant.model as LLMID,
+      prompt: assistant.prompt,
+      temperature: assistant.temperature,
+      contextLength: assistant.context_length,
+      includeProfileContext: assistant.include_profile_context,
+      includeWorkspaceInstructions: assistant.include_workspace_instructions,
+      embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
+    })
   }
 
   return {

@@ -26,7 +26,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
-const ICON_SIZE = 28
+const ICON_SIZE = 32
 
 interface MessageProps {
   message: Tables<"messages">
@@ -48,6 +48,7 @@ export const Message: FC<MessageProps> = ({
   onSubmitEdit
 }) => {
   const {
+    assistants,
     profile,
     isGenerating,
     setIsGenerating,
@@ -141,6 +142,10 @@ export const Message: FC<MessageProps> = ({
     ...availableOpenRouterModels
   ].find(llm => llm.modelId === message.model) as LLM
 
+  const messageAssistantImage = assistantImages.find(
+    image => image.assistantId === message.assistant_id
+  )?.base64
+
   const selectedAssistantImage = assistantImages.find(
     image => image.path === selectedAssistant?.image_path
   )?.base64
@@ -182,9 +187,25 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <div className="flex items-center space-x-3">
               {message.role === "assistant" ? (
-                selectedAssistant ? (
+                messageAssistantImage ? (
+                  <Image
+                    style={{
+                      width: `${ICON_SIZE}px`,
+                      height: `${ICON_SIZE}px`
+                    }}
+                    className="rounded"
+                    src={messageAssistantImage}
+                    alt="assistant image"
+                    height={ICON_SIZE}
+                    width={ICON_SIZE}
+                  />
+                ) : selectedAssistant ? (
                   selectedAssistantImage ? (
                     <Image
+                      style={{
+                        width: `${ICON_SIZE}px`,
+                        height: `${ICON_SIZE}px`
+                      }}
                       className="rounded"
                       src={selectedAssistantImage || ""}
                       alt="assistant image"
@@ -226,9 +247,13 @@ export const Message: FC<MessageProps> = ({
 
               <div className="font-semibold">
                 {message.role === "assistant"
-                  ? selectedAssistant
-                    ? selectedAssistant?.name
-                    : MODEL_DATA?.modelName
+                  ? message.assistant_id
+                    ? assistants.find(
+                        assistant => assistant.id === message.assistant_id
+                      )?.name
+                    : selectedAssistant
+                      ? selectedAssistant?.name
+                      : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
               </div>
             </div>
