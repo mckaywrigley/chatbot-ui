@@ -351,6 +351,7 @@ export interface Database {
           prompt: string
           sharing: string
           temperature: number
+          topic_description: string | null
           updated_at: string | null
           user_id: string
           workspace_id: string
@@ -369,6 +370,7 @@ export interface Database {
           prompt: string
           sharing?: string
           temperature: number
+          topic_description?: string | null
           updated_at?: string | null
           user_id: string
           workspace_id: string
@@ -387,6 +389,7 @@ export interface Database {
           prompt?: string
           sharing?: string
           temperature?: number
+          topic_description?: string | null
           updated_at?: string | null
           user_id?: string
           workspace_id?: string

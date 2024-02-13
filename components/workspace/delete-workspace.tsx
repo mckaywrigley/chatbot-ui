@@ -14,6 +14,7 @@ import { deleteWorkspace } from "@/db/workspaces"
 import { Tables } from "@/supabase/types"
 import { FC, useContext, useRef, useState } from "react"
 import { Input } from "../ui/input"
+import { useRouter } from "next/navigation"
 
 interface DeleteWorkspaceProps {
   workspace: Tables<"workspaces">
@@ -26,6 +27,7 @@ export const DeleteWorkspace: FC<DeleteWorkspaceProps> = ({
 }) => {
   const { setWorkspaces, setSelectedWorkspace } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
+  const router = useRouter()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -41,7 +43,10 @@ export const DeleteWorkspace: FC<DeleteWorkspaceProps> = ({
         w => w.id !== workspace.id
       )
 
-      setSelectedWorkspace(filteredWorkspaces[0])
+      const defaultWorkspace = filteredWorkspaces[0]
+
+      setSelectedWorkspace(defaultWorkspace)
+      router.push(`/${defaultWorkspace.id}/chat`)
 
       return filteredWorkspaces
     })
