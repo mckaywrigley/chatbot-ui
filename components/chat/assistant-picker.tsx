@@ -104,7 +104,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                       alt={item.name}
                       width={32}
                       height={32}
-                      className="rounded-full"
+                      className="rounded"
                     />
                   ) : (
                     <IconRobotFace size={32} />
