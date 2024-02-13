@@ -16,6 +16,7 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
+import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 
@@ -66,6 +67,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 
+  const {
+    setNewMessageContentToNextUserMessage,
+    setNewMessageContentToPreviousUserMessage
+  } = useChatHistoryHandler()
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -81,34 +87,46 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleSendMessage(userInput, chatMessages, false)
     }
 
+    // Consolidate conditions to avoid TypeScript error
     if (
-      isPromptPickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
+      isPromptPickerOpen ||
+      isFilePickerOpen ||
+      isToolPickerOpen ||
+      isAssistantPickerOpen
     ) {
-      event.preventDefault()
-      setFocusPrompt(!focusPrompt)
+      if (
+        event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      ) {
+        event.preventDefault()
+        // Toggle focus based on picker type
+        if (isPromptPickerOpen) setFocusPrompt(!focusPrompt)
+        if (isFilePickerOpen) setFocusFile(!focusFile)
+        if (isToolPickerOpen) setFocusTool(!focusTool)
+        if (isAssistantPickerOpen) setFocusAssistant(!focusAssistant)
+      }
     }
 
-    if (
-      isFilePickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
-    ) {
+    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
-      setFocusFile(!focusFile)
+      setNewMessageContentToPreviousUserMessage()
     }
 
-    if (
-      isToolPickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
-    ) {
+    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
-      setFocusTool(!focusTool)
+      setNewMessageContentToNextUserMessage()
+    }
+
+    //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
+    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
+      event.preventDefault()
+      setNewMessageContentToPreviousUserMessage()
+    }
+
+    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
+      event.preventDefault()
+      setNewMessageContentToNextUserMessage()
     }
 
     if (
