@@ -11,7 +11,7 @@ export type LLMID =
 export type OpenAILLMID =
   | "gpt-4-turbo-preview" // GPT-4 Turbo
   | "gpt-4-vision-preview" // GPT-4 Vision
-//  | "gpt-4" // GPT-4
+  | "gpt-4" // GPT-4
   | "gpt-3.5-turbo" // Updated GPT-3.5 Turbo
 
 // Google Models
@@ -32,8 +32,8 @@ export type MistralLLMID =
 
 // Perplexity Models (UPDATED 1/31/24)
 export type PerplexityLLMID =
-//  | "pplx-7b-online" // Perplexity Online 7B
-//  | "pplx-70b-online" // Perplexity Online 70B
+  | "pplx-7b-online" // Perplexity Online 7B
+  | "pplx-70b-online" // Perplexity Online 70B
   | "pplx-7b-chat" // Perplexity Chat 7B
   | "pplx-70b-chat" // Perplexity Chat 70B
   | "mixtral-8x7b-instruct" // Mixtral 8x7B Instruct
