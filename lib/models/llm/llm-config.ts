@@ -13,7 +13,7 @@ const llmConfig = {
     namespace: process.env.SECRET_PINECONE_NAMESPACE,
     temperature: 0.7,
     messageLength: {
-      min: parseInt(process.env.MIN_LAST_MESSAGE_LENGTH || "50", 10),
+      min: parseInt(process.env.MIN_LAST_MESSAGE_LENGTH || "40", 10),
       max: parseInt(process.env.MAX_LAST_MESSAGE_LENGTH || "1000", 10)
     }
   },

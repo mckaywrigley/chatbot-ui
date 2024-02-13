@@ -11,7 +11,7 @@ import {
 } from "@/lib/ai-helper"
 // import { cleanMessagesFromWarnings } from "@/lib/models/clean-messages"
 import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
-import preparePineconeQuery from "@/lib/models/prepare-pinecone-query"
+// import preparePineconeQuery from "@/lib/models/prepare-pinecone-query"
 import queryPineconeVectorStore from "@/lib/models/query-pinecone"
 
 import llmConfig from "@/lib/models/llm/llm-config"
@@ -56,10 +56,8 @@ export async function POST(request: Request) {
     // const cleanedMessages = await cleanMessagesFromWarnings(messages)
     const cleanedMessages = messages
 
-    let systemMessage: Message = {
-      role: "system",
-      content: `${llmConfig.systemPrompts.hackerGPT}`
-    }
+    const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
+    updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
     if (
       llmConfig.usePinecone &&
@@ -68,14 +66,12 @@ export async function POST(request: Request) {
       cleanedMessages[cleanedMessages.length - 1].content.length >
         llmConfig.pinecone.messageLength.min
     ) {
-      let combinedContent = preparePineconeQuery(
-        cleanedMessages,
-        llmConfig.pinecone.messageLength.max
-      )
+      let latestUserMessage =
+        cleanedMessages[cleanedMessages.length - 1].content
 
-      if (!(await isEnglish(combinedContent))) {
-        combinedContent = await translateToEnglish(
-          combinedContent,
+      if (!(await isEnglish(latestUserMessage))) {
+        latestUserMessage = await translateToEnglish(
+          latestUserMessage,
           openRouterUrl,
           openRouterHeaders,
           llmConfig.models.translation
@@ -83,7 +79,7 @@ export async function POST(request: Request) {
       }
 
       const pineconeResults = await queryPineconeVectorStore(
-        combinedContent,
+        latestUserMessage,
         llmConfig.openai.apiKey,
         llmConfig.pinecone
       )
@@ -91,18 +87,11 @@ export async function POST(request: Request) {
       if (pineconeResults !== "None") {
         modelTemperature = pineconeTemperature
 
-        systemMessage.content =
+        cleanedMessages[0].content =
           `${llmConfig.systemPrompts.hackerGPT} ` +
           `${llmConfig.systemPrompts.pinecone} ` +
-          `Context:\n ${pineconeResults}`
+          `RAG Context:\n ${pineconeResults}`
       }
-    }
-
-    if (cleanedMessages[0]?.role !== "system") {
-      cleanedMessages.unshift(systemMessage)
-    } else {
-      const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
-      updateOrAddSystemMessage(messages, systemMessageContent)
     }
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
