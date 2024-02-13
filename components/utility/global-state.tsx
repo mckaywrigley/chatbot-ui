@@ -97,13 +97,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // CHAT INPUT COMMAND STORE
   const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
   const [slashCommand, setSlashCommand] = useState("")
-  const [isAtPickerOpen, setIsAtPickerOpen] = useState(false)
-  const [atCommand, setAtCommand] = useState("")
+  const [isFilePickerOpen, setIsFilePickerOpen] = useState(false)
+  const [hashtagCommand, setHashtagCommand] = useState("")
   const [isToolPickerOpen, setIsToolPickerOpen] = useState(false)
   const [toolCommand, setToolCommand] = useState("")
   const [focusPrompt, setFocusPrompt] = useState(false)
   const [focusFile, setFocusFile] = useState(false)
   const [focusTool, setFocusTool] = useState(false)
+  const [focusAssistant, setFocusAssistant] = useState(false)
+  const [atCommand, setAtCommand] = useState("")
+  const [isAssistantPickerOpen, setIsAssistantPickerOpen] = useState(false)
 
   // ATTACHMENTS STORE
   const [chatFiles, setChatFiles] = useState<ChatFile[]>([])
@@ -276,10 +279,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setIsPromptPickerOpen,
         slashCommand,
         setSlashCommand,
-        isAtPickerOpen,
-        setIsAtPickerOpen,
-        atCommand,
-        setAtCommand,
+        isFilePickerOpen,
+        setIsFilePickerOpen,
+        hashtagCommand,
+        setHashtagCommand,
         isToolPickerOpen,
         setIsToolPickerOpen,
         toolCommand,
@@ -290,6 +293,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setFocusFile,
         focusTool,
         setFocusTool,
+        focusAssistant,
+        setFocusAssistant,
+        atCommand,
+        setAtCommand,
+        isAssistantPickerOpen,
+        setIsAssistantPickerOpen,
 
         // ATTACHMENT STORE
         chatFiles,

@@ -1,0 +1,1 @@
+ALTER TABLE models ADD COLUMN context_length INT NOT NULL DEFAULT 4096;
