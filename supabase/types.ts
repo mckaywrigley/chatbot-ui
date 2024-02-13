@@ -930,6 +930,7 @@ export interface Database {
         Row: {
           api_key: string
           base_url: string
+          context_length: number
           created_at: string
           description: string
           folder_id: string | null
@@ -943,6 +944,7 @@ export interface Database {
         Insert: {
           api_key: string
           base_url: string
+          context_length?: number
           created_at?: string
           description: string
           folder_id?: string | null
@@ -956,6 +958,7 @@ export interface Database {
         Update: {
           api_key?: string
           base_url?: string
+          context_length?: number
           created_at?: string
           description?: string
           folder_id?: string | null

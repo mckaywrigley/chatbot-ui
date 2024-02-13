@@ -45,24 +45,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     }
   }, [isOpen])
 
-  // useEffect(() => {
-  //   const checkModelLock = async () => {
-  //     const isUsingAzure = profile?.use_azure_openai
-
-  //     if (selectedModel && profile) {
-  //       const locked = await isModelLocked(
-  //         selectedModel.provider === "openai" && isUsingAzure
-  //           ? "azure"
-  //           : selectedModel.provider,
-  //         profile
-  //       )
-  //       setIsLocked(locked)
-  //     }
-  //   }
-
-  //   checkModelLock()
-  // }, [profile])
-
   const handleSelectModel = (modelId: LLMID) => {
     onSelectModel(modelId)
     setIsOpen(false)

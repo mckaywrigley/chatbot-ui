@@ -18,6 +18,7 @@ export const ModelItem: FC<ModelItemProps> = ({ model }) => {
   const [description, setDescription] = useState(model.description)
   const [modelId, setModelId] = useState(model.model_id)
   const [name, setName] = useState(model.name)
+  const [contextLength, setContextLength] = useState(model.context_length)
 
   return (
     <SidebarItem
@@ -30,6 +31,7 @@ export const ModelItem: FC<ModelItemProps> = ({ model }) => {
           api_key: apiKey,
           base_url: baseUrl,
           description,
+          context_length: contextLength,
           model_id: modelId,
           name
         } as TablesUpdate<"models">
@@ -79,6 +81,18 @@ export const ModelItem: FC<ModelItemProps> = ({ model }) => {
               placeholder="API Key..."
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Max Context Length</Label>
+
+            <Input
+              type="number"
+              placeholder="4096"
+              min={0}
+              value={contextLength}
+              onChange={e => setContextLength(parseInt(e.target.value))}
             />
           </div>
         </>
