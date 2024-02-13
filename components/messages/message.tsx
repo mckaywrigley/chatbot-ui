@@ -336,8 +336,10 @@ export const Message: FC<MessageProps> = ({
                 className="flex cursor-pointer items-center text-lg hover:opacity-50"
                 onClick={() => setViewSources(true)}
               >
-                {fileItems.length} Sources from{" "}
-                {Object.keys(fileSummary).length} Files{" "}
+                {fileItems.length}
+                {fileItems.length > 1 ? " Sources " : " Source "}
+                from {Object.keys(fileSummary).length}{" "}
+                {Object.keys(fileSummary).length > 1 ? "Files" : "File"}{" "}
                 <IconCaretRightFilled className="ml-1" />
               </div>
             ) : (
@@ -346,17 +348,17 @@ export const Message: FC<MessageProps> = ({
                   className="flex cursor-pointer items-center text-lg hover:opacity-50"
                   onClick={() => setViewSources(false)}
                 >
-                  {fileItems.length} Sources from{" "}
-                  {Object.keys(fileSummary).length} Files{" "}
+                  {fileItems.length}
+                  {fileItems.length > 1 ? " Sources " : " Source "}
+                  from {Object.keys(fileSummary).length}{" "}
+                  {Object.keys(fileSummary).length > 1 ? "Files" : "File"}{" "}
                   <IconCaretDownFilled className="ml-1" />
                 </div>
 
-                <div className="mt-3 space-y-3">
+                <div className="mt-3 space-y-4">
                   {Object.values(fileSummary).map((file, index) => (
                     <div key={index}>
-                      <div className="ml-4 flex items-center space-x-2">
-                        <div className="text-xl">{index + 1}. </div>
-
+                      <div className="flex items-center space-x-2">
                         <div>
                           <FileIcon type={file.type} />
                         </div>
@@ -374,16 +376,15 @@ export const Message: FC<MessageProps> = ({
                         .map((fileItem, index) => (
                           <div
                             key={index}
-                            className="ml-8 mt-1 flex cursor-pointer items-center space-x-2 hover:opacity-50"
+                            className="ml-8 mt-1.5 flex cursor-pointer items-center space-x-2 hover:opacity-50"
                             onClick={() => {
                               setSelectedFileItem(fileItem)
                               setShowFileItemPreview(true)
                             }}
                           >
-                            <div>-</div>
-
-                            <div className="truncate text-sm font-normal">
-                              {fileItem.content}
+                            <div className="text-sm font-normal">
+                              <span className="mr-1 text-lg font-bold">-</span>{" "}
+                              {fileItem.content.substring(0, 200)}...
                             </div>
                           </div>
                         ))}
