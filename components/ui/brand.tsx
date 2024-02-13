@@ -10,6 +10,5 @@ interface BrandProps {
 export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
       <div className="text-4xl font-bold tracking-wide">Ultimate AI</div>
-    </Link>
   )
 }
