@@ -1,5 +1,12 @@
 import { ChatbotUIContext } from "@/context/context"
-import { type UIEventHandler, useCallback, useContext, useEffect, useRef, useState } from "react"
+import {
+  type UIEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 
 export const useScroll = () => {
   const { isGenerating, chatMessages } = useContext(ChatbotUIContext)
@@ -27,8 +34,8 @@ export const useScroll = () => {
     }
   }, [chatMessages])
 
-  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback((e) => {
-    const target = e.target as HTMLDivElement;
+  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {
+    const target = e.target as HTMLDivElement
     const bottom =
       Math.round(target.scrollHeight) - Math.round(target.scrollTop) ===
       Math.round(target.clientHeight)

@@ -1,10 +1,10 @@
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
+import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
@@ -22,7 +22,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const [url, setUrl] = useState("")
   const [customHeaders, setCustomHeaders] = useState("")
   const [schema, setSchema] = useState("")
-  const [isRequestInBody, setIsRequestInBody] = useState(true)
+  const [schemaError, setSchemaError] = useState("")
 
   if (!profile || !selectedWorkspace) return null
 
@@ -36,8 +36,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
           description,
           url,
           custom_headers: customHeaders,
-          schema,
-          request_in_body: isRequestInBody
+          schema
         } as TablesInsert<"tools">
       }
       isOpen={isOpen}
@@ -148,33 +147,22 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
                 }
               }`}
               value={schema}
-              onValueChange={setSchema}
+              onValueChange={value => {
+                setSchema(value)
+
+                try {
+                  const parsedSchema = JSON.parse(value)
+                  validateOpenAPI(parsedSchema)
+                    .then(() => setSchemaError("")) // Clear error if validation is successful
+                    .catch(error => setSchemaError(error.message)) // Set specific validation error message
+                } catch (error) {
+                  setSchemaError("Invalid JSON format") // Set error for invalid JSON format
+                }
+              }}
               minRows={15}
             />
-          </div>
 
-          <div className="space-y-1">
-            <Label>Request in...</Label>
-
-            <Tabs
-              defaultValue={isRequestInBody ? "body" : "url"}
-              className="w-[400px]"
-            >
-              <TabsList>
-                <TabsTrigger
-                  value="body"
-                  onClick={() => setIsRequestInBody(true)}
-                >
-                  Body
-                </TabsTrigger>
-                <TabsTrigger
-                  value="url"
-                  onClick={() => setIsRequestInBody(false)}
-                >
-                  URL
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="text-xs text-red-500">{schemaError}</div>
           </div>
         </>
       )}

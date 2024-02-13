@@ -29,36 +29,40 @@ export async function POST(request: Request) {
     let schemaDetails = []
 
     for (const selectedTool of selectedTools) {
-      const convertedSchema = await openapiToFunctions(
-        JSON.parse(selectedTool.schema as string)
-      )
-      const tools = convertedSchema.functions || []
-      allTools = allTools.concat(tools)
+      try {
+        const convertedSchema = await openapiToFunctions(
+          JSON.parse(selectedTool.schema as string)
+        )
+        const tools = convertedSchema.functions || []
+        allTools = allTools.concat(tools)
 
-      const routeMap = convertedSchema.routes.reduce(
-        (map: Record<string, string>, route) => {
-          map[route.path.replace(/{(\w+)}/g, ":$1")] = route.operationId
-          return map
-        },
-        {}
-      )
+        const routeMap = convertedSchema.routes.reduce(
+          (map: Record<string, string>, route) => {
+            map[route.path.replace(/{(\w+)}/g, ":$1")] = route.operationId
+            return map
+          },
+          {}
+        )
 
-      allRouteMaps = { ...allRouteMaps, ...routeMap }
+        allRouteMaps = { ...allRouteMaps, ...routeMap }
 
-      schemaDetails.push({
-        title: convertedSchema.info.title,
-        description: convertedSchema.info.description,
-        url: convertedSchema.info.server,
-        headers: selectedTool.custom_headers,
-        routeMap,
-        request_in_body: selectedTool.request_in_body
-      })
+        schemaDetails.push({
+          title: convertedSchema.info.title,
+          description: convertedSchema.info.description,
+          url: convertedSchema.info.server,
+          headers: selectedTool.custom_headers,
+          routeMap,
+          requestInBody: convertedSchema.routes[0].requestInBody
+        })
+      } catch (error: any) {
+        console.error("Error converting schema", error)
+      }
     }
 
     const firstResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
-      tools: allTools
+      tools: allTools.length > 0 ? allTools : undefined
     })
 
     const message = firstResponse.choices[0].message
@@ -104,7 +108,7 @@ export async function POST(request: Request) {
         }
 
         // Determine if the request should be in the body or as a query
-        const isRequestInBody = schemaDetail.request_in_body // Moved this line up to the loop
+        const isRequestInBody = schemaDetail.requestInBody
         let data = {}
 
         if (isRequestInBody) {

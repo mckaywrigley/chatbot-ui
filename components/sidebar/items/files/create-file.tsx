@@ -3,7 +3,7 @@ import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { FILE_NAME_MAX } from "@/db/limits"
+import { FILE_DESCRIPTION_MAX, FILE_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
@@ -73,6 +73,17 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={FILE_NAME_MAX}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Description</Label>
+
+            <Input
+              placeholder="File description..."
+              value={name}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={FILE_DESCRIPTION_MAX}
             />
           </div>
         </>
