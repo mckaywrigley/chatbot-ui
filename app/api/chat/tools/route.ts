@@ -33,7 +33,6 @@ export async function POST(request: Request) {
         const convertedSchema = await openapiToFunctions(
           JSON.parse(selectedTool.schema as string)
         )
-        console.log("convertedSchema", convertedSchema)
         const tools = convertedSchema.functions || []
         allTools = allTools.concat(tools)
 
@@ -53,14 +52,12 @@ export async function POST(request: Request) {
           url: convertedSchema.info.server,
           headers: selectedTool.custom_headers,
           routeMap,
-          request_in_body: selectedTool.request_in_body
+          requestInBody: convertedSchema.routes[0].requestInBody
         })
       } catch (error: any) {
         console.error("Error converting schema", error)
       }
     }
-
-    console.log("allTools", allTools)
 
     const firstResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
@@ -111,7 +108,7 @@ export async function POST(request: Request) {
         }
 
         // Determine if the request should be in the body or as a query
-        const isRequestInBody = schemaDetail.request_in_body // Moved this line up to the loop
+        const isRequestInBody = schemaDetail.requestInBody
         let data = {}
 
         if (isRequestInBody) {

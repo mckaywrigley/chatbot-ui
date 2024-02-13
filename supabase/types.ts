@@ -1338,7 +1338,6 @@ export interface Database {
           folder_id: string | null
           id: string
           name: string
-          request_in_body: boolean
           schema: Json
           sharing: string
           updated_at: string | null
@@ -1352,7 +1351,6 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name: string
-          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
@@ -1366,7 +1364,6 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name?: string
-          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
