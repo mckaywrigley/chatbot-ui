@@ -8,11 +8,12 @@ import {
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
+import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
-import { ChhashtagCommandInput } from "./chat-command-input"
+import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
@@ -50,7 +51,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setFocusFile,
     chatSettings,
     selectedTools,
-    setSelectedTools
+    setSelectedTools,
+    assistantImages
   } = useContext(ChatbotUIContext)
 
   const {
@@ -138,14 +140,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   return (
     <>
-      <ChatFilesDisplay />
+      <div className="flex flex-col flex-wrap justify-center gap-2">
+        <ChatFilesDisplay />
 
-      <div className="flex flex-wrap justify-center gap-2">
         {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
               key={index}
-              className="mt-2 flex justify-center"
+              className="flex justify-center"
               onClick={() =>
                 setSelectedTools(
                   selectedTools.filter(
@@ -161,11 +163,30 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               </div>
             </div>
           ))}
+
+        {selectedAssistant && (
+          <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
+            <Image
+              className="rounded"
+              src={
+                assistantImages.find(
+                  img => img.path === selectedAssistant.image_path
+                )?.base64
+              }
+              width={28}
+              height={28}
+              alt={selectedAssistant.name}
+            />
+            <div className="text-sm font-bold">
+              Talking to {selectedAssistant.name}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
-          <ChhashtagCommandInput />
+          <ChatCommandInput />
         </div>
 
         <>

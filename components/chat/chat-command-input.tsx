@@ -6,9 +6,9 @@ import { FilePicker } from "./file-picker"
 import { PromptPicker } from "./prompt-picker"
 import { ToolPicker } from "./tool-picker"
 
-interface ChhashtagCommandInputProps {}
+interface ChatCommandInputProps {}
 
-export const ChhashtagCommandInput: FC<ChhashtagCommandInputProps> = ({}) => {
+export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   const {
     newMessageFiles,
     chatFiles,
