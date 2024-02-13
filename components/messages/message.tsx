@@ -9,9 +9,7 @@ import {
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
-  IconFileFilled,
   IconFileText,
-  IconFileTypePdf,
   IconMoodSmile,
   IconPencil,
   IconRobotFace
@@ -20,6 +18,7 @@ import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
+import { FileIcon } from "../ui/file-icon"
 import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -151,6 +150,35 @@ export const Message: FC<MessageProps> = ({
   )?.base64
 
   const modelDetails = LLM_LIST.find(model => model.modelId === message.model)
+
+  const fileAccumulator: Record<
+    string,
+    {
+      id: string
+      name: string
+      count: number
+      type: string
+      description: string
+    }
+  > = {}
+
+  const fileSummary = fileItems.reduce((acc, fileItem) => {
+    const parentFile = files.find(file => file.id === fileItem.file_id)
+    if (parentFile) {
+      if (!acc[parentFile.id]) {
+        acc[parentFile.id] = {
+          id: parentFile.id,
+          name: parentFile.name,
+          count: 1,
+          type: parentFile.type,
+          description: parentFile.description
+        }
+      } else {
+        acc[parentFile.id].count += 1
+      }
+    }
+    return acc
+  }, fileAccumulator)
 
   return (
     <div
@@ -302,64 +330,65 @@ export const Message: FC<MessageProps> = ({
         </div>
 
         {fileItems.length > 0 && (
-          <div className="mt-6 text-lg font-bold">
+          <div className="border-primary mt-6 border-t pt-4 font-bold">
             {!viewSources ? (
               <div
-                className="flex cursor-pointer items-center hover:opacity-50"
+                className="flex cursor-pointer items-center text-lg hover:opacity-50"
                 onClick={() => setViewSources(true)}
               >
-                View {fileItems.length} Sources{" "}
+                {fileItems.length} Sources from{" "}
+                {Object.keys(fileSummary).length} Files{" "}
                 <IconCaretRightFilled className="ml-1" />
               </div>
             ) : (
               <>
                 <div
-                  className="flex cursor-pointer items-center hover:opacity-50"
+                  className="flex cursor-pointer items-center text-lg hover:opacity-50"
                   onClick={() => setViewSources(false)}
                 >
-                  Sources <IconCaretDownFilled className="ml-1" />
+                  {fileItems.length} Sources from{" "}
+                  {Object.keys(fileSummary).length} Files{" "}
+                  <IconCaretDownFilled className="ml-1" />
                 </div>
 
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {fileItems.map((fileItem, index) => {
-                    const parentFile = files.find(
-                      file => file.id === fileItem.file_id
-                    )
+                <div className="mt-3 space-y-3">
+                  {Object.values(fileSummary).map((file, index) => (
+                    <div key={index}>
+                      <div className="ml-4 flex items-center space-x-2">
+                        <div className="text-xl">{index + 1}. </div>
 
-                    return (
-                      <div
-                        key={index}
-                        className="border-primary flex cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
-                        onClick={() => {
-                          setSelectedFileItem(fileItem)
-                          setShowFileItemPreview(true)
-                        }}
-                      >
-                        <div className="rounded bg-blue-500 p-2">
-                          {(() => {
-                            let fileExtension = parentFile?.type.includes("/")
-                              ? parentFile.type.split("/")[1]
-                              : parentFile?.type
-
-                            switch (fileExtension) {
-                              case "pdf":
-                                return <IconFileTypePdf />
-                              default:
-                                return <IconFileFilled />
-                            }
-                          })()}
+                        <div>
+                          <FileIcon type={file.type} />
                         </div>
 
-                        <div className="w-fit space-y-1 truncate text-wrap text-xs">
-                          <div className="truncate">{parentFile?.name}</div>
-
-                          <div className="truncate text-xs opacity-50">
-                            {fileItem.content.substring(0, 60)}...
-                          </div>
-                        </div>
+                        <div className="truncate">{file.name}</div>
                       </div>
-                    )
-                  })}
+
+                      {fileItems
+                        .filter(fileItem => {
+                          const parentFile = files.find(
+                            parentFile => parentFile.id === fileItem.file_id
+                          )
+                          return parentFile?.id === file.id
+                        })
+                        .map((fileItem, index) => (
+                          <div
+                            key={index}
+                            className="ml-8 mt-1 flex cursor-pointer items-center space-x-2 hover:opacity-50"
+                            onClick={() => {
+                              setSelectedFileItem(fileItem)
+                              setShowFileItemPreview(true)
+                            }}
+                          >
+                            <div>-</div>
+
+                            <div className="truncate text-sm font-normal">
+                              {fileItem.content}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ))}
                 </div>
               </>
             )}

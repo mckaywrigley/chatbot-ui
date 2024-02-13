@@ -1,4 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
+import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
@@ -22,7 +25,8 @@ export const usePromptAndCommand = () => {
     setAtCommand,
     setIsAssistantPickerOpen,
     setSelectedAssistant,
-    setChatSettings
+    setChatSettings,
+    setChatFiles
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -130,7 +134,7 @@ export const usePromptAndCommand = () => {
     setSelectedTools(prev => [...prev, tool])
   }
 
-  const handleSelectAssistant = (assistant: Tables<"assistants">) => {
+  const handleSelectAssistant = async (assistant: Tables<"assistants">) => {
     setIsAssistantPickerOpen(false)
     setUserInput(userInput.replace(/@[^ ]*$/, ""))
     setSelectedAssistant(assistant)
@@ -144,6 +148,35 @@ export const usePromptAndCommand = () => {
       includeWorkspaceInstructions: assistant.include_workspace_instructions,
       embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
     })
+
+    let allFiles = []
+
+    const assistantFiles = (await getAssistantFilesByAssistantId(assistant.id))
+      .files
+    allFiles = [...assistantFiles]
+    const assistantCollections = (
+      await getAssistantCollectionsByAssistantId(assistant.id)
+    ).collections
+    for (const collection of assistantCollections) {
+      const collectionFiles = (
+        await getCollectionFilesByCollectionId(collection.id)
+      ).files
+      allFiles = [...allFiles, ...collectionFiles]
+    }
+    const assistantTools = (await getAssistantToolsByAssistantId(assistant.id))
+      .tools
+
+    setSelectedTools(assistantTools)
+    setChatFiles(
+      allFiles.map(file => ({
+        id: file.id,
+        name: file.name,
+        type: file.type,
+        file: null
+      }))
+    )
+
+    if (allFiles.length > 0) setShowFilesDisplay(true)
   }
 
   return {
