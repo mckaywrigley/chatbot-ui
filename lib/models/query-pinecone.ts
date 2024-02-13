@@ -46,7 +46,7 @@ const queryPineconeVectorStore = async (
     const data = await response.json()
     let matches = data.matches || []
 
-    if (matches.length < 1) {
+    if (matches.length < 0) {
       return "None"
     }
 
