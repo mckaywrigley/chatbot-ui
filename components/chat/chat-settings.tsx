@@ -1,7 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { LLMID, ModelProvider } from "@/types"
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef } from "react"
 import { Button } from "../ui/button"
@@ -13,7 +13,14 @@ interface ChatSettingsProps {}
 export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
   useHotkey("i", () => handleClick())
 
-  const { chatSettings, setChatSettings } = useContext(ChatbotUIContext)
+  const {
+    chatSettings,
+    setChatSettings,
+    models,
+    availableHostedModels,
+    availableLocalModels,
+    availableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -41,7 +48,21 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
 
   if (!chatSettings) return null
 
-  const fullModel = LLM_LIST.find(llm => llm.modelId === chatSettings.model)
+  const allModels = [
+    ...models.map(model => ({
+      modelId: model.model_id as LLMID,
+      modelName: model.name,
+      provider: "custom" as ModelProvider,
+      hostedId: model.id,
+      platformLink: "",
+      imageInput: false
+    })),
+    ...availableHostedModels,
+    ...availableLocalModels,
+    ...availableOpenRouterModels
+  ]
+
+  const fullModel = allModels.find(llm => llm.modelId === chatSettings.model)
 
   return (
     <Popover>

@@ -27,7 +27,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
       isTyping={isTyping}
       contentType="files"
       icon={<FileIcon type={file.type} size={30} />}
-      updateState={{ name }}
+      updateState={{ name, description }}
       renderInputs={() => (
         <>
           <div

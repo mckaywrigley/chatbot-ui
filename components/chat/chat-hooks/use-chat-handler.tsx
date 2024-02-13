@@ -56,23 +56,23 @@ export const useChatHandler = () => {
     useRetrieval,
     sourceCount,
     setIsPromptPickerOpen,
-    setIsAtPickerOpen,
+    setIsFilePickerOpen,
     selectedTools,
     selectedPreset,
     setChatSettings,
     models,
     isPromptPickerOpen,
-    isAtPickerOpen,
+    isFilePickerOpen,
     isToolPickerOpen
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (!isPromptPickerOpen || !isAtPickerOpen || !isToolPickerOpen) {
+    if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
       chatInputRef.current?.focus()
     }
-  }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
+  }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
   const handleNewChat = async () => {
     if (!selectedWorkspace) return
@@ -91,7 +91,7 @@ export const useChatHandler = () => {
     setNewMessageImages([])
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
-    setIsAtPickerOpen(false)
+    setIsFilePickerOpen(false)
 
     setSelectedTools([])
     setToolInUse("none")
@@ -165,7 +165,7 @@ export const useChatHandler = () => {
       setUserInput("")
       setIsGenerating(true)
       setIsPromptPickerOpen(false)
-      setIsAtPickerOpen(false)
+      setIsFilePickerOpen(false)
       setNewMessageImages([])
 
       const newAbortController = new AbortController()
@@ -221,7 +221,8 @@ export const useChatHandler = () => {
           chatSettings!,
           b64Images,
           isRegeneration,
-          setChatMessages
+          setChatMessages,
+          selectedAssistant
         )
 
       let payload: ChatPayload = {
@@ -238,7 +239,7 @@ export const useChatHandler = () => {
       let generatedText = ""
 
       if (selectedTools.length > 0) {
-        setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
+        setToolInUse("Tools")
 
         const formattedMessages = await buildFinalMessages(
           payload,
@@ -341,7 +342,8 @@ export const useChatHandler = () => {
         retrievedFileItems,
         setChatMessages,
         setChatFileItems,
-        setChatImages
+        setChatImages,
+        selectedAssistant
       )
 
       setIsGenerating(false)

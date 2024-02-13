@@ -818,6 +818,7 @@ export interface Database {
       }
       messages: {
         Row: {
+          assistant_id: string | null
           chat_id: string
           content: string
           created_at: string
@@ -830,6 +831,7 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          assistant_id?: string | null
           chat_id: string
           content: string
           created_at?: string
@@ -842,6 +844,7 @@ export interface Database {
           user_id: string
         }
         Update: {
+          assistant_id?: string | null
           chat_id?: string
           content?: string
           created_at?: string
@@ -854,6 +857,13 @@ export interface Database {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_chat_id_fkey"
             columns: ["chat_id"]
@@ -920,6 +930,7 @@ export interface Database {
         Row: {
           api_key: string
           base_url: string
+          context_length: number
           created_at: string
           description: string
           folder_id: string | null
@@ -933,6 +944,7 @@ export interface Database {
         Insert: {
           api_key: string
           base_url: string
+          context_length?: number
           created_at?: string
           description: string
           folder_id?: string | null
@@ -946,6 +958,7 @@ export interface Database {
         Update: {
           api_key?: string
           base_url?: string
+          context_length?: number
           created_at?: string
           description?: string
           folder_id?: string | null
@@ -1331,7 +1344,6 @@ export interface Database {
           folder_id: string | null
           id: string
           name: string
-          request_in_body: boolean
           schema: Json
           sharing: string
           updated_at: string | null
@@ -1345,7 +1357,6 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name: string
-          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
@@ -1359,7 +1370,6 @@ export interface Database {
           folder_id?: string | null
           id?: string
           name?: string
-          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
