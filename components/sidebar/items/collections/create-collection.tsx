@@ -2,7 +2,7 @@ import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
-import { COLLECTION_NAME_MAX } from "@/db/limits"
+import { COLLECTION_DESCRIPTION_MAX, COLLECTION_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { CollectionFile } from "@/types"
 import { FC, useContext, useState } from "react"
@@ -80,6 +80,17 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={COLLECTION_NAME_MAX}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label>Description</Label>
+
+            <Input
+              placeholder="Collection description..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              maxLength={COLLECTION_DESCRIPTION_MAX}
             />
           </div>
         </>

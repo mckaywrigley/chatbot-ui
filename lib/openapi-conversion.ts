@@ -10,32 +10,106 @@ interface OpenAPIData {
     path: string
     method: string
     operationId: string
+    requestInBody?: boolean
   }[]
   functions: any
+}
+
+export const validateOpenAPI = async (openapiSpec: any) => {
+  if (!openapiSpec.info) {
+    throw new Error("('info'): field required")
+  }
+
+  if (!openapiSpec.info.title) {
+    throw new Error("('info', 'title'): field required")
+  }
+
+  if (!openapiSpec.info.version) {
+    throw new Error("('info', 'version'): field required")
+  }
+
+  if (
+    !openapiSpec.servers ||
+    !openapiSpec.servers.length ||
+    !openapiSpec.servers[0].url
+  ) {
+    throw new Error("Could not find a valid URL in `servers`")
+  }
+
+  if (!openapiSpec.paths || Object.keys(openapiSpec.paths).length === 0) {
+    throw new Error("No paths found in the OpenAPI spec")
+  }
+
+  Object.keys(openapiSpec.paths).forEach(path => {
+    if (!path.startsWith("/")) {
+      throw new Error(`Path ${path} does not start with a slash; skipping`)
+    }
+  })
+
+  if (
+    Object.values(openapiSpec.paths).some((methods: any) =>
+      Object.values(methods).some((spec: any) => !spec.operationId)
+    )
+  ) {
+    throw new Error("Some methods are missing operationId")
+  }
+
+  if (
+    Object.values(openapiSpec.paths).some((methods: any) =>
+      Object.values(methods).some(
+        (spec: any) => spec.requestBody && !spec.requestBody.content
+      )
+    )
+  ) {
+    throw new Error(
+      "Some methods with a requestBody are missing requestBody.content"
+    )
+  }
+
+  if (
+    Object.values(openapiSpec.paths).some((methods: any) =>
+      Object.values(methods).some((spec: any) => {
+        if (spec.requestBody?.content?.["application/json"]?.schema) {
+          if (
+            !spec.requestBody.content["application/json"].schema.properties ||
+            Object.keys(spec.requestBody.content["application/json"].schema)
+              .length === 0
+          ) {
+            throw new Error(
+              `In context=('paths', '${Object.keys(methods)[0]}', '${
+                Object.keys(spec)[0]
+              }', 'requestBody', 'content', 'application/json', 'schema'), object schema missing properties`
+            )
+          }
+        }
+      })
+    )
+  ) {
+    throw new Error("Some object schemas are missing properties")
+  }
 }
 
 export const openapiToFunctions = async (
   openapiSpec: any
 ): Promise<OpenAPIData> => {
   const functions: any[] = [] // Define a proper type for function objects
-  const routes: { path: string; method: string; operationId: string }[] = []
+  const routes: {
+    path: string
+    method: string
+    operationId: string
+    requestInBody?: boolean // Add a flag to indicate if the request should be in the body
+  }[] = []
 
   for (const [path, methods] of Object.entries(openapiSpec.paths)) {
-    // Check if methods is an object
     if (typeof methods !== "object" || methods === null) {
-      continue // Skip this iteration if methods is not an object
+      continue
     }
 
     for (const [method, specWithRef] of Object.entries(
       methods as Record<string, any>
     )) {
-      // 1. Resolve JSON references.
       const spec: any = await $RefParser.dereference(specWithRef)
-
-      // 2. Extract a name for the functions.
       const functionName = spec.operationId
-
-      // 3. Extract a description and parameters.
       const desc = spec.description || spec.summary || ""
 
       const schema: { type: string; properties: any; required?: string[] } = {
@@ -72,11 +146,14 @@ export const openapiToFunctions = async (
         }
       })
 
-      // Add route information to the routes array
+      // Determine if the request should be in the body based on the presence of requestBody
+      const requestInBody = !!spec.requestBody
+
       routes.push({
         path,
         method,
-        operationId: functionName
+        operationId: functionName,
+        requestInBody // Include this flag in the route information
       })
     }
   }

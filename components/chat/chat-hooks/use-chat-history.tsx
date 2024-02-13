@@ -28,7 +28,6 @@ export const useChatHistoryHandler = () => {
    * Sets the new message content to the previous user message.
    */
   const setNewMessageContentToPreviousUserMessage = () => {
-    console.log(`chatMessages`, chatMessages)
     let tempIndex = messageHistoryIndex
     while (
       tempIndex > 0 &&

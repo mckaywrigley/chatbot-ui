@@ -8,6 +8,7 @@ import {
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
+import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
@@ -15,9 +16,9 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
+import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
-import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 
 interface ChatInputProps {}
 
@@ -31,6 +32,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
 
   const {
+    isAssistantPickerOpen,
+    focusAssistant,
+    setFocusAssistant,
     userInput,
     chatMessages,
     isGenerating,
@@ -44,11 +48,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
-    isAtPickerOpen,
+    isFilePickerOpen,
     setFocusFile,
     chatSettings,
     selectedTools,
-    setSelectedTools
+    setSelectedTools,
+    assistantImages
   } = useContext(ChatbotUIContext)
 
   const {
@@ -82,34 +87,35 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleSendMessage(userInput, chatMessages, false)
     }
 
+    // Consolidate conditions to avoid TypeScript error
     if (
-      isPromptPickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
+      isPromptPickerOpen ||
+      isFilePickerOpen ||
+      isToolPickerOpen ||
+      isAssistantPickerOpen
     ) {
-      event.preventDefault()
-      setFocusPrompt(!focusPrompt)
+      if (
+        event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      ) {
+        event.preventDefault()
+        // Toggle focus based on picker type
+        if (isPromptPickerOpen) setFocusPrompt(!focusPrompt)
+        if (isFilePickerOpen) setFocusFile(!focusFile)
+        if (isToolPickerOpen) setFocusTool(!focusTool)
+        if (isAssistantPickerOpen) setFocusAssistant(!focusAssistant)
+      }
     }
 
-    if (
-      isAtPickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
-    ) {
+    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
-      setFocusFile(!focusFile)
+      setNewMessageContentToPreviousUserMessage()
     }
 
-    if (
-      isToolPickerOpen &&
-      (event.key === "Tab" ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown")
-    ) {
+    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
-      setFocusTool(!focusTool)
+      setNewMessageContentToNextUserMessage()
     }
 
     //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
@@ -121,6 +127,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToNextUserMessage()
+    }
+
+    if (
+      isAssistantPickerOpen &&
+      (event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown")
+    ) {
+      event.preventDefault()
+      setFocusAssistant(!focusAssistant)
     }
   }
 
@@ -142,14 +158,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   return (
     <>
-      <ChatFilesDisplay />
+      <div className="flex flex-col flex-wrap justify-center gap-2">
+        <ChatFilesDisplay />
 
-      <div className="flex flex-wrap justify-center gap-2">
         {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
               key={index}
-              className="mt-2 flex justify-center"
+              className="flex justify-center"
               onClick={() =>
                 setSelectedTools(
                   selectedTools.filter(
@@ -165,6 +181,25 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               </div>
             </div>
           ))}
+
+        {selectedAssistant && (
+          <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
+            <Image
+              className="rounded"
+              src={
+                assistantImages.find(
+                  img => img.path === selectedAssistant.image_path
+                )?.base64
+              }
+              width={28}
+              height={28}
+              alt={selectedAssistant.name}
+            />
+            <div className="text-sm font-bold">
+              Talking to {selectedAssistant.name}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
@@ -196,7 +231,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(
-            `Ask anything. Type "/" for prompts, "#" for files, and "!" for tools.`
+            `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
           )}
           onValueChange={handleInputChange}
           value={userInput}

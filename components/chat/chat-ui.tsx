@@ -1,6 +1,7 @@
 import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
@@ -36,7 +37,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
-    setUseRetrieval
+    setUseRetrieval,
+    setSelectedTools
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -159,6 +161,11 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
       if (assistant) {
         setSelectedAssistant(assistant)
+
+        const assistantTools = (
+          await getAssistantToolsByAssistantId(assistant.id)
+        ).tools
+        setSelectedTools(assistantTools)
       }
     }
 
