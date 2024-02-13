@@ -33,11 +33,11 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
-          icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
-          contentType="presets"
-          onContentTypeChange={onContentTypeChange}
-        />
+//        <SidebarSwitchItem
+//          icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
+//          contentType="presets"
+//          onContentTypeChange={onContentTypeChange}
+//        />
 
         <SidebarSwitchItem
           icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
@@ -57,23 +57,23 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
-          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
-          contentType="collections"
-          onContentTypeChange={onContentTypeChange}
-        />
+//        <SidebarSwitchItem
+//          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
+//          contentType="collections"
+//          onContentTypeChange={onContentTypeChange}
+//        />
 
-        <SidebarSwitchItem
-          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
-          contentType="assistants"
-          onContentTypeChange={onContentTypeChange}
-        />
+//        <SidebarSwitchItem
+//          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
+//          contentType="assistants"
+//          onContentTypeChange={onContentTypeChange}
+//        />
 
-        <SidebarSwitchItem
-          icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
-          contentType="tools"
-          onContentTypeChange={onContentTypeChange}
-        />
+//        <SidebarSwitchItem
+//          icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
+//          contentType="tools"
+//          onContentTypeChange={onContentTypeChange}
+//        />
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">
