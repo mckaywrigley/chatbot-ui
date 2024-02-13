@@ -11,8 +11,7 @@ import {
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil,
-  IconRobotFace
+  IconPencil
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -227,25 +226,6 @@ export const Message: FC<MessageProps> = ({
                     height={ICON_SIZE}
                     width={ICON_SIZE}
                   />
-                ) : selectedAssistant ? (
-                  selectedAssistantImage ? (
-                    <Image
-                      style={{
-                        width: `${ICON_SIZE}px`,
-                        height: `${ICON_SIZE}px`
-                      }}
-                      className="rounded"
-                      src={selectedAssistantImage || ""}
-                      alt="assistant image"
-                      height={ICON_SIZE}
-                      width={ICON_SIZE}
-                    />
-                  ) : (
-                    <IconRobotFace
-                      className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                      size={ICON_SIZE}
-                    />
-                  )
                 ) : (
                   <WithTooltip
                     display={<div>{MODEL_DATA?.modelName}</div>}
