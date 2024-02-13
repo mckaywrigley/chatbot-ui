@@ -178,10 +178,10 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     presets: setPresets,
     prompts: setPrompts,
     files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
+//    collections: setCollections,
+//    assistants: setAssistants,
+//    tools: setTools,
+//    models: setModels
   }
 
   const handleCreate = async () => {
