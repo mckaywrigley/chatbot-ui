@@ -43,6 +43,8 @@ export async function buildFinalMessages(
     chatFileItems
   } = payload
 
+  console.log("build-prompt.ts", { payload })
+
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",

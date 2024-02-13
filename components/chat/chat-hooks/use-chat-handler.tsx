@@ -18,6 +18,7 @@ import {
   validateChatSettings,
   createSimpleAssistantMessage
 } from "../chat-helpers"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -93,10 +94,14 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
 
-    setSelectedTools([])
     setToolInUse("none")
 
     if (selectedAssistant) {
+      const assistantTools = (
+        await getAssistantToolsByAssistantId(selectedAssistant.id)
+      ).tools
+      setSelectedTools(assistantTools)
+
       setChatSettings({
         model: selectedAssistant.model as LLMID,
         prompt: selectedAssistant.prompt,
@@ -255,7 +260,8 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            selectedTools
+            selectedTools,
+            chatId: currentChat?.id
           })
         })
 

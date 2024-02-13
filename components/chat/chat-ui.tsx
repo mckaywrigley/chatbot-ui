@@ -39,7 +39,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setShowFilesDisplay,
     setUseRetrieval,
     profile,
-    setSelectedTools
+    setSelectedTools,
+    setTopicDescription
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -168,6 +169,10 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         ).tools
         setSelectedTools(assistantTools)
       }
+    }
+
+    if (chat.topic_description) {
+      setTopicDescription(chat.topic_description)
     }
 
     setSelectedChat(chat)

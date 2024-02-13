@@ -56,6 +56,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     assistantImages
   } = useContext(ChatbotUIContext)
 
+  // console.log("Watching", selectedAssistant, selectedTools)
+
   const {
     chatInputRef,
     handleSendMessage,
