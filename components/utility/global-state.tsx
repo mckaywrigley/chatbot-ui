@@ -87,6 +87,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   })
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
+  const [topicDescription, setTopicDescription] = useState<string>("")
 
   // ACTIVE CHAT STORE
   const [isGenerating, setIsGenerating] = useState<boolean>(false)
@@ -265,6 +266,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setSelectedChat,
         chatFileItems,
         setChatFileItems,
+        topicDescription,
+        setTopicDescription,
 
         // ACTIVE CHAT STORE
         isGenerating,

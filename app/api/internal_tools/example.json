@@ -1,0 +1,70 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Topic Management API",
+    "description": "This API allows for updating the name of a topic.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Main API server"
+    }
+  ],
+  "paths": {
+    "/internal_tools": {
+      "patch": {
+        "operationId": "updateTopicName",
+        "summary": "Updates a topic name.",
+        "description": "This endpoint updates the name and description of a study topic.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["topic_name", "topic_description"],
+                "properties": {
+                  "topic_name": {
+                    "type": "string",
+                    "description": "The new name to assign to the topic."
+                  },
+                  "topic_description": {
+                    "type": "string",
+                    "description": "The longform topic description."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Topic name updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "topic_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request in updating topic"
+          },
+          "404": {
+            "description": "Topic not found"
+          }
+        }
+      }
+    }
+  }
+}

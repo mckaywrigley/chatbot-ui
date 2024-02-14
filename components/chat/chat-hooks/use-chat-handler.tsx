@@ -18,6 +18,7 @@ import {
   validateChatSettings,
   createSimpleAssistantMessage
 } from "../chat-helpers"
+import { usePromptAndCommand } from "./use-prompt-and-command"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -63,10 +64,13 @@ export const useChatHandler = () => {
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
-    isToolPickerOpen
+    isToolPickerOpen,
+    setTopicDescription,
+    assistants
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
+  const { handleSelectAssistant } = usePromptAndCommand()
 
   useEffect(() => {
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
@@ -92,53 +96,19 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
+    setTopicDescription("")
 
-    setSelectedTools([])
     setToolInUse("none")
 
-    if (selectedAssistant) {
-      setChatSettings({
-        model: selectedAssistant.model as LLMID,
-        prompt: selectedAssistant.prompt,
-        temperature: selectedAssistant.temperature,
-        contextLength: selectedAssistant.context_length,
-        includeProfileContext: selectedAssistant.include_profile_context,
-        includeWorkspaceInstructions:
-          selectedAssistant.include_workspace_instructions,
-        embeddingsProvider: selectedAssistant.embeddings_provider as
-          | "openai"
-          | "local"
-      })
-    } else if (selectedPreset) {
-      setChatSettings({
-        model: selectedPreset.model as LLMID,
-        prompt: selectedPreset.prompt,
-        temperature: selectedPreset.temperature,
-        contextLength: selectedPreset.context_length,
-        includeProfileContext: selectedPreset.include_profile_context,
-        includeWorkspaceInstructions:
-          selectedPreset.include_workspace_instructions,
-        embeddingsProvider: selectedPreset.embeddings_provider as
-          | "openai"
-          | "local"
-      })
-    } else if (selectedWorkspace) {
-      setChatSettings({
-        model: (selectedWorkspace.default_model ||
-          "gpt-4-1106-preview") as LLMID,
-        prompt:
-          selectedWorkspace.default_prompt ||
-          "You are a friendly, helpful AI assistant.",
-        temperature: selectedWorkspace.default_temperature || 0.5,
-        contextLength: selectedWorkspace.default_context_length || 4096,
-        includeProfileContext:
-          selectedWorkspace.include_profile_context || true,
-        includeWorkspaceInstructions:
-          selectedWorkspace.include_workspace_instructions || true,
-        embeddingsProvider:
-          (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-          "openai"
-      })
+    console.log("Start with Topic assistant")
+    // get the assistant from assistances context where name ="Study coach"
+    const topicAssistant = assistants.find(
+      assistant => assistant.name === "Topic creation tutor"
+    )
+    if (!topicAssistant) {
+      console.error("No assistant with name 'Study coach' found")
+    } else {
+      handleSelectAssistant(topicAssistant)
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
@@ -255,7 +225,8 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            selectedTools
+            selectedTools,
+            chatId: currentChat?.id
           })
         })
 
