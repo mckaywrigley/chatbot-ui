@@ -19,7 +19,8 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
-
+import { updateChat } from "@/db/chats"
+import { deleteChatFilesByChatId } from "@/db/chat-files"
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
@@ -55,7 +56,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setSelectedTools,
     assistantImages,
     topicDescription,
-    assistants
+    assistants,
+    setNewMessageFiles,
+    setChats,
+    selectedChat
   } = useContext(ChatbotUIContext)
 
   // console.log("Watching", selectedAssistant, selectedTools)
@@ -160,7 +164,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
-  const handleProceedToLearning = () => {
+  const handleProceedToLearning = async () => {
     console.log("Proceed to learning")
     // get the assistant from assistances context where name ="Study coach"
     const selectedAssistant = assistants.find(
@@ -171,6 +175,27 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       return
     }
     handleSelectAssistant(selectedAssistant)
+    setNewMessageFiles([])
+    let currentChat = selectedChat ? { ...selectedChat } : null
+
+    if (!currentChat) {
+      console.error("No chat found")
+      return
+    }
+
+    const updatedChat = await updateChat(currentChat.id, {
+      assistant_id: selectedAssistant.id
+    })
+
+    setChats(prevChats => {
+      const updatedChats = prevChats.map(prevChat =>
+        prevChat.id === updatedChat.id ? updatedChat : prevChat
+      )
+
+      return updatedChats
+    })
+
+    deleteChatFilesByChatId(currentChat.id)
   }
 
   return (
@@ -199,23 +224,24 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
 
-        {topicDescription.length > 0 && (
-          <div className="flex justify-between space-x-4">
-            <div className="w-1/2">
-              <button
-                className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                onClick={handleProceedToLearning}
-              >
-                Lets proceed to learning
-              </button>
+        {topicDescription.length > 0 &&
+          selectedAssistant?.name === "Topic creation tutor" && (
+            <div className="flex justify-between space-x-4">
+              <div className="w-1/2">
+                <button
+                  className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+                  onClick={handleProceedToLearning}
+                >
+                  Lets proceed to learning
+                </button>
+              </div>
+              <div className="w-1/2">
+                <button className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white">
+                  Another prompt
+                </button>
+              </div>
             </div>
-            <div className="w-1/2">
-              <button className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white">
-                Another prompt
-              </button>
-            </div>
-          </div>
-        )}
+          )}
 
         {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">

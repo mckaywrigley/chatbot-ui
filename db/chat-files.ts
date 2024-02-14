@@ -48,3 +48,14 @@ export const createChatFiles = async (
 
   return createdChatFiles
 }
+// delete chat files by chat id
+export const deleteChatFilesByChatId = async (chatId: string) => {
+  const { error } = await supabase
+    .from("chat_files")
+    .delete()
+    .eq("chat_id", chatId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
