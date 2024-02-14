@@ -61,11 +61,7 @@ export async function POST(request: Request) {
 
     let latestUserMessage = cleanedMessages[cleanedMessages.length - 1].content
 
-    if (
-      !latestUserMessage.startsWith(
-        "Using the content of the uploaded file, respond to the user's query by:"
-      )
-    ) {
+    if (!latestUserMessage.startsWith("Assist with the user's query:")) {
       if (
         llmConfig.usePinecone &&
         cleanedMessages.length > 0 &&
