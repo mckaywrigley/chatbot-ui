@@ -166,12 +166,19 @@ export async function buildFinalMessages(
 
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
-      content:
-        `Analyze the following file content in response to the user's query: "${finalMessages[finalMessages.length - 1].content}". ` +
-        `Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. Assess each section for information pertinent to the query.\n\n${retrievalText}\n\n` +
-        `Provide a concise summary of the key information relevant to the user's query. Highlight any ambiguities or multiple perspectives discovered during the analysis. ` +
-        `If the file does not contain relevant information, or if the answer is not clear, state 'I don't know.'\n\n` +
-        `Summary of findings:\n-`
+      content: `Using the content of the uploaded file, respond to the user's query by:
+
+     1. Reading through the file to identify information pertinent to the query: '${finalMessages[finalMessages.length - 1].content}'.
+     2. Extracting key points that directly answer or are relevant to the user's question.
+     3. Organizing the extracted information to address the query comprehensively.
+     4. Highlighting any ambiguities or conflicting information discovered within the file content.
+     5. Clearly stating if the file does not contain information relevant to the query or if the response cannot be conclusively determined from the provided content.
+     
+     Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. Assess each section for information pertinent to the query.
+     
+     \n\n${retrievalText}\n\n
+     
+     Summarize the findings succinctly, ensuring the response is informative and directly addresses the user's needs based on the file's content.`
     }
   }
 

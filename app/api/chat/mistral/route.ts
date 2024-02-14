@@ -59,38 +59,43 @@ export async function POST(request: Request) {
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
+    let latestUserMessage = cleanedMessages[cleanedMessages.length - 1].content
+
     if (
-      llmConfig.usePinecone &&
-      cleanedMessages.length > 0 &&
-      cleanedMessages[cleanedMessages.length - 1].role === "user" &&
-      cleanedMessages[cleanedMessages.length - 1].content.length >
-        llmConfig.pinecone.messageLength.min
-    ) {
-      let latestUserMessage =
-        cleanedMessages[cleanedMessages.length - 1].content
-
-      if (!(await isEnglish(latestUserMessage))) {
-        latestUserMessage = await translateToEnglish(
-          latestUserMessage,
-          openRouterUrl,
-          openRouterHeaders,
-          llmConfig.models.translation
-        )
-      }
-
-      const pineconeResults = await queryPineconeVectorStore(
-        latestUserMessage,
-        llmConfig.openai.apiKey,
-        llmConfig.pinecone
+      !latestUserMessage.startsWith(
+        "Using the content of the uploaded file, respond to the user's query by:"
       )
+    ) {
+      if (
+        llmConfig.usePinecone &&
+        cleanedMessages.length > 0 &&
+        cleanedMessages[cleanedMessages.length - 1].role === "user" &&
+        cleanedMessages[cleanedMessages.length - 1].content.length >
+          llmConfig.pinecone.messageLength.min
+      ) {
+        if (!(await isEnglish(latestUserMessage))) {
+          latestUserMessage = await translateToEnglish(
+            latestUserMessage,
+            openRouterUrl,
+            openRouterHeaders,
+            llmConfig.models.translation
+          )
+        }
 
-      if (pineconeResults !== "None") {
-        modelTemperature = pineconeTemperature
+        const pineconeResults = await queryPineconeVectorStore(
+          latestUserMessage,
+          llmConfig.openai.apiKey,
+          llmConfig.pinecone
+        )
 
-        cleanedMessages[0].content =
-          `${llmConfig.systemPrompts.hackerGPT} ` +
-          `${llmConfig.systemPrompts.pinecone} ` +
-          `RAG Context:\n ${pineconeResults}`
+        if (pineconeResults !== "None") {
+          modelTemperature = pineconeTemperature
+
+          cleanedMessages[0].content =
+            `${llmConfig.systemPrompts.hackerGPT} ` +
+            `${llmConfig.systemPrompts.pinecone} ` +
+            `RAG Context:\n ${pineconeResults}`
+        }
       }
     }
 
