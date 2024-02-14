@@ -83,7 +83,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   //   await action(item as any)
   // }
 
-  if (contentType === "Collections" || contentType === "Tools" || contentType === "Models") {
+  if (contentType === "collections" || contentType === "tools" || contentType === "models") {
     return null; // Do not render the SidebarItem for "assistants", "tools", or "models"
   }
 
