@@ -83,10 +83,11 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   //   await action(item as any)
   // }
 
-  if (contentType === "collections" || contentType === "tools" || contentType === "models") {
-    return null; // Do not render the SidebarItem for "assistants", "tools", or "models"
+ const excludedContentTypes = ["assistants", "tools", "models"];
+ if (excludedContentTypes.includes(contentType)) {
+    return null; // Do not render the SidebarItem for excluded content types
   }
-
+ 
   return (
     <SidebarUpdateItem
       item={item}
@@ -127,5 +128,5 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         )} */}
       </div>
     </SidebarUpdateItem>
-  );
+  )
 }
