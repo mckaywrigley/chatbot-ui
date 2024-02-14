@@ -6,7 +6,7 @@ export async function getSubscriptionByUserId(userId: string) {
     .select("*")
     .eq("user_id", userId)
     .eq("status", "active")
-    .single()
+    .maybeSingle()
 
   return subscription
 }

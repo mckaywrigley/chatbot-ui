@@ -14,6 +14,13 @@ export function formatDate(input: string | number | Date): string {
   })
 }
 
+export function unixToDateString(unix: number | null): string | null {
+  if (unix === null) {
+    return null
+  }
+  return new Date(unix * 1000).toISOString()
+}
+
 // example of results:
 // - 20 minutes 4 seconds
 // - 1 hour 20 minutes 4 seconds

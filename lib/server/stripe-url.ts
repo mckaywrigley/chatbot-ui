@@ -2,16 +2,22 @@
 
 import Stripe from "stripe"
 import { createSupabaseAppServerClient } from "./server-utils"
+import {
+  getActiveSubscriptions,
+  getStripe,
+  isRestoreableSubscription
+} from "./stripe"
+import { Result, errStr, ok } from "../result"
 
-export async function getCheckoutUrl(): Promise<string> {
+export async function getCheckoutUrl(): Promise<Result<string>> {
   const supabase = createSupabaseAppServerClient()
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
-    throw new Error("User not found")
+    return errStr("User not found")
   }
   const productId = process.env.STRIPE_PRODUCT_ID
   if (typeof productId !== "string") {
-    throw new Error("Missing Stripe product ID")
+    return errStr("Missing Stripe product ID")
   }
 
   const stripe = getStripe()
@@ -27,14 +33,29 @@ export async function getCheckoutUrl(): Promise<string> {
       }
     })
   } else {
-    customer = customers.data[0]
+    for (const existingCustomer of customers.data) {
+      // check if customer already has an active subscription
+      const subscriptions = await getActiveSubscriptions(
+        stripe,
+        existingCustomer.id
+      )
+      const restoreable = subscriptions.data.some(subscription => {
+        return isRestoreableSubscription(subscription)
+      })
+      if (restoreable) {
+        return errStr(
+          "Try to restore your subscription. You already have an active subscription."
+        )
+      }
+      customer = existingCustomer
+    }
   }
 
   const price = await retrievePriceAndValidation(stripe, productId)
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    customer: customer.id,
+    customer: customer!.id,
     line_items: [
       {
         price: price.id,
@@ -46,10 +67,10 @@ export async function getCheckoutUrl(): Promise<string> {
     cancel_url: process.env.STRIPE_RETURN_URL
   })
   if (session.url === null) {
-    throw new Error("Missing checkout URL")
+    return errStr("Missing checkout URL")
   }
 
-  return session.url
+  return ok(session.url)
 }
 
 export async function retrievePriceAndValidation(
@@ -69,11 +90,11 @@ export async function retrievePriceAndValidation(
   return price
 }
 
-export async function getBillingPortalUrl() {
+export async function getBillingPortalUrl(): Promise<Result<string>> {
   const supabase = createSupabaseAppServerClient()
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
-    throw new Error("User not found")
+    return errStr("User not found")
   }
   const { data: subscription } = await supabase
     .from("subscriptions")
@@ -81,7 +102,7 @@ export async function getBillingPortalUrl() {
     .eq("user_id", user.id)
     .single()
   if (!subscription) {
-    throw new Error("Subscription not found")
+    return errStr("Subscription not found")
   }
 
   const stripe = getStripe()
@@ -90,18 +111,7 @@ export async function getBillingPortalUrl() {
     return_url: process.env.STRIPE_RETURN_URL
   })
   if (session.url === null) {
-    throw new Error("Missing checkout URL")
+    return errStr("Missing checkout URL")
   }
-  return session.url
-}
-
-function getStripe() {
-  const apiKey = process.env.STRIPE_API_KEY
-  if (typeof apiKey !== "string") {
-    throw new Error("Missing Stripe API key")
-  }
-  const stripe = new Stripe(apiKey, {
-    apiVersion: "2023-10-16"
-  })
-  return stripe
+  return ok(session.url)
 }

@@ -6,6 +6,9 @@ import { getBillingPortalUrl } from "@/lib/server/stripe-url"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useState } from "react"
 import { PlanDialog } from "../plan-dialog"
+import { restoreSubscription } from "@/lib/server/restore"
+import { toast } from "sonner"
+import * as Sentry from "@sentry/nextjs"
 
 interface SubscriptionTabProps {
   value: string
@@ -14,13 +17,45 @@ interface SubscriptionTabProps {
 export const SubscriptionTab: FC<SubscriptionTabProps> = ({ value }) => {
   const router = useRouter()
   const [showPlanDialog, setShowPlanDialog] = useState(false)
-  const { subscription } = useContext(ChatbotUIContext)
+  const [loading, setLoading] = useState(false)
+  const { subscription, setSubscription, profile } =
+    useContext(ChatbotUIContext)
   const isPremium = subscription !== null
 
   const redirectToBillingPortal = async () => {
-    const checkoutUrl = await getBillingPortalUrl()
-    router.push(checkoutUrl)
+    const checkoutUrlResult = await getBillingPortalUrl()
+    if (checkoutUrlResult.type === "error") {
+      toast.error(checkoutUrlResult.error.message)
+    } else {
+      router.push(checkoutUrlResult.value)
+    }
   }
+
+  const handleRestoreButtonClick = async () => {
+    try {
+      setLoading(true)
+      const restoreResult = await restoreSubscription()
+      if (restoreResult.type === "error") {
+        Sentry.withScope(scope => {
+          scope.setExtra("user.id", profile?.user_id)
+          Sentry.captureMessage(restoreResult.error.message)
+        })
+        toast.error(restoreResult.error.message)
+      } else {
+        if (restoreResult.value === null) {
+          toast.warning("You have no subscription to restore.")
+        } else {
+          toast.info("Your subscription has been restored.")
+          setSubscription(restoreResult.value)
+        }
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const showRestoreSubscription =
+    !isPremium && process.env.NEXT_PUBLIC_ENABLE_STRIPE_RESTORE === "true"
 
   return (
     <TabsContent className="mt-4 space-y-4" value={value}>
@@ -31,11 +66,12 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({ value }) => {
         <p className="mt-1">
           <PlanName isPremium={isPremium} />
         </p>
-        <p className="mt-4">
+        <p className="mt-4 flex-row space-y-4">
           {isPremium && (
             <Button
               className="w-full"
               variant="destructive"
+              disabled={loading}
               onClick={redirectToBillingPortal}
             >
               Manage Subscription
@@ -46,6 +82,7 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({ value }) => {
               <Button
                 className="w-full"
                 variant="destructive"
+                disabled={loading}
                 onClick={() => setShowPlanDialog(true)}
               >
                 Manage Subscription
@@ -56,6 +93,16 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({ value }) => {
                 onOpenChange={setShowPlanDialog}
               />
             </>
+          )}
+          {showRestoreSubscription && (
+            <Button
+              className="w-full"
+              variant="secondary"
+              disabled={loading}
+              onClick={() => handleRestoreButtonClick()}
+            >
+              Restore Subscription
+            </Button>
           )}
         </p>
       </div>

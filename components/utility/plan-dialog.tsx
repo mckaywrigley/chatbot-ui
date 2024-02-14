@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { ChatbotUIContext } from "@/context/context"
 import { getCheckoutUrl } from "@/lib/server/stripe-url"
+import * as Sentry from "@sentry/nextjs"
 import {
   IconCircleCheck,
   // IconCurrencyBitcoin,
@@ -16,6 +17,7 @@ import {
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useState } from "react"
+import { toast } from "sonner"
 
 interface PlanDialogProps {
   showIcon?: boolean
@@ -39,9 +41,17 @@ export const PlanDialog: FC<PlanDialogProps> = ({
     onOpenChange && onOpenChange(value)
   }
 
-  const redirectToStripePortal = async () => {
-    const checkoutUrl = await getCheckoutUrl()
-    router.push(checkoutUrl)
+  const redirectToStripeCheckoutUrl = async () => {
+    const result = await getCheckoutUrl()
+    if (result.type === "error") {
+      Sentry.withScope(scope => {
+        scope.setExtras({ userId: profile.user_id })
+        scope.captureMessage(result.error.message)
+      })
+      toast.error(result.error.message)
+    } else {
+      router.push(result.value)
+    }
   }
   const show = open ?? showDialog
   return (
@@ -89,7 +99,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
               <div className="mb-4 grid grid-cols-1 gap-1">
                 <Button
                   variant="custom_accent1"
-                  onClick={redirectToStripePortal}
+                  onClick={redirectToStripeCheckoutUrl}
                 >
                   <IconLockOpen color={"white"} size={22} strokeWidth={2} />
                   <span className="ml-1 text-white">Upgrade to Plus</span>

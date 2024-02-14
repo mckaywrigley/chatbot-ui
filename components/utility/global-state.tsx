@@ -211,6 +211,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // SUBSCRIPTION STORE
         subscription,
+        setSubscription,
 
         // ITEMS STORE
         assistants,

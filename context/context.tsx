@@ -19,6 +19,7 @@ interface ChatbotUIContext {
 
   // SUBSCRIPTION STORE
   subscription: Tables<"subscriptions"> | null
+  setSubscription: Dispatch<SetStateAction<Tables<"subscriptions"> | null>>
 
   // ITEMS STORE
   assistants: Tables<"assistants">[]
@@ -142,6 +143,7 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 
   // SUBSCRIPTION STORE
   subscription: null,
+  setSubscription: () => {},
 
   // ITEMS STORE
   assistants: [],

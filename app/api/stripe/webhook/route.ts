@@ -2,7 +2,9 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
+import { unixToDateString } from "@/lib/utils"
 import { createClient } from "@supabase/supabase-js"
+import { getStripe } from "@/lib/server/stripe"
 
 // Import via bare specifier thanks to the import_map.json file.
 import Stripe from "stripe"
@@ -75,22 +77,6 @@ export async function POST(request: Request) {
   }
 
   return new Response(JSON.stringify({ ok: true }), { status: 200 })
-}
-
-function unixToDateString(unix: number | null): string | null {
-  if (unix === null) {
-    return null
-  }
-  return new Date(unix * 1000).toISOString()
-}
-
-function getStripe() {
-  return new Stripe(process.env.STRIPE_API_KEY as string, {
-    // This is needed to use the Fetch API rather than relying on the Node http
-    // package.
-    apiVersion: "2023-10-16",
-    httpClient: Stripe.createFetchHttpClient()
-  })
 }
 
 async function upsertSubscription(subscriptionId: string, customerId: string) {
