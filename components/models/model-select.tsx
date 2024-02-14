@@ -161,8 +161,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               .filter(model =>
                 model.modelName.toLowerCase().includes(search.toLowerCase())
               )
-			  .filter(model => !model.modelName.toLowerCase().includes("online"))
-			  .filter(model => !model.modelName.includes("70B"))
               .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null

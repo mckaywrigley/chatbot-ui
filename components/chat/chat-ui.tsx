@@ -222,6 +222,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatInput />
       </div>
 
+      <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
+        <ChatHelp />
+      </div>
     </div>
   )
 }
