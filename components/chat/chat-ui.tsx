@@ -11,7 +11,7 @@ import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, MessageImage } from "@/types"
 import { useParams } from "next/navigation"
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, use, useContext, useEffect, useState } from "react"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
 import { ChatInput } from "./chat-input"
@@ -40,7 +40,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setUseRetrieval,
     profile,
     setSelectedTools,
-    setTopicDescription
+    setTopicDescription,
+    chats
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -58,6 +59,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   } = useScroll()
 
   const [loading, setLoading] = useState(true)
+  const [chatTitle, setChatTitle] = useState(selectedChat?.name || "Chat")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +80,16 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     }
   }, [])
 
+  useEffect(() => {
+    console.log("Topic description and chat name updated")
+    // find selected chat in chats
+    const chat = chats.find(chat => chat.id === selectedChat?.id)
+    setTopicDescription(chat?.topic_description || "")
+    setChatTitle(chat?.name || "Chat")
+  }, [chats])
+
   const fetchMessages = async () => {
+    console.log("Fetching messages")
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)
 
     const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(
@@ -209,7 +220,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
       <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-20 font-bold">
         <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
-          {selectedChat?.name || "Chat"}
+          {chatTitle}
         </div>
       </div>
 

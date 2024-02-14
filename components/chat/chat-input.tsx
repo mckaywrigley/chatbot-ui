@@ -53,7 +53,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     chatSettings,
     selectedTools,
     setSelectedTools,
-    assistantImages
+    assistantImages,
+    topicDescription,
+    assistants
   } = useContext(ChatbotUIContext)
 
   // console.log("Watching", selectedAssistant, selectedTools)
@@ -65,7 +67,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleFocusChatInput
   } = useChatHandler()
 
-  const { handleInputChange } = usePromptAndCommand()
+  const { handleInputChange, handleSelectAssistant } = usePromptAndCommand()
 
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 
@@ -158,6 +160,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  const handleProceedToLearning = () => {
+    console.log("Proceed to learning")
+    // get the assistant from assistances context where name ="Study coach"
+    const selectedAssistant = assistants.find(
+      assistant => assistant.name === "Study coach"
+    )
+    if (!selectedAssistant) {
+      console.error("No assistant with name 'Study coach' found")
+      return
+    }
+    handleSelectAssistant(selectedAssistant)
+  }
+
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
@@ -183,6 +198,24 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               </div>
             </div>
           ))}
+
+        {topicDescription.length > 0 && (
+          <div className="flex justify-between space-x-4">
+            <div className="w-1/2">
+              <button
+                className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+                onClick={handleProceedToLearning}
+              >
+                Lets proceed to learning
+              </button>
+            </div>
+            <div className="w-1/2">
+              <button className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white">
+                Another prompt
+              </button>
+            </div>
+          </div>
+        )}
 
         {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">

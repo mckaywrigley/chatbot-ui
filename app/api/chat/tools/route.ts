@@ -144,8 +144,9 @@ export async function POST(request: Request) {
 
           const bodyContent = parsedArgs.requestBody || parsedArgs
 
-          if (bodyContent.topic_name) {
+          if (functionName === "updateTopicName") {
             // Update the chat/topic name & content in the database
+            console.log("Updating chat topic", bodyContent)
             data = await updateChatTopic(
               chatId,
               bodyContent.topic_name,
