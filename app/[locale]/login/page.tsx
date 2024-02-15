@@ -122,21 +122,12 @@ export default async function Login({
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-        // emailRedirectTo: `${origin}/auth/callback`
-      }
-    })
-
     if (error) {
       console.error(error)
       return redirect(`/login?message=${error.message}`)
     }
 
-    window.location.href = "https://ultimateai.org/subscribe.html";
+    return redirect("https://UltimateAI.org")
 
     // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
     // return redirect("/login?message=Check email to continue sign in process")
