@@ -122,11 +122,6 @@ export default async function Login({
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 
-    if (error) {
-      console.error(error)
-      return redirect(`/login?message=${error.message}`)
-    }
-
     return redirect("https://UltimateAI.org")
 
     // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
