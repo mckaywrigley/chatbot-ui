@@ -106,7 +106,7 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    window.location.href = "https://ultimateai.org/subscribe.html";
+    return redirect("https://UltimateAI.org")
 
     // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
     // return redirect("/login?message=Check email to continue sign in process")
