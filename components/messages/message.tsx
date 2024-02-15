@@ -240,10 +240,10 @@ export const Message: FC<MessageProps> = ({
                 )
               ) : profile?.image_url ? (
                 <Image
-                  className={`size-[28px] rounded`}
+                  className={`size-[32px] rounded`}
                   src={profile?.image_url}
-                  height={28}
-                  width={28}
+                  height={32}
+                  width={32}
                   alt="user image"
                 />
               ) : (
