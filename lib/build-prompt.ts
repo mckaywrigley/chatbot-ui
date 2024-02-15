@@ -24,7 +24,7 @@ const buildBasePrompt = (
     fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
   }
 
-  fullPrompt += `User Instructions:\n${prompt}`
+  fullPrompt += `${prompt}`
 
   return fullPrompt
 }
@@ -179,7 +179,7 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
     .map(item => `<BEGIN SOURCE>\n${item.content}\n</END SOURCE>`)
     .join("\n\n")
 
-  return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
+  return `Use the following sources to create a detailed topic description. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
 }
 
 export async function buildGoogleGeminiFinalMessages(

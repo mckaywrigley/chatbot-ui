@@ -512,36 +512,3 @@ export const handleCreateMessages = async (
     setChatMessages(finalChatMessages)
   }
 }
-
-export const createSimpleAssistantMessage = async (
-  currentChat: Tables<"chats">,
-  profile: Tables<"profiles">,
-  modelData: LLM,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
-) => {
-  const finalAssistantMessage: TablesInsert<"messages"> = {
-    chat_id: currentChat.id,
-    user_id: profile.user_id,
-    content: "Hello, welcome to your new workspace!",
-    model: modelData.modelId,
-    role: "assistant",
-    sequence_number: 0, // This could be set dynamically based on the current chat messages length if needed.
-    image_paths: []
-  }
-
-  // Create the assistant message in the database.
-  const createdMessages = await createMessages([finalAssistantMessage])
-  console.log("createdMessages", { createdMessages })
-
-  // Create a ChatMessage object for updating the state.
-  const newAssistantChatMessage: ChatMessage = {
-    message: createdMessages[0],
-    fileItems: [] // Assuming no file items are associated with this simple message.
-  }
-
-  // Update the chat messages state with the new assistant message.
-  setChatMessages(prevMessages => [...prevMessages, newAssistantChatMessage])
-
-  // return the new assistant message id
-  return createdMessages[0].chat_id
-}
