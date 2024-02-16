@@ -15,10 +15,10 @@ import {
   handleLocalChat,
   handleRetrieval,
   processResponse,
-  validateChatSettings,
-  createSimpleAssistantMessage
+  validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
+import { t } from "i18next"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -65,6 +65,7 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
+    topicDescription,
     setTopicDescription,
     assistants
   } = useContext(ChatbotUIContext)
@@ -201,9 +202,10 @@ export const useChatHandler = () => {
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
-        assistant: selectedChat?.assistant_id ? selectedAssistant : null,
+        assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        chatFileItems: chatFileItems,
+        topicDescription
       }
 
       let generatedText = ""
@@ -225,8 +227,7 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            selectedTools,
-            chatId: currentChat?.id
+            selectedTools
           })
         })
 
@@ -327,53 +328,6 @@ export const useChatHandler = () => {
     }
   }
 
-  const handleCreateNewChat = async (
-    createdWorkspace: Tables<"workspaces">
-  ) => {
-    if (!createdWorkspace || !profile) {
-      console.log(
-        "Missing data to create a new chat",
-        { createdWorkspace },
-        { profile }
-      )
-      return
-    }
-
-    const newWorkspaceChat = await handleCreateChat(
-      chatSettings!,
-      profile!,
-      createdWorkspace!,
-      "Learnspace home chat",
-      selectedAssistant!,
-      newMessageFiles,
-      setSelectedChat,
-      setChats,
-      setChatFiles
-    )
-
-    const modelData = [
-      ...models.map(model => ({
-        modelId: model.model_id as LLMID,
-        modelName: model.name,
-        provider: "custom" as ModelProvider,
-        hostedId: model.id,
-        platformLink: "",
-        imageInput: false
-      })),
-      ...LLM_LIST,
-      ...availableLocalModels,
-      ...availableOpenRouterModels
-    ].find(llm => llm.modelId === chatSettings?.model)
-
-    const newMessageId = await createSimpleAssistantMessage(
-      newWorkspaceChat,
-      profile!,
-      modelData!,
-      setChatMessages
-    )
-    return newMessageId
-  }
-
   const handleSendEdit = async (
     editedContent: string,
     sequenceNumber: number
@@ -402,7 +356,6 @@ export const useChatHandler = () => {
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
-    handleSendEdit,
-    handleCreateNewChat
+    handleSendEdit
   }
 }

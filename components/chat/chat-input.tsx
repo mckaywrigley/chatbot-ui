@@ -62,8 +62,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     selectedChat
   } = useContext(ChatbotUIContext)
 
-  // console.log("Watching", selectedAssistant, selectedTools)
-
   const {
     chatInputRef,
     handleSendMessage,
@@ -165,7 +163,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
 
   const handleProceedToLearning = async () => {
-    console.log("Proceed to learning")
     // get the assistant from assistances context where name ="Study coach"
     const selectedAssistant = assistants.find(
       assistant => assistant.name === "Study coach"
@@ -183,8 +180,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       return
     }
 
+    const topic_description = chatMessages
+      .filter(message => message.message.role === "assistant")
+      .map(message => message.message.content)
+      .pop()
+
     const updatedChat = await updateChat(currentChat.id, {
-      assistant_id: selectedAssistant.id
+      assistant_id: selectedAssistant.id,
+      topic_description
     })
 
     setChats(prevChats => {
@@ -224,7 +227,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
 
-        {topicDescription.length > 0 &&
+        {chatMessages.length > 1 &&
           selectedAssistant?.name === "Topic creation tutor" && (
             <div className="flex justify-between space-x-4">
               <div className="w-1/2">
@@ -232,7 +235,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                   className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
                   onClick={handleProceedToLearning}
                 >
-                  Lets proceed to learning
+                  Save topic & proceed to learning
                 </button>
               </div>
               <div className="w-1/2">
