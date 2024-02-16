@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ChatFile, MessageImage } from "@/types"
+import { cn } from "@/utils/utils"
 import { IconFileFilled } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC } from "react"

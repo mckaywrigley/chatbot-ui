@@ -1,4 +1,4 @@
-import useHotkey from "@/lib/hooks/use-hotkey"
+import useHotkey from "@/utils/hooks/use-hotkey"
 import {
   IconBrandGithub,
   IconBrandX,

@@ -8,7 +8,7 @@ import { ChatUI } from "@/components/chat/chat-ui"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { Brand } from "@/components/ui/brand"
 import { ChatbotUIContext } from "@/context/context"
-import useHotkey from "@/lib/hooks/use-hotkey"
+import useHotkey from "@/utils/hooks/use-hotkey"
 import { useTheme } from "next-themes"
 import { useContext } from "react"
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -107,11 +107,11 @@ TableCaption.displayName = "TableCaption"
 
 export {
   Table,
-  TableHeader,
   TableBody,
+  TableCaption,
+  TableCell,
   TableFooter,
   TableHead,
-  TableRow,
-  TableCell,
-  TableCaption
+  TableHeader,
+  TableRow
 }

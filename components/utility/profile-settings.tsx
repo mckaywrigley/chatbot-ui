@@ -7,12 +7,12 @@ import {
 } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
-import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
-import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
-import { supabase } from "@/lib/supabase/browser-client"
-import { cn } from "@/lib/utils"
 import { OpenRouterLLM } from "@/types"
+import { exportLocalStorageAsJSON } from "@/utils/export-old-data"
+import { fetchOpenRouterModels } from "@/utils/models/fetch-models"
+import { LLM_LIST_MAP } from "@/utils/models/llm/llm-list"
+import { supabase } from "@/utils/supabase/browser-client"
+import { cn } from "@/utils/utils"
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,

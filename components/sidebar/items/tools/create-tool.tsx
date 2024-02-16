@@ -4,8 +4,8 @@ import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
-import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { TablesInsert } from "@/supabase/types"
+import { validateOpenAPI } from "@/utils/openapi-conversion"
 import { FC, useContext, useState } from "react"
 
 interface CreateToolProps {

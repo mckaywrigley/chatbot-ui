@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
+import { useCopyToClipboard } from "@/utils/hooks/use-copy-to-clipboard"
 import { IconCheck, IconCopy, IconDownload } from "@tabler/icons-react"
 import { FC, memo } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"

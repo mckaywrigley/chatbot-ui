@@ -1,6 +1,9 @@
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import { CHAT_SETTING_LIMITS } from "@/utils/chat-setting-limits"
+import {
+  checkApiKey,
+  getServerProfile
+} from "@/utils/server/server-chat-helpers"
 import Anthropic from "@anthropic-ai/sdk"
 import { AnthropicStream, StreamingTextResponse } from "ai"
 

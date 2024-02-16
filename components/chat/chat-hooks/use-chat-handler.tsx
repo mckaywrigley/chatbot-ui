@@ -1,12 +1,12 @@
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
+import { buildFinalMessages } from "@/utils/build-prompt"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
-import { LLM_LIST } from "../../../lib/models/llm/llm-list"
+import { LLM_LIST } from "../../../utils/models/llm/llm-list"
 import {
   createTempMessages,
   handleCreateChat,

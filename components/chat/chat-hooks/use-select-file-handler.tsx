@@ -1,6 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { createDocXFile, createFile } from "@/db/files"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { LLM_LIST } from "@/utils/models/llm/llm-list"
 import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"

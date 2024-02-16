@@ -77,9 +77,9 @@ import {
   getToolWorkspacesByToolId,
   updateTool
 } from "@/db/tools"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
+import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { toast } from "sonner"

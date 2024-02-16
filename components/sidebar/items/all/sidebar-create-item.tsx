@@ -23,9 +23,9 @@ import {
   uploadAssistantImage
 } from "@/db/storage/assistant-images"
 import { createTool } from "@/db/tools"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { ContentType } from "@/types"
+import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 

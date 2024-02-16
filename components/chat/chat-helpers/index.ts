@@ -5,11 +5,6 @@ import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
-import {
-  buildFinalMessages,
-  buildGoogleGeminiFinalMessages
-} from "@/lib/build-prompt"
-import { consumeReadableStream } from "@/lib/consume-stream"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
   ChatFile,
@@ -19,6 +14,11 @@ import {
   LLM,
   MessageImage
 } from "@/types"
+import {
+  buildFinalMessages,
+  buildGoogleGeminiFinalMessages
+} from "@/utils/build-prompt"
+import { consumeReadableStream } from "@/utils/consume-stream"
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"

@@ -5,8 +5,8 @@ import {
   uploadWorkspaceImage
 } from "@/db/storage/workspace-images"
 import { updateWorkspace } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { LLMID } from "@/types"
+import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import { IconHome, IconSettings } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"

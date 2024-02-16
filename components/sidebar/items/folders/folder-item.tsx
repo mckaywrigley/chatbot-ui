@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
+import { cn } from "@/utils/utils"
 import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
 import { FC, useRef, useState } from "react"
 import { DeleteFolder } from "./delete-folder"

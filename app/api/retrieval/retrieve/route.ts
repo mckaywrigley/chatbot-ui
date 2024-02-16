@@ -1,6 +1,9 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
+import { generateLocalEmbedding } from "@/utils/generate-local-embedding"
+import {
+  checkApiKey,
+  getServerProfile
+} from "@/utils/server/server-chat-helpers"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 

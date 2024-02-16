@@ -1,4 +1,4 @@
-import { openapiToFunctions } from "@/lib/openapi-conversion"
+import { openapiToFunctions } from "@/utils/openapi-conversion"
 
 const validSchemaURL = JSON.stringify({
   openapi: "3.1.0",

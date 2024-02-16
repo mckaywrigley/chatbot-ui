@@ -6,13 +6,6 @@ import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId } from "@/db/profile"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { getWorkspacesByUserId } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import {
-  fetchHostedModels,
-  fetchOllamaModels,
-  fetchOpenRouterModels
-} from "@/lib/models/fetch-models"
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
 import {
   ChatFile,
@@ -25,6 +18,13 @@ import {
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
+import { convertBlobToBase64 } from "@/utils/blob-to-b64"
+import {
+  fetchHostedModels,
+  fetchOllamaModels,
+  fetchOpenRouterModels
+} from "@/utils/models/fetch-models"
+import { supabase } from "@/utils/supabase/browser-client"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 

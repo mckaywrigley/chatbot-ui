@@ -1,8 +1,8 @@
 "use client"
 
 import { ChatbotUIContext } from "@/context/context"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { ChatSettings } from "@/types"
+import { CHAT_SETTING_LIMITS } from "@/utils/chat-setting-limits"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { ModelSelect } from "../models/model-select"

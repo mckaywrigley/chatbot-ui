@@ -1,5 +1,8 @@
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import {
+  checkApiKey,
+  getServerProfile
+} from "@/utils/server/server-chat-helpers"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export const runtime = "edge"

@@ -1,7 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
+import useHotkey from "@/utils/hooks/use-hotkey"
+import { LLM_LIST } from "@/utils/models/llm/llm-list"
+import { cn } from "@/utils/utils"
 import {
   IconBolt,
   IconCirclePlus,

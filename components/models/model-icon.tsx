@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
 import mistral from "@/public/providers/mistral.png"
 import perplexity from "@/public/providers/perplexity.png"
 import { ModelProvider } from "@/types"
+import { cn } from "@/utils/utils"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
