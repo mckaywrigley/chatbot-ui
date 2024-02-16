@@ -18,6 +18,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
+import { t } from "i18next"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -64,6 +65,7 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
+    topicDescription,
     setTopicDescription,
     assistants
   } = useContext(ChatbotUIContext)
@@ -200,9 +202,10 @@ export const useChatHandler = () => {
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
-        assistant: selectedChat?.assistant_id ? selectedAssistant : null,
+        assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        chatFileItems: chatFileItems,
+        topicDescription
       }
 
       let generatedText = ""
