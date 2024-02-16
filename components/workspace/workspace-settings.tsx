@@ -207,7 +207,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
             <TabsContent className="mt-4 space-y-4" value="main">
               <>
                 <div className="space-y-1">
-                  <Label>Name</Label>
+                  <Label>Workspace Name</Label>
 
                   <Input
                     placeholder="Name..."
@@ -227,7 +227,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                 </div> */}
 
                 <div className="space-y-1">
-                  <Label>Image</Label>
+                  <Label>Workspace Image</Label>
 
                   <ImagePicker
                     src={imageLink}
