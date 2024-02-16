@@ -161,23 +161,23 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               .filter(model =>
                 model.modelName.toLowerCase().includes(search.toLowerCase())
               )
-			  .filter(model => !model.modelName.toLowerCase().includes("online"))
+              .filter(model => !model.modelName.toLowerCase().includes("online"))
 			  .filter(model => !model.modelName.includes("70B"))
 			  .filter(model => !model.modelName.startsWith("openai/"))
-			  .filter(model => model.modelName !== "James")
+			  .filter(model => model.modelName !== "GPT-4")
 			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
 
             return (
-				<div key={provider}>
-					<div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-					{provider === "openai" && profile.use_azure_openai
-						? "AZURE OPENAI"
-						: provider === "openrouter" // Check if the provider is "openrouter"
-						? "Other popular providers" // Display "Other providers" if true
-						: provider.toLocaleUpperCase()} // Otherwise, display the provider's name in uppercase
-					</div>
+              <div key={provider}>
+                <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
+                  {provider === "openai" && profile.use_azure_openai
+                    ? "AZURE OPENAI"
+					: provider === "openrouter" // Check if the provider is "openrouter"
+					? "Other providers" // Display "Other providers" if true
+					: provider.toLocaleUpperCase()}
+                </div>
 
                 <div className="mb-4">
                   {filteredModels.map(model => {
