@@ -222,7 +222,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow">
+        <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
               Create{" "}

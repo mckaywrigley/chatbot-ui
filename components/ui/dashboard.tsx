@@ -87,7 +87,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       </Button>
 
       <div
-        className={cn("border-r-2 duration-200 dark:border-none")}
+        className={cn(
+          "bg-background absolute z-50 h-full border-r-2 duration-200 lg:relative"
+        )}
         style={{
           // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",

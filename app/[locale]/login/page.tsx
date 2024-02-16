@@ -1,5 +1,5 @@
 import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
+import { SubmitButton } from "@/components/ui/submit-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/server"
@@ -192,7 +192,7 @@ export default async function Login({
         <form className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2">
           <Brand />
 
-          <Button
+          <SubmitButton
             className="mt-4 rounded-md border border-gray-600 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
             variant="secondary"
             role="button"
@@ -200,7 +200,7 @@ export default async function Login({
           >
             <IconBrandGoogle className="mr-1" size={20} />
             Log in with Google
-          </Button>
+          </SubmitButton>
         </form>
         <div className="mt-4 flex items-center">
           <div className="grow border-t border-gray-300"></div>
@@ -231,16 +231,16 @@ export default async function Login({
             placeholder="••••••••"
           />
 
-          <Button className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white hover:bg-blue-800">
+          <SubmitButton className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white hover:bg-blue-800">
             Login
-          </Button>
+          </SubmitButton>
 
-          <Button
+          <SubmitButton
             formAction={signUp}
             className="border-foreground/20 mb-2 rounded-md border px-4 py-2 hover:border-gray-400"
           >
             Sign Up
-          </Button>
+          </SubmitButton>
           <div className="text-muted-foreground mt-1 flex justify-center text-sm">
             By using HackerGPT, you agree to our&nbsp;
             <a

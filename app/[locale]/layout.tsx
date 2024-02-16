@@ -90,8 +90,8 @@ export default async function RootLayout({
   const { t, resources } = await initTranslations(locale, i18nNamespaces)
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={inter.className + " h-full"}>
         <Providers attribute="class" defaultTheme="dark">
           <TranslationsProvider
             namespaces={i18nNamespaces}
@@ -99,7 +99,7 @@ export default async function RootLayout({
             resources={resources}
           >
             <Toaster richColors position="top-center" duration={3000} />
-            <div className="bg-background text-foreground flex h-screen flex-col items-center">
+            <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
               {session ? <GlobalState>{children}</GlobalState> : children}
             </div>
             <GlobalAlertDialog />
