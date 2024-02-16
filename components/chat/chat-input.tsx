@@ -62,8 +62,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     selectedChat
   } = useContext(ChatbotUIContext)
 
-  // console.log("Watching", selectedAssistant, selectedTools)
-
   const {
     chatInputRef,
     handleSendMessage,
@@ -182,7 +180,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       return
     }
 
-    // get latest topic description from last message in chatMessages where role = "system"
     const topic_description = chatMessages
       .filter(message => message.message.role === "assistant")
       .map(message => message.message.content)

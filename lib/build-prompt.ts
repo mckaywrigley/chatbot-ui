@@ -61,7 +61,7 @@ export async function buildFinalMessages(
   let scopedChatMessages: ChatMessage[]
 
   const isStudyCoach = assistant?.name === "Study coach"
-  // if isStudyCoach, filter chatMessages to remove messages that occur before the first message where message.assistant_id === assistant.id
+
   if (isStudyCoach) {
     const firstAssistantMessageIndex = chatMessages.findIndex(
       message => message.message.assistant_id === assistant.id
@@ -133,7 +133,6 @@ export async function buildFinalMessages(
 
   finalMessages.unshift(tempSystemMessage)
 
-  // if isStudyCoach, update the content property of the last message in finalMessages by calling buildTopicText
   if (isStudyCoach) {
     const userPrompt = finalMessages[finalMessages.length - 1].content
     const topicText = buildTopicText(userPrompt, topicDescription)
@@ -188,7 +187,7 @@ export async function buildFinalMessages(
       }\n\n${retrievalText}`
     }
   }
-  console.log({ finalMessages })
+
   return finalMessages
 }
 
