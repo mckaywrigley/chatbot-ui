@@ -169,38 +169,38 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
             if (filteredModels.length === 0) return null
 
-            return (
-             <div key={provider}>
-			    <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-				  {provider === "openai" && profile.use_azure_openai
-					? "AZURE OPENAI"
-					: provider === "openrouter" // Check if the provider is "openrouter"
-					? "Other popular models" // Display "Other providers" if true
-					: provider.toLocaleUpperCase()} // Otherwise, display the provider's name in uppercase
-			 </div>
+return (
+  <div key={provider}>
+    <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
+      {provider === "openai" && profile.use_azure_openai
+        ? "AZURE OPENAI"
+        : provider === "openrouter" // Check if the provider is "openrouter"
+        ? "Other providers" // Display "Other providers" if true
+        : provider.toLocaleUpperCase()} // Otherwise, display the provider's name in uppercase
+    </div>
 
-                <div className="mb-4">
-                  {filteredModels.map(model => {
-                    return (
-                      <div
-                        key={model.modelId}
-                        className="flex items-center space-x-1"
-                      >
-                        {selectedModelId === model.modelId && (
-                          <IconCheck className="ml-2" size={32} />
-                        )}
+    <div className="mb-4">
+      {filteredModels.map(model => {
+        return (
+          <div
+            key={model.modelId}
+            className="flex items-center space-x-1"
+          >
+            {selectedModelId === model.modelId && (
+              <IconCheck className="ml-2" size={32} />
+            )}
 
-                        <ModelOption
-                          key={model.modelId}
-                          model={model}
-                          onSelect={() => handleSelectModel(model.modelId)}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
+            <ModelOption
+              key={model.modelId}
+              model={model}
+              onSelect={() => handleSelectModel(model.modelId)}
+            />
+          </div>
+        )
+      })}
+    </div>
+  </div>
+)
           })}
         </div>
       </DropdownMenuContent>
