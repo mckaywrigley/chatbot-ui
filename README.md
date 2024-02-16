@@ -52,13 +52,19 @@ In your terminal at the root of your local Chatbot UI repository, run:
 npm run update
 ```
 
-If you run a hosted instance you'll also need to run:
+If you run a cloud instance of Supabase you'll need to also run:
 
 ```bash
 npm run db-push
 ```
 
-to apply the latest migrations to your live database.
+If you run a self hosted instance of Supabase you'll need to also run:
+
+```bash
+supabase db push --db-url postgres://{user}:{password}@{hostname}:{port}/{database-name}
+```
+
+These values can at https://YOUR_SELF_HOSTED_SUPABASE_URL/project/default/settings/database
 
 ## Local Quickstart
 
@@ -100,10 +106,18 @@ You will need to install Docker to run Supabase locally. You can download it [he
 
 #### 2. Install Supabase CLI
 
-**MacOS/Linux**
+**MacOS**
 
 ```bash
 brew install supabase/tap/supabase
+```
+
+**Linux (Ubuntu)**
+
+Go [here](https://github.com/supabase/cli/releases) and install via package download.
+
+```bash
+sudo apt install ./PATH_TO_SUPABASE_CLI.deb
 ```
 
 **Windows**
@@ -182,13 +196,13 @@ You will want separate repositories for your local and hosted instances.
 
 Create a new repository for your hosted instance of Chatbot UI on GitHub and push your code to it.
 
-### 2. Setup Backend with Supabase
+### 2.1 Setup Backend with Cloud Supabase
 
-#### 1. Create a new project
+#### 2.1.1. Create a new project
 
 Go to [Supabase](https://supabase.com/) and create a new project.
 
-#### 2. Get Project Values
+#### 2.1.2. Get Project Values
 
 Once you are in the project dashboard, click on the "Project Settings" icon tab on the far bottom left.
 
@@ -208,7 +222,7 @@ Here you will get the values for the following environment variables:
 
 - `Service role key`: Found in "Project API keys" as "service_role" (Reminder: Treat this like a password!)
 
-#### 3. Configure Auth
+#### 2.1.3. Configure Auth
 
 Next, click on the "Authentication" icon tab on the far left.
 
@@ -216,7 +230,7 @@ In the text tabs, click on "Providers" and make sure "Email" is enabled.
 
 We recommend turning off "Confirm email" for your own personal instance.
 
-#### 4. Connect to Hosted DB
+#### 2.1.4. Connect to Hosted DB
 
 Open up your repository for your hosted instance of Chatbot UI.
 
@@ -249,7 +263,117 @@ supabase db push
 
 Your hosted database should now be set up!
 
+### 2.2 Setup Backend with Self Hosted Supabase
+
+Generally following [these instructions](https://supabase.com/docs/guides/self-hosting). The instructions below are supposed to be done on a different machine than your frontend. I tested this with Ubuntu 22.04
+
+#### 2.2.1. Install Docker
+
+You will need to install Docker to run Supabase locally. You can download it [here](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) for free.
+
+To get permissions to interact with Docker without needing root access for every command, run
+
+```
+sudo usermod -aG docker $USER
+```
+
+Then, to log out and log back in for the changes to take effect, run
+
+```
+newgrp docker
+```
+
+#### 2.2.2. Running Supabase
+
+```bash
+# Get the code
+
+git clone --depth 1 https://github.com/supabase/supabase
+
+# Go to the docker folder
+
+cd supabase/docker
+
+# Copy the fake env vars
+
+cp .env.example .env
+
+# Pull the latest images
+
+docker compose pull
+
+# Start the services (in detached mode)
+
+docker compose up -d
+```
+
+#### 2.2.3. Install Supabase CLI (Ubuntu)
+
+Go [here](https://github.com/supabase/cli/releases) and install via package download.
+
+```bash
+sudo apt install ./PATH_TO_SUPABASE_CLI.deb
+```
+
+#### 2.2.4. Secure your services
+
+Create a JWT token
+
+```bash
+openssl rand -hex 32
+```
+
+Go [here](https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys) and create JWT service and anon keys. Follow the rest of the instructions to update API keys and secrets.
+
+When restarting services
+
+```bash
+# Stop docker and remove volumes:
+docker compose down -v
+# Turn docker back on
+docker compose up -d
+```
+
+#### 2.2.5. Updating the database
+
+If you need to make modifications to the database, use the [Supabase CLI](https://supabase.com/docs/guides/cli). Attach the argument `db-url` when possible with the following value:
+
+```
+postgresql://postgres:PASSWORD@IP_ADDR:5432/postgres
+```
+
+#### 2.2.6. Updating database environment variables
+
+##### POSTGRES PASSWORD
+
+You can create any POSTGRES_PASSWORD
+
+##### General settings
+
+```
+SITE_URL= where the client/frontend is hosted
+...
+API_EXTERNAL_URL= where the database is hosted
+```
+
+If you want to modify the email templates (signup, forget password...), then you'll have to modify the mailer config to point to an HTML function ([resource](https://stackoverflow.com/questions/75236832/how-to-customize-supabase-selfhosted-on-docker-email))
+
 ### 3. Setup Frontend with Vercel
+
+**Note**: If you self hosted your database, you'll need to add your database URL to the allowed origins.
+
+```ts
+// next.config.js
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        "http://localhost:3000",
+        // add your database url here
+      ]
+    },
+    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
+  }
+```
 
 Go to [Vercel](https://vercel.com/) and create a new project.
 
