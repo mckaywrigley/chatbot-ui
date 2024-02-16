@@ -10,7 +10,11 @@ View the latest demo [here](https://x.com/mckaywrigley/status/173827324228315177
 
 ## Official Hosted Version
 
-Check back soon for an official hosted version of Chatbot UI.
+You can find the official hosted version of Chatbot UI [here](https://chatbotui.com).
+
+Basic features are free to use.
+
+We offer a premium tier for advanced features and faster messages to help pay for hosting costs.
 
 ## Sponsor
 
