@@ -163,9 +163,9 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               )
 			  .filter(model => !model.modelName.toLowerCase().includes("online"))
 			  .filter(model => !model.modelName.includes("70B"))
-			  .filter(model => !model.provider.startsWith("openai/"))
-			  .filter(model => model.modelName !== "GPT-4" || model.modelName.toLowerCase().includes("gpt-4"))
-              .sort((a, b) => a.provider.localeCompare(b.provider))
+			  .filter(model => !model.modelName.startsWith("openai/"))
+			  .filter(model => model.modelName !== "GPT-4")
+			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
 
