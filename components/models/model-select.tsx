@@ -164,18 +164,18 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 			  .filter(model => !model.modelName.toLowerCase().includes("online"))
 			  .filter(model => !model.modelName.includes("70B"))
 			  .filter(model => !model.modelName.startsWith("openai/"))
-			  .filter(model => model.modelName !== "GPT-4")
+			  .filter(model => model.modelName !== "")
 			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
 
             return (
-              <div key={provider}>
-                <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-                  {provider === "openai" && profile.use_azure_openai
-                    ? "AZURE OPENAI"
-                    : provider.toLocaleUpperCase()}
-                </div>
+				<div key={provider}>
+					<div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
+					{provider === "openai" && profile.use_azure_openai
+						? "AZURE OPENAI"
+						: provider.toLocaleUpperCase()}
+					</div>
 
                 <div className="mb-4">
                   {filteredModels.map(model => {
