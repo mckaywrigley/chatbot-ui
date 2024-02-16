@@ -170,14 +170,14 @@ export const ModelSelect: FC<ModelSelectProps> = ({
             if (filteredModels.length === 0) return null
 
             return (
-             <div key={provider}>
-			    <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-				  {provider === "openai" && profile.use_azure_openai
-					? "AZURE OPENAI"
-					: provider === "openrouter" // Check if the provider is "openrouter"
-					? "Other popular models" // Display "Other providers" if true
-					: provider.toLocaleUpperCase()} // Otherwise, display the provider's name in uppercase
-			 </div>
+				<div key={provider}>
+					<div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
+					{provider === "openai" && profile.use_azure_openai
+						? "AZURE OPENAI"
+						: provider === "openrouter" // Check if the provider is "openrouter"
+						? "Other popular providers" // Display "Other providers" if true
+						: provider.toLocaleUpperCase()} // Otherwise, display the provider's name in uppercase
+					</div>
 
                 <div className="mb-4">
                   {filteredModels.map(model => {
