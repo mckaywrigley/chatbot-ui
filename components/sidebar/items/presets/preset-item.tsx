@@ -9,10 +9,18 @@ import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
 
 interface PresetItemProps {
+  workspaces: Tables<"workspaces">[]
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   preset: Tables<"presets">
 }
 
-export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
+export const PresetItem: FC<PresetItemProps> = ({
+  workspaces,
+  profile,
+  models,
+  preset
+}) => {
   const [name, setName] = useState(preset.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(preset.description)
@@ -29,6 +37,7 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={preset}
       isTyping={isTyping}
       contentType="presets"
@@ -64,6 +73,8 @@ export const PresetItem: FC<PresetItemProps> = ({ preset }) => {
           </div>
 
           <ChatSettingsForm
+            profile={profile}
+            models={models}
             chatSettings={presetChatSettings as any}
             onChangeChatSettings={setPresetChatSettings}
             useAdvancedDropdown={true}

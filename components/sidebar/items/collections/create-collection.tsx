@@ -3,21 +3,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { COLLECTION_DESCRIPTION_MAX, COLLECTION_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { CollectionFile } from "@/types"
 import { FC, useContext, useState } from "react"
 import { CollectionFileSelect } from "./collection-file-select"
 
 interface CreateCollectionProps {
+  profile: Tables<"profiles">
+  files: Tables<"files">[]
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
 export const CreateCollection: FC<CreateCollectionProps> = ({
+  profile,
+  files,
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -67,6 +71,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
             <Label>Files</Label>
 
             <CollectionFileSelect
+              files={files}
               selectedCollectionFiles={selectedCollectionFiles}
               onCollectionFileSelect={handleFileSelect}
             />

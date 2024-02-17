@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { ChatbotUIContext } from "@/context/context"
 import { deleteAssistant } from "@/db/assistants"
 import { deleteChat } from "@/db/chats"
 import { deleteCollection } from "@/db/collections"
@@ -20,7 +19,7 @@ import { deleteFileFromStorage } from "@/db/storage/files"
 import { deleteTool } from "@/db/tools"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType } from "@/types"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useRef, useState } from "react"
 
 interface SidebarDeleteItemProps {
   item: DataItemType
@@ -31,17 +30,6 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   item,
   contentType
 }) => {
-  const {
-    setChats,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setTools,
-    setModels
-  } = useContext(ChatbotUIContext)
-
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [showDialog, setShowDialog] = useState(false)
@@ -65,9 +53,6 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     },
     assistants: async (assistant: Tables<"assistants">) => {
       await deleteAssistant(assistant.id)
-      setChats(prevState =>
-        prevState.filter(chat => chat.assistant_id !== assistant.id)
-      )
     },
     tools: async (tool: Tables<"tools">) => {
       await deleteTool(tool.id)
@@ -77,28 +62,12 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     }
   }
 
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
-
   const handleDelete = async () => {
     const deleteFunction = deleteFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
 
-    if (!deleteFunction || !setStateFunction) return
+    if (!deleteFunction) return
 
     await deleteFunction(item as any)
-
-    setStateFunction((prevItems: any) =>
-      prevItems.filter((prevItem: any) => prevItem.id !== item.id)
-    )
 
     setShowDialog(false)
   }

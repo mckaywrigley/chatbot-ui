@@ -4,19 +4,21 @@ import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { PROMPT_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
 interface CreatePromptProps {
+  profile: Tables<"profiles">
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
 export const CreatePrompt: FC<CreatePromptProps> = ({
+  profile,
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
   const [isTyping, setIsTyping] = useState(false)
   const [name, setName] = useState("")
   const [content, setContent] = useState("")

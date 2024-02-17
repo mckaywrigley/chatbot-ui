@@ -8,6 +8,7 @@ import { FC, useContext, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
 
 interface SidebarItemProps {
+  workspaces: Tables<"workspaces">[]
   item: DataItemType
   isTyping: boolean
   contentType: ContentType
@@ -17,6 +18,7 @@ interface SidebarItemProps {
 }
 
 export const SidebarItem: FC<SidebarItemProps> = ({
+  workspaces,
   item,
   contentType,
   updateState,
@@ -24,7 +26,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   icon,
   isTyping
 }) => {
-  const { selectedWorkspace, setChats, setSelectedAssistant } =
+  const { selectedWorkspace, setSelectedAssistant } =
     useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -57,7 +59,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         embeddings_provider: assistant.embeddings_provider
       })
 
-      setChats(prevState => [createdChat, ...prevState])
       setSelectedAssistant(assistant)
 
       return router.push(`/${selectedWorkspace.id}/chat/${createdChat.id}`)
@@ -85,6 +86,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
 
   return (
     <SidebarUpdateItem
+      workspaces={workspaces}
       item={item}
       isTyping={isTyping}
       contentType={contentType}

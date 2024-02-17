@@ -4,17 +4,22 @@ import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { validateOpenAPI } from "@/utils/openapi-conversion"
 import { FC, useContext, useState } from "react"
 
 interface CreateToolProps {
+  profile: Tables<"profiles">
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
-export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+export const CreateTool: FC<CreateToolProps> = ({
+  profile,
+  isOpen,
+  onOpenChange
+}) => {
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -24,7 +29,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const [schema, setSchema] = useState("")
   const [schemaError, setSchemaError] = useState("")
 
-  if (!profile || !selectedWorkspace) return null
+  if (!selectedWorkspace) return null
 
   return (
     <SidebarCreateItem

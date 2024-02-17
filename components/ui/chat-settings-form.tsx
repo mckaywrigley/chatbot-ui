@@ -1,10 +1,12 @@
 "use client"
 
 import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { CHAT_SETTING_LIMITS } from "@/utils/chat-setting-limits"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { ModelSelect } from "../models/model-select"
 import { AdvancedSettings } from "./advanced-settings"
 import { Checkbox } from "./checkbox"
@@ -21,6 +23,8 @@ import { TextareaAutosize } from "./textarea-autosize"
 import { WithTooltip } from "./with-tooltip"
 
 interface ChatSettingsFormProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   chatSettings: ChatSettings
   onChangeChatSettings: (value: ChatSettings) => void
   useAdvancedDropdown?: boolean
@@ -28,13 +32,13 @@ interface ChatSettingsFormProps {
 }
 
 export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
+  profile,
+  models,
   chatSettings,
   onChangeChatSettings,
   useAdvancedDropdown = true,
   showTooltip = true
 }) => {
-  const { profile, models } = useContext(ChatbotUIContext)
-
   if (!profile) return null
 
   return (
@@ -43,6 +47,8 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         <Label>Model</Label>
 
         <ModelSelect
+          profile={profile}
+          models={models}
           selectedModelId={chatSettings.model}
           onSelectModel={model => {
             onChangeChatSettings({ ...chatSettings, model })
@@ -68,6 +74,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
       {useAdvancedDropdown ? (
         <AdvancedSettings>
           <AdvancedContent
+            models={models}
             chatSettings={chatSettings}
             onChangeChatSettings={onChangeChatSettings}
             showTooltip={showTooltip}
@@ -76,6 +83,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
       ) : (
         <div>
           <AdvancedContent
+            models={models}
             chatSettings={chatSettings}
             onChangeChatSettings={onChangeChatSettings}
             showTooltip={showTooltip}
@@ -87,17 +95,19 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
 }
 
 interface AdvancedContentProps {
+  models: Tables<"models">[]
   chatSettings: ChatSettings
   onChangeChatSettings: (value: ChatSettings) => void
   showTooltip: boolean
 }
 
 const AdvancedContent: FC<AdvancedContentProps> = ({
+  models,
   chatSettings,
   onChangeChatSettings,
   showTooltip
 }) => {
-  const { profile, selectedWorkspace, availableOpenRouterModels, models } =
+  const { selectedWorkspace, availableOpenRouterModels } =
     useContext(ChatbotUIContext)
 
   const isCustomModel = models.some(

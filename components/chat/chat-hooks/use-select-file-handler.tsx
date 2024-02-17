@@ -1,5 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { createDocXFile, createFile } from "@/db/files"
+import { Tables } from "@/supabase/types"
 import { LLM_LIST } from "@/utils/models/llm/llm-list"
 import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
@@ -14,15 +15,17 @@ export const ACCEPTED_FILE_TYPES = [
   "text/plain"
 ].join(",")
 
-export const useSelectFileHandler = () => {
+export const useSelectFileHandler = ({
+  profile
+}: {
+  profile: Tables<"profiles">
+}) => {
   const {
     selectedWorkspace,
-    profile,
     chatSettings,
     setNewMessageImages,
     setNewMessageFiles,
     setShowFilesDisplay,
-    setFiles,
     setUseRetrieval
   } = useContext(ChatbotUIContext)
 
@@ -108,8 +111,6 @@ export const useSelectFileHandler = () => {
             chatSettings.embeddingsProvider
           )
 
-          setFiles(prev => [...prev, createdFile])
-
           setNewMessageFiles(prev =>
             prev.map(item =>
               item.id === "loading"
@@ -168,8 +169,6 @@ export const useSelectFileHandler = () => {
               selectedWorkspace.id,
               chatSettings.embeddingsProvider
             )
-
-            setFiles(prev => [...prev, createdFile])
 
             setNewMessageFiles(prev =>
               prev.map(item =>

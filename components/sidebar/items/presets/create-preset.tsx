@@ -4,19 +4,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { PRESET_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
 interface CreatePresetProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
 export const CreatePreset: FC<CreatePresetProps> = ({
+  profile,
+  models,
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -70,6 +74,8 @@ export const CreatePreset: FC<CreatePresetProps> = ({
           </div>
 
           <ChatSettingsForm
+            profile={profile}
+            models={models}
             chatSettings={presetChatSettings as any}
             onChangeChatSettings={setPresetChatSettings}
             useAdvancedDropdown={true}

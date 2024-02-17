@@ -1,7 +1,6 @@
-import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import {
   DropdownMenu,
@@ -11,16 +10,16 @@ import {
 import { Input } from "../ui/input"
 
 interface AssignWorkspaces {
+  workspaces: Tables<"workspaces">[]
   selectedWorkspaces: Tables<"workspaces">[]
   onSelectWorkspace: (workspace: Tables<"workspaces">) => void
 }
 
 export const AssignWorkspaces: FC<AssignWorkspaces> = ({
+  workspaces,
   selectedWorkspaces,
   onSelectWorkspace
 }) => {
-  const { workspaces } = useContext(ChatbotUIContext)
-
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 

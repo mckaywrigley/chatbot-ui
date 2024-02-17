@@ -5,7 +5,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import {
   IconBooks,
@@ -13,9 +12,11 @@ import {
   IconCircleCheckFilled
 } from "@tabler/icons-react"
 import { FileIcon } from "lucide-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 
 interface AssistantRetrievalSelectProps {
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
   selectedAssistantRetrievalItems: Tables<"files">[] | Tables<"collections">[]
   onAssistantRetrievalItemsSelect: (
     item: Tables<"files"> | Tables<"collections">
@@ -23,11 +24,11 @@ interface AssistantRetrievalSelectProps {
 }
 
 export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
+  files,
+  collections,
   selectedAssistantRetrievalItems,
   onAssistantRetrievalItemsSelect
 }) => {
-  const { files, collections } = useContext(ChatbotUIContext)
-
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 

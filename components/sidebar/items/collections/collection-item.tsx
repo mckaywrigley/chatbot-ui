@@ -9,10 +9,16 @@ import { SidebarItem } from "../all/sidebar-display-item"
 import { CollectionFileSelect } from "./collection-file-select"
 
 interface CollectionItemProps {
+  workspaces: Tables<"workspaces">[]
   collection: Tables<"collections">
+  files: Tables<"files">[]
 }
 
-export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
+export const CollectionItem: FC<CollectionItemProps> = ({
+  workspaces,
+  collection,
+  files
+}) => {
   const [name, setName] = useState(collection.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(collection.description)
@@ -38,6 +44,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={collection}
       isTyping={isTyping}
       contentType="collections"
@@ -62,6 +69,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
               <Label>Files</Label>
 
               <CollectionFileSelect
+                files={files}
                 selectedCollectionFiles={
                   renderState.selectedCollectionFiles.length === 0
                     ? renderState.startingCollectionFiles

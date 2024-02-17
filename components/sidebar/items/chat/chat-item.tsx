@@ -13,10 +13,12 @@ import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
 
 interface ChatItemProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   chat: Tables<"chats">
 }
 
-export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
+export const ChatItem: FC<ChatItemProps> = ({ profile, models, chat }) => {
   const {
     selectedWorkspace,
     selectedChat,
@@ -103,7 +105,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       >
         <UpdateChat chat={chat} />
 
-        <DeleteChat chat={chat} />
+        <DeleteChat profile={profile} models={models} chat={chat} />
       </div>
     </div>
   )

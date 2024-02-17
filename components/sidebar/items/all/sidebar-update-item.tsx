@@ -86,6 +86,7 @@ import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
+  workspaces: Tables<"workspaces">[]
   isTyping: boolean
   item: DataItemType
   contentType: ContentType
@@ -95,6 +96,7 @@ interface SidebarUpdateItemProps {
 }
 
 export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
+  workspaces,
   item,
   contentType,
   children,
@@ -102,19 +104,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   updateState,
   isTyping
 }) => {
-  const {
-    workspaces,
-    selectedWorkspace,
-    setChats,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setTools,
-    setModels,
-    setAssistantImages
-  } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, setAssistantImages } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -295,16 +285,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
     for (const workspace of deleteList) {
       await deleteWorkspaceFn(itemId, workspace.id)
-    }
-
-    if (deleteList.map(w => w.id).includes(selectedWorkspace.id)) {
-      const setStateFunction = stateUpdateFunctions[contentType]
-
-      if (setStateFunction) {
-        setStateFunction((prevItems: any) =>
-          prevItems.filter((prevItem: any) => prevItem.id !== item.id)
-        )
-      }
     }
 
     const createList = selectedWorkspaces.filter(
@@ -571,32 +551,14 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     }
   }
 
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
-
   const handleUpdate = async () => {
     try {
       const updateFunction = updateFunctions[contentType]
-      const setStateFunction = stateUpdateFunctions[contentType]
 
-      if (!updateFunction || !setStateFunction) return
+      if (!updateFunction) return
       if (isTyping) return // Prevent update while typing
 
       const updatedItem = await updateFunction(item.id, updateState)
-
-      setStateFunction((prevItems: any) =>
-        prevItems.map((prevItem: any) =>
-          prevItem.id === item.id ? updatedItem : prevItem
-        )
-      )
 
       setIsOpen(false)
 
@@ -651,6 +613,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
                 <Label>Assigned Workspaces</Label>
 
                 <AssignWorkspaces
+                  workspaces={workspaces}
                   selectedWorkspaces={selectedWorkspaces}
                   onSelectWorkspace={handleSelectWorkspace}
                 />

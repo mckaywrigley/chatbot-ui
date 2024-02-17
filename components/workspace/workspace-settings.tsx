@@ -5,6 +5,7 @@ import {
   uploadWorkspaceImage
 } from "@/db/storage/workspace-images"
 import { updateWorkspace } from "@/db/workspaces"
+import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import { IconHome, IconSettings } from "@tabler/icons-react"
@@ -29,9 +30,11 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { DeleteWorkspace } from "./delete-workspace"
 
-interface WorkspaceSettingsProps {}
+interface WorkspaceSettingsProps {
+  models: Tables<"models">[]
+}
 
-export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
+export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({ models }) => {
   const {
     selectedWorkspace,
     setSelectedWorkspace,
@@ -256,6 +259,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
               </div>
 
               <ChatSettingsForm
+                profile={profile}
+                models={models}
                 chatSettings={defaultChatSettings as any}
                 onChangeChatSettings={setDefaultChatSettings}
               />
@@ -267,6 +272,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           <div>
             {!selectedWorkspace.is_home && (
               <DeleteWorkspace
+                profile={profile}
+                models={models}
                 workspace={selectedWorkspace}
                 onDelete={() => setIsOpen(false)}
               />

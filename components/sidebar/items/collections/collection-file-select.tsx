@@ -6,22 +6,22 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { FileIcon } from "@/components/ui/file-icon"
 import { Input } from "@/components/ui/input"
-import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import { CollectionFile } from "@/types"
 import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 
 interface CollectionFileSelectProps {
+  files: Tables<"files">[]
   selectedCollectionFiles: CollectionFile[]
   onCollectionFileSelect: (file: CollectionFile) => void
 }
 
 export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
+  files,
   selectedCollectionFiles,
   onCollectionFileSelect
 }) => {
-  const { files } = useContext(ChatbotUIContext)
-
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 

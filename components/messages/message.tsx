@@ -27,6 +27,10 @@ import { MessageMarkdown } from "./message-markdown"
 const ICON_SIZE = 32
 
 interface MessageProps {
+  assistants: Tables<"assistants">[]
+  profile: Tables<"profiles">
+  files: Tables<"files">[]
+  models: Tables<"models">[]
   message: Tables<"messages">
   fileItems: Tables<"file_items">[]
   isEditing: boolean
@@ -37,6 +41,10 @@ interface MessageProps {
 }
 
 export const Message: FC<MessageProps> = ({
+  assistants,
+  profile,
+  files,
+  models,
   message,
   fileItems,
   isEditing,
@@ -46,8 +54,6 @@ export const Message: FC<MessageProps> = ({
   onSubmitEdit
 }) => {
   const {
-    assistants,
-    profile,
     isGenerating,
     setIsGenerating,
     firstTokenReceived,
@@ -57,12 +63,13 @@ export const Message: FC<MessageProps> = ({
     selectedAssistant,
     chatImages,
     assistantImages,
-    toolInUse,
-    files,
-    models
+    toolInUse
   } = useContext(ChatbotUIContext)
 
-  const { handleSendMessage } = useChatHandler()
+  const { handleSendMessage } = useChatHandler({
+    profile,
+    models
+  })
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 

@@ -1,4 +1,3 @@
-import { ChatbotUIContext } from "@/context/context"
 import { updateAssistant } from "@/db/assistants"
 import { updateChat } from "@/db/chats"
 import { updateCollection } from "@/db/collections"
@@ -10,7 +9,7 @@ import { updateTool } from "@/db/tools"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { cn } from "@/utils/utils"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { Separator } from "../ui/separator"
 import { AssistantItem } from "./items/assistants/assistant-item"
 import { ChatItem } from "./items/chat/chat-item"
@@ -23,27 +22,30 @@ import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
 
 interface SidebarDataListProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
+  workspaces: Tables<"workspaces">[]
+  presets: Tables<"presets">[]
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
+  files: Tables<"files">[]
+  tools: Tables<"tools">[]
+  collections: Tables<"collections">[]
 }
 
 export const SidebarDataList: FC<SidebarDataListProps> = ({
+  profile,
+  models,
+  workspaces,
+  presets,
   contentType,
   data,
-  folders
+  folders,
+  files,
+  tools,
+  collections
 }) => {
-  const {
-    setChats,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setTools,
-    setModels
-  } = useContext(ChatbotUIContext)
-
   const divRef = useRef<HTMLDivElement>(null)
 
   const [isOverflowing, setIsOverflowing] = useState(false)
@@ -55,22 +57,51 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   ) => {
     switch (contentType) {
       case "chats":
-        return <ChatItem key={item.id} chat={item as Tables<"chats">} />
+        return (
+          <ChatItem
+            key={item.id}
+            profile={profile}
+            models={models}
+            chat={item as Tables<"chats">}
+          />
+        )
 
       case "presets":
-        return <PresetItem key={item.id} preset={item as Tables<"presets">} />
+        return (
+          <PresetItem
+            key={item.id}
+            workspaces={workspaces}
+            profile={profile}
+            models={models}
+            preset={item as Tables<"presets">}
+          />
+        )
 
       case "prompts":
-        return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
+        return (
+          <PromptItem
+            key={item.id}
+            prompt={item as Tables<"prompts">}
+            workspaces={workspaces}
+          />
+        )
 
       case "files":
-        return <FileItem key={item.id} file={item as Tables<"files">} />
+        return (
+          <FileItem
+            key={item.id}
+            file={item as Tables<"files">}
+            workspaces={workspaces}
+          />
+        )
 
       case "collections":
         return (
           <CollectionItem
             key={item.id}
+            workspaces={workspaces}
             collection={item as Tables<"collections">}
+            files={files}
           />
         )
 
@@ -78,15 +109,32 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <AssistantItem
             key={item.id}
+            workspaces={workspaces}
             assistant={item as Tables<"assistants">}
+            tools={tools}
+            models={models}
+            files={files}
+            collections={collections}
           />
         )
 
       case "tools":
-        return <ToolItem key={item.id} tool={item as Tables<"tools">} />
+        return (
+          <ToolItem
+            key={item.id}
+            tool={item as Tables<"tools">}
+            workspaces={workspaces}
+          />
+        )
 
       case "models":
-        return <ModelItem key={item.id} model={item as Tables<"models">} />
+        return (
+          <ModelItem
+            key={item.id}
+            model={item as Tables<"models">}
+            workspaces={workspaces}
+          />
+        )
 
       default:
         return null
@@ -143,36 +191,18 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     models: updateModel
   }
 
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
-
   const updateFolder = async (itemId: string, folderId: string | null) => {
     const item: any = data.find(item => item.id === itemId)
 
     if (!item) return null
 
     const updateFunction = updateFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
 
-    if (!updateFunction || !setStateFunction) return
+    if (!updateFunction) return
 
     const updatedItem = await updateFunction(item.id, {
       folder_id: folderId
     })
-
-    setStateFunction((items: any) =>
-      items.map((item: any) =>
-        item.id === updatedItem.id ? updatedItem : item
-      )
-    )
   }
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {

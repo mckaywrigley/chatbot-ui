@@ -46,18 +46,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   createState,
   isTyping
 }) => {
-  const {
-    selectedWorkspace,
-    setChats,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setAssistantImages,
-    setTools,
-    setModels
-  } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, setAssistantImages } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -173,32 +162,18 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     models: createModel
   }
 
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
-
   const handleCreate = async () => {
     try {
       if (!selectedWorkspace) return
       if (isTyping) return // Prevent creation while typing
 
       const createFunction = createFunctions[contentType]
-      const setStateFunction = stateUpdateFunctions[contentType]
 
-      if (!createFunction || !setStateFunction) return
+      if (!createFunction) return
 
       setCreating(true)
 
       const newItem = await createFunction(createState, selectedWorkspace.id)
-
-      setStateFunction((prevItems: any) => [...prevItems, newItem])
 
       onOpenChange(false)
       setCreating(false)

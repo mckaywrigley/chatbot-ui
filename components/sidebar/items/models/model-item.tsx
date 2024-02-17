@@ -8,9 +8,10 @@ import { SidebarItem } from "../all/sidebar-display-item"
 
 interface ModelItemProps {
   model: Tables<"models">
+  workspaces: Tables<"workspaces">[]
 }
 
-export const ModelItem: FC<ModelItemProps> = ({ model }) => {
+export const ModelItem: FC<ModelItemProps> = ({ model, workspaces }) => {
   const [isTyping, setIsTyping] = useState(false)
 
   const [apiKey, setApiKey] = useState(model.api_key)
@@ -22,6 +23,7 @@ export const ModelItem: FC<ModelItemProps> = ({ model }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={model}
       isTyping={isTyping}
       contentType="models"

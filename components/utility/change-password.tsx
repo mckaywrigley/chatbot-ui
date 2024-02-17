@@ -1,7 +1,7 @@
-"use client"
-
-import { useRouter } from "next/navigation"
-import { FC, useState } from "react"
+import { createClient } from "@/utils/supabase/server"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { FC } from "react"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -12,51 +12,57 @@ import {
 } from "../ui/dialog"
 import { Input } from "../ui/input"
 
-interface ChangePasswordProps {}
+interface ChangePasswordProps {
+  message: string
+}
 
-export const ChangePassword: FC<ChangePasswordProps> = () => {
-  const router = useRouter()
-
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-
-  const handleResetPassword = async () => {
-    if (!newPassword) return alert("Please enter your new password.")
-
-    await supabase.auth.updateUser({ password: newPassword })
-
-    alert("Password changed successfully.")
-
-    return router.push("/login")
-  }
-
+export const ChangePassword: FC<ChangePasswordProps> = async ({ message }) => {
   return (
-    <Dialog open={true}>
-      <DialogContent className="h-[240px] w-[400px] p-4">
-        <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
-        </DialogHeader>
+    <form
+      action={async (formData: FormData) => {
+        const cookieStore = cookies()
+        const supabase = createClient(cookieStore)
 
-        <Input
-          id="password"
-          placeholder="New Password"
-          type="password"
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-        />
+        if (formData.get("newPassword") !== formData.get("confirmPassword")) {
+          return redirect("/change-password?message=Passwords do not match")
+        }
 
-        <Input
-          id="confirmPassword"
-          placeholder="Confirm New Password"
-          type="password"
-          value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
-        />
+        await supabase.auth.updateUser({
+          password: formData.get("newPassword") as string
+        })
 
-        <DialogFooter>
-          <Button onClick={handleResetPassword}>Confirm Change</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        return redirect("/login")
+      }}
+    >
+      <Dialog open={true}>
+        <DialogContent className="h-[240px] w-[400px] p-4">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            name="newPassword"
+            placeholder="New Password"
+            type="password"
+          />
+
+          <Input
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            type="password"
+          />
+
+          {message && (
+            <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
+              {message}
+            </p>
+          )}
+
+          <DialogFooter>
+            <Button type="submit">Confirm Change</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </form>
   )
 }

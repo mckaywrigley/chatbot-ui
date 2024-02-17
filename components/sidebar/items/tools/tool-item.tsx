@@ -10,9 +10,10 @@ import { SidebarItem } from "../all/sidebar-display-item"
 
 interface ToolItemProps {
   tool: Tables<"tools">
+  workspaces: Tables<"workspaces">[]
 }
 
-export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
+export const ToolItem: FC<ToolItemProps> = ({ tool, workspaces }) => {
   const [name, setName] = useState(tool.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
@@ -25,6 +26,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={tool}
       isTyping={isTyping}
       contentType="tools"

@@ -4,12 +4,25 @@ import { Tables } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 import { Message } from "../messages/message"
 
-interface ChatMessagesProps {}
+interface ChatMessagesProps {
+  assistants: Tables<"assistants">[]
+  profile: Tables<"profiles">
+  files: Tables<"files">[]
+  models: Tables<"models">[]
+}
 
-export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
+export const ChatMessages: FC<ChatMessagesProps> = ({
+  assistants,
+  profile,
+  files,
+  models
+}) => {
   const { chatMessages, chatFileItems } = useContext(ChatbotUIContext)
 
-  const { handleSendEdit } = useChatHandler()
+  const { handleSendEdit } = useChatHandler({
+    profile,
+    models
+  })
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
@@ -25,6 +38,10 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
       return (
         <Message
           key={chatMessage.message.sequence_number}
+          assistants={assistants}
+          profile={profile}
+          files={files}
+          models={models}
           message={chatMessage.message}
           fileItems={messageFileItems}
           isEditing={editingMessage?.id === chatMessage.message.id}

@@ -9,19 +9,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ChatbotUIContext } from "@/context/context"
 import { updateFolder } from "@/db/folders"
 import { Tables } from "@/supabase/types"
 import { IconEdit } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useRef, useState } from "react"
 
 interface UpdateFolderProps {
   folder: Tables<"folders">
 }
 
 export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
-  const { setFolders } = useContext(ChatbotUIContext)
-
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [showFolderDialog, setShowFolderDialog] = useState(false)
@@ -31,9 +28,6 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
     const updatedFolder = await updateFolder(folder.id, {
       name
     })
-    setFolders(prevState =>
-      prevState.map(c => (c.id === folder.id ? updatedFolder : c))
-    )
 
     setShowFolderDialog(false)
   }

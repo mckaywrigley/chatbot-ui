@@ -346,17 +346,25 @@ export const processResponse = async (
   }
 }
 
-export const handleCreateChat = async (
-  chatSettings: ChatSettings,
-  profile: Tables<"profiles">,
-  selectedWorkspace: Tables<"workspaces">,
-  messageContent: string,
-  selectedAssistant: Tables<"assistants">,
-  newMessageFiles: ChatFile[],
-  setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
-  setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
+export const handleCreateChat = async ({
+  chatSettings,
+  profile,
+  selectedWorkspace,
+  messageContent,
+  selectedAssistant,
+  newMessageFiles,
+  setSelectedChat,
+  setChatFiles
+}: {
+  chatSettings: ChatSettings
+  profile: Tables<"profiles">
+  selectedWorkspace: Tables<"workspaces">
+  messageContent: string
+  selectedAssistant: Tables<"assistants">
+  newMessageFiles: ChatFile[]
+  setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>
   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
-) => {
+}) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
     workspace_id: selectedWorkspace.id,
@@ -372,7 +380,6 @@ export const handleCreateChat = async (
   })
 
   setSelectedChat(createdChat)
-  setChats(chats => [createdChat, ...chats])
 
   await createChatFiles(
     newMessageFiles.map(file => ({

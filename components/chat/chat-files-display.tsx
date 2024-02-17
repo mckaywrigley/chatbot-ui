@@ -1,5 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getFileFromStorage } from "@/db/storage/files"
+import { Tables } from "@/supabase/types"
 import { ChatFile, MessageImage } from "@/types"
 import useHotkey from "@/utils/hooks/use-hotkey"
 import { cn } from "@/utils/utils"
@@ -22,14 +23,15 @@ import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 
-interface ChatFilesDisplayProps {}
+interface ChatFilesDisplayProps {
+  files: Tables<"files">[]
+}
 
-export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
+export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({ files }) => {
   useHotkey("f", () => setShowFilesDisplay(prev => !prev))
   useHotkey("e", () => setUseRetrieval(prev => !prev))
 
   const {
-    files,
     newMessageImages,
     setNewMessageImages,
     newMessageFiles,

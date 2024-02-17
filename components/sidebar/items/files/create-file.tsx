@@ -4,16 +4,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { FILE_DESCRIPTION_MAX, FILE_NAME_MAX } from "@/db/limits"
-import { TablesInsert } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
 
 interface CreateFileProps {
+  profile: Tables<"profiles">
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
-export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+export const CreateFile: FC<CreateFileProps> = ({
+  profile,
+  isOpen,
+  onOpenChange
+}) => {
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)

@@ -6,6 +6,7 @@ import { createFiles } from "@/db/files"
 import { createPresets } from "@/db/presets"
 import { createPrompts } from "@/db/prompts"
 import { createTools } from "@/db/tools"
+import { Tables } from "@/supabase/types"
 import { IconUpload, IconX } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -21,20 +22,12 @@ import {
 } from "../ui/dialog"
 import { Input } from "../ui/input"
 
-interface ImportProps {}
+interface ImportProps {
+  profile: Tables<"profiles">
+}
 
-export const Import: FC<ImportProps> = ({}) => {
-  const {
-    profile,
-    selectedWorkspace,
-    setChats,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setTools
-  } = useContext(ChatbotUIContext)
+export const Import: FC<ImportProps> = ({ profile }) => {
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -58,16 +51,6 @@ export const Import: FC<ImportProps> = ({}) => {
     assistants: 0,
     tools: 0
   })
-
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools
-  }
 
   const handleSelectFiles = async (e: any) => {
     const filePromises = Array.from(e.target.files).map(file => {
@@ -179,14 +162,6 @@ export const Import: FC<ImportProps> = ({}) => {
       ),
       tools: await createTools(saveData.tools, selectedWorkspace.id)
     }
-
-    Object.keys(createdItems).forEach(key => {
-      const typedKey = key as keyof typeof stateUpdateFunctions
-      stateUpdateFunctions[typedKey]((prevItems: any) => [
-        ...prevItems,
-        ...createdItems[typedKey]
-      ])
-    })
 
     toast.success("Data imported successfully!")
 

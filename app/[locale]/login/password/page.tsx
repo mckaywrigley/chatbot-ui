@@ -1,29 +1,20 @@
-"use client"
-
 import { ChangePassword } from "@/components/utility/change-password"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { createClient } from "@/utils/supabase/server"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-export default function ChangePasswordPage() {
-  const [loading, setLoading] = useState(true)
+export default async function ChangePasswordPage({
+  searchParams
+}: {
+  searchParams: { message: string }
+}) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
-  const router = useRouter()
-
-  useEffect(() => {
-    ;(async () => {
-      const session = (await supabase.auth.getSession()).data.session
-
-      if (!session) {
-        router.push("/login")
-      } else {
-        setLoading(false)
-      }
-    })()
-  }, [])
-
-  if (loading) {
-    return null
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    return redirect("/login")
   }
 
-  return <ChangePassword />
+  return <ChangePassword message={searchParams.message} />
 }

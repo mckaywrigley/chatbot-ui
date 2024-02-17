@@ -11,15 +11,25 @@ import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
 
 interface CreateAssistantProps {
+  profile: Tables<"profiles">
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
+  models: Tables<"models">[]
+  tools: Tables<"tools">[]
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 
 export const CreateAssistant: FC<CreateAssistantProps> = ({
+  profile,
+  files,
+  collections,
+  models,
+  tools,
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -175,6 +185,8 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
           </div>
 
           <ChatSettingsForm
+            profile={profile}
+            models={models}
             chatSettings={assistantChatSettings as any}
             onChangeChatSettings={setAssistantChatSettings}
             useAdvancedDropdown={true}
@@ -184,6 +196,8 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             <Label>Files & Collections</Label>
 
             <AssistantRetrievalSelect
+              files={files}
+              collections={collections}
               selectedAssistantRetrievalItems={selectedAssistantRetrievalItems}
               onAssistantRetrievalItemsSelect={handleRetrievalItemSelect}
             />
@@ -194,6 +208,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
               <Label>Tools</Label>
 
               <AssistantToolSelect
+                tools={tools}
                 selectedAssistantTools={selectedAssistantToolItems}
                 onAssistantToolsSelect={handleToolSelect}
               />

@@ -15,9 +15,21 @@ import { AssistantToolSelect } from "./assistant-tool-select"
 
 interface AssistantItemProps {
   assistant: Tables<"assistants">
+  tools: Tables<"tools">[]
+  models: Tables<"models">[]
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
+  workspaces: Tables<"workspaces">[]
 }
 
-export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
+export const AssistantItem: FC<AssistantItemProps> = ({
+  assistant,
+  tools,
+  models,
+  files,
+  collections,
+  workspaces
+}) => {
   const { selectedWorkspace, assistantImages } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState(assistant.name)
@@ -105,6 +117,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={assistant}
       contentType="assistants"
       isTyping={isTyping}
@@ -202,6 +215,8 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
           </div>
 
           <ChatSettingsForm
+            profile={profile}
+            models={models}
             chatSettings={assistantChatSettings as any}
             onChangeChatSettings={setAssistantChatSettings}
             useAdvancedDropdown={true}
@@ -211,6 +226,8 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
             <Label>Files & Collections</Label>
 
             <AssistantRetrievalSelect
+              files={files}
+              collections={collections}
               selectedAssistantRetrievalItems={
                 [
                   ...renderState.selectedAssistantFiles,
@@ -273,6 +290,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
             <Label>Tools</Label>
 
             <AssistantToolSelect
+              tools={tools}
               selectedAssistantTools={
                 renderState.selectedAssistantTools.length === 0
                   ? renderState.startingAssistantTools

@@ -1,4 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import { LLM, LLMID, ModelProvider } from "@/types"
 import { IconCheck, IconChevronDown } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -14,17 +15,19 @@ import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
 
 interface ModelSelectProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   selectedModelId: string
   onSelectModel: (modelId: LLMID) => void
 }
 
 export const ModelSelect: FC<ModelSelectProps> = ({
+  profile,
+  models,
   selectedModelId,
   onSelectModel
 }) => {
   const {
-    profile,
-    models,
     availableHostedModels,
     availableLocalModels,
     availableOpenRouterModels

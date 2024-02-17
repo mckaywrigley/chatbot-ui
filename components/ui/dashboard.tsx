@@ -55,7 +55,9 @@ export const Dashboard: FC<DashboardProps> = ({
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
 
-  const { handleSelectDeviceFile } = useSelectFileHandler()
+  const { handleSelectDeviceFile } = useSelectFileHandler({
+    profile
+  })
 
   const [contentType, setContentType] = useState<ContentType>(
     tabValue as ContentType
@@ -97,8 +99,6 @@ export const Dashboard: FC<DashboardProps> = ({
 
   return (
     <div className="flex size-full">
-      {/* <CommandK /> */}
-
       <Button
         className={cn(
           "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
@@ -140,6 +140,7 @@ export const Dashboard: FC<DashboardProps> = ({
             <Sidebar
               contentType={contentType}
               showSidebar={showSidebar}
+              profile={profile}
               assistants={assistants}
               chats={chats}
               collections={collections}

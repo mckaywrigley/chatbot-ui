@@ -24,6 +24,8 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 
 interface ChatInputProps {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
   prompts: Tables<"prompts">[]
   files: Tables<"files">[]
   collections: Tables<"collections">[]
@@ -32,6 +34,8 @@ interface ChatInputProps {
 }
 
 export const ChatInput: FC<ChatInputProps> = ({
+  profile,
+  models,
   prompts,
   files,
   collections,
@@ -78,11 +82,16 @@ export const ChatInput: FC<ChatInputProps> = ({
     handleSendMessage,
     handleStopMessage,
     handleFocusChatInput
-  } = useChatHandler()
+  } = useChatHandler({
+    profile,
+    models
+  })
 
   const { handleInputChange } = usePromptAndCommand()
 
-  const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
+  const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler({
+    profile
+  })
 
   const {
     setNewMessageContentToNextUserMessage,
@@ -176,7 +185,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
-        <ChatFilesDisplay />
+        <ChatFilesDisplay files={files} />
 
         {selectedTools &&
           selectedTools.map((tool, index) => (

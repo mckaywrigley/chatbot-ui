@@ -4,6 +4,7 @@ import { getFiles } from "@/actions/files"
 import { getMessages } from "@/actions/messages"
 import { getModels } from "@/actions/models"
 import { getPresets } from "@/actions/presets"
+import { getProfile } from "@/actions/profiles"
 import { getPrompts } from "@/actions/prompts"
 import { getTools } from "@/actions/tools"
 import { ChatHelp } from "@/components/chat/chat-help"
@@ -15,17 +16,8 @@ import { Brand } from "@/components/ui/brand"
 import { createClient } from "@/utils/supabase/server"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { ReactNode } from "react"
 
-interface ChatPageProps {
-  children: ReactNode
-  params: {
-    workspaceid: string
-    chatid: string
-  }
-}
-
-export default async function ChatPage({ children, params }: ChatPageProps) {
+export default async function ChatPage({ children, params }: any) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
@@ -34,10 +26,9 @@ export default async function ChatPage({ children, params }: ChatPageProps) {
     return redirect("/login")
   }
 
-  console.log("params", params)
   const workspaceId = params.workspaceid as string
-  const chatId = params.chatid as string
 
+  const profile = await getProfile(data.user.id)
   const assistants = await getAssistants(workspaceId)
   const messages = await getMessages(workspaceId)
   const models = await getModels(workspaceId)
@@ -60,13 +51,15 @@ export default async function ChatPage({ children, params }: ChatPageProps) {
           </div>
 
           <div className="absolute right-2 top-2">
-            <ChatSettings models={models} />
+            <ChatSettings profile={profile} models={models} />
           </div>
 
           <div className="flex grow flex-col items-center justify-center" />
 
           <div className="w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
             <ChatInput
+              profile={profile}
+              models={models}
               prompts={prompts}
               assistants={assistants}
               files={files}
@@ -81,6 +74,8 @@ export default async function ChatPage({ children, params }: ChatPageProps) {
         </div>
       ) : (
         <ChatUI
+          profile={profile}
+          models={models}
           prompts={prompts}
           assistants={assistants}
           files={files}

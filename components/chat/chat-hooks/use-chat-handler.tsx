@@ -18,7 +18,13 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 
-export const useChatHandler = () => {
+export const useChatHandler = ({
+  profile,
+  models
+}: {
+  profile: Tables<"profiles">
+  models: Tables<"models">[]
+}) => {
   const router = useRouter()
 
   const {
@@ -26,14 +32,12 @@ export const useChatHandler = () => {
     chatFiles,
     setUserInput,
     setNewMessageImages,
-    profile,
     setIsGenerating,
     setChatMessages,
     setFirstTokenReceived,
     selectedChat,
     selectedWorkspace,
     setSelectedChat,
-    setChats,
     setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
@@ -59,7 +63,6 @@ export const useChatHandler = () => {
     selectedTools,
     selectedPreset,
     setChatSettings,
-    models,
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen
@@ -304,28 +307,19 @@ export const useChatHandler = () => {
       }
 
       if (!currentChat) {
-        currentChat = await handleCreateChat(
-          chatSettings!,
-          profile!,
-          selectedWorkspace!,
-          messageContent,
-          selectedAssistant!,
-          newMessageFiles,
-          setSelectedChat,
-          setChats,
-          setChatFiles
-        )
+        currentChat = await handleCreateChat({
+          chatSettings: chatSettings!,
+          profile: profile!,
+          selectedWorkspace: selectedWorkspace!,
+          messageContent: messageContent,
+          selectedAssistant: selectedAssistant!,
+          newMessageFiles: newMessageFiles,
+          setSelectedChat: setSelectedChat,
+          setChatFiles: setChatFiles
+        })
       } else {
         const updatedChat = await updateChat(currentChat.id, {
           updated_at: new Date().toISOString()
-        })
-
-        setChats(prevChats => {
-          const updatedChats = prevChats.map(prevChat =>
-            prevChat.id === updatedChat.id ? updatedChat : prevChat
-          )
-
-          return updatedChats
         })
       }
 

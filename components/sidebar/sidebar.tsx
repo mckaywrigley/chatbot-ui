@@ -11,6 +11,7 @@ interface SidebarProps {
   contentType: ContentType
   showSidebar: boolean
 
+  profile: Tables<"profiles">
   assistants: Tables<"assistants">[]
   chats: Tables<"chats">[]
   collections: Tables<"collections">[]
@@ -28,6 +29,7 @@ export const Sidebar: FC<SidebarProps> = ({
   contentType,
   showSidebar,
 
+  profile,
   assistants,
   chats,
   collections,
@@ -64,6 +66,13 @@ export const Sidebar: FC<SidebarProps> = ({
         contentType={contentType}
         data={data}
         folders={folders}
+        profile={profile}
+        files={files}
+        collections={collections}
+        models={models}
+        tools={tools}
+        presets={presets}
+        workspaces={workspaces}
       />
     )
   }
@@ -83,7 +92,7 @@ export const Sidebar: FC<SidebarProps> = ({
         <div className="flex items-center border-b-2 pb-2">
           <WorkspaceSwitcher workspaces={[]} />
 
-          <WorkspaceSettings />
+          <WorkspaceSettings models={models} />
         </div>
 
         {(() => {

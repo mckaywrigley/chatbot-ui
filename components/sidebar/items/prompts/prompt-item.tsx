@@ -9,14 +9,16 @@ import { SidebarItem } from "../all/sidebar-display-item"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">
+  workspaces: Tables<"workspaces">[]
 }
 
-export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
+export const PromptItem: FC<PromptItemProps> = ({ prompt, workspaces }) => {
   const [name, setName] = useState(prompt.name)
   const [content, setContent] = useState(prompt.content)
   const [isTyping, setIsTyping] = useState(false)
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={prompt}
       isTyping={isTyping}
       contentType="prompts"

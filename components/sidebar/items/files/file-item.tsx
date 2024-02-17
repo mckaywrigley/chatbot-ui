@@ -9,9 +9,10 @@ import { SidebarItem } from "../all/sidebar-display-item"
 
 interface FileItemProps {
   file: Tables<"files">
+  workspaces: Tables<"workspaces">[]
 }
 
-export const FileItem: FC<FileItemProps> = ({ file }) => {
+export const FileItem: FC<FileItemProps> = ({ file, workspaces }) => {
   const [name, setName] = useState(file.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(file.description)
@@ -23,6 +24,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
 
   return (
     <SidebarItem
+      workspaces={workspaces}
       item={file}
       isTyping={isTyping}
       contentType="files"

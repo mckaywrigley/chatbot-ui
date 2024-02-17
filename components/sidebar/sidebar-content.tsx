@@ -6,17 +6,31 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { SidebarSearch } from "./sidebar-search"
 
 interface SidebarContentProps {
+  profile: Tables<"profiles">
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
+  models: Tables<"models">[]
+  tools: Tables<"tools">[]
   workspaceId: string
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
+  workspaces: Tables<"workspaces">[]
+  presets: Tables<"presets">[]
 }
 
 export const SidebarContent: FC<SidebarContentProps> = ({
+  profile,
+  files,
+  collections,
+  models,
+  tools,
   workspaceId,
   contentType,
   data,
-  folders
+  folders,
+  workspaces,
+  presets
 }) => {
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -29,6 +43,11 @@ export const SidebarContent: FC<SidebarContentProps> = ({
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
       <div className="mt-2 flex items-center">
         <SidebarCreateButtons
+          profile={profile}
+          files={files}
+          collections={collections}
+          models={models}
+          tools={tools}
           workspaceId={workspaceId}
           contentType={contentType}
           hasData={data.length > 0}
@@ -47,6 +66,13 @@ export const SidebarContent: FC<SidebarContentProps> = ({
         contentType={contentType}
         data={filteredData}
         folders={folders}
+        profile={profile}
+        models={models}
+        workspaces={workspaces}
+        presets={presets}
+        files={files}
+        tools={tools}
+        collections={collections}
       />
     </div>
   )
