@@ -13,7 +13,7 @@ import { cn } from "@/utils/utils"
 import { IconFileDownload, IconUser } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useRef, useState } from "react"
-import { Logout } from "../logout"
+import { LogoutButton } from "../logout-button"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
 import ImagePicker from "../ui/image-picker"
@@ -182,7 +182,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ profile }) => {
               <SheetTitle className="flex items-center justify-between space-x-2">
                 <div>User Settings</div>
 
-                <Logout />
+                <LogoutButton />
               </SheetTitle>
             </SheetHeader>
 
