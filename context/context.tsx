@@ -13,32 +13,6 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
 
 interface ChatbotUIContext {
-  // PROFILE STORE
-  profile: Tables<"profiles"> | null
-  setProfile: Dispatch<SetStateAction<Tables<"profiles"> | null>>
-
-  // ITEMS STORE
-  assistants: Tables<"assistants">[]
-  setAssistants: Dispatch<SetStateAction<Tables<"assistants">[]>>
-  collections: Tables<"collections">[]
-  setCollections: Dispatch<SetStateAction<Tables<"collections">[]>>
-  chats: Tables<"chats">[]
-  setChats: Dispatch<SetStateAction<Tables<"chats">[]>>
-  files: Tables<"files">[]
-  setFiles: Dispatch<SetStateAction<Tables<"files">[]>>
-  folders: Tables<"folders">[]
-  setFolders: Dispatch<SetStateAction<Tables<"folders">[]>>
-  models: Tables<"models">[]
-  setModels: Dispatch<SetStateAction<Tables<"models">[]>>
-  presets: Tables<"presets">[]
-  setPresets: Dispatch<SetStateAction<Tables<"presets">[]>>
-  prompts: Tables<"prompts">[]
-  setPrompts: Dispatch<SetStateAction<Tables<"prompts">[]>>
-  tools: Tables<"tools">[]
-  setTools: Dispatch<SetStateAction<Tables<"tools">[]>>
-  workspaces: Tables<"workspaces">[]
-  setWorkspaces: Dispatch<SetStateAction<Tables<"workspaces">[]>>
-
   // MODELS STORE
   envKeyMap: Record<string, VALID_ENV_KEYS>
   setEnvKeyMap: Dispatch<SetStateAction<Record<string, VALID_ENV_KEYS>>>
@@ -139,32 +113,6 @@ interface ChatbotUIContext {
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
-  // PROFILE STORE
-  profile: null,
-  setProfile: () => {},
-
-  // ITEMS STORE
-  assistants: [],
-  setAssistants: () => {},
-  collections: [],
-  setCollections: () => {},
-  chats: [],
-  setChats: () => {},
-  files: [],
-  setFiles: () => {},
-  folders: [],
-  setFolders: () => {},
-  models: [],
-  setModels: () => {},
-  presets: [],
-  setPresets: () => {},
-  prompts: [],
-  setPrompts: () => {},
-  tools: [],
-  setTools: () => {},
-  workspaces: [],
-  setWorkspaces: () => {},
-
   // MODELS STORE
   envKeyMap: {},
   setEnvKeyMap: () => {},

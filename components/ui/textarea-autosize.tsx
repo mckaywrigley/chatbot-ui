@@ -8,7 +8,7 @@ interface TextareaAutosizeProps {
 
   textareaRef?: React.RefObject<HTMLTextAreaElement>
   className?: string
-
+  name?: string
   placeholder?: string
   minRows?: number
   maxRows?: number
@@ -24,6 +24,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
 
   textareaRef,
   className,
+  name = "",
   placeholder = "",
   minRows = 1,
   maxRows = 6,
@@ -39,6 +40,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
         "bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-2 px-3 py-2 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
+      name={name}
       minRows={minRows}
       maxRows={minRows > maxRows ? minRows : maxRows}
       placeholder={placeholder}

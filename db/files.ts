@@ -1,8 +1,10 @@
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
-import { supabase } from "@/utils/supabase/browser-client"
+import { createClient } from "@/utils/supabase/client"
 import mammoth from "mammoth"
 import { toast } from "sonner"
 import { uploadFile } from "./storage/files"
+
+const supabase = createClient()
 
 export const getFileById = async (fileId: string) => {
   const { data: file, error } = await supabase

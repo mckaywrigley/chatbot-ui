@@ -2,10 +2,8 @@
 
 "use client"
 
+import { getProfile } from "@/actions/profiles"
 import { ChatbotUIContext } from "@/context/context"
-import { getProfileByUserId } from "@/db/profile"
-import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
-import { getWorkspacesByUserId } from "@/db/workspaces"
 import { Tables } from "@/supabase/types"
 import {
   ChatFile,
@@ -18,14 +16,11 @@ import {
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
-import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import {
   fetchHostedModels,
   fetchOllamaModels,
   fetchOpenRouterModels
 } from "@/utils/models/fetch-models"
-import { supabase } from "@/utils/supabase/browser-client"
-import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 
 interface GlobalStateProps {
@@ -33,23 +28,6 @@ interface GlobalStateProps {
 }
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
-  const router = useRouter()
-
-  // PROFILE STORE
-  const [profile, setProfile] = useState<Tables<"profiles"> | null>(null)
-
-  // ITEMS STORE
-  const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
-  const [collections, setCollections] = useState<Tables<"collections">[]>([])
-  const [chats, setChats] = useState<Tables<"chats">[]>([])
-  const [files, setFiles] = useState<Tables<"files">[]>([])
-  const [folders, setFolders] = useState<Tables<"folders">[]>([])
-  const [models, setModels] = useState<Tables<"models">[]>([])
-  const [presets, setPresets] = useState<Tables<"presets">[]>([])
-  const [prompts, setPrompts] = useState<Tables<"prompts">[]>([])
-  const [tools, setTools] = useState<Tables<"tools">[]>([])
-  const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
-
   // MODELS STORE
   const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({})
   const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([])
@@ -125,7 +103,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      const profile = await fetchStartingData()
+      const profile = await getProfile(user.id)
 
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)
@@ -152,80 +130,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     })()
   }, [])
 
-  const fetchStartingData = async () => {
-    const session = (await supabase.auth.getSession()).data.session
-
-    if (session) {
-      const user = session.user
-
-      const profile = await getProfileByUserId(user.id)
-      setProfile(profile)
-
-      if (!profile.has_onboarded) {
-        return router.push("/setup")
-      }
-
-      const workspaces = await getWorkspacesByUserId(user.id)
-      setWorkspaces(workspaces)
-
-      for (const workspace of workspaces) {
-        let workspaceImageUrl = ""
-
-        if (workspace.image_path) {
-          workspaceImageUrl =
-            (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
-        }
-
-        if (workspaceImageUrl) {
-          const response = await fetch(workspaceImageUrl)
-          const blob = await response.blob()
-          const base64 = await convertBlobToBase64(blob)
-
-          setWorkspaceImages(prev => [
-            ...prev,
-            {
-              workspaceId: workspace.id,
-              path: workspace.image_path,
-              base64: base64,
-              url: workspaceImageUrl
-            }
-          ])
-        }
-      }
-
-      return profile
-    }
-  }
-
   return (
     <ChatbotUIContext.Provider
       value={{
-        // PROFILE STORE
-        profile,
-        setProfile,
-
-        // ITEMS STORE
-        assistants,
-        setAssistants,
-        collections,
-        setCollections,
-        chats,
-        setChats,
-        files,
-        setFiles,
-        folders,
-        setFolders,
-        models,
-        setModels,
-        presets,
-        setPresets,
-        prompts,
-        setPrompts,
-        tools,
-        setTools,
-        workspaces,
-        setWorkspaces,
-
         // MODELS STORE
         envKeyMap,
         setEnvKeyMap,

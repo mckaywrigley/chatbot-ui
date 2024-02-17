@@ -1,6 +1,5 @@
 "use client"
 
-import { supabase } from "@/utils/supabase/browser-client"
 import { useRouter } from "next/navigation"
 import { FC, useState } from "react"
 import { Button } from "../ui/button"

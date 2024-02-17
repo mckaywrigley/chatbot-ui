@@ -1,4 +1,6 @@
-import { supabase } from "@/utils/supabase/browser-client"
+import { createClient } from "@/utils/supabase/client"
+
+const supabase = createClient()
 
 export const uploadMessageImage = async (path: string, image: File) => {
   const bucket = "message_images"

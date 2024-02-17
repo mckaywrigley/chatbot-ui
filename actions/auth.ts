@@ -10,20 +10,19 @@ export const login = async (formData: FormData) => {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string
-  }
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  })
 
   if (error) {
     return redirect(`/login?message=${error.message}`)
   }
 
-  revalidatePath("/", "layout")
+  revalidatePath("/")
   return redirect("/")
 }
 
@@ -66,8 +65,18 @@ export const signUp = async (formData: FormData) => {
     return redirect(`/login?message=${error.message}`)
   }
 
-  revalidatePath("/", "layout")
+  revalidatePath("/")
   return redirect("/")
+}
+
+export const logout = async () => {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  await supabase.auth.signOut()
+
+  revalidatePath("/")
+  return redirect("/login")
 }
 
 export const handleResetPassword = async (formData: FormData) => {
@@ -85,7 +94,7 @@ export const handleResetPassword = async (formData: FormData) => {
     return redirect(`/login?message=${error.message}`)
   }
 
-  revalidatePath("/", "layout")
+  revalidatePath("/")
   return redirect("/login?message=Check email to reset password")
 }
 

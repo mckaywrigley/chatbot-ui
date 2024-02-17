@@ -1,7 +1,6 @@
-import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
-import { FC, useContext } from "react"
+import { FC } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
 import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
@@ -11,21 +10,32 @@ import { SidebarContent } from "./sidebar-content"
 interface SidebarProps {
   contentType: ContentType
   showSidebar: boolean
+
+  assistants: Tables<"assistants">[]
+  chats: Tables<"chats">[]
+  collections: Tables<"collections">[]
+  folders: Tables<"folders">[]
+  files: Tables<"files">[]
+  presets: Tables<"presets">[]
+  prompts: Tables<"prompts">[]
+  tools: Tables<"tools">[]
+  models: Tables<"models">[]
 }
 
-export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
-  const {
-    folders,
-    chats,
-    presets,
-    prompts,
-    files,
-    collections,
-    assistants,
-    tools,
-    models
-  } = useContext(ChatbotUIContext)
+export const Sidebar: FC<SidebarProps> = ({
+  contentType,
+  showSidebar,
 
+  assistants,
+  chats,
+  collections,
+  folders,
+  files,
+  presets,
+  prompts,
+  tools,
+  models
+}) => {
   const chatFolders = folders.filter(folder => folder.type === "chats")
   const presetFolders = folders.filter(folder => folder.type === "presets")
   const promptFolders = folders.filter(folder => folder.type === "prompts")

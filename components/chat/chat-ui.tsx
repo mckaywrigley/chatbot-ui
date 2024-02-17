@@ -1,4 +1,3 @@
-import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
@@ -179,10 +178,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       includeWorkspaceInstructions: chat.include_workspace_instructions,
       embeddingsProvider: chat.embeddings_provider as "openai" | "local"
     })
-  }
-
-  if (loading) {
-    return <Loading />
   }
 
   return (

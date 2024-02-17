@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/sidebar/sidebar"
 import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
 import { Button } from "@/components/ui/button"
 import { Tabs } from "@/components/ui/tabs"
+import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import useHotkey from "@/utils/hooks/use-hotkey"
 import { cn } from "@/utils/utils"
@@ -11,15 +12,38 @@ import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
-import { CommandK } from "../utility/command-k"
 
 export const SIDEBAR_WIDTH = 350
 
 interface DashboardProps {
   children: React.ReactNode
+
+  assistants: Tables<"assistants">[]
+  chats: Tables<"chats">[]
+  collections: Tables<"collections">[]
+  folders: Tables<"folders">[]
+  files: Tables<"files">[]
+  presets: Tables<"presets">[]
+  profile: Tables<"profiles">
+  prompts: Tables<"prompts">[]
+  tools: Tables<"tools">[]
+  models: Tables<"models">[]
 }
 
-export const Dashboard: FC<DashboardProps> = ({ children }) => {
+export const Dashboard: FC<DashboardProps> = ({
+  children,
+
+  assistants,
+  chats,
+  collections,
+  folders,
+  files,
+  presets,
+  profile,
+  prompts,
+  tools,
+  models
+}) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
 
   const pathname = usePathname()
@@ -69,7 +93,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   return (
     <div className="flex size-full">
-      <CommandK />
+      {/* <CommandK /> */}
 
       <Button
         className={cn(
@@ -104,9 +128,24 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
           >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+            <SidebarSwitcher
+              profile={profile}
+              onContentTypeChange={setContentType}
+            />
 
-            <Sidebar contentType={contentType} showSidebar={showSidebar} />
+            <Sidebar
+              contentType={contentType}
+              showSidebar={showSidebar}
+              assistants={assistants}
+              chats={chats}
+              collections={collections}
+              folders={folders}
+              files={files}
+              presets={presets}
+              prompts={prompts}
+              tools={tools}
+              models={models}
+            />
           </Tabs>
         )}
       </div>

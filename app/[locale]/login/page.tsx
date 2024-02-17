@@ -1,9 +1,13 @@
 import { handleResetPassword, login, signUp } from "@/actions/auth"
+import { getHomeWorkspace } from "@/actions/workspaces"
 import { Brand } from "@/components/ui/brand"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubmitButton } from "@/components/ui/submit-button"
+import { createClient } from "@/utils/supabase/server"
 import { Metadata } from "next"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Login"
@@ -14,6 +18,15 @@ export default async function Login({
 }: {
   searchParams: { message: string }
 }) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const { data, error } = await supabase.auth.getUser()
+  if (data.user) {
+    const homeWorkspace = await getHomeWorkspace(data.user.id)
+    return redirect(`/${homeWorkspace.id}/chat`)
+  }
+
   return (
     <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
       <form

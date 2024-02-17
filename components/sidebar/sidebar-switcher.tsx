@@ -1,3 +1,4 @@
+import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import {
   IconAdjustmentsHorizontal,
@@ -18,10 +19,12 @@ import { SidebarSwitchItem } from "./sidebar-switch-item"
 export const SIDEBAR_ICON_SIZE = 28
 
 interface SidebarSwitcherProps {
+  profile: Tables<"profiles">
   onContentTypeChange: (contentType: ContentType) => void
 }
 
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
+  profile,
   onContentTypeChange
 }) => {
   return (
@@ -85,7 +88,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         <WithTooltip
           display={<div>Profile Settings</div>}
-          trigger={<ProfileSettings />}
+          trigger={<ProfileSettings profile={profile} />}
         />
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
-import { supabase } from "@/utils/supabase/browser-client"
+import { createClient } from "@/utils/supabase/client"
+
+const supabase = createClient()
 
 export const getFoldersByWorkspaceId = async (workspaceId: string) => {
   const { data: folders, error } = await supabase
