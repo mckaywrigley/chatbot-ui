@@ -63,6 +63,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({
       </div>
 
       <SidebarDataList
+        workspaceId={workspaceId}
         contentType={contentType}
         data={filteredData}
         folders={folders}

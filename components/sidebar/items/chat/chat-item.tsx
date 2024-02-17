@@ -13,12 +13,18 @@ import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
 
 interface ChatItemProps {
+  workspaceId: string
   profile: Tables<"profiles">
   models: Tables<"models">[]
   chat: Tables<"chats">
 }
 
-export const ChatItem: FC<ChatItemProps> = ({ profile, models, chat }) => {
+export const ChatItem: FC<ChatItemProps> = ({
+  workspaceId,
+  profile,
+  models,
+  chat
+}) => {
   const {
     selectedWorkspace,
     selectedChat,
@@ -34,8 +40,7 @@ export const ChatItem: FC<ChatItemProps> = ({ profile, models, chat }) => {
   const itemRef = useRef<HTMLDivElement>(null)
 
   const handleClick = () => {
-    if (!selectedWorkspace) return
-    return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
+    return router.push(`/${workspaceId}/chat/${chat.id}`)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

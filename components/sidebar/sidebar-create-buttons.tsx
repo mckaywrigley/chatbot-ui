@@ -1,5 +1,5 @@
+import { createFolder } from "@/actions/folders"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { createFolder } from "@/db/folders"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
@@ -61,7 +61,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     switch (contentType) {
       case "chats":
         return async () => {
-          handleNewChat()
+          handleNewChat(workspaceId)
         }
 
       case "presets":

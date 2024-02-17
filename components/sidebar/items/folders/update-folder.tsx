@@ -1,3 +1,4 @@
+import { updateFolder } from "@/actions/folders"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { updateFolder } from "@/db/folders"
 import { Tables } from "@/supabase/types"
 import { IconEdit } from "@tabler/icons-react"
 import { FC, useRef, useState } from "react"

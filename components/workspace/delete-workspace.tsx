@@ -9,11 +9,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { ChatbotUIContext } from "@/context/context"
 import { deleteWorkspace } from "@/db/workspaces"
 import { Tables } from "@/supabase/types"
 import { useRouter } from "next/navigation"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useRef, useState } from "react"
 import { Input } from "../ui/input"
 
 interface DeleteWorkspaceProps {
@@ -29,7 +28,6 @@ export const DeleteWorkspace: FC<DeleteWorkspaceProps> = ({
   workspace,
   onDelete
 }) => {
-  const { setSelectedWorkspace } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler({
     profile,
     models
@@ -48,7 +46,7 @@ export const DeleteWorkspace: FC<DeleteWorkspaceProps> = ({
     setShowWorkspaceDialog(false)
     onDelete()
 
-    handleNewChat()
+    handleNewChat(workspace.id)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

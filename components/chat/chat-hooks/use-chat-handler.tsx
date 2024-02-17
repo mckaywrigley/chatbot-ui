@@ -36,7 +36,6 @@ export const useChatHandler = ({
     setChatMessages,
     setFirstTokenReceived,
     selectedChat,
-    selectedWorkspace,
     setSelectedChat,
     setSelectedTools,
     availableLocalModels,
@@ -76,9 +75,7 @@ export const useChatHandler = ({
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async () => {
-    if (!selectedWorkspace) return
-
+  const handleNewChat = async (workspaceId: string) => {
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
@@ -143,7 +140,7 @@ export const useChatHandler = ({
       })
     }
 
-    return router.push(`/${selectedWorkspace.id}/chat`)
+    return router.push(`/${workspaceId}/chat`)
   }
 
   const handleFocusChatInput = () => {

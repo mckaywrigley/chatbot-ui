@@ -24,6 +24,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 
 interface ChatInputProps {
+  workspaceId: string
   profile: Tables<"profiles">
   models: Tables<"models">[]
   prompts: Tables<"prompts">[]
@@ -34,6 +35,7 @@ interface ChatInputProps {
 }
 
 export const ChatInput: FC<ChatInputProps> = ({
+  workspaceId,
   profile,
   models,
   prompts,
@@ -44,7 +46,7 @@ export const ChatInput: FC<ChatInputProps> = ({
 }) => {
   const { t } = useTranslation()
 
-  useHotkey("o", () => handleNewChat())
+  useHotkey("o", () => handleNewChat(workspaceId))
   useHotkey("l", () => {
     handleFocusChatInput()
   })

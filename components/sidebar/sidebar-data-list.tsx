@@ -22,6 +22,7 @@ import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
 
 interface SidebarDataListProps {
+  workspaceId: string
   profile: Tables<"profiles">
   models: Tables<"models">[]
   workspaces: Tables<"workspaces">[]
@@ -35,6 +36,7 @@ interface SidebarDataListProps {
 }
 
 export const SidebarDataList: FC<SidebarDataListProps> = ({
+  workspaceId,
   profile,
   models,
   workspaces,
@@ -59,6 +61,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       case "chats":
         return (
           <ChatItem
+            workspaceId={workspaceId}
             key={item.id}
             profile={profile}
             models={models}

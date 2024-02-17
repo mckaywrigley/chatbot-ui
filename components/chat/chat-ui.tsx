@@ -22,6 +22,7 @@ import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
 
 interface ChatUIProps {
+  workspaceId: string
   profile: Tables<"profiles">
   models: Tables<"models">[]
   prompts: Tables<"prompts">[]
@@ -32,6 +33,7 @@ interface ChatUIProps {
 }
 
 export const ChatUI: FC<ChatUIProps> = ({
+  workspaceId,
   profile,
   models,
   prompts,
@@ -40,7 +42,7 @@ export const ChatUI: FC<ChatUIProps> = ({
   tools,
   assistants
 }) => {
-  useHotkey("o", () => handleNewChat())
+  useHotkey("o", () => handleNewChat(workspaceId))
 
   const params = useParams()
 
@@ -241,6 +243,7 @@ export const ChatUI: FC<ChatUIProps> = ({
 
       <div className="relative w-[300px] items-end pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput
+          workspaceId={workspaceId}
           profile={profile}
           models={models}
           prompts={prompts}

@@ -38,7 +38,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ profile, models, chat }) => {
 
     setShowChatDialog(false)
 
-    handleNewChat()
+    handleNewChat(chat.workspace_id)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
