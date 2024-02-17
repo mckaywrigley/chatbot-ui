@@ -67,6 +67,7 @@ export default async function WorkspaceLayout({
       tools={tools}
       models={models}
       workspaces={workspaces}
+      workspaceId={workspaceId}
     >
       {children}
     </Dashboard>

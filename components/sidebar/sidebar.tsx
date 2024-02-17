@@ -21,6 +21,7 @@ interface SidebarProps {
   tools: Tables<"tools">[]
   models: Tables<"models">[]
   workspaces: Tables<"workspaces">[]
+  workspaceId: string
 }
 
 export const Sidebar: FC<SidebarProps> = ({
@@ -36,7 +37,8 @@ export const Sidebar: FC<SidebarProps> = ({
   prompts,
   tools,
   models,
-  workspaces
+  workspaces,
+  workspaceId
 }) => {
   const chatFolders = folders.filter(folder => folder.type === "chats")
   const presetFolders = folders.filter(folder => folder.type === "presets")
@@ -57,7 +59,12 @@ export const Sidebar: FC<SidebarProps> = ({
     folders: Tables<"folders">[]
   ) => {
     return (
-      <SidebarContent contentType={contentType} data={data} folders={folders} />
+      <SidebarContent
+        workspaceId={workspaceId}
+        contentType={contentType}
+        data={data}
+        folders={folders}
+      />
     )
   }
 

@@ -6,12 +6,14 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { SidebarSearch } from "./sidebar-search"
 
 interface SidebarContentProps {
+  workspaceId: string
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
 }
 
 export const SidebarContent: FC<SidebarContentProps> = ({
+  workspaceId,
   contentType,
   data,
   folders
@@ -27,6 +29,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
       <div className="mt-2 flex items-center">
         <SidebarCreateButtons
+          workspaceId={workspaceId}
           contentType={contentType}
           hasData={data.length > 0}
         />

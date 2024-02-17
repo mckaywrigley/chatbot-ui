@@ -29,6 +29,7 @@ interface DashboardProps {
   tools: Tables<"tools">[]
   models: Tables<"models">[]
   workspaces: Tables<"workspaces">[]
+  workspaceId: string
 }
 
 export const Dashboard: FC<DashboardProps> = ({
@@ -44,7 +45,8 @@ export const Dashboard: FC<DashboardProps> = ({
   prompts,
   tools,
   models,
-  workspaces
+  workspaces,
+  workspaceId
 }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
 
@@ -148,6 +150,7 @@ export const Dashboard: FC<DashboardProps> = ({
               tools={tools}
               models={models}
               workspaces={workspaces}
+              workspaceId={workspaceId}
             />
           </Tabs>
         )}

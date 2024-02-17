@@ -4,6 +4,7 @@ import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
 import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
@@ -14,16 +15,17 @@ import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
 
 interface SidebarCreateButtonsProps {
+  workspaceId: string
   contentType: ContentType
   hasData: boolean
 }
 
 export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
+  workspaceId,
   contentType,
   hasData
 }) => {
-  const { profile, selectedWorkspace, folders, setFolders } =
-    useContext(ChatbotUIContext)
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
 
   const [isCreatingPrompt, setIsCreatingPrompt] = useState(false)
@@ -35,17 +37,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingModel, setIsCreatingModel] = useState(false)
 
   const handleCreateFolder = async () => {
-    if (!profile) return
-    if (!selectedWorkspace) return
-
     const createdFolder = await createFolder({
       user_id: profile.user_id,
-      workspace_id: selectedWorkspace.id,
+      workspace_id: workspaceId,
       name: "New Folder",
       description: "",
       type: contentType
     })
-    setFolders([...folders, createdFolder])
   }
 
   const getCreateFunction = () => {
