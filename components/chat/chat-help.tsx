@@ -1,3 +1,5 @@
+"use client"
+
 import useHotkey from "@/utils/hooks/use-hotkey"
 import {
   IconBrandGithub,

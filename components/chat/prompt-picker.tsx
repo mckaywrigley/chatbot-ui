@@ -7,11 +7,12 @@ import { Label } from "../ui/label"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
-interface PromptPickerProps {}
+interface PromptPickerProps {
+  prompts: Tables<"prompts">[]
+}
 
-export const PromptPicker: FC<PromptPickerProps> = ({}) => {
+export const PromptPicker: FC<PromptPickerProps> = ({ prompts }) => {
   const {
-    prompts,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
     focusPrompt,

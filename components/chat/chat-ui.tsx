@@ -1,3 +1,5 @@
+"use client"
+
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
@@ -6,6 +8,7 @@ import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
+import { Tables } from "@/supabase/types"
 import { LLMID, MessageImage } from "@/types"
 import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import useHotkey from "@/utils/hooks/use-hotkey"
@@ -18,9 +21,21 @@ import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
 
-interface ChatUIProps {}
+interface ChatUIProps {
+  prompts: Tables<"prompts">[]
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
+  tools: Tables<"tools">[]
+  assistants: Tables<"assistants">[]
+}
 
-export const ChatUI: FC<ChatUIProps> = ({}) => {
+export const ChatUI: FC<ChatUIProps> = ({
+  prompts,
+  files,
+  collections,
+  tools,
+  assistants
+}) => {
   useHotkey("o", () => handleNewChat())
 
   const params = useParams()
@@ -31,7 +46,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedChat,
     setChatSettings,
     setChatImages,
-    assistants,
     setSelectedAssistant,
     setChatFileItems,
     setChatFiles,
@@ -214,7 +228,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div className="relative w-[300px] items-end pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
-        <ChatInput />
+        <ChatInput
+          prompts={prompts}
+          files={files}
+          collections={collections}
+          tools={tools}
+          assistants={assistants}
+        />
       </div>
 
       <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">

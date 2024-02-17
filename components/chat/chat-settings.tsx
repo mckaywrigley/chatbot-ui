@@ -1,4 +1,7 @@
+"use client"
+
 import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import { LLMID, ModelProvider } from "@/types"
 import { CHAT_SETTING_LIMITS } from "@/utils/chat-setting-limits"
 import useHotkey from "@/utils/hooks/use-hotkey"
@@ -8,15 +11,16 @@ import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
-interface ChatSettingsProps {}
+interface ChatSettingsProps {
+  models: Tables<"models">[]
+}
 
-export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
+export const ChatSettings: FC<ChatSettingsProps> = ({ models }) => {
   useHotkey("i", () => handleClick())
 
   const {
     chatSettings,
     setChatSettings,
-    models,
     availableHostedModels,
     availableLocalModels,
     availableOpenRouterModels

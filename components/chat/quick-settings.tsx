@@ -1,3 +1,5 @@
+"use client"
+
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
@@ -21,16 +23,20 @@ import {
 import { Input } from "../ui/input"
 import { QuickSettingOption } from "./quick-setting-option"
 
-interface QuickSettingsProps {}
+interface QuickSettingsProps {
+  presets: Tables<"presets">[]
+  assistants: Tables<"assistants">[]
+}
 
-export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
+export const QuickSettings: FC<QuickSettingsProps> = ({
+  presets,
+  assistants
+}) => {
   const { t } = useTranslation()
 
   useHotkey("p", () => setIsOpen(prevState => !prevState))
 
   const {
-    presets,
-    assistants,
     selectedAssistant,
     selectedPreset,
     chatSettings,

@@ -1,6 +1,5 @@
 "use client"
 
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import {
   Popover,
   PopoverContent,
@@ -8,6 +7,7 @@ import {
 } from "@/components/ui/popover"
 import { ChatbotUIContext } from "@/context/context"
 import { createWorkspace } from "@/db/workspaces"
+import { Tables } from "@/supabase/types"
 import useHotkey from "@/utils/hooks/use-hotkey"
 import { IconBuilding, IconHome, IconPlus } from "@tabler/icons-react"
 import { ChevronsUpDown } from "lucide-react"
@@ -17,20 +17,17 @@ import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 
-interface WorkspaceSwitcherProps {}
+interface WorkspaceSwitcherProps {
+  workspaces: Tables<"workspaces">[]
+}
 
-export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
+export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({
+  workspaces
+}) => {
   useHotkey(";", () => setOpen(prevState => !prevState))
 
-  const {
-    workspaces,
-    workspaceImages,
-    selectedWorkspace,
-    setSelectedWorkspace,
-    setWorkspaces
-  } = useContext(ChatbotUIContext)
-
-  const { handleNewChat } = useChatHandler()
+  const { workspaceImages, selectedWorkspace, setSelectedWorkspace } =
+    useContext(ChatbotUIContext)
 
   const router = useRouter()
 
@@ -63,7 +60,6 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
       name: "New Workspace"
     })
 
-    setWorkspaces([...workspaces, createdWorkspace])
     setSelectedWorkspace(createdWorkspace)
     setOpen(false)
 

@@ -31,7 +31,7 @@ export default async function WorkspaceLayout({
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
-    return redirect("/")
+    return redirect("/login")
   }
 
   const profile = await getProfile(data.user.id)
@@ -66,6 +66,7 @@ export default async function WorkspaceLayout({
       prompts={prompts}
       tools={tools}
       models={models}
+      workspaces={workspaces}
     >
       {children}
     </Dashboard>

@@ -3,62 +3,59 @@ import { Tables } from "@/supabase/types"
 import { IconBooks } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef } from "react"
 import { FileIcon } from "../ui/file-icon"
+import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
 interface FilePickerProps {
-  isOpen: boolean
-  searchQuery: string
-  onOpenChange: (isOpen: boolean) => void
-  selectedFileIds: string[]
-  selectedCollectionIds: string[]
-  onSelectFile: (file: Tables<"files">) => void
-  onSelectCollection: (collection: Tables<"collections">) => void
-  isFocused: boolean
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
 }
 
-export const FilePicker: FC<FilePickerProps> = ({
-  isOpen,
-  searchQuery,
-  onOpenChange,
-  selectedFileIds,
-  selectedCollectionIds,
-  onSelectFile,
-  onSelectCollection,
-  isFocused
-}) => {
-  const { files, collections, setIsFilePickerOpen } =
-    useContext(ChatbotUIContext)
+export const FilePicker: FC<FilePickerProps> = ({ files, collections }) => {
+  const {
+    setIsFilePickerOpen,
+    newMessageFiles,
+    chatFiles,
+    slashCommand,
+    isFilePickerOpen,
+    hashtagCommand,
+    focusPrompt,
+    focusFile
+  } = useContext(ChatbotUIContext)
+
+  const { handleSelectUserFile, handleSelectUserCollection } =
+    usePromptAndCommand()
 
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    if (isFocused && itemsRef.current[0]) {
+    if (focusFile && itemsRef.current[0]) {
       itemsRef.current[0].focus()
     }
-  }, [isFocused])
+  }, [focusFile])
 
   const filteredFiles = files.filter(
     file =>
-      file.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !selectedFileIds.includes(file.id)
+      file.name.toLowerCase().includes(hashtagCommand.toLowerCase()) &&
+      ![...newMessageFiles, ...chatFiles].map(file => file.id).includes(file.id)
   )
 
   const filteredCollections = collections.filter(
     collection =>
-      collection.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !selectedCollectionIds.includes(collection.id)
+      collection.name.toLowerCase().includes(hashtagCommand.toLowerCase()) &&
+      !([] as string[]).includes(collection.id)
   )
 
   const handleOpenChange = (isOpen: boolean) => {
-    onOpenChange(isOpen)
+    setIsFilePickerOpen(isOpen)
   }
 
   const handleSelectFile = (file: Tables<"files">) => {
-    onSelectFile(file)
+    handleSelectUserFile(file)
     handleOpenChange(false)
   }
 
   const handleSelectCollection = (collection: Tables<"collections">) => {
-    onSelectCollection(collection)
+    handleSelectUserCollection(collection)
     handleOpenChange(false)
   }
 
@@ -103,7 +100,7 @@ export const FilePicker: FC<FilePickerProps> = ({
 
   return (
     <>
-      {isOpen && (
+      {isFilePickerOpen && (
         <div className="bg-background flex flex-col space-y-1 rounded-xl border-2 p-2 text-sm">
           {filteredFiles.length === 0 && filteredCollections.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">

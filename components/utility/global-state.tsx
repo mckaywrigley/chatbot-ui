@@ -21,6 +21,8 @@ import {
   fetchOllamaModels,
   fetchOpenRouterModels
 } from "@/utils/models/fetch-models"
+import { createClient } from "@/utils/supabase/client"
+import { redirect } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 
 interface GlobalStateProps {
@@ -103,7 +105,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      const profile = await getProfile(user.id)
+      const supabase = createClient()
+      const { data } = await supabase.auth.getUser()
+      if (!data.user) {
+        return redirect("/login")
+      }
+
+      const profile = await getProfile(data.user.id)
 
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)

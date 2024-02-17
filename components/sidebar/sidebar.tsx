@@ -20,6 +20,7 @@ interface SidebarProps {
   prompts: Tables<"prompts">[]
   tools: Tables<"tools">[]
   models: Tables<"models">[]
+  workspaces: Tables<"workspaces">[]
 }
 
 export const Sidebar: FC<SidebarProps> = ({
@@ -34,7 +35,8 @@ export const Sidebar: FC<SidebarProps> = ({
   presets,
   prompts,
   tools,
-  models
+  models,
+  workspaces
 }) => {
   const chatFolders = folders.filter(folder => folder.type === "chats")
   const presetFolders = folders.filter(folder => folder.type === "presets")
@@ -72,7 +74,7 @@ export const Sidebar: FC<SidebarProps> = ({
     >
       <div className="flex h-full flex-col p-3">
         <div className="flex items-center border-b-2 pb-2">
-          <WorkspaceSwitcher />
+          <WorkspaceSwitcher workspaces={[]} />
 
           <WorkspaceSettings />
         </div>

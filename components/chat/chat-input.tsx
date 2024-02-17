@@ -1,4 +1,7 @@
+"use client"
+
 import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import useHotkey from "@/utils/hooks/use-hotkey"
 import { LLM_LIST } from "@/utils/models/llm/llm-list"
 import { cn } from "@/utils/utils"
@@ -20,11 +23,24 @@ import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 
-interface ChatInputProps {}
+interface ChatInputProps {
+  prompts: Tables<"prompts">[]
+  files: Tables<"files">[]
+  collections: Tables<"collections">[]
+  tools: Tables<"tools">[]
+  assistants: Tables<"assistants">[]
+}
 
-export const ChatInput: FC<ChatInputProps> = ({}) => {
+export const ChatInput: FC<ChatInputProps> = ({
+  prompts,
+  files,
+  collections,
+  tools,
+  assistants
+}) => {
   const { t } = useTranslation()
 
+  useHotkey("o", () => handleNewChat())
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -57,6 +73,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   } = useContext(ChatbotUIContext)
 
   const {
+    handleNewChat,
     chatInputRef,
     handleSendMessage,
     handleStopMessage,
@@ -207,7 +224,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
-          <ChatCommandInput />
+          <ChatCommandInput
+            prompts={prompts}
+            files={files}
+            collections={collections}
+            tools={tools}
+            assistants={assistants}
+          />
         </div>
 
         <>

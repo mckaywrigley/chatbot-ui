@@ -9,6 +9,7 @@ import { LLMID } from "@/types"
 import { convertBlobToBase64 } from "@/utils/blob-to-b64"
 import { IconHome, IconSettings } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
@@ -32,10 +33,8 @@ interface WorkspaceSettingsProps {}
 
 export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   const {
-    profile,
     selectedWorkspace,
     setSelectedWorkspace,
-    setWorkspaces,
     setChatSettings,
     workspaceImages,
     setWorkspaceImages
@@ -143,15 +142,6 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
 
     setIsOpen(false)
     setSelectedWorkspace(updatedWorkspace)
-    setWorkspaces(workspaces => {
-      return workspaces.map(workspace => {
-        if (workspace.id === selectedWorkspace.id) {
-          return updatedWorkspace
-        }
-
-        return workspace
-      })
-    })
 
     toast.success("Workspace updated!")
   }
