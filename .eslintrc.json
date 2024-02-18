@@ -4,11 +4,14 @@
   "extends": [
     "next/core-web-vitals",
     "prettier",
-    "plugin:tailwindcss/recommended"
+    "plugin:tailwindcss/recommended", 
+    "next"
   ],
   "plugins": ["tailwindcss"],
   "rules": {
-    "tailwindcss/no-custom-classname": "off"
+    "tailwindcss/no-custom-classname": "off",
+    "react/no-unescaped-entities": "off",
+    "@next/next/no-page-custom-font": "off"
   },
   "settings": {
     "tailwindcss": {

@@ -8,7 +8,7 @@ export const FinishStep: FC<FinishStepProps> = ({ displayName }) => {
   return (
     <div className="space-y-4">
       <div>
-        Welcome to Chatbot UI
+        Welcome to Aidon AI
         {displayName.length > 0 ? `, ${displayName.split(" ")[0]}` : null}!
       </div>
 
