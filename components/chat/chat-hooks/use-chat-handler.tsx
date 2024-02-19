@@ -227,7 +227,8 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            selectedTools
+            selectedTools,
+            chatId: currentChat?.id
           })
         })
 

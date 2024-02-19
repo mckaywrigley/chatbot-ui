@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Topic Management API",
-    "description": "This API allows for updating the name of a topic.",
+    "title": "Save topic test result",
+    "description": "This API allows for updating the free recall and quiz test result.",
     "version": "1.0.0"
   },
   "servers": [
@@ -14,24 +14,20 @@
   "paths": {
     "/internal_tools": {
       "patch": {
-        "operationId": "updateTopicName",
-        "summary": "Updates a topic name.",
-        "description": "This endpoint updates the name and description of a study topic.",
+        "operationId": "updateTopicQuizResult",
+        "summary": "Updates a topic free recall test quiz result.",
+        "description": "This endpoint updates a topic free recall test quiz result.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["topic_name", "topic_description"],
+                "required": ["test_result"],
                 "properties": {
-                  "topic_name": {
-                    "type": "string",
-                    "description": "The new name to assign to the topic."
-                  },
-                  "topic_description": {
-                    "type": "string",
-                    "description": "The longform topic description."
+                  "test_result": {
+                    "type": "integer",
+                    "description": "The score out of 100."
                   }
                 }
               }
@@ -40,7 +36,7 @@
         },
         "responses": {
           "200": {
-            "description": "Topic name updated successfully",
+            "description": "Topic test result updated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -49,8 +45,8 @@
                     "message": {
                       "type": "string"
                     },
-                    "topic_name": {
-                      "type": "string"
+                    "test_result": {
+                      "type": "integer"
                     }
                   }
                 }
