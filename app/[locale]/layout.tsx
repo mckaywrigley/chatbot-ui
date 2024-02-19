@@ -12,9 +12,9 @@ import { ReactNode } from "react"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
-const APP_NAME = "Chatbot UI"
-const APP_DEFAULT_TITLE = "Chatbot UI"
-const APP_TITLE_TEMPLATE = "%s - Chatbot UI"
+const APP_NAME = "Aidon.ai"
+const APP_DEFAULT_TITLE = "Aidon.ai"
+const APP_TITLE_TEMPLATE = "%s - Aidon.ai"
 const APP_DESCRIPTION = "Chabot UI PWA!"
 
 interface RootLayoutProps {
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#000000"
+  themeColor: "#FF7077"
 }
 
 const i18nNamespaces = ["translation"]

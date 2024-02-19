@@ -1,10 +1,10 @@
 {
-  "short_name": "Chatbot UI",
-  "name": "Chatbot UI",
+  "short_name": "Aidon.ai",
+  "name": "Aidon.ai",
   "icons": [
     {
       "src": "/icon-192x192.png",
-      "type": "image/ico",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
