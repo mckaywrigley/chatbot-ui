@@ -74,10 +74,13 @@ export async function POST(request: Request) {
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
+    let functionNames = []
+
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
         const functionName = functionCall.name
+        functionNames.push(functionName)
         const argumentsString = toolCall.function.arguments.trim()
         const parsedArgs = JSON.parse(argumentsString)
 
@@ -208,7 +211,9 @@ export async function POST(request: Request) {
 
     const stream = OpenAIStream(secondResponse)
 
-    return new StreamingTextResponse(stream)
+    return new StreamingTextResponse(stream, {
+      headers: { "FUNCTION-NAMES": functionNames.join(",") }
+    })
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

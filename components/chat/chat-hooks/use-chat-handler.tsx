@@ -234,6 +234,15 @@ export const useChatHandler = () => {
 
         setToolInUse("none")
 
+        // if the response is ok and has a score
+        if (
+          response.headers
+            .get("FUNCTION-NAMES")
+            ?.includes("updateTopicQuizResult")
+        ) {
+          console.log("updateTopicQuizResult was called and the response is ok")
+        }
+
         generatedText = await processResponse(
           response,
           isRegeneration

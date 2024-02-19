@@ -96,5 +96,5 @@ export async function updateTopicQuizResult(
     return { success: false, error: error.message }
   }
 
-  return { success: true, data }
+  return { success: true, message: `Saved test result of ${test_result}%.` }
 }

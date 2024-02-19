@@ -44,9 +44,6 @@
                   "properties": {
                     "message": {
                       "type": "string"
-                    },
-                    "test_result": {
-                      "type": "integer"
                     }
                   }
                 }
