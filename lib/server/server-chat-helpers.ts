@@ -2,6 +2,7 @@ import { Database, Tables } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import * as ebisu from "ebisu-js"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -87,9 +88,29 @@ export async function updateTopicQuizResult(
     }
   )
 
+  const { data: chat } = await supabase
+    .from("chats")
+    .select("*")
+    .eq("id", chatId)
+    .maybeSingle()
+
+  // if updated_at is null, set it to created_at
+  const updated_at = (chat?.updated_at || chat?.created_at) as string
+
+  const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
+  const [arg1, arg2, arg3] = chatEbisuModel
+
+  const model = ebisu.defaultModel(arg1, arg2, arg3)
+  var successes = test_result / 100
+  var total = 1
+  // elapsed time in hours from last update to now
+  var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
+  var newModel = ebisu.updateRecall(model, successes, total, elapsed)
+  console.log({ test_result }, { newModel })
+
   const { data, error } = await supabase
     .from("chats")
-    .update({ test_result })
+    .update({ test_result, ebisu_model: newModel })
     .eq("id", chatId)
 
   if (error) {
