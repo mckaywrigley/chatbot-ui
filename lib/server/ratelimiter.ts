@@ -74,7 +74,9 @@ export async function getRemaining(
   const limit = _getLimit(model, isPremium)
   const remaining = limit - timestamps.length
   if (remaining <= 0) {
-    const timeRemaining = timestamps[limit - 1] - now + timeWindow
+    // Calculate timeRemaining based on the first message in the window
+    const oldestTimestamp = timestamps[0] // Get the oldest message timestamp
+    const timeRemaining = oldestTimestamp - now + timeWindow // Adjust calculation here
     return [0, timeRemaining]
   }
   return [remaining, null]
@@ -95,10 +97,20 @@ function _getLimit(model: string, isPremium: boolean): number {
 }
 
 async function _addRequest(key: string) {
-  const timestamp = Date.now()
-  const timeWindowMinutes = Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
-  await getRedis().zadd(key, { score: timestamp, member: timestamp })
-  await getRedis().expire(key, 60 * timeWindowMinutes)
+  const timestamp = Date.now();
+  const timeWindowMinutes = Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES);
+  const timeWindow = timeWindowMinutes * 60 * 1000;
+  const windowStart = timestamp - timeWindow;
+
+  // Add the new request timestamp
+  await getRedis().zadd(key, { score: timestamp, member: timestamp });
+
+  // Remove timestamps outside the time window
+  await getRedis().zremrangebyscore(key, 0, windowStart);
+
+  // Set an expiration time to clean up old keys automatically
+  // This is a safety measure in case the zremrangebyscore operation misses some entries
+  await getRedis().expire(key, 60 * timeWindowMinutes);
 }
 
 function _getFixedModelName(model: string): string {
