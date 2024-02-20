@@ -3,6 +3,7 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import * as ebisu from "ebisu-js"
+import { AssertionError } from "assert"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -105,10 +106,21 @@ export async function updateTopicQuizResult(
   var total = 1
   // elapsed time in hours from last update to now
   var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
-  var newModel = ebisu.updateRecall(model, successes, total, elapsed)
-  console.log({ test_result }, { newModel })
+  let newModel
+  try {
+    newModel = ebisu.updateRecall(model, successes, total, elapsed)
+  } catch (error) {
+    if (error instanceof AssertionError) {
+      // Handle the AssertionError by using a more reasonable elapsed time
+      newModel = ebisu.updateRecall(model, successes, total, 2)
+    } else {
+      // If it's not an AssertionError, rethrow the error
+      throw error
+    }
+  }
+  console.log({ test_result }, { elapsed }, { newModel })
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("chats")
     .update({ test_result, ebisu_model: newModel })
     .eq("id", chatId)

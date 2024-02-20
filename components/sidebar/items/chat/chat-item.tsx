@@ -11,6 +11,9 @@ import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
+import leafMap from "../../../icons/leaf_map.png"
+import DynamicPieChart from "../../../icons/dynamic-pie-chart"
+import * as ebisu from "ebisu-js"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -53,6 +56,19 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     image => image.assistantId === chat.assistant_id
   )?.base64
 
+  // Ebisu
+  const updated_at = (chat?.updated_at || chat?.created_at) as string
+
+  const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
+  const [arg1, arg2, arg3] = chatEbisuModel
+
+  const model = ebisu.defaultModel(arg1, arg2, arg3)
+
+  // elapsed time in hours from last update to now
+  var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
+
+  const predictedRecall = ebisu.predictRecall(model, elapsed, true)
+
   return (
     <div
       ref={itemRef}
@@ -64,31 +80,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       onKeyDown={handleKeyDown}
       onClick={handleClick}
     >
-      {chat.assistant_id ? (
-        assistantImage ? (
-          <Image
-            style={{ width: "30px", height: "30px" }}
-            className="rounded"
-            src={assistantImage}
-            alt="Assistant image"
-            width={30}
-            height={30}
-          />
-        ) : (
-          <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={30}
-          />
-        )
-      ) : (
-        <WithTooltip
-          delayDuration={200}
-          display={<div>{MODEL_DATA?.modelName}</div>}
-          trigger={
-            <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
-          }
-        />
-      )}
+      <DynamicPieChart value={predictedRecall * 100} scale={0.6} />
 
       <div className="ml-3 flex-1 truncate text-sm font-semibold">
         {chat.name}
