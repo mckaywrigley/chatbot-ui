@@ -162,9 +162,10 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                 model.modelName.toLowerCase().includes(search.toLowerCase())
               )
               .filter(model => !model.modelName.toLowerCase().includes("online"))
-			  .filter(model => !model.modelName.includes("70B"))
 			  .filter(model => !model.modelName.startsWith("openai/"))
+			  .filter(model => !model.modelName.startsWith("perplexity/pplx"))	  
 			  .filter(model => model.modelName !== "GPT-4")
+			  .filter(model => model.modelName !== "google/gemini-pro-vision")
 			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
