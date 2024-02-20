@@ -339,7 +339,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <div className="flex items-center space-x-2">
                   <Label>Username</Label>
 
@@ -384,7 +384,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   used={username.length}
                   limit={PROFILE_USERNAME_MAX}
                 />
-              </div>
+              </div> */}
 
               {/* <div className="space-y-1">
                 <Label>Profile Image</Label>
