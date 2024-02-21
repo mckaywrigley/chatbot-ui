@@ -101,7 +101,7 @@ export async function updateTopicQuizResult(
   const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
   const [arg1, arg2, arg3] = chatEbisuModel
 
-  const model = ebisu.defaultModel(arg1, arg2, arg3)
+  const model = ebisu.defaultModel(arg3, arg1, arg2)
   var successes = test_result / 100
   var total = 1
   // elapsed time in hours from last update to now
@@ -118,11 +118,18 @@ export async function updateTopicQuizResult(
       throw error
     }
   }
-  console.log({ test_result }, { elapsed }, { newModel })
+  const now = new Date()
+  const halfLifeHours = ebisu.modelToPercentileDecay(newModel)
+
+  const revise_date = new Date(
+    now.getTime() + halfLifeHours * 60 * 60 * 1000
+  ).toISOString()
+
+  console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
   const { error } = await supabase
     .from("chats")
-    .update({ test_result, ebisu_model: newModel })
+    .update({ test_result, ebisu_model: newModel, revise_date })
     .eq("id", chatId)
 
   if (error) {

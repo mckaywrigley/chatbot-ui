@@ -21,6 +21,7 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
+import * as ebisu from "ebisu-js"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -95,29 +96,34 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const getSortedData = (
     data: any,
-    dateCategory: "Today" | "Yesterday" | "Previous Week" | "Older"
+    dateCategory: "Today" | "Tomorrow" | "Next Week" | "Two weeks or more"
   ) => {
     const now = new Date()
     const todayStart = new Date(now.setHours(0, 0, 0, 0))
-    const yesterdayStart = new Date(
-      new Date().setDate(todayStart.getDate() - 1)
-    )
-    const oneWeekAgoStart = new Date(
-      new Date().setDate(todayStart.getDate() - 7)
-    )
+    const tomorrowStart = new Date(new Date().setDate(todayStart.getDate() + 1))
+    const nextWeekStart = new Date(new Date().setDate(todayStart.getDate() + 7))
 
     return data
       .filter((item: any) => {
-        const itemDate = new Date(item.updated_at || item.created_at)
+        const reviseDate = item.revise_date
+          ? new Date(item.revise_date)
+          : new Date()
         switch (dateCategory) {
           case "Today":
-            return itemDate >= todayStart
-          case "Yesterday":
-            return itemDate >= yesterdayStart && itemDate < todayStart
-          case "Previous Week":
-            return itemDate >= oneWeekAgoStart && itemDate < yesterdayStart
-          case "Older":
-            return itemDate < oneWeekAgoStart
+            return reviseDate >= todayStart && reviseDate < tomorrowStart
+          case "Tomorrow":
+            return reviseDate >= tomorrowStart && reviseDate < nextWeekStart
+          case "Next Week":
+            return (
+              reviseDate >= nextWeekStart &&
+              reviseDate <
+                new Date(nextWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+            )
+          case "Two weeks or more":
+            return (
+              reviseDate >=
+              new Date(nextWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+            )
           default:
             return true
         }
@@ -131,7 +137,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           new Date(a.updated_at || a.created_at).getTime()
       )
   }
-
   const updateFunctions = {
     chats: updateChat,
     presets: updatePreset,
@@ -263,15 +268,15 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
             {contentType === "chats" ? (
               <>
-                {["Today", "Yesterday", "Previous Week", "Older"].map(
+                {["Today", "Tomorrow", "Next Week", "Two weeks or more"].map(
                   dateCategory => {
                     const sortedData = getSortedData(
                       dataWithoutFolders,
                       dateCategory as
                         | "Today"
-                        | "Yesterday"
-                        | "Previous Week"
-                        | "Older"
+                        | "Tomorrow"
+                        | "Next Week"
+                        | "Two weeks or more"
                     )
 
                     return (

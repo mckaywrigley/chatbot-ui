@@ -46,15 +46,15 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     }
   }
 
-  const MODEL_DATA = [
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === chat.model) as LLM
+  // const MODEL_DATA = [
+  //   ...LLM_LIST,
+  //   ...availableLocalModels,
+  //   ...availableOpenRouterModels
+  // ].find(llm => llm.modelId === chat.model) as LLM
 
-  const assistantImage = assistantImages.find(
-    image => image.assistantId === chat.assistant_id
-  )?.base64
+  // const assistantImage = assistantImages.find(
+  //   image => image.assistantId === chat.assistant_id
+  // )?.base64
 
   // Ebisu
   const updated_at = (chat?.updated_at || chat?.created_at) as string
@@ -62,12 +62,13 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
   const [arg1, arg2, arg3] = chatEbisuModel
 
-  const model = ebisu.defaultModel(arg1, arg2, arg3)
+  const model = ebisu.defaultModel(arg3, arg1, arg2)
 
   // elapsed time in hours from last update to now
   var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
 
   const predictedRecall = ebisu.predictRecall(model, elapsed, true)
+  console.log(chat.name, model, elapsed, predictedRecall)
 
   return (
     <div

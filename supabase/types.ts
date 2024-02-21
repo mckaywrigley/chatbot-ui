@@ -350,6 +350,7 @@ export interface Database {
           model: string
           name: string
           prompt: string
+          revise_date: string | null
           sharing: string
           temperature: number
           test_result: number | null
@@ -371,6 +372,7 @@ export interface Database {
           model: string
           name: string
           prompt: string
+          revise_date?: string | null
           sharing?: string
           temperature: number
           test_result?: number | null
@@ -392,6 +394,7 @@ export interface Database {
           model?: string
           name?: string
           prompt?: string
+          revise_date?: string | null
           sharing?: string
           temperature?: number
           test_result?: number | null
