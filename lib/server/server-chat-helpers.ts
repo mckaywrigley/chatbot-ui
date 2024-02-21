@@ -2,6 +2,8 @@ import { Database, Tables } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import * as ebisu from "ebisu-js"
+import { AssertionError } from "assert"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -69,4 +71,70 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   if (apiKey === null || apiKey === "") {
     throw new Error(`${keyName} API Key not found`)
   }
+}
+export async function updateTopicQuizResult(
+  chatId: string,
+  test_result: number
+) {
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  const { data: chat } = await supabase
+    .from("chats")
+    .select("*")
+    .eq("id", chatId)
+    .maybeSingle()
+
+  // if updated_at is null, set it to created_at
+  const updated_at = (chat?.updated_at || chat?.created_at) as string
+
+  const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
+  const [arg1, arg2, arg3] = chatEbisuModel
+
+  const model = ebisu.defaultModel(arg3, arg1, arg2)
+  var successes = test_result / 100
+  var total = 1
+  // elapsed time in hours from last update to now
+  var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
+  let newModel
+  try {
+    newModel = ebisu.updateRecall(model, successes, total, elapsed)
+  } catch (error) {
+    if (error instanceof AssertionError) {
+      // Handle the AssertionError by using a more reasonable elapsed time
+      newModel = ebisu.updateRecall(model, successes, total, 2)
+    } else {
+      // If it's not an AssertionError, rethrow the error
+      throw error
+    }
+  }
+  const now = new Date()
+  const halfLifeHours = ebisu.modelToPercentileDecay(newModel)
+
+  const revise_date = new Date(
+    now.getTime() + halfLifeHours * 60 * 60 * 1000
+  ).toISOString()
+
+  console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
+
+  const { error } = await supabase
+    .from("chats")
+    .update({ test_result, ebisu_model: newModel, revise_date })
+    .eq("id", chatId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, message: `Saved test result of ${test_result}%.` }
 }

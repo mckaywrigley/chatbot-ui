@@ -101,7 +101,6 @@ export const useChatHandler = () => {
 
     setToolInUse("none")
 
-    console.log("Start with Topic assistant")
     // get the assistant from assistances context where name ="Study coach"
     const topicAssistant = assistants.find(
       assistant => assistant.name === "Topic creation tutor"
@@ -227,11 +226,21 @@ export const useChatHandler = () => {
           body: JSON.stringify({
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
-            selectedTools
+            selectedTools,
+            chatId: currentChat?.id
           })
         })
 
         setToolInUse("none")
+
+        // if the response is ok and has a score
+        if (
+          response.headers
+            .get("FUNCTION-NAMES")
+            ?.includes("updateTopicQuizResult")
+        ) {
+          console.log("updateTopicQuizResult was called and the response is ok")
+        }
 
         generatedText = await processResponse(
           response,

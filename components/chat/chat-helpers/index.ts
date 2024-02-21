@@ -368,7 +368,8 @@ export const handleCreateChat = async (
     name: messageContent.substring(0, 100),
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
-    embeddings_provider: chatSettings.embeddingsProvider
+    embeddings_provider: chatSettings.embeddingsProvider,
+    ebisu_model: [4, 4, 24]
   })
 
   setSelectedChat(createdChat)

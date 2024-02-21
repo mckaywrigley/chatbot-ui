@@ -341,6 +341,7 @@ export interface Database {
           assistant_id: string | null
           context_length: number
           created_at: string
+          ebisu_model: number[] | null
           embeddings_provider: string
           folder_id: string | null
           id: string
@@ -349,8 +350,10 @@ export interface Database {
           model: string
           name: string
           prompt: string
+          revise_date: string | null
           sharing: string
           temperature: number
+          test_result: number | null
           topic_description: string | null
           updated_at: string | null
           user_id: string
@@ -360,6 +363,7 @@ export interface Database {
           assistant_id?: string | null
           context_length: number
           created_at?: string
+          ebisu_model?: number[] | null
           embeddings_provider: string
           folder_id?: string | null
           id?: string
@@ -368,8 +372,10 @@ export interface Database {
           model: string
           name: string
           prompt: string
+          revise_date?: string | null
           sharing?: string
           temperature: number
+          test_result?: number | null
           topic_description?: string | null
           updated_at?: string | null
           user_id: string
@@ -379,6 +385,7 @@ export interface Database {
           assistant_id?: string | null
           context_length?: number
           created_at?: string
+          ebisu_model?: number[] | null
           embeddings_provider?: string
           folder_id?: string | null
           id?: string
@@ -387,8 +394,10 @@ export interface Database {
           model?: string
           name?: string
           prompt?: string
+          revise_date?: string | null
           sharing?: string
           temperature?: number
+          test_result?: number | null
           topic_description?: string | null
           updated_at?: string | null
           user_id?: string

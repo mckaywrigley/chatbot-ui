@@ -81,7 +81,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   }, [])
 
   useEffect(() => {
-    console.log("Topic description and chat name updated")
     // find selected chat in chats
     const chat = chats.find(chat => chat.id === selectedChat?.id)
     setTopicDescription(chat?.topic_description || "")
@@ -89,7 +88,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   }, [chats])
 
   const fetchMessages = async () => {
-    console.log("Fetching messages")
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)
 
     const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(

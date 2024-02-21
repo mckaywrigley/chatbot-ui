@@ -42,7 +42,7 @@ export async function buildFinalMessages(
     topicDescription
   } = payload
 
-  console.log("buildFinalMessages", { payload })
+  // console.log("buildFinalMessages", { payload })
 
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
