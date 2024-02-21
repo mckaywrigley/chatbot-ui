@@ -1,17 +1,10 @@
-import { ModelIcon } from "@/components/models/model-icon"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { LLM } from "@/types"
-import { IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
-import leafMap from "../../../icons/leaf_map.png"
 import DynamicPieChart from "../../../icons/dynamic-pie-chart"
 import * as ebisu from "ebisu-js"
 
@@ -20,13 +13,7 @@ interface ChatItemProps {
 }
 
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
-  const {
-    selectedWorkspace,
-    selectedChat,
-    availableLocalModels,
-    assistantImages,
-    availableOpenRouterModels
-  } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, selectedChat } = useContext(ChatbotUIContext)
 
   const router = useRouter()
   const params = useParams()
@@ -45,16 +32,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       itemRef.current?.click()
     }
   }
-
-  // const MODEL_DATA = [
-  //   ...LLM_LIST,
-  //   ...availableLocalModels,
-  //   ...availableOpenRouterModels
-  // ].find(llm => llm.modelId === chat.model) as LLM
-
-  // const assistantImage = assistantImages.find(
-  //   image => image.assistantId === chat.assistant_id
-  // )?.base64
 
   // Ebisu
   const updated_at = (chat?.updated_at || chat?.created_at) as string

@@ -26,7 +26,6 @@ export const getChatsByWorkspaceId = async (workspaceId: string) => {
 }
 
 export const createChat = async (chat: TablesInsert<"chats">) => {
-  console.log("createChat", { chat })
   const { data: createdChat, error } = await supabase
     .from("chats")
     .insert([chat])
