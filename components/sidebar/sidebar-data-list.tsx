@@ -29,7 +29,8 @@ import {
   endOfWeek,
   isThisMonth,
   startOfWeek,
-  endOfMonth
+  endOfMonth,
+  addMonths
 } from "date-fns"
 
 interface SidebarDataListProps {
@@ -58,6 +59,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+
+  const currentTime = new Date()
 
   const getDataListComponent = (
     contentType: ContentType,
@@ -108,43 +111,48 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     dateCategory:
       | "Today"
       | "Tomorrow"
-      | "This Week"
-      | "Next Week"
-      | "This Month"
-      | "Next Month"
+      | "This week"
+      | "Next week"
+      | "Later this month"
+      | "Next month"
       | "After next month"
   ) => {
     return data
       .filter((item: any) => {
         const reviseDate = item.revise_date
           ? new Date(item.revise_date)
-          : new Date()
+          : currentTime
 
-        const revisionThisWeek =
-          !isToday(reviseDate) && !isTomorrow && isThisWeek(reviseDate)
+        const reviseToday = isToday(reviseDate)
+        const reviseTomorrow = isTomorrow(reviseDate)
+
         const revisionNextWeek =
-          reviseDate >= addWeeks(startOfWeek(new Date()), 1) &&
-          reviseDate <= endOfWeek(addWeeks(new Date(), 1))
+          reviseDate >= addWeeks(startOfWeek(currentTime), 1) &&
+          reviseDate <= endOfWeek(addWeeks(currentTime, 1))
 
+        const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
-            return isToday(reviseDate)
+            return reviseToday
           case "Tomorrow":
-            return isTomorrow(reviseDate)
-          case "This Week":
-            return revisionThisWeek
-          case "Next Week":
+            return reviseTomorrow
+          case "This week":
+            return !reviseToday && !reviseTomorrow && isThisWeek(reviseDate)
+          case "Next week":
             return revisionNextWeek
-          case "This Month":
+          case "Later this month":
             return (
               !isThisWeek(reviseDate) &&
               !revisionNextWeek &&
               isThisMonth(reviseDate)
             )
-          case "Next Month":
-            return reviseDate > endOfMonth(new Date())
+          case "Next month":
+            return (
+              reviseDate > endOfMonth(currentTime) &&
+              reviseDate <= endOfNextMonth
+            )
           case "After next month":
-            return reviseDate > addWeeks(endOfMonth(new Date()), 1)
+            return reviseDate > endOfNextMonth
           default:
             return true
         }
@@ -292,10 +300,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 {[
                   "Today",
                   "Tomorrow",
-                  "This Week",
-                  "Next Week",
-                  "This Month",
-                  "Next Month",
+                  "This week",
+                  "Next week",
+                  "Later this month",
+                  "Next month",
                   "After next month"
                 ].map(dateCategory => {
                   const sortedData = getSortedData(
@@ -303,10 +311,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                     dateCategory as
                       | "Today"
                       | "Tomorrow"
-                      | "This Week"
-                      | "Next Week"
-                      | "This Month"
-                      | "Next Month"
+                      | "This week"
+                      | "Next week"
+                      | "Later this month"
+                      | "Next month"
                       | "After next month"
                   )
 
