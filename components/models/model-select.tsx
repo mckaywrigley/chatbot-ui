@@ -161,7 +161,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               .filter(model =>
                 model.modelName.toLowerCase().includes(search.toLowerCase())
               )
-              .filter(model => !model.modelName.toLowerCase().includes("online"))
+              .filter(model => !model.modelName.toLowerCase().includes("Perplexity Online"))
 			  .filter(model => !model.modelName.startsWith("openai/"))
 			  .filter(model => !model.modelName.startsWith("perplexity/pplx"))	  
 			  .filter(model => model.modelName !== "GPT-4")
