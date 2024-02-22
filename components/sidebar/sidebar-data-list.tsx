@@ -21,7 +21,17 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
-import * as ebisu from "ebisu-js"
+import {
+  isToday,
+  isTomorrow,
+  isThisWeek,
+  addWeeks,
+  endOfWeek,
+  isThisMonth,
+  startOfWeek,
+  endOfMonth,
+  addMonths
+} from "date-fns"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -49,6 +59,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+
+  const currentTime = new Date()
 
   const getDataListComponent = (
     contentType: ContentType,
@@ -96,34 +108,51 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const getSortedData = (
     data: any,
-    dateCategory: "Today" | "Tomorrow" | "Next Week" | "Two weeks or more"
+    dateCategory:
+      | "Today"
+      | "Tomorrow"
+      | "This week"
+      | "Next week"
+      | "Later this month"
+      | "Next month"
+      | "After next month"
   ) => {
-    const now = new Date()
-    const todayStart = new Date(now.setHours(0, 0, 0, 0))
-    const tomorrowStart = new Date(new Date().setDate(todayStart.getDate() + 1))
-    const nextWeekStart = new Date(new Date().setDate(todayStart.getDate() + 7))
-
     return data
       .filter((item: any) => {
         const reviseDate = item.revise_date
           ? new Date(item.revise_date)
-          : new Date()
+          : currentTime
+
+        const reviseToday = isToday(reviseDate)
+        const reviseTomorrow = isTomorrow(reviseDate)
+
+        const revisionNextWeek =
+          reviseDate >= addWeeks(startOfWeek(currentTime), 1) &&
+          reviseDate <= endOfWeek(addWeeks(currentTime, 1))
+
+        const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
-            return reviseDate >= todayStart && reviseDate < tomorrowStart
+            return reviseToday
           case "Tomorrow":
-            return reviseDate >= tomorrowStart && reviseDate < nextWeekStart
-          case "Next Week":
+            return reviseTomorrow
+          case "This week":
+            return !reviseToday && !reviseTomorrow && isThisWeek(reviseDate)
+          case "Next week":
+            return revisionNextWeek
+          case "Later this month":
             return (
-              reviseDate >= nextWeekStart &&
-              reviseDate <
-                new Date(nextWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+              !isThisWeek(reviseDate) &&
+              !revisionNextWeek &&
+              isThisMonth(reviseDate)
             )
-          case "Two weeks or more":
+          case "Next month":
             return (
-              reviseDate >=
-              new Date(nextWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+              reviseDate > endOfMonth(currentTime) &&
+              reviseDate <= endOfNextMonth
             )
+          case "After next month":
+            return reviseDate > endOfNextMonth
           default:
             return true
         }
@@ -268,49 +297,58 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
             {contentType === "chats" ? (
               <>
-                {["Today", "Tomorrow", "Next Week", "Two weeks or more"].map(
-                  dateCategory => {
-                    const sortedData = getSortedData(
-                      dataWithoutFolders,
-                      dateCategory as
-                        | "Today"
-                        | "Tomorrow"
-                        | "Next Week"
-                        | "Two weeks or more"
-                    )
+                {[
+                  "Today",
+                  "Tomorrow",
+                  "This week",
+                  "Next week",
+                  "Later this month",
+                  "Next month",
+                  "After next month"
+                ].map(dateCategory => {
+                  const sortedData = getSortedData(
+                    dataWithoutFolders,
+                    dateCategory as
+                      | "Today"
+                      | "Tomorrow"
+                      | "This week"
+                      | "Next week"
+                      | "Later this month"
+                      | "Next month"
+                      | "After next month"
+                  )
 
-                    return (
-                      sortedData.length > 0 && (
-                        <div key={dateCategory} className="pb-2">
-                          <div className="text-muted-foreground mb-1 text-sm font-bold">
-                            {dateCategory}
-                          </div>
-
-                          <div
-                            className={cn(
-                              "flex grow flex-col",
-                              isDragOver && "bg-accent"
-                            )}
-                            onDrop={handleDrop}
-                            onDragEnter={handleDragEnter}
-                            onDragLeave={handleDragLeave}
-                            onDragOver={handleDragOver}
-                          >
-                            {sortedData.map((item: any) => (
-                              <div
-                                key={item.id}
-                                draggable
-                                onDragStart={e => handleDragStart(e, item.id)}
-                              >
-                                {getDataListComponent(contentType, item)}
-                              </div>
-                            ))}
-                          </div>
+                  return (
+                    sortedData.length > 0 && (
+                      <div key={dateCategory} className="pb-2">
+                        <div className="text-muted-foreground mb-1 text-sm font-bold">
+                          {dateCategory}
                         </div>
-                      )
+
+                        <div
+                          className={cn(
+                            "flex grow flex-col",
+                            isDragOver && "bg-accent"
+                          )}
+                          onDrop={handleDrop}
+                          onDragEnter={handleDragEnter}
+                          onDragLeave={handleDragLeave}
+                          onDragOver={handleDragOver}
+                        >
+                          {sortedData.map((item: any) => (
+                            <div
+                              key={item.id}
+                              draggable
+                              onDragStart={e => handleDragStart(e, item.id)}
+                            >
+                              {getDataListComponent(contentType, item)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )
-                  }
-                )}
+                  )
+                })}
               </>
             ) : (
               <div
