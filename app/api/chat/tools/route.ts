@@ -2,7 +2,9 @@ import { openapiToFunctions } from "@/lib/openapi-conversion"
 import {
   checkApiKey,
   getServerProfile,
-  updateTopicQuizResult
+  updateTopicQuizResult,
+  updateTopicDescription,
+  updateReviseDate
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
@@ -147,6 +149,15 @@ export async function POST(request: Request) {
           if (functionName === "updateTopicQuizResult") {
             // Update the chat/topic name & content in the database
             data = await updateTopicQuizResult(chatId, bodyContent.test_result)
+          } else if (functionName === "updateTopicDescription") {
+            data = await updateTopicDescription(
+              chatId,
+              bodyContent.topic_description
+            )
+          } else if (functionName === "scheduleStudySession") {
+            data = await updateReviseDate(chatId, bodyContent.hours_time)
+          } else if (functionName === "proceedToLearning") {
+            console.log("proceedToLearning")
           } else {
             const requestInit = {
               method: "POST",
@@ -212,7 +223,10 @@ export async function POST(request: Request) {
     const stream = OpenAIStream(secondResponse)
 
     return new StreamingTextResponse(stream, {
-      headers: { "FUNCTION-NAMES": functionNames.join(",") }
+      headers: {
+        "FUNCTION-NAMES": functionNames.join(","),
+        "X-RATE-LIMIT": "lol"
+      }
     })
   } catch (error: any) {
     console.error(error)

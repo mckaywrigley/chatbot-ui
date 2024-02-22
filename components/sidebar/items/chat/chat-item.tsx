@@ -45,7 +45,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
 
   const predictedRecall = ebisu.predictRecall(model, elapsed, true)
-  console.log(chat.name, model, elapsed, predictedRecall)
 
   return (
     <div

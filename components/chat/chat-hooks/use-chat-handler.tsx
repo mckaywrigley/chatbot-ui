@@ -18,7 +18,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
-import { t } from "i18next"
+import { deleteChatFilesByChatId } from "@/db/chat-files"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -232,6 +232,7 @@ export const useChatHandler = () => {
         })
 
         setToolInUse("none")
+        console.log("response", { response })
 
         // if the response is ok and has a score
         if (
@@ -240,6 +241,20 @@ export const useChatHandler = () => {
             ?.includes("updateTopicQuizResult")
         ) {
           console.log("updateTopicQuizResult was called and the response is ok")
+        } else if (
+          response.headers.get("FUNCTION-NAMES")?.includes("proceedToLearning")
+        ) {
+          console.log("proceedToLearning was called and the response is ok")
+          const selectedAssistant = assistants.find(
+            assistant => assistant.name === "Study coach"
+          )
+          if (!selectedAssistant) {
+            console.error("No assistant with name 'Study coach' found")
+            return
+          }
+          handleSelectAssistant(selectedAssistant)
+          setNewMessageFiles([])
+          deleteChatFilesByChatId(currentChat!.id)
         }
 
         generatedText = await processResponse(

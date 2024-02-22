@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Save topic test result",
-    "description": "This API allows for updating the free recall and quiz test result.",
+    "title": "Start a study session",
+    "description": "Notifies app to progress to Study session. Should only be called if user request to start study session",
     "version": "1.0.0"
   },
   "servers": [
@@ -14,20 +14,20 @@
   "paths": {
     "/internal_tools": {
       "patch": {
-        "operationId": "updateTopicQuizResult",
-        "summary": "Updates a topic free recall test quiz result.",
-        "description": "This endpoint updates a topic free recall test quiz result.",
+        "operationId": "proceedToLearning",
+        "summary": "Notifies app to set app state to Study mode.",
+        "description": "When this endpoint is triggered, the app will enter study mode.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["test_result"],
+                "required": ["study_mode"],
                 "properties": {
-                  "test_result": {
-                    "type": "integer",
-                    "description": "The score out of 100."
+                  "study_mode": {
+                    "type": "boolean",
+                    "description": "Whether the study mode should start."
                   }
                 }
               }
@@ -36,7 +36,7 @@
         },
         "responses": {
           "200": {
-            "description": "Topic test result updated successfully",
+            "description": "Study mode started successfully",
             "content": {
               "application/json": {
                 "schema": {

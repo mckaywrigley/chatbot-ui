@@ -59,7 +59,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   } = useScroll()
 
   const [loading, setLoading] = useState(true)
-  const [chatTitle, setChatTitle] = useState(selectedChat?.name || "Chat")
+  const [chatTitle, setChatTitle] = useState("Chat")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,7 +84,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     // find selected chat in chats
     const chat = chats.find(chat => chat.id === selectedChat?.id)
     setTopicDescription(chat?.topic_description || "")
-    setChatTitle(chat?.name || "Chat")
   }, [chats])
 
   const fetchMessages = async () => {
@@ -194,6 +193,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       includeWorkspaceInstructions: chat.include_workspace_instructions,
       embeddingsProvider: chat.embeddings_provider as "openai" | "local"
     })
+
+    setChatTitle(chat.name || "Chat")
   }
 
   if (loading) {

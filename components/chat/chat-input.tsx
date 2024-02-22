@@ -180,14 +180,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       return
     }
 
-    const topic_description = chatMessages
-      .filter(message => message.message.role === "assistant")
-      .map(message => message.message.content)
-      .pop()
-
     const updatedChat = await updateChat(currentChat.id, {
-      assistant_id: selectedAssistant.id,
-      topic_description
+      assistant_id: selectedAssistant.id
     })
 
     setChats(prevChats => {
@@ -199,6 +193,21 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     })
 
     deleteChatFilesByChatId(currentChat.id)
+  }
+
+  const handlePreWrittenMessage = async (message: string) => {
+    console.log("Schedule study")
+
+    // setChats(prevChats => {
+    //   const updatedChats = prevChats.map(prevChat =>
+    //     prevChat.id === updatedChat.id ? updatedChat : prevChat
+    //   )
+
+    //   return updatedChats
+    // })
+
+    // generate assistant message "Study session scheduled for 12 hours from now"
+    handleSendMessage(message, chatMessages, false)
   }
 
   return (
@@ -227,20 +236,29 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
 
-        {chatMessages.length > 1 &&
-          selectedAssistant?.name === "Topic creation tutor" && (
+        {selectedAssistant?.name === "Topic creation tutor" &&
+          topicDescription.length > 0 && (
             <div className="flex justify-between space-x-4">
               <div className="w-1/2">
                 <button
                   className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                  onClick={handleProceedToLearning}
+                  onClick={() =>
+                    handlePreWrittenMessage(
+                      "Schedule a study session in 12 hours"
+                    )
+                  }
                 >
-                  Save topic & proceed to learning
+                  Schedule study in 12h
                 </button>
               </div>
               <div className="w-1/2">
-                <button className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white">
-                  Another prompt
+                <button
+                  className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+                  onClick={() =>
+                    handlePreWrittenMessage("Start a study sesssion now")
+                  }
+                >
+                  Start a study sesssion now
                 </button>
               </div>
             </div>

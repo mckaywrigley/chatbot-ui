@@ -27,7 +27,7 @@ const DynamicPieChart: FC<ChatbotUISVGProps> = ({ value, scale = 1 }) => {
         cy="25"
         r={radius}
         fill="none"
-        stroke="tomato"
+        stroke="#FF5733"
         strokeWidth="10"
         strokeDasharray={circumference}
         strokeDashoffset={dashOffset}

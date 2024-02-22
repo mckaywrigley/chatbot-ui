@@ -138,3 +138,62 @@ export async function updateTopicQuizResult(
 
   return { success: true, message: `Saved test result of ${test_result}%.` }
 }
+
+export async function updateTopicDescription(
+  chatId: string,
+  topic_description: string
+) {
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  const { error } = await supabase
+    .from("chats")
+    .update({ topic_description })
+    .eq("id", chatId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, message: `Saved topic description.` }
+}
+
+// update revise date by chat id and hours time
+export async function updateReviseDate(chatId: string, hours_time: number) {
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  let currentTime = new Date()
+  const reviseDate = currentTime.setHours(currentTime.getHours() + 12)
+
+  const { error } = await supabase
+    .from("chats")
+    .update({ revise_date: new Date(reviseDate).toISOString() })
+    .eq("id", chatId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, message: `Saved revise date of ${hours_time} hours.` }
+}
