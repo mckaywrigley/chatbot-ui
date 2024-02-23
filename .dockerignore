@@ -1,0 +1,16 @@
+node_modules/
+test-results/
+scripts/
+.git/
+.husky/
+__tests__/
+.next/
+
+.env*
+.nvmrc
+
+docker*
+
+
+.github
+

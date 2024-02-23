@@ -158,6 +158,8 @@ Follow the instructions [here](https://github.com/jmorganca/ollama#macos).
 
 ### 6. Run app locally
 
+#### Without docker
+
 In your terminal at the root of your local Chatbot UI repository, run:
 
 ```bash
@@ -167,6 +169,20 @@ npm run chat
 Your local instance of Chatbot UI should now be running at [http://localhost:3000](http://localhost:3000). Be sure to use a compatible node version (i.e. v18).
 
 You can view your backend GUI at [http://localhost:54323/project/default/editor](http://localhost:54323/project/default/editor).
+
+#### With docker (optional)
+
+First, the docker image needs to be build and then it can be run
+
+```bash
+docker image build -t chatbot-ui:latest .
+docker container run -d --name chatbot-ui \
+    --network host \
+    --env-file=$(pwd)/.env.local \
+    chatbot-ui:latest
+```
+
+If the container is not started in the host network, make sure you have set all the ip addresses right in the `.env.local` file.
 
 ## Hosted Quickstart
 
