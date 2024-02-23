@@ -243,22 +243,18 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <button
                   className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
                   onClick={() =>
-                    handlePreWrittenMessage(
-                      "Schedule a study session in 12 hours"
-                    )
+                    handlePreWrittenMessage("Schedule a test in 12 hours.")
                   }
                 >
-                  Schedule study in 12h
+                  Schedule test in 12 hours
                 </button>
               </div>
               <div className="w-1/2">
                 <button
                   className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                  onClick={() =>
-                    handlePreWrittenMessage("Start a study sesssion now")
-                  }
+                  onClick={() => handlePreWrittenMessage("Test me now")}
                 >
-                  Start a study sesssion now
+                  Test me now
                 </button>
               </div>
             </div>

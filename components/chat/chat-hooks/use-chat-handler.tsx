@@ -232,7 +232,6 @@ export const useChatHandler = () => {
         })
 
         setToolInUse("none")
-        console.log("response", { response })
 
         // if the response is ok and has a score
         if (
@@ -242,9 +241,9 @@ export const useChatHandler = () => {
         ) {
           console.log("updateTopicQuizResult was called and the response is ok")
         } else if (
-          response.headers.get("FUNCTION-NAMES")?.includes("proceedToLearning")
+          response.headers.get("FUNCTION-NAMES")?.includes("testMeNow")
         ) {
-          console.log("proceedToLearning was called and the response is ok")
+          console.log("testMeNow was called and the response is ok")
           const selectedAssistant = assistants.find(
             assistant => assistant.name === "Study coach"
           )

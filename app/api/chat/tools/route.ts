@@ -154,10 +154,10 @@ export async function POST(request: Request) {
               chatId,
               bodyContent.topic_description
             )
-          } else if (functionName === "scheduleStudySession") {
+          } else if (functionName === "scheduleTestSession") {
             data = await updateReviseDate(chatId, bodyContent.hours_time)
-          } else if (functionName === "proceedToLearning") {
-            console.log("proceedToLearning")
+          } else if (functionName === "testMeNow") {
+            console.log("testMeNow")
           } else {
             const requestInit = {
               method: "POST",
