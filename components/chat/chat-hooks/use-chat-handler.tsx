@@ -158,8 +158,6 @@ export const useChatHandler = () => {
     chatMessages: ChatMessage[],
     isRegeneration: boolean
   ) => {
-    const startingInput = messageContent
-
     try {
       setUserInput("")
       setIsGenerating(true)
@@ -351,7 +349,6 @@ export const useChatHandler = () => {
     } catch (error) {
       setIsGenerating(false)
       setFirstTokenReceived(false)
-      setUserInput(startingInput)
     }
   }
 
