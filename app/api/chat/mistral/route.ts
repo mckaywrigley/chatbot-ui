@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     // const cleanedMessages = await cleanMessagesFromWarnings(messages)
     const cleanedMessages = messages
 
-    const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
+    const systemMessageContent = `[INST] ${llmConfig.systemPrompts.hackerGPT} [/INST]`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
     let latestUserMessage = cleanedMessages[cleanedMessages.length - 1].content
@@ -88,17 +88,17 @@ export async function POST(request: Request) {
           modelTemperature = pineconeTemperature
 
           cleanedMessages[0].content =
-            `${llmConfig.systemPrompts.hackerGPT} ` +
+            `[INST] ${llmConfig.systemPrompts.hackerGPT} ` +
             `${llmConfig.systemPrompts.pinecone} ` +
-            `RAG Context:\n ${pineconeResults}`
+            `RAG Context:\n ${pineconeResults} [/INST]`
         }
       }
     }
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
 
-    const model1 = llmConfig.models.default
-    const model2 = llmConfig.models.hackerGPT
+    const model1 = llmConfig.models.hackerGPT_default
+    const model2 = llmConfig.models.hackerGPT_enhance
     const selectedModel = Math.random() < 0.8 ? model1 : model2
 
     const requestBody = {
