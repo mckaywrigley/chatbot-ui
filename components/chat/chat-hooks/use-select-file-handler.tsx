@@ -11,7 +11,8 @@ export const ACCEPTED_FILE_TYPES = [
   "application/json",
   "text/markdown",
   "application/pdf",
-  "text/plain"
+  "text/plain",
+  "text/html"
 ].join(",")
 
 export const useSelectFileHandler = () => {
@@ -52,13 +53,17 @@ export const useSelectFileHandler = () => {
     setUseRetrieval(true)
 
     if (file) {
-      let simplifiedFileType = file.type.split("/")[1]
+      let simplifiedFileType =
+        file.type.split("/")[0] === "text" ? "text" : file.type.split("/")[1]
 
       let reader = new FileReader()
 
       if (file.type.includes("image")) {
         reader.readAsDataURL(file)
-      } else if (ACCEPTED_FILE_TYPES.split(",").includes(file.type)) {
+      } else if (
+        ACCEPTED_FILE_TYPES.split(",").includes(file.type) ||
+        file.type.split("/")[0] === "text"
+      ) {
         if (simplifiedFileType.includes("vnd.adobe.pdf")) {
           simplifiedFileType = "pdf"
         } else if (
@@ -133,7 +138,7 @@ export const useSelectFileHandler = () => {
             : reader.readAsText(file)
         }
       } else {
-        throw new Error("Unsupported file type")
+        toast.error("Unsupported file type")
       }
 
       reader.onloadend = async function () {

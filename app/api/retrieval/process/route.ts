@@ -4,7 +4,8 @@ import {
   processJSON,
   processMarkdown,
   processPdf,
-  processTxt
+  processTxt,
+  convert
 } from "@/lib/retrieval/processing"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
@@ -59,9 +60,9 @@ export async function POST(req: Request) {
         chunks = await processTxt(blob)
         break
       default:
-        return new NextResponse("Unsupported file type", {
-          status: 400
-        })
+        const cleanText = await convert(blob)
+        chunks = await processTxt(new Blob([cleanText]))
+        break
     }
 
     let embeddings: any = []

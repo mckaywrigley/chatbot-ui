@@ -17,6 +17,7 @@ import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
+import Modal from "@/components/chat/dialog-portal"
 import { toast } from "sonner"
 
 interface ChatInputProps {}
@@ -29,6 +30,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
+  const [showConfirmationDialog, setShowConfirmationDialog] =
+    useState<boolean>(false)
+  const [currentFile, setCurrentFile] = useState<File | null>(null)
 
   const {
     userInput,
@@ -127,8 +131,78 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  const handleConversionConfirmation = () => {
+    if (currentFile) {
+      handleSelectDeviceFile(currentFile)
+      setShowConfirmationDialog(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setCurrentFile(null)
+    setShowConfirmationDialog(false)
+  }
+
+  const handleFileUpload = (file: File) => {
+    const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
+
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "svg"]
+
+    const videoExtensions = ["mp4", "avi", "mov", "wmv", "flv"]
+
+    if (imageExtensions.includes(fileExtension)) {
+      alert("HackerGPT does not support image files yet.")
+      return
+    } else if (videoExtensions.includes(fileExtension)) {
+      alert("HackerGPT does not support video files yet.")
+      return
+    }
+
+    if (
+      fileExtension &&
+      !["csv", "json", "md", "pdf", "txt", "html", "htm"].includes(
+        fileExtension
+      )
+    ) {
+      setShowConfirmationDialog(true)
+      setCurrentFile(file)
+      return
+    } else {
+      handleSelectDeviceFile(file)
+    }
+  }
+
   return (
     <>
+      <Modal isOpen={showConfirmationDialog}>
+        <div className="bg-background/20 size-screen fixed inset-0 z-40 backdrop-blur-sm"></div>
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
+            <p>
+              The file extension{" "}
+              <b>.{currentFile?.name.split(".").pop()?.toLowerCase()}</b> is
+              currently not supported.
+            </p>
+            <p>Would you like to convert its content into a text format?</p>
+            <div className="mt-5 flex justify-center gap-5">
+              <button
+                onClick={handleCancel}
+                className="ring-offset-background focus-visible:ring-ring bg-input text-primary hover:bg-input/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConversionConfirmation}
+                className="ring-offset-background focus-visible:ring-ring bg-primary text-primary-foreground hover:bg-primary/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              >
+                Convert
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
 
@@ -173,7 +247,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             type="file"
             onChange={e => {
               if (!e.target.files) return
-              handleSelectDeviceFile(e.target.files[0])
+              handleFileUpload(e.target.files[0])
             }}
             accept={filesToAccept}
           />
