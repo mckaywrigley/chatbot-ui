@@ -41,7 +41,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
+        {/* <SidebarSwitchItem
           icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
           contentType="presets"
           onContentTypeChange={onContentTypeChange}
@@ -51,7 +51,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
-        />
+        /> */}
 
         {/* <SidebarSwitchItem
           icon={<IconSparkles size={SIDEBAR_ICON_SIZE} />}

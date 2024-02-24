@@ -182,9 +182,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={t(
-            `Ask anything. Type "/" for prompts and "#" for files.`
-          )}
+          placeholder={t(`Ask anything. Type "#" for files.`)}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

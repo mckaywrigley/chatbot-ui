@@ -24,7 +24,7 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
 
   return (
     <>
-      <PromptPicker />
+      {/* <PromptPicker /> */}
 
       <FilePicker
         isOpen={isAtPickerOpen}
