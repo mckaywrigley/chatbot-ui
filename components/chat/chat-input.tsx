@@ -175,7 +175,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   return (
     <>
       <Modal isOpen={showConfirmationDialog}>
-        <div className="bg-background/20 size-screen fixed inset-0 z-40 backdrop-blur-sm"></div>
+        <div className="bg-background/20 size-screen fixed inset-0 z-50 backdrop-blur-sm"></div>
 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
