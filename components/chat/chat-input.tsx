@@ -17,6 +17,7 @@ import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
+import { toast } from "sonner"
 
 interface ChatInputProps {}
 
@@ -111,11 +112,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     const imagesAllowed = LLM_LIST.find(
       llm => llm.modelId === chatSettings?.model
     )?.imageInput
-    if (!imagesAllowed) return
 
     const items = event.clipboardData.items
     for (const item of items) {
       if (item.type.indexOf("image") === 0) {
+        if (!imagesAllowed) {
+          toast.error(`Images are not supported for this model.`)
+          return
+        }
         const file = item.getAsFile()
         if (!file) return
         handleSelectDeviceFile(file)
@@ -125,9 +129,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   return (
     <>
-      <ChatFilesDisplay />
+      <div className="flex flex-col flex-wrap justify-center gap-2">
+        <ChatFilesDisplay />
 
-      <div className="flex flex-wrap justify-center gap-2">
         {selectedTools &&
           selectedTools.map((tool, index) => (
             <div

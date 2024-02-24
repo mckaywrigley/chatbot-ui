@@ -14,8 +14,13 @@ export async function GET(request: Request) {
   }
 
   if (next) {
-    return NextResponse.redirect(requestUrl.origin + next)
+    // requestUrl.origin returns `localhost:3000`, manually override from .env.local
+    return NextResponse.redirect(
+      process.env.NEXT_PUBLIC_PRODUCTION_ORIGIN! || requestUrl.origin + next
+    )
   } else {
-    return NextResponse.redirect(requestUrl.origin)
+    return NextResponse.redirect(
+      process.env.NEXT_PUBLIC_PRODUCTION_ORIGIN! || requestUrl.origin
+    )
   }
 }
