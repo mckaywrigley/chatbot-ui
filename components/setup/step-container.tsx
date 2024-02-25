@@ -42,16 +42,16 @@ export const StepContainer: FC<StepContainerProps> = ({
 
   return (
     <Card
-      className="max-h-[calc(100vh-60px)] w-[600px] overflow-auto"
+      className="max-h-[calc(100vh-60px)] w-full overflow-auto sm:w-[600px]"
       onKeyDown={handleKeyDown}
     >
       <CardHeader>
         <CardTitle className="flex justify-between">
           <div>{stepTitle}</div>
 
-          <div className="text-sm">
+          {/* <div className="text-sm">
             {stepNum} / {SETUP_STEP_COUNT}
-          </div>
+          </div> */}
         </CardTitle>
 
         <CardDescription>{stepDescription}</CardDescription>
