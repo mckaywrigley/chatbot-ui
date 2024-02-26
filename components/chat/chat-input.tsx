@@ -21,6 +21,8 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { updateChat } from "@/db/chats"
 import { deleteChatFilesByChatId } from "@/db/chat-files"
+import QuickResponse from "./QuickResponse"
+
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
@@ -195,18 +197,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     deleteChatFilesByChatId(currentChat.id)
   }
 
-  const handlePreWrittenMessage = async (message: string) => {
-    console.log("Schedule study")
-
-    // setChats(prevChats => {
-    //   const updatedChats = prevChats.map(prevChat =>
-    //     prevChat.id === updatedChat.id ? updatedChat : prevChat
-    //   )
-
-    //   return updatedChats
-    // })
-
-    // generate assistant message "Study session scheduled for 12 hours from now"
+  const handleQuickResponse = async (message: string) => {
     handleSendMessage(message, chatMessages, false)
   }
 
@@ -236,29 +227,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
 
-        {selectedAssistant?.name === "Topic creation tutor" &&
-          topicDescription.length > 0 && (
-            <div className="flex justify-between space-x-4">
-              <div className="w-1/2">
-                <button
-                  className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                  onClick={() =>
-                    handlePreWrittenMessage("Schedule a test in 12 hours.")
-                  }
-                >
-                  Schedule test in 12 hours
-                </button>
-              </div>
-              <div className="w-1/2">
-                <button
-                  className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                  onClick={() => handlePreWrittenMessage("Test me now")}
-                >
-                  Test me now
-                </button>
-              </div>
-            </div>
-          )}
+        <QuickResponse
+          selectedAssistant={selectedAssistant}
+          handleClick={handleQuickResponse}
+          topicDescription={topicDescription}
+        />
 
         {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">

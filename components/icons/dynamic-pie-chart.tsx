@@ -11,6 +11,8 @@ const DynamicPieChart: FC<ChatbotUISVGProps> = ({ value, scale = 1 }) => {
   const filledPercentage = value // Percentage of the pie chart filled
   const dashOffset = ((100 - filledPercentage) / 100) * circumference // Calculating dash offset
 
+  const strokeColor = value < 50 ? "coral" : "ForestGreen" // Set stroke color based on value
+
   return (
     <svg width={50 * scale} height={50 * scale} viewBox="0 0 50 50">
       <circle
@@ -27,7 +29,7 @@ const DynamicPieChart: FC<ChatbotUISVGProps> = ({ value, scale = 1 }) => {
         cy="25"
         r={radius}
         fill="none"
-        stroke="#FF5733"
+        stroke={strokeColor} // Use strokeColor
         strokeWidth="10"
         strokeDasharray={circumference}
         strokeDashoffset={dashOffset}

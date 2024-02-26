@@ -145,6 +145,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             return revisionNextWeek
           case "Later this month":
             return (
+              reviseDate > currentTime &&
               !isThisWeek(reviseDate) &&
               !revisionNextWeek &&
               isThisMonth(reviseDate)

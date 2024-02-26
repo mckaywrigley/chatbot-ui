@@ -5,13 +5,17 @@ import { encode } from "gpt-tokenizer"
 const buildBasePrompt = (
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Tables<"assistants"> | null
+  assistant: Tables<"assistants"> | null,
+  topicDescription?: string
 ) => {
   let fullPrompt = ""
 
   if (assistant) {
-    fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
-    fullPrompt += `System Instructions:\n${assistant.prompt}\n\n`
+    fullPrompt += `${assistant.prompt}\n\n`
+  }
+
+  if (topicDescription) {
+    fullPrompt += `<source>\n${topicDescription}\n</source>`
   }
 
   fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
@@ -47,7 +51,8 @@ export async function buildFinalMessages(
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    assistant,
+    topicDescription
   )
 
   const CHUNK_SIZE = chatSettings.contextLength
