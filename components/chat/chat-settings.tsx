@@ -18,6 +18,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
     setChatSettings,
     models,
     availableHostedModels,
+    availableAIMaskModels,
     availableLocalModels,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
@@ -59,6 +60,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
     })),
     ...availableHostedModels,
     ...availableLocalModels,
+    ...availableAIMaskModels,
     ...availableOpenRouterModels
   ]
 

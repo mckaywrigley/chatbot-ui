@@ -6,4 +6,5 @@ export type ModelProvider =
   | "perplexity"
   | "ollama"
   | "openrouter"
+  | "ai-mask"
   | "custom"

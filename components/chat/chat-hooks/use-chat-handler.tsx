@@ -13,6 +13,7 @@ import {
   handleCreateMessages,
   handleHostedChat,
   handleLocalChat,
+  handleAIMaskChat,
   handleRetrieval,
   processResponse,
   validateChatSettings
@@ -35,6 +36,7 @@ export const useChatHandler = () => {
     setSelectedChat,
     setChats,
     setSelectedTools,
+    availableAIMaskModels,
     availableLocalModels,
     availableOpenRouterModels,
     abortController,
@@ -181,6 +183,7 @@ export const useChatHandler = () => {
         })),
         ...LLM_LIST,
         ...availableLocalModels,
+        ...availableAIMaskModels,
         ...availableOpenRouterModels
       ].find(llm => llm.modelId === chatSettings?.model)
 
@@ -274,6 +277,19 @@ export const useChatHandler = () => {
       } else {
         if (modelData!.provider === "ollama") {
           generatedText = await handleLocalChat(
+            payload,
+            profile!,
+            chatSettings!,
+            tempAssistantChatMessage,
+            isRegeneration,
+            newAbortController,
+            setIsGenerating,
+            setFirstTokenReceived,
+            setChatMessages,
+            setToolInUse
+          )
+        } else if (modelData!.provider === "ai-mask") {
+          generatedText = await handleAIMaskChat(
             payload,
             profile!,
             chatSettings!,

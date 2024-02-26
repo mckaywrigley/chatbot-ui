@@ -44,6 +44,8 @@ interface ChatbotUIContext {
   setEnvKeyMap: Dispatch<SetStateAction<Record<string, VALID_ENV_KEYS>>>
   availableHostedModels: LLM[]
   setAvailableHostedModels: Dispatch<SetStateAction<LLM[]>>
+  availableAIMaskModels: LLM[]
+  setAvailableAIMaskModels: Dispatch<SetStateAction<LLM[]>>
   availableLocalModels: LLM[]
   setAvailableLocalModels: Dispatch<SetStateAction<LLM[]>>
   availableOpenRouterModels: OpenRouterLLM[]
@@ -170,6 +172,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setEnvKeyMap: () => {},
   availableHostedModels: [],
   setAvailableHostedModels: () => {},
+  availableAIMaskModels: [],
+  setAvailableAIMaskModels: () => {},
   availableLocalModels: [],
   setAvailableLocalModels: () => {},
   availableOpenRouterModels: [],

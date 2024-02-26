@@ -2,6 +2,7 @@ import { Tables } from "@/supabase/types"
 import { LLM, LLMID, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
+import { AIMaskClient } from "@ai-mask/sdk"
 
 export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   try {
@@ -50,6 +51,22 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   } catch (error) {
     console.warn("Error fetching hosted models: " + error)
   }
+}
+
+export const fetchAIMaskModels = async (): Promise<LLM[]> => {
+  const aiMaskClient = new AIMaskClient()
+  const models = await aiMaskClient.getModels()
+  aiMaskClient.dispose()
+  return models
+    .filter(model => model.task === "chat")
+    .map(model => ({
+      modelId: model.id as LLMID,
+      modelName: model.name,
+      provider: "ai-mask",
+      hostedId: model.id,
+      platformLink: "",
+      imageInput: false
+    }))
 }
 
 export const fetchOllamaModels = async () => {

@@ -8,6 +8,7 @@ import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
+  fetchAIMaskModels,
   fetchHostedModels,
   fetchOllamaModels,
   fetchOpenRouterModels
@@ -54,6 +55,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({})
   const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([])
   const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
+  const [availableAIMaskModels, setAvailableAIMaskModels] = useState<LLM[]>([])
   const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
     OpenRouterLLM[]
   >([])
@@ -149,6 +151,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         if (!localModels) return
         setAvailableLocalModels(localModels)
       }
+
+      const aiMaskModels = await fetchAIMaskModels()
+      setAvailableAIMaskModels(aiMaskModels)
     })()
   }, [])
 
@@ -231,6 +236,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setEnvKeyMap,
         availableHostedModels,
         setAvailableHostedModels,
+        availableAIMaskModels,
+        setAvailableAIMaskModels,
         availableLocalModels,
         setAvailableLocalModels,
         availableOpenRouterModels,

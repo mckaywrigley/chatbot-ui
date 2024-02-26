@@ -27,6 +27,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     models,
     availableHostedModels,
     availableLocalModels,
+    availableAIMaskModels,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
 
@@ -60,6 +61,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       imageInput: false
     })),
     ...availableHostedModels,
+    ...availableAIMaskModels,
     ...availableLocalModels,
     ...availableOpenRouterModels
   ]

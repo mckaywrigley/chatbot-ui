@@ -19,6 +19,7 @@ import {
   LLM,
   MessageImage
 } from "@/types"
+import { AIMaskClient, ChatCompletionParams } from "@ai-mask/sdk"
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
@@ -142,6 +143,69 @@ export const createTempMessages = (
     tempUserChatMessage,
     tempAssistantChatMessage
   }
+}
+
+export const handleAIMaskChat = async (
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  chatSettings: ChatSettings,
+  tempAssistantMessage: ChatMessage,
+  isRegeneration: boolean,
+  newAbortController: AbortController,
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+) => {
+  const aiMaskClient = new AIMaskClient({ name: "chatbot-ui" })
+  const lastChatMessage = isRegeneration
+    ? payload.chatMessages[payload.chatMessages.length - 1]
+    : tempAssistantMessage
+
+  const messages = (await buildFinalMessages(
+    payload,
+    profile,
+    []
+  )) as ChatCompletionParams["messages"]
+  console.log(chatSettings)
+  let fullText = ""
+
+  const response = await aiMaskClient.infer(
+    {
+      modelId: chatSettings.model,
+      task: "chat",
+      inferParams: {
+        messages,
+        temperature: chatSettings.temperature
+      }
+    },
+    contentToAdd => {
+      fullText += contentToAdd
+      setFirstTokenReceived(true)
+      setToolInUse("none")
+
+      setChatMessages(prev =>
+        prev.map(chatMessage => {
+          if (chatMessage.message.id === lastChatMessage.message.id) {
+            const updatedChatMessage: ChatMessage = {
+              message: {
+                ...chatMessage.message,
+                content: fullText
+              },
+              fileItems: chatMessage.fileItems
+            }
+
+            return updatedChatMessage
+          }
+
+          return chatMessage
+        })
+      )
+    }
+  )
+  aiMaskClient.dispose()
+  setIsGenerating(false)
+  return response
 }
 
 export const handleLocalChat = async (
