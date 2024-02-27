@@ -157,6 +157,7 @@ export const handleAIMaskChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
+  // TODO persist client in a hook
   const aiMaskClient = new AIMaskClient({ name: "chatbot-ui" })
   const lastChatMessage = isRegeneration
     ? payload.chatMessages[payload.chatMessages.length - 1]
@@ -167,17 +168,12 @@ export const handleAIMaskChat = async (
     profile,
     []
   )) as ChatCompletionParams["messages"]
-  console.log(chatSettings)
   let fullText = ""
 
-  const response = await aiMaskClient.infer(
+  const response = await aiMaskClient.chat(chatSettings.model,
     {
-      modelId: chatSettings.model,
-      task: "chat",
-      inferParams: {
-        messages,
-        temperature: chatSettings.temperature
-      }
+      messages,
+      temperature: chatSettings.temperature
     },
     contentToAdd => {
       fullText += contentToAdd
@@ -368,16 +364,16 @@ export const processResponse = async (
           contentToAdd = isHosted
             ? chunk
             : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
-                .trimEnd()
-                .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
+            // objects. A chunk may have more than one of these objects, so we
+            // need to split the chunk by new-lines and handle each one
+            // separately.
+            chunk
+              .trimEnd()
+              .split("\n")
+              .reduce(
+                (acc, line) => acc + JSON.parse(line).message.content,
+                ""
+              )
           fullText += contentToAdd
         } catch (error) {
           console.error("Error parsing JSON:", error)
@@ -515,9 +511,8 @@ export const handleCreateMessages = async (
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        let filePath = `${profile.user_id}/${currentChat.id}/${
-          createdMessages[0].id
-        }/${uuidv4()}`
+        let filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id
+          }/${uuidv4()}`
 
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)

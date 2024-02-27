@@ -26,6 +26,7 @@ import {
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
+import { AIMaskClient } from "@ai-mask/sdk"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 
@@ -126,7 +127,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [toolInUse, setToolInUse] = useState<string>("none")
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const profile = await fetchStartingData()
 
       if (profile) {
@@ -152,8 +153,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setAvailableLocalModels(localModels)
       }
 
-      const aiMaskModels = await fetchAIMaskModels()
-      setAvailableAIMaskModels(aiMaskModels)
+      if (AIMaskClient.isExtensionAvailable()) {
+        const aiMaskModels = await fetchAIMaskModels()
+        setAvailableAIMaskModels(aiMaskModels)
+      }
     })()
   }, [])
 
