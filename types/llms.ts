@@ -41,6 +41,10 @@ export type PerplexityLLMID =
   | "llama-2-70b-chat" // Llama2 70B Chat
   | "codellama-34b-instruct" // CodeLlama 34B Instruct
   | "codellama-70b-instruct" // CodeLlama 70B Instruct
+  | "sonar-small-chat" // Sonar Small Chat
+  | "sonar-small-online" // Sonar Small Online
+  | "sonar-medium-chat" // Sonar Medium Chat
+  | "sonar-medium-online" // Sonar Medium Online
 
 export interface LLM {
   modelId: LLMID
