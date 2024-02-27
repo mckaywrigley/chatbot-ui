@@ -5,7 +5,10 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
-import { getMessagesByChatId } from "@/db/messages"
+import {
+  getMessagesByChatId,
+  deleteMessagesIncludingAndAfter
+} from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -18,6 +21,7 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { set } from "date-fns"
 
 interface ChatUIProps {}
 
@@ -41,7 +45,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     profile,
     setSelectedTools,
     setTopicDescription,
-    chats
+    chats,
+    setChatStudyState,
+    chatStudyState
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -75,8 +81,20 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         handleFocusChatInput()
         setLoading(false)
       })
+      setChatStudyState("waiting")
     } else {
       setLoading(false)
+    }
+
+    return () => {
+      if (selectedChat) {
+        console.log("deleting all messages")
+        deleteMessagesIncludingAndAfter(
+          selectedChat.user_id,
+          selectedChat.id,
+          0
+        )
+      }
     }
   }, [])
 

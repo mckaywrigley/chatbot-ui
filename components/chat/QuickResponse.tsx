@@ -1,61 +1,115 @@
-import { FC } from "react"
+import { useContext } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { useChatHandler } from "./chat-hooks/use-chat-handler"
 
-interface QuickResponseProps {
-  selectedAssistant: { name: string } | null
-  handleClick: (message: string) => void
-  topicDescription: string
-}
+const QuickResponse = () => {
+  const {
+    chatMessages,
+    chatStudyState,
+    setChatStudyState,
+    setChatMessages,
+    selectedChat,
+    selectedAssistant
+  } = useContext(ChatbotUIContext)
 
-const QuickResponse: FC<QuickResponseProps> = ({
-  selectedAssistant,
-  handleClick,
-  topicDescription
-}) => {
-  let buttonTexts = {
-    button1: "",
-    button2: ""
+  const { handleSendMessage } = useChatHandler()
+
+  const handleQuickResponse = async (message: string) => {
+    handleSendMessage(message, chatMessages, false)
   }
 
-  if (
-    selectedAssistant?.name === "Topic creation tutor" &&
-    topicDescription.length > 0
-  ) {
-    buttonTexts.button1 = "Schedule a test in 12 hours."
-    buttonTexts.button2 = "Test me now"
-  } else if (
-    selectedAssistant?.name === "Study coach" &&
-    topicDescription.length > 0
-  ) {
-    buttonTexts.button1 = "Proceed to scoring"
-    buttonTexts.button2 = "Give me a hint"
+  let buttonConfigs = {
+    button1: {
+      text: "",
+      onClick: handleQuickResponse // Default onClick handler
+    },
+    button2: {
+      text: "",
+      onClick: handleQuickResponse // Default onClick handler
+    }
   }
 
-  // Check if any of the conditions are met before returning the JSX.
-  if (buttonTexts.button1 && buttonTexts.button2) {
-    return (
-      <div className="flex justify-between space-x-4">
+  if (chatStudyState === "waiting") {
+    buttonConfigs.button1.text = "Start a new free recall session."
+    buttonConfigs.button1.onClick = async () => {
+      // Custom onClick handler
+      await setChatStudyState("recalling")
+      const promptMessage = {
+        message: {
+          id: "1",
+          user_id: "1",
+          content: `Try to recall as much as possible about the topic ${selectedChat!.name}.`,
+          created_at: new Date().toISOString(),
+          image_paths: [],
+          model: "",
+          role: "assistant",
+          sequence_number: 0,
+          updated_at: null,
+          assistant_id: selectedAssistant!.id,
+          chat_id: selectedChat!.id
+        },
+        fileItems: []
+      }
+
+      setChatMessages([promptMessage])
+    }
+    buttonConfigs.button2.text = "Edit topic description."
+  } else if (chatStudyState === "feedback") {
+    buttonConfigs.button1.text = "Proceed to scoring."
+  } else if (chatStudyState === "updated") {
+    buttonConfigs.button1.text = "Show full topic description."
+    buttonConfigs.button1.onClick = async () => {
+      await setChatStudyState("reading")
+      const promptMessage = {
+        message: {
+          id: "1",
+          user_id: "1",
+          content: selectedChat!.topic_description || "",
+          created_at: new Date().toISOString(),
+          image_paths: [],
+          model: "",
+          role: "assistant",
+          sequence_number: chatMessages.length + 2,
+          updated_at: null,
+          assistant_id: selectedAssistant!.id,
+          chat_id: selectedChat!.id
+        },
+        fileItems: []
+      }
+
+      setChatMessages(prevMessages => [...prevMessages, promptMessage])
+    }
+  }
+
+  // Render buttons based on the configuration
+  return (
+    <div className="flex justify-between space-x-4">
+      {buttonConfigs.button1.text && (
         <div className="w-1/2">
           <button
-            className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-            onClick={() => handleClick(buttonTexts.button1)}
+            className="w-full rounded-md border border-blue-500 px-4 py-2 text-left text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+            onClick={() =>
+              buttonConfigs.button1.onClick(buttonConfigs.button1.text)
+            }
           >
-            {buttonTexts.button1}
+            {buttonConfigs.button1.text}
           </button>
         </div>
+      )}
+      {buttonConfigs.button2.text && (
         <div className="w-1/2">
           <button
-            className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-            onClick={() => handleClick(buttonTexts.button2)}
+            className="w-full rounded-md border border-blue-500 px-4 py-2 text-left text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+            onClick={() =>
+              buttonConfigs.button2.onClick(buttonConfigs.button2.text)
+            }
           >
-            {buttonTexts.button2}
+            {buttonConfigs.button2.text}
           </button>
         </div>
-      </div>
-    )
-  } else {
-    // Return null or a placeholder when conditions are not met
-    return null
-  }
+      )}
+    </div>
+  )
 }
 
 export default QuickResponse

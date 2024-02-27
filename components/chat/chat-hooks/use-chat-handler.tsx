@@ -19,6 +19,7 @@ import {
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
 import { deleteChatFilesByChatId } from "@/db/chat-files"
+import { set } from "date-fns"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -67,7 +68,9 @@ export const useChatHandler = () => {
     isToolPickerOpen,
     topicDescription,
     setTopicDescription,
-    assistants
+    assistants,
+    setChatStudyState,
+    chatStudyState
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -100,6 +103,8 @@ export const useChatHandler = () => {
     setTopicDescription("")
 
     setToolInUse("none")
+
+    setChatStudyState("new")
 
     // get the assistant from assistances context where name ="Study coach"
     const topicAssistant = assistants.find(
@@ -215,7 +220,8 @@ export const useChatHandler = () => {
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
-          chatImages
+          chatImages,
+          chatStudyState
         )
 
         const response = await fetch("/api/chat/tools", {
@@ -240,6 +246,7 @@ export const useChatHandler = () => {
             ?.includes("updateTopicQuizResult")
         ) {
           console.log("updateTopicQuizResult was called and the response is ok")
+          setChatStudyState("updated")
         } else if (
           response.headers.get("FUNCTION-NAMES")?.includes("testMeNow")
         ) {
@@ -254,6 +261,8 @@ export const useChatHandler = () => {
           handleSelectAssistant(selectedAssistant)
           setNewMessageFiles([])
           deleteChatFilesByChatId(currentChat!.id)
+        } else {
+          setChatStudyState("feedback")
         }
 
         generatedText = await processResponse(
@@ -371,6 +380,60 @@ export const useChatHandler = () => {
 
     handleSendMessage(editedContent, filteredMessages, false)
   }
+
+  // const handleCreatePassiveMessages = async (messageContent: string, generatedText: string) => {
+  //   // Assume a single chat session context, as the existing setup does.
+  //   // This simplifies the example, not accounting for selecting different chats or sessions.
+  //   let currentChat = selectedChat ? { ...selectedChat } : null;
+
+  //   if (!currentChat) {
+  //     console.error('No current chat selected. Unable to create passive messages.');
+  //     return;
+  //   }
+
+  //   // Mockup chatMessage structure based on your existing code.
+  //   // Adjust according to the actual structure of your ChatMessage type.
+  //   const chatMessages = [
+  //     {
+  //       content: messageContent,
+  //       type: 'user', // Assuming 'user' and 'assistant' types. Adjust as necessary.
+  //       timestamp: new Date().toISOString(),
+  //       // Add other necessary properties here.
+  //     },
+  //     {
+  //       content: generatedText,
+  //       type: 'assistant',
+  //       timestamp: new Date().toISOString(),
+  //       // Add other necessary properties here.
+  //     },
+  //   ];
+
+  //   // Assuming newMessageImages and other arguments are not relevant for passive creation.
+  //   // You may need to adjust this based on actual requirements and available data.
+  //   const newMessageImages = []; // Adjust if images are relevant for your passive messages.
+  //   const isRegeneration = false; // Assuming passive messages are not regenerations.
+  //   const retrievedFileItems = []; // Adjust if file items are relevant for your passive messages.
+
+  //   // Now call handleCreateMessages with the structured arguments.
+  //   // Adjust the call according to the actual signature of handleCreateMessages.
+  //   await handleCreateMessages(
+  //     chatMessages,
+  //     currentChat,
+  //     profile, // Assuming 'profile' is available in your closure. Adjust as necessary.
+  //     modelData, // This needs to be defined based on your context or omitted if not relevant.
+  //     messageContent,
+  //     generatedText,
+  //     newMessageImages,
+  //     isRegeneration,
+  //     retrievedFileItems,
+  //     setChatMessages, // Assuming this is a state setter function available in your closure.
+  //     setChatFileItems, // Assuming this is relevant and available.
+  //     setChatImages, // Assuming this is relevant and available.
+  //     selectedAssistant // Assuming this is available in your closure. Adjust as necessary.
+  //   );
+
+  //   // Additional logic can be added here if necessary, e.g., post-message creation processing.
+  // };
 
   return {
     chatInputRef,
