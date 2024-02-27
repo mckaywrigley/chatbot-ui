@@ -3,6 +3,7 @@ import { ChatSettings } from "@/types"
 import { ServerRuntime } from "next"
 
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
+import { StreamingTextResponse } from "ai"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
 
     const controller = new AbortController()
     const endpoint = `${process.env.SECRET_ENDPOINT_PLUGINS_HACKERGPT_V2}`
-    const response = await fetch(endpoint, {
+    const fetchResponse = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,8 +78,9 @@ export async function POST(request: Request) {
       body: JSON.stringify(chatBody)
     })
 
-    const text = await response.text()
-    return new Response(text)
+    return new StreamingTextResponse(
+      fetchResponse.body as ReadableStream<Uint8Array>
+    )
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
