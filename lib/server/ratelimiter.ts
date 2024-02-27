@@ -60,7 +60,10 @@ export async function getRemaining(
   isPremium: boolean
 ): Promise<[number, number | null]> {
   const storageKey = _makeStorageKey(userId, model)
-  const timeWindowMinutes = Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
+  let timeWindowMinutes =
+    model === "plugins"
+      ? Number(process.env.RATELIMITER_TIME_PLUGINS_WINDOW_MINUTES)
+      : Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
   const timeWindow = timeWindowMinutes * 60 * 1000
   const now = Date.now()
   const timestamps: number[] = await getRedis().zrange(
@@ -74,22 +77,23 @@ export async function getRemaining(
   const limit = _getLimit(model, isPremium)
   const remaining = limit - timestamps.length
   if (remaining <= 0) {
-    // Calculate timeRemaining based on the first message in the window
-    const oldestTimestamp = timestamps[0] // Get the oldest message timestamp
-    const timeRemaining = oldestTimestamp - now + timeWindow // Adjust calculation here
+    const oldestTimestamp = timestamps[0]
+    const timeRemaining = oldestTimestamp - now + timeWindow
     return [0, timeRemaining]
   }
   return [remaining, null]
 }
 
 function _getLimit(model: string, isPremium: boolean): number {
-  const fixedModelName = _getFixedModelName(model)
-  const limitKey =
-    "RATELIMITER_LIMIT_" +
-    fixedModelName +
-    "_" +
-    (isPremium ? "PREMIUM" : "FREE")
-  const limit = Number(process.env[limitKey])
+  let limit
+  if (model === "plugins") {
+    const limitKey = `RATELIMITER_LIMIT_PLUGINS_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey])
+  } else {
+    const fixedModelName = _getFixedModelName(model)
+    const limitKey = `RATELIMITER_LIMIT_${fixedModelName}_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey])
+  }
   if (isNaN(limit) || limit < 0) {
     throw new Error("Invalid limit configuration")
   }
@@ -131,32 +135,39 @@ export function resetRateLimit(model: string, userId: string) {
 
 export function getRateLimitErrorMessage(
   timeRemaining: number,
-  premium: boolean
+  premium: boolean,
+  model: string
 ): string {
   const remainingText = epochTimeToNaturalLanguage(timeRemaining)
 
-  const errorMessageForFree = `
-      ⚠️ Hold On! You've Hit Your Usage Cap.
+  if (model === "plugins") {
+    let message = `
+  ⚠️ You've reached the rate limit for plugins.
+⏰ Access will be restored in ${remainingText}.`
+
+    if (!premium) {
+      message += `
+🚀 Consider upgrading for higher limits and more features.`
+    }
+
+    return message.trim()
+  }
+
+  let message = `
+⚠️ Hold On! You've Hit Your Usage Cap.
 ⏰ Don't worry—you'll be back in ${remainingText}.
+  `.trim()
+
+  if (premium) {
+    message += `
 🔓 Want more? Upgrade to Plus and unlock a world of features:
 - Enjoy unlimited usage,
 - Get exclusive access to GPT-4 Turbo,
 - Experience faster response speed.
-${
-  /*- Explore the web with our Web Browsing plugin,
-- Plus, get access to advanced hacking tools like Katana, HttpX, Naabu, and more.*/ ""
-}
-      `.trim()
-
-  const errorMessageForPlus = `
-⚠️ Hold On! You've Hit Your Usage Cap.
-⏰ Don't worry—you'll be back in ${remainingText}.
-      `.trim()
-
-  let message = errorMessageForFree
-  if (premium) {
-    message = errorMessageForPlus
+- Plus, get access to advanced hacking tools like Katana, HttpX, Naabu, and more.
+    `.trim()
   }
+
   return message
 }
 
@@ -169,7 +180,11 @@ export async function checkRatelimitOnApi(
     return null
   }
   const premium = await isPremiumUser(userId)
-  const message = getRateLimitErrorMessage(result.timeRemaining!, premium)
+  const message = getRateLimitErrorMessage(
+    result.timeRemaining!,
+    premium,
+    model
+  )
   const response = new Response(
     JSON.stringify({
       message: message,

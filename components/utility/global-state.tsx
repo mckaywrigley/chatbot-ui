@@ -99,6 +99,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [abortController, setAbortController] =
     useState<AbortController | null>(null)
 
+  // ENHANCE MENU STORE
+  const [isEnhancedMenuOpen, setIsEnhancedMenuOpen] = useState(true)
+  const [selectedPluginType, setSelectedPluginType] = useState("")
+  const [selectedPlugin, setSelectedPlugin] = useState("")
+
   // CHAT INPUT COMMAND STORE
   const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
   const [slashCommand, setSlashCommand] = useState("")
@@ -282,6 +287,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setFirstTokenReceived,
         abortController,
         setAbortController,
+
+        // ENHANCE MENU STORE
+        isEnhancedMenuOpen,
+        setIsEnhancedMenuOpen,
+        selectedPluginType,
+        setSelectedPluginType,
+        selectedPlugin,
+        setSelectedPlugin,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,

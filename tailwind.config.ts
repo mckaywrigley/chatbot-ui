@@ -22,6 +22,11 @@ module.exports = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        'hgpt-dark-gray': '#202123',
+        'hgpt-medium-gray': '#343541',
+        'hgpt-light-gray': '#444654',
+        'hgpt-chat-gray': '#40414F',
+        'hgpt-hover-white': '#dddddd',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))'

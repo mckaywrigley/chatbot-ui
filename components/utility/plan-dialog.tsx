@@ -76,10 +76,10 @@ export const PlanDialog: FC<PlanDialogProps> = ({
 
         <div className="mt-1">
           <div className="mb-2 grid grid-cols-1 gap-8 sm:grid-cols-2">
-            <div className="bg-hgpt-dark-gray mb-4 flex-1 rounded-lg sm:mb-0">
+            <div className="mb-4 flex-1 rounded-lg sm:mb-0">
               <h3 className="mb-2 text-lg font-bold">Free plan</h3>
               <button
-                className="text-hgpt-dark-gray mb-4 w-full rounded bg-[#8e8ea0] px-4 py-2 text-[#28292c]"
+                className="mb-4 w-full rounded bg-[#8e8ea0] px-4 py-2 text-[#28292c]"
                 disabled
               >
                 Your current plan
@@ -117,10 +117,10 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                 Unlimited access to our HackerGPT model
               </ProsStatement>
               <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
-              {/* <ProsStatement>
+              <ProsStatement>
                 Access to additional tools like Subfinder, Katana, Web Browsing
                 and more
-              </ProsStatement> */}
+              </ProsStatement>
               <ProsStatement>Faster response speed</ProsStatement>
             </div>
           </div>

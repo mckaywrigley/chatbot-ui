@@ -24,3 +24,10 @@ export interface ChatAPIPayload {
   chatSettings: ChatSettings
   messages: Tables<"messages">[]
 }
+
+export interface Message {
+  role: Role
+  content: string
+}
+
+export type Role = "assistant" | "user" | "system"

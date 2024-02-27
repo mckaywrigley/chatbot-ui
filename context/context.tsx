@@ -91,6 +91,14 @@ interface ChatbotUIContext {
   isGenerating: boolean
   setIsGenerating: Dispatch<SetStateAction<boolean>>
 
+  // ENHANCE MENU
+  isEnhancedMenuOpen: boolean
+  setIsEnhancedMenuOpen: Dispatch<SetStateAction<boolean>>
+  selectedPluginType: string
+  setSelectedPluginType: Dispatch<SetStateAction<string>>
+  selectedPlugin: string
+  setSelectedPlugin: Dispatch<SetStateAction<string>>
+
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
   setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
@@ -214,6 +222,14 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setFirstTokenReceived: () => {},
   abortController: null,
   setAbortController: () => {},
+
+  // ENHANCE MENU STORE
+  isEnhancedMenuOpen: false,
+  setIsEnhancedMenuOpen: () => {},
+  selectedPluginType: "",
+  setSelectedPluginType: () => {},
+  selectedPlugin: "",
+  setSelectedPlugin: () => {},
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: false,

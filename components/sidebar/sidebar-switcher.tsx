@@ -1,23 +1,23 @@
 import { ContentType } from "@/types"
 import {
-  IconAdjustmentsHorizontal,
-  IconBolt,
+  // IconAdjustmentsHorizontal,
+  // IconBolt,
   IconBooks,
   IconFile,
-  IconKey,
-  IconKeyOff,
-  IconLock,
-  IconMessage,
-  IconPencil,
-  IconRobotFace,
-  IconSparkles
+  // IconKey,
+  // IconKeyOff,
+  // IconLock,
+  IconMessage
+  // IconPencil,
+  // IconRobotFace,
+  // IconSparkles
 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
-import { Settings } from "../utility/settings"
+// import { Settings } from "../utility/settings"
 import { PlanDialog } from "../utility/plan-dialog"
 import { ChatbotUIContext } from "@/context/context"
 
@@ -45,9 +45,9 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
           contentType="presets"
           onContentTypeChange={onContentTypeChange}
-        />
+        /> */}
 
-        <SidebarSwitchItem
+        {/* <SidebarSwitchItem
           icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}

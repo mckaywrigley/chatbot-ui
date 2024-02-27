@@ -209,15 +209,7 @@ export const handleHostedChat = async (
 
   let formattedMessages = []
 
-  // if (provider === "google") {
-  //   formattedMessages = await buildGoogleGeminiFinalMessages(
-  //     payload,
-  //     profile,
-  //     newMessageImages
-  //   )
-  // } else {
   formattedMessages = await buildFinalMessages(payload, profile, chatImages)
-  // }
 
   const apiEndpoint =
     provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
@@ -226,6 +218,59 @@ export const handleHostedChat = async (
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
     customModelId: provider === "custom" ? modelData.hostedId : ""
+  }
+
+  const response = await fetchChatResponse(
+    apiEndpoint,
+    requestBody,
+    true,
+    newAbortController,
+    setIsGenerating,
+    setChatMessages,
+    alertDispatch
+  )
+
+  return await processResponse(
+    response,
+    isRegeneration
+      ? payload.chatMessages[payload.chatMessages.length - 1]
+      : tempAssistantChatMessage,
+    true,
+    newAbortController,
+    setFirstTokenReceived,
+    setChatMessages,
+    setToolInUse
+  )
+}
+
+export const handleHostedPluginsChat = async (
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  modelData: LLM,
+  tempAssistantChatMessage: ChatMessage,
+  isRegeneration: boolean,
+  newAbortController: AbortController,
+  newMessageImages: MessageImage[],
+  chatImages: MessageImage[],
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  alertDispatch: React.Dispatch<AlertAction>,
+  selectedPlugin: string,
+  isPremium: boolean
+) => {
+  let formattedMessages = []
+
+  formattedMessages = await buildFinalMessages(payload, profile, chatImages)
+
+  const apiEndpoint = "/api/chat/plugins"
+
+  const requestBody = {
+    chatSettings: payload.chatSettings,
+    messages: formattedMessages,
+    selectedPlugin,
+    isPremium
   }
 
   const response = await fetchChatResponse(

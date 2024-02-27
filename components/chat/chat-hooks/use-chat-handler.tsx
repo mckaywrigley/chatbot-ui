@@ -15,9 +15,11 @@ import {
   handleLocalChat,
   handleRetrieval,
   processResponse,
+  handleHostedPluginsChat,
   validateChatSettings
 } from "../chat-helpers"
 import { useAlertContext } from "@/context/alert-context"
+import { PluginID } from "@/types/plugins"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -64,7 +66,9 @@ export const useChatHandler = () => {
     models,
     isPromptPickerOpen,
     isAtPickerOpen,
-    isToolPickerOpen
+    isToolPickerOpen,
+    selectedPlugin,
+    subscription
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -268,6 +272,29 @@ export const useChatHandler = () => {
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse
+        )
+      } else if (
+        selectedPlugin.length > 0 &&
+        selectedPlugin !== PluginID.NONE
+      ) {
+        const isPremium = subscription !== null
+
+        generatedText = await handleHostedPluginsChat(
+          payload,
+          profile!,
+          modelData!,
+          tempAssistantChatMessage,
+          isRegeneration,
+          newAbortController,
+          newMessageImages,
+          chatImages,
+          setIsGenerating,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse,
+          alertDispatch,
+          selectedPlugin,
+          isPremium
         )
       } else {
         if (modelData!.provider === "ollama") {

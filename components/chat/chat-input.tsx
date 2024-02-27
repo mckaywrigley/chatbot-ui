@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 import {
   IconBolt,
   IconPaperclip,
+  IconPuzzle,
+  IconPuzzleOff,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
@@ -17,8 +19,10 @@ import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
+import { EnhancedMenuPicker } from "./enhance-menu"
 import Modal from "@/components/chat/dialog-portal"
 import { toast } from "sonner"
+import { PluginID } from "@/types/plugins"
 
 interface ChatInputProps {}
 
@@ -48,11 +52,15 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
+    showFilesDisplay,
     isAtPickerOpen,
     setFocusFile,
     chatSettings,
     selectedTools,
-    setSelectedTools
+    setSelectedTools,
+    isEnhancedMenuOpen,
+    setIsEnhancedMenuOpen,
+    selectedPlugin
   } = useContext(ChatbotUIContext)
 
   const {
@@ -61,6 +69,28 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
+
+  const handleToggleEnhancedMenu = () => {
+    setIsEnhancedMenuOpen(!isEnhancedMenuOpen)
+  }
+
+  const divRef = useRef<HTMLDivElement>(null)
+  const [bottomSpacingPx, setBottomSpacingPx] = useState(20)
+
+  useEffect(() => {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { height } = entry.contentRect
+        setBottomSpacingPx(height + 20)
+      }
+    })
+
+    if (divRef.current) {
+      observer.observe(divRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   const { handleInputChange } = usePromptAndCommand()
 
@@ -206,6 +236,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
 
+        {isEnhancedMenuOpen && <EnhancedMenuPicker />}
+
         {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
@@ -228,12 +260,31 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           ))}
       </div>
 
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
-        <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
+      <div
+        className={`border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2 ${selectedPlugin && selectedPlugin !== PluginID.NONE ? "border-primary" : ""}`}
+        ref={divRef}
+      >
+        <div
+          className={`absolute left-0 w-full overflow-auto rounded-xl dark:border-none`}
+          style={{ bottom: `${bottomSpacingPx}px` }}
+        >
           <ChatCommandInput />
         </div>
 
         <>
+          {isEnhancedMenuOpen ? (
+            <IconPuzzle
+              className="absolute bottom-[12px] left-12 cursor-pointer p-1 hover:opacity-50"
+              size={32}
+              onClick={handleToggleEnhancedMenu}
+            />
+          ) : (
+            <IconPuzzleOff
+              className="absolute bottom-[12px] left-12 cursor-pointer p-1 opacity-50 hover:opacity-100"
+              size={32}
+              onClick={handleToggleEnhancedMenu}
+            />
+          )}
           <IconPaperclip
             className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
             size={32}
@@ -255,7 +306,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-24 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(`Ask anything. Type "#" for files.`)}
           onValueChange={handleInputChange}
           value={userInput}
