@@ -21,6 +21,7 @@ import {
   SETUP_STEP_COUNT,
   StepContainer
 } from "../../../components/setup/step-container"
+import { AIMaskStep } from "@/components/setup/ai-mask-step"
 
 export default function SetupPage() {
   const {
@@ -177,8 +178,23 @@ export default function SetupPage() {
           </StepContainer>
         )
 
-      // API Step
+      // AI Mask Step
       case 2:
+        return (
+          <StepContainer
+            stepDescription="Enter API keys for each service you'd like to use."
+            stepNum={currentStep}
+            stepTitle="Install AI-Mask (optional)"
+            onShouldProceed={handleShouldProceed}
+            showNextButton={true}
+            showBackButton={true}
+          >
+            <AIMaskStep />
+          </StepContainer>
+        )
+
+      // API Step
+      case 3:
         return (
           <StepContainer
             stepDescription="Enter API keys for each service you'd like to use."
@@ -222,7 +238,7 @@ export default function SetupPage() {
         )
 
       // Finish Step
-      case 3:
+      case 4:
         return (
           <StepContainer
             stepDescription="You are all set up!"

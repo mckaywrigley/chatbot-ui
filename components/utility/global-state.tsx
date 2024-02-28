@@ -127,7 +127,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [toolInUse, setToolInUse] = useState<string>("none")
 
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       const profile = await fetchStartingData()
 
       if (profile) {

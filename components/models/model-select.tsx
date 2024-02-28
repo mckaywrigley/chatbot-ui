@@ -38,14 +38,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<"hosted" | "local">("hosted")
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 100) // FIX: hacky
-    }
-  }, [isOpen])
-
   const handleSelectModel = (modelId: LLMID) => {
     onSelectModel(modelId)
     setIsOpen(false)
@@ -66,6 +58,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     ...availableOpenRouterModels
   ]
 
+  // TODO better differenciation between ollama/aimask/hosted
+
   const groupedModels = allModels.reduce<Record<string, LLM[]>>(
     (groups, model) => {
       const key = model.provider
@@ -81,6 +75,21 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const selectedModel = allModels.find(
     model => model.modelId === selectedModelId
   )
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100) // FIX: hacky
+      if (
+        selectedModel &&
+        (selectedModel.provider === "ollama" ||
+          selectedModel.provider === "ai-mask")
+      )
+        setTab("local")
+      else setTab("hosted")
+    }
+  }, [isOpen, selectedModel])
 
   if (!profile) return null
 
@@ -135,11 +144,11 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         align="start"
       >
         <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
-          {availableLocalModels.length > 0 && (
+          {(availableLocalModels.length > 0 ||
+            availableAIMaskModels.length > 0) && (
             <TabsList defaultValue="hosted" className="grid grid-cols-2">
-              <TabsTrigger value="hosted">Hosted</TabsTrigger>
-
               <TabsTrigger value="local">Local</TabsTrigger>
+              <TabsTrigger value="hosted">Hosted</TabsTrigger>
             </TabsList>
           )}
         </Tabs>
@@ -156,9 +165,14 @@ export const ModelSelect: FC<ModelSelectProps> = ({
           {Object.entries(groupedModels).map(([provider, models]) => {
             const filteredModels = models
               .filter(model => {
-                if (tab === "hosted") return model.provider !== "ollama"
-                if (tab === "local") return model.provider === "ollama"
-                if (tab === "openrouter") return model.provider === "openrouter"
+                if (tab === "local")
+                  return (
+                    model.provider === "ollama" || model.provider === "ai-mask"
+                  )
+                if (tab === "hosted")
+                  return (
+                    model.provider !== "ollama" && model.provider !== "ai-mask"
+                  )
               })
               .filter(model =>
                 model.modelName.toLowerCase().includes(search.toLowerCase())

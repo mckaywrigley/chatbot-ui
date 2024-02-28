@@ -170,7 +170,8 @@ export const handleAIMaskChat = async (
   )) as ChatCompletionParams["messages"]
   let fullText = ""
 
-  const response = await aiMaskClient.chat(chatSettings.model,
+  const response = await aiMaskClient.chat(
+    chatSettings.model,
     {
       messages,
       temperature: chatSettings.temperature
@@ -364,16 +365,16 @@ export const processResponse = async (
           contentToAdd = isHosted
             ? chunk
             : // Ollama's streaming endpoint returns new-line separated JSON
-            // objects. A chunk may have more than one of these objects, so we
-            // need to split the chunk by new-lines and handle each one
-            // separately.
-            chunk
-              .trimEnd()
-              .split("\n")
-              .reduce(
-                (acc, line) => acc + JSON.parse(line).message.content,
-                ""
-              )
+              // objects. A chunk may have more than one of these objects, so we
+              // need to split the chunk by new-lines and handle each one
+              // separately.
+              chunk
+                .trimEnd()
+                .split("\n")
+                .reduce(
+                  (acc, line) => acc + JSON.parse(line).message.content,
+                  ""
+                )
           fullText += contentToAdd
         } catch (error) {
           console.error("Error parsing JSON:", error)
@@ -511,8 +512,9 @@ export const handleCreateMessages = async (
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        let filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id
-          }/${uuidv4()}`
+        let filePath = `${profile.user_id}/${currentChat.id}/${
+          createdMessages[0].id
+        }/${uuidv4()}`
 
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)

@@ -9,6 +9,7 @@ import { FC, HTMLAttributes } from "react"
 import { AnthropicSVG } from "../icons/anthropic-svg"
 import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
+import { AIMaskSVG } from "../icons/ai-mask-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider
@@ -53,6 +54,18 @@ export const ModelIcon: FC<ModelIconProps> = ({
     case "anthropic":
       return (
         <AnthropicSVG
+          className={cn(
+            "rounded-sm bg-[#fff] p-1 text-black",
+            props.className,
+            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+          )}
+          width={width}
+          height={height}
+        />
+      )
+    case "ai-mask":
+      return (
+        <AIMaskSVG
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
             props.className,
