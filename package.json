@@ -64,7 +64,7 @@
     "@tabler/icons-react": "^2.40.0",
     "@vercel/analytics": "^1.1.1",
     "@vercel/edge-config": "^0.4.1",
-    "@ai-mask/sdk": "^0.5.0",
+    "@ai-mask/sdk": "^0.6.0",
     "@xenova/transformers": "^2.13.4",
     "ai": "^2.2.31",
     "class-variance-authority": "^0.7.0",
