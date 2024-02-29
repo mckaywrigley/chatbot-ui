@@ -21,7 +21,6 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
-import { set } from "date-fns"
 
 interface ChatUIProps {}
 
@@ -88,7 +87,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
     return () => {
       if (selectedChat) {
-        console.log("deleting all messages")
         deleteMessagesIncludingAndAfter(
           selectedChat.user_id,
           selectedChat.id,

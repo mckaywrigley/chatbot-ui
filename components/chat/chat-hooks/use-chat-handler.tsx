@@ -224,6 +224,8 @@ export const useChatHandler = () => {
           chatStudyState
         )
 
+        console.log({ formattedMessages })
+
         const response = await fetch("/api/chat/tools", {
           method: "POST",
           headers: {
@@ -261,6 +263,20 @@ export const useChatHandler = () => {
           handleSelectAssistant(selectedAssistant)
           setNewMessageFiles([])
           deleteChatFilesByChatId(currentChat!.id)
+        } else if (
+          // if the response is ok and has a score
+          response.headers.get("FUNCTION-NAMES")?.includes("recall_complete")
+        ) {
+          console.log("recall_complete was called and the response is ok")
+          setChatStudyState("scoring")
+          const selectedAssistant = assistants.find(
+            assistant => assistant.name === "Scoring"
+          )
+          if (!selectedAssistant) {
+            console.error("No assistant with name 'scoring' found")
+            return
+          }
+          handleSelectAssistant(selectedAssistant)
         } else {
           setChatStudyState("feedback")
         }

@@ -78,6 +78,16 @@ export async function POST(request: Request) {
 
     let functionNames = []
 
+    if (toolCalls.length === 0) {
+      // If no tool calls, return the first response directly without a second OpenAI call
+      console.log("No tool calls")
+      return new Response(message.content, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+    }
+
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
@@ -158,6 +168,8 @@ export async function POST(request: Request) {
             data = await updateReviseDate(chatId, bodyContent.hours_time)
           } else if (functionName === "testMeNow") {
             console.log("testMeNow")
+          } else if (functionName === "recall_complete") {
+            console.log("recall_complete")
           } else {
             const requestInit = {
               method: "POST",

@@ -5,17 +5,12 @@ import { encode } from "gpt-tokenizer"
 const buildBasePrompt = (
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Tables<"assistants"> | null,
-  topicDescription?: string
+  assistant: Tables<"assistants"> | null
 ) => {
   let fullPrompt = ""
 
   if (assistant) {
     fullPrompt += `${assistant.prompt}\n\n`
-  }
-
-  if (topicDescription) {
-    fullPrompt += `<source>\n${topicDescription}\n</source>`
   }
 
   fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
@@ -50,8 +45,7 @@ export async function buildFinalMessages(
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant,
-    topicDescription
+    assistant
   )
 
   const CHUNK_SIZE = chatSettings.contextLength
@@ -124,6 +118,16 @@ export async function buildFinalMessages(
 
   finalMessages.unshift(tempSystemMessage)
 
+  if (assistant?.name === "Feedback") {
+    const userPrompt = finalMessages[finalMessages.length - 1].content
+    const topicText = buildTopicText(
+      userPrompt,
+      topicDescription,
+      chatMessages.length
+    )
+    finalMessages[finalMessages.length - 1].content = topicText
+  }
+
   finalMessages = finalMessages.map(message => {
     let content
 
@@ -184,9 +188,18 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
   return `Use the following sources to create a detailed topic description. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
 }
 
-// function buildTopicText(userPrompt: string, topicDescription: string) {
-//   return `<answer>${userPrompt}</answer> \n\n Use the following topic description as source to compare the answer to:\n\n<source>${topicDescription}</source>`
-// }
+function buildTopicText(
+  userPrompt: string,
+  topicDescription: string,
+  numberOfMessages: number
+) {
+  if (numberOfMessages === 2) {
+    // Add source topic description to user prompt
+    return `<attempt>${userPrompt}</attempt> \n\n <source>${topicDescription}</source>`
+  } else {
+    return userPrompt
+  }
+}
 
 export async function buildGoogleGeminiFinalMessages(
   payload: ChatPayload,

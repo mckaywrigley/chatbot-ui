@@ -1,6 +1,7 @@
 import { useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 
 const QuickResponse = () => {
   const {
@@ -9,7 +10,10 @@ const QuickResponse = () => {
     setChatStudyState,
     setChatMessages,
     selectedChat,
-    selectedAssistant
+    selectedAssistant,
+    assistants,
+    setSelectedAssistant,
+    setSelectedTools
   } = useContext(ChatbotUIContext)
 
   const { handleSendMessage } = useChatHandler()
@@ -52,6 +56,19 @@ const QuickResponse = () => {
       }
 
       setChatMessages([promptMessage])
+
+      const feedbackAssistant = assistants.find(
+        assistant => assistant.name === "Feedback"
+      )
+
+      if (feedbackAssistant) {
+        setSelectedAssistant(feedbackAssistant)
+
+        const assistantTools = (
+          await getAssistantToolsByAssistantId(feedbackAssistant.id)
+        ).tools
+        setSelectedTools(assistantTools)
+      }
     }
     buttonConfigs.button2.text = "Edit topic description."
   } else if (chatStudyState === "feedback") {
