@@ -165,6 +165,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 			  .filter(model => !model.modelName.startsWith("perplexity/pplx"))	  
 			  .filter(model => model.modelName !== "GPT-4")
 			  .filter(model => model.modelName !== "google/gemini-pro-vision")
+			  .filter(model => model.modelName !== "Sonar Small Online")
+			  .filter(model => model.modelName !== "Sonar Medium Online")
 			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
