@@ -1,3 +1,4 @@
+import { GoogleSVG } from "@/components/icons/google-svg"
 import { Brand } from "@/components/ui/brand"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,6 +21,7 @@ export default async function Login({
   searchParams: { message: string }
 }) {
   const cookieStore = cookies()
+
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -81,6 +83,23 @@ export default async function Login({
     return redirect(`/${homeWorkspace.id}/chat`)
   }
 
+  const handleSignInWithGoogle = async () => {
+    "use server"
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore)
+
+    const { error, data } = await supabase.auth.signInWithOAuth({
+      provider: "google"
+    })
+
+    if (error) {
+      console.log(error)
+      return redirect(`/login?message=${error.message}`)
+    }
+
+    return redirect(data.url)
+  }
+
   const getEnvVarOrEdgeConfigValue = async (name: string) => {
     "use server"
     if (process.env.EDGE_CONFIG) {
@@ -89,6 +108,14 @@ export default async function Login({
 
     return process.env[name]
   }
+
+  const isGoogleAuthEnabled =
+    (await getEnvVarOrEdgeConfigValue("GOOGLE_AUTH_ENABLED"))?.toLowerCase() ===
+    "true"
+  const isEmailVerificationEnabled =
+    (
+      await getEnvVarOrEdgeConfigValue("EMAIL_VERIFICATION_ENABLED")
+    )?.toLowerCase() === "true"
 
   const signUp = async (formData: FormData) => {
     "use server"
@@ -136,10 +163,13 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect("/setup")
+    if (isEmailVerificationEnabled) {
+      return redirect(
+        "/login?message=Check your email to continue sign in process"
+      )
+    }
 
-    // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-    // return redirect("/login?message=Check email to continue sign in process")
+    return redirect("/setup")
   }
 
   const handleResetPassword = async (formData: FormData) => {
@@ -164,7 +194,7 @@ export default async function Login({
   return (
     <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
       <form
-        className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2"
+        className="animate-in text-foreground flex w-full flex-col justify-center gap-2"
         action={signIn}
       >
         <Brand />
@@ -216,6 +246,18 @@ export default async function Login({
           </p>
         )}
       </form>
+
+      {isGoogleAuthEnabled && Boolean(isGoogleAuthEnabled) === true && (
+        <form>
+          <button
+            formAction={handleSignInWithGoogle}
+            className="text-muted-foreground mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            <GoogleSVG className="size-5" aria-hidden="true" />
+            Login with Google
+          </button>
+        </form>
+      )}
     </div>
   )
 }
