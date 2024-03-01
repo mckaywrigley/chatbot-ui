@@ -122,58 +122,57 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         asChild
         disabled={allModels.length === 0}
       >
-        {allModels.length === 0 ? (
+        {/* {allModels.length === 0 ? (
           <div className="rounded text-sm font-bold">
             Unlock models by entering API keys in your profile settings.
           </div>
-        ) : (
-          <div className="max-h-[300px] overflow-auto">
-            {Object.entries(groupedSortedModels).map(([provider, models]) => {
-              const filteredModels = models
-                .filter(model => model.provider !== "openrouter")
-                .filter(model => {
-                  if (tab === "hosted") return model.provider !== "ollama"
-                  if (tab === "local") return model.provider === "ollama"
-                  if (tab === "openrouter")
-                    return model.provider === "openrouter"
-                })
-                .filter(model =>
-                  model.modelName.toLowerCase().includes(search.toLowerCase())
-                )
-
-              if (filteredModels.length === 0) return null
-
-              return (
-                <div key={provider}>
-                  <div className="mb-2">
-                    {filteredModels.map(model => (
-                      <div
-                        key={model.modelId}
-                        className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-2"
-                        onClick={() => {
-                          if (!isPremium && model.provider === "openai") {
-                            setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
-                          } else {
-                            handleSelectModel(model.modelId) // Allow selection for premium users or non-OpenAI models
-                          }
-                        }}
-                      >
-                        <ModelOption model={model} onSelect={() => {}} />
-                        {selectedModelId === model.modelId ? (
-                          <IconCircleCheck className="" size={28} />
-                        ) : !isPremium && model.provider === "openai" ? (
-                          <IconLock className="opacity-50" size={28} />
-                        ) : (
-                          <IconCircle className="opacity-50" size={28} />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        ) : ( */}
+        <div className="max-h-[300px] overflow-auto">
+          {Object.entries(groupedSortedModels).map(([provider, models]) => {
+            const filteredModels = models
+              .filter(model => model.provider !== "openrouter")
+              .filter(model => {
+                if (tab === "hosted") return model.provider !== "ollama"
+                if (tab === "local") return model.provider === "ollama"
+                if (tab === "openrouter") return model.provider === "openrouter"
+              })
+              .filter(model =>
+                model.modelName.toLowerCase().includes(search.toLowerCase())
               )
-            })}
-          </div>
-        )}
+
+            if (filteredModels.length === 0) return null
+
+            return (
+              <div key={provider}>
+                <div className="mb-2">
+                  {filteredModels.map(model => (
+                    <div
+                      key={model.modelId}
+                      className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-2"
+                      onClick={() => {
+                        if (!isPremium && model.provider === "openai") {
+                          setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
+                        } else {
+                          handleSelectModel(model.modelId) // Allow selection for premium users or non-OpenAI models
+                        }
+                      }}
+                    >
+                      <ModelOption model={model} onSelect={() => {}} />
+                      {selectedModelId === model.modelId ? (
+                        <IconCircleCheck className="" size={28} />
+                      ) : !isPremium && model.provider === "openai" ? (
+                        <IconLock className="opacity-50" size={28} />
+                      ) : (
+                        <IconCircle className="opacity-50" size={28} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        {/* )} */}
       </DropdownMenuTrigger>
       <PlanDialog
         showIcon={false}

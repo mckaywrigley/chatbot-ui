@@ -218,32 +218,40 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between"
+        className="flex min-w-[300px] flex-col justify-between sm:min-w-[450px]"
         side="left"
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold">
+            <SheetTitle className="text-xl font-bold sm:text-2xl">
               Create{" "}
               {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
             </SheetTitle>
           </SheetHeader>
 
-          <div className="mt-4 space-y-3">{renderInputs()}</div>
+          <div className="mt-2 space-y-2 sm:mt-4 sm:space-y-3">
+            {renderInputs()}
+          </div>
         </div>
 
         <SheetFooter className="mt-2 flex justify-between">
-          <div className="flex grow justify-end space-x-2">
+          <div className="flex grow justify-end space-x-1 sm:space-x-2">
             <Button
               disabled={creating}
               variant="outline"
               onClick={() => onOpenChange(false)}
+              className="text-xs sm:text-sm"
             >
               Cancel
             </Button>
 
-            <Button disabled={creating} ref={buttonRef} onClick={handleCreate}>
+            <Button
+              disabled={creating}
+              ref={buttonRef}
+              onClick={handleCreate}
+              className="text-xs sm:text-sm"
+            >
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>

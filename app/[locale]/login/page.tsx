@@ -211,7 +211,7 @@ export default async function Login({
           action={signIn}
           className="animate-in text-foreground mt-4 flex w-full flex-1 flex-col justify-center gap-2"
         >
-          <Label className="text-md mt-4" htmlFor="email">
+          <Label className="text-md" htmlFor="email">
             Email
           </Label>
           <Input
@@ -241,6 +241,13 @@ export default async function Login({
           >
             Sign Up
           </SubmitButton>
+
+          {searchParams?.message && (
+            <p className="bg-foreground/10 text-foreground mt-2 p-4 text-center">
+              {searchParams.message}
+            </p>
+          )}
+
           <div className="text-muted-foreground mt-1 flex justify-center text-sm">
             By using HackerGPT, you agree to our&nbsp;
             <a
@@ -262,12 +269,6 @@ export default async function Login({
               Reset
             </button>
           </div>
-
-          {searchParams?.message && (
-            <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
-              {searchParams.message}
-            </p>
-          )}
         </form>
       </div>
     </div>
