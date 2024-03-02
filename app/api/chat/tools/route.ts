@@ -69,6 +69,14 @@ export async function POST(request: Request) {
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
+    if (toolCalls.length === 0) {
+      return new Response(message.content, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+    }
+
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
