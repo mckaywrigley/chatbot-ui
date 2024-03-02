@@ -38,6 +38,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     useState<boolean>(false)
   const [currentFile, setCurrentFile] = useState<File | null>(null)
 
+  const useIsMobile = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768)
+      }
+
+      window.addEventListener("resize", handleResize)
+      return () => window.removeEventListener("resize", handleResize)
+    }, [])
+
+    return isMobile
+  }
+  const isMobile = useIsMobile()
+
   const {
     userInput,
     chatMessages,
@@ -307,7 +323,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-24 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={t(`Ask anything. Type "#" for files.`)}
+          placeholder={
+            isMobile
+              ? t(`Message. Type "#" for files.`)
+              : t(`Ask anything. Type "#" for files.`)
+          }
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

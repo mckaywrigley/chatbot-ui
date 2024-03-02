@@ -118,8 +118,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
               </ProsStatement>
               <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
               <ProsStatement>
-                Access to additional tools like Subfinder, Katana, Web Browsing
-                and more
+                Access to additional tools like Nuclei, Katana, HttpX and more
               </ProsStatement>
               <ProsStatement>Faster response speed</ProsStatement>
             </div>
