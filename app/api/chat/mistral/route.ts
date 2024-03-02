@@ -30,7 +30,7 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { messages } = json as {
+  const { chatSettings, messages } = json as {
     chatSettings: ChatSettings
     messages: any[]
   }
@@ -41,6 +41,10 @@ export async function POST(request: Request) {
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
 
     const openrouterApiKey = profile.openrouter_api_key || ""
+
+    if (chatSettings.model === "mistral-large") {
+      llmConfig.usePinecone = false
+    }
 
     let modelTemperature = 0.4
     const pineconeTemperature = llmConfig.pinecone.temperature
@@ -99,9 +103,15 @@ export async function POST(request: Request) {
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
 
-    const model1 = llmConfig.models.hackerGPT_default
-    const model2 = llmConfig.models.hackerGPT_enhance
-    const selectedModel = Math.random() < 0.8 ? model1 : model2
+    let selectedModel
+
+    if (chatSettings.model === "mistral-large") {
+      selectedModel = "mistralai/mistral-large"
+    } else {
+      const model1 = llmConfig.models.hackerGPT_default
+      const model2 = llmConfig.models.hackerGPT_enhance
+      selectedModel = Math.random() < 0.8 ? model1 : model2
+    }
 
     const requestBody = {
       model: selectedModel,

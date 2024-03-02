@@ -14,6 +14,7 @@ export type MistralLLMID =
   | "mistral-tiny" // Mistral Tiny
   | "mistral-small" // Mistral Small
   | "mistral-medium" // Mistral Medium
+  | "mistral-large" // Mistral Large
 
 export interface LLM {
   modelId: LLMID

@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       return rateLimitCheckResultForChatSettingsModel.response
     }
 
-    if (model === "gpt-4-turbo-preview") {
+    if (model === "mistral-large") {
       model = "gpt-4"
     } else {
       model = "gpt-3.5-turbo-instruct"

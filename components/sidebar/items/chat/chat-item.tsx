@@ -85,7 +85,12 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           delayDuration={200}
           display={<div>{MODEL_DATA?.modelName}</div>}
           trigger={
-            <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
+            <ModelIcon
+              provider={MODEL_DATA?.provider}
+              modelId={MODEL_DATA?.modelId}
+              height={30}
+              width={30}
+            />
           }
         />
       )}
