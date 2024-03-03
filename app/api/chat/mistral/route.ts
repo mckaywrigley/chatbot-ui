@@ -30,7 +30,7 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { messages } = json as {
+  const { chatSettings, messages } = json as {
     chatSettings: ChatSettings
     messages: any[]
   }
@@ -41,6 +41,29 @@ export async function POST(request: Request) {
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
 
     const openrouterApiKey = profile.openrouter_api_key || ""
+
+    let selectedModel
+    let rateLimitCheckResult
+
+    if (chatSettings.model === "mistral-large") {
+      llmConfig.usePinecone = false
+      selectedModel = "mistralai/mistral-large"
+
+      rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
+    } else {
+      const model1 = llmConfig.models.hackerGPT_default
+      const model2 = llmConfig.models.hackerGPT_enhance
+      selectedModel = Math.random() < 0.8 ? model1 : model2
+
+      rateLimitCheckResult = await checkRatelimitOnApi(
+        profile.user_id,
+        "hackergpt"
+      )
+    }
+
+    if (rateLimitCheckResult !== null) {
+      return rateLimitCheckResult.response
+    }
 
     let modelTemperature = 0.4
     const pineconeTemperature = llmConfig.pinecone.temperature
@@ -99,10 +122,6 @@ export async function POST(request: Request) {
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
 
-    const model1 = llmConfig.models.hackerGPT_default
-    const model2 = llmConfig.models.hackerGPT_enhance
-    const selectedModel = Math.random() < 0.8 ? model1 : model2
-
     const requestBody = {
       model: selectedModel,
       route: "fallback",
@@ -116,15 +135,6 @@ export async function POST(request: Request) {
     }
 
     try {
-      // rate limit check
-      const rateLimitCheckResult = await checkRatelimitOnApi(
-        profile.user_id,
-        "hackergpt"
-      )
-      if (rateLimitCheckResult !== null) {
-        return rateLimitCheckResult.response
-      }
-
       const res = await fetch(openRouterUrl, {
         method: "POST",
         headers: openRouterHeaders,

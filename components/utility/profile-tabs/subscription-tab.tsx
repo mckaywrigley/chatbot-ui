@@ -115,7 +115,5 @@ interface PlanNameProps {
 }
 
 export const PlanName: FC<PlanNameProps> = ({ isPremium }) => {
-  return (
-    <span className="text-xl font-bold">{isPremium ? "Plus" : "Free"}</span>
-  )
+  return <span className="text-xl font-bold">{isPremium ? "Pro" : "Free"}</span>
 }

@@ -4,12 +4,14 @@ interface HackerAISVGProps {
   height?: number
   width?: number
   className?: string
+  fill?: string
 }
 
 export const HackerAISVG: FC<HackerAISVGProps> = ({
   height = 40,
   width = 40,
-  className
+  className,
+  fill = "#000"
 }) => {
   return (
     <svg
@@ -22,7 +24,7 @@ export const HackerAISVG: FC<HackerAISVGProps> = ({
     >
       <g
         transform="translate(0.000000,189.000000) scale(0.100000,-0.100000)"
-        fill={`#000`}
+        fill={fill}
       >
         <path
           d="M1117 2440 c-583 -92 -1007 -580 -1007 -1160 0 -474 292 -906 731

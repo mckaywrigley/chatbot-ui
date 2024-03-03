@@ -158,14 +158,14 @@ export function getRateLimitErrorMessage(
 ⏰ Don't worry—you'll be back in ${remainingText}.
   `.trim()
 
-  if (premium) {
+  if (!premium) {
     message += `
-🔓 Want more? Upgrade to Plus and unlock a world of features:
+
+🔓 Want more? Upgrade to Pro and unlock a world of features:
 - Enjoy unlimited usage,
-- Get exclusive access to GPT-4 Turbo,
+- Get exclusive access to our HackerGPT Pro model,
 - Experience faster response speed.
-- Plus, get access to advanced hacking tools like Katana, HttpX, Naabu, and more.
-    `.trim()
+- Plus, get access to advanced hacking tools like Katana, HttpX, Naabu, and more.`
   }
 
   return message

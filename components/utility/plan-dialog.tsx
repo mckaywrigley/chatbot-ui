@@ -11,12 +11,12 @@ import { getCheckoutUrl } from "@/lib/server/stripe-url"
 import * as Sentry from "@sentry/nextjs"
 import {
   IconCircleCheck,
-  // IconCurrencyBitcoin,
   IconLockOpen,
-  IconX
+  IconX,
+  IconLoader2
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useState, useEffect } from "react"
 import { toast } from "sonner"
 
 interface PlanDialogProps {
@@ -33,26 +33,57 @@ export const PlanDialog: FC<PlanDialogProps> = ({
   const router = useRouter()
   const { profile } = useContext(ChatbotUIContext)
   const [showDialog, setShowDialog] = useState(false)
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null) // State to store the fetched URL
+  const [isLoading, setIsLoading] = useState(false) // State to track loading status
 
-  if (!profile) return null
+  useEffect(() => {
+    if (!profile || !showDialog) return
+
+    const fetchStripeCheckoutUrl = async () => {
+      const result = await getCheckoutUrl()
+
+      if (result.type === "error") {
+        Sentry.withScope(scope => {
+          scope.setExtras({ userId: profile.user_id })
+          scope.captureMessage(result.error.message)
+        })
+        toast.error(result.error.message)
+      } else {
+        setCheckoutUrl(result.value)
+      }
+    }
+
+    fetchStripeCheckoutUrl()
+  }, [showDialog, profile?.user_id])
 
   const handleOpenChange = (value: boolean) => {
     setShowDialog(value)
-    onOpenChange && onOpenChange(value)
+    if (onOpenChange) onOpenChange(value)
   }
 
-  const redirectToStripeCheckoutUrl = async () => {
-    const result = await getCheckoutUrl()
-    if (result.type === "error") {
-      Sentry.withScope(scope => {
-        scope.setExtras({ userId: profile.user_id })
-        scope.captureMessage(result.error.message)
-      })
-      toast.error(result.error.message)
-    } else {
-      router.push(result.value)
+  const handleUpgradeClick = async () => {
+    if (checkoutUrl) {
+      router.push(checkoutUrl)
+    } else if (!isLoading && profile) {
+      setIsLoading(true)
+      const result = await getCheckoutUrl()
+      setIsLoading(false)
+      if (result.type === "error") {
+        Sentry.withScope(scope => {
+          scope.setExtras({ userId: profile.user_id })
+          scope.captureMessage(result.error.message)
+        })
+        toast.error(result.error.message)
+      } else {
+        router.push(result.value)
+      }
     }
   }
+
+  if (!profile) {
+    return null
+  }
+
   const show = open ?? showDialog
   return (
     <Dialog open={show} onOpenChange={handleOpenChange}>
@@ -64,11 +95,11 @@ export const PlanDialog: FC<PlanDialogProps> = ({
 
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <div className="flex justify-between">
-            <DialogTitle>Your Plan</DialogTitle>
+          <div className="flex justify-between border-b border-gray-300 pb-4">
+            <DialogTitle>Upgrade your plan</DialogTitle>
             <IconX
               className="cursor-pointer text-gray-500 hover:opacity-50"
-              size={24}
+              size={22}
               onClick={() => handleOpenChange(false)}
             />
           </div>
@@ -77,7 +108,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
         <div className="mt-1">
           <div className="mb-2 grid grid-cols-1 gap-8 sm:grid-cols-2">
             <div className="mb-4 flex-1 rounded-lg sm:mb-0">
-              <h3 className="mb-2 text-lg font-bold">Free plan</h3>
+              <h3 className="mb-2 text-lg font-bold">Free</h3>
               <button
                 className="mb-4 w-full rounded bg-[#8e8ea0] px-4 py-2 text-[#28292c]"
                 disabled
@@ -93,30 +124,27 @@ export const PlanDialog: FC<PlanDialogProps> = ({
 
             <div>
               <div className="flex items-center justify-between">
-                <h3 className="mb-2 text-lg font-bold">HackerGPT Plus</h3>
-                <div className="mb-2 text-lg text-[#8e8ea0]">USD $20/mo</div>
+                <h3 className="mb-2 text-lg font-bold">Pro</h3>
+                <div className="mb-2 text-lg text-[#8e8ea0]">USD $20/month</div>
               </div>
               <div className="mb-4 grid grid-cols-1 gap-1">
                 <Button
                   variant="custom_accent1"
-                  onClick={redirectToStripeCheckoutUrl}
+                  onClick={handleUpgradeClick}
+                  disabled={isLoading}
                 >
-                  <IconLockOpen color={"white"} size={22} strokeWidth={2} />
-                  <span className="ml-1 text-white">Upgrade to Plus</span>
+                  {isLoading ? (
+                    <IconLoader2 size={22} className="animate-spin" />
+                  ) : (
+                    <IconLockOpen color={"white"} size={22} strokeWidth={2} />
+                  )}
+                  <span className="ml-1 text-white">Upgrade to Pro</span>
                 </Button>
-                {/* <Button variant="custom_accent2">
-                  <IconCurrencyBitcoin
-                    color={"white"}
-                    size={22}
-                    strokeWidth={2}
-                  />
-                  <span className="ml-1">Pay with Crypto</span>
-                </Button> */}
               </div>
+              <ProsStatement>Access to our HackerGPT Pro model</ProsStatement>
               <ProsStatement>
                 Unlimited access to our HackerGPT model
               </ProsStatement>
-              <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
               <ProsStatement>
                 Access to additional tools like Nuclei, Katana, HttpX and more
               </ProsStatement>
