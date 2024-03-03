@@ -568,6 +568,7 @@ export interface Database {
           created_at: string
           file_id: string
           id: string
+          level: number | null
           local_embedding: string | null
           openai_embedding: string | null
           sharing: string
@@ -580,6 +581,7 @@ export interface Database {
           created_at?: string
           file_id: string
           id?: string
+          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -592,6 +594,7 @@ export interface Database {
           created_at?: string
           file_id?: string
           id?: string
+          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -718,6 +721,36 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      files_raptor: {
+        Row: {
+          child_chunk_id: string
+          parent_chunk_id: string
+        }
+        Insert: {
+          child_chunk_id: string
+          parent_chunk_id: string
+        }
+        Update: {
+          child_chunk_id?: string
+          parent_chunk_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_raptor_child_chunk_id_fkey"
+            columns: ["child_chunk_id"]
+            isOneToOne: false
+            referencedRelation: "file_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_raptor_parent_chunk_id_fkey"
+            columns: ["parent_chunk_id"]
+            isOneToOne: false
+            referencedRelation: "file_items"
             referencedColumns: ["id"]
           }
         ]
@@ -1114,12 +1147,12 @@ export interface Database {
           created_at: string
           display_name: string
           google_gemini_api_key: string | null
+          groq_api_key: string | null
           has_onboarded: boolean
           id: string
           image_path: string
           image_url: string
           mistral_api_key: string | null
-          groq_api_key: string | null
           openai_api_key: string | null
           openai_organization_id: string | null
           openrouter_api_key: string | null
@@ -1142,12 +1175,12 @@ export interface Database {
           created_at?: string
           display_name: string
           google_gemini_api_key?: string | null
+          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path: string
           image_url: string
           mistral_api_key?: string | null
-          groq_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
           openrouter_api_key?: string | null
@@ -1170,12 +1203,12 @@ export interface Database {
           created_at?: string
           display_name?: string
           google_gemini_api_key?: string | null
+          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path?: string
           image_url?: string
-          mistral_api_key?: string | null          
-          groq_api_key?: string | null
+          mistral_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
           openrouter_api_key?: string | null
@@ -1755,14 +1788,14 @@ export type Tables<
     ? R
     : never
   : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-        Database["public"]["Views"])
-    ? (Database["public"]["Tables"] &
-        Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+      Database["public"]["Views"])
+  ? (Database["public"]["Tables"] &
+      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+      Row: infer R
+    }
+    ? R
     : never
+  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
@@ -1778,12 +1811,12 @@ export type TablesInsert<
     ? I
     : never
   : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Insert: infer I
+    }
+    ? I
     : never
+  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
@@ -1799,12 +1832,12 @@ export type TablesUpdate<
     ? U
     : never
   : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Update: infer U
+    }
+    ? U
     : never
+  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
@@ -1816,5 +1849,6 @@ export type Enums<
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-    : never
+  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+  : never
+
