@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
   if (premiumPlugins.includes(selectedPlugin) && !isPremium) {
     return new Response(
-      "Access Denied: The plugin you're trying to use is exclusive to Plus members. Please upgrade to a Plus account to use this plugin."
+      "Access Denied: The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
     )
   }
 

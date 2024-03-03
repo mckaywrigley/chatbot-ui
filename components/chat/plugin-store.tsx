@@ -353,7 +353,7 @@ function PluginStoreModal({
                                   {plugin.name}
                                   {plugin.isPremium && (
                                     <span className="ml-2 rounded bg-yellow-200 px-2 py-1 text-xs font-semibold uppercase text-yellow-700 shadow">
-                                      Plus
+                                      Pro
                                     </span>
                                   )}
                                 </h4>

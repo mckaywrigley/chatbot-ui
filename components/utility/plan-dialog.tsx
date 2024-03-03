@@ -11,12 +11,12 @@ import { getCheckoutUrl } from "@/lib/server/stripe-url"
 import * as Sentry from "@sentry/nextjs"
 import {
   IconCircleCheck,
-  // IconCurrencyBitcoin,
   IconLockOpen,
-  IconX
+  IconX,
+  IconLoader2
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useState, useEffect } from "react"
 import { toast } from "sonner"
 
 interface PlanDialogProps {
@@ -30,29 +30,63 @@ export const PlanDialog: FC<PlanDialogProps> = ({
   open,
   onOpenChange
 }) => {
-  const router = useRouter()
-  const { profile } = useContext(ChatbotUIContext)
-  const [showDialog, setShowDialog] = useState(false)
+  const router = useRouter();
+  const { profile } = useContext(ChatbotUIContext);
+  const [showDialog, setShowDialog] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null); // State to store the fetched URL
+  const [isLoading, setIsLoading] = useState(false); // State to track loading status
 
-  if (!profile) return null
+  if (!profile) return null;
 
   const handleOpenChange = (value: boolean) => {
-    setShowDialog(value)
-    onOpenChange && onOpenChange(value)
-  }
+    setShowDialog(value);
+    onOpenChange && onOpenChange(value);
+  };
 
-  const redirectToStripeCheckoutUrl = async () => {
-    const result = await getCheckoutUrl()
+  // Modified to only fetch and store the URL
+  const fetchStripeCheckoutUrl = async () => {
+    const result = await getCheckoutUrl();
     if (result.type === "error") {
       Sentry.withScope(scope => {
-        scope.setExtras({ userId: profile.user_id })
-        scope.captureMessage(result.error.message)
-      })
-      toast.error(result.error.message)
+        scope.setExtras({ userId: profile.user_id });
+        scope.captureMessage(result.error.message);
+      });
+      toast.error(result.error.message);
     } else {
-      router.push(result.value)
+      setCheckoutUrl(result.value); // Store the URL without redirecting
     }
-  }
+  };
+
+  // Use useEffect to fetch the Stripe checkout URL when the dialog opens
+  useEffect(() => {
+    if (showDialog) {
+      fetchStripeCheckoutUrl();
+    }
+  }, [showDialog]);
+
+  // Redirect to the stored URL when the button is clicked
+  const handleUpgradeClick = async () => {
+    // If the URL is already fetched, redirect immediately.
+    if (checkoutUrl) {
+      router.push(checkoutUrl);
+    } else if (!isLoading) {
+      setIsLoading(true);
+      // If the URL has not been fetched yet, fetch it now.
+      const result = await getCheckoutUrl();
+      setIsLoading(false);
+      if (result.type === "error") {
+        Sentry.withScope(scope => {
+          scope.setExtras({ userId: profile.user_id });
+          scope.captureMessage(result.error.message);
+        });
+        toast.error(result.error.message);
+      } else {
+        // Redirect after fetching the URL.
+        router.push(result.value);
+      }
+    }
+  };
+    
   const show = open ?? showDialog
   return (
     <Dialog open={show} onOpenChange={handleOpenChange}>
@@ -63,21 +97,21 @@ export const PlanDialog: FC<PlanDialogProps> = ({
       )}
 
       <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <div className="flex justify-between">
-            <DialogTitle>Your Plan</DialogTitle>
-            <IconX
-              className="cursor-pointer text-gray-500 hover:opacity-50"
-              size={24}
-              onClick={() => handleOpenChange(false)}
-            />
-          </div>
-        </DialogHeader>
+      <DialogHeader>
+        <div className="flex justify-between border-b border-gray-300 pb-4">
+          <DialogTitle>Upgrade your plan</DialogTitle>
+          <IconX
+            className="cursor-pointer text-gray-500 hover:opacity-50"
+            size={22}
+            onClick={() => handleOpenChange(false)}
+          />
+        </div>
+      </DialogHeader>
 
         <div className="mt-1">
           <div className="mb-2 grid grid-cols-1 gap-8 sm:grid-cols-2">
             <div className="mb-4 flex-1 rounded-lg sm:mb-0">
-              <h3 className="mb-2 text-lg font-bold">Free plan</h3>
+              <h3 className="mb-2 text-lg font-bold">Free</h3>
               <button
                 className="mb-4 w-full rounded bg-[#8e8ea0] px-4 py-2 text-[#28292c]"
                 disabled
@@ -93,30 +127,27 @@ export const PlanDialog: FC<PlanDialogProps> = ({
 
             <div>
               <div className="flex items-center justify-between">
-                <h3 className="mb-2 text-lg font-bold">HackerGPT Plus</h3>
-                <div className="mb-2 text-lg text-[#8e8ea0]">USD $20/mo</div>
+                <h3 className="mb-2 text-lg font-bold">Pro</h3>
+                <div className="mb-2 text-lg text-[#8e8ea0]">USD $20/month</div>
               </div>
               <div className="mb-4 grid grid-cols-1 gap-1">
                 <Button
                   variant="custom_accent1"
-                  onClick={redirectToStripeCheckoutUrl}
+                  onClick={handleUpgradeClick}
+                  disabled={isLoading}
                 >
-                  <IconLockOpen color={"white"} size={22} strokeWidth={2} />
-                  <span className="ml-1 text-white">Upgrade to Plus</span>
+                  {isLoading ? (
+                    <IconLoader2 size={22} className="animate-spin" />
+                  ) : (
+                      <IconLockOpen color={"white"} size={22} strokeWidth={2} />
+                  )}
+                  <span className="ml-1 text-white">Upgrade to Pro</span>
                 </Button>
-                {/* <Button variant="custom_accent2">
-                  <IconCurrencyBitcoin
-                    color={"white"}
-                    size={22}
-                    strokeWidth={2}
-                  />
-                  <span className="ml-1">Pay with Crypto</span>
-                </Button> */}
               </div>
+              <ProsStatement>Access to our HackerGPT Pro model</ProsStatement>
               <ProsStatement>
                 Unlimited access to our HackerGPT model
               </ProsStatement>
-              <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
               <ProsStatement>
                 Access to additional tools like Subfinder, Katana, Web Browsing
                 and more

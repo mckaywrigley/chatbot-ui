@@ -148,7 +148,7 @@ const LockedPluginModal = ({
             <>
               <p>
                 The <b>{currentPlugin?.name}</b> plugin is only accessible with
-                a <b>Plus</b> plan.
+                a <b>Pro</b> plan.
               </p>
               <p>Ready to upgrade for access?</p>
             </>

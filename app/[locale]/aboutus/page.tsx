@@ -27,7 +27,7 @@ export default function AboutUsPage() {
             <p className="mb-4 text-lg text-gray-800 dark:text-gray-300">
               When you ask a question, it&apos;s sent to our server. We verify
               user authenticity and manage your question quota based on whether
-              you&apos;re a free or plus user. We then search our database for
+              you&apos;re a free or pro user. We then search our database for
               information that closely matches your question. For questions not
               in English, we translate them to find relevant information from
               our database. If a strong match is found, it&apos;s incorporated

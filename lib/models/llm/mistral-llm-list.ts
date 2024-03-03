@@ -36,7 +36,7 @@ const MISTRAL_MEDIUM: LLM = {
 
 const MISTRAL_LARGE: LLM = {
   modelId: "mistral-large",
-  modelName: "Mistral Large",
+  modelName: "HackerGPT Pro",
   provider: "mistral",
   hostedId: "mistral-large",
   platformLink: MISTRAL_PLATORM_LINK,

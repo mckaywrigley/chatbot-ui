@@ -4,8 +4,8 @@ import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import { FC, HTMLAttributes } from "react"
 // import { OpenAISVG } from "../icons/openai-svg"
-import Image from "next/image"
-import mistral from "@/public/providers/mistral.png"
+// import Image from "next/image"
+// import mistral from "@/public/providers/mistral.png"
 import { HackerAISVG } from "../icons/hackerai-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -51,15 +51,15 @@ export const ModelIcon: FC<ModelIconProps> = ({
       )
     case "mistral-large":
       return (
-        <Image
+        <HackerAISVG
           className={cn(
-            "rounded-sm p-1",
+            "rounded-sm  bg-[#fff] p-0.5 text-black",
+            props.className,
             theme === "dark" ? "bg-white" : "border-[1px] border-black"
           )}
-          src={mistral.src}
-          alt="Mistral"
           width={width}
           height={height}
+          fill="#ff0000"
         />
       )
     default:
