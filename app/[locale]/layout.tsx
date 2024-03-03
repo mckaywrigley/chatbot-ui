@@ -12,6 +12,7 @@ import { ReactNode } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import "./globals.css"
 import { GlobalAlertDialog } from "./global-alert-dialog"
+import { PluginProvider } from "@/components/chat/chat-hooks/PluginProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 const APP_NAME = "HackerGPT"
@@ -114,11 +115,13 @@ export default async function RootLayout({
             locale={locale}
             resources={resources}
           >
-            <Toaster richColors position="top-center" duration={3000} />
-            <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
-              {session ? <GlobalState>{children}</GlobalState> : children}
-            </div>
-            <GlobalAlertDialog />
+            <PluginProvider>
+              <Toaster richColors position="top-center" duration={3000} />
+              <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
+                {session ? <GlobalState>{children}</GlobalState> : children}
+              </div>
+              <GlobalAlertDialog />
+            </PluginProvider>
           </TranslationsProvider>
         </Providers>
         <Analytics />

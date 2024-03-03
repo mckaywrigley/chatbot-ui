@@ -1,4 +1,12 @@
-import React, { createContext, useReducer, useContext, useEffect } from "react"
+"use client"
+
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useEffect,
+  Dispatch
+} from "react"
 
 import { PluginSummary } from "@/types/plugins"
 

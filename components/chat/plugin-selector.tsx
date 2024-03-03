@@ -16,6 +16,7 @@ import { PluginID, PluginSummary } from "@/types/plugins"
 import { ChatbotUIContext } from "@/context/context"
 import Modal from "./dialog-portal"
 import { PlanDialog } from "../utility/plan-dialog"
+import { usePluginContext } from "./chat-hooks/PluginProvider"
 
 interface PluginSelectorProps {
   onPluginSelect: (type: string) => void
@@ -30,6 +31,9 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
   const [showLockedPluginDialog, setShowLockedPluginDialog] = useState(false)
   const [currentPlugin, setCurrentPlugin] = useState<PluginSummary | null>(null)
   const [showPlanDialog, setShowPlanDialog] = useState(false)
+  const { state: pluginState, dispatch: pluginDispatch } = usePluginContext()
+
+  const defaultPluginIds = [0, 99]
 
   const isPremium = subscription !== null
 
@@ -47,8 +51,33 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
     }
   }, [selectedPlugin])
 
+  const installPlugin = (plugin: PluginSummary) => {
+    pluginDispatch({
+      type: "INSTALL_PLUGIN",
+      payload: { ...plugin, isInstalled: true }
+    })
+  }
+
+  const uninstallPlugin = (pluginId: number) => {
+    pluginDispatch({
+      type: "UNINSTALL_PLUGIN",
+      payload: pluginId
+    })
+  }
+
+  const updatedAvailablePlugins = availablePlugins.map(plugin => {
+    const isInstalled = pluginState.installedPlugins.some(
+      p => p.id === plugin.id
+    )
+    return { ...plugin, isInstalled }
+  })
+
+  const selectorPlugins = updatedAvailablePlugins.filter(
+    plugin => plugin.isInstalled || defaultPluginIds.includes(plugin.id)
+  )
+
   const renderPluginOptions = () => {
-    return availablePlugins.map(plugin => (
+    return selectorPlugins.map(plugin => (
       <DropdownMenuItem
         key={plugin.id}
         onSelect={() => {
@@ -99,8 +128,9 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
       <PluginStoreModal
         isOpen={isPluginStoreModalOpen}
         setIsOpen={setIsPluginStoreModalOpen}
-        installPlugin={undefined}
-        uninstallPlugin={undefined}
+        pluginsData={updatedAvailablePlugins}
+        installPlugin={installPlugin}
+        uninstallPlugin={uninstallPlugin}
       />
       <LockedPluginModal
         isOpen={showLockedPluginDialog}

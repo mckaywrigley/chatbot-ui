@@ -5,11 +5,13 @@ import {
   IconSearch,
   IconCode,
   IconCircleX,
-  IconCloudDownload
+  IconCloudDownload,
+  IconLockOpen
 } from "@tabler/icons-react"
 
 import { PluginSummary, PluginID } from "@/types/plugins"
 import { usePluginContext } from "@/components/chat/chat-hooks/PluginProvider"
+import { DialogTrigger } from "@radix-ui/react-dialog"
 
 export const availablePlugins: PluginSummary[] = [
   {
@@ -122,16 +124,16 @@ export const availablePlugins: PluginSummary[] = [
     githubRepoUrl: "https://github.com/projectdiscovery/alterx",
     isInstalled: false,
     isPremium: false
+  },
+  {
+    id: 99,
+    name: "Plugins Store",
+    selectorName: "Plugins Store",
+    value: PluginID.PLUGINS_STORE,
+    categories: ["Uncategorized"],
+    isInstalled: false,
+    isPremium: false
   }
-  // {
-  //   id: 99,
-  //   name: "Plugins Store",
-  //   selectorName: "Plugins Store",
-  //   value: PluginID.PLUGINS_STORE,
-  //   categories: ["Uncategorized"],
-  //   isInstalled: false,
-  //   isPremium: false
-  // }
 ]
 
 function getPluginsPerPage() {
@@ -144,6 +146,7 @@ function getPluginsPerPage() {
 interface PluginStoreModalProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  pluginsData: PluginSummary[]
   installPlugin: any
   uninstallPlugin: any
 }
@@ -151,10 +154,10 @@ interface PluginStoreModalProps {
 function PluginStoreModal({
   isOpen,
   setIsOpen,
+  pluginsData,
   installPlugin,
   uninstallPlugin
 }: PluginStoreModalProps) {
-  const { state, dispatch } = usePluginContext()
   const categories = ["Free", "Popular", "New", "All", "Installed"]
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("Free")
@@ -196,7 +199,7 @@ function PluginStoreModal({
 
   const excludedPluginIds = [0, 99]
 
-  const filteredPlugins = availablePlugins
+  const filteredPlugins = pluginsData
     .filter(plugin => !excludedPluginIds.includes(plugin.id))
     .filter(plugin => {
       const matchesSearch = plugin.name
