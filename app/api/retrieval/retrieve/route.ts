@@ -1,5 +1,6 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { rephraser } from "@/lib/retrieve/rephraser"
+import { retriever } from "@/lib/retrieve/retriever"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { ChatMessage } from "@/types"
@@ -42,8 +43,6 @@ export async function POST(request: Request) {
       }
     }
 
-    let chunks: any[] = []
-
     let openai
     if (profile.use_azure_openai) {
       openai = new OpenAI({
@@ -77,47 +76,13 @@ export async function POST(request: Request) {
       }
     }
 
-    if (embeddingsProvider === "openai") {
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: rephrasedUserInput || messageContent
-      })
-
-      const openaiEmbedding = response.data.map(item => item.embedding)[0]
-
-      const { data: openaiFileItems, error: openaiError } =
-        await supabaseAdmin.rpc("match_file_items_openai", {
-          query_embedding: openaiEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (openaiError) {
-        throw openaiError
-      }
-
-      chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(
-        rephrasedUserInput || messageContent
-      )
-
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
-    }
-
-    const mostSimilarChunks = chunks?.sort(
-      (a, b) => b.similarity - a.similarity
+    const mostSimilarChunks = await retriever(
+      supabaseAdmin,
+      openai,
+      embeddingsProvider,
+      rephrasedUserInput || messageContent,
+      sourceCount,
+      uniqueFileIds
     )
 
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
