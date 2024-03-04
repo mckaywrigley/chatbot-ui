@@ -130,12 +130,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           reviseDate >= addWeeks(startOfWeek(currentTime), 1) &&
           reviseDate <= endOfWeek(addWeeks(currentTime, 1))
 
+        const notTomorrow = isTomorrow(reviseDate)
+
         const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
             return isToday(reviseDate) || isDateBeforeToday(reviseDate)
           case "Tomorrow":
-            return isTomorrow(reviseDate)
+            return notTomorrow
           case "Later this week":
             return (
               reviseDate > endOfDay(addDays(new Date(), 1)) &&
@@ -152,6 +154,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             )
           case "Next month":
             return (
+              notTomorrow &&
               reviseDate > endOfMonth(currentTime) &&
               reviseDate <= endOfNextMonth
             )

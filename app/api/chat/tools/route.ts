@@ -2,9 +2,7 @@ import { openapiToFunctions } from "@/lib/openapi-conversion"
 import {
   checkApiKey,
   getServerProfile,
-  updateTopicQuizResult,
-  updateTopicDescription,
-  updateReviseDate
+  functionCalledByOpenAI
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
@@ -14,11 +12,18 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, selectedTools, chatId } = json as {
+  const {
+    chatSettings,
+    messages,
+    selectedTools,
+    chatId,
+    recallAssistantFunctions
+  } = json as {
     chatSettings: ChatSettings
     messages: any[]
     selectedTools: Tables<"tools">[]
     chatId: string
+    recallAssistantFunctions: OpenAI.Chat.Completions.ChatCompletionTool[]
   }
 
   try {
@@ -35,48 +40,60 @@ export async function POST(request: Request) {
     let allRouteMaps = {}
     let schemaDetails = []
 
-    for (const selectedTool of selectedTools) {
-      try {
-        const convertedSchema = await openapiToFunctions(
-          JSON.parse(selectedTool.schema as string)
-        )
-        const tools = convertedSchema.functions || []
-        allTools = allTools.concat(tools)
+    let firstResponse
 
-        const routeMap = convertedSchema.routes.reduce(
-          (map: Record<string, string>, route) => {
-            map[route.path.replace(/{(\w+)}/g, ":$1")] = route.operationId
-            return map
-          },
-          {}
-        )
+    if (recallAssistantFunctions.length > 0) {
+      firstResponse = await openai.chat.completions.create({
+        model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+        messages,
+        tools: recallAssistantFunctions
+      })
+    } else {
+      for (const selectedTool of selectedTools) {
+        try {
+          const convertedSchema = await openapiToFunctions(
+            JSON.parse(selectedTool.schema as string)
+          )
+          const tools = convertedSchema.functions || []
+          allTools = allTools.concat(tools)
 
-        allRouteMaps = { ...allRouteMaps, ...routeMap }
+          const routeMap = convertedSchema.routes.reduce(
+            (map: Record<string, string>, route) => {
+              map[route.path.replace(/{(\w+)}/g, ":$1")] = route.operationId
+              return map
+            },
+            {}
+          )
 
-        schemaDetails.push({
-          title: convertedSchema.info.title,
-          description: convertedSchema.info.description,
-          url: convertedSchema.info.server,
-          headers: selectedTool.custom_headers,
-          routeMap,
-          requestInBody: convertedSchema.routes[0].requestInBody
-        })
-      } catch (error: any) {
-        console.error("Error converting schema", error)
+          allRouteMaps = { ...allRouteMaps, ...routeMap }
+
+          schemaDetails.push({
+            title: convertedSchema.info.title,
+            description: convertedSchema.info.description,
+            url: convertedSchema.info.server,
+            headers: selectedTool.custom_headers,
+            routeMap,
+            requestInBody: convertedSchema.routes[0].requestInBody
+          })
+        } catch (error: any) {
+          console.error("Error converting schema", error)
+        }
       }
-    }
 
-    const firstResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages,
-      tools: allTools.length > 0 ? allTools : undefined
-    })
+      firstResponse = await openai.chat.completions.create({
+        model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+        messages,
+        tools: allTools.length > 0 ? allTools : undefined
+      })
+    }
 
     const message = firstResponse.choices[0].message
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
     let functionNames = []
+
+    console.log("firstResponse message:", message)
 
     if (toolCalls.length === 0) {
       // If no tool calls, return the first response directly without a second OpenAI call
@@ -88,14 +105,19 @@ export async function POST(request: Request) {
       })
     }
 
-    if (toolCalls.length > 0) {
-      for (const toolCall of toolCalls) {
-        const functionCall = toolCall.function
-        const functionName = functionCall.name
-        functionNames.push(functionName)
-        const argumentsString = toolCall.function.arguments.trim()
-        const parsedArgs = JSON.parse(argumentsString)
+    for (const toolCall of toolCalls) {
+      const functionCall = toolCall.function
+      const functionName = functionCall.name
+      functionNames.push(functionName)
+      const argumentsString = toolCall.function.arguments.trim()
+      const parsedArgs = JSON.parse(argumentsString)
 
+      let data = {}
+      const bodyContent = parsedArgs.requestBody || parsedArgs
+
+      if (recallAssistantFunctions.length > 0) {
+        data = await functionCalledByOpenAI(functionName, bodyContent, chatId)
+      } else {
         // Find the schema detail that contains the function name
         const schemaDetail = schemaDetails.find(detail =>
           Object.values(detail.routeMap).includes(functionName)
@@ -129,7 +151,6 @@ export async function POST(request: Request) {
 
         // Determine if the request should be in the body or as a query
         const isRequestInBody = schemaDetail.requestInBody
-        let data = {}
 
         if (isRequestInBody) {
           // If the type is set to body
@@ -154,38 +175,20 @@ export async function POST(request: Request) {
 
           const fullUrl = schemaDetail.url + path
 
-          const bodyContent = parsedArgs.requestBody || parsedArgs
+          const requestInit = {
+            method: "POST",
+            headers,
+            body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
+          }
 
-          if (functionName === "updateTopicQuizResult") {
-            // Update the chat/topic name & content in the database
-            data = await updateTopicQuizResult(chatId, bodyContent.test_result)
-          } else if (functionName === "updateTopicDescription") {
-            data = await updateTopicDescription(
-              chatId,
-              bodyContent.topic_description
-            )
-          } else if (functionName === "scheduleTestSession") {
-            data = await updateReviseDate(chatId, bodyContent.hours_time)
-          } else if (functionName === "testMeNow") {
-            console.log("testMeNow")
-          } else if (functionName === "recall_complete") {
-            console.log("recall_complete")
+          const response = await fetch(fullUrl, requestInit)
+
+          if (!response.ok) {
+            data = {
+              error: response.statusText
+            }
           } else {
-            const requestInit = {
-              method: "POST",
-              headers,
-              body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
-            }
-
-            const response = await fetch(fullUrl, requestInit)
-
-            if (!response.ok) {
-              data = {
-                error: response.statusText
-              }
-            } else {
-              data = await response.json()
-            }
+            data = await response.json()
           }
         } else {
           // If the type is set to query
@@ -216,14 +219,14 @@ export async function POST(request: Request) {
             data = await response.json()
           }
         }
-
-        messages.push({
-          tool_call_id: toolCall.id,
-          role: "tool",
-          name: functionName,
-          content: JSON.stringify(data)
-        })
       }
+
+      messages.push({
+        tool_call_id: toolCall.id,
+        role: "tool",
+        name: functionName,
+        content: JSON.stringify(data)
+      })
     }
 
     const secondResponse = await openai.chat.completions.create({
@@ -236,7 +239,7 @@ export async function POST(request: Request) {
 
     return new StreamingTextResponse(stream, {
       headers: {
-        "FUNCTION-NAMES": functionNames.join(","),
+        "FUNCTION-NAME": functionNames[0],
         "X-RATE-LIMIT": "lol"
       }
     })

@@ -80,7 +80,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         handleFocusChatInput()
         setLoading(false)
       })
-      setChatStudyState("waiting")
     } else {
       setLoading(false)
     }
@@ -197,6 +196,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
     if (chat.topic_description) {
       setTopicDescription(chat.topic_description)
+      setChatStudyState("recall_ready")
+    } else {
+      setChatStudyState("no_topic_description")
     }
 
     setSelectedChat(chat)

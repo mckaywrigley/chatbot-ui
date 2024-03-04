@@ -72,6 +72,7 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
     throw new Error(`${keyName} API Key not found`)
   }
 }
+
 export async function updateTopicQuizResult(
   chatId: string,
   test_result: number
@@ -196,4 +197,31 @@ export async function updateReviseDate(chatId: string, hours_time: number) {
   }
 
   return { success: true, message: `Saved revise date of ${hours_time} hours.` }
+}
+
+export async function functionCalledByOpenAI(
+  functionName: string,
+  bodyContent: {
+    test_result: number
+    topic_description: string
+    hours_time: number
+  },
+  chatId: string
+) {
+  let tempData = {}
+  if (functionName === "updateTopicQuizResult") {
+    // Update the chat/topic name & content in the database
+    tempData = await updateTopicQuizResult(chatId, bodyContent.test_result)
+  } else if (functionName === "updateTopicDescription") {
+    tempData = await updateTopicDescription(
+      chatId,
+      bodyContent.topic_description
+    )
+  } else if (functionName === "scheduleTestSession") {
+    tempData = await updateReviseDate(chatId, bodyContent.hours_time)
+  } else {
+    // functionName === "testMeNow" or functionName === "recall_complete"
+    tempData = { success: true }
+  }
+  return tempData
 }

@@ -1,0 +1,12 @@
+{
+  "context_length": 4096,
+  "created_at": "2024-03-01T10:41:21.997Z",
+  "embeddings_provider": "openai",
+  "folder_id": null,
+  "image_path": null,
+  "include_profile_context": false,
+  "include_workspace_instructions": false,
+  "sharing": "private",
+  "updated_at": null,
+  "user_id": null
+}

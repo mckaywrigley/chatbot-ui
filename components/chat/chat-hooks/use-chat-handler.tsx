@@ -15,11 +15,14 @@ import {
   handleLocalChat,
   handleRetrieval,
   processResponse,
-  validateChatSettings
+  validateChatSettings,
+  getNextStudyState,
+  getRecallAssistantByStudyState
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
 import { deleteChatFilesByChatId } from "@/db/chat-files"
 import { set } from "date-fns"
+import recallAssistants from "@/lib/assistants"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -60,8 +63,6 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
     selectedTools,
-    selectedPreset,
-    setChatSettings,
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
@@ -214,7 +215,9 @@ export const useChatHandler = () => {
 
       let generatedText = ""
 
-      if (selectedTools.length > 0) {
+      const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
+
+      if (selectedTools.length > 0 || chatStudyState.length > 0) {
         setToolInUse("Tools")
 
         const formattedMessages = await buildFinalMessages(
@@ -223,8 +226,6 @@ export const useChatHandler = () => {
           chatImages,
           chatStudyState
         )
-
-        console.log({ formattedMessages })
 
         const response = await fetch("/api/chat/tools", {
           method: "POST",
@@ -235,51 +236,22 @@ export const useChatHandler = () => {
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
             selectedTools,
-            chatId: currentChat?.id
+            chatId: currentChat?.id,
+            recallAssistantFunctions: recallAssistant?.functions ?? []
           })
         })
 
         setToolInUse("none")
 
-        // if the response is ok and has a score
-        if (
-          response.headers
-            .get("FUNCTION-NAMES")
-            ?.includes("updateTopicQuizResult")
-        ) {
-          console.log("updateTopicQuizResult was called and the response is ok")
-          setChatStudyState("updated")
-        } else if (
-          response.headers.get("FUNCTION-NAMES")?.includes("testMeNow")
-        ) {
-          console.log("testMeNow was called and the response is ok")
-          const selectedAssistant = assistants.find(
-            assistant => assistant.name === "Study coach"
-          )
-          if (!selectedAssistant) {
-            console.error("No assistant with name 'Study coach' found")
-            return
-          }
-          handleSelectAssistant(selectedAssistant)
-          setNewMessageFiles([])
-          deleteChatFilesByChatId(currentChat!.id)
-        } else if (
-          // if the response is ok and has a score
-          response.headers.get("FUNCTION-NAMES")?.includes("recall_complete")
-        ) {
-          console.log("recall_complete was called and the response is ok")
-          setChatStudyState("scoring")
-          const selectedAssistant = assistants.find(
-            assistant => assistant.name === "Scoring"
-          )
-          if (!selectedAssistant) {
-            console.error("No assistant with name 'scoring' found")
-            return
-          }
-          handleSelectAssistant(selectedAssistant)
-        } else {
-          setChatStudyState("feedback")
+        // Use response header function call name to get next student state from recallAssistants
+        const nextStudyState = getNextStudyState(
+          recallAssistant,
+          response.headers.get("FUNCTION-NAME")
+        )
+        if (nextStudyState) {
+          setChatStudyState(nextStudyState)
         }
+        //////////////////////////
 
         generatedText = await processResponse(
           response,

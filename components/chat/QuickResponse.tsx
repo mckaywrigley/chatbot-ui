@@ -33,7 +33,7 @@ const QuickResponse = () => {
     }
   }
 
-  if (chatStudyState === "waiting") {
+  if (chatStudyState === "recall_ready") {
     buttonConfigs.button1.text = "Start a new free recall session."
     buttonConfigs.button1.onClick = async () => {
       // Custom onClick handler
@@ -58,7 +58,7 @@ const QuickResponse = () => {
       setChatMessages([promptMessage])
 
       const feedbackAssistant = assistants.find(
-        assistant => assistant.name === "Feedback"
+        assistant => assistant.name === "feedback"
       )
 
       if (feedbackAssistant) {
@@ -73,7 +73,8 @@ const QuickResponse = () => {
     buttonConfigs.button2.text = "Edit topic description."
   } else if (chatStudyState === "feedback") {
     buttonConfigs.button1.text = "Proceed to scoring."
-  } else if (chatStudyState === "updated") {
+    buttonConfigs.button2.text = "More hints."
+  } else if (chatStudyState === "score_updated") {
     buttonConfigs.button1.text = "Show full topic description."
     buttonConfigs.button1.onClick = async () => {
       await setChatStudyState("reading")
