@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     if (chatSettings.model === "mistral-medium") {
       ratelimitmodel = "hackergpt"
     } else {
-      ratelimitmodel = model
+      ratelimitmodel = "gpt-4"
     }
 
     const rateLimitCheckResultForPlugins = await checkRatelimitOnApi(
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       signal: controller.signal,
       body: JSON.stringify(chatBody)
     })
-
+    console.log(fetchResponse)
     return new StreamingTextResponse(
       fetchResponse.body as ReadableStream<Uint8Array>
     )
