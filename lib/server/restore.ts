@@ -75,12 +75,20 @@ async function restoreToDatabase(
   subscriptionId: string
 ): Promise<Result<Tables<"subscriptions">>> {
   const supabaseAdmin = createSupabaseAdminClient()
-  await stripe.subscriptions.update(subscriptionId, {
-    cancel_at_period_end: false
-  })
+
+  // Retrieve the subscription details from Stripe
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
-  // check if the user has active subscription already
+  console.log(subscription.cancel_at_period_end)
+  // Check if the subscription is already set to cancel at the period end
+  if (subscription.cancel_at_period_end) {
+    // If not, update the subscription to ensure it does not cancel at the period end
+    await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: false
+    })
+  }
+
+  // Check if the user has an active subscription already in Supabase
   const { data: subscriptions, error } = await supabaseAdmin
     .from("subscriptions")
     .select("*")
@@ -94,26 +102,36 @@ async function restoreToDatabase(
     return errStr("error fetching subscriptions")
   }
   if (subscriptions.length > 0) {
+    // If an active subscription already exists, return it
     return ok(subscriptions[0])
   }
+
+  // Ensure the subscription has a valid customer ID from Stripe
   if (!subscription.customer || typeof subscription.customer !== "string") {
     return errStr("invalid customer value")
   }
 
-  // restore subscription
+  // Restore subscription data in Supabase without attempting to update the Stripe subscription
   const result = await supabaseAdmin.from("subscriptions").upsert(
     {
       subscription_id: subscriptionId,
       user_id: user.id,
       customer_id: subscription.customer,
       status: subscription.status,
-      start_date: unixToDateString(subscription.start_date),
-      cancel_at: unixToDateString(subscription.cancel_at),
-      canceled_at: unixToDateString(subscription.canceled_at),
-      ended_at: unixToDateString(subscription.ended_at)
+      start_date: unixToDateString(subscription.current_period_start),
+      cancel_at: subscription.cancel_at
+        ? unixToDateString(subscription.cancel_at)
+        : null,
+      canceled_at: subscription.canceled_at
+        ? unixToDateString(subscription.canceled_at)
+        : null,
+      ended_at: subscription.ended_at
+        ? unixToDateString(subscription.ended_at)
+        : null
     },
     { onConflict: "subscription_id" }
   )
+
   if (result.error) {
     console.error(result.error)
     Sentry.withScope(scope => {
@@ -122,6 +140,8 @@ async function restoreToDatabase(
     })
     return errStr("error upserting subscription")
   }
+
+  // Retrieve and return the newly restored subscription from Supabase
   const newSubscription = await supabaseAdmin
     .from("subscriptions")
     .select("*")
