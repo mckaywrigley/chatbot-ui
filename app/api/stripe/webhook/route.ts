@@ -79,7 +79,16 @@ export async function POST(request: Request) {
   return new Response(JSON.stringify({ ok: true }), { status: 200 })
 }
 
-async function upsertSubscription(subscriptionId: string, customerId: string) {
+// Retry configuration
+const MAX_RETRY_ATTEMPTS = 5 // Maximum number of retry attempts
+const RETRY_DELAY_MS = 2000 // Delay between retries in milliseconds
+
+// Modified upsertSubscription function with retry mechanism
+async function upsertSubscription(
+  subscriptionId: string,
+  customerId: string,
+  attempt = 0
+) {
   console.log("upsertSubscription", subscriptionId, customerId)
 
   const supabaseAdmin = createClient(
@@ -93,35 +102,53 @@ async function upsertSubscription(subscriptionId: string, customerId: string) {
     throw new Error("No customer found. customerId: " + customerId)
   }
 
+  // Attempt to fetch the user profile
   const userId = customer.metadata.userId
-  const { data: profile } = await supabaseAdmin
+  const { data: profile, error } = await supabaseAdmin
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
     .single()
-  if (!profile) {
-    console.error("No profile found.", customer.metadata, userId)
-    throw new Error("No profile found. customerId: " + customerId)
-  }
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  // If profile is found, proceed as normal
+  if (profile) {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
-  const result = await supabaseAdmin.from("subscriptions").upsert(
-    {
-      subscription_id: subscriptionId,
-      user_id: profile.user_id,
-      customer_id: customerId,
-      status: subscription.status,
-      start_date: unixToDateString(subscription.start_date),
-      cancel_at: unixToDateString(subscription.cancel_at),
-      canceled_at: unixToDateString(subscription.canceled_at),
-      ended_at: unixToDateString(subscription.ended_at)
-    },
-    { onConflict: "subscription_id" }
-  )
-  if (result.error) {
-    console.error(result.error)
-    throw new Error(result.error.message)
+    const result = await supabaseAdmin.from("subscriptions").upsert(
+      {
+        subscription_id: subscriptionId,
+        user_id: profile.user_id,
+        customer_id: customerId,
+        status: subscription.status,
+        start_date: unixToDateString(subscription.start_date),
+        cancel_at: unixToDateString(subscription.cancel_at),
+        canceled_at: unixToDateString(subscription.canceled_at),
+        ended_at: unixToDateString(subscription.ended_at)
+      },
+      { onConflict: "subscription_id" }
+    )
+    if (result.error) {
+      console.error(result.error)
+      throw new Error(result.error.message)
+    }
+  } else if (attempt < MAX_RETRY_ATTEMPTS) {
+    // If profile is not found and maximum retry attempts are not reached, retry after a delay
+    console.log(`Profile not found, retrying... Attempt ${attempt + 1}`)
+    setTimeout(
+      () => upsertSubscription(subscriptionId, customerId, attempt + 1),
+      RETRY_DELAY_MS
+    )
+  } else {
+    // If maximum retry attempts are reached and profile is still not found, throw an error
+    console.error(
+      "No profile found after maximum retry attempts.",
+      customer.metadata,
+      userId
+    )
+    throw new Error(
+      "No profile found. Maximum retry attempts reached. customerId: " +
+        customerId
+    )
   }
 }
 
