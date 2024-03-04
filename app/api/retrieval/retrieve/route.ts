@@ -1,13 +1,24 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import { rephraser } from "@/lib/retrieve/rephraser"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
+import { ChatMessage } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
-    userInput: string
+  const {
+    messageContent,
+    prompt,
+    chatMessages,
+    fileIds,
+    embeddingsProvider,
+    sourceCount
+  } = json as {
+    messageContent: string
+    prompt: string
+    chatMessages: ChatMessage[]
     fileIds: string[]
     embeddingsProvider: "openai" | "local"
     sourceCount: number
@@ -48,10 +59,28 @@ export async function POST(request: Request) {
       })
     }
 
+    let rephrasedUserInput: string | null | undefined = null
+    if (process.env.REPHRASER_ENABLED === "true") {
+      try {
+        rephrasedUserInput = await rephraser(
+          openai,
+          process.env.REPHRASER_MODEL_ID || "gpt-3.5-turbo-0125",
+          messageContent,
+          prompt,
+          process.env.RAPHRASER_MODE as any,
+          chatMessages,
+          parseInt(process.env.REPHRASER_MAX_HISTORY_MESSAGES || "3"),
+          parseInt(process.env.REPHRASER_MAX_HISTORY_TOKENS || "2048")
+        )
+      } catch (error: any) {
+        console.error("Error rephrasing user input", error)
+      }
+    }
+
     if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
         model: "text-embedding-3-small",
-        input: userInput
+        input: rephrasedUserInput || messageContent
       })
 
       const openaiEmbedding = response.data.map(item => item.embedding)[0]
@@ -69,7 +98,9 @@ export async function POST(request: Request) {
 
       chunks = openaiFileItems
     } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(userInput)
+      const localEmbedding = await generateLocalEmbedding(
+        rephrasedUserInput || messageContent
+      )
 
       const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {

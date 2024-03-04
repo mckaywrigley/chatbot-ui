@@ -205,7 +205,9 @@ export const useChatHandler = () => {
         setToolInUse("retrieval")
 
         retrievedFileItems = await handleRetrieval(
-          userInput,
+          messageContent,
+          chatSettings!.prompt,
+          chatMessages,
           newMessageFiles,
           chatFiles,
           chatSettings!.embeddingsProvider,
