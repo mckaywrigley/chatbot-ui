@@ -1,5 +1,9 @@
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
+import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
+import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
@@ -17,10 +21,6 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
-import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
-import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
-import { getCollectionFilesByCollectionId } from "@/db/collection-files"
-import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -157,22 +157,22 @@ export const useChatHandler = () => {
           | "local"
       })
     } else if (selectedWorkspace) {
-      setChatSettings({
-        model: (selectedWorkspace.default_model ||
-          "gpt-4-1106-preview") as LLMID,
-        prompt:
-          selectedWorkspace.default_prompt ||
-          "You are a friendly, helpful AI assistant.",
-        temperature: selectedWorkspace.default_temperature || 0.5,
-        contextLength: selectedWorkspace.default_context_length || 4096,
-        includeProfileContext:
-          selectedWorkspace.include_profile_context || true,
-        includeWorkspaceInstructions:
-          selectedWorkspace.include_workspace_instructions || true,
-        embeddingsProvider:
-          (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-          "openai"
-      })
+      // setChatSettings({
+      //   model: (selectedWorkspace.default_model ||
+      //     "gpt-4-1106-preview") as LLMID,
+      //   prompt:
+      //     selectedWorkspace.default_prompt ||
+      //     "You are a friendly, helpful AI assistant.",
+      //   temperature: selectedWorkspace.default_temperature || 0.5,
+      //   contextLength: selectedWorkspace.default_context_length || 4096,
+      //   includeProfileContext:
+      //     selectedWorkspace.include_profile_context || true,
+      //   includeWorkspaceInstructions:
+      //     selectedWorkspace.include_workspace_instructions || true,
+      //   embeddingsProvider:
+      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
+      //     "openai"
+      // })
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
