@@ -251,6 +251,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                   onValueChange={setInstructions}
                   minRows={5}
                   maxRows={10}
+                  maxLength={1500}
                 />
 
                 <LimitDisplay
