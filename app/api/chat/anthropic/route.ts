@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       apiKey: profile.anthropic_api_key || ""
     })
 
-    const response = await anthropic.beta.messages.create({
+    const response = await anthropic.messages.create({
       model: chatSettings.model,
       messages: ANTHROPIC_FORMATTED_MESSAGES,
       temperature: chatSettings.temperature,
