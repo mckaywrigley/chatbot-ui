@@ -205,6 +205,7 @@ export async function functionCalledByOpenAI(
     test_result: number
     topic_description: string
     hours_time: number
+    recallSummary: string
   },
   chatId: string
 ) {

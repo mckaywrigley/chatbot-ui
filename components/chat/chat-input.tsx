@@ -202,7 +202,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
 
-        {selectedTools &&
+        {/* {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
               key={index}
@@ -221,11 +221,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <div>{tool.name}</div>
               </div>
             </div>
-          ))}
+          ))} */}
 
+        <p>{chatStudyState}</p>
         <QuickResponse />
 
-        {selectedAssistant && (
+        {/* {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
             {selectedAssistant.image_path && (
               <Image
@@ -245,7 +246,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               Talking to {selectedAssistant.name}
             </div>
           </div>
-        )}
+        )} */}
       </div>
       {chatStudyState !== "waiting" && (
         <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">

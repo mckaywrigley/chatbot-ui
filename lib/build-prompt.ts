@@ -5,17 +5,13 @@ import { encode } from "gpt-tokenizer"
 const buildBasePrompt = (
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Tables<"assistants"> | null,
-  topicDescription?: string
+  recallAssistantPrompt: string,
+  sourceDescription: string
 ) => {
-  let fullPrompt = ""
+  let fullPrompt = recallAssistantPrompt
 
-  if (assistant) {
-    fullPrompt += `${assistant.prompt}\n\n`
-  }
-
-  if (topicDescription) {
-    fullPrompt += `<source>\n${topicDescription}\n</source>`
+  if (sourceDescription.length > 0) {
+    fullPrompt += `<source>\n${sourceDescription}\n</source>`
   }
 
   fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
@@ -35,23 +31,25 @@ export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
   chatImages: MessageImage[],
-  chatStudyState: string
+  recallAssistant
 ) {
   const {
     chatSettings,
     workspaceInstructions,
     chatMessages,
-    assistant,
     messageFileItems,
     chatFileItems,
     topicDescription
   } = payload
 
+  const sourceDescription =
+    recallAssistant.name !== "topic" ? topicDescription : ""
+
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant,
-    topicDescription
+    recallAssistant.prompt,
+    sourceDescription
   )
 
   const CHUNK_SIZE = chatSettings.contextLength

@@ -10,7 +10,10 @@ import {
   buildGoogleGeminiFinalMessages
 } from "@/lib/build-prompt"
 import { consumeReadableStream } from "@/lib/consume-stream"
-import recallAssistants from "@/lib/assistants"
+import recallAssistants, {
+  AssistantWithTool,
+  nextStudyStateForFunction
+} from "@/lib/assistants"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
   ChatFile,
@@ -157,7 +160,7 @@ export const handleLocalChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const formattedMessages = await buildFinalMessages(payload, profile, [])
+  const formattedMessages = await buildFinalMessages(payload, profile, [], null)
 
   // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
   const response = await fetchChatResponse(
@@ -216,7 +219,12 @@ export const handleHostedChat = async (
       newMessageImages
     )
   } else {
-    formattedMessages = await buildFinalMessages(payload, profile, chatImages)
+    formattedMessages = await buildFinalMessages(
+      payload,
+      profile,
+      chatImages,
+      null
+    )
   }
 
   const apiEndpoint =
@@ -532,24 +540,25 @@ export const getRecallAssistantByStudyState = (studyState: string) =>
 // }
 
 export const getNextStudyState = (
-  recallAssistant,
+  recallAssistant: AssistantWithTool | undefined | null,
   functionName: string | null
 ) => {
-  if (!recallAssistant) {
-    console.log("Assistant not found")
+  if (!recallAssistant || !functionName) {
     return null // Assistant not found
   }
 
   // Find the tool by function name and return its next_study_state
-  const tool = recallAssistant.tools.find(
+  const tool = recallAssistant.functions.find(
     tool => tool.function.name === functionName
   )
-  if (!tool || !tool.function.next_study_state) {
-    console.log("Function not found or next_study_state not defined")
+  if (!tool) {
+    console.log("Function not found ")
     return null // Tool or next_study_state not found
   }
 
-  return tool.function.next_study_state
+  const nextStudyState = nextStudyStateForFunction(tool.function.name)
+
+  return nextStudyState
 }
 
 // // if the response is ok and has a score

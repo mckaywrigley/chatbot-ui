@@ -201,6 +201,8 @@ export const useChatHandler = () => {
           selectedAssistant
         )
 
+      let generatedText = ""
+
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",
@@ -213,18 +215,58 @@ export const useChatHandler = () => {
         topicDescription
       }
 
-      let generatedText = ""
-
       const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
 
-      if (selectedTools.length > 0 || chatStudyState.length > 0) {
+      if (chatStudyState.length > 0) {
+        const formattedMessages = await buildFinalMessages(
+          payload,
+          profile!,
+          chatImages,
+          recallAssistant
+        )
+
+        const response = await fetch("/api/chat/functions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chatSettings: payload.chatSettings,
+            messages: formattedMessages,
+            chatId: currentChat?.id,
+            recallAssistantFunctions: recallAssistant?.functions ?? []
+          })
+        })
+
+        // Use response header function call name to get next student state from recallAssistants
+        const nextStudyState = getNextStudyState(
+          recallAssistant,
+          response.headers.get("FUNCTION-NAME")
+        )
+        if (nextStudyState) {
+          setChatStudyState(nextStudyState)
+        }
+        //////////////////////////
+
+        generatedText = await processResponse(
+          response,
+          isRegeneration
+            ? payload.chatMessages[payload.chatMessages.length - 1]
+            : tempAssistantChatMessage,
+          true,
+          newAbortController,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse
+        )
+      } else if (selectedTools.length > 0) {
         setToolInUse("Tools")
 
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
           chatImages,
-          chatStudyState
+          recallAssistant
         )
 
         const response = await fetch("/api/chat/tools", {
@@ -242,16 +284,6 @@ export const useChatHandler = () => {
         })
 
         setToolInUse("none")
-
-        // Use response header function call name to get next student state from recallAssistants
-        const nextStudyState = getNextStudyState(
-          recallAssistant,
-          response.headers.get("FUNCTION-NAME")
-        )
-        if (nextStudyState) {
-          setChatStudyState(nextStudyState)
-        }
-        //////////////////////////
 
         generatedText = await processResponse(
           response,
