@@ -55,6 +55,12 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 2000,
     MAX_CONTEXT_LENGTH: 32000
   },
+  "mistral-large-2402": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 1.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 2000,
+    MAX_CONTEXT_LENGTH: 32000
+  },
 
   // OPENAI MODELS
   "gpt-3.5-turbo": {
