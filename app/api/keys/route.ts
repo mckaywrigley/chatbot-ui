@@ -10,6 +10,7 @@ export async function GET() {
     google: VALID_ENV_KEYS.GOOGLE_GEMINI_API_KEY,
     anthropic: VALID_ENV_KEYS.ANTHROPIC_API_KEY,
     mistral: VALID_ENV_KEYS.MISTRAL_API_KEY,
+    groq: VALID_ENV_KEYS.GROQ_API_KEY,
     perplexity: VALID_ENV_KEYS.PERPLEXITY_API_KEY,
     openrouter: VALID_ENV_KEYS.OPENROUTER_API_KEY,
 

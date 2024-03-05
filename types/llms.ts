@@ -5,6 +5,7 @@ export type LLMID =
   | GoogleLLMID
   | AnthropicLLMID
   | MistralLLMID
+  | GroqLLMID
   | PerplexityLLMID
 
 // OpenAI Models (UPDATED 1/29/24)
@@ -29,6 +30,10 @@ export type MistralLLMID =
   | "mistral-tiny" // Mistral Tiny
   | "mistral-small" // Mistral Small
   | "mistral-medium" // Mistral Medium
+
+export type GroqLLMID =
+  | "llama2-70b-4096" // LLaMA2-70b
+  | "mixtral-8x7b-32768" // Mixtral-8x7b
 
 // Perplexity Models (UPDATED 1/31/24)
 export type PerplexityLLMID =
