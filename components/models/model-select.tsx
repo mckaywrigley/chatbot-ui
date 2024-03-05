@@ -167,6 +167,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 			  .filter(model => model.modelName !== "google/gemini-pro-vision")
 			  .filter(model => model.modelName !== "Sonar Small Online")
 			  .filter(model => model.modelName !== "Sonar Medium Online")
+			  .filter(model => !model.modelName.toLowerCase().includes("opus"))
+			  .filter(model => !model.modelName.toLowerCase().includes("beta"))
 			  .sort((a, b) => a.provider.localeCompare(b.provider))
 
             if (filteredModels.length === 0) return null
