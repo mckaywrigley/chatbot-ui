@@ -24,6 +24,8 @@ export type GoogleLLMID =
 export type AnthropicLLMID =
   | "claude-2.1" // Claude 2
   | "claude-instant-1.2" // Claude Instant
+  | "claude-3-sonnet-20240229" // Claude 3 Sonnet
+  | "claude-3-opus-20240229" // Claude 3 Opus
 
 // Mistral Models
 export type MistralLLMID =
