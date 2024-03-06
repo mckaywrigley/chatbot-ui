@@ -19,6 +19,7 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
+import { toast } from "sonner"
 
 interface ChatInputProps {}
 
@@ -144,11 +145,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     const imagesAllowed = LLM_LIST.find(
       llm => llm.modelId === chatSettings?.model
     )?.imageInput
-    if (!imagesAllowed) return
 
     const items = event.clipboardData.items
     for (const item of items) {
       if (item.type.indexOf("image") === 0) {
+        if (!imagesAllowed) {
+          toast.error(
+            `Images are not supported for this model. Use models like GPT-4 Vision instead.`
+          )
+          return
+        }
         const file = item.getAsFile()
         if (!file) return
         handleSelectDeviceFile(file)
