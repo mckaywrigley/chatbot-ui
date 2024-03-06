@@ -37,7 +37,7 @@ const QuickResponse = () => {
     buttonConfigs.button1.text = "Start a new free recall session."
     buttonConfigs.button1.onClick = async () => {
       // Custom onClick handler
-      await setChatStudyState("recalling")
+      await setChatStudyState("recall_first_attempt")
       const promptMessage = {
         message: {
           id: "1",
@@ -71,7 +71,7 @@ const QuickResponse = () => {
       // }
     }
     buttonConfigs.button2.text = "Edit topic description."
-  } else if (chatStudyState === "recalling") {
+  } else if (chatStudyState === "recall_hinting") {
     buttonConfigs.button1.text = "Proceed to scoring."
     buttonConfigs.button2.text = "More hints."
   } else if (chatStudyState === "score_updated") {

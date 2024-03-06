@@ -16,12 +16,12 @@ import {
   handleRetrieval,
   processResponse,
   validateChatSettings,
-  getNextStudyState,
   getRecallAssistantByStudyState
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
 import { deleteChatFilesByChatId } from "@/db/chat-files"
 import { set } from "date-fns"
+import { StudyState } from "@/lib/assistants"
 import recallAssistants from "@/lib/assistants"
 
 export const useChatHandler = () => {
@@ -217,7 +217,7 @@ export const useChatHandler = () => {
 
       const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
 
-      if (chatStudyState.length > 0) {
+      if (chatStudyState.length > 0 && recallAssistant) {
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
@@ -234,18 +234,15 @@ export const useChatHandler = () => {
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
             chatId: currentChat?.id,
-            recallAssistantFunctions: recallAssistant?.functions ?? []
+            recallAssistantFunctions: recallAssistant?.functions ?? [],
+            chatStudyState
           })
         })
 
-        // Use response header function call name to get next student state from recallAssistants
-        const nextStudyState = getNextStudyState(
-          recallAssistant,
-          response.headers.get("FUNCTION-NAME")
-        )
-        if (nextStudyState) {
-          setChatStudyState(nextStudyState)
-        }
+        const newStudyState = response.headers.get("NEW-STUDY-STATE")
+        console.log({ newStudyState })
+        if (newStudyState) setChatStudyState(newStudyState as StudyState)
+
         //////////////////////////
 
         generatedText = await processResponse(
@@ -266,7 +263,7 @@ export const useChatHandler = () => {
           payload,
           profile!,
           chatImages,
-          recallAssistant
+          recallAssistant!
         )
 
         const response = await fetch("/api/chat/tools", {

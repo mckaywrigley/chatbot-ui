@@ -1,10 +1,12 @@
-import recallAssistants from "@/lib/assistants"
+import recallAssistants, {
+  StudyState,
+  nextStudyStateForFunction
+} from "@/lib/assistants"
 import {
   checkApiKey,
   getServerProfile,
   functionCalledByOpenAI
 } from "@/lib/server/server-chat-helpers"
-import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
@@ -12,12 +14,18 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, chatId, recallAssistantFunctions } = json as {
+  const {
+    chatSettings,
+    messages,
+    chatId,
+    recallAssistantFunctions,
+    chatStudyState
+  } = json as {
     chatSettings: ChatSettings
     messages: any[]
-    selectedTools: Tables<"tools">[]
     chatId: string
     recallAssistantFunctions: OpenAI.Chat.Completions.ChatCompletionTool[]
+    chatStudyState: StudyState
   }
 
   try {
@@ -44,13 +52,16 @@ export async function POST(request: Request) {
 
     if (toolCalls.length === 0) {
       // If no tool calls, return the first response directly without a second OpenAI call
-      console.log("No tool calls")
       return new Response(message.content, {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...(chatStudyState === "recall_first_attempt" && {
+            "NEW-STUDY-STATE": "recall_hinting"
+          })
         }
       })
     }
+
     // assume only one tool call
     const toolCall = toolCalls[0]
 
@@ -115,8 +126,7 @@ export async function POST(request: Request) {
       if (scoreToolCalls.length === 0) {
         return new Response(finalMessageContent, {
           headers: {
-            "Content-Type": "application/json",
-            "FUNCTION-NAME": functionName
+            "Content-Type": "application/json"
           }
         })
       }
@@ -156,12 +166,17 @@ export async function POST(request: Request) {
 
     const stream = OpenAIStream(finalResponse)
 
-    return new StreamingTextResponse(stream, {
-      headers: {
-        "FUNCTION-NAME": functionName,
-        "X-RATE-LIMIT": "lol"
-      }
-    })
+    const nextStudyState = nextStudyStateForFunction(functionName)
+
+    if (nextStudyState) {
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": nextStudyState
+        }
+      })
+    } else {
+      return new StreamingTextResponse(stream)
+    }
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

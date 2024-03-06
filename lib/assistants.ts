@@ -6,7 +6,8 @@ export type StudyState =
   | "topic_description_updated"
   | "test_scheduled"
   | "recall_ready"
-  | "recalling"
+  | "recall_first_attempt"
+  | "recall_hinting"
   | "score_updated"
   | "reviewing"
   | "no_topic_description"
@@ -32,12 +33,8 @@ const nextStudyStateAfterFuncCall: NextStudyStateFunction[] = [
     next_study_state: "topic_description_updated"
   },
   {
-    name: "scheduleTestSession",
-    next_study_state: "test_scheduled"
-  },
-  {
     name: "testMeNow",
-    next_study_state: "reviewing"
+    next_study_state: "recall_first_attempt"
   },
   {
     name: "recall_complete",
@@ -97,25 +94,6 @@ const assistantsWithTools: AssistantWithTool[] = [
       {
         type: "function",
         function: {
-          name: "scheduleTestSession",
-          description:
-            "This function schedules a test session a certain number of hours from now, based on student request or completion of topic editing.",
-          parameters: {
-            type: "object",
-            properties: {
-              hours: {
-                type: "integer",
-                description:
-                  "Number of hours from now when the test session should be scheduled."
-              }
-            },
-            required: ["hours"]
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
           name: "testMeNow",
           description:
             "This function initiates a topic recall session immediately upon student's request.",
@@ -137,7 +115,7 @@ const assistantsWithTools: AssistantWithTool[] = [
     name: "feedback",
     model: "gpt-3.5-turbo",
     temperature: 1,
-    study_states: ["recall_ready", "recalling"],
+    study_states: ["recall_ready", "recall_first_attempt", "recall_hinting"],
     prompt: `You are a friendly and supportive tutor dedicated to guiding the user (student) through an active free recall study session. 
     Objective: The goal is to assist the student in reflecting on their current understanding, recognize their achievements, and motivate them to fill in the gaps in their knowledge without directly providing the answers. Encourage curiosity and the desire to learn more, while making the feedback process a positive and constructive experience.
     Steps:

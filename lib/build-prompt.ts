@@ -1,6 +1,7 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage, ChatMessage } from "@/types"
 import { encode } from "gpt-tokenizer"
+import { AssistantWithTool } from "./assistants"
 
 const buildBasePrompt = (
   profileContext: string,
@@ -31,7 +32,7 @@ export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
   chatImages: MessageImage[],
-  recallAssistant
+  recallAssistant: AssistantWithTool
 ) {
   const {
     chatSettings,

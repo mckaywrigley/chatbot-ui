@@ -12,6 +12,7 @@ import {
 import { consumeReadableStream } from "@/lib/consume-stream"
 import recallAssistants, {
   AssistantWithTool,
+  StudyState,
   nextStudyStateForFunction
 } from "@/lib/assistants"
 import { Tables, TablesInsert } from "@/supabase/types"
@@ -523,7 +524,7 @@ export const handleCreateMessages = async (
   }
 }
 
-export const getRecallAssistantByStudyState = (studyState: string) =>
+export const getRecallAssistantByStudyState = (studyState: StudyState) =>
   recallAssistants.find(
     assistant =>
       assistant.study_states && assistant.study_states.includes(studyState)
@@ -538,28 +539,6 @@ export const getRecallAssistantByStudyState = (studyState: string) =>
 //   // return the functions array
 //   return recallAssistant.tools
 // }
-
-export const getNextStudyState = (
-  recallAssistant: AssistantWithTool | undefined | null,
-  functionName: string | null
-) => {
-  if (!recallAssistant || !functionName) {
-    return null // Assistant not found
-  }
-
-  // Find the tool by function name and return its next_study_state
-  const tool = recallAssistant.functions.find(
-    tool => tool.function.name === functionName
-  )
-  if (!tool) {
-    console.log("Function not found ")
-    return null // Tool or next_study_state not found
-  }
-
-  const nextStudyState = nextStudyStateForFunction(tool.function.name)
-
-  return nextStudyState
-}
 
 // // if the response is ok and has a score
 // if (
