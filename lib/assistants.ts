@@ -12,7 +12,7 @@ export type StudyState =
   | "no_topic_description"
   | "scoring"
 
-type AssistantName = "topic" | "feedback" | "score"
+type AssistantName = "topic" | "feedback" | "score" | "review"
 
 export interface AssistantWithTool {
   name: AssistantName
@@ -67,6 +67,11 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: ["Proceed to scoring.", "More hints."]
   },
   {
+    name: "scoring",
+    assistant: "score",
+    triggeredBy: "recallComplete"
+  },
+  {
     name: "score_updated",
     assistant: "score",
     triggeredBy: "updateTopicQuizResult",
@@ -74,17 +79,12 @@ export const studyStates: StudyStateObject[] = [
   },
   {
     name: "reviewing",
-    assistant: "topic",
+    assistant: "review",
     triggeredBy: "showFullTopicDescription"
   },
   {
     name: "no_topic_description",
     assistant: "topic"
-  },
-  {
-    name: "scoring",
-    assistant: "score",
-    triggeredBy: "recallComplete"
   }
 ]
 
@@ -205,6 +205,36 @@ The student can change the score if they so wish.`,
           name: "showFullTopicDescription",
           description:
             "This function shows the full topic description to the student."
+        }
+      }
+    ]
+  },
+  {
+    name: "review",
+    model: "gpt-3.5-turbo",
+    temperature: 1,
+    prompt: `You are a friendly and supportive tutor dedicated to guiding the user (student) through an active free recall study session. 
+      The student has just gone through a recall session and has reviewed the topic. Your goal is to assist the student in recalling the topic they have just learned to achieve full recall.
+      Compare the Student's Recall Attempt to the Source Topic Description: Identify which facts the student has remembered incorrectly or those they have missed. Provide encouraging feedback. Let the student know which facts they missed or recalled incorrectly. 
+      Next, allow the student to attempt another recall attempt until they have successfully recalled the topic.
+      Finally, when the student has successfully recalled the topic, tell them they have successfully completed the recall session.`,
+    functions: [
+      {
+        type: "function",
+        function: {
+          name: "updateTopicDescription",
+          description:
+            "This function updates the detailed topic description based on student inputs and finalized content.",
+          parameters: {
+            type: "object",
+            properties: {
+              topic_description: {
+                type: "string",
+                description: "The full topic description to be saved."
+              }
+            },
+            required: ["topic_description"]
+          }
         }
       }
     ]
