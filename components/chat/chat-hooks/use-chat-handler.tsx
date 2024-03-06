@@ -105,7 +105,7 @@ export const useChatHandler = () => {
 
     setToolInUse("none")
 
-    setChatStudyState("new")
+    setChatStudyState("topic_creation")
 
     // get the assistant from assistances context where name ="Study coach"
     const topicAssistant = assistants.find(

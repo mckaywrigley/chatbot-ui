@@ -1,15 +1,32 @@
 import OpenAI from "openai"
 
+export type StudyState =
+  | "topic_creation"
+  | "topic_created"
+  | "topic_description_updated"
+  | "test_scheduled"
+  | "recall_ready"
+  | "recalling"
+  | "score_updated"
+  | "reviewing"
+  | "no_topic_description"
+  | "scoring"
+
 export interface AssistantWithTool {
   name: string
   model: string
   temperature: number
-  study_states: string[]
+  study_states: StudyState[]
   prompt: string
   functions: OpenAI.Chat.Completions.ChatCompletionTool[]
 }
 
-const functionStudyStates = [
+interface NextStudyStateFunction {
+  name: string
+  next_study_state: StudyState
+}
+
+const nextStudyStateAfterFuncCall: NextStudyStateFunction[] = [
   {
     name: "updateTopicDescription",
     next_study_state: "topic_description_updated"
@@ -20,7 +37,7 @@ const functionStudyStates = [
   },
   {
     name: "testMeNow",
-    next_study_state: "reading"
+    next_study_state: "reviewing"
   },
   {
     name: "recall_complete",
@@ -28,16 +45,18 @@ const functionStudyStates = [
   },
   {
     name: "updateTopicQuizResult",
-    next_study_state: "reading"
+    next_study_state: "reviewing"
   },
   {
     name: "showFullTopicDescription",
-    next_study_state: "reading"
+    next_study_state: "reviewing"
   }
 ]
 
-export const nextStudyStateForFunction = (functionName: string) => {
-  const studyState = functionStudyStates.find(
+export const nextStudyStateForFunction = (
+  functionName: string
+): StudyState | null => {
+  const studyState = nextStudyStateAfterFuncCall.find(
     state => state.name === functionName
   )
   return studyState ? studyState.next_study_state : null
@@ -48,7 +67,7 @@ const assistantsWithTools: AssistantWithTool[] = [
     name: "topic",
     model: "gpt-3.5-turbo",
     temperature: 0.7,
-    study_states: ["no_topic_description", "score_updated", "reading"],
+    study_states: ["no_topic_description", "score_updated", "reviewing"],
     prompt: `You are an upbeat, encouraging tutor who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. Only ask one question at a time.
       First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
       Given this source information, produce a detailed multi paragraph explanation of the topic. In addition outline the key facts in a list.

@@ -57,18 +57,18 @@ const QuickResponse = () => {
 
       setChatMessages([promptMessage])
 
-      const feedbackAssistant = assistants.find(
-        assistant => assistant.name === "feedback"
-      )
+      // const feedbackAssistant = assistants.find(
+      //   assistant => assistant.name === "feedback"
+      // )
 
-      if (feedbackAssistant) {
-        setSelectedAssistant(feedbackAssistant)
+      // if (feedbackAssistant) {
+      //   setSelectedAssistant(feedbackAssistant)
 
-        const assistantTools = (
-          await getAssistantToolsByAssistantId(feedbackAssistant.id)
-        ).tools
-        setSelectedTools(assistantTools)
-      }
+      //   const assistantTools = (
+      //     await getAssistantToolsByAssistantId(feedbackAssistant.id)
+      //   ).tools
+      //   setSelectedTools(assistantTools)
+      // }
     }
     buttonConfigs.button2.text = "Edit topic description."
   } else if (chatStudyState === "recalling") {
@@ -77,7 +77,7 @@ const QuickResponse = () => {
   } else if (chatStudyState === "score_updated") {
     buttonConfigs.button1.text = "Show full topic description."
     buttonConfigs.button1.onClick = async () => {
-      await setChatStudyState("reading")
+      await setChatStudyState("reviewing")
       const promptMessage = {
         message: {
           id: "1",
