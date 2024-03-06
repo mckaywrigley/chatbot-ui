@@ -1,5 +1,6 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { rephraser } from "@/lib/retrieve/rephraser"
+import { reranker } from "@/lib/retrieve/reranker"
+import { retriever } from "@/lib/retrieve/retriever"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { ChatMessage } from "@/types"
@@ -42,8 +43,6 @@ export async function POST(request: Request) {
       }
     }
 
-    let chunks: any[] = []
-
     let openai
     if (profile.use_azure_openai) {
       openai = new OpenAI({
@@ -61,64 +60,44 @@ export async function POST(request: Request) {
 
     let rephrasedUserInput: string | null | undefined = null
     if (process.env.REPHRASER_ENABLED === "true") {
-      try {
-        rephrasedUserInput = await rephraser(
-          openai,
-          process.env.REPHRASER_MODEL_ID || "gpt-3.5-turbo-0125",
-          messageContent,
-          prompt,
-          process.env.RAPHRASER_MODE as any,
-          chatMessages,
-          parseInt(process.env.REPHRASER_MAX_HISTORY_MESSAGES || "3"),
-          parseInt(process.env.REPHRASER_MAX_HISTORY_TOKENS || "2048")
-        )
-      } catch (error: any) {
-        console.error("Error rephrasing user input", error)
-      }
+      rephrasedUserInput = await rephraser(
+        openai,
+        process.env.REPHRASER_MODEL_ID || "gpt-3.5-turbo-0125",
+        messageContent,
+        prompt,
+        process.env.RAPHRASER_MODE as any,
+        chatMessages,
+        parseInt(process.env.REPHRASER_MAX_HISTORY_MESSAGES || "3"),
+        parseInt(process.env.REPHRASER_MAX_HISTORY_TOKENS || "2048")
+      )
     }
 
-    if (embeddingsProvider === "openai") {
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: rephrasedUserInput || messageContent
-      })
+    const rerankerEnabled = process.env.RERANKER_ENABLED === "true"
 
-      const openaiEmbedding = response.data.map(item => item.embedding)[0]
+    const mostSimilarChunks = await retriever(
+      supabaseAdmin,
+      openai,
+      embeddingsProvider,
+      rephrasedUserInput || messageContent,
+      rerankerEnabled
+        ? parseInt(process.env.RERANKER_QUANTITY_ANALIZED || "12")
+        : sourceCount,
+      uniqueFileIds
+    )
 
-      const { data: openaiFileItems, error: openaiError } =
-        await supabaseAdmin.rpc("match_file_items_openai", {
-          query_embedding: openaiEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (openaiError) {
-        throw openaiError
-      }
-
-      chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(
-        rephrasedUserInput || messageContent
+    if (rerankerEnabled) {
+      const researchResults = await reranker(
+        openai,
+        rephrasedUserInput || messageContent,
+        mostSimilarChunks,
+        sourceCount,
+        process.env.RERANKER_MODEL_ID as any
       )
 
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
+      return new Response(JSON.stringify({ results: researchResults }), {
+        status: 200
+      })
     }
-
-    const mostSimilarChunks = chunks?.sort(
-      (a, b) => b.similarity - a.similarity
-    )
 
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
