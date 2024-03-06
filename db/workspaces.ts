@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 
+
 export const getHomeWorkspaceByUserId = async (userId: string) => {
   const { data: homeWorkspace, error } = await supabase
     .from("workspaces")
@@ -84,9 +85,9 @@ export const deleteWorkspace = async (workspaceId: string) => {
     .delete()
     .eq("id", workspaceId)
 
-  if (error) {
-    throw new Error(error.message)
-  }
+  // if (error) {
+  //   throw new Error(error.message)
+  // }
 
   return true
 }
