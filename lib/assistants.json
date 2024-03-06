@@ -8,7 +8,7 @@
       {
         "type": "function",
         "function": {
-          "name": "recall_complete",
+          "name": "recallComplete",
           "description": "This function should be called once the student has finished their recall phase.",
           "parameters": {
             "type": "object",

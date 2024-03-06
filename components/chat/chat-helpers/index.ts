@@ -10,11 +10,6 @@ import {
   buildGoogleGeminiFinalMessages
 } from "@/lib/build-prompt"
 import { consumeReadableStream } from "@/lib/consume-stream"
-import recallAssistants, {
-  AssistantWithTool,
-  StudyState,
-  nextStudyStateForFunction
-} from "@/lib/assistants"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
   ChatFile,
@@ -523,50 +518,3 @@ export const handleCreateMessages = async (
     setChatMessages(finalChatMessages)
   }
 }
-
-export const getRecallAssistantByStudyState = (studyState: StudyState) =>
-  recallAssistants.find(
-    assistant =>
-      assistant.study_states && assistant.study_states.includes(studyState)
-  )
-
-//   // get recall assistant functions
-// export const getRecallAssistantFunctions = (recallAssistant) => {
-//   if (!recallAssistant) {
-//     console.error("Assistant not found")
-//     return null
-//   }
-//   // return the functions array
-//   return recallAssistant.tools
-// }
-
-// // if the response is ok and has a score
-// if (
-//   response.headers
-//     .get("FUNCTION-NAMES")
-//     ?.includes("updateTopicQuizResult")
-// ) {
-//   console.log("updateTopicQuizResult was called and the response is ok")
-//   setChatStudyState("score_updated")
-// } else if (
-//   response.headers.get("FUNCTION-NAMES")?.includes("testMeNow")
-// ) {
-//   console.log("testMeNow was called and the response is ok")
-//   setChatStudyState("recall_ready")
-// } else if (
-//   // if the response is ok and has a score
-//   response.headers.get("FUNCTION-NAMES")?.includes("recall_complete")
-// ) {
-//   console.log("recall_complete was called and the response is ok")
-//   setChatStudyState("scoring")
-//   const selectedAssistant = assistants.find(
-//     assistant => assistant.name === "Scoring"
-//   )
-//   if (!selectedAssistant) {
-//     console.error("No assistant with name 'scoring' found")
-//     return
-//   }
-//   handleSelectAssistant(selectedAssistant)
-// } else {
-//   setChatStudyState("feedback")
-// }

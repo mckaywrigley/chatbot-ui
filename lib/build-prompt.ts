@@ -1,5 +1,5 @@
 import { Tables } from "@/supabase/types"
-import { ChatPayload, MessageImage, ChatMessage } from "@/types"
+import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { AssistantWithTool } from "./assistants"
 
@@ -32,7 +32,7 @@ export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
   chatImages: MessageImage[],
-  recallAssistant: AssistantWithTool
+  recallAssistant: AssistantWithTool | null
 ) {
   const {
     chatSettings,
@@ -42,6 +42,16 @@ export async function buildFinalMessages(
     chatFileItems,
     topicDescription
   } = payload
+
+  if (recallAssistant === null) {
+    recallAssistant = {
+      name: "topic",
+      prompt: chatSettings.prompt,
+      model: chatSettings.model,
+      temperature: chatSettings.temperature,
+      functions: []
+    }
+  }
 
   const sourceDescription =
     recallAssistant.name !== "topic" ? topicDescription : ""
@@ -198,7 +208,8 @@ export async function buildGoogleGeminiFinalMessages(
   const BUILT_PROMPT = buildBasePrompt(
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    "",
+    ""
   )
 
   let finalMessages = []

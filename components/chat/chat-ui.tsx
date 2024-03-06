@@ -37,6 +37,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatImages,
     assistants,
     setSelectedAssistant,
+    selectedAssistant,
     setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
@@ -196,8 +197,46 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
     if (chat.topic_description) {
       setTopicDescription(chat.topic_description)
-      setChatStudyState("recall_ready")
+
+      await setChatStudyState("recall_first_attempt")
+
+      setChatMessages([
+        {
+          message: {
+            id: "1",
+            user_id: "1",
+            content: `Try to recall as much as possible about the topic ${chat.name}.`,
+            created_at: new Date().toISOString(),
+            image_paths: [],
+            model: "",
+            role: "assistant",
+            sequence_number: 0,
+            updated_at: null,
+            assistant_id: selectedAssistant!.id,
+            chat_id: chat.id
+          },
+          fileItems: []
+        }
+      ])
     } else {
+      setChatMessages([
+        {
+          message: {
+            id: "1",
+            user_id: "1",
+            content: `Please add topic description below for ${chat.name}.`,
+            created_at: new Date().toISOString(),
+            image_paths: [],
+            model: "",
+            role: "assistant",
+            sequence_number: 0,
+            updated_at: null,
+            assistant_id: selectedAssistant!.id,
+            chat_id: chat.id
+          },
+          fileItems: []
+        }
+      ])
       setChatStudyState("no_topic_description")
     }
 

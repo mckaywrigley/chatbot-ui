@@ -221,7 +221,7 @@ export async function functionCalledByOpenAI(
   } else if (functionName === "scheduleTestSession") {
     tempData = await updateReviseDate(chatId, bodyContent.hours_time)
   } else {
-    // functionName === "testMeNow" or functionName === "recall_complete"
+    // functionName === "testMeNow" or functionName === "recallComplete"
     tempData = { success: true }
   }
   return tempData

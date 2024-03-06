@@ -5,7 +5,6 @@ export type StudyState =
   | "topic_created"
   | "topic_description_updated"
   | "test_scheduled"
-  | "recall_ready"
   | "recall_first_attempt"
   | "recall_hinting"
   | "score_updated"
@@ -13,58 +12,87 @@ export type StudyState =
   | "no_topic_description"
   | "scoring"
 
+type AssistantName = "topic" | "feedback" | "score"
+
 export interface AssistantWithTool {
-  name: string
+  name: AssistantName
   model: string
   temperature: number
-  study_states: StudyState[]
   prompt: string
   functions: OpenAI.Chat.Completions.ChatCompletionTool[]
 }
 
-interface NextStudyStateFunction {
-  name: string
-  next_study_state: StudyState
+export type FunctionCalls =
+  | "updateTopicDescription"
+  | "testMeNow"
+  | "recallComplete"
+  | "updateTopicQuizResult"
+  | "showFullTopicDescription"
+
+// Interface for objects within the studyStates array
+interface StudyStateObject {
+  name: StudyState
+  assistant: AssistantName
+  triggeredBy?: FunctionCalls
+  quickResponses?: string[]
 }
 
-const nextStudyStateAfterFuncCall: NextStudyStateFunction[] = [
+// Example usage
+export const studyStates: StudyStateObject[] = [
   {
-    name: "updateTopicDescription",
-    next_study_state: "topic_description_updated"
+    name: "topic_creation",
+    assistant: "topic"
   },
   {
-    name: "testMeNow",
-    next_study_state: "recall_first_attempt"
+    name: "topic_created",
+    assistant: "topic"
   },
   {
-    name: "recall_complete",
-    next_study_state: "scoring"
+    name: "topic_description_updated",
+    assistant: "topic",
+    triggeredBy: "updateTopicDescription"
   },
   {
-    name: "updateTopicQuizResult",
-    next_study_state: "reviewing"
+    name: "test_scheduled",
+    assistant: "topic"
   },
   {
-    name: "showFullTopicDescription",
-    next_study_state: "reviewing"
+    name: "recall_first_attempt",
+    assistant: "feedback",
+    triggeredBy: "testMeNow"
+  },
+  {
+    name: "recall_hinting",
+    assistant: "feedback",
+    quickResponses: ["Proceed to scoring.", "More hints."]
+  },
+  {
+    name: "score_updated",
+    assistant: "score",
+    triggeredBy: "updateTopicQuizResult",
+    quickResponses: ["Show full topic description."]
+  },
+  {
+    name: "reviewing",
+    assistant: "topic",
+    triggeredBy: "showFullTopicDescription"
+  },
+  {
+    name: "no_topic_description",
+    assistant: "topic"
+  },
+  {
+    name: "scoring",
+    assistant: "score",
+    triggeredBy: "recallComplete"
   }
 ]
-
-export const nextStudyStateForFunction = (
-  functionName: string
-): StudyState | null => {
-  const studyState = nextStudyStateAfterFuncCall.find(
-    state => state.name === functionName
-  )
-  return studyState ? studyState.next_study_state : null
-}
 
 const assistantsWithTools: AssistantWithTool[] = [
   {
     name: "topic",
     model: "gpt-3.5-turbo",
     temperature: 0.7,
-    study_states: ["no_topic_description", "score_updated", "reviewing"],
     prompt: `You are an upbeat, encouraging tutor who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. Only ask one question at a time.
       First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
       Given this source information, produce a detailed multi paragraph explanation of the topic. In addition outline the key facts in a list.
@@ -115,18 +143,17 @@ const assistantsWithTools: AssistantWithTool[] = [
     name: "feedback",
     model: "gpt-3.5-turbo",
     temperature: 1,
-    study_states: ["recall_ready", "recall_first_attempt", "recall_hinting"],
     prompt: `You are a friendly and supportive tutor dedicated to guiding the user (student) through an active free recall study session. 
     Objective: The goal is to assist the student in reflecting on their current understanding, recognize their achievements, and motivate them to fill in the gaps in their knowledge without directly providing the answers. Encourage curiosity and the desire to learn more, while making the feedback process a positive and constructive experience.
     Steps:
     Step 1. Compare the Student's Recall Attempt to the Source Topic Description below: Identify which facts the student has remembered correctly and acknowledge these specifically to reinforce their learning.
     Step 2. Provide Encouraging Feedback: Offer positive reinforcement for the facts the student has successfully recalled. Emphasize the effort and what was done well. Highlight Areas for Improvement: Without directly giving away the answers, hint at areas or topics the student might not have mentioned or fully remembered. Use questions or suggestive statements that encourage the student to think deeper or research further. 
-    Step 3. If you have no more hints to give or if the students requests to move on to scoring, call the tool / function "recall_complete". This will allow the student to progress to the next study state; scoring.`,
+    Step 3. If you have no more hints to give or if the students requests to move on to scoring, call the tool / function "recallComplete". This will allow the student to progress to the next study state; scoring.`,
     functions: [
       {
         type: "function",
         function: {
-          name: "recall_complete",
+          name: "recallComplete",
           description:
             "This function should be called once the student has finished their recall phase.",
           parameters: {
@@ -147,7 +174,6 @@ const assistantsWithTools: AssistantWithTool[] = [
     name: "score",
     model: "gpt-3.5-turbo",
     temperature: 1,
-    study_states: ["scoring"],
     prompt: `Compare the source material with the students recall attempt(s) for this conversation. 
 Assess the student's recall attempt on a scale from 0 (no recall) to 100 (perfect recall). Consider the accuracy, detail, and number of facts recalled in your scoring.
 Call the tool/function updateTopicQuizResult with score.
@@ -184,6 +210,36 @@ The student can change the score if they so wish.`,
     ]
   }
 ]
+
+export const getRecallAssistantByStudyState = (
+  studyState: StudyState
+): AssistantWithTool => {
+  const assistantName = studyStates.find(
+    state => state.name === studyState
+  )?.assistant
+
+  if (!assistantName) {
+    throw new Error(`No assistant found for study state: ${studyState}`)
+  }
+
+  return assistantsWithTools.find(
+    assistant => assistant.name === assistantName
+  ) as AssistantWithTool
+}
+
+export const nextStudyStateForFunction = (
+  functionName: FunctionCalls
+): StudyState => {
+  const studyState = studyStates.find(
+    state => state.triggeredBy === functionName
+  )
+
+  if (!studyState) {
+    throw new Error(`No study state found for function: ${functionName}`)
+  }
+
+  return studyState.name
+}
 
 // const assistantDefaults = {
 //   context_length: 4096,

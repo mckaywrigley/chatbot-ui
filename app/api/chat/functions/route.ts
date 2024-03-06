@@ -1,6 +1,8 @@
-import recallAssistants, {
+import recallAssistants from "@/lib/assistants"
+import {
+  nextStudyStateForFunction,
   StudyState,
-  nextStudyStateForFunction
+  FunctionCalls
 } from "@/lib/assistants"
 import {
   checkApiKey,
@@ -65,7 +67,7 @@ export async function POST(request: Request) {
     // assume only one tool call
     const toolCall = toolCalls[0]
 
-    let functionName = toolCall.function.name
+    let functionName = toolCall.function.name as FunctionCalls
     const argumentsString = toolCall.function.arguments.trim()
     const parsedArgs = JSON.parse(argumentsString)
 
@@ -73,7 +75,7 @@ export async function POST(request: Request) {
     let bodyContent = parsedArgs.requestBody || parsedArgs
     let toolId = toolCall.id
 
-    if (functionName === "recall_complete") {
+    if (functionName === "recallComplete") {
       // call openAI with scoring recall agent
       messages.push({
         tool_call_id: toolCall.id,

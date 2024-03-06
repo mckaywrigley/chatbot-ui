@@ -15,14 +15,10 @@ import {
   handleLocalChat,
   handleRetrieval,
   processResponse,
-  validateChatSettings,
-  getRecallAssistantByStudyState
+  validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
-import { deleteChatFilesByChatId } from "@/db/chat-files"
-import { set } from "date-fns"
-import { StudyState } from "@/lib/assistants"
-import recallAssistants from "@/lib/assistants"
+import { StudyState, getRecallAssistantByStudyState } from "@/lib/assistants"
 
 export const useChatHandler = () => {
   const router = useRouter()
