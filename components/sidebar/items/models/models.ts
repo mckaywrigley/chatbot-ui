@@ -1,3 +1,4 @@
+// Get models from backend/URL
 export async function getModels() {
   try {
     const response = await fetch("/api/models", {
@@ -26,6 +27,7 @@ export async function getModels() {
   }
 }
 
+// Send URL to backend
 export async function sendURL(baseUrl: string) {
   try {
     await fetch("/api/models", {
@@ -47,6 +49,7 @@ export async function sendURL(baseUrl: string) {
   }
 }
 
+// Check if URL is valid
 export const isValidUrl = urlString => {
   const cleanURL = urlString.replace(/[^\w\s.:/?&=%-<>]/g, "")
   const urlPattern = new RegExp(
@@ -71,6 +74,7 @@ export const isValidUrl = urlString => {
   }
 }
 
+// Remove search parameters from URL
 export function removeSearchParams(urlString) {
   try {
     const url = new URL(urlString)

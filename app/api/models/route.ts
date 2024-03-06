@@ -2,12 +2,14 @@ import { ServerRuntime } from "next"
 import { LLMID } from "@/types"
 
 export const runtime: ServerRuntime = "edge"
+
 let url = ""
 
 export async function GET() {
   try {
     const modelIDs = []
     if (url == "") return Response.json({ modelIDs })
+
     // Get models from an url
     const models = await fetch(url, {
       method: "GET",
@@ -15,9 +17,11 @@ export async function GET() {
         "Content-Type": "application/json"
       }
     })
+
     if (!models.ok) return Response.json({ modelIDs })
 
     const data = await models.json()
+    // Sanitize and add to array
     for (const model of data.data) {
       if (typeof model.id === "string") {
         modelIDs.push(sanitizeInput(model.id.trim()))
@@ -25,6 +29,7 @@ export async function GET() {
     }
     modelIDs.sort()
 
+    // Map array of models
     const allModels = [
       ...modelIDs.map(models => ({
         modelId: models as LLMID,
@@ -33,6 +38,7 @@ export async function GET() {
     ]
 
     return Response.json({ allModels })
+
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500

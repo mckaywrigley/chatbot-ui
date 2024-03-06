@@ -45,6 +45,7 @@ export const CreateModel: FC<CreateModelProps> = ({ isOpen, onOpenChange }) => {
     setIsOpen(false)
   }
 
+  // Get data when opening dropdown
   const openDropdown = async (dropdownIsOpen: boolean) => {
     if (dropdownIsOpen && baseUrl !== "") {
       const data = await getModels()

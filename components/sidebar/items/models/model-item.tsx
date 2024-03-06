@@ -43,6 +43,7 @@ export const ModelItem: FC<ModelItemProps> = ({ model }) => {
     setIsOpen(false)
   }
 
+  // Get data when opening dropdown and when loading the model to edit
   const openDropdown = async (dropdownIsOpen: boolean) => {
     if (!dropdownIsOpen) {
       setArray([])
