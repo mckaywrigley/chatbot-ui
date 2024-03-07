@@ -1,6 +1,6 @@
 # Define IAM role for EKS cluster
 data "aws_iam_policy_document" "assume_role" {
-  source_json = <<EOF
+  # source_json = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "assume_role" {
     }
   ]
 }
-EOF
+# EOF
 }
 
 resource "aws_iam_role" "eks_cluster" {
