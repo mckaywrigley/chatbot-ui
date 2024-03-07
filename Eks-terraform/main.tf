@@ -27,13 +27,13 @@ data "aws_vpc" "default" {
 }
 #get public subnets for cluster
 data "aws_subnets" "public" {
-  vpc_id = data.aws_vpcs.default.ids[0]
-//
+  # vpc_id = data.aws_vpcs.default.ids[0]
+
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
-//
+
 
 }
 #cluster provision
