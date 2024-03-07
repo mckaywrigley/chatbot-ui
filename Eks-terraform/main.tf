@@ -25,6 +25,16 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
 data "aws_vpc" "default" {
   default = true
 }
+
+data "aws_subnets" "public" {
+  vpc_id = data.aws_vpc.default.id
+
+  filter {
+    name   = "map-public-ip-on-launch"
+    values = ["true"]
+  }
+}
+//
 #get public subnets for cluster
 data "aws_subnets" "public" {
   # vpc_id = data.aws_vpcs.default.ids[0]
@@ -33,9 +43,9 @@ data "aws_subnets" "public" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
-
-
 }
+
+//
 #cluster provision
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
