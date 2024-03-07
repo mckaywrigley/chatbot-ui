@@ -17,7 +17,7 @@ resource "aws_iam_role" "example" {
 }
 
 resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::326071639025:role/chatbot
+  policy_arn = "arn:aws:iam::326071639025:role/chatbot"
   role       = aws_iam_role.example.name
 }
 
