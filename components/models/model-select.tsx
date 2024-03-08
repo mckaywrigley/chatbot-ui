@@ -163,7 +163,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               )
               .filter(model => !model.modelName.startsWith("openai/"))
 			  .filter(model => !model.modelName.startsWith("perplexity/pplx"))	  
-			  .filter(model => model.modelName !== "GPT-4")
+			  .filter(model => model.modelName !== "GPT-3.5")
 			  .filter(model => model.modelName !== "google/gemini-pro-vision")
 			  .filter(model => model.modelName !== "Sonar Small Online")
 			  .filter(model => model.modelName !== "Sonar Medium Online")
