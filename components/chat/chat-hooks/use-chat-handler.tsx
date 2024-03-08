@@ -145,8 +145,7 @@ export const useChatHandler = () => {
       if (allFiles.length > 0) setShowFilesDisplay(true)
     } else if (selectedPreset) {
       setChatSettings({
-        //model: selectedPreset.model as LLMID,
-		model: 'gpt-3.5-turbo',
+        model: selectedPreset.model as LLMID,
         prompt: selectedPreset.prompt,
         temperature: selectedPreset.temperature,
         contextLength: selectedPreset.context_length,
