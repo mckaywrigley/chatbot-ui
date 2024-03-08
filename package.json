@@ -65,7 +65,7 @@
     "@supabase/supabase-js": "^2.38.4",
     "@tabler/icons-react": "^2.40.0",
     "@upstash/redis": "^1.28.3",
-    "@vercel/analytics": "^1.1.1",
+    "@vercel/analytics": "^1.2.2",
     "@vercel/edge-config": "^0.4.1",
     "@xenova/transformers": "^2.13.4",
     "ai": "^2.2.31",
