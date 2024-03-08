@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     description: APP_DESCRIPTION,
     images: [
       {
-        url: "/icon-512x512.png",
+        url: "https://chat.hackerai.co/icon-512x512.png",
         width: 512,
         height: 512,
         alt: "HackerGPT"
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     description: APP_DESCRIPTION,
     images: [
       {
-        url: "/icon-512x512.png",
+        url: "https://chat.hackerai.co/icon-512x512.png",
         width: 512,
         height: 512,
         alt: "HackerGPT"
