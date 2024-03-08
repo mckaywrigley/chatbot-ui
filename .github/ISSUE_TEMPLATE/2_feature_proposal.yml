@@ -1,0 +1,21 @@
+name: '🌠 Feature Proposal'
+description: 'Propose a new feature or enhancement'
+title: '[Feature Proposal] '
+labels: ['🌠 Feature Proposal']
+body:
+  - type: textarea
+    attributes:
+      label: '🥰 Feature Overview'
+      description: Provide a detailed and articulate description of the problem or need that this feature will address.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '🧐 Suggested Solution'
+      description: Clearly outline your proposed solution or the feature you envision, including how it would function and its intended benefits.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '📝 Additional Information'
+      description: Include any additional information or context that could help in understanding the feature better, such as potential impacts, use cases, or examples.

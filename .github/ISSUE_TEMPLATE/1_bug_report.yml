@@ -1,0 +1,48 @@
+name: '🐛 Bug Report'
+description: 'Report an bug'
+title: '[Bug] '
+labels: ['🐛 Bug']
+body:
+  - type: dropdown
+    attributes:
+      label: '💻 Operating System'
+      options:
+        - Windows
+        - macOS
+        - Ubuntu
+        - Other Linux
+        - iOS
+        - Android
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: '🌐 Browser'
+      options:
+        - Chrome
+        - Edge
+        - Safari
+        - Firefox
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '🐛 Bug Description'
+      description: Provide a detailed and specific description of the bug, highlighting the main issue and its impact.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: '🚦 Expected Behavior'
+      description: Describe in detail what the expected behavior or outcome should have been under normal circumstances.
+  - type: textarea
+    attributes:
+      label: '📷 Steps to Reproduce'
+      description: Outline a clear and precise step-by-step process to reproduce the bug, ensuring reproducibility.
+  - type: textarea
+    attributes:
+      label: '📝 Additional Context'
+      description: Offer any extra information that might help in understanding the issue better. This includes non-reproducible cases or any unique scenarios pertaining to your problem.

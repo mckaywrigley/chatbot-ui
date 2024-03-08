@@ -51,12 +51,15 @@ export async function getCheckoutUrl(): Promise<Result<string>> {
     }
   }
 
-  if (customer && (!customer.metadata.userId || customer.metadata.userId !== user.id)) {
+  if (
+    customer &&
+    (!customer.metadata.userId || customer.metadata.userId !== user.id)
+  ) {
     await stripe.customers.update(customer.id, {
-      metadata: { userId: user.id },
-    });
+      metadata: { userId: user.id }
+    })
   }
-  
+
   const price = await retrievePriceAndValidation(stripe, productId)
 
   const session = await stripe.checkout.sessions.create({

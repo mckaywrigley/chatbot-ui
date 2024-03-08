@@ -12,11 +12,13 @@ export default function AboutUsPage() {
               What is HackerGPT?
             </h3>
             <p className="text-lg text-gray-800 dark:text-gray-300">
-              HackerGPT is your intelligent robot assistant, specialized for
-              ethical hackers. Built on an extensive dataset of hacking
-              resources, including detailed guides, hacking write-ups and bug
-              bounty reports, we continuously evolve and enhance its
-              capabilities.
+              HackerGPT is an AI-powered assistant that is specifically designed
+              for ethical hackers. It is capable of providing comprehensive
+              assistance and answering your hacking related questions using a
+              vast dataset that includes detailed guides, extensive hacking
+              write-ups, and in-depth bug bounty reports. In addition to that,
+              HackerGPT enables direct interaction with hacking tools, which can
+              significantly amplify your hacking endeavors.
             </p>
           </div>
 
@@ -27,22 +29,22 @@ export default function AboutUsPage() {
             <p className="mb-4 text-lg text-gray-800 dark:text-gray-300">
               When you ask a question, it&apos;s sent to our server. We verify
               user authenticity and manage your question quota based on whether
-              you&apos;re a free or pro user. We then search our database for
-              information that closely matches your question. For questions not
-              in English, we translate them to find relevant information from
-              our database. If a strong match is found, it&apos;s incorporated
-              into the AI&apos;s response process. Your question is then
-              securely passed to OpenRouter or OpenAI for processing, with no
-              personal information sent. Responses vary based on the module:
+              you&apos;re a free or pro user. We then search our hacking
+              database for information that closely matches your question. For
+              questions that are not in English, we translate them to obtain
+              relevant information from our hacking database. If we find a
+              strong match, we integrate it into the AI&apos;s response process.
+              We then securely send your question to OpenRouter for processing
+              without sending any personal information. Responses vary depending
+              on the module:
             </p>
             <ul className="ml-8 list-disc space-y-2">
               <li>
-                HackerGPT: A tuned version of Mixtral 8x7B with semantic search
-                on our data.
+                HackerGPT: A fine-tuned version of Mixtral 8x7B with semantic
+                search on our data.
               </li>
               <li>
-                GPT-4 Turbo: The latest and greatest from OpenAI, paired with
-                our unique prompt.
+                HackerGPT Pro: A Mistral Large, paired with our unique prompt.
               </li>
             </ul>
           </div>
@@ -59,16 +61,16 @@ export default function AboutUsPage() {
               <li>MistralAI and OpenAI doesn&apos;t know who&apos;s asking.</li>
             </ul>
           </div> */}
-          {/* <div>
+          <div>
             <h3 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-300">
               What Makes HackerGPT Special?
             </h3>
             <p className="mb-4 text-lg text-gray-800 dark:text-gray-300">
-              HackerGPT isn&apos;t just an AI that can answer your hacking
-              questions; it actually can hack with you using popular open-source
-              hacking tools. To see all the tools you can use with HackerGPT,
-              type <code>/tools</code>. If you want a quick guide on using a
-              specific tool, like Subfinder, just type{" "}
+              HackerGPT is not just an AI that answers your hacking questions,
+              it can also assist you in hacking using widely used open-source
+              hacking tools. If you want to see all available tools, you can
+              open the Plugin Store. Additionally, if you need a quick guide on
+              using a specific tool such as Subfinder, select the tool and type{" "}
               <code>/subfinder -h</code>.
             </p>
             <p className="mb-4 text-lg text-gray-800 dark:text-gray-300">
@@ -121,7 +123,7 @@ export default function AboutUsPage() {
             <p className="mb-4 text-lg text-gray-800 dark:text-gray-300">
               Along with these, there are more tools available with HackerGPT.
             </p>
-          </div> */}
+          </div>
           <div>
             <h3 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-300">
               Is HackerGPT Open Source?
