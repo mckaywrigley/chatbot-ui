@@ -214,12 +214,12 @@ export const useChatHandler = () => {
       const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
 
       if (chatStudyState.length > 0 && recallAssistant) {
-        const formattedMessages = await buildFinalMessages(
-          payload,
-          profile!,
-          chatImages,
-          recallAssistant
-        )
+        // const formattedMessages = await buildFinalMessages(
+        //   payload,
+        //   profile!,
+        //   chatImages,
+        //   recallAssistant
+        // )
 
         const response = await fetch("/api/chat/functions", {
           method: "POST",
@@ -227,11 +227,12 @@ export const useChatHandler = () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
+            messages: isRegeneration
+              ? [...chatMessages]
+              : [...chatMessages, tempUserChatMessage],
             chatId: currentChat?.id,
-            recallAssistantFunctions: recallAssistant?.functions ?? [],
-            chatStudyState
+            chatStudyState,
+            topicDescription
           })
         })
 
