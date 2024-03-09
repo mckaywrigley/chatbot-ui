@@ -35,14 +35,12 @@ export const getAssistantToolsByAssistantId = async (assistantId: string) => {
     name: assistantTools.name
   }
 }
-
-async function insertTools(
-  tableName: string,
-  tools: TablesInsert<"assistant_tools">[] | TablesInsert<"assistant_tools">
+async function insertAssistantTool(
+  assistantTool: TablesInsert<"assistant_tools">
 ) {
   const { data, error } = await supabase
-    .from(tableName)
-    .insert(tools)
+    .from("assistant_tools")
+    .insert(assistantTool)
     .select("*")
 
   if (!data) {
@@ -52,43 +50,47 @@ async function insertTools(
   return data
 }
 
-async function handleToolInsertion(assistantTools: any, tableName: string) {
-  const isPlatformTool = (tool: any) =>
-    platformToolList.some(ptool => ptool.id === tool.tool_id)
-  const filteredTools = assistantTools.filter(isPlatformTool)
-  return await insertTools(tableName, filteredTools)
+async function insertAssistantPlatformTool(
+  assistantPlatformTool: TablesInsert<"assistant_platform_tools">
+) {
+  const { data, error } = await supabase
+    .from("assistant_platform_tools")
+    .insert(assistantPlatformTool)
+    .select("*")
+
+  if (!data) {
+    throw new Error(error.message)
+  }
+
+  return data
 }
 
 export const createAssistantTool = async (
   assistantTool: TablesInsert<"assistant_tools">
 ) => {
-  const tableName = platformToolList.some(
-    ptool => ptool.id === assistantTool.tool_id
-  )
-    ? "assistant_platform_tools"
-    : "assistant_tools"
-  return await insertTools(tableName, assistantTool)
+  if (platformToolList.some(ptool => ptool.id === assistantTool.tool_id)) {
+    return await insertAssistantPlatformTool(assistantTool)
+  } else {
+    return await insertAssistantTool(assistantTool)
+  }
 }
-
 export const createAssistantTools = async (
   assistantTools: TablesInsert<"assistant_tools">[]
 ) => {
-  const createdAssistantUserTools = await handleToolInsertion(
-    assistantTools,
-    "assistant_tools"
+  const createdAssistantUserTools = await Promise.all(
+    assistantTools
+      .filter(
+        tool => !platformToolList.some(ptool => ptool.id === tool.tool_id)
+      )
+      .map(async tool => await insertAssistantTool(tool))
   )
-  const createdPlatformTools = await handleToolInsertion(
-    assistantTools,
-    "assistant_platform_tools"
+  const createdPlatformTools = await Promise.all(
+    assistantTools
+      .filter(tool => platformToolList.some(ptool => ptool.id === tool.tool_id))
+      .map(async tool => await insertAssistantPlatformTool(tool))
   )
 
   return { createdAssistantUserTools, createdPlatformTools }
-}
-
-export const createAssistantPlatformTools = async (
-  assistantPlatformTools: TablesInsert<"assistant_platform_tools">[]
-) => {
-  return await insertTools("assistant_platform_tools", assistantPlatformTools)
 }
 
 export const deleteAssistantTool = async (
