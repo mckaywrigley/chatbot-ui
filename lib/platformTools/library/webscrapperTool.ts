@@ -59,8 +59,7 @@ export const webscrapperTool: PlatformTool = {
   toolName: "webscrappingTools", // This is the name of the tool in the code.
   version: "v1.0.0", // This is the version of the tool.
   // This is the description of the tool.
-  description:
-    "This tool fetches data from a URL and returns it in markdown format.",
+  description: "This tool enables data retrieval from URLs mentioned in chat.",
   toolsFunctions: [
     {
       id: "FetchDataFromUrl", // This is the unique identifier of the tool function.
