@@ -1,4 +1,5 @@
 import { openapiToFunctions } from "@/lib/openapi-conversion"
+import { platformToolFunction } from "@/lib/platformTools/utils/platformToolsUtils"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
@@ -91,6 +92,25 @@ export async function POST(request: Request) {
 
         if (!schemaDetail) {
           throw new Error(`Function ${functionName} not found in any schema`)
+        }
+
+        // Reroute to local executor for local tools
+        if (schemaDetail.url === "local://executor") {
+          const toolFunction = platformToolFunction(functionName)
+          if (!toolFunction) {
+            throw new Error(`Function ${functionName} not found`)
+          }
+
+          const data = await toolFunction(parsedArgs)
+
+          messages.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: functionName,
+            content: JSON.stringify(data)
+          })
+
+          continue
         }
 
         const pathTemplate = Object.keys(schemaDetail.routeMap).find(
