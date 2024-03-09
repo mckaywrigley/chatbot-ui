@@ -1,0 +1,5 @@
+{
+  "Ask anything. Type \"@\" for assistants, \"/\" for prompts, \"#\" for files, and \"!\" for tools.": "何でも質問してください。「@」でアシスタント、「/」でプロンプト、「#」でファイル、「!」を入力するとツールを呼び出せます。",
+  "Images are not supported for this model. Use models like GPT-4 Vision instead.": "このモデルでは画像はサポートされていません。代わりに GPT-4 Vision のようなモデルを使用してください。",
+  "Quick Settings": "クイック設定"
+}
