@@ -1,6 +1,6 @@
 {
-  "short_name": "Chatbot UI",
-  "name": "Chatbot UI",
+  "short_name": "PXAI Labs Premium",
+  "name": "PixelVerseAI Labs Premium - The all in one AI chatbot tool",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -19,7 +19,7 @@
       "purpose":"maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/login",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000"
