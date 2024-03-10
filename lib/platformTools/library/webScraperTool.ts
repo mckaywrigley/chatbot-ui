@@ -15,7 +15,7 @@ const fetchAndReturn = async (url: string) => {
 }
 
 // This function fetches data from a URL and returns it in markdown format.
-const webscrapper = async ({
+const webScraper = async ({
   parameters: { url }
 }: {
   parameters: { url: string }
@@ -49,21 +49,28 @@ const webscrapper = async ({
     mdDoc = "Failed to fetch the URL: " + error.message
   }
 
+  // Fix for relative URLs
+  const urlRegex = /href="((?:\.\.\/)*(?:\.\/)*)\/?(?!\/)/g
+  mdDoc = mdDoc.replace(
+    urlRegex,
+    (match, p1) => `href="${new URL(p1, modifiedUrl).href}`
+  )
+
   return { url, mdDoc }
 }
 
 // This is the definition of the webscrapping tool.
-export const webscrapperTool: PlatformTool = {
+export const webScraperTool: PlatformTool = {
   id: "b3f07a6e-5e01-423e-9f06-ee51830608be", // This is the unique identifier of the tool.
-  name: "Webscrapping Tools", // This is the name of the tool.
-  toolName: "webscrappingTools", // This is the name of the tool in the code.
+  name: "Web Scraper Tools", // This is the name of the tool.
+  toolName: "webScraperTools", // This is the name of the tool in the code.
   version: "v1.0.0", // This is the version of the tool.
   // This is the description of the tool.
   description: "This tool enables data retrieval from URLs mentioned in chat.",
   toolsFunctions: [
     {
       id: "FetchDataFromUrl", // This is the unique identifier of the tool function.
-      toolFunction: webscrapper, // This is the function that will be called when the tool function is executed.
+      toolFunction: webScraper, // This is the function that will be called when the tool function is executed.
       description: "Fetch data from a URL and return it in markdown format.", // This is the description of the tool function.
       parameters: [
         // These are the parameters of the tool function.
