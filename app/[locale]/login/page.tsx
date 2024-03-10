@@ -193,12 +193,12 @@ export default async function Login({
           Login
         </SubmitButton>
 
-        <SubmitButton
+        {/* <SubmitButton
           formAction={signUp}
           className="border-foreground/20 mb-2 rounded-md border px-4 py-2"
         >
           Sign Up
-        </SubmitButton>
+        </SubmitButton> */}
 
         <div className="text-muted-foreground mt-1 flex justify-center text-sm">
           <span className="mr-1">Forgot your password?</span>
