@@ -67,7 +67,9 @@ export const useChatHandler = () => {
     setTopicDescription,
     assistants,
     setChatStudyState,
-    chatStudyState
+    chatStudyState,
+    setRecallAnalysis,
+    recallAnalysis
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -214,12 +216,14 @@ export const useChatHandler = () => {
       const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
 
       if (chatStudyState.length > 0 && recallAssistant) {
-        // const formattedMessages = await buildFinalMessages(
-        //   payload,
-        //   profile!,
-        //   chatImages,
-        //   recallAssistant
-        // )
+        const formattedMessages = await buildFinalMessages(
+          payload,
+          profile!,
+          chatImages,
+          recallAssistant
+        )
+
+        const formattedMessagesWithoutSystem = formattedMessages.slice(1)
 
         const response = await fetch("/api/chat/functions", {
           method: "POST",
@@ -227,18 +231,21 @@ export const useChatHandler = () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            messages: isRegeneration
-              ? [...chatMessages]
-              : [...chatMessages, tempUserChatMessage],
+            messages: formattedMessagesWithoutSystem,
             chatId: currentChat?.id,
             chatStudyState,
-            topicDescription
+            topicDescription,
+            recallAnalysis
           })
         })
 
         const newStudyState = response.headers.get("NEW-STUDY-STATE")
         console.log({ newStudyState })
         if (newStudyState) setChatStudyState(newStudyState as StudyState)
+
+        const analysis = response.headers.get("ANALYSIS")
+        console.log({ analysis })
+        if (analysis) setRecallAnalysis(analysis)
 
         //////////////////////////
 

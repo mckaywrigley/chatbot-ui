@@ -1,9 +1,4 @@
-import recallAssistants from "@/lib/assistants"
-import {
-  nextStudyStateForFunction,
-  StudyState,
-  FunctionCalls
-} from "@/lib/assistants"
+import { StudyState } from "@/lib/assistants"
 import {
   checkApiKey,
   getServerProfile,
@@ -11,16 +6,17 @@ import {
 } from "@/lib/server/server-chat-helpers"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { messages, chatId, chatStudyState, topicDescription } = json as {
-    messages: any[]
-    chatId: string
-    chatStudyState: StudyState
-    topicDescription: string
-  }
+  const { messages, chatId, chatStudyState, topicDescription, recallAnalysis } =
+    json as {
+      messages: any[]
+      chatId: string
+      chatStudyState: StudyState
+      topicDescription: string
+      recallAnalysis: string
+    }
 
   try {
     const profile = await getServerProfile()
@@ -32,8 +28,25 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
-    const studentMessage = messages[messages.length - 1].message.content
+    const studentMessage = messages[messages.length - 1].content
+    const messagesWithoutLast = messages.slice(0, -1)
+
     console.log({ studentMessage })
+
+    const getScore = async (messagesFromLLM: any) => {
+      console.log({ messagesFromLLM })
+      const scoreRunner = await openai.beta.chat.completions.stream({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: `Based on the student's recall attempt and any subsequent hints provided, calculate the recall score on a scale from 0 to 100. Points should be awarded fully for correct initial recalls and halved for correct recalls post-hint. Return the score as a single number.`
+          },
+          ...messages
+        ]
+      })
+      return await scoreRunner.finalContent()
+    }
 
     if (chatStudyState === "recall_first_attempt") {
       const analysisRunner = await openai.beta.chat.completions.stream({
@@ -41,8 +54,9 @@ export async function POST(request: Request) {
         messages: [
           {
             role: "system",
-            content: `Compare the students recall attempt with the source material.
-Then compile a list of correct, incorrect and forgotten facts in JSON format; use keys "correct", "incorrect" and "forgotten" with an array of strings in each. `
+            content: `"Given the student's recall attempt and the original source material, identify discrepancies and omissions. 
+Please provide the results in JSON format, listing incorrect facts under 'incorrect_facts' and forgotten facts under 'forgotten_facts'. 
+Each list should contain strings that succinctly summarise the errors or omissions. Ensure the facts are presented clearly for educational review."`
           },
           {
             role: "user",
@@ -55,6 +69,15 @@ Student recall: """${studentMessage}"""`
       })
 
       const analysis = await analysisRunner.finalContent()
+      const serverResult = await functionCalledByOpenAI(
+        "updateRecallAnalysis",
+        [analysis],
+        chatId
+      )
+      if (serverResult.success === false) {
+        throw new Error("Server error")
+      }
+
       console.log("analysis:", analysis)
 
       const feedbackRunner = await openai.beta.chat.completions.stream({
@@ -62,11 +85,11 @@ Student recall: """${studentMessage}"""`
         messages: [
           {
             role: "system",
-            content: `You are a friendly and supportive tutor dedicated to guiding the user (student) through an active free recall study session.
-Given the analysis of correct, incorrect and forgotten facts, offer positive reinforcement for the facts the student has successfully recalled.
-Give the correct answers to the incorrect facts recalled.
-If the student forgot facts, offer a hint to the student in a way that does not reveal the answer. 
-If the student did not make an error, simply offer them an encouraging comment and ask them if they would like to continue to scoring their attempt.`
+            content: `As a friendly and supportive tutor, your goal is to guide the user through an active free recall study session. Follow these steps:
+1. Commend the student on the facts they've correctly recalled, providing positive reinforcement.
+2. Correct any inaccuracies in the student's recall, supplying the right information.
+3. For any forgotten facts, offer hints that encourage recall without directly giving away the answers.
+4. If no errors are present, offer encouragement and inquire if they wish to proceed to evaluate their recall attempt.`
           },
           {
             role: "user",
@@ -78,154 +101,71 @@ Analysis: """${analysis}"""`
       })
 
       const stream = OpenAIStream(feedbackRunner)
-      // return new StreamingTextResponse(stream, {
-      //   headers: {
-      //     "NEW-STUDY-STATE": "score"
-      //   }
-      // })
-
-      return new StreamingTextResponse(stream)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": "recall_hinting",
+          ANALYSIS: JSON.stringify(analysis)
+        }
+      })
     }
 
-    // const firstResponse = await openai.chat.completions.create({
-    //   model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-    //   messages,
-    //   tools: recallAssistantFunctions
-    // })
+    if (chatStudyState === "recall_hinting") {
+      let newStudyState: StudyState = "recall_hinting"
+      const newMessages = [
+        {
+          role: "system",
+          content: `You are a friendly and supportive tutor. Your tasks are to:
+          1. Analyze the given 'forgotten facts' and assist the student in recalling them by providing hints. Ensure the hints encourage thinking without revealing the answers directly.
+          2. Respond to the student's guesses by affirming correct answers or gently correcting wrong ones.
+          3. If all hints have been given, or the student wishes to proceed, use the 'getScore' tool to evaluate the recall attempt. Provide a score and generate constructive feedback based on this outcome. Ensure to motivate the student for future learning endeavors.`
+        },
+        ...messagesWithoutLast,
+        {
+          role: "user",
+          content: `Topic source: """${topicDescription}"""
+Student response: """${studentMessage}"""
+Analysis: """${recallAnalysis}"""`
+        }
+      ]
+      const feedbackRunner = await openai.beta.chat.completions
+        .runTools({
+          stream: true,
+          model: "gpt-3.5-turbo",
+          messages: newMessages,
+          tools: [
+            {
+              type: "function",
+              function: {
+                function: getScore,
+                parameters: {
+                  type: "object",
+                  properties: {
+                    messages: { type: "string" }
+                  }
+                },
+                description:
+                  "Function to calculate the score of the student's recall attempt and provide constructive feedback."
+              }
+            }
+          ]
+        })
+        .on("message", msg => console.log(msg))
+        .on("finalFunctionCall", (result: any) => {
+          console.log("finalFunctionCall getScore result:", result)
+          const functionName = result.function.function.name
+          if (functionName === "getScore") {
+            newStudyState = "score_updated"
+          }
+        })
 
-    // const message = firstResponse.choices[0].message
-    // messages.push(message)
-    // const toolCalls = message.tool_calls || []
+      const stream = OpenAIStream(feedbackRunner)
 
-    // console.log("firstResponse message:", message)
-
-    // if (toolCalls.length === 0) {
-    //   // If no tool calls, return the first response directly without a second OpenAI call
-    //   return new Response(message.content, {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       ...(chatStudyState === "recall_first_attempt" && {
-    //         "NEW-STUDY-STATE": "recall_hinting"
-    //       })
-    //     }
-    //   })
-    // }
-
-    // // assume only one tool call
-    // const toolCall = toolCalls[0]
-
-    // let functionName = toolCall.function.name as FunctionCalls
-    // const argumentsString = toolCall.function.arguments.trim()
-    // const parsedArgs = JSON.parse(argumentsString)
-
-    // let functionResponse = {}
-    // let bodyContent = parsedArgs.requestBody || parsedArgs
-    // let toolId = toolCall.id
-
-    // if (functionName === "recallComplete") {
-    //   // call openAI with scoring recall agent
-    //   messages.push({
-    //     tool_call_id: toolCall.id,
-    //     role: "tool",
-    //     name: functionName,
-    //     content: JSON.stringify({ success: true })
-    //   })
-
-    //   const secondResponse = await openai.chat.completions.create({
-    //     model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-    //     messages
-    //   })
-
-    //   const recallSummary = secondResponse.choices[0].message.content
-
-    //   const scoreRecallAssistant = recallAssistants.find(
-    //     assistant => assistant.name === "score"
-    //   )
-
-    //   if (!scoreRecallAssistant) {
-    //     throw new Error("No score assistant found")
-    //   }
-
-    //   messages.push({
-    //     role: "user",
-    //     content: scoreRecallAssistant?.prompt
-    //   })
-
-    //   functionName = "updateTopicQuizResult"
-    //   const updateTopicQuizResultFunction = scoreRecallAssistant.functions.find(
-    //     func => func.function.name === functionName
-    //   )
-    //   // error if no updateTopicQuizResultFunction is found
-    //   if (!updateTopicQuizResultFunction) {
-    //     throw new Error("No updateTopicQuizResult function found")
-    //   }
-
-    //   const scoreFirstResponse = await openai.chat.completions.create({
-    //     model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-    //     messages,
-    //     tools: [updateTopicQuizResultFunction] // Wrap the function in an array
-    //   })
-
-    //   const scoreMessage = scoreFirstResponse.choices[0].message
-    //   messages.push(scoreMessage)
-
-    //   const scoreToolCalls = scoreMessage.tool_calls || []
-    //   const finalMessageContent = scoreFirstResponse.choices[0].message.content
-
-    //   if (scoreToolCalls.length === 0) {
-    //     return new Response(finalMessageContent, {
-    //       headers: {
-    //         "Content-Type": "application/json"
-    //       }
-    //     })
-    //   }
-
-    //   const scoreToolCall = scoreToolCalls[0]
-
-    //   const updateTopicQuizArgumentsString =
-    //     scoreToolCall.function.arguments.trim()
-    //   const updateTopicQuizParsedArgs = JSON.parse(
-    //     updateTopicQuizArgumentsString
-    //   )
-
-    //   bodyContent =
-    //     updateTopicQuizParsedArgs.requestBody || updateTopicQuizParsedArgs
-
-    //   toolId = scoreToolCall.id
-    // }
-
-    // functionResponse = await functionCalledByOpenAI(
-    //   functionName,
-    //   bodyContent,
-    //   chatId
-    // )
-
-    // messages.push({
-    //   tool_call_id: toolId,
-    //   role: "tool",
-    //   name: functionName,
-    //   content: JSON.stringify(functionResponse)
-    // })
-
-    // const finalResponse = await openai.chat.completions.create({
-    //   model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-    //   messages,
-    //   stream: true
-    // })
-
-    // const stream = OpenAIStream(finalResponse)
-
-    // const nextStudyState = nextStudyStateForFunction(functionName)
-
-    // if (nextStudyState) {
-    //   return new StreamingTextResponse(stream, {
-    //     headers: {
-    //       "NEW-STUDY-STATE": nextStudyState
-    //     }
-    //   })
-    // } else {
-    //   return new StreamingTextResponse(stream)
-    // }
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
+    }
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

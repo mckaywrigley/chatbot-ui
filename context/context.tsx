@@ -83,6 +83,8 @@ interface ChatbotUIContext {
   setTopicDescription: Dispatch<SetStateAction<string>>
   chatStudyState: StudyState
   setChatStudyState: Dispatch<SetStateAction<StudyState>>
+  recallAnalysis: string
+  setRecallAnalysis: Dispatch<SetStateAction<string>>
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
@@ -213,6 +215,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setTopicDescription: () => {},
   chatStudyState: "topic_creation",
   setChatStudyState: () => {},
+  recallAnalysis: "",
+  setRecallAnalysis: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,

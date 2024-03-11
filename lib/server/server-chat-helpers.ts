@@ -1,4 +1,4 @@
-import { Database, Tables } from "@/supabase/types"
+import { Database, Tables, TablesUpdate } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
@@ -73,10 +73,7 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   }
 }
 
-export async function updateTopicQuizResult(
-  chatId: string,
-  test_result: number
-) {
+export const getChatById = async (chatId: string) => {
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -95,6 +92,43 @@ export async function updateTopicQuizResult(
     .select("*")
     .eq("id", chatId)
     .maybeSingle()
+
+  return chat
+}
+
+const updateChat = async (chatId: string, chat: TablesUpdate<"chats">) => {
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  const { error } = await supabase
+    .from("chats")
+    .update(chat)
+    .eq("id", chatId)
+    .select("*")
+    .single()
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+export async function updateTopicQuizResult(
+  chatId: string,
+  test_result: number
+) {
+  const chat = await getChatById(chatId)
 
   // if updated_at is null, set it to created_at
   const updated_at = (chat?.updated_at || chat?.created_at) as string
@@ -128,101 +162,53 @@ export async function updateTopicQuizResult(
 
   console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
-  const { error } = await supabase
-    .from("chats")
-    .update({ test_result, ebisu_model: newModel, revise_date })
-    .eq("id", chatId)
-
-  if (error) {
-    return { success: false, error: error.message }
-  }
-
-  return { success: true, message: `Saved test result of ${test_result}%.` }
+  const chatUpdateStatus = await updateChat(chatId, {
+    test_result,
+    ebisu_model: newModel,
+    revise_date
+  })
+  return chatUpdateStatus
 }
 
 export async function updateTopicDescription(
   chatId: string,
   topic_description: string
 ) {
-  const cookieStore = cookies()
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        }
-      }
-    }
-  )
-
-  const { error } = await supabase
-    .from("chats")
-    .update({ topic_description })
-    .eq("id", chatId)
-
-  if (error) {
-    return { success: false, error: error.message }
-  }
-
-  return { success: true, message: `Saved topic description.` }
+  const chatUpdateStatus = await updateChat(chatId, {
+    topic_description
+  })
+  return chatUpdateStatus
 }
 
 // update revise date by chat id and hours time
 export async function updateReviseDate(chatId: string, hours_time: number) {
-  const cookieStore = cookies()
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        }
-      }
-    }
-  )
-
   let currentTime = new Date()
   const reviseDate = currentTime.setHours(currentTime.getHours() + 12)
 
-  const { error } = await supabase
-    .from("chats")
-    .update({ revise_date: new Date(reviseDate).toISOString() })
-    .eq("id", chatId)
-
-  if (error) {
-    return { success: false, error: error.message }
-  }
-
-  return { success: true, message: `Saved revise date of ${hours_time} hours.` }
+  const chatUpdateStatus = await updateChat(chatId, {
+    revise_date: new Date(reviseDate).toISOString()
+  })
+  return chatUpdateStatus
 }
 
 export async function functionCalledByOpenAI(
   functionName: string,
-  bodyContent: {
-    test_result: number
-    topic_description: string
-    hours_time: number
-    recallSummary: string
-  },
+  args: any[],
   chatId: string
 ) {
-  let tempData = {}
+  let result = { success: false }
   if (functionName === "updateTopicQuizResult") {
     // Update the chat/topic name & content in the database
-    tempData = await updateTopicQuizResult(chatId, bodyContent.test_result)
+    result = await updateTopicQuizResult(chatId, args[0])
   } else if (functionName === "updateTopicDescription") {
-    tempData = await updateTopicDescription(
-      chatId,
-      bodyContent.topic_description
-    )
+    result = await updateTopicDescription(chatId, args[0])
   } else if (functionName === "scheduleTestSession") {
-    tempData = await updateReviseDate(chatId, bodyContent.hours_time)
+    result = await updateReviseDate(chatId, args[0])
+  } else if (functionName === "updateRecallAnalysis") {
+    result = await updateChat(chatId, { recall_analysis: args[0] })
   } else {
     // functionName === "testMeNow" or functionName === "recallComplete"
-    tempData = { success: true }
+    result = { success: true }
   }
-  return tempData
+  return result
 }
