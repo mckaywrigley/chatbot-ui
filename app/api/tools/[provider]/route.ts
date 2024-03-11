@@ -1,17 +1,21 @@
+import { ChatClientProxy } from "@/lib/chat/client/ChatClientProxy"
+import { OPENAI_LLM_LIST } from "@/lib/models/llm/openai-llm-list"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
 import { platformToolFunction } from "@/lib/platformTools/utils/platformToolsUtils"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
-import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import { ChatSettings, LLMID } from "@/types"
 import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 export async function POST(request: Request) {
+  const url = new URL(request.url)
+  const provider = url.pathname.split("/").pop()
+
   const json = await request.json()
-  const { chatSettings, messages, selectedTools } = json as {
+  const { chatSettings, messages, customModelId, selectedTools } = json as {
     chatSettings: ChatSettings
     messages: any[]
+    customModelId?: string
     selectedTools: Tables<"tools">[]
   }
 
@@ -60,8 +64,20 @@ export async function POST(request: Request) {
       }
     }
 
+    let toolModel = chatSettings.model
+    let isOpenAIModel = true
+
+    const modelDetails = OPENAI_LLM_LIST.find(
+      (model: any) => model.modelId === chatSettings.model
+    )
+    if (!modelDetails) {
+      toolModel =
+        (process.env.OPENAI_DEFAULT_TOOL_MODEL as LLMID) || "gpt-3.5-turbo"
+      isOpenAIModel = false
+    }
+
     const firstResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+      model: toolModel,
       messages,
       tools: allTools.length > 0 ? allTools : undefined
     })
@@ -105,7 +121,7 @@ export async function POST(request: Request) {
 
           messages.push({
             tool_call_id: toolCall.id,
-            role: "tool",
+            role: isOpenAIModel ? "tool" : "system",
             name: functionName,
             content: JSON.stringify(data)
           })
@@ -211,22 +227,24 @@ export async function POST(request: Request) {
 
         messages.push({
           tool_call_id: toolCall.id,
-          role: "tool",
+          role: isOpenAIModel ? "tool" : "system",
           name: functionName,
           content: JSON.stringify(data)
         })
       }
     }
 
-    const secondResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages,
-      stream: true
-    })
+    // Second response with the tool call results
+    const chatClientProxy = new ChatClientProxy(provider || ``)
 
-    const stream = OpenAIStream(secondResponse)
-
-    return new StreamingTextResponse(stream)
+    try {
+      await chatClientProxy.initialize(customModelId)
+      return await chatClientProxy.createChatCompletion(chatSettings, messages)
+    } catch (error: any) {
+      return new Response(JSON.stringify({ message: error.message }), {
+        status: error.status || 500
+      })
+    }
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

@@ -1,7 +1,6 @@
 import { ChatSettings } from "@/types"
-import { StreamingTextResponse } from "ai"
+import { StreamingTextResponse, GoogleGenerativeAIStream } from "ai"
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatClientBase } from "../ChatClientBase"
 import { ApiError } from "@/lib/error/ApiError"
@@ -27,10 +26,14 @@ export class GoogleChatClient extends ChatClientBase {
       model: chatSettings.model
     })
 
+    if (messages[messages.length - 1].role === "model") messages.pop()
+
     if (chatSettings.model === "gemini-pro") {
       const lastMessage = messages.pop()
 
-      return googleModel
+      console.log(lastMessage)
+
+      const result = await googleModel
         .startChat({
           history: messages,
           generationConfig: {
@@ -38,14 +41,18 @@ export class GoogleChatClient extends ChatClientBase {
           }
         })
         .sendMessageStream(lastMessage.parts)
+
+      return GoogleGenerativeAIStream(result)
     } else if (chatSettings.model === "gemini-pro-vision") {
       // FIX: Hacky until chat messages are supported
       const HACKY_MESSAGE = messages[messages.length - 1]
 
-      return googleModel.generateContent([
+      const result = await googleModel.generateContentStream([
         HACKY_MESSAGE.prompt,
         HACKY_MESSAGE.imageParts
       ])
+
+      return GoogleGenerativeAIStream(result)
     } else {
       throw new Error("Unsupported model type for Google AI")
     }

@@ -281,7 +281,12 @@ export const useChatHandler = () => {
           chatImages
         )
 
-        const response = await fetch("/api/chat/tools", {
+        const apiEndpoint =
+          modelData?.provider === "custom"
+            ? "/api/tools/custom"
+            : `/api/tools/${modelData?.provider}`
+
+        const response = await fetch(apiEndpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
