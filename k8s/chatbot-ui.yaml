@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: chatbot-ui
-          image: <docker user>/chatbot-ui:latest
+          image: vikashmuktha/chatbot:latest
           resources: {}
           ports:
             - containerPort: 3000
