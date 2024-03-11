@@ -1,60 +1,94 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: chatbot-ui
----
-apiVersion: v1
-kind: Secret
-metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
-type: Opaque
-data:
-  OPENAI_API_KEY: a8194b4433msha3464448dba2486p1cf17ajsn06aa658de95b
+# # apiVersion: v1
+# # kind: Namespace
+# # metadata:
+# #   name: chatbot-ui
+# # ---
+# # apiVersion: v1
+# # kind: Secret
+# # metadata:
+# #   namespace: chatbot-ui
+# #   name: chatbot-ui
+# # type: Opaque
+# # data:
+# #   OPENAI_API_KEY: <OPEN-API-KEYS>
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   namespace: chatbot-ui
+#   name: chatbot-ui
+#   labels:
+#     app: chatbot-ui
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: chatbot-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: chatbot-ui
+#     spec:
+#       containers:
+#         - name: chatbot-ui
+#           image: vikashmuktha/chatbot:latest
+#           resources: {}
+#           ports:
+#             - containerPort: 3000
+#           # env:
+#           #   - name: OPENAI_API_KEY
+#           #     valueFrom:
+#           #       secretKeyRef:
+#           #         name: chatbot-ui
+#           #         key: OPENAI_API_KEY
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   namespace: chatbot-ui
+#   name: chatbot-ui
+#   labels:
+#     app: chatbot-ui
+# spec:
+#   ports:
+#     - name: http
+#       protocol: TCP
+#       port: 80
+#       targetPort: 3000
+#   selector:
+#     app: chatbot-ui
+#   type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
-  labels:
-    app: chatbot-ui
+  name: chatbot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chatbot-ui
+      app: chatbot
   template:
     metadata:
       labels:
-        app: chatbot-ui
+        app: chatbot
     spec:
       containers:
-        - name: chatbot-ui
-          image: vikashmuktha/chatbot:latest
-          resources: {}
-          ports:
-            - containerPort: 3000
-          env:
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: chatbot-ui
-                  key: OPENAI_API_KEY
+      - name: chatbot
+        image: viakshmuktha/chatbot:latest
+        ports:
+        - containerPort: 3000   # Use port 3000
+
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  namespace: chatbot-ui
-  name: chatbot-ui
-  labels:
-    app: chatbot-ui
+  name: chatbot-service
 spec:
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 3000
   selector:
-    app: chatbot-ui
-  type: ClusterIP
+    app: chatbot
+  ports:
+  - protocol: TCP
+    port: 80                 # Expose port 80
+    targetPort: 3000
+  type: LoadBalancer
