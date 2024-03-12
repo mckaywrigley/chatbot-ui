@@ -303,6 +303,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             height={34}
             width={34}
             alt={"Image"}
+            unoptimized
           />
         ) : (
           <Button size="icon" variant="ghost">
