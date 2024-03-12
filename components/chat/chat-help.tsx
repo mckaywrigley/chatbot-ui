@@ -44,7 +44,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
 
             <Link
               className="cursor-pointer hover:opacity-50"
-              href="https://github.com/Hacker-GPT/HackerGPT"
+              href="https://github.com/Hacker-GPT/HackerGPT-2.0/"
               target="_blank"
               rel="noopener noreferrer"
             >

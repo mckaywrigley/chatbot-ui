@@ -135,7 +135,7 @@ export default function AboutUsPage() {
               developers around the world to contribute to its development and
               improvement. Check out our GitHub repository for more details:{" "}
               <a
-                href="https://github.com/Hacker-GPT/HackerGPT"
+                href="https://github.com/Hacker-GPT/HackerGPT-2.0/"
                 className="text-blue-600 hover:text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
               >
                 HackerGPT on GitHub
