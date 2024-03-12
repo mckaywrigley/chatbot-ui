@@ -53,3 +53,5 @@ worker-*.js
 # Sentry Config File
 .sentryclirc
 
+supabase/config.toml
+public/worker-development.js
