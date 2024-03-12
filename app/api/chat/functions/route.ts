@@ -77,7 +77,11 @@ Student recall: """${studentMessage}"""`
       })
 
       stream = OpenAIStream(feedbackRunner)
-      return { stream, newStudyState: "recall_hinting" }
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": "recall_hinting"
+        }
+      })
     case "recall_hinting":
       const updateTopicQuizResult = async (response: { score: number }) => {
         const serverResult = await functionCalledByOpenAI(
@@ -128,8 +132,14 @@ Student recall: """${studentMessage}"""`
         ]
       })
 
-      stream = OpenAIStream(feedbackHinting)
-      return { stream, newStudyState: "score_updated" }
+      const finalAssistantContent = await feedbackHinting.finalContent()
+
+      return new Response(finalAssistantContent, {
+        headers: {
+          "Content-Type": "application/json",
+          "NEW-STUDY-STATE": "score_updated"
+        }
+      })
 
     default:
       // Handle other states or error
@@ -155,7 +165,7 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
-    const { stream, newStudyState } = await callLLM(
+    const response = await callLLM(
       chatId,
       openai,
       topicDescription,
@@ -164,11 +174,7 @@ export async function POST(request: Request) {
       recallAnalysis
     )
 
-    return new StreamingTextResponse(stream, {
-      headers: {
-        "NEW-STUDY-STATE": newStudyState
-      }
-    })
+    return response
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
