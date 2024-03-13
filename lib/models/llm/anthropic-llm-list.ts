@@ -1,6 +1,6 @@
 import { LLM } from "@/types"
 
-const ANTHROPIC_PLATORM_LINK =
+const ANTHROPIC_PLATFORM_LINK =
   "https://docs.anthropic.com/claude/reference/getting-started-with-the-api"
 
 // Anthropic Models (UPDATED 03/13/24) -----------------------------
@@ -11,7 +11,7 @@ const CLAUDE_2: LLM = {
   modelName: "Claude 2",
   provider: "anthropic",
   hostedId: "claude-2.1",
-  platformLink: ANTHROPIC_PLATORM_LINK,
+  platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false
 }
 
@@ -21,7 +21,7 @@ const CLAUDE_INSTANT: LLM = {
   modelName: "Claude Instant",
   provider: "anthropic",
   hostedId: "claude-instant-1.2",
-  platformLink: ANTHROPIC_PLATORM_LINK,
+  platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false
 }
 
@@ -31,7 +31,7 @@ const CLAUDE_3_HAIKU: LLM = {
   modelName: "Claude 3 Haiku",
   provider: "anthropic",
   hostedId: "claude-3-haiku-20240307",
-  platformLink: ANTHROPIC_PLATORM_LINK,
+  platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false
 }
 
@@ -41,7 +41,7 @@ const CLAUDE_3_SONNET: LLM = {
   modelName: "Claude 3 Sonnet",
   provider: "anthropic",
   hostedId: "claude-3-sonnet-20240229",
-  platformLink: ANTHROPIC_PLATORM_LINK,
+  platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false
 }
 
@@ -51,7 +51,7 @@ const CLAUDE_3_OPUS: LLM = {
   modelName: "Claude 3 Opus",
   provider: "anthropic",
   hostedId: "claude-3-opus-20240229",
-  platformLink: ANTHROPIC_PLATORM_LINK,
+  platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false
 }
 
