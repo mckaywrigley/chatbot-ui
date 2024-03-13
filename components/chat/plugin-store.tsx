@@ -10,8 +10,6 @@ import {
 } from "@tabler/icons-react"
 
 import { PluginSummary, PluginID } from "@/types/plugins"
-import { usePluginContext } from "@/components/chat/chat-hooks/PluginProvider"
-import { DialogTrigger } from "@radix-ui/react-dialog"
 
 export const availablePlugins: PluginSummary[] = [
   {
@@ -38,6 +36,19 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 2,
+    name: "CVEMap",
+    selectorName: "CVEMap: Explore CVEs",
+    value: PluginID.CVEMAP,
+    icon: "https://avatars.githubusercontent.com/u/50994705",
+    description:
+      "Efficiently explore CVE databases, linking vulnerabilities to exploits and remediations.",
+    categories: ["Free", "Popular", "New"],
+    githubRepoUrl: "https://github.com/projectdiscovery/cvemap",
+    isInstalled: false,
+    isPremium: false
+  },
+  {
+    id: 3,
     name: "CyberChef",
     selectorName: "CyberChef: Data Manipulation",
     value: PluginID.CYBERCHEF,
@@ -50,58 +61,58 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: false
   },
   {
-    id: 3,
+    id: 4,
     name: "Nuclei",
     selectorName: "Nuclei: Discover Vulnerabilities",
     value: PluginID.NUCLEI,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customisable vulnerability scanner",
-    categories: ["New", "Popular"],
+    categories: ["Popular"],
     githubRepoUrl: "https://github.com/projectdiscovery/nuclei",
     isInstalled: false,
     isPremium: true
   },
   {
-    id: 4,
+    id: 5,
     name: "Katana",
     selectorName: "Katana: Crawl Websites",
     value: PluginID.KATANA,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
       "A web crawling framework designed to navigate and parse for hidden details",
-    categories: ["New", "Popular"],
+    categories: ["Popular"],
     githubRepoUrl: "https://github.com/projectdiscovery/katana",
     isInstalled: false,
     isPremium: true
   },
   {
-    id: 5,
+    id: 6,
     name: "HttpX",
     selectorName: "HttpX: Web Analysis",
     value: PluginID.HTTPX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
       "An HTTP toolkit that probes services, web servers, and other valuable metadata",
-    categories: ["New", "Popular"],
+    categories: ["Popular"],
     githubRepoUrl: "https://github.com/projectdiscovery/httpx",
     isInstalled: false,
     isPremium: true
   },
   {
-    id: 6,
+    id: 7,
     name: "Naabu",
     selectorName: "Naabu: Discover Ports",
     value: PluginID.NAABU,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
       "A fast port scanner designed to scan large networks at high speed",
-    categories: ["New", "Popular"],
+    categories: ["Popular"],
     githubRepoUrl: "https://github.com/projectdiscovery/naabu",
     isInstalled: false,
     isPremium: true
   },
   {
-    id: 7,
+    id: 8,
     name: "GAU",
     selectorName: "GAU: Url Enumeration",
     value: PluginID.GAU,
@@ -114,7 +125,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: false
   },
   {
-    id: 8,
+    id: 9,
     name: "AlterX",
     selectorName: "AlterX: Subdomain Wordlist Generator",
     value: PluginID.ALTERX,

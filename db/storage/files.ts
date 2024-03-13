@@ -14,7 +14,9 @@ export const uploadFile = async (
   )
 
   if (file.size > SIZE_LIMIT) {
-    throw new Error(`File must be less than ${Math.floor(SIZE_LIMIT / 1000000)}MB`)
+    throw new Error(
+      `File must be less than ${Math.floor(SIZE_LIMIT / 1000000)}MB`
+    )
   }
 
   const filePath = `${payload.user_id}/${Buffer.from(payload.file_id).toString("base64")}`
