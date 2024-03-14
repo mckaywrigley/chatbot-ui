@@ -1,9 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
-import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
-import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
-import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
@@ -112,41 +108,9 @@ export const useChatHandler = () => {
           | "openai"
           | "local"
       })
-
-      let allFiles = []
-
-      const assistantFiles = (
-        await getAssistantFilesByAssistantId(selectedAssistant.id)
-      ).files
-      allFiles = [...assistantFiles]
-      const assistantCollections = (
-        await getAssistantCollectionsByAssistantId(selectedAssistant.id)
-      ).collections
-      for (const collection of assistantCollections) {
-        const collectionFiles = (
-          await getCollectionFilesByCollectionId(collection.id)
-        ).files
-        allFiles = [...allFiles, ...collectionFiles]
-      }
-      const assistantTools = (
-        await getAssistantToolsByAssistantId(selectedAssistant.id)
-      ).tools
-
-      setSelectedTools(assistantTools)
-      setChatFiles(
-        allFiles.map(file => ({
-          id: file.id,
-          name: file.name,
-          type: file.type,
-          file: null
-        }))
-      )
-
-      if (allFiles.length > 0) setShowFilesDisplay(true)
     } else if (selectedPreset) {
       setChatSettings({
-        //model: selectedPreset.model as LLMID,
-		model: 'gpt-3.5-turbo',
+        model: selectedPreset.model as LLMID,
         prompt: selectedPreset.prompt,
         temperature: selectedPreset.temperature,
         contextLength: selectedPreset.context_length,
@@ -158,22 +122,22 @@ export const useChatHandler = () => {
           | "local"
       })
     } else if (selectedWorkspace) {
-      // setChatSettings({
-      //   model: (selectedWorkspace.default_model ||
-      //     "gpt-4-1106-preview") as LLMID,
-      //   prompt:
-      //     selectedWorkspace.default_prompt ||
-      //     "You are a friendly, helpful AI assistant.",
-      //   temperature: selectedWorkspace.default_temperature || 0.5,
-      //   contextLength: selectedWorkspace.default_context_length || 4096,
-      //   includeProfileContext:
-      //     selectedWorkspace.include_profile_context || true,
-      //   includeWorkspaceInstructions:
-      //     selectedWorkspace.include_workspace_instructions || true,
-      //   embeddingsProvider:
-      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-      //     "openai"
-      // })
+      setChatSettings({
+        model: (selectedWorkspace.default_model ||
+          "gpt-4-1106-preview") as LLMID,
+        prompt:
+          selectedWorkspace.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature: selectedWorkspace.default_temperature || 0.5,
+        contextLength: selectedWorkspace.default_context_length || 4096,
+        includeProfileContext:
+          selectedWorkspace.include_profile_context || true,
+        includeWorkspaceInstructions:
+          selectedWorkspace.include_workspace_instructions || true,
+        embeddingsProvider:
+          (selectedWorkspace.embeddings_provider as "openai" | "local") ||
+          "openai"
+      })
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
@@ -241,7 +205,9 @@ export const useChatHandler = () => {
         setToolInUse("retrieval")
 
         retrievedFileItems = await handleRetrieval(
-          userInput,
+          messageContent,
+          chatSettings!.prompt,
+          chatMessages,
           newMessageFiles,
           chatFiles,
           chatSettings!.embeddingsProvider,
