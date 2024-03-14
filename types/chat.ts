@@ -6,6 +6,7 @@ export interface ChatSettings {
   prompt: string
   temperature: number
   contextLength: number
+  maxResponseLength: number
   includeProfileContext: boolean
   includeWorkspaceInstructions: boolean
   embeddingsProvider: "openai" | "local"
