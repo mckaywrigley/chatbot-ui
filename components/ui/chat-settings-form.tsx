@@ -30,7 +30,7 @@ interface ChatSettingsFormProps {
 export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
   chatSettings,
   onChangeChatSettings,
-  useAdvancedDropdown = false,
+  useAdvancedDropdown = true,
   showTooltip = true
 }) => {
   const { profile, models } = useContext(ChatbotUIContext)
