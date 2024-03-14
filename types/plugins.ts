@@ -28,6 +28,7 @@ export enum PluginID {
   ALTERX = "alterx",
   WEB_SEARCH = "websearch",
   ENHANCED_SEARCH = "enhancedsearch",
+  WEB_SCRAPER = "webscraper",
   PLUGINS_STORE = "pluginselector"
 }
 
@@ -67,6 +68,9 @@ export const Plugins: Record<PluginID, Plugin> = {
   },
   [PluginID.ENHANCED_SEARCH]: {
     id: PluginID.ENHANCED_SEARCH
+  },
+  [PluginID.WEB_SCRAPER]: {
+    id: PluginID.WEB_SCRAPER
   },
   [PluginID.PLUGINS_STORE]: {
     id: PluginID.PLUGINS_STORE

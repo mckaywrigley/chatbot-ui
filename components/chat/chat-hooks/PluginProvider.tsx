@@ -59,7 +59,7 @@ export const PluginProvider = ({ children }: { children: React.ReactNode }) => {
     const localData = localStorage.getItem("installedPlugins")
     let installedPlugins = localData ? JSON.parse(localData) : []
 
-    const defaultPluginIds = [1, 2, 3]
+    const defaultPluginIds = [1, 2, 3, 10]
 
     if (!localData) {
       defaultPluginIds.forEach(id => {

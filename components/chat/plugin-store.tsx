@@ -137,6 +137,18 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: false
   },
   {
+    id: 10,
+    name: "Web Scraper",
+    selectorName: "Web Scraper: Extract Data from Websites",
+    value: PluginID.WEB_SCRAPER,
+    icon: "https://avatars.githubusercontent.com/u/50994705",
+    description: "Extract data from websites and chat with the extracted data",
+    categories: ["Free", "Popular", "New"],
+    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
+    isInstalled: false,
+    isPremium: false
+  },
+  {
     id: 99,
     name: "Plugins Store",
     selectorName: "Plugins Store",
