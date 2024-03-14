@@ -30,13 +30,13 @@ export async function POST(request: Request) {
         return {
           ...message,
           content: message?.content.map((content: any) => {
-            if (content?.type === "image_url") {
+            if (content?.type === "image_url" && content?.image_url?.length) {
               return {
                 type: "image",
                 source: {
                   type: "base64",
-                  media_type: getMediaTypeFromDataURL(content?.image_url ?? ""),
-                  data: getBase64FromDataURL(content?.image_url ?? "")
+                  media_type: getMediaTypeFromDataURL(content.image_url),
+                  data: getBase64FromDataURL(content.image_url)
                 }
               }
             } else {
