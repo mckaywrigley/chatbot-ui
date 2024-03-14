@@ -180,7 +180,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                 >
                   <div className="rounded bg-blue-500 p-2">
                     {(() => {
-                      let fileExtension = file.type.includes("/")
+                      let fileExtension = file.type?.includes("/")
                         ? file.type.split("/")[1]
                         : file.type
 

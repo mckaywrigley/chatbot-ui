@@ -20,10 +20,16 @@ import {
 } from "../chat-helpers"
 import { useAlertContext } from "@/context/alert-context"
 import { PluginID } from "@/types/plugins"
+import { getFileById } from "@/db/files"
+import { toast } from "sonner"
+import { usePromptAndCommand } from "./use-prompt-and-command"
 
 export const useChatHandler = () => {
   const router = useRouter()
   const { dispatch: alertDispatch } = useAlertContext()
+  const {
+    handleSelectUserFile
+  } = usePromptAndCommand()
 
   const {
     userInput,
@@ -163,6 +169,7 @@ export const useChatHandler = () => {
     chatMessages: ChatMessage[],
     isRegeneration: boolean
   ) => {
+
     try {
       setUserInput("")
       setIsGenerating(true)
@@ -194,6 +201,37 @@ export const useChatHandler = () => {
         selectedWorkspace,
         messageContent
       )
+
+      
+      const urlRegex = /https?:\/\/[^\s]+/g;
+      const urls = messageContent.match(urlRegex) || [];
+      console.log(urls); // This line is for demonstration and can be removed or replaced as needed.
+
+      for (const url of urls) {
+          const response = await fetch(`/api/retrieval/process/web`, {
+            method: "POST",
+            body: JSON.stringify({ 
+              embeddingsProvider: "openai",
+              workspace_id: selectedWorkspace?.id,
+              url: url
+            })
+          })
+          const { message, fileId } = await response.json()
+        
+        if (message === "Embed Successful") {
+            const fileFromDb = await getFileById(fileId);
+          if (fileFromDb) {              
+              if( !newMessageFiles.some(file => file.id === fileFromDb.id) && !chatFiles.some(file => file.id === fileFromDb.id)) {
+                handleSelectUserFile(fileFromDb);
+                newMessageFiles.push({...fileFromDb, file: null})
+              }               
+            } else {
+              toast.error("File not found in database.");
+            }
+          } else {
+            toast.error("Failed to process websites.")
+          }        
+      }
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 

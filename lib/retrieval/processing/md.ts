@@ -4,7 +4,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processMarkdown = async (
-  markdown: Blob
+  markdown: Blob, prepend: string = ""
 ): Promise<FileItemChunk[]> => {
   const fileBuffer = Buffer.from(await markdown.arrayBuffer())
   const textDecoder = new TextDecoder("utf-8")
@@ -22,9 +22,10 @@ export const processMarkdown = async (
   for (let i = 0; i < splitDocs.length; i++) {
     const doc = splitDocs[i]
 
+    const finalContent = prepend + (prepend?.length>0 ? "\n\n" : "") + doc.pageContent
     chunks.push({
-      content: doc.pageContent,
-      tokens: encode(doc.pageContent).length
+      content: finalContent,
+      tokens: encode(finalContent).length
     })
   }
 
