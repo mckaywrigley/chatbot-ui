@@ -32,7 +32,7 @@ const CLAUDE_3_HAIKU: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-haiku-20240307",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false
+  imageInput: true
 }
 
 // Claude 3 Sonnet (UPDATED 03/04/24)
@@ -42,7 +42,7 @@ const CLAUDE_3_SONNET: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-sonnet-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false
+  imageInput: true
 }
 
 // Claude 3 Opus (UPDATED 03/04/24)
@@ -52,7 +52,7 @@ const CLAUDE_3_OPUS: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-opus-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false
+  imageInput: true
 }
 
 export const ANTHROPIC_LLM_LIST: LLM[] = [
