@@ -1,5 +1,9 @@
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
+import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
+import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
@@ -17,8 +21,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
-import { usePromptAndCommand } from "./use-prompt-and-command"
-import { StudyState, getRecallAssistantByStudyState } from "@/lib/assistants"
+import { StudyState } from "@/lib/assistants"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -59,21 +62,20 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
     selectedTools,
+    selectedPreset,
+    setChatSettings,
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
-    topicDescription,
-    setTopicDescription,
-    assistants,
-    setChatStudyState,
     chatStudyState,
+    setChatStudyState,
+    recallAnalysis,
     setRecallAnalysis,
-    recallAnalysis
+    topicDescription
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
-  const { handleSelectAssistant } = usePromptAndCommand()
 
   useEffect(() => {
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
@@ -99,20 +101,84 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
-    setTopicDescription("")
 
+    setSelectedTools([])
     setToolInUse("none")
 
-    setChatStudyState("topic_creation")
+    if (selectedAssistant) {
+      setChatSettings({
+        model: selectedAssistant.model as LLMID,
+        prompt: selectedAssistant.prompt,
+        temperature: selectedAssistant.temperature,
+        contextLength: selectedAssistant.context_length,
+        includeProfileContext: selectedAssistant.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedAssistant.include_workspace_instructions,
+        embeddingsProvider: selectedAssistant.embeddings_provider as
+          | "openai"
+          | "local"
+      })
 
-    // get the assistant from assistances context where name ="Study coach"
-    const topicAssistant = assistants.find(
-      assistant => assistant.name === "Topic creation tutor"
-    )
-    if (!topicAssistant) {
-      console.error("No assistant with name 'Study coach' found")
-    } else {
-      handleSelectAssistant(topicAssistant)
+      let allFiles = []
+
+      const assistantFiles = (
+        await getAssistantFilesByAssistantId(selectedAssistant.id)
+      ).files
+      allFiles = [...assistantFiles]
+      const assistantCollections = (
+        await getAssistantCollectionsByAssistantId(selectedAssistant.id)
+      ).collections
+      for (const collection of assistantCollections) {
+        const collectionFiles = (
+          await getCollectionFilesByCollectionId(collection.id)
+        ).files
+        allFiles = [...allFiles, ...collectionFiles]
+      }
+      const assistantTools = (
+        await getAssistantToolsByAssistantId(selectedAssistant.id)
+      ).tools
+
+      setSelectedTools(assistantTools)
+      setChatFiles(
+        allFiles.map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+      )
+
+      if (allFiles.length > 0) setShowFilesDisplay(true)
+    } else if (selectedPreset) {
+      setChatSettings({
+        model: selectedPreset.model as LLMID,
+        prompt: selectedPreset.prompt,
+        temperature: selectedPreset.temperature,
+        contextLength: selectedPreset.context_length,
+        includeProfileContext: selectedPreset.include_profile_context,
+        includeWorkspaceInstructions:
+          selectedPreset.include_workspace_instructions,
+        embeddingsProvider: selectedPreset.embeddings_provider as
+          | "openai"
+          | "local"
+      })
+    } else if (selectedWorkspace) {
+      // setChatSettings({
+      //   model: (selectedWorkspace.default_model ||
+      //     "gpt-4-1106-preview") as LLMID,
+      //   prompt:
+      //     selectedWorkspace.default_prompt ||
+      //     "You are a friendly, helpful AI assistant.",
+      //   temperature: selectedWorkspace.default_temperature || 0.5,
+      //   contextLength: selectedWorkspace.default_context_length || 4096,
+      //   includeProfileContext:
+      //     selectedWorkspace.include_profile_context || true,
+      //   includeWorkspaceInstructions:
+      //     selectedWorkspace.include_workspace_instructions || true,
+      //   embeddingsProvider:
+      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
+      //     "openai"
+      // })
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
@@ -199,92 +265,69 @@ export const useChatHandler = () => {
           selectedAssistant
         )
 
-      let generatedText = ""
-
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
-        assistant: selectedAssistant,
+        assistant: selectedChat?.assistant_id ? selectedAssistant : null,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems,
-        topicDescription
+        chatFileItems: chatFileItems
       }
 
-      const recallAssistant = getRecallAssistantByStudyState(chatStudyState)
+      let generatedText = ""
 
-      if (chatStudyState.length > 0 && recallAssistant) {
+      if (selectedTools.length > 0 || chatStudyState.length > 0) {
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
-          chatImages,
-          recallAssistant
+          chatImages
         )
 
-        const formattedMessagesWithoutSystem = formattedMessages.slice(1)
+        let response: Response
 
-        const response = await fetch("/api/chat/functions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            messages: formattedMessagesWithoutSystem,
-            chatId: currentChat?.id,
-            chatStudyState,
-            topicDescription,
-            recallAnalysis
+        if (chatStudyState.length > 0) {
+          const formattedMessagesWithoutSystem = formattedMessages.slice(1)
+
+          response = await fetch("/api/chat/functions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              messages: formattedMessagesWithoutSystem,
+              chatId: currentChat?.id,
+              chatStudyState,
+              topicDescription,
+              recallAnalysis
+            })
           })
-        })
 
-        const newStudyState = response.headers.get("NEW-STUDY-STATE")
-        console.log({ newStudyState })
-        if (newStudyState) setChatStudyState(newStudyState as StudyState)
+          const newStudyState = response.headers.get("NEW-STUDY-STATE")
+          console.log({ newStudyState })
+          if (newStudyState) setChatStudyState(newStudyState as StudyState)
 
-        const analysis = response.headers.get("ANALYSIS")
-        console.log({ analysis })
-        if (analysis) setRecallAnalysis(analysis)
+          const analysis = response.headers.get("ANALYSIS")
+          console.log({ analysis })
+          if (analysis) setRecallAnalysis(analysis)
+        } else {
+          setToolInUse("Tools")
 
-        //////////////////////////
-
-        generatedText = await processResponse(
-          response,
-          isRegeneration
-            ? payload.chatMessages[payload.chatMessages.length - 1]
-            : tempAssistantChatMessage,
-          true,
-          newAbortController,
-          setFirstTokenReceived,
-          setChatMessages,
-          setToolInUse
-        )
-      } else if (selectedTools.length > 0) {
-        setToolInUse("Tools")
-
-        const formattedMessages = await buildFinalMessages(
-          payload,
-          profile!,
-          chatImages,
-          recallAssistant!
-        )
-
-        const response = await fetch("/api/chat/tools", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
-            selectedTools,
-            chatId: currentChat?.id,
-            recallAssistantFunctions: recallAssistant?.functions ?? []
+          response = await fetch("/api/chat/tools", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chatSettings: payload.chatSettings,
+              messages: formattedMessages,
+              selectedTools
+            })
           })
-        })
 
-        setToolInUse("none")
+          setToolInUse("none")
+        }
 
         generatedText = await processResponse(
           response,
@@ -401,60 +444,6 @@ export const useChatHandler = () => {
 
     handleSendMessage(editedContent, filteredMessages, false)
   }
-
-  // const handleCreatePassiveMessages = async (messageContent: string, generatedText: string) => {
-  //   // Assume a single chat session context, as the existing setup does.
-  //   // This simplifies the example, not accounting for selecting different chats or sessions.
-  //   let currentChat = selectedChat ? { ...selectedChat } : null;
-
-  //   if (!currentChat) {
-  //     console.error('No current chat selected. Unable to create passive messages.');
-  //     return;
-  //   }
-
-  //   // Mockup chatMessage structure based on your existing code.
-  //   // Adjust according to the actual structure of your ChatMessage type.
-  //   const chatMessages = [
-  //     {
-  //       content: messageContent,
-  //       type: 'user', // Assuming 'user' and 'assistant' types. Adjust as necessary.
-  //       timestamp: new Date().toISOString(),
-  //       // Add other necessary properties here.
-  //     },
-  //     {
-  //       content: generatedText,
-  //       type: 'assistant',
-  //       timestamp: new Date().toISOString(),
-  //       // Add other necessary properties here.
-  //     },
-  //   ];
-
-  //   // Assuming newMessageImages and other arguments are not relevant for passive creation.
-  //   // You may need to adjust this based on actual requirements and available data.
-  //   const newMessageImages = []; // Adjust if images are relevant for your passive messages.
-  //   const isRegeneration = false; // Assuming passive messages are not regenerations.
-  //   const retrievedFileItems = []; // Adjust if file items are relevant for your passive messages.
-
-  //   // Now call handleCreateMessages with the structured arguments.
-  //   // Adjust the call according to the actual signature of handleCreateMessages.
-  //   await handleCreateMessages(
-  //     chatMessages,
-  //     currentChat,
-  //     profile, // Assuming 'profile' is available in your closure. Adjust as necessary.
-  //     modelData, // This needs to be defined based on your context or omitted if not relevant.
-  //     messageContent,
-  //     generatedText,
-  //     newMessageImages,
-  //     isRegeneration,
-  //     retrievedFileItems,
-  //     setChatMessages, // Assuming this is a state setter function available in your closure.
-  //     setChatFileItems, // Assuming this is relevant and available.
-  //     setChatImages, // Assuming this is relevant and available.
-  //     selectedAssistant // Assuming this is available in your closure. Adjust as necessary.
-  //   );
-
-  //   // Additional logic can be added here if necessary, e.g., post-message creation processing.
-  // };
 
   return {
     chatInputRef,

@@ -2,7 +2,7 @@ import { StudyState } from "@/lib/assistants"
 import {
   checkApiKey,
   getServerProfile,
-  functionCalledByOpenAI
+  functionCalledByLLM
 } from "@/lib/server/server-chat-helpers"
 import { OpenAIStream, StreamingTextResponse, MistralStream } from "ai"
 import OpenAI from "openai"
@@ -55,7 +55,7 @@ const callLLM = async (
       console.log("analysis:", analysis)
       const { score, forgotten_facts } = JSON.parse(analysis)
 
-      serverResult = await functionCalledByOpenAI(
+      serverResult = await functionCalledByLLM(
         "updateRecallAnalysis",
         [forgotten_facts],
         chatId
@@ -74,7 +74,7 @@ const callLLM = async (
 4. If no errors are present, offer encouragement and inquire if they wish to proceed to view the topic source.`
 
       if (perfectRecall) {
-        serverResult = await functionCalledByOpenAI(
+        serverResult = await functionCalledByLLM(
           "updateTopicQuizResult",
           [100],
           chatId
@@ -156,7 +156,7 @@ Student recall: """${studentMessage}"""`
           score: number
         }>(analysis)
 
-      serverResult = await functionCalledByOpenAI(
+      serverResult = await functionCalledByLLM(
         "updateTopicQuizResult",
         [final_score],
         chatId
@@ -176,7 +176,7 @@ Student recall: """${studentMessage}"""`
           {
             role: "system",
             content:
-              "Act as a study mentor, guiding student through active recall sessions. Your tasks include giving detailed feedback, scheduling the next session based on student performance, and suggesting review of source material if needed."
+              "Act as a study mentor, guiding student through active recall sessions. Your tasks include giving detailed feedback, scheduling the next session based on student performance, and suggesting review of source material if needed. Write in a chat message format. Do not write as a letter or email format."
           },
           {
             role: "user",
@@ -193,6 +193,16 @@ Student recall: """${studentMessage}"""`
           "NEW-STUDY-STATE": "score_updated"
         }
       })
+
+    case "score_updated":
+      if (studentMessage === "Show full topic description.") {
+        return new Response(JSON.stringify(topicDescription), {
+          status: 200,
+          headers: {
+            "NEW-STUDY-STATE": "topic_created"
+          }
+        })
+      }
 
     default:
       // Handle other states or error

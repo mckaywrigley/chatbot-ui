@@ -198,7 +198,7 @@ export async function updateReviseDate(chatId: string, hours_time: number) {
   return chatUpdateStatus
 }
 
-export async function functionCalledByOpenAI(
+export async function functionCalledByLLM(
   functionName: string,
   args: any[],
   chatId: string

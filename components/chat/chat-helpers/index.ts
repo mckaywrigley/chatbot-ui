@@ -156,7 +156,7 @@ export const handleLocalChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const formattedMessages = await buildFinalMessages(payload, profile, [], null)
+  const formattedMessages = await buildFinalMessages(payload, profile, [])
 
   // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
   const response = await fetchChatResponse(
@@ -215,12 +215,7 @@ export const handleHostedChat = async (
       newMessageImages
     )
   } else {
-    formattedMessages = await buildFinalMessages(
-      payload,
-      profile,
-      chatImages,
-      null
-    )
+    formattedMessages = await buildFinalMessages(payload, profile, chatImages)
   }
 
   const apiEndpoint =

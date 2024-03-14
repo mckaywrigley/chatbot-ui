@@ -1,18 +1,17 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { AssistantWithTool } from "./assistants"
 
 const buildBasePrompt = (
+  prompt: string,
   profileContext: string,
   workspaceInstructions: string,
-  recallAssistantPrompt: string,
-  sourceDescription: string
+  assistant: Tables<"assistants"> | null
 ) => {
-  let fullPrompt = recallAssistantPrompt
+  let fullPrompt = ""
 
-  if (sourceDescription.length > 0) {
-    fullPrompt += `<source>\n${sourceDescription}\n</source>`
+  if (assistant) {
+    fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
   }
 
   fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
@@ -22,8 +21,10 @@ const buildBasePrompt = (
   }
 
   if (workspaceInstructions) {
-    fullPrompt += `Further Instructions:\n${workspaceInstructions}\n\n`
+    fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
   }
+
+  fullPrompt += `User Instructions:\n${prompt}`
 
   return fullPrompt
 }
@@ -31,36 +32,22 @@ const buildBasePrompt = (
 export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
-  chatImages: MessageImage[],
-  recallAssistant: AssistantWithTool | null
+  chatImages: MessageImage[]
 ) {
   const {
     chatSettings,
     workspaceInstructions,
     chatMessages,
+    assistant,
     messageFileItems,
-    chatFileItems,
-    topicDescription
+    chatFileItems
   } = payload
 
-  if (recallAssistant === null) {
-    recallAssistant = {
-      name: "topic",
-      prompt: chatSettings.prompt,
-      model: chatSettings.model,
-      temperature: chatSettings.temperature,
-      functions: []
-    }
-  }
-
-  const sourceDescription =
-    recallAssistant.name !== "topic" ? topicDescription : ""
-
   const BUILT_PROMPT = buildBasePrompt(
+    chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    recallAssistant.prompt,
-    sourceDescription
+    assistant
   )
 
   const CHUNK_SIZE = chatSettings.contextLength
@@ -193,10 +180,6 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
   return `Use the following sources to create a detailed topic description. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
 }
 
-// function buildTopicText(userPrompt: string, topicDescription: string) {
-//   return `<answer>${userPrompt}</answer> \n\n Use the following topic description as source to compare the answer to:\n\n<source>${topicDescription}</source>`
-// }
-
 export async function buildGoogleGeminiFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
@@ -206,10 +189,10 @@ export async function buildGoogleGeminiFinalMessages(
     payload
 
   const BUILT_PROMPT = buildBasePrompt(
+    chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    "",
-    ""
+    assistant
   )
 
   let finalMessages = []
