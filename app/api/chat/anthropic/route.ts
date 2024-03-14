@@ -1,5 +1,6 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { getBase64FromDataURL, getMediaTypeFromDataURL } from "@/lib/utils"
 import { ChatSettings } from "@/types"
 import Anthropic from "@anthropic-ai/sdk"
 import { AnthropicStream, StreamingTextResponse } from "ai"
@@ -23,6 +24,28 @@ export async function POST(request: Request) {
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || ""
     })
+
+    ANTHROPIC_FORMATTED_MESSAGES = ANTHROPIC_FORMATTED_MESSAGES?.map(
+      (message: any) => {
+        return {
+          ...message,
+          content: message?.content.map((content: any) => {
+            if (content?.type === "image_url") {
+              return {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: getMediaTypeFromDataURL(content?.image_url ?? ""),
+                  data: getBase64FromDataURL(content?.image_url ?? "")
+                }
+              }
+            } else {
+              return content
+            }
+          })
+        }
+      }
+    )
 
     const response = await anthropic.messages.create({
       model: chatSettings.model,
