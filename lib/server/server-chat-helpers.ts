@@ -167,7 +167,14 @@ export async function updateTopicQuizResult(
     ebisu_model: newModel,
     revise_date
   })
-  return chatUpdateStatus
+  if (chatUpdateStatus.success === false) {
+    return chatUpdateStatus
+  }
+
+  return {
+    success: true,
+    revise_date
+  }
 }
 
 export async function updateTopicDescription(
@@ -195,8 +202,9 @@ export async function functionCalledByOpenAI(
   functionName: string,
   args: any[],
   chatId: string
-) {
-  let result = { success: false }
+): Promise<{ success: boolean; revise_date?: any }> {
+  // Update the return type here
+  let result: { success: boolean; revise_date?: any } = { success: false } // Update the type here
   if (functionName === "updateTopicQuizResult") {
     // Update the chat/topic name & content in the database
     result = await updateTopicQuizResult(chatId, args[0])

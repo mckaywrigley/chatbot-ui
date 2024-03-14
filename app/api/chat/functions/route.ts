@@ -4,139 +4,192 @@ import {
   getServerProfile,
   functionCalledByOpenAI
 } from "@/lib/server/server-chat-helpers"
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import { OpenAIStream, StreamingTextResponse, MistralStream } from "ai"
 import OpenAI from "openai"
+import MistralClient from "@mistralai/mistralai"
+import { convertLLMStringToJson } from "@/lib/server/server-utils"
+import { parseISO, formatDistanceToNow } from "date-fns/esm"
 
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
+  mistral: MistralClient,
   topicDescription: string,
   messages: any[],
   studyState: StudyState,
   recallAnalysis: string
 ) => {
-  let stream
+  let stream, chatResponse, chatStreamResponse, analysis, serverResult
   const messagesWithoutLast = messages.slice(0, -1)
   const studentMessage = await messages[messages.length - 1].content
 
   switch (studyState) {
     case "recall_first_attempt":
-      const firstMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-        [
-          {
-            role: "system",
-            content: `"Given the student's recall attempt and the original source material, identify omissions. 
-  Please provide the results of forgotten facts in JSON format using key 'forgotten_facts'. 
-  Each list should contain strings that succinctly summarise the omissions. Ensure the facts are presented clearly for educational review."`
-          },
+      // GET FORGOTTEN FACTS AND SAVE TO DB
+      chatResponse = await mistral.chat({
+        model: "open-mixtral-8x7b",
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+        messages: [
           {
             role: "user",
-            content: `Topic source: """${topicDescription}"""
-Student recall: """${studentMessage}"""`
+            content: `Given the original topic source material and a student's recall attempt, perform the following tasks:
+            1. Calculate a recall score representing how accurately the student's recall matches the original material. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
+            2. Identify any significant omissions in the student's recall. List these omissions as succinctly as possible, providing clear and educational summaries for review.
+            
+            Output the results in JSON format with the following structure:
+            - "score": A numerical value between 0 and 100 indicating the recall accuracy.
+            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall.
+            
+            Original topic source material:
+            """${topicDescription}"""
+            
+            Student's recall attempt:
+            """${studentMessage}"""
+            `
           }
         ]
+      } as any)
 
-      console.log({ firstMessages })
-      const analysisRunner = await openai.chat.completions.create({
-        stream: false,
-        model: "gpt-3.5-turbo",
-        messages: firstMessages,
-        response_format: { type: "json_object" }
-      })
+      analysis = await chatResponse.choices[0]?.message?.content
+      console.log("analysis:", analysis)
+      const { score, forgotten_facts } = JSON.parse(analysis)
 
-      const analysis = await analysisRunner.choices[0]?.message?.content
-      const serverResult = await functionCalledByOpenAI(
+      serverResult = await functionCalledByOpenAI(
         "updateRecallAnalysis",
-        [analysis],
+        [forgotten_facts],
         chatId
       )
       if (serverResult.success === false) {
         throw new Error("Server error")
       }
 
-      console.log("analysis:", analysis)
+      const perfectRecall = score >= 95 // LLM model is not perfect, so we need to set a threshold
 
-      const feedbackRunner = await openai.beta.chat.completions.stream({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: `You are a friendly and supportive tutor. Follow these steps:
-    1. Commend the student on the facts they've correctly recalled, providing positive reinforcement.
-    2. Correct any inaccuracies in the student's recall, supplying the right information. DO NOT PROVIDE ANSWERS TO FORGOTTEN FACTS.
-    3. For any forgotten facts, offer a hint for each item in the Forgotton facts list that will encourage recall without directly giving away the answer. 
-    4. If no errors are present, offer encouragement and inquire if they wish to proceed to view the topic source.`
-          },
-          {
-            role: "user",
-            content: `Topic source: """${topicDescription}"""
-    Student recall: """${studentMessage}"""
-    Forgotton facts: """${analysis}"""`
-          }
-        ]
-      })
+      let systemMessage = `You are a study mentor. You help students remember facts on their own by providing hints and clues without giving away answers.`
+      let userMessage = `Follow these steps:
+1. Commend the student on the facts they've correctly recalled, providing positive reinforcement.
+2. Go through each fact recalled by the student and Correct any inaccuracies WITHOUT providing answers to forgotten facts.
+3. Offer a hints to help the student recall facts they have omitted by referring to the Topic source only. Make sure the hints are not about the facts they recalled.
+4. If no errors are present, offer encouragement and inquire if they wish to proceed to view the topic source.`
 
-      stream = OpenAIStream(feedbackRunner)
-      return new StreamingTextResponse(stream, {
-        headers: {
-          "NEW-STUDY-STATE": "recall_hinting"
-        }
-      })
-    case "recall_hinting":
-      const updateTopicQuizResult = async (response: { score: number }) => {
-        const serverResult = await functionCalledByOpenAI(
+      if (perfectRecall) {
+        serverResult = await functionCalledByOpenAI(
           "updateTopicQuizResult",
-          [response.score],
+          [100],
           chatId
         )
         if (serverResult.success === false) {
-          return { success: false }
+          throw new Error("Server error")
         }
-        return { success: true }
+        systemMessage = "You are a helpful and friendly study tutor."
+        userMessage = `Generate upbeat feedback based on the students recall performance. Then ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
       }
 
-      const newMessages = [
-        {
-          role: "system",
-          content: `Compare the source material below with the students recall attempt(s) for this conversation. 
-          Assess the student's recall attempt on a scale from 0 (no recall) to 100 (perfect recall). Consider the accuracy, detail, and number of facts recalled in your scoring.
-          Call the tool/function updateTopicQuizResult with score to save to database.
-          Confirm Score with the User: Present the recall score to the student with a confirmation message, e.g.: \"Based on our session, I'd score your recall at [insert score here] out of 100. This reflects the great details you've remembered. Do you feel this score accurately represents your recall attempt?\"
-          The student can change the score if they so wish.
-          <source>${topicDescription}</source>`
-        },
-        ...messages
-      ]
-
-      const feedbackHinting = await openai.beta.chat.completions.runTools({
-        stream: true,
-        model: "gpt-3.5-turbo",
-        messages: newMessages,
-        tools: [
+      chatStreamResponse = await mistral.chatStream({
+        model: "open-mixtral-8x7b",
+        temperature: 0,
+        messages: [
           {
-            type: "function",
-            function: {
-              name: "updateTopicQuizResult",
-              description:
-                "This function updates the free recall and quiz test result for a topic.",
-              parameters: {
-                type: "object",
-                properties: {
-                  score: { type: "integer" }
-                }
-              },
-              function: updateTopicQuizResult,
-              parse: JSON.parse
-            }
+            role: "system",
+            content: systemMessage
+          },
+          {
+            role: "user",
+            content: `${userMessage}
+
+Topic source: """${topicDescription}"""
+
+Student recall: """${studentMessage}"""`
           }
         ]
       })
 
-      const finalAssistantContent = await feedbackHinting.finalContent()
-
-      return new Response(finalAssistantContent, {
+      stream = MistralStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
         headers: {
-          "Content-Type": "application/json",
+          "NEW-STUDY-STATE": perfectRecall ? "score_updated" : "recall_hinting"
+        }
+      })
+    case "recall_hinting":
+      // PROVIDE ANSWER TO HINTS AND PERFORRM FINAL SCORE
+
+      chatResponse = await mistral.chat({
+        model: "open-mixtral-8x7b",
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a friendly and supportive study mentor. You are tasked with helping a student through an active free recall session."
+          },
+          ...messagesWithoutLast,
+          {
+            role: "user",
+            content: `Given the original topic source material and the student's attempt at recalling after you provided hints, perform the following tasks:
+            1. Provide constructive feedback with the answers to each hint using the topic description below.
+            2. Then assess the student's overall recall attempt based on all messages in this conversation on a scale from 0 (no recall) to 100 (perfect recall).
+            
+            Output the results in JSON format with the following structure:
+            - "feedback": A string with generated feedback with the answers to hints content.
+            - "score": A numerical value between 0 and 100 indicating the recall accuracy.
+            
+            Original topic source material:
+            """${topicDescription}"""
+            
+            Student's answer to hints:
+            """${studentMessage}"""
+
+            Output the results in JSON format only.
+            `
+          }
+        ]
+      } as any)
+
+      analysis = await chatResponse.choices[0]?.message?.content
+      console.log("analysis:", analysis)
+
+      const { score: final_score, feedback: hint_feedback } =
+        convertLLMStringToJson<{
+          feedback: string
+          score: number
+        }>(analysis)
+
+      serverResult = await functionCalledByOpenAI(
+        "updateTopicQuizResult",
+        [final_score],
+        chatId
+      )
+      if (serverResult.success === false) {
+        throw new Error("Server error")
+      }
+
+      const { revise_date } = serverResult
+      const date = parseISO(revise_date)
+      const dateFromNow = formatDistanceToNow(date)
+
+      chatStreamResponse = await mistral.chatStream({
+        model: "open-mixtral-8x7b",
+        temperature: 0.7,
+        messages: [
+          {
+            role: "system",
+            content:
+              "Act as a study mentor, guiding student through active recall sessions. Your tasks include giving detailed feedback, scheduling the next session based on student performance, and suggesting review of source material if needed."
+          },
+          {
+            role: "user",
+            content: `Provide concise feedback considering the hint feedback ('${hint_feedback}') and final score (${final_score}) in chat message format, focusing on both strengths and areas for improvement. 
+            Inform the student of the next recall session date; ${dateFromNow} from now, to ensure consistent study progress. 
+            Ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
+          }
+        ]
+      })
+
+      stream = MistralStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
+        headers: {
           "NEW-STUDY-STATE": "score_updated"
         }
       })
@@ -165,9 +218,12 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
+    const mistral = new MistralClient(process.env.MISTRAL_API_KEY)
+
     const response = await callLLM(
       chatId,
       openai,
+      mistral,
       topicDescription,
       messages,
       chatStudyState,
