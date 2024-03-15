@@ -12,7 +12,8 @@ export async function GET() {
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      organization: profile.openai_organization_id,
+	  baseURL: "https://gateway.ai.cloudflare.com/v1/a03197fe72510387a4b4e9f7f3595e47/open-ai/openai"
     })
 
     const myAssistants = await openai.beta.assistants.list({
