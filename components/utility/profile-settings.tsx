@@ -320,7 +320,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
-              <div>User Settings</div>
+              <div>Account Center</div>
 
               <Button
                 tabIndex={-1}
@@ -734,7 +734,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <div className="flex items-center space-x-2">
                     <Label>Your current plan is: PixelVerseAI <span className="bg-blue-500 text-white rounded-full px-2 py-1">Plus/Max</span></Label>
                   </div>
-                  <Label className="text-sm text-gray-500">Note: Plus & Max members share the same website, however, Max users get unlimited usage.</Label>
+                  <Label className="text-sm text-gray-400">Note: Plus & Max members share the same dashboard, however, Max users get unlimited usage.</Label>
                   <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onClick={() => window.open('https://billing.stripe.com/p/login/5kA8xz3rpb3rgh2aEE', '_blank')}>Configure subscription</button>
                 </div>
               </div>
@@ -757,7 +757,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             <WithTooltip
               display={
                 <div>
-                  Download Chatbot UI 1.0 data as JSON. Import coming soon!
+                  Download PixelVerseAI data as JSON. Import coming soon!
                 </div>
               }
               trigger={
