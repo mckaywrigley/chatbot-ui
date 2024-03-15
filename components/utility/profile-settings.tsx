@@ -335,9 +335,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-3">
+            <TabsList className="mt-4 grid w-full grid-cols-2">
               <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="keys">API Keys</TabsTrigger>
+              {/* <TabsTrigger value="keys">API Keys</TabsTrigger> */}
               <TabsTrigger value="account">Account</TabsTrigger>
             </TabsList>
 
@@ -434,7 +434,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
             </TabsContent>
 
-            <TabsContent className="mt-4 space-y-4" value="keys">
+            {/* <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
@@ -725,17 +725,18 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 )}
               </div>
-            </TabsContent>
+            </TabsContent> */}
 
 
             <TabsContent className="mt-4 space-y-4" value="account">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <Label>Your current plan is: PixelVerseAI Plus/Max</Label>
-                  <Label>Note: Plus & Max memebers share the same website, however, Max users get unlimited usage.</Label>
+                  <Label>Your current plan is: PixelVerseAI <span className="bg-blue-500 text-white rounded-full px-2 py-1">Plus/Max</span></Label>
+                  <Label>Note: Plus & Max members share the same portal/dashboard, however, Max users get unlimited usage.</Label>
                 </div>
               </div>
             </TabsContent>
+
 
 
 
