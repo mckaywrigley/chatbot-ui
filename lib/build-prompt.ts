@@ -87,7 +87,7 @@ export async function buildFinalMessages(
   // Limit the finalMessages to the last 30
   let finalMessages = [];
 
-  for (let i = processedChatMessages.length - 1; i >= 0 && finalMessages.length < 10; i--) {
+  for (let i = processedChatMessages.length - 1; i >= 0 && finalMessages.length < 5; i--) {
     finalMessages.unshift(processedChatMessages[i].message);
   }
 
