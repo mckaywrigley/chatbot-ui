@@ -335,7 +335,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
+            <TabsList className="mt-4 grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="keys">API Keys</TabsTrigger>
               <TabsTrigger value="account">Account</TabsTrigger>
