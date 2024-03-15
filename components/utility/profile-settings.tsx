@@ -730,12 +730,15 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
             <TabsContent className="mt-4 space-y-4" value="account">
               <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <Label>Your current plan is: PixelVerseAI <span className="bg-blue-500 text-white rounded-full px-2 py-1">Plus/Max</span></Label>
-                  <Label>Note: Plus & Max members share the same portal/dashboard, however, Max users get unlimited usage.</Label>
+                <div className="flex flex-col space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <Label>Your current plan is: PixelVerseAI <span className="bg-blue-500 text-white rounded-full px-2 py-1">Plus/Max</span></Label>
+                  </div>
+                  <Label>Note: Plus & Max members share the same website, however, Max users get unlimited usage.</Label>
                 </div>
               </div>
             </TabsContent>
+
 
 
 
