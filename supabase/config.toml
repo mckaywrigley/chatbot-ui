@@ -35,7 +35,7 @@ enabled = true
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
-api_url = "http://aiplus.pixelverse.tech"
+api_url = "https://aiplus.pixelverse.tech"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
@@ -54,9 +54,9 @@ file_size_limit = "50MiB"
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://aiplus.pixelverse.tech"
+site_url = "https://aiplus.pixelverse.tech"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://aiplus.pixelverse.tech"]
+additional_redirect_urls = ["https://aiplus.pixelverse.tech"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 604800
 # If disabled, the refresh token will never expire.
