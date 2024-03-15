@@ -146,7 +146,7 @@ export const useChatHandler = () => {
     } else if (selectedPreset) {
       setChatSettings({
         //model: selectedPreset.model as LLMID,
-		model: 'gpt-3.5-turbo',
+		model: 'claude-3-haiku-20240307',
         prompt: selectedPreset.prompt,
         temperature: selectedPreset.temperature,
         contextLength: selectedPreset.context_length,

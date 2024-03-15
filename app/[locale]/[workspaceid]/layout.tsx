@@ -156,7 +156,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setModels(modelData.models)
 
     setChatSettings({
-      model: 'gpt-3.5-turbo',
+      model: 'claude-3-haiku-20240307',
       prompt:
         workspace?.default_prompt ||
         "You are a friendly, helpful AI assistant.",
