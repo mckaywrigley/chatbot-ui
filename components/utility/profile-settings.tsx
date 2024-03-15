@@ -338,6 +338,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             <TabsList className="mt-4 grid w-full grid-cols-2">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="keys">API Keys</TabsTrigger>
+              <TabsTrigger value="account">Account</TabsTrigger>
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
@@ -725,6 +726,21 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
             </TabsContent>
+
+
+            <TabsContent className="mt-4 space-y-4" value="account">
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Label>Your current plan is: PixelVerseAI Plus/Max</Label>
+                  <Label>Note: Plus & Max memebers share the same website, however, Max users get unlimited usage.</Label>
+                </div>
+              </div>
+            </TabsContent>
+
+
+
+
+
           </Tabs>
         </div>
 
