@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         process.env.REPHRASER_MODEL_ID || "gpt-3.5-turbo-0125",
         messageContent,
         prompt,
-        process.env.RAPHRASER_MODE as any,
+        process.env.REPHRASER_MODE as any,
         chatMessages,
         parseInt(process.env.REPHRASER_MAX_HISTORY_MESSAGES || "3"),
         parseInt(process.env.REPHRASER_MAX_HISTORY_TOKENS || "2048")
