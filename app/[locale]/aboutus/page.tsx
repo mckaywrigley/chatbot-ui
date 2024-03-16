@@ -44,7 +44,8 @@ export default function AboutUsPage() {
                 search on our data.
               </li>
               <li>
-                HackerGPT Pro: A Mistral Large, paired with our unique prompt.
+                GPT-4 Turbo: The latest and greatest from OpenAI, paired with
+                our unique prompt.
               </li>
             </ul>
           </div>

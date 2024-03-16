@@ -3,7 +3,7 @@ import { LLMID, ModelProvider } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import { FC, HTMLAttributes } from "react"
-// import { OpenAISVG } from "../icons/openai-svg"
+import { OpenAISVG } from "../icons/openai-svg"
 // import Image from "next/image"
 // import mistral from "@/public/providers/mistral.png"
 import { HackerAISVG } from "../icons/hackerai-svg"
@@ -25,18 +25,18 @@ export const ModelIcon: FC<ModelIconProps> = ({
   const { theme } = useTheme()
 
   switch (modelId as LLMID) {
-    // case "openai":
-    //   return (
-    //     <OpenAISVG
-    //       className={cn(
-    //         "rounded-sm bg-[#fff] p-1 text-black",
-    //         props.className,
-    //         theme === "dark" ? "bg-white" : "border-[1px] border-black"
-    //       )}
-    //       width={width}
-    //       height={height}
-    //     />
-    //   )
+    case "gpt-4-turbo-preview":
+      return (
+        <OpenAISVG
+          className={cn(
+            "rounded-sm bg-[#fff] p-1 text-black",
+            props.className,
+            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+          )}
+          width={width}
+          height={height}
+        />
+      )
     case "mistral-medium":
       return (
         <HackerAISVG

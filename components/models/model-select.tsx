@@ -76,7 +76,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     ...availableHostedModels,
     ...availableLocalModels,
     ...availableOpenRouterModels
-  ].filter(model => model.provider !== "openai") // This line filters out OpenAI models
+  ]
+  // .filter(model => model.provider !== "openai") // This line filters out OpenAI models
 
   const sortedModels = [...allModels].sort((a, b) => {
     // Prioritize 'mistral' to appear first
@@ -84,8 +85,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     if (b.provider === "mistral" && a.provider !== "mistral") return 1
 
     // Then prioritize 'openai'
-    // if (a.provider === "openai" && b.provider !== "openai") return -1
-    // if (b.provider === "openai" && a.provider !== "openai") return 1
+    if (a.provider === "openai" && b.provider !== "openai") return -1
+    if (b.provider === "openai" && a.provider !== "openai") return 1
 
     // Finally, sort alphabetically by provider name, or any other criteria you see fit
     return (
@@ -150,7 +151,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                       key={model.modelId}
                       className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-2"
                       onClick={() => {
-                        if (!isPremium && model.modelId === "mistral-large") {
+                        if (!isPremium && model.provider === "openai") {
                           setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
                         } else {
                           handleSelectModel(model.modelId) // Allow selection for premium users or non-OpenAI models
@@ -160,7 +161,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                       <ModelOption model={model} onSelect={() => {}} />
                       {selectedModelId === model.modelId ? (
                         <IconCircleCheck className="" size={28} />
-                      ) : !isPremium && model.modelId === "mistral-large" ? (
+                      ) : !isPremium && model.provider === "openai" ? (
                         <IconLock className="opacity-50" size={28} />
                       ) : (
                         <IconCircle className="opacity-50" size={28} />

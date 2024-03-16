@@ -163,7 +163,7 @@ export function getRateLimitErrorMessage(
 
 🔓 Want more? Upgrade to Pro and unlock a world of features:
 - Enjoy unlimited usage,
-- Get exclusive access to our HackerGPT Pro model,
+- Get exclusive access to GPT-4 Turbo,
 - Experience faster response speed.
 - Plus, get access to advanced hacking tools like Katana, HttpX, Naabu, and more.`
   }

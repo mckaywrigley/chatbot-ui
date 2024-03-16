@@ -170,7 +170,7 @@ const LockedPluginModal = ({
           {isPremium ? (
             <>
               <p>
-                Use the <b>HackerGPT Pro</b> model for the{" "}
+                Use the <b>GPT-4 Turbo</b> model for the{" "}
                 <b>{currentPlugin?.name}</b> plugin.
               </p>
             </>

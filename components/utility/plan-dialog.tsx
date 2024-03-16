@@ -141,7 +141,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                   <span className="ml-1 text-white">Upgrade to Pro</span>
                 </Button>
               </div>
-              <ProsStatement>Access to our HackerGPT Pro model</ProsStatement>
+              <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
               <ProsStatement>
                 Unlimited access to our HackerGPT model
               </ProsStatement>
