@@ -303,7 +303,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           />
         ) : (
           <Button size="icon" variant="ghost">
-            <IconUser size={SIDEBAR_ICON_SIZE} />
+            <IconUser size={24} />
           </Button>
         )}
       </SheetTrigger>

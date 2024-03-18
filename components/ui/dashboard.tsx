@@ -13,7 +13,8 @@ import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 
-export const SIDEBAR_WIDTH = 350
+export const SIDEBAR_WIDTH = 370
+export const SIDEBAR_MI_WIDTH = 260
 
 interface DashboardProps {
   children: React.ReactNode
@@ -112,7 +113,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       </div>
 
       <div
-        className="bg-muted/50 flex grow flex-col"
+        className="bg-pixelspace-gray-90 flex grow flex-col"
         onDrop={onFileDrop}
         onDragOver={onDragOver}
         onDragEnter={handleDragEnter}

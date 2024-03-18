@@ -10,17 +10,17 @@ interface BrandProps {
 
 export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
-    <Link
-      className="flex cursor-pointer flex-col items-center hover:opacity-50"
-      href="https://www.chatbotui.com"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div className="mb-2">
-        <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
+    <div className="flex cursor-pointer flex-col items-center">
+      <div className="relative size-[100px]">
+        <div className="absolute left-0 top-0 size-[100px] rounded-full bg-stone-900" />
+        <div className="absolute left-[30px] top-[30px] size-10">
+          <div className="bg-pixelspace-pink absolute left-0 top-0 size-[18.64px] rounded-full" />
+          <div className="bg-pixelspace-pink absolute left-[21.36px] top-0 size-[18.64px] rounded-full" />
+          <div className="bg-pixelspace-pink absolute left-0 top-[21.36px] size-[18.64px] rounded-full" />
+          <div className="bg-pixelspace-pink absolute left-[21.36px] top-[21.36px] size-[18.64px] rounded-full" />
+        </div>
       </div>
-
-      <div className="text-4xl font-bold tracking-wide">Chatbot UI</div>
-    </Link>
+      <div className="mt-6 text-4xl font-bold tracking-wide">Pixelspace AI</div>
+    </div>
   )
 }

@@ -13,6 +13,8 @@ import { ChatbotUIContext } from "@/context/context"
 import { deleteChat } from "@/db/chats"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { Tables } from "@/supabase/types"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconTrash } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 
@@ -49,7 +51,13 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
   return (
     <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
       <DialogTrigger asChild>
-        <IconTrash className="hover:opacity-50" size={18} />
+        <button
+          type="button"
+          className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
+        >
+          <FontAwesomeIcon icon={faTrash} className="mr-2" />
+          <span>Delete</span>
+        </button>
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>
