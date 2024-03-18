@@ -9,13 +9,20 @@ import {
 import { ChatbotUIContext } from "@/context/context"
 import { createWorkspace } from "@/db/workspaces"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { IconBuilding, IconHome, IconPlus } from "@tabler/icons-react"
-import { ChevronsUpDown } from "lucide-react"
+import {
+  IconBuilding,
+  IconHome,
+  IconBuildingLighthouse,
+  IconPlus
+} from "@tabler/icons-react"
+import { ChevronsDown, ChevronsUpDown } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons"
 
 interface WorkspaceSwitcherProps {}
 
@@ -103,8 +110,8 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className="border-input flex h-[36px]
-        w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1 hover:opacity-50"
+        className="border-input hover:bg-pixelspace-gray-50 bg-pixelspace-gray-60
+        flex h-[40px] w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1"
       >
         <div className="flex items-center truncate">
           {selectedWorkspace && (
@@ -119,7 +126,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
                   alt={selectedWorkspace.name}
                 />
               ) : (
-                <IconComponent className="mb-0.5 mr-2" size={22} />
+                <IconComponent className="mb-0.5 mr-2" size={16} />
               )}
             </div>
           )}
@@ -127,7 +134,10 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
           {getWorkspaceName(value) || "Select workspace..."}
         </div>
 
-        <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+        <FontAwesomeIcon
+          icon={faChevronDown}
+          className="text-pixelspace-gray-20"
+        />
       </PopoverTrigger>
 
       <PopoverContent className="p-2">

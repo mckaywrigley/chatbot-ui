@@ -1,5 +1,5 @@
 {
-  "compilerOptions": {
+  "compilerOptions": { 
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
