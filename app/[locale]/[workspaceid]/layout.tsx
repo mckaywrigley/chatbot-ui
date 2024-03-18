@@ -28,7 +28,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const router = useRouter()
 
   const params = useParams()
-  const workspaceId = params.workspaceid as string
+  const workspaceId = params?.workspaceid as string
 
   const {
     setChatSettings,

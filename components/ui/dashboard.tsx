@@ -26,7 +26,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const tabValue = searchParams.get("tab") || "chats"
+  const tabValue = searchParams?.get("tab") || "chats"
 
   const { handleSelectDeviceFile } = useSelectFileHandler()
 
