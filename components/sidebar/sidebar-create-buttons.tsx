@@ -96,19 +96,19 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   return (
-    <div className="flex w-full space-x-2">
-      <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
-        <IconPlus className="mr-1" size={20} />
-        New{" "}
-        {contentType.charAt(0).toUpperCase() +
-          contentType.slice(1, contentType.length - 1)}
-      </Button>
+    <div className="flex space-x-2">
+      <button
+        className="flex size-[42px] items-center justify-center rounded border"
+        onClick={getCreateFunction()}
+      >
+        <IconPlus size={20} />
+      </button>
 
-      {hasData && (
+      {/* {hasData && (
         <Button className="size-[36px] p-1" onClick={handleCreateFolder}>
           <IconFolderPlus size={20} />
         </Button>
-      )}
+      )} */}
 
       {isCreatingPrompt && (
         <CreatePrompt

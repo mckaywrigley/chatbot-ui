@@ -20,6 +20,17 @@ import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faArrowUp,
+  faBox,
+  faMicrophone
+} from "@fortawesome/free-solid-svg-icons"
+import { faPaperclipVertical } from "@fortawesome/pro-regular-svg-icons"
+// import { LiveAudioVisualizer } from "react-audio-visualize"
+import RecordingTimer, {
+  getMinutesAndSeconds
+} from "@/components/chat/RecordingTimer"
 
 interface ChatInputProps {}
 
@@ -31,6 +42,26 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
+
+  const [voiceRecorder, setVoiceRecorder] = useState<MediaRecorder | null>(null)
+
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>()
+
+  const [stream, setStream] = useState<MediaStream | null>(null)
+
+  const [auxContent, setAuxContent] = useState<string>()
+
+  const [isRecording, setIsRecording] = useState<boolean>(false)
+
+  const [content, setContent] = useState<string>()
+
+  const [time, setTime] = useState("")
+
+  const [timeSeconds, setTimeSeconds] = useState(0)
+
+  const [transcriptionLoading, setTranscriptionLoading] = useState(false)
+
+  const [startProcessingAudio, setStartProcessingAudio] = useState(false)
 
   const {
     isAssistantPickerOpen,
@@ -162,9 +193,64 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  // Lógica del AudioRecorder
+  const onAudioClick = async () => {
+    setContent(content ? content : "")
+    try {
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      })
+
+      const isSafari =
+        window.navigator.userAgent.search("Safari") >= 0 &&
+        window.navigator.userAgent.search("Chrome") < 0
+      let mimeType = "audio/webm;codecs=opus"
+
+      if (isSafari) {
+        if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          mimeType = "audio/mp4"
+        } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+          mimeType = "audio/x-m4a"
+        }
+      }
+
+      const mediaRecorder = new window.MediaRecorder(audioStream, {
+        mimeType: mimeType
+      })
+
+      setStream(audioStream)
+      setVoiceRecorder(mediaRecorder)
+      setAuxContent(content)
+      setContent("")
+      setIsRecording(true)
+    } catch (e) {
+      console.log(e)
+      console.log("No se otorgó permiso para acceder al micrófono.")
+    }
+  }
+
+  const onStopRecording = () => {
+    if (!isRecording || !stream || !voiceRecorder) return
+    const tracks = stream.getAudioTracks()
+
+    for (const track of tracks) {
+      track.stop()
+    }
+    voiceRecorder.stop()
+    setContent(auxContent)
+    setAuxContent("")
+    setIsRecording(false)
+    setStartProcessingAudio(true)
+  }
+
+  const handleSetTime = (time: number) => {
+    setTime(getMinutesAndSeconds(time))
+    setTimeSeconds(time)
+  }
+
   return (
     <>
-      <div className="flex flex-col flex-wrap justify-center gap-2">
+      <div className="flex flex-col flex-wrap  gap-2">
         <ChatFilesDisplay />
 
         {selectedTools &&
@@ -180,7 +266,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 )
               }
             >
-              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">
+              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 py-1 pr-3 hover:opacity-50">
                 <IconBolt size={20} />
 
                 <div>{tool.name}</div>
@@ -211,19 +297,73 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         )}
       </div>
 
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
+      <div className="border-input bg-pixelspace-gray-60 relative mt-3 flex min-h-[56px] w-[714px] items-center rounded-[50px] border-2 px-[14px] py-[6px]">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
 
         <>
-          <IconCirclePlus
-            className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
-          />
-
           {/* Hidden input to select files from device */}
+
+          <div className="flex items-center">
+            <button
+              className="border-pixelspace-gray-50 mr-3 inline-flex size-6 items-center justify-center"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <FontAwesomeIcon icon={faPaperclipVertical} />
+            </button>
+            <div
+              className={`h-8 border-l ${
+                !voiceRecorder && !isRecording ? "" : null
+              } flex items-center border-gray-600 py-2 pl-3`}
+            >
+              <button
+                disabled={transcriptionLoading}
+                onClick={!isRecording ? onAudioClick : onStopRecording}
+                className={`px-1 hover:text-neutral-900 hover:opacity-60 dark:bg-opacity-60 dark:text-white dark:hover:text-neutral-200  `}
+              >
+                {isRecording ? (
+                  <FontAwesomeIcon icon={faBox} />
+                ) : (
+                  <div className="relative flex items-center justify-center">
+                    <FontAwesomeIcon icon={faMicrophone} />
+                    <i
+                      style={{ fontSize: 16, display: "flex" }}
+                      className={`fa-solid fa-microphone flex items-center justify-center ${
+                        transcriptionLoading ? "0 text-pixelspace-gray-3 " : ""
+                      }`}
+                    >
+                      {transcriptionLoading ? (
+                        <div className="absolute size-4 animate-spin rounded-full border-t-2 border-neutral-800 p-4 dark:border-neutral-100"></div>
+                      ) : null}
+                    </i>
+                  </div>
+                )}
+              </button>
+              {voiceRecorder && isRecording && (
+                <RecordingTimer
+                  handleSetTime={handleSetTime}
+                  isRunning={isRecording}
+                />
+              )}
+              {transcriptionLoading ? (
+                <div className="w-[200px]">
+                  <span className="text-sm text-[#F6F6F9]">{time} </span>
+                  <span className="text-sm text-[#F6F6F9]">total duration</span>
+                </div>
+              ) : null}{" "}
+            </div>
+            {voiceRecorder && isRecording && (
+              <div className="w-auto shrink-0">
+                {/* <LiveAudioVisualizer
+                  mediaRecorder={mediaRecorder}
+                  width={200}
+                  height={75}
+                /> */}
+              </div>
+            )}
+          </div>
+
           <Input
             ref={fileInputRef}
             className="hidden"
@@ -238,9 +378,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(
-            `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
+            `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
           )}
           onValueChange={handleInputChange}
           value={userInput}
@@ -252,7 +392,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onCompositionEnd={() => setIsTyping(false)}
         />
 
-        <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
+        <div className="cursor-pointer hover:opacity-50">
           {isGenerating ? (
             <IconPlayerStopFilled
               className="hover:bg-background animate-pulse rounded bg-transparent p-1"
@@ -260,18 +400,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               size={30}
             />
           ) : (
-            <IconSend
-              className={cn(
-                "bg-primary text-secondary rounded p-1",
-                !userInput && "cursor-not-allowed opacity-50"
-              )}
+            <button
+              className="bg-pixelspace-pink size-8 rounded-full"
               onClick={() => {
                 if (!userInput) return
 
                 handleSendMessage(userInput, chatMessages, false)
               }}
-              size={30}
-            />
+            >
+              <FontAwesomeIcon icon={faArrowUp} />
+            </button>
           )}
         </div>
       </div>

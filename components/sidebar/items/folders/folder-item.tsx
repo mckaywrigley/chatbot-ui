@@ -1,10 +1,16 @@
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
-import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
-import { FC, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { DeleteFolder } from "./delete-folder"
 import { UpdateFolder } from "./update-folder"
+import {
+  Position,
+  shouldRenderMenuOnTop
+} from "@/Core/Utils/context-menu-helper"
+import { FolderClosed } from "lucide-react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faEllipsisH } from "@fortawesome/free-solid-svg-icons"
 
 interface FolderProps {
   folder: Tables<"folders">
@@ -21,9 +27,17 @@ export const Folder: FC<FolderProps> = ({
 }) => {
   const itemRef = useRef<HTMLDivElement>(null)
 
+  const menuRef = useRef<any>(null)
+
   const [isDragOver, setIsDragOver] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const [renderOnTop, setRenderOnTop] = useState(false)
+
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -59,6 +73,56 @@ export const Folder: FC<FolderProps> = ({
     setIsExpanded(!isExpanded)
   }
 
+  // Menu context logic
+
+  const handleMenuButtonClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+
+    setIsMenuOpen(!isMenuOpen)
+    const rect = e.currentTarget.getBoundingClientRect()
+
+    const menuHeight = 150
+
+    let menuPositionY
+
+    const offsetX = -5
+    let offsetY = 18
+
+    if (rect.bottom + menuHeight > window.innerHeight) {
+      menuPositionY = rect.top - menuHeight
+      offsetY = -offsetY
+    } else {
+      menuPositionY = rect.bottom + offsetY
+    }
+
+    const menuPosition = {
+      x: rect.left + offsetX,
+      y: menuPositionY
+    }
+
+    setPosition(menuPosition)
+  }
+
+  useEffect(() => {
+    setRenderOnTop(shouldRenderMenuOnTop(position))
+  }, [position])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  // End menu context logic
+
   return (
     <div
       ref={itemRef}
@@ -75,22 +139,64 @@ export const Folder: FC<FolderProps> = ({
       <div
         tabIndex={0}
         className={cn(
-          "hover:bg-accent focus:bg-accent flex w-full cursor-pointer items-center justify-between rounded p-2 hover:opacity-50 focus:outline-none"
+          "hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between rounded p-2"
         )}
         onClick={handleClick}
       >
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-2">
-            {isExpanded ? (
-              <IconChevronDown stroke={3} />
-            ) : (
-              <IconChevronRight stroke={3} />
-            )}
-
             <div>{folder.name}</div>
           </div>
+          <div
+            role="button"
+            className="size-[14px] text-white hover:text-neutral-100"
+            onClick={e => {
+              e.stopPropagation()
+              handleMenuButtonClick(e)
+            }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            {isHovering || isExpanded ? (
+              <FontAwesomeIcon className="flex" icon={faEllipsisH} />
+            ) : null}
+          </div>
 
-          {isHovering && (
+          {isMenuOpen && (
+            <div
+              ref={menuRef}
+              style={{
+                top: `${position.y}px`,
+                left: `${position.x}px`
+              }}
+              className={`bg-pixelspace-gray-60 absolute z-20 w-44 divide-y divide-gray-100 rounded text-right shadow dark:divide-gray-600 `}
+            >
+              <div className="block px-4 py-2 text-left">
+                <span className="text-xs font-semibold text-gray-300 dark:text-gray-200">
+                  Folder options
+                </span>
+              </div>
+              <ul
+                className="py-2 text-sm text-gray-200 dark:text-gray-200"
+                aria-labelledby="dropdownMenuIconHorizontalButton"
+              >
+                <li>
+                  <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
+                    <UpdateFolder folder={folder} />
+                  </div>
+                </li>
+
+                <hr className="dark:border-gray-600" />
+                <li className="mt-1">
+                  <div className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
+                    <DeleteFolder folder={folder} contentType={contentType} />
+                  </div>
+                </li>
+              </ul>
+            </div>
+          )}
+
+          {/* {isHovering && (
             <div
               onClick={e => {
                 e.stopPropagation()
@@ -102,13 +208,11 @@ export const Folder: FC<FolderProps> = ({
 
               <DeleteFolder folder={folder} contentType={contentType} />
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
-      {isExpanded && (
-        <div className="ml-5 mt-2 space-y-2 border-l-2 pl-4">{children}</div>
-      )}
+      {isExpanded && <div className=" mt-2 space-y-2  pl-4">{children}</div>}
     </div>
   )
 }
