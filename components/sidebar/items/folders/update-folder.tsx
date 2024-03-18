@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { updateFolder } from "@/db/folders"
 import { Tables } from "@/supabase/types"
+import { faPencil } from "@fortawesome/pro-regular-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconEdit } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 
@@ -47,7 +49,13 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
   return (
     <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
       <DialogTrigger asChild>
-        <IconEdit className="hover:opacity-50" size={18} />
+        <button
+          type="button"
+          className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
+        >
+          <FontAwesomeIcon icon={faPencil} className="mr-2" />
+          <span>Rename</span>
+        </button>
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>

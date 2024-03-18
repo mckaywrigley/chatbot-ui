@@ -13,6 +13,8 @@ import { deleteFolder } from "@/db/folders"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
+import { faTrash } from "@fortawesome/pro-regular-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconTrash } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -102,7 +104,13 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
   return (
     <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
       <DialogTrigger asChild>
-        <IconTrash className="hover:opacity-50" size={18} />
+        <button
+          type="button"
+          className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
+        >
+          <FontAwesomeIcon icon={faTrash} className="mr-2" />
+          <span>Delete</span>
+        </button>
       </DialogTrigger>
 
       <DialogContent className="min-w-[550px]">
