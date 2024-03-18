@@ -23,7 +23,7 @@ import {
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
@@ -64,6 +64,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   const [displayName, setDisplayName] = useState(profile?.display_name || "")
   const [username, setUsername] = useState(profile?.username || "")
+  const [userEmail, setUserEmail] = useState("")
   const [usernameAvailable, setUsernameAvailable] = useState(true)
   const [loadingUsername, setLoadingUsername] = useState(false)
   const [profileImageSrc, setProfileImageSrc] = useState(
@@ -124,6 +125,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     router.refresh()
     return
   }
+
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const user = await supabase.auth.getUser()
+      setUserEmail(user?.data.user?.email || "Not available")
+    }
+    fetchUserEmail()
+  }, [])
 
   const handleSave = async () => {
     if (!profile) return
@@ -398,6 +407,15 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   onImageChange={setProfileImageFile}
                 />
               </div> */}
+
+              <div className="space-y-1">
+                <Label>Email</Label>
+                <Input
+                  value={userEmail}
+                  disabled={true}
+                  className="cursor-not-allowed"
+                />
+              </div>
 
               <div className="space-y-1">
                 <Label>Chat Display Name</Label>
