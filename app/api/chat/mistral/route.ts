@@ -5,13 +5,10 @@ import { ServerRuntime } from "next"
 
 import {
   updateOrAddSystemMessage,
-  Message,
   replaceWordsInLastUserMessage,
   wordReplacements
 } from "@/lib/ai-helper"
-// import { cleanMessagesFromWarnings } from "@/lib/models/clean-messages"
 import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
-// import preparePineconeQuery from "@/lib/models/prepare-pinecone-query"
 import queryPineconeVectorStore from "@/lib/models/query-pinecone"
 
 import llmConfig from "@/lib/models/llm/llm-config"
@@ -66,7 +63,6 @@ export async function POST(request: Request) {
     }
 
     let modelTemperature = 0.4
-    const pineconeTemperature = llmConfig.pinecone.temperature
 
     const openRouterUrl = llmConfig.openrouter.url
     const openRouterHeaders = {
@@ -76,7 +72,6 @@ export async function POST(request: Request) {
       "Content-Type": "application/json"
     }
 
-    // const cleanedMessages = await cleanMessagesFromWarnings(messages)
     const cleanedMessages = messages
 
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
@@ -103,19 +98,27 @@ export async function POST(request: Request) {
           )
         }
 
-        const pineconeResults = await queryPineconeVectorStore(
+        const standaloneQuestion = await generateStandaloneQuestion(
+          messages,
           latestUserMessage,
+          selectedModel,
+          openRouterUrl,
+          openRouterHeaders
+        )
+
+        const pineconeResults = await queryPineconeVectorStore(
+          standaloneQuestion,
           llmConfig.openai.apiKey,
           llmConfig.pinecone
         )
 
         if (pineconeResults !== "None") {
-          modelTemperature = pineconeTemperature
+          modelTemperature = llmConfig.pinecone.temperature
 
           cleanedMessages[0].content =
             `${llmConfig.systemPrompts.hackerGPT} ` +
             `${llmConfig.systemPrompts.pinecone} ` +
-            `RAG Context:\n ${pineconeResults}`
+            `RAG Context:\n${pineconeResults}`
         }
       }
     }
@@ -200,5 +203,94 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })
+  }
+}
+
+async function generateStandaloneQuestion(
+  messages: any[],
+  latestUserMessage: any,
+  selectedModel: any,
+  openRouterUrl: string | URL | Request,
+  openRouterHeaders: any
+) {
+  if (messages.length === 2) {
+    return latestUserMessage
+  }
+
+  const modelStandaloneQuestion =
+    Math.random() < 0.5 ? selectedModel : "mistralai/mistral-7b-instruct:nitro"
+
+  let chatHistory = messages
+    .slice(1)
+    .map(msg => `${msg.role}: ${msg.content}`)
+    .join("\n")
+  const template = `Objective: Craft the follow-up question into a direct, actionable, standalone question optimized for searching a RAG index of documents. The question should be specifically formulated to leverage indexing best practices, focusing on keywords and clear actions. Ensure the question is concise, includes all necessary context, and is phrased to retrieve the most relevant information or steps from the RAG index based on user wants.
+
+  Guidelines:
+  
+  1. **Keyword Emphasis**: Incorporate key terms related to the topic that are likely indexed or highlighted within the RAG documents. This helps in directly targeting the relevant sections or information.
+  2. **Action-Oriented**: Phrase the question to seek specific actions, steps, or methods. This approach facilitates retrieving actionable content from the documents.
+  3. **Clarity and Context**: While maintaining conciseness, ensure the question is self-contained, providing sufficient detail to be understood in isolation. Specify the context or area of application where necessary.
+  4. **Optimization for Search**: Formulate the question in a way that it could directly match or closely align with headings, titles, or key sections in the RAG documents, enhancing the precision of retrieved information.
+    
+  Examples:
+  
+  1. Original Follow Up: Will she win the award?
+     - Chat History discusses a specific author being nominated for a literary prize.
+     - Standalone, Concise Question: Will author Jane Doe win the 2024 Booker Prize for her novel "The Lost Chapter"?
+  
+  2. Original Follow Up: What's the procedure?
+     - Chat History refers to applying for a specific visa.
+     - Standalone, Concise Question: What is the application procedure for the U.S. tourist visa B-2 as of 2024?
+  
+  Task:
+  Given the chat history and follow-up question below, create a rephrased, standalone question that is concise and contains all relevant context. RAG doesn't have access to chat history, only to a standalone question, so create a question that way so RAG can find them. If the inquiry seems outside the scope of the RAG index's information, such as a code, return the original question or query as is.
+  
+  Chat History:
+  """${chatHistory}"""
+  
+  Follow Up Input:
+  """${latestUserMessage}"""
+  
+  Your Rephrased Standalone Question:`
+
+  const firstMessage = messages[0]
+    ? messages[0]
+    : { role: "system", content: `${llmConfig.systemPrompts.hackerGPT}` }
+
+  try {
+    const requestBody = {
+      model: modelStandaloneQuestion,
+      route: "fallback",
+      messages: [
+        { role: firstMessage.role, content: firstMessage.content },
+        { role: "user", content: template }
+      ],
+      temperature: 0.1,
+      max_tokens: 512
+    }
+
+    const res = await fetch(openRouterUrl, {
+      method: "POST",
+      headers: openRouterHeaders,
+      body: JSON.stringify(requestBody)
+    })
+
+    if (!res.ok) {
+      const errorBody = await res.text()
+      console.error("Error Response Body:", errorBody)
+      throw new Error(
+        `HTTP error! status: ${res.status}. Error Body: ${errorBody}`
+      )
+    }
+
+    const data = await res.json()
+
+    const standaloneQuestion = data.choices?.[0]?.message?.content?.trim()
+
+    return standaloneQuestion
+  } catch (error) {
+    console.error("Error in generateStandaloneQuestion:", error)
+    return latestUserMessage
   }
 }

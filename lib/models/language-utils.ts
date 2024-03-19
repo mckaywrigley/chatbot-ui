@@ -18,22 +18,16 @@ export const translateToEnglish = async (
       {
         role: "system",
         content:
-          "You are a translation AI. " +
-          "As a translation AI, your primary objective is to translate user-submitted text into English with high accuracy. " +
-          "Focus on providing translations that are clear and direct. " +
-          "Avoid adding any additional comments or information. " +
-          "If the user's query is already in English, simply return the query as it is. " +
-          "Your role is exclusively to translate; do not deviate from this task or engage in answering user queries."
+          "You are a translation AI. Your task is to identify if the text provided is already in English or not. " +
+          "If the text is in English or not suitable for translation (e.g., code snippets, already clear English), " +
+          "simply respond with 'None', 4 LETTERS, without any additional comments or explanations. NOTHING ELSE, EVEN STUFF LIKE (Note: This is a JavaScript function definition for translating text to English using an API. It's not a text that needs to be translated.)" +
+          "Do not provide any analysis, commentary, or suggestions about consulting experts. " +
+          "Your response should either be a direct translation into English (if applicable) or a single word: 'None'."
       },
       {
         role: "user",
         content:
-          "Translate the provided text into English. " +
-          "Aim for an accurate and succinct translation into English. " +
-          "The translation should accurately reflect the original text's meaning and context, without any supplementary comments, opinions, or extraneous information. " +
-          "Refrain from engaging in discussions or asking for interpretations. " +
-          "Avoid engaging in discussions or providing interpretations beyond the translation." +
-          "Translate: " +
+          "Evaluate and translate this text into English if necessary. For English text or non-translatable content, respond with 'None' and NOTHING ELSE, EVEN STUFF LIKE (Note: This is a JavaScript function definition for translating text to English using an API. It's not a text that needs to be translated.):\n\n" +
           text
       }
     ],
@@ -56,7 +50,13 @@ export const translateToEnglish = async (
     }
 
     const data = await request.json()
-    return data.choices[0].message.content
+    const translatedText = data.choices[0].message.content
+
+    if (translatedText === "None" || translatedText.length <= 25) {
+      return text
+    } else {
+      return translatedText
+    }
   } catch (error) {
     console.error(`Error during translation: ${error}`)
     return ""
