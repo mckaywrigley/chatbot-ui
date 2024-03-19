@@ -3,7 +3,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
 import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
@@ -12,6 +12,12 @@ import { CreateModel } from "./items/models/create-model"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
+import {
+  Position,
+  shouldRenderMenuOnTop
+} from "@/Core/Utils/context-menu-helper"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -33,6 +39,62 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
   const [isCreatingTool, setIsCreatingTool] = useState(false)
   const [isCreatingModel, setIsCreatingModel] = useState(false)
+
+  // hooks context menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
+  const [renderOnTop, setRenderOnTop] = useState(false)
+  const menuRef = useRef<any>(null)
+  // End hooks context menu
+
+  // Menu context logic
+  const handleMenuButtonClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+
+    setIsMenuOpen(!isMenuOpen)
+    const rect = e.currentTarget.getBoundingClientRect()
+
+    const menuHeight = 150
+
+    let menuPositionY
+
+    const offsetX = -9
+    let offsetY = 1
+
+    if (rect.bottom + menuHeight > window.innerHeight) {
+      menuPositionY = rect.top - menuHeight
+      offsetY = -offsetY
+    } else {
+      menuPositionY = rect.bottom + offsetY
+    }
+
+    const menuPosition = {
+      x: rect.left + offsetX,
+      y: menuPositionY
+    }
+
+    setPosition(menuPosition)
+  }
+
+  useEffect(() => {
+    setRenderOnTop(shouldRenderMenuOnTop(position))
+  }, [position])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  // End menu context logic
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -97,18 +159,63 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
 
   return (
     <div className="flex space-x-2">
-      <button
+      <div
         className="flex size-[42px] items-center justify-center rounded border"
-        onClick={getCreateFunction()}
+        onClick={e => {
+          e.stopPropagation()
+          handleMenuButtonClick(e)
+        }}
       >
         <IconPlus size={20} />
-      </button>
+      </div>
 
       {/* {hasData && (
         <Button className="size-[36px] p-1" onClick={handleCreateFolder}>
           <IconFolderPlus size={20} />
         </Button>
       )} */}
+
+      {isMenuOpen && (
+        <div
+          ref={menuRef}
+          style={{
+            top: `${position.y}px`,
+            left: `${position.x}px`
+          }}
+          className={`bg-pixelspace-gray-60 absolute z-20 w-44 divide-y rounded text-right shadow dark:divide-gray-600 `}
+        >
+          <ul
+            className="text-sm text-gray-200 dark:text-gray-200"
+            aria-labelledby="dropdownMenuIconHorizontalButton"
+          >
+            <li>
+              <div
+                role="button"
+                onClick={getCreateFunction()}
+                className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-10 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm dark:hover:text-white"
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
+                New{" "}
+                {contentType.charAt(0).toUpperCase() +
+                  contentType.slice(1, contentType.length - 1)}
+              </div>
+            </li>
+
+            {hasData && (
+              <li>
+                <div
+                  role="button"
+                  onClick={handleCreateFolder}
+                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-10 block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm  dark:hover:text-white"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
+                  Create folder
+                </div>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
 
       {isCreatingPrompt && (
         <CreatePrompt

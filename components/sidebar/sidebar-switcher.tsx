@@ -25,43 +25,56 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
   return (
-    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between  border-r p-5">
-      <TabsList className="bg-pixelspace-gray-90 grid h-[460px] grid-rows-11 space-y-[26px]">
+    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between border-r px-5 pb-6  pt-8">
+      <TabsList className="bg-pixelspace-gray-90 grid h-[460px]   grid-rows-8 space-y-[32px]">
         <SidebarSwitchItem
-          icon={<IconMessage size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-kit fa-thread-simple text-pixelspace-pink"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="chats"
           onContentTypeChange={onContentTypeChange}
         />
 
         <SidebarSwitchItem
-          icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
-          contentType="presets"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-regular fa-sparkles text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
         />
-        <hr className="border-pixelspace-gray-60 border" />
+
+        <hr className="border-pixelspace-gray-60 w-4 border" />
 
         <SidebarSwitchItem
-          icon={<IconSparkles size={SIDEBAR_ICON_SIZE} />}
-          contentType="models"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <hr className="border-pixelspace-gray-60 border" />
-
-        <SidebarSwitchItem
-          icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-regular fa-file text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="files"
           onContentTypeChange={onContentTypeChange}
         />
 
+        {/* <SidebarSwitchItem
+          icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
+          contentType="presets"
+          onContentTypeChange={onContentTypeChange}
+        /> */}
+
         <SidebarSwitchItem
-          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-regular fa-files text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="collections"
           onContentTypeChange={onContentTypeChange}
         />
@@ -69,14 +82,35 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <hr className="border-pixelspace-gray-60 border" />
 
         <SidebarSwitchItem
-          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-regular fa-robot text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="assistants"
           onContentTypeChange={onContentTypeChange}
         />
 
         <SidebarSwitchItem
-          icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
+          icon={
+            <i
+              className="fa-regular fa-bolt text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
           contentType="tools"
+          onContentTypeChange={onContentTypeChange}
+        />
+
+        <SidebarSwitchItem
+          icon={
+            <i
+              className="fa-regular fa-microchip-ai text-pixelspace-gray-3"
+              style={{ width: 16, height: 16 }}
+            ></i>
+          }
+          contentType="models"
           onContentTypeChange={onContentTypeChange}
         />
       </TabsList>

@@ -51,14 +51,14 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
   return (
     <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
       <DialogTrigger asChild>
-        <button
-          type="button"
+        <div
+          role="button"
           className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
           onClick={handleDeleteChat}
         >
           <FontAwesomeIcon icon={faTrash} className="mr-2" />
           <span>Delete</span>
-        </button>
+        </div>
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>
@@ -75,11 +75,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
             Cancel
           </Button>
 
-          <Button
-            ref={buttonRef}
-            variant="destructive"
-            onClick={handleDeleteChat}
-          >
+          <Button variant="destructive" onClick={handleDeleteChat}>
             Delete
           </Button>
         </DialogFooter>
