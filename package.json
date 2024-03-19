@@ -116,7 +116,7 @@
     "@types/react-syntax-highlighter": "^15.5.11",
     "@types/stripe": "^8.0.417",
     "@types/uuid": "^9.0.7",
-    "autoprefixer": "^10.4.16",
+    "autoprefixer": "^10.4.18",
     "clsx": "^2.0.0",
     "eslint": "^8",
     "eslint-config-next": "^14.1.3",
