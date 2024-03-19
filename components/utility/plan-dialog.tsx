@@ -125,7 +125,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="mb-2 text-lg font-bold">Pro</h3>
-                <div className="mb-2 text-lg text-[#8e8ea0]">USD $29/month</div>
+                <div className="mb-2 text-lg text-[#8e8ea0]">USD $20/month</div>
               </div>
               <div className="mb-4 grid grid-cols-1 gap-1">
                 <Button
