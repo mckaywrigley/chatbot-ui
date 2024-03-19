@@ -29,4 +29,4 @@ const GEMMA_7B_IT: LLM = {
   imageInput: false
 }
 
-export const GROQ_LLM_LIST: LLM[] = [LLaMA2_70B, MIXTRAL_8X7B]
+export const GROQ_LLM_LIST: LLM[] = [LLaMA2_70B, MIXTRAL_8X7B, GEMMA_7B_IT]
