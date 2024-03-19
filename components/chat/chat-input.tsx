@@ -24,12 +24,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faArrowUp,
   faBox,
-  faMicrophone
-} from "@fortawesome/free-solid-svg-icons"
-import {
-  faPaperclipVertical,
+  faMicrophone,
   faSquare
-} from "@fortawesome/pro-regular-svg-icons"
+} from "@fortawesome/free-solid-svg-icons"
+import { faPaperclipVertical } from "@fortawesome/pro-regular-svg-icons"
 // import { LiveAudioVisualizer } from "react-audio-visualize"
 import RecordingTimer, {
   getMinutesAndSeconds
@@ -326,13 +324,15 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 className={`px-1 hover:text-neutral-900 hover:opacity-60 dark:bg-opacity-60 dark:text-white dark:hover:text-neutral-200  `}
               >
                 {isRecording ? (
-                  <FontAwesomeIcon
-                    icon={faSquare}
-                    className="text-pixelspace-red-500"
-                  />
+                  <div className="bg-pixelspace-pink flex size-6 items-center justify-center rounded-full">
+                    <FontAwesomeIcon
+                      icon={faSquare}
+                      style={{ fontSize: 11 }}
+                      className="text-pixelspace-gray-3"
+                    />
+                  </div>
                 ) : (
                   <div className="relative flex items-center justify-center">
-                    <FontAwesomeIcon icon={faMicrophone} />
                     <i
                       style={{ fontSize: 16, display: "flex" }}
                       className={`fa-solid fa-microphone flex items-center justify-center ${

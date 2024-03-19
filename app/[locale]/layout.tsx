@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Toaster } from "@/components/ui/sonner"
 import { GlobalState } from "@/components/utility/global-state"
 import { Providers } from "@/components/utility/providers"
@@ -102,6 +103,7 @@ export default async function RootLayout({
           </TranslationsProvider>
         </Providers>
       </body>
+      <script src="https://kit.fontawesome.com/9b48115d80.js" async />
     </html>
   )
 }
