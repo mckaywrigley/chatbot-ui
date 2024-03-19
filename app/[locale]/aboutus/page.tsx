@@ -40,8 +40,12 @@ export default function AboutUsPage() {
             </p>
             <ul className="ml-8 list-disc space-y-2">
               <li>
-                HackerGPT: A fine-tuned version of Mixtral 8x7B with semantic
-                search on our data.
+                HackerGPT: A Mixtral 8x7B with a semantic search on our hacking
+                data paired with our unique prompt.
+              </li>
+              <li>
+                HackerGPT Pro: A Mistral Large with a semantic search on our
+                hacking data paired with our unique prompt.
               </li>
               <li>
                 GPT-4 Turbo: The latest and greatest from OpenAI, paired with

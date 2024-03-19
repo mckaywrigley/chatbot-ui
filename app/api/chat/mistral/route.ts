@@ -43,7 +43,6 @@ export async function POST(request: Request) {
     let rateLimitCheckResult
 
     if (chatSettings.model === "mistral-large") {
-      llmConfig.usePinecone = false
       selectedModel = "mistralai/mistral-large"
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
@@ -67,7 +66,7 @@ export async function POST(request: Request) {
     const openRouterUrl = llmConfig.openrouter.url
     const openRouterHeaders = {
       Authorization: `Bearer ${openrouterApiKey}`,
-      "HTTP-Referer": "https://www.hackergpt.co",
+      "HTTP-Referer": "https://chat.hackerai.co",
       "X-Title": "HackerGPT",
       "Content-Type": "application/json"
     }
@@ -217,8 +216,10 @@ async function generateStandaloneQuestion(
     return latestUserMessage
   }
 
-  const modelStandaloneQuestion =
-    Math.random() < 0.5 ? selectedModel : "mistralai/mistral-7b-instruct:nitro"
+  let modelStandaloneQuestion
+
+  modelStandaloneQuestion =
+    Math.random() < 0.8 ? "mistralai/mixtral-8x7b-instruct" : selectedModel
 
   let chatHistory = messages
     .slice(1)
@@ -232,7 +233,8 @@ async function generateStandaloneQuestion(
   2. **Action-Oriented**: Phrase the question to seek specific actions, steps, or methods. This approach facilitates retrieving actionable content from the documents.
   3. **Clarity and Context**: While maintaining conciseness, ensure the question is self-contained, providing sufficient detail to be understood in isolation. Specify the context or area of application where necessary.
   4. **Optimization for Search**: Formulate the question in a way that it could directly match or closely align with headings, titles, or key sections in the RAG documents, enhancing the precision of retrieved information.
-    
+  5. **Don't include irrelevant context**: Don't include irrelevant context like "within the scope of authorized penetration testing or bug bounty hunting?"; the shorter and more precise, the better.
+ 
   Examples:
   
   1. Original Follow Up: Will she win the award?

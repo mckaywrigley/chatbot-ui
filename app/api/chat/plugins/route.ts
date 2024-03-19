@@ -54,11 +54,11 @@ export async function POST(request: Request) {
       return rateLimitCheckResultForChatSettingsModel.response
     }
 
-    if (model === "mistral-large" || model === "gpt-4-turbo-preview") {
-      model = "gpt-4"
-    } else {
-      model = "gpt-3.5-turbo-instruct"
-    }
+    // if (model === "mistral-large" || model === "gpt-4-turbo-preview") {
+    model = "gpt-4"
+    // } else {
+    //   model = "gpt-3.5-turbo-instruct"
+    // }
 
     const chatBody = {
       model: model,
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       signal: controller.signal,
       body: JSON.stringify(chatBody)
     })
-    console.log(fetchResponse)
+
     return new StreamingTextResponse(
       fetchResponse.body as ReadableStream<Uint8Array>
     )

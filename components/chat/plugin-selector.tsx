@@ -81,10 +81,7 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
       <DropdownMenuItem
         key={plugin.id}
         onSelect={() => {
-          if (
-            !plugin.isPremium ||
-            (isPremium && chatSettings?.model !== "mistral-medium")
-          ) {
+          if (!plugin.isPremium || isPremium) {
             if (plugin.value === PluginID.PLUGINS_STORE) {
               setIsPluginStoreModalOpen(true)
             } else {
@@ -97,7 +94,7 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
             setShowLockedPluginDialog(true)
           }
         }}
-        className={`flex items-center justify-between ${(plugin.isPremium && !isPremium) || (plugin.isPremium && chatSettings?.model === "mistral-medium") ? "cursor-not-allowed opacity-50" : ""}`}
+        className={`flex items-center justify-between ${plugin.isPremium && !isPremium ? "cursor-not-allowed opacity-50" : ""}`}
       >
         <span>{plugin.selectorName}</span>
         {plugin.isPremium && !isPremium ? (
@@ -167,14 +164,7 @@ const LockedPluginModal = ({
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
-          {isPremium ? (
-            <>
-              <p>
-                Use the <b>GPT-4 Turbo</b> model for the{" "}
-                <b>{currentPlugin?.name}</b> plugin.
-              </p>
-            </>
-          ) : (
+          {!isPremium && (
             <>
               <p>
                 The <b>{currentPlugin?.name}</b> plugin is only accessible with

@@ -153,6 +153,11 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                       onClick={() => {
                         if (!isPremium && model.provider === "openai") {
                           setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
+                        } else if (
+                          model.modelId === "mistral-large" &&
+                          !isPremium
+                        ) {
+                          setShowPlanDialog(true) // Show dialog for non-premium users trying to select a Mistral Large model
                         } else {
                           handleSelectModel(model.modelId) // Allow selection for premium users or non-OpenAI models
                         }
@@ -161,7 +166,9 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                       <ModelOption model={model} onSelect={() => {}} />
                       {selectedModelId === model.modelId ? (
                         <IconCircleCheck className="" size={28} />
-                      ) : !isPremium && model.provider === "openai" ? (
+                      ) : !isPremium &&
+                        (model.provider === "openai" ||
+                          model.modelId === "mistral-large") ? (
                         <IconLock className="opacity-50" size={28} />
                       ) : (
                         <IconCircle className="opacity-50" size={28} />

@@ -34,13 +34,13 @@ const MISTRAL_MEDIUM: LLM = {
   imageInput: false
 }
 
-// const MISTRAL_LARGE: LLM = {
-//   modelId: "mistral-large",
-//   modelName: "HackerGPT Pro",
-//   provider: "mistral",
-//   hostedId: "mistral-large",
-//   platformLink: MISTRAL_PLATORM_LINK,
-//   imageInput: false
-// }
+const MISTRAL_LARGE: LLM = {
+  modelId: "mistral-large",
+  modelName: "HackerGPT Pro",
+  provider: "mistral",
+  hostedId: "mistral-large",
+  platformLink: MISTRAL_PLATORM_LINK,
+  imageInput: false
+}
 
-export const MISTRAL_LLM_LIST: LLM[] = [MISTRAL_MEDIUM]
+export const MISTRAL_LLM_LIST: LLM[] = [MISTRAL_MEDIUM, MISTRAL_LARGE]
