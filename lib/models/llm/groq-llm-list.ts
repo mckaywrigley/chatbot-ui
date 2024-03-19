@@ -20,13 +20,5 @@ const MIXTRAL_8X7B: LLM = {
   imageInput: false
 }
 
-const GEMMA_7B_IT: LLM = {
-  modelId: "gemma-7b-it",
-  modelName: "Gemma-7b-it",
-  provider: "groq",
-  hostedId: "gemma-7b-it",
-  platformLink: GROQ_PLATORM_LINK,
-  imageInput: false
-}
 
-export const GROQ_LLM_LIST: LLM[] = [LLaMA2_70B, MIXTRAL_8X7B, GEMMA_7B_IT]
+export const GROQ_LLM_LIST: LLM[] = [LLaMA2_70B, MIXTRAL_8X7B]
