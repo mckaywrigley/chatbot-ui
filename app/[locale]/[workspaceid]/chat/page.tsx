@@ -42,7 +42,7 @@ export default function ChatPage() {
             <QuickSettings />
           </div> */}
 
-          <div className="absolute left-2 top-2">
+          <div className="absolute top-2 md:left-2">
             <ChatSettings />
           </div>
 

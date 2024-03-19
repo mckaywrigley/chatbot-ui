@@ -145,11 +145,11 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
             return (
               <div key={provider}>
-                <div className="mb-2">
+                <div className="">
                   {filteredModels.map(model => (
                     <div
                       key={model.modelId}
-                      className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-2"
+                      className="hover:bg-accent flex w-full cursor-not-allowed items-center justify-between space-x-3 truncate rounded p-1"
                       onClick={() => {
                         if (!isPremium && model.provider === "openai") {
                           setShowPlanDialog(true) // Show dialog for non-premium users trying to select an OpenAI model
