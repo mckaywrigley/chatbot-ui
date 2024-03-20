@@ -105,8 +105,6 @@ export const useChatHandler = () => {
     setSelectedTools([])
     setToolInUse("none")
 
-    console.log({ chatStudyState })
-
     setChatStudyState("topic_creation")
 
     if (selectedAssistant) {
