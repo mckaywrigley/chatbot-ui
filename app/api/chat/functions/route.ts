@@ -21,13 +21,167 @@ const callLLM = async (
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   const messagesWithoutLast = messages.slice(0, -1)
-  const studentMessage = await messages[messages.length - 1].content
+  const studentMessage = messages[messages.length - 1]
+  let newStudyState: StudyState
+  let defaultModel = "mistral-medium-latest"
+  const copyEditResponse = `You are an upbeat, encouraging instructional designer who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. Only ask one question at a time.
+  First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
+  Given this source information, copy edit the content. In addition outline the key facts in a list.
+  Next, ask the student if they would like to change anything. Wait for a response.`
 
   switch (studyState) {
+    case "topic_creation":
+    case "no_topic_description":
+      chatResponse = await mistral.chatStream({
+        model: defaultModel,
+        temperature: 0.4,
+        messages: [
+          {
+            role: "system",
+            content: copyEditResponse
+          },
+          ...messages
+        ]
+      })
+
+      stream = MistralStream(chatResponse)
+      newStudyState = "topic_edit"
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
+
+    case "topic_updated":
+    case "topic_edit":
+      // TOPIC MANAGEMENT ///////////////////////////////
+      if (studentMessage.content === "Start recall now.") {
+        newStudyState = "recall_first_attempt"
+        return new Response(
+          "Try to recall as much as possible about the topic.",
+          {
+            status: 200,
+            headers: {
+              "NEW-STUDY-STATE": newStudyState
+            }
+          }
+        )
+      }
+
+      const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+        {
+          type: "function",
+          function: {
+            name: "updateTopicContent",
+            description:
+              "This function updates the detailed topic description based on student inputs and finalized content.",
+            parameters: {
+              type: "object",
+              required: ["description"],
+              properties: {
+                content: {
+                  type: "string",
+                  description: "The full topic content to be saved."
+                }
+              }
+            }
+          }
+        },
+        {
+          type: "function",
+          function: {
+            name: "testMeNow",
+            description:
+              "This function initiates a topic recall session immediately upon student's request.",
+            parameters: {
+              type: "object",
+              properties: {
+                start_test: {
+                  type: "boolean",
+                  description: "Flag to start the test immediately."
+                }
+              },
+              required: ["start_test"]
+            }
+          }
+        }
+      ]
+
+      let toolMessages = [
+        {
+          role: "system",
+          content: `${copyEditResponse}
+  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description.`
+        },
+        ...messages
+      ]
+
+      chatResponse = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo-0125",
+        messages: toolMessages,
+        tools
+      })
+
+      const message = chatResponse.choices[0].message
+      toolMessages.push(message)
+      const toolCalls = message.tool_calls || []
+
+      if (toolCalls.length === 0) {
+        return new Response(message.content, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+      }
+
+      newStudyState = "topic_updated"
+      for (const toolCall of toolCalls) {
+        let functionName = toolCall.function.name
+        const argumentsString = toolCall.function.arguments.trim()
+        const parsedArgs = JSON.parse(argumentsString)
+
+        let functionResponse = {}
+        let bodyContent = parsedArgs.requestBody || parsedArgs
+        let toolId = toolCall.id
+
+        if (functionName === "updateTopicContent") {
+          functionResponse = await functionCalledByLLM(
+            "updateTopicContent",
+            bodyContent,
+            chatId
+          )
+        } else {
+          // has to be testMeNow
+          functionResponse = { success: true }
+          newStudyState = "recall_first_attempt"
+        }
+
+        toolMessages.push({
+          tool_call_id: toolId,
+          role: "tool",
+          name: functionName,
+          content: JSON.stringify(functionResponse)
+        })
+      }
+
+      const secondResponse = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo-0125",
+        messages: toolMessages,
+        stream: true
+      })
+
+      stream = OpenAIStream(secondResponse)
+
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
+
     case "recall_first_attempt":
-      // GET FORGOTTEN FACTS AND SAVE TO DB
+      // GET FORGOTTEN FACTS AND SAVE TO DB ///////////////////////////////
       chatResponse = await mistral.chat({
-        model: "open-mixtral-8x7b",
+        model: defaultModel,
         temperature: 0.1,
         response_format: { type: "json_object" },
         messages: [
@@ -45,7 +199,7 @@ const callLLM = async (
             """${topicDescription}"""
             
             Student's recall attempt:
-            """${studentMessage}"""
+            """${studentMessage.content}"""
             `
           }
         ]
@@ -57,12 +211,17 @@ const callLLM = async (
 
       serverResult = await functionCalledByLLM(
         "updateRecallAnalysis",
-        [forgotten_facts],
+        {
+          recall_analysis: JSON.stringify(forgotten_facts)
+        },
         chatId
       )
       if (serverResult.success === false) {
         throw new Error("Server error")
       }
+
+      // WORK OUT IF PERFECT SCORE
+      // ROUTE TO HINTING OR SCORE UPDATED
 
       const perfectRecall = score >= 95 // LLM model is not perfect, so we need to set a threshold
 
@@ -76,7 +235,9 @@ const callLLM = async (
       if (perfectRecall) {
         serverResult = await functionCalledByLLM(
           "updateTopicQuizResult",
-          [100],
+          {
+            test_result: 100
+          },
           chatId
         )
         if (serverResult.success === false) {
@@ -87,8 +248,8 @@ const callLLM = async (
       }
 
       chatStreamResponse = await mistral.chatStream({
-        model: "open-mixtral-8x7b",
-        temperature: 0,
+        model: defaultModel,
+        temperature: 0.2,
         messages: [
           {
             role: "system",
@@ -100,7 +261,7 @@ const callLLM = async (
 
 Topic source: """${topicDescription}"""
 
-Student recall: """${studentMessage}"""`
+Student recall: """${studentMessage.content}"""`
           }
         ]
       })
@@ -112,11 +273,11 @@ Student recall: """${studentMessage}"""`
         }
       })
     case "recall_hinting":
-      // PROVIDE ANSWER TO HINTS AND PERFORRM FINAL SCORE
+      // PROVIDE ANSWER TO HINTS AND PERFORRM FINAL SCORE ////////////////////
 
       chatResponse = await mistral.chat({
-        model: "open-mixtral-8x7b",
-        temperature: 0.1,
+        model: defaultModel,
+        temperature: 0.2,
         response_format: { type: "json_object" },
         messages: [
           {
@@ -139,7 +300,7 @@ Student recall: """${studentMessage}"""`
             """${topicDescription}"""
             
             Student's answer to hints:
-            """${studentMessage}"""
+            """${studentMessage.content}"""
 
             Output the results in JSON format only.
             `
@@ -158,7 +319,9 @@ Student recall: """${studentMessage}"""`
 
       serverResult = await functionCalledByLLM(
         "updateTopicQuizResult",
-        [final_score],
+        {
+          test_result: final_score
+        },
         chatId
       )
       if (serverResult.success === false) {
@@ -170,7 +333,7 @@ Student recall: """${studentMessage}"""`
       const dateFromNow = formatDistanceToNow(date)
 
       chatStreamResponse = await mistral.chatStream({
-        model: "open-mixtral-8x7b",
+        model: defaultModel,
         temperature: 0.7,
         messages: [
           {
@@ -188,18 +351,22 @@ Student recall: """${studentMessage}"""`
       })
 
       stream = MistralStream(chatStreamResponse)
+      newStudyState = "score_updated"
       return new StreamingTextResponse(stream, {
         headers: {
-          "NEW-STUDY-STATE": "score_updated"
+          "NEW-STUDY-STATE": newStudyState
         }
       })
 
     case "score_updated":
-      if (studentMessage === "Show full topic description.") {
+      // SHOW FULL TOPIC DESCRIPTION ///////////////////////////////
+      if (studentMessage.content === "Show full topic description.") {
+        newStudyState = "test_scheduled"
+
         return new Response(JSON.stringify(topicDescription), {
           status: 200,
           headers: {
-            "NEW-STUDY-STATE": "topic_created"
+            "NEW-STUDY-STATE": newStudyState
           }
         })
       }

@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
-import { updateChat } from "@/db/chats"
+import { getChatById, updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
@@ -22,6 +22,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { StudyState } from "@/lib/assistants"
+import { set } from "date-fns"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -72,7 +73,8 @@ export const useChatHandler = () => {
     setChatStudyState,
     recallAnalysis,
     setRecallAnalysis,
-    topicDescription
+    topicDescription,
+    setTopicDescription
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -104,6 +106,10 @@ export const useChatHandler = () => {
 
     setSelectedTools([])
     setToolInUse("none")
+
+    console.log({ chatStudyState })
+
+    setChatStudyState("topic_creation")
 
     if (selectedAssistant) {
       setChatSettings({
@@ -225,13 +231,13 @@ export const useChatHandler = () => {
         ...availableOpenRouterModels
       ].find(llm => llm.modelId === chatSettings?.model)
 
-      validateChatSettings(
-        chatSettings,
-        modelData,
-        profile,
-        selectedWorkspace,
-        messageContent
-      )
+      // validateChatSettings(
+      //   chatSettings,
+      //   modelData,
+      //   profile,
+      //   selectedWorkspace,
+      //   messageContent
+      // )
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 
@@ -306,7 +312,14 @@ export const useChatHandler = () => {
 
           const newStudyState = response.headers.get("NEW-STUDY-STATE")
           console.log({ newStudyState })
-          if (newStudyState) setChatStudyState(newStudyState as StudyState)
+          if (newStudyState) {
+            setChatStudyState(newStudyState as StudyState)
+            if (newStudyState === "topic_updated") {
+              const newTopicContent = await getChatById(currentChat!.id)
+              const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
+              setTopicDescription(topicDescription)
+            }
+          }
 
           const analysis = response.headers.get("ANALYSIS")
           console.log({ analysis })

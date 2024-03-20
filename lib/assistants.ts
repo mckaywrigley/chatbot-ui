@@ -2,8 +2,8 @@ import OpenAI from "openai"
 
 export type StudyState =
   | "topic_creation"
-  | "topic_created"
-  | "topic_description_updated"
+  | "topic_edit"
+  | "topic_updated"
   | "test_scheduled"
   | "recall_first_attempt"
   | "recall_hinting"
@@ -24,10 +24,12 @@ export const studyStates: StudyStateObject[] = [
     name: "topic_creation"
   },
   {
-    name: "topic_created"
+    name: "topic_edit",
+    quickResponses: ["Save topic."]
   },
   {
-    name: "topic_description_updated"
+    name: "topic_updated",
+    quickResponses: ["Start recall now."]
   },
   {
     name: "test_scheduled"

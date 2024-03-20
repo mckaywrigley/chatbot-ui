@@ -177,12 +177,9 @@ export async function updateTopicQuizResult(
   }
 }
 
-export async function updateTopicDescription(
-  chatId: string,
-  topic_description: string
-) {
+export async function updateTopicContent(chatId: string, content: string) {
   const chatUpdateStatus = await updateChat(chatId, {
-    topic_description
+    topic_description: content
   })
   return chatUpdateStatus
 }
@@ -198,25 +195,108 @@ export async function updateReviseDate(chatId: string, hours_time: number) {
   return chatUpdateStatus
 }
 
-export async function functionCalledByLLM(
-  functionName: string,
-  args: any[],
-  chatId: string
-): Promise<{ success: boolean; revise_date?: any }> {
-  // Update the return type here
-  let result: { success: boolean; revise_date?: any } = { success: false } // Update the type here
-  if (functionName === "updateTopicQuizResult") {
-    // Update the chat/topic name & content in the database
-    result = await updateTopicQuizResult(chatId, args[0])
-  } else if (functionName === "updateTopicDescription") {
-    result = await updateTopicDescription(chatId, args[0])
-  } else if (functionName === "scheduleTestSession") {
-    result = await updateReviseDate(chatId, args[0])
-  } else if (functionName === "updateRecallAnalysis") {
-    result = await updateChat(chatId, { recall_analysis: args[0] })
-  } else {
-    // functionName === "testMeNow" or functionName === "recallComplete"
-    result = { success: true }
-  }
-  return result
+// Function-specific argument types
+interface FunctionArguments {
+  updateTopicQuizResult: { test_result: number }
+  updateTopicContent: { content: string }
+  scheduleTestSession: { hours_time: number }
+  updateRecallAnalysis: { recall_analysis: string }
 }
+
+// Helper type for extracting the specific argument type
+type FunctionArg<F extends keyof FunctionArguments> = FunctionArguments[F]
+
+export async function functionCalledByLLM<F extends keyof FunctionArguments>(
+  functionName: F,
+  bodyContent: FunctionArg<F>,
+  chatId: string
+): Promise<any> {
+  let tempData = {}
+
+  switch (functionName) {
+    case "updateTopicQuizResult":
+      // Explicitly assert the type of bodyContent for this case
+      const quizResultArgs = bodyContent as FunctionArg<"updateTopicQuizResult">
+      tempData = await updateTopicQuizResult(chatId, quizResultArgs.test_result)
+      break
+    case "updateTopicContent":
+      // Assert the type for this case
+      const contentArgs = bodyContent as FunctionArg<"updateTopicContent">
+      tempData = await updateTopicContent(chatId, contentArgs.content)
+      break
+    case "scheduleTestSession":
+      // And so on for each case...
+      const sessionArgs = bodyContent as FunctionArg<"scheduleTestSession">
+      tempData = await updateReviseDate(chatId, sessionArgs.hours_time)
+      break
+    case "updateRecallAnalysis":
+      const recallArgs = bodyContent as FunctionArg<"updateRecallAnalysis">
+      tempData = await updateChat(chatId, recallArgs)
+      break
+    default:
+      console.error(`Function ${functionName} is not supported.`)
+      return { success: false }
+  }
+
+  return tempData
+}
+
+// export async function functionCalledByLLM(
+//   functionName: string,
+//   bodyContent:
+//     | Partial<{
+//         test_result: number
+//         content: string
+//         hours_time: number
+//         recallSummary: string
+//         forgotten_facts: string
+//       }>
+//     | {
+//         test_result?: number
+//         content?: string
+//         hours_time?: number
+//         recallSummary?: string
+//         forgotten_facts?: string
+//       },
+//   chatId: string
+// ) {
+//   let tempData = {}
+//   if (functionName === "updateTopicQuizResult") {
+//     // Update the chat/topic name & content in the database
+//     tempData = await updateTopicQuizResult(chatId, bodyContent.test_result)
+//   } else if (functionName === "updateTopicContent") {
+//     tempData = await updateTopicContent(chatId, bodyContent.content)
+//   } else if (functionName === "scheduleTestSession") {
+//     tempData = await updateReviseDate(chatId, bodyContent.hours_time)
+//   } else if (functionName === "updateRecallAnalysis") {
+//     tempData = await updateChat(chatId, {
+//       recall_analysis: bodyContent.forgotten_facts
+//     })
+//   } else {
+//     // functionName === "testMeNow" or functionName === "recallComplete"
+//   }
+//   return (tempData = { success: false })
+// }
+
+// export async function functionCalledByLLM(
+//   functionName: string,
+//   args: any[],
+//   chatId: string
+// ): Promise<{ success: boolean; revise_date?: any }> {
+//   // Update the return type here
+//   let result: { success: boolean; revise_date?: any } = { success: false } // Update the type here
+//   if (functionName === "updateTopicQuizResult") {
+//     // Update the chat/topic name & content in the database
+//     result = await updateTopicQuizResult(chatId, args[0])
+//   } else if (functionName === "updateTopicContent") {
+//     result = await updateTopicContent(chatId, args[0])
+//   } else if (functionName === "scheduleTestSession") {
+//     result = await updateReviseDate(chatId, args[0])
+//   } else if (functionName === "updateRecallAnalysis") {
+//     result = await updateChat(chatId, { recall_analysis: args[0] })
+//   } else {
+//     // functionName === "testMeNow" or functionName === "recallComplete"
+//     result = { success: true }
+//   }
+//   return result
+// }
