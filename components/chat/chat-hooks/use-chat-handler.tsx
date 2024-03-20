@@ -21,6 +21,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
+import { OPENAI_TRANSCRIPTION_API_URL } from "@/Core/config/openai"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -411,6 +412,26 @@ export const useChatHandler = () => {
     handleSendMessage(editedContent, filteredMessages, false)
   }
 
+  const processTranscription = async (audio: Blob): Promise<any> => {
+    const formData = new FormData()
+    formData.append("audio", audio)
+
+    const response = await fetch(OPENAI_TRANSCRIPTION_API_URL, {
+      method: "POST",
+      body: formData
+    })
+
+    const responseJson = await response.json()
+
+    return {
+      error: responseJson.error,
+      transcription: responseJson.text,
+      url: responseJson.url,
+      duration: responseJson.duration,
+      transcriptionWithTimeStamps: responseJson.textWithTimeStamps
+    }
+  }
+
   return {
     chatInputRef,
     prompt,
@@ -418,6 +439,7 @@ export const useChatHandler = () => {
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
-    handleSendEdit
+    handleSendEdit,
+    processTranscription
   }
 }

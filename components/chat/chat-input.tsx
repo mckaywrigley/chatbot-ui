@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
@@ -66,6 +67,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const [startProcessingAudio, setStartProcessingAudio] = useState(false)
 
+  const [sendDirectFromButton, setSendDirectFromButton] = useState(false)
+
+  const [chunks, setChunks] = useState<Blob[]>([])
+
   const {
     isAssistantPickerOpen,
     focusAssistant,
@@ -95,7 +100,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     chatInputRef,
     handleSendMessage,
     handleStopMessage,
-    handleFocusChatInput
+    handleFocusChatInput,
+    processTranscription
   } = useChatHandler()
 
   const { handleInputChange } = usePromptAndCommand()
@@ -114,6 +120,72 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
+
+  useEffect(() => {
+    if (chatInputRef && chatInputRef.current) {
+      chatInputRef.current.style.height = "inherit"
+      chatInputRef.current.style.height = `${chatInputRef.current?.scrollHeight}px`
+      chatInputRef.current.style.overflow = `${
+        chatInputRef?.current?.scrollHeight > 400 ? "auto" : "hidden"
+      }`
+    }
+
+    // if (sendDirectFromButton && !startProcessingAudio && content) {
+    //   handleSendMessage()
+    // }
+  }, [content, startProcessingAudio])
+
+  useEffect(() => {
+    async function fetchTranscription(audio: any) {
+      try {
+        setTranscriptionLoading(true)
+        const result = await processTranscription(audio)
+        // TODO: Implement error handling
+        const error = result?.error
+
+        const transcription = result?.transcription
+
+        if (transcription) {
+          handleInputChange(transcription)
+        }
+
+        setStartProcessingAudio(false)
+        setVoiceRecorder(null)
+        setTranscriptionLoading(false)
+        setTime("")
+      } catch (error) {
+        console.log("error", error)
+        setStartProcessingAudio(false)
+        setVoiceRecorder(null)
+        setTranscriptionLoading(false)
+        setTime("")
+      }
+    }
+    if (startProcessingAudio && timeSeconds > 1) {
+      console.log("voiceRecorder!.mimeType", voiceRecorder!.mimeType)
+      const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
+      void fetchTranscription(audio)
+    } else {
+      setSendDirectFromButton(false)
+      setStartProcessingAudio(false)
+      setVoiceRecorder(null)
+      setTranscriptionLoading(false)
+      setTime("")
+    }
+  }, [startProcessingAudio])
+
+  useEffect(() => {
+    if (!isRecording || !voiceRecorder) return
+    voiceRecorder.start(800)
+
+    voiceRecorder.ondataavailable = ({ data }) => {
+      chunks.push(data)
+    }
+  }, [isRecording, voiceRecorder, chunks])
+
+  const handleTranscriptAndSendRecord = (e: any) => {
+    setSendDirectFromButton(true)
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
