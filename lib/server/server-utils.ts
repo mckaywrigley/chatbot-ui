@@ -6,5 +6,3 @@ export function createResponse(data: object, status: number): Response {
     }
   })
 }
-
-// Use the function with different types of input strings as needed

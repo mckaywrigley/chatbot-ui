@@ -227,13 +227,13 @@ export const useChatHandler = () => {
         ...availableOpenRouterModels
       ].find(llm => llm.modelId === chatSettings?.model)
 
-      // validateChatSettings(
-      //   chatSettings,
-      //   modelData,
-      //   profile,
-      //   selectedWorkspace,
-      //   messageContent
-      // )
+      validateChatSettings(
+        chatSettings,
+        modelData,
+        profile,
+        selectedWorkspace,
+        messageContent
+      )
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 

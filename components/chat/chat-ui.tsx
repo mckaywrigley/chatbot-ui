@@ -46,8 +46,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedTools,
     setTopicDescription,
     chats,
-    setChatStudyState,
-    chatStudyState
+    setChatStudyState
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()

@@ -165,39 +165,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
-  const handleProceedToLearning = async () => {
-    // get the assistant from assistances context where name ="Study coach"
-    const selectedAssistant = assistants.find(
-      assistant => assistant.name === "Study coach"
-    )
-    if (!selectedAssistant) {
-      console.error("No assistant with name 'Study coach' found")
-      return
-    }
-    handleSelectAssistant(selectedAssistant)
-    setNewMessageFiles([])
-    let currentChat = selectedChat ? { ...selectedChat } : null
-
-    if (!currentChat) {
-      console.error("No chat found")
-      return
-    }
-
-    const updatedChat = await updateChat(currentChat.id, {
-      assistant_id: selectedAssistant.id
-    })
-
-    setChats(prevChats => {
-      const updatedChats = prevChats.map(prevChat =>
-        prevChat.id === updatedChat.id ? updatedChat : prevChat
-      )
-
-      return updatedChats
-    })
-
-    deleteChatFilesByChatId(currentChat.id)
-  }
-
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
