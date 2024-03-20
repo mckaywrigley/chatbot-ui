@@ -21,7 +21,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
-import { StudyState } from "@/lib/assistants"
+import { StudyState } from "@/lib/studyStates"
 import { set } from "date-fns"
 
 export const useChatHandler = () => {
@@ -71,8 +71,6 @@ export const useChatHandler = () => {
     isToolPickerOpen,
     chatStudyState,
     setChatStudyState,
-    recallAnalysis,
-    setRecallAnalysis,
     topicDescription,
     setTopicDescription
   } = useContext(ChatbotUIContext)
@@ -305,25 +303,21 @@ export const useChatHandler = () => {
               messages: formattedMessagesWithoutSystem,
               chatId: currentChat?.id,
               chatStudyState,
-              topicDescription,
-              recallAnalysis
+              topicDescription
             })
           })
 
           const newStudyState = response.headers.get("NEW-STUDY-STATE")
-          console.log({ newStudyState })
           if (newStudyState) {
             setChatStudyState(newStudyState as StudyState)
             if (newStudyState === "topic_updated") {
               const newTopicContent = await getChatById(currentChat!.id)
               const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
               setTopicDescription(topicDescription)
+              // remove files from chat
+              setChatFiles([])
             }
           }
-
-          const analysis = response.headers.get("ANALYSIS")
-          console.log({ analysis })
-          if (analysis) setRecallAnalysis(analysis)
         } else {
           setToolInUse("Tools")
 

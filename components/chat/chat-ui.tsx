@@ -237,7 +237,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
           fileItems: []
         }
       ])
-      setChatStudyState("no_topic_description")
+      setChatStudyState("topic_creation")
     }
 
     setSelectedChat(chat)
