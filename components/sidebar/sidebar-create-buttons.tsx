@@ -160,13 +160,16 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   return (
     <div className="flex space-x-2">
       <div
-        className="flex size-[42px] items-center justify-center rounded border"
+        className="flex size-[42px] cursor-pointer items-center justify-center rounded border"
         onClick={e => {
           e.stopPropagation()
           handleMenuButtonClick(e)
         }}
       >
-        <IconPlus size={20} />
+        <i
+          className="fa-solid fa-plus text-pixelspace-gray-20"
+          style={{ width: 16, height: 16 }}
+        ></i>
       </div>
 
       {/* {hasData && (

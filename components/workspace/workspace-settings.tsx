@@ -170,12 +170,15 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         <WithTooltip
           display={<div>Workspace Settings</div>}
           trigger={
-            <div className=" border-pixelspace-60 ml-2 flex size-10 items-center justify-center rounded-md border">
-              <IconSettings
-                className=" cursor-pointer  hover:opacity-50"
-                size={16}
-                onClick={() => setIsOpen(true)}
-              />
+            <div
+              role="button"
+              className=" border-pixelspace-60 ml-2 flex size-[42px] items-center justify-center rounded-md border"
+              onClick={() => setIsOpen(true)}
+            >
+              <i
+                className="fa-regular fa-gear text-pixelspace-gray-20"
+                style={{ width: 16, height: 16 }}
+              ></i>
             </div>
           }
         />

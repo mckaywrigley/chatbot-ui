@@ -1,9 +1,6 @@
 import { ContentType } from "@/types"
 import { FC } from "react"
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCoffee, faSearch } from "@fortawesome/free-solid-svg-icons"
-
 import { Input } from "../ui/input"
 
 interface SidebarSearchProps {
@@ -18,9 +15,12 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
   setSearchTerm
 }) => {
   return (
-    <div className="bg-pixelspace-gray-60 flex h-[42px] items-center rounded-md p-3">
+    <div className="bg-pixelspace-gray-60 flex h-[42px] w-full items-center rounded-md px-2 py-3">
       <div>
-        <FontAwesomeIcon className="text-pixelspace-gray-20" icon={faSearch} />
+        <i
+          className="fa-regular fa-magnifying-glass text-pixelspace-gray-20"
+          style={{ width: 16, height: 16 }}
+        ></i>
       </div>
       <Input
         placeholder={`Search ${contentType === "chats" ? "threads" : contentType}...`}
