@@ -11,6 +11,7 @@ import {
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
+import { StudyState } from "@/lib/studyStates"
 
 interface ChatbotUIContext {
   // PROFILE STORE
@@ -80,6 +81,8 @@ interface ChatbotUIContext {
   setChatFileItems: Dispatch<SetStateAction<Tables<"file_items">[]>>
   topicDescription: string
   setTopicDescription: Dispatch<SetStateAction<string>>
+  chatStudyState: StudyState
+  setChatStudyState: Dispatch<SetStateAction<StudyState>>
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
@@ -208,6 +211,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setChatFileItems: () => {},
   topicDescription: "",
   setTopicDescription: () => {},
+  chatStudyState: "topic_creation",
+  setChatStudyState: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,

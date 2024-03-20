@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
-import { updateChat } from "@/db/chats"
+import { getChatById, updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
@@ -21,8 +21,8 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
-import { usePromptAndCommand } from "./use-prompt-and-command"
-import { t } from "i18next"
+import { StudyState } from "@/lib/studyStates"
+import { set } from "date-fns"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -69,13 +69,13 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
+    chatStudyState,
+    setChatStudyState,
     topicDescription,
-    setTopicDescription,
-    assistants
+    setTopicDescription
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
-  const { handleSelectAssistant } = usePromptAndCommand()
 
   useEffect(() => {
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
@@ -101,9 +101,11 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
-    setTopicDescription("")
 
+    setSelectedTools([])
     setToolInUse("none")
+
+    setChatStudyState("topic_creation")
 
     if (selectedAssistant) {
       setChatSettings({
@@ -271,45 +273,65 @@ export const useChatHandler = () => {
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
-        assistant: selectedAssistant,
+        assistant: selectedChat?.assistant_id ? selectedAssistant : null,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems,
-        topicDescription
+        chatFileItems: chatFileItems
       }
 
       let generatedText = ""
 
-      if (selectedTools.length > 0) {
-        setToolInUse("Tools")
-
+      if (selectedTools.length > 0 || chatStudyState.length > 0) {
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
           chatImages
         )
 
-        const response = await fetch("/api/chat/tools", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
-            selectedTools,
-            chatId: currentChat?.id
+        let response: Response
+
+        if (chatStudyState.length > 0) {
+          const formattedMessagesWithoutSystem = formattedMessages.slice(1)
+
+          response = await fetch("/api/chat/functions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              messages: formattedMessagesWithoutSystem,
+              chatId: currentChat?.id,
+              chatStudyState,
+              topicDescription
+            })
           })
-        })
 
-        setToolInUse("none")
+          const newStudyState = response.headers.get("NEW-STUDY-STATE")
+          if (newStudyState) {
+            setChatStudyState(newStudyState as StudyState)
+            if (newStudyState === "topic_updated") {
+              const newTopicContent = await getChatById(currentChat!.id)
+              const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
+              setTopicDescription(topicDescription)
+              // remove files from chat
+              setChatFiles([])
+            }
+          }
+        } else {
+          setToolInUse("Tools")
 
-        // if the response is ok and has a score
-        if (
-          response.headers
-            .get("FUNCTION-NAMES")
-            ?.includes("updateTopicQuizResult")
-        ) {
-          console.log("updateTopicQuizResult was called and the response is ok")
+          response = await fetch("/api/chat/tools", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chatSettings: payload.chatSettings,
+              messages: formattedMessages,
+              selectedTools
+            })
+          })
+
+          setToolInUse("none")
         }
 
         generatedText = await processResponse(

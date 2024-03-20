@@ -6,7 +6,6 @@ import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
 import DynamicPieChart from "../../../icons/dynamic-pie-chart"
-import * as ebisu from "ebisu-js"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -33,20 +32,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     }
   }
 
-  // Ebisu
-  const updated_at = (chat?.updated_at || chat?.created_at) as string
-
-  const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
-  const [arg1, arg2, arg3] = chatEbisuModel
-
-  const model = ebisu.defaultModel(arg3, arg1, arg2)
-
-  // elapsed time in hours from last update to now
-  var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
-
-  const predictedRecall = ebisu.predictRecall(model, elapsed, true)
-  console.log(chat.name, model, elapsed, predictedRecall)
-
   return (
     <div
       ref={itemRef}
@@ -58,7 +43,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       onKeyDown={handleKeyDown}
       onClick={handleClick}
     >
-      <DynamicPieChart value={predictedRecall * 100} scale={0.6} />
+      <DynamicPieChart value={chat.predictedRecall * 100} scale={0.6} />
 
       <div className="ml-3 flex-1 truncate text-sm font-semibold">
         {chat.name}

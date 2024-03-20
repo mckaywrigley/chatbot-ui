@@ -1,8 +1,9 @@
 import { Tables } from "@/supabase/types"
-import { ChatPayload, MessageImage, ChatMessage } from "@/types"
+import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 
 const buildBasePrompt = (
+  prompt: string,
   profileContext: string,
   workspaceInstructions: string,
   assistant: Tables<"assistants"> | null
@@ -11,7 +12,6 @@ const buildBasePrompt = (
 
   if (assistant) {
     fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
-    fullPrompt += `System Instructions:\n${assistant.prompt}\n\n`
   }
 
   fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
@@ -21,8 +21,10 @@ const buildBasePrompt = (
   }
 
   if (workspaceInstructions) {
-    fullPrompt += `Further Instructions:\n${workspaceInstructions}\n\n`
+    fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
   }
+
+  fullPrompt += `User Instructions:\n${prompt}`
 
   return fullPrompt
 }
@@ -38,13 +40,11 @@ export async function buildFinalMessages(
     chatMessages,
     assistant,
     messageFileItems,
-    chatFileItems,
-    topicDescription
+    chatFileItems
   } = payload
 
-  // console.log("buildFinalMessages", { payload })
-
   const BUILT_PROMPT = buildBasePrompt(
+    chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
     assistant
@@ -58,21 +58,8 @@ export async function buildFinalMessages(
   let usedTokens = 0
   usedTokens += PROMPT_TOKENS
 
-  let scopedChatMessages: ChatMessage[]
-
-  const isStudyCoach = assistant?.name === "Study coach"
-
-  if (isStudyCoach) {
-    const firstAssistantMessageIndex = chatMessages.findIndex(
-      message => message.message.assistant_id === assistant.id
-    )
-    scopedChatMessages = chatMessages.slice(firstAssistantMessageIndex)
-  } else {
-    scopedChatMessages = chatMessages
-  }
-
-  const processedChatMessages = scopedChatMessages.map((chatMessage, index) => {
-    const nextChatMessage = scopedChatMessages[index + 1]
+  const processedChatMessages = chatMessages.map((chatMessage, index) => {
+    const nextChatMessage = chatMessages[index + 1]
 
     if (nextChatMessage === undefined) {
       return chatMessage
@@ -132,12 +119,6 @@ export async function buildFinalMessages(
   }
 
   finalMessages.unshift(tempSystemMessage)
-
-  if (isStudyCoach) {
-    const userPrompt = finalMessages[finalMessages.length - 1].content
-    const topicText = buildTopicText(userPrompt, topicDescription)
-    finalMessages[finalMessages.length - 1].content = topicText
-  }
 
   finalMessages = finalMessages.map(message => {
     let content
@@ -199,10 +180,6 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
   return `Use the following sources to create a detailed topic description. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
 }
 
-function buildTopicText(userPrompt: string, topicDescription: string) {
-  return `<answer>${userPrompt}</answer> \n\n Use the following topic description as source to compare the answer to:\n\n<source>${topicDescription}</source>`
-}
-
 export async function buildGoogleGeminiFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
@@ -212,6 +189,7 @@ export async function buildGoogleGeminiFinalMessages(
     payload
 
   const BUILT_PROMPT = buildBasePrompt(
+    chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
     assistant

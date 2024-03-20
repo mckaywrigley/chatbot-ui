@@ -5,7 +5,10 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
-import { getMessagesByChatId } from "@/db/messages"
+import {
+  getMessagesByChatId,
+  deleteMessagesIncludingAndAfter
+} from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -34,6 +37,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatImages,
     assistants,
     setSelectedAssistant,
+    selectedAssistant,
     setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
@@ -41,7 +45,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     profile,
     setSelectedTools,
     setTopicDescription,
-    chats
+    chats,
+    setChatStudyState
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -59,7 +64,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   } = useScroll()
 
   const [loading, setLoading] = useState(true)
-  const [chatTitle, setChatTitle] = useState(selectedChat?.name || "Chat")
+  const [chatTitle, setChatTitle] = useState("Chat")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,13 +83,22 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     } else {
       setLoading(false)
     }
+
+    return () => {
+      if (selectedChat) {
+        deleteMessagesIncludingAndAfter(
+          selectedChat.user_id,
+          selectedChat.id,
+          0
+        )
+      }
+    }
   }, [])
 
   useEffect(() => {
     // find selected chat in chats
     const chat = chats.find(chat => chat.id === selectedChat?.id)
     setTopicDescription(chat?.topic_description || "")
-    setChatTitle(chat?.name || "Chat")
   }, [chats])
 
   const fetchMessages = async () => {
@@ -182,6 +196,47 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
     if (chat.topic_description) {
       setTopicDescription(chat.topic_description)
+
+      await setChatStudyState("recall_first_attempt")
+
+      setChatMessages([
+        {
+          message: {
+            id: "1",
+            user_id: "1",
+            content: `Try to recall as much as possible about the topic ${chat.name}.`,
+            created_at: new Date().toISOString(),
+            image_paths: [],
+            model: "",
+            role: "assistant",
+            sequence_number: 0,
+            updated_at: null,
+            assistant_id: null,
+            chat_id: chat.id
+          },
+          fileItems: []
+        }
+      ])
+    } else {
+      setChatMessages([
+        {
+          message: {
+            id: "1",
+            user_id: "1",
+            content: `Please add topic description below for ${chat.name}.`,
+            created_at: new Date().toISOString(),
+            image_paths: [],
+            model: "",
+            role: "assistant",
+            sequence_number: 0,
+            updated_at: null,
+            assistant_id: selectedAssistant!.id,
+            chat_id: chat.id
+          },
+          fileItems: []
+        }
+      ])
+      setChatStudyState("topic_creation")
     }
 
     setSelectedChat(chat)
@@ -194,6 +249,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       includeWorkspaceInstructions: chat.include_workspace_instructions,
       embeddingsProvider: chat.embeddings_provider as "openai" | "local"
     })
+
+    setChatTitle(chat.name || "Chat")
   }
 
   if (loading) {

@@ -1,9 +1,5 @@
 import { openapiToFunctions } from "@/lib/openapi-conversion"
-import {
-  checkApiKey,
-  getServerProfile,
-  updateTopicQuizResult
-} from "@/lib/server/server-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
@@ -12,11 +8,10 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, selectedTools, chatId } = json as {
+  const { chatSettings, messages, selectedTools } = json as {
     chatSettings: ChatSettings
     messages: any[]
     selectedTools: Tables<"tools">[]
-    chatId: string
   }
 
   try {
@@ -74,7 +69,6 @@ export async function POST(request: Request) {
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
-    let functionNames = []
     if (toolCalls.length === 0) {
       return new Response(message.content, {
         headers: {
@@ -87,7 +81,6 @@ export async function POST(request: Request) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
         const functionName = functionCall.name
-        functionNames.push(functionName)
         const argumentsString = toolCall.function.arguments.trim()
         const parsedArgs = JSON.parse(argumentsString)
 
@@ -151,25 +144,20 @@ export async function POST(request: Request) {
 
           const bodyContent = parsedArgs.requestBody || parsedArgs
 
-          if (functionName === "updateTopicQuizResult") {
-            // Update the chat/topic name & content in the database
-            data = await updateTopicQuizResult(chatId, bodyContent.test_result)
+          const requestInit = {
+            method: "POST",
+            headers,
+            body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
+          }
+
+          const response = await fetch(fullUrl, requestInit)
+
+          if (!response.ok) {
+            data = {
+              error: response.statusText
+            }
           } else {
-            const requestInit = {
-              method: "POST",
-              headers,
-              body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
-            }
-
-            const response = await fetch(fullUrl, requestInit)
-
-            if (!response.ok) {
-              data = {
-                error: response.statusText
-              }
-            } else {
-              data = await response.json()
-            }
+            data = await response.json()
           }
         } else {
           // If the type is set to query
@@ -218,9 +206,7 @@ export async function POST(request: Request) {
 
     const stream = OpenAIStream(secondResponse)
 
-    return new StreamingTextResponse(stream, {
-      headers: { "FUNCTION-NAMES": functionNames.join(",") }
-    })
+    return new StreamingTextResponse(stream)
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

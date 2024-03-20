@@ -1,4 +1,4 @@
-import { Database, Tables } from "@/supabase/types"
+import { Database, Tables, TablesUpdate } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
@@ -73,10 +73,8 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
     throw new Error(`${keyName} API Key not found`)
   }
 }
-export async function updateTopicQuizResult(
-  chatId: string,
-  test_result: number
-) {
+
+export const getChatById = async (chatId: string) => {
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -95,6 +93,43 @@ export async function updateTopicQuizResult(
     .select("*")
     .eq("id", chatId)
     .maybeSingle()
+
+  return chat
+}
+
+const updateChat = async (chatId: string, chat: TablesUpdate<"chats">) => {
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  const { error } = await supabase
+    .from("chats")
+    .update(chat)
+    .eq("id", chatId)
+    .select("*")
+    .single()
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+export async function updateTopicQuizResult(
+  chatId: string,
+  test_result: number
+) {
+  const chat = await getChatById(chatId)
 
   // if updated_at is null, set it to created_at
   const updated_at = (chat?.updated_at || chat?.created_at) as string
@@ -128,14 +163,81 @@ export async function updateTopicQuizResult(
 
   console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
-  const { error } = await supabase
-    .from("chats")
-    .update({ test_result, ebisu_model: newModel, revise_date })
-    .eq("id", chatId)
-
-  if (error) {
-    return { success: false, error: error.message }
+  const chatUpdateStatus = await updateChat(chatId, {
+    test_result,
+    ebisu_model: newModel,
+    revise_date
+  })
+  if (chatUpdateStatus.success === false) {
+    return chatUpdateStatus
   }
 
-  return { success: true, message: `Saved test result of ${test_result}%.` }
+  return {
+    success: true,
+    revise_date
+  }
+}
+
+export async function updateTopicContent(chatId: string, content: string) {
+  const chatUpdateStatus = await updateChat(chatId, {
+    topic_description: content
+  })
+  return chatUpdateStatus
+}
+
+// update revise date by chat id and hours time
+export async function updateReviseDate(chatId: string, hours_time: number) {
+  let currentTime = new Date()
+  const reviseDate = currentTime.setHours(currentTime.getHours() + 12)
+
+  const chatUpdateStatus = await updateChat(chatId, {
+    revise_date: new Date(reviseDate).toISOString()
+  })
+  return chatUpdateStatus
+}
+
+// Function-specific argument types
+interface FunctionArguments {
+  updateTopicQuizResult: { test_result: number }
+  updateTopicContent: { content: string }
+  scheduleTestSession: { hours_time: number }
+  updateRecallAnalysis: { recall_analysis: string }
+}
+
+// Helper type for extracting the specific argument type
+type FunctionArg<F extends keyof FunctionArguments> = FunctionArguments[F]
+
+export async function functionCalledByLLM<F extends keyof FunctionArguments>(
+  functionName: F,
+  bodyContent: FunctionArg<F>,
+  chatId: string
+): Promise<any> {
+  let tempData = {}
+
+  switch (functionName) {
+    case "updateTopicQuizResult":
+      // Explicitly assert the type of bodyContent for this case
+      const quizResultArgs = bodyContent as FunctionArg<"updateTopicQuizResult">
+      tempData = await updateTopicQuizResult(chatId, quizResultArgs.test_result)
+      break
+    case "updateTopicContent":
+      // Assert the type for this case
+      const contentArgs = bodyContent as FunctionArg<"updateTopicContent">
+      tempData = await updateTopicContent(chatId, contentArgs.content)
+      break
+    case "scheduleTestSession":
+      // And so on for each case...
+      const sessionArgs = bodyContent as FunctionArg<"scheduleTestSession">
+      tempData = await updateReviseDate(chatId, sessionArgs.hours_time)
+      break
+    case "updateRecallAnalysis":
+      const recallArgs = bodyContent as FunctionArg<"updateRecallAnalysis">
+      tempData = await updateChat(chatId, recallArgs)
+      break
+    default:
+      console.error(`Function ${functionName} is not supported.`)
+      return { success: false }
+  }
+
+  return tempData
 }

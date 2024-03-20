@@ -6,6 +6,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId } from "@/db/profile"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { getWorkspacesByUserId } from "@/db/workspaces"
+import { StudyState } from "@/lib/studyStates"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   fetchHostedModels,
@@ -88,6 +89,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
   const [topicDescription, setTopicDescription] = useState<string>("")
+  const [chatStudyState, setChatStudyState] =
+    useState<StudyState>("topic_creation")
 
   // ACTIVE CHAT STORE
   const [isGenerating, setIsGenerating] = useState<boolean>(false)
@@ -268,6 +271,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setChatFileItems,
         topicDescription,
         setTopicDescription,
+        chatStudyState,
+        setChatStudyState,
 
         // ACTIVE CHAT STORE
         isGenerating,

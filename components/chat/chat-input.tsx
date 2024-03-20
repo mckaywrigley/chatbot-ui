@@ -3,12 +3,10 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
-  IconBolt,
   IconCirclePlus,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
@@ -21,6 +19,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { updateChat } from "@/db/chats"
 import { deleteChatFilesByChatId } from "@/db/chat-files"
+import QuickResponse from "./QuickResponse"
 import { toast } from "sonner"
 
 interface ChatInputProps {}
@@ -54,14 +53,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isFilePickerOpen,
     setFocusFile,
     chatSettings,
-    selectedTools,
-    setSelectedTools,
-    assistantImages,
-    topicDescription,
     assistants,
     setNewMessageFiles,
     setChats,
-    selectedChat
+    selectedChat,
+    chatStudyState
   } = useContext(ChatbotUIContext)
 
   const {
@@ -169,51 +165,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
-  const handleProceedToLearning = async () => {
-    // get the assistant from assistances context where name ="Study coach"
-    const selectedAssistant = assistants.find(
-      assistant => assistant.name === "Study coach"
-    )
-    if (!selectedAssistant) {
-      console.error("No assistant with name 'Study coach' found")
-      return
-    }
-    handleSelectAssistant(selectedAssistant)
-    setNewMessageFiles([])
-    let currentChat = selectedChat ? { ...selectedChat } : null
-
-    if (!currentChat) {
-      console.error("No chat found")
-      return
-    }
-
-    const topic_description = chatMessages
-      .filter(message => message.message.role === "assistant")
-      .map(message => message.message.content)
-      .pop()
-
-    const updatedChat = await updateChat(currentChat.id, {
-      assistant_id: selectedAssistant.id,
-      topic_description
-    })
-
-    setChats(prevChats => {
-      const updatedChats = prevChats.map(prevChat =>
-        prevChat.id === updatedChat.id ? updatedChat : prevChat
-      )
-
-      return updatedChats
-    })
-
-    deleteChatFilesByChatId(currentChat.id)
-  }
-
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
 
-        {selectedTools &&
+        {/* {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
               key={index}
@@ -232,28 +189,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <div>{tool.name}</div>
               </div>
             </div>
-          ))}
+          ))} */}
 
-        {chatMessages.length > 1 &&
-          selectedAssistant?.name === "Topic creation tutor" && (
-            <div className="flex justify-between space-x-4">
-              <div className="w-1/2">
-                <button
-                  className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
-                  onClick={handleProceedToLearning}
-                >
-                  Save topic & proceed to learning
-                </button>
-              </div>
-              <div className="w-1/2">
-                <button className="w-full rounded-md border border-blue-500 px-4 py-2 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white">
-                  Another prompt
-                </button>
-              </div>
-            </div>
-          )}
+        <p>{chatStudyState}</p>
+        <QuickResponse />
 
-        {selectedAssistant && (
+        {/* {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
             {selectedAssistant.image_path && (
               <Image
@@ -273,7 +214,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               Talking to {selectedAssistant.name}
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">

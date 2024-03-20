@@ -7,7 +7,7 @@ import { updateModel } from "@/db/models"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
 import { updateTool } from "@/db/tools"
-import { cn } from "@/lib/utils"
+import { cn, isDateBeforeToday } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -30,8 +30,11 @@ import {
   isThisMonth,
   startOfWeek,
   endOfMonth,
-  addMonths
+  addMonths,
+  endOfDay,
+  addDays
 } from "date-fns"
+import * as ebisu from "ebisu-js"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -111,7 +114,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     dateCategory:
       | "Today"
       | "Tomorrow"
-      | "This week"
+      | "Later this week"
       | "Next week"
       | "Later this month"
       | "Next month"
@@ -123,31 +126,35 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           ? new Date(item.revise_date)
           : currentTime
 
-        const reviseToday = isToday(reviseDate)
-        const reviseTomorrow = isTomorrow(reviseDate)
-
         const revisionNextWeek =
           reviseDate >= addWeeks(startOfWeek(currentTime), 1) &&
           reviseDate <= endOfWeek(addWeeks(currentTime, 1))
 
+        const notTomorrow = isTomorrow(reviseDate)
+
         const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
-            return reviseToday
+            return isToday(reviseDate) || isDateBeforeToday(reviseDate)
           case "Tomorrow":
-            return reviseTomorrow
-          case "This week":
-            return !reviseToday && !reviseTomorrow && isThisWeek(reviseDate)
+            return notTomorrow
+          case "Later this week":
+            return (
+              reviseDate > endOfDay(addDays(new Date(), 1)) &&
+              isThisWeek(reviseDate)
+            )
           case "Next week":
             return revisionNextWeek
           case "Later this month":
             return (
+              reviseDate > currentTime &&
               !isThisWeek(reviseDate) &&
               !revisionNextWeek &&
               isThisMonth(reviseDate)
             )
           case "Next month":
             return (
+              notTomorrow &&
               reviseDate > endOfMonth(currentTime) &&
               reviseDate <= endOfNextMonth
             )
@@ -158,12 +165,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         }
       })
       .sort(
-        (
-          a: { updated_at: string; created_at: string },
-          b: { updated_at: string; created_at: string }
-        ) =>
-          new Date(b.updated_at || b.created_at).getTime() -
-          new Date(a.updated_at || a.created_at).getTime()
+        (a: { predictedRecall: number }, b: { predictedRecall: number }) =>
+          a.predictedRecall - b.predictedRecall
       )
   }
   const updateFunctions = {
@@ -250,6 +253,19 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
+  const dataWithPredictedRecall = dataWithoutFolders.map(item => {
+    const updated_at = (item.updated_at || item.created_at) as string
+    const chatEbisuModel = "ebisu_model" in item ? item.ebisu_model : [4, 4, 24]
+    const [arg1, arg2, arg3] = chatEbisuModel || [24, 4, 4] // Add null check and default value
+    const model = ebisu.defaultModel(arg3, arg1, arg2)
+    const elapsed =
+      (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
+    const predictedRecall = ebisu.predictRecall(model, elapsed, true)
+    return {
+      ...item,
+      predictedRecall
+    }
+  })
 
   return (
     <>
@@ -300,18 +316,18 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 {[
                   "Today",
                   "Tomorrow",
-                  "This week",
+                  "Later this week",
                   "Next week",
                   "Later this month",
                   "Next month",
                   "After next month"
                 ].map(dateCategory => {
                   const sortedData = getSortedData(
-                    dataWithoutFolders,
+                    dataWithPredictedRecall,
                     dateCategory as
                       | "Today"
                       | "Tomorrow"
-                      | "This week"
+                      | "Later this week"
                       | "Next week"
                       | "Later this month"
                       | "Next month"
