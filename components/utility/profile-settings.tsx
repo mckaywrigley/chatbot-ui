@@ -298,17 +298,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       <SheetTrigger asChild>
         {profile.image_url ? (
           <Image
-            className="mt-2 size-[34px] cursor-pointer rounded-full hover:opacity-50"
+            className="mt-2 size-[35px] cursor-pointer rounded-full hover:opacity-50"
             src={profile.image_url + "?" + new Date().getTime()}
-            height={34}
-            width={34}
+            height={35}
+            width={35}
             alt={"Image"}
           />
         ) : (
           <Button size="icon" variant="ghost">
             <i
               className="fa-regular fa-face-smile"
-              style={{ width: 16, height: 16 }}
+              style={{ width: 34, height: 34 }}
             ></i>
           </Button>
         )}

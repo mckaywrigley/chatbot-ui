@@ -105,7 +105,10 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
           >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+            <SidebarSwitcher
+              contentType={contentType}
+              onContentTypeChange={setContentType}
+            />
 
             <Sidebar contentType={contentType} showSidebar={showSidebar} />
           </Tabs>

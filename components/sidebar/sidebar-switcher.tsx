@@ -19,18 +19,20 @@ export const SIDEBAR_ICON_SIZE = 12
 
 interface SidebarSwitcherProps {
   onContentTypeChange: (contentType: ContentType) => void
+  contentType: ContentType
 }
 
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
-  onContentTypeChange
+  onContentTypeChange,
+  contentType
 }) => {
   return (
-    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between border-r px-5 pb-6  pt-8">
+    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between border-r px-4 pb-6  pt-8">
       <TabsList className="bg-pixelspace-gray-90 grid h-[460px]   grid-rows-8 space-y-[32px]">
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-kit fa-thread-simple text-pixelspace-pink"
+              className={`fa-kit fa-thread-simple ${contentType === "chats" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -41,7 +43,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-sparkles text-pixelspace-gray-3"
+              className={`fa-regular fa-sparkles ${contentType === "prompts" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -54,7 +56,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-file text-pixelspace-gray-3"
+              className={`fa-regular fa-file ${contentType === "files" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -71,7 +73,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-files text-pixelspace-gray-3"
+              className={`fa-regular fa-files ${contentType === "collections" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -84,7 +86,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-robot text-pixelspace-gray-3"
+              className={`fa-regular fa-robot ${contentType === "assistants" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -95,7 +97,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-bolt text-pixelspace-gray-3"
+              className={`fa-regular fa-bolt ${contentType === "tools" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
@@ -106,7 +108,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className="fa-regular fa-microchip-ai text-pixelspace-gray-3"
+              className={`fa-regular fa-microchip-ai ${contentType === "models" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }
