@@ -583,7 +583,6 @@ export interface Database {
           created_at: string
           file_id: string
           id: string
-          level: number | null
           local_embedding: string | null
           openai_embedding: string | null
           sharing: string
@@ -596,7 +595,6 @@ export interface Database {
           created_at?: string
           file_id: string
           id?: string
-          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -609,7 +607,6 @@ export interface Database {
           created_at?: string
           file_id?: string
           id?: string
-          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -736,36 +733,6 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      files_raptor: {
-        Row: {
-          child_chunk_id: string
-          parent_chunk_id: string
-        }
-        Insert: {
-          child_chunk_id: string
-          parent_chunk_id: string
-        }
-        Update: {
-          child_chunk_id?: string
-          parent_chunk_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "files_raptor_child_chunk_id_fkey"
-            columns: ["child_chunk_id"]
-            isOneToOne: false
-            referencedRelation: "file_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "files_raptor_parent_chunk_id_fkey"
-            columns: ["parent_chunk_id"]
-            isOneToOne: false
-            referencedRelation: "file_items"
             referencedColumns: ["id"]
           }
         ]
@@ -1163,7 +1130,6 @@ export interface Database {
           created_at: string
           display_name: string
           google_gemini_api_key: string | null
-          groq_api_key: string | null
           has_onboarded: boolean
           id: string
           image_path: string
@@ -1192,7 +1158,6 @@ export interface Database {
           created_at?: string
           display_name: string
           google_gemini_api_key?: string | null
-          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path: string
@@ -1221,7 +1186,6 @@ export interface Database {
           created_at?: string
           display_name?: string
           google_gemini_api_key?: string | null
-          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path?: string
