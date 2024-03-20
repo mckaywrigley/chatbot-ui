@@ -3,7 +3,7 @@ import { LLM } from "@/types"
 const ANTHROPIC_PLATORM_LINK =
   "https://docs.anthropic.com/claude/reference/getting-started-with-the-api"
 
-// Anthropic Models (UPDATED 12/21/23) -----------------------------
+// Anthropic Models (UPDATED 03/04/24) -----------------------------
 
 // Claude 2 (UPDATED 12/21/23)
 const CLAUDE_2: LLM = {
@@ -25,4 +25,29 @@ const CLAUDE_INSTANT: LLM = {
   imageInput: false
 }
 
-export const ANTHROPIC_LLM_LIST: LLM[] = [CLAUDE_2, CLAUDE_INSTANT]
+// Claude 3 Sonnet (UPDATED 03/04/24)
+const CLAUDE_3_SONNET: LLM = {
+  modelId: "claude-3-sonnet-20240229",
+  modelName: "Claude 3 Sonnet",
+  provider: "anthropic",
+  hostedId: "claude-3-sonnet-20240229",
+  platformLink: ANTHROPIC_PLATORM_LINK,
+  imageInput: false
+}
+
+// Claude 3 Opus (UPDATED 03/04/24)
+const CLAUDE_3_OPUS: LLM = {
+  modelId: "claude-3-opus-20240229",
+  modelName: "Claude 3 Opus",
+  provider: "anthropic",
+  hostedId: "claude-3-opus-20240229",
+  platformLink: ANTHROPIC_PLATORM_LINK,
+  imageInput: false
+}
+
+export const ANTHROPIC_LLM_LIST: LLM[] = [
+  CLAUDE_2,
+  CLAUDE_INSTANT,
+  CLAUDE_3_SONNET,
+  CLAUDE_3_OPUS
+]

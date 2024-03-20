@@ -3,47 +3,9 @@ import { LLM } from "@/types"
 const PERPLEXITY_PLATORM_LINK =
   "https://docs.perplexity.ai/docs/getting-started"
 
-// Perplexity Models (UPDATED 1/31/24) -----------------------------
-
-// Perplexity Online 7B (UPDATED 12/21/23)
-const PERPLEXITY_ONLINE_7B: LLM = {
-  modelId: "pplx-7b-online",
-  modelName: "Perplexity Online 7B",
-  provider: "perplexity",
-  hostedId: "pplx-7b-online",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
-// Perplexity Online 70B (UPDATED 12/21/23)
-const PERPLEXITY_ONLINE_70B: LLM = {
-  modelId: "pplx-70b-online",
-  modelName: "Perplexity Online 70B",
-  provider: "perplexity",
-  hostedId: "pplx-70b-online",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
-// Perplexity Chat 7B (UPDATED 1/31/24)
-const PERPLEXITY_CHAT_7B: LLM = {
-  modelId: "pplx-7b-chat",
-  modelName: "Perplexity Chat 7B",
-  provider: "perplexity",
-  hostedId: "pplx-7b-chat",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
-// Perplexity Chat 70B (UPDATED 1/31/24)
-const PERPLEXITY_CHAT_70B: LLM = {
-  modelId: "pplx-70b-chat",
-  modelName: "Perplexity Chat 70B",
-  provider: "perplexity",
-  hostedId: "pplx-70b-chat",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
+// Perplexity Models (UPDATED 2/25/24) -----------------------------
+// Model Deprecation Notice
+// Please note that on March 15, the pplx-70b-chat, pplx-70b-online, llama-2-70b-chat, and codellama-34b-instruct models will no longer be available through the Perplexity API.
 
 // Mixtral 8x7B Instruct (UPDATED 1/31/24)
 const MIXTRAL_8X7B_INSTRUCT: LLM = {
@@ -65,26 +27,6 @@ const MISTRAL_7B_INSTRUCT: LLM = {
   imageInput: false
 }
 
-// Llama2 70B Chat (UPDATED 1/31/24)
-const LLAMA_2_70B_CHAT: LLM = {
-  modelId: "llama-2-70b-chat",
-  modelName: "Llama2 70B Chat",
-  provider: "perplexity",
-  hostedId: "llama-2-70b-chat",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
-// CodeLlama 34B Instruct (UPDATED 1/31/24)
-const CODELLAMA_34B_INSTRUCT: LLM = {
-  modelId: "codellama-34b-instruct",
-  modelName: "CodeLlama 34B Instruct",
-  provider: "perplexity",
-  hostedId: "codellama-34b-instruct",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
 // CodeLlama 70B Instruct (UPDATED 1/31/24)
 const CODELLAMA_70B_INSTRUCT: LLM = {
   modelId: "codellama-70b-instruct",
@@ -95,14 +37,52 @@ const CODELLAMA_70B_INSTRUCT: LLM = {
   imageInput: false
 }
 
+// Sonar Small Chat (UPDATED 2/25/24)
+const PERPLEXITY_SONAR_SMALL_CHAT_7B: LLM = {
+  modelId: "sonar-small-chat",
+  modelName: "Sonar Small Chat",
+  provider: "perplexity",
+  hostedId: "sonar-small-chat",
+  platformLink: PERPLEXITY_PLATORM_LINK,
+  imageInput: false
+}
+
+// Sonar Small Online (UPDATED 2/25/24)
+const PERPLEXITY_SONAR_SMALL_ONLINE_7B: LLM = {
+  modelId: "sonar-small-online",
+  modelName: "Sonar Small Online",
+  provider: "perplexity",
+  hostedId: "sonar-small-online",
+  platformLink: PERPLEXITY_PLATORM_LINK,
+  imageInput: false
+}
+
+// Sonar Medium Chat (UPDATED 2/25/24)
+const PERPLEXITY_SONAR_MEDIUM_CHAT_8x7B: LLM = {
+  modelId: "sonar-medium-chat",
+  modelName: "Sonar Medium Chat",
+  provider: "perplexity",
+  hostedId: "sonar-medium-chat",
+  platformLink: PERPLEXITY_PLATORM_LINK,
+  imageInput: false
+}
+
+// Sonar Medium Online (UPDATED 2/25/24)
+const PERPLEXITY_SONAR_MEDIUM_ONLINE_8x7B: LLM = {
+  modelId: "sonar-medium-online",
+  modelName: "Sonar Medium Online",
+  provider: "perplexity",
+  hostedId: "sonar-medium-online",
+  platformLink: PERPLEXITY_PLATORM_LINK,
+  imageInput: false
+}
+
 export const PERPLEXITY_LLM_LIST: LLM[] = [
-  PERPLEXITY_ONLINE_7B,
-  PERPLEXITY_ONLINE_70B,
-  PERPLEXITY_CHAT_7B,
-  PERPLEXITY_CHAT_70B,
   MIXTRAL_8X7B_INSTRUCT,
   MISTRAL_7B_INSTRUCT,
-  LLAMA_2_70B_CHAT,
-  CODELLAMA_34B_INSTRUCT,
-  CODELLAMA_70B_INSTRUCT
+  CODELLAMA_70B_INSTRUCT,
+  PERPLEXITY_SONAR_SMALL_CHAT_7B,
+  PERPLEXITY_SONAR_SMALL_ONLINE_7B,
+  PERPLEXITY_SONAR_MEDIUM_CHAT_8x7B,
+  PERPLEXITY_SONAR_MEDIUM_ONLINE_8x7B
 ]
