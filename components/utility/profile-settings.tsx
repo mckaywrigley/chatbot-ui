@@ -305,12 +305,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             alt={"Image"}
           />
         ) : (
-          <Button size="icon" variant="ghost">
-            <i
-              className="fa-regular fa-face-smile"
-              style={{ width: 34, height: 34 }}
-            ></i>
-          </Button>
+          <div
+            role="button"
+            className="flex size-[34px] cursor-pointer items-center justify-center"
+          >
+            <i className="fa-regular fa-face-smile relative right-0 top-0"></i>
+          </div>
         )}
       </SheetTrigger>
 
