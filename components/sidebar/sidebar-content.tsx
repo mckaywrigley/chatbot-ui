@@ -24,9 +24,9 @@ export const SidebarContent: FC<SidebarContentProps> = ({
 
   return (
     // Subtract 50px for the height of the workspace settings
-    <div className="flex max-h-[calc(100%-50px)] grow flex-col">
-      <div className="flex items-center justify-center">
-        <div className="mr-2 mt-2">
+    <div className="flex max-h-[calc(100%-50px)] w-[362px] grow flex-col">
+      <div className=" flex w-full justify-between px-3">
+        <div className="mr-2 mt-2 grow">
           <SidebarSearch
             contentType={contentType}
             searchTerm={searchTerm}

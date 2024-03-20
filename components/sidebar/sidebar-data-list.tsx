@@ -236,7 +236,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           <div
             className={`h-full ${
               isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
-            } space-y-2 pt-2 ${isOverflowing ? "mr-2" : ""}`}
+            } ${isOverflowing ? "mr-2" : ""}`}
           >
             {folders.map(folder => (
               <Folder
@@ -277,7 +277,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                     return (
                       sortedData.length > 0 && (
                         <div key={dateCategory} className="pb-2">
-                          <div className="text-muted-foreground mb-1 text-sm font-bold">
+                          <div className="text-muted-foreground  px-3 py-4 text-sm font-bold">
                             {dateCategory}
                           </div>
 

@@ -139,12 +139,12 @@ export const Folder: FC<FolderProps> = ({
       <div
         tabIndex={0}
         className={cn(
-          "hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between rounded p-2"
+          "hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between px-3 py-4"
         )}
         onClick={handleClick}
       >
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center py-[2px]">
             <div>{folder.name}</div>
           </div>
           <div
@@ -158,7 +158,10 @@ export const Folder: FC<FolderProps> = ({
             onMouseLeave={() => setIsHovering(false)}
           >
             {isHovering || isExpanded ? (
-              <FontAwesomeIcon className="flex" icon={faEllipsisH} />
+              <FontAwesomeIcon
+                className="text-pixelspace-gray-20 flex"
+                icon={faEllipsisH}
+              />
             ) : null}
           </div>
 
@@ -212,7 +215,7 @@ export const Folder: FC<FolderProps> = ({
         </div>
       </div>
 
-      {isExpanded && <div className=" mt-2 space-y-2  pl-4">{children}</div>}
+      {isExpanded && <div className=" mt-2 space-y-[1px]">{children}</div>}
     </div>
   )
 }

@@ -111,7 +111,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className="border-input hover:bg-pixelspace-gray-50 bg-pixelspace-gray-60
-        flex h-[40px] w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1"
+        flex h-[42px] w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1"
       >
         <div className="flex items-center truncate">
           {selectedWorkspace && (
@@ -126,7 +126,10 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
                   alt={selectedWorkspace.name}
                 />
               ) : (
-                <IconComponent className="mb-0.5 mr-2" size={16} />
+                <i
+                  className="fa-regular fa-house text-pixelspace-gray-20 mr-3"
+                  style={{ width: 16, height: 16 }}
+                ></i>
               )}
             </div>
           )}
@@ -134,10 +137,10 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
           {getWorkspaceName(value) || "Select workspace..."}
         </div>
 
-        <FontAwesomeIcon
-          icon={faChevronDown}
-          className="text-pixelspace-gray-20"
-        />
+        <i
+          className="fa-solid fa-chevron-down text-pixelspace-gray-20"
+          style={{ width: 14, height: 14 }}
+        ></i>
       </PopoverTrigger>
 
       <PopoverContent className="p-2">

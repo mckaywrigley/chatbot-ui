@@ -127,7 +127,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   return (
     <div
       className={cn(
-        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center rounded p-3  focus:outline-none",
+        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center px-3 py-4 focus:outline-none",
         selectedChat?.id === chat.id && "bg-pixelspace-gray-70"
       )}
       tabIndex={0}
@@ -150,7 +150,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         />
       )}
 
-      <div className="ml-3 flex-1 truncate text-sm font-semibold">
+      <div className="ml-3 flex-1 truncate py-[6px] text-sm font-semibold">
         {chat.name}
       </div>
       <div
@@ -164,7 +164,10 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         onMouseLeave={() => setIsMouseInside(false)}
       >
         {isMouseInside || selectedChat?.id === chat?.id ? (
-          <FontAwesomeIcon className="flex" icon={faEllipsisH} />
+          <FontAwesomeIcon
+            className="text-pixelspace-gray-20 flex"
+            icon={faEllipsisH}
+          />
         ) : null}
       </div>
 
