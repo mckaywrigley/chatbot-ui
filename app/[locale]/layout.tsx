@@ -12,10 +12,10 @@ import { ReactNode } from "react"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
-const APP_NAME = "PixelVerseAI Labs Premium"
-const APP_DEFAULT_TITLE = "PixelVerseAI Labs Premium"
-const APP_TITLE_TEMPLATE = "%s - PXAI Labs"
-const APP_DESCRIPTION = "PixelVerseAI Labs Premium"
+const APP_NAME = "PixelVerseAI Plus"
+const APP_DEFAULT_TITLE = "PixelVerseAI Plus"
+const APP_TITLE_TEMPLATE = "%s - PixelVerseAI Plus"
+const APP_DESCRIPTION = "PixelVerseAI Plus - The all in one chatbot app with GPT 4, Claude 3 and more"
 
 interface RootLayoutProps {
   children: ReactNode
