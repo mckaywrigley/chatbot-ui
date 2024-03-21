@@ -322,6 +322,8 @@ Original topic source material:
   }
 }
 
+export const maxDuration = 30
+
 export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
