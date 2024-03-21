@@ -93,105 +93,30 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setSelectedTools,
     assistantImages
   } = useContext(ChatbotUIContext)
-
   const {
     chatInputRef,
     handleSendMessage,
     handleStopMessage,
-    handleFocusChatInput,
-    processTranscription
+    handleFocusChatInput
   } = useChatHandler()
-
   const { handleInputChange } = usePromptAndCommand()
-
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
-
   const {
     setNewMessageContentToNextUserMessage,
     setNewMessageContentToPreviousUserMessage
   } = useChatHistoryHandler()
-
   const fileInputRef = useRef<HTMLInputElement>(null)
-
   useEffect(() => {
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
-
-  useEffect(() => {
-    if (chatInputRef && chatInputRef.current) {
-      chatInputRef.current.style.height = "inherit"
-      chatInputRef.current.style.height = `${chatInputRef.current?.scrollHeight}px`
-      chatInputRef.current.style.overflow = `${
-        chatInputRef?.current?.scrollHeight > 400 ? "auto" : "hidden"
-      }`
-    }
-
-    // if (sendDirectFromButton && !startProcessingAudio && content) {
-    //   handleSendMessage()
-    // }
-  }, [content, startProcessingAudio])
-
-  useEffect(() => {
-    async function fetchTranscription(audio: any) {
-      try {
-        setTranscriptionLoading(true)
-        const result = await processTranscription(audio)
-        // TODO: Implement error handling
-        const error = result?.error
-
-        const transcription = result?.transcription
-
-        if (transcription) {
-          handleInputChange(transcription)
-        }
-
-        setStartProcessingAudio(false)
-        setVoiceRecorder(null)
-        setTranscriptionLoading(false)
-        setTime("")
-      } catch (error) {
-        console.log("error", error)
-        setStartProcessingAudio(false)
-        setVoiceRecorder(null)
-        setTranscriptionLoading(false)
-        setTime("")
-      }
-    }
-    if (startProcessingAudio && timeSeconds > 1) {
-      console.log("voiceRecorder!.mimeType", voiceRecorder!.mimeType)
-      const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
-      void fetchTranscription(audio)
-    } else {
-      setSendDirectFromButton(false)
-      setStartProcessingAudio(false)
-      setVoiceRecorder(null)
-      setTranscriptionLoading(false)
-      setTime("")
-    }
-  }, [startProcessingAudio])
-
-  useEffect(() => {
-    if (!isRecording || !voiceRecorder) return
-    voiceRecorder.start(800)
-
-    voiceRecorder.ondataavailable = ({ data }) => {
-      chunks.push(data)
-    }
-  }, [isRecording, voiceRecorder, chunks])
-
-  const handleTranscriptAndSendRecord = (e: any) => {
-    setSendDirectFromButton(true)
-  }
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
       handleSendMessage(userInput, chatMessages, false)
     }
-
     // Consolidate conditions to avoid TypeScript error
     if (
       isPromptPickerOpen ||
@@ -212,28 +137,23 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         if (isAssistantPickerOpen) setFocusAssistant(!focusAssistant)
       }
     }
-
     if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToPreviousUserMessage()
     }
-
     if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToNextUserMessage()
     }
-
     //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
     if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToPreviousUserMessage()
     }
-
     if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToNextUserMessage()
     }
-
     if (
       isAssistantPickerOpen &&
       (event.key === "Tab" ||
@@ -244,12 +164,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       setFocusAssistant(!focusAssistant)
     }
   }
-
   const handlePaste = (event: React.ClipboardEvent) => {
     const imagesAllowed = LLM_LIST.find(
       llm => llm.modelId === chatSettings?.model
     )?.imageInput
-
     const items = event.clipboardData.items
     for (const item of items) {
       if (item.type.indexOf("image") === 0) {
@@ -265,7 +183,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
-
   // Lógica del AudioRecorder
   const onAudioClick = async () => {
     setContent(content ? content : "")
@@ -273,12 +190,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       const audioStream = await navigator.mediaDevices.getUserMedia({
         audio: true
       })
-
       const isSafari =
         window.navigator.userAgent.search("Safari") >= 0 &&
         window.navigator.userAgent.search("Chrome") < 0
       let mimeType = "audio/webm;codecs=opus"
-
       if (isSafari) {
         if (MediaRecorder.isTypeSupported("audio/mp4")) {
           mimeType = "audio/mp4"
@@ -286,11 +201,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           mimeType = "audio/x-m4a"
         }
       }
-
       const mediaRecorder = new window.MediaRecorder(audioStream, {
         mimeType: mimeType
       })
-
       setStream(audioStream)
       setVoiceRecorder(mediaRecorder)
       setAuxContent(content)
@@ -301,11 +214,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       console.log("No se otorgó permiso para acceder al micrófono.")
     }
   }
-
   const onStopRecording = () => {
     if (!isRecording || !stream || !voiceRecorder) return
     const tracks = stream.getAudioTracks()
-
     for (const track of tracks) {
       track.stop()
     }
@@ -315,17 +226,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsRecording(false)
     setStartProcessingAudio(true)
   }
-
   const handleSetTime = (time: number) => {
     setTime(getMinutesAndSeconds(time))
     setTimeSeconds(time)
   }
-
   return (
     <>
       <div className="flex flex-col flex-wrap  gap-2">
         <ChatFilesDisplay />
-
         {selectedTools &&
           selectedTools.map((tool, index) => (
             <div
@@ -341,12 +249,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             >
               <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 py-1 pr-3 hover:opacity-50">
                 <IconBolt size={20} />
-
                 <div>{tool.name}</div>
               </div>
             </div>
           ))}
-
         {selectedAssistant && (
           <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
             {selectedAssistant.image_path && (
@@ -362,22 +268,18 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 alt={selectedAssistant.name}
               />
             )}
-
             <div className="text-sm font-bold">
               Talking to {selectedAssistant.name}
             </div>
           </div>
         )}
       </div>
-
       <div className="border-input bg-pixelspace-gray-60 relative mt-3 flex min-h-[56px] w-[714px] items-center rounded-[50px] border-2 px-[14px] py-[6px]">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
-
         <>
           {/* Hidden input to select files from device */}
-
           <div className="flex items-center">
             <button
               className="border-pixelspace-gray-50 mr-3 inline-flex size-6 items-center justify-center"
@@ -441,7 +343,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               </div>
             )}
           </div>
-
           <Input
             ref={fileInputRef}
             className="hidden"
@@ -453,7 +354,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             accept={filesToAccept}
           />
         </>
-
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -469,7 +369,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onCompositionStart={() => setIsTyping(true)}
           onCompositionEnd={() => setIsTyping(false)}
         />
-
         <div className="cursor-pointer hover:opacity-50">
           {isGenerating ? (
             <IconPlayerStopFilled
@@ -482,7 +381,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               className="bg-pixelspace-pink size-8 rounded-full"
               onClick={() => {
                 if (!userInput) return
-
                 handleSendMessage(userInput, chatMessages, false)
               }}
             >
