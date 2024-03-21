@@ -342,6 +342,7 @@ export interface Database {
           context_length: number
           created_at: string
           embeddings_provider: string
+          finish_reason: string | null
           folder_id: string | null
           id: string
           include_profile_context: boolean
@@ -360,6 +361,7 @@ export interface Database {
           context_length: number
           created_at?: string
           embeddings_provider: string
+          finish_reason?: string | null
           folder_id?: string | null
           id?: string
           include_profile_context: boolean
@@ -378,6 +380,7 @@ export interface Database {
           context_length?: number
           created_at?: string
           embeddings_provider?: string
+          finish_reason?: string | null
           folder_id?: string | null
           id?: string
           include_profile_context?: boolean

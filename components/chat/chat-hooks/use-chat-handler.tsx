@@ -1,27 +1,26 @@
+import { useAlertContext } from "@/context/alert-context"
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
+import { getFileById } from "@/db/files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
+import { PluginID } from "@/types/plugins"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
+import { toast } from "sonner"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
-  handleLocalChat,
+  handleHostedPluginsChat,
   handleRetrieval,
   processResponse,
-  handleHostedPluginsChat,
   validateChatSettings
 } from "../chat-helpers"
-import { useAlertContext } from "@/context/alert-context"
-import { PluginID } from "@/types/plugins"
-import { getFileById } from "@/db/files"
-import { toast } from "sonner"
 import { usePromptAndCommand } from "./use-prompt-and-command"
 
 export const useChatHandler = () => {
@@ -163,10 +162,16 @@ export const useChatHandler = () => {
     }
   }
 
+  const handleSendContinuation = async () => {
+    console.log("handleSendContinuation")
+    await handleSendMessage(null, chatMessages, false, true)
+  }
+
   const handleSendMessage = async (
-    messageContent: string,
+    messageContent: string | null,
     chatMessages: ChatMessage[],
-    isRegeneration: boolean
+    isRegeneration: boolean,
+    isContinuation: boolean = false
   ) => {
     try {
       setUserInput("")
@@ -197,46 +202,48 @@ export const useChatHandler = () => {
         modelData,
         profile,
         selectedWorkspace,
+        isContinuation,
         messageContent
       )
 
-      const urlRegex = /https?:\/\/[^\s]+/g
-      const urls = messageContent.match(urlRegex) || []
+      if (!isContinuation && messageContent) {
+        const urlRegex = /https?:\/\/[^\s]+/g
+        const urls = messageContent.match(urlRegex) || []
 
-      if (selectedPlugin !== PluginID.WEB_SCRAPER && urls.length > 0) {
-        toast.warning("Enable the Web Scraper plugin to process websites.")
-      } else {
-        for (const url of urls) {
-          const response = await fetch(`/api/retrieval/process/web`, {
-            method: "POST",
-            body: JSON.stringify({
-              embeddingsProvider: "openai",
-              workspace_id: selectedWorkspace?.id,
-              url: url
+        if (selectedPlugin !== PluginID.WEB_SCRAPER && urls.length > 0) {
+          toast.warning("Enable the Web Scraper plugin to process websites.")
+        } else {
+          for (const url of urls) {
+            const response = await fetch(`/api/retrieval/process/web`, {
+              method: "POST",
+              body: JSON.stringify({
+                embeddingsProvider: "openai",
+                workspace_id: selectedWorkspace?.id,
+                url: url
+              })
             })
-          })
-          const { message, fileId } = await response.json()
+            const { message, fileId } = await response.json()
 
-          if (message === "Embed Successful") {
-            const fileFromDb = await getFileById(fileId)
-            if (fileFromDb) {
-              if (
-                !newMessageFiles.some(file => file.id === fileFromDb.id) &&
-                !chatFiles.some(file => file.id === fileFromDb.id)
-              ) {
-                handleSelectUserFile(fileFromDb)
-                setFiles(prevFiles => [...prevFiles, fileFromDb])
-                newMessageFiles.push({ ...fileFromDb, file: null })
+            if (message === "Embed Successful") {
+              const fileFromDb = await getFileById(fileId)
+              if (fileFromDb) {
+                if (
+                  !newMessageFiles.some(file => file.id === fileFromDb.id) &&
+                  !chatFiles.some(file => file.id === fileFromDb.id)
+                ) {
+                  handleSelectUserFile(fileFromDb)
+                  setFiles(prevFiles => [...prevFiles, fileFromDb])
+                  newMessageFiles.push({ ...fileFromDb, file: null })
+                }
+              } else {
+                toast.error("File not found in database.")
               }
             } else {
-              toast.error("File not found in database.")
+              toast.error("Failed to process websites.")
             }
-          } else {
-            toast.error("Failed to process websites.")
           }
         }
       }
-
       let currentChat = selectedChat ? { ...selectedChat } : null
 
       const b64Images = newMessageImages.map(image => image.base64)
@@ -265,23 +272,29 @@ export const useChatHandler = () => {
           chatSettings!,
           b64Images,
           isRegeneration,
+          isContinuation,
           setChatMessages
         )
+
+      const sentChatMessages = [...chatMessages]
+      if (!isRegeneration) {
+        sentChatMessages.push(tempUserChatMessage)
+        if (!isContinuation) sentChatMessages.push(tempAssistantChatMessage)
+      }
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",
-        chatMessages: isRegeneration
-          ? [...chatMessages]
-          : [...chatMessages, tempUserChatMessage],
+        chatMessages: sentChatMessages,
         assistant: selectedChat?.assistant_id ? selectedAssistant : null,
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems
       }
 
       let generatedText = ""
+      let finishReasonFromResponse = ""
 
-      if (selectedTools.length > 0) {
+      if (!isContinuation && selectedTools.length > 0) {
         setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
 
         const formattedMessages = await buildFinalMessages(
@@ -304,17 +317,18 @@ export const useChatHandler = () => {
 
         setToolInUse("none")
 
-        generatedText = await processResponse(
+        const { fullText, finishReason } = await processResponse(
           response,
           isRegeneration
             ? payload.chatMessages[payload.chatMessages.length - 1]
             : tempAssistantChatMessage,
-          true,
           newAbortController,
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse
         )
+        generatedText = fullText
+        finishReasonFromResponse = finishReason
       } else if (
         selectedPlugin.length > 0 &&
         selectedPlugin !== PluginID.NONE &&
@@ -322,7 +336,7 @@ export const useChatHandler = () => {
       ) {
         const isPremium = subscription !== null
 
-        generatedText = await handleHostedPluginsChat(
+        const { fullText, finishReason } = await handleHostedPluginsChat(
           payload,
           profile!,
           modelData!,
@@ -339,55 +353,49 @@ export const useChatHandler = () => {
           selectedPlugin,
           isPremium
         )
+        generatedText = fullText
+        finishReasonFromResponse = finishReason
       } else {
-        if (modelData!.provider === "ollama") {
-          generatedText = await handleLocalChat(
-            payload,
-            profile!,
-            chatSettings!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse,
-            alertDispatch
-          )
-        } else {
-          generatedText = await handleHostedChat(
-            payload,
-            profile!,
-            modelData!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            newMessageImages,
-            chatImages,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse,
-            alertDispatch
-          )
-        }
+        const { fullText, finishReason } = await handleHostedChat(
+          payload,
+          profile!,
+          modelData!,
+          tempAssistantChatMessage,
+          isRegeneration,
+          isContinuation,
+          newAbortController,
+          newMessageImages,
+          chatImages,
+          setIsGenerating,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse,
+          alertDispatch
+        )
+        generatedText = fullText
+        finishReasonFromResponse = finishReason
       }
+
+      console.log("generatedText", generatedText)
+      console.log("finishReasonFromResponse", finishReasonFromResponse)
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
           chatSettings!,
           profile!,
           selectedWorkspace!,
-          messageContent,
+          messageContent || "",
           selectedAssistant!,
           newMessageFiles,
+          finishReasonFromResponse,
           setSelectedChat,
           setChats,
           setChatFiles
         )
       } else {
         const updatedChat = await updateChat(currentChat.id, {
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          finish_reason: finishReasonFromResponse
         })
 
         setChats(prevChats => {
@@ -397,6 +405,10 @@ export const useChatHandler = () => {
 
           return updatedChats
         })
+
+        if (selectedChat?.id === updatedChat.id) {
+          setSelectedChat(updatedChat)
+        }
       }
 
       await handleCreateMessages(
@@ -408,6 +420,7 @@ export const useChatHandler = () => {
         generatedText,
         newMessageImages,
         isRegeneration,
+        isContinuation,
         retrievedFileItems,
         setChatMessages,
         setChatFileItems,
@@ -451,6 +464,7 @@ export const useChatHandler = () => {
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
+    handleSendContinuation,
     handleSendEdit
   }
 }

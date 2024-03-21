@@ -1,8 +1,6 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
-import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 import {
@@ -15,7 +13,17 @@ import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 
 export const runtime: ServerRuntime = "edge"
 
+class APIError extends Error {
+  code: any
+  constructor(message: string | undefined, code: any) {
+    super(message)
+    this.name = "APIError"
+    this.code = code
+  }
+}
+
 export async function POST(request: Request) {
+  console.log("OpenAI request received")
   const json = await request.json()
   const { chatSettings, messages } = json as {
     chatSettings: ChatSettings
@@ -27,10 +35,12 @@ export async function POST(request: Request) {
 
     checkApiKey(profile.openai_api_key, "OpenAI")
 
-    const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
-    })
+    const openAiUrl = "https://api.openai.com/v1/chat/completions"
+
+    const openAiHeaders = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${profile.openai_api_key}`
+    }
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
 
@@ -47,19 +57,48 @@ export async function POST(request: Request) {
       return rateLimitCheckResult.response
     }
 
-    const response = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages: messages as ChatCompletionCreateParamsBase["messages"],
-      // temperature: chatSettings.temperature,
-      temperature: 0.4,
-      // max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null,
-      max_tokens: 1024,
-      stream: true
+    const res = await fetch(openAiUrl, {
+      method: "POST",
+      headers: openAiHeaders,
+      body: JSON.stringify({
+        model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+        messages: messages as ChatCompletionCreateParamsBase["messages"],
+        // temperature: chatSettings.temperature,
+        temperature: 0.4,
+        // max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null,
+        max_tokens: 1024,
+        stream: true
+      })
     })
 
-    const stream = OpenAIStream(response)
+    if (!res.ok) {
+      const result = await res.json()
+      let errorMessage = result.error?.message || "An unknown error occurred"
 
-    return new StreamingTextResponse(stream)
+      switch (res.status) {
+        case 400:
+          throw new APIError(`Bad Request: ${errorMessage}`, 400)
+        case 401:
+          throw new APIError(`Invalid Credentials: ${errorMessage}`, 401)
+        case 402:
+          throw new APIError(`Out of Credits: ${errorMessage}`, 402)
+        case 403:
+          throw new APIError(`Moderation Required: ${errorMessage}`, 403)
+        case 408:
+          throw new APIError(`Request Timeout: ${errorMessage}`, 408)
+        case 429:
+          throw new APIError(`Rate Limited: ${errorMessage}`, 429)
+        case 502:
+          throw new APIError(`Service Unavailable: ${errorMessage}`, 502)
+        default:
+          throw new APIError(`HTTP Error: ${errorMessage}`, res.status)
+      }
+    }
+
+    if (!res.body) {
+      throw new Error("Response body is null")
+    }
+    return res
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500

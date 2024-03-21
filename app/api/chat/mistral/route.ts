@@ -1,11 +1,10 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 
 import {
-  updateOrAddSystemMessage,
   replaceWordsInLastUserMessage,
+  updateOrAddSystemMessage,
   wordReplacements
 } from "@/lib/ai-helper"
 import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
@@ -170,12 +169,7 @@ export async function POST(request: Request) {
       if (!res.body) {
         throw new Error("Response body is null")
       }
-
-      // Convert the response into a friendly text-stream.
-      const stream = OpenAIStream(res)
-
-      // Respond with the stream
-      return new StreamingTextResponse(stream)
+      return res
     } catch (error) {
       if (error instanceof APIError) {
         console.error(
@@ -269,7 +263,7 @@ async function generateStandaloneQuestion(
         { role: "user", content: template }
       ],
       temperature: 0.1,
-      max_tokens: 512
+      max_tokens: 256
     }
 
     const res = await fetch(openRouterUrl, {

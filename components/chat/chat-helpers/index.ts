@@ -29,7 +29,8 @@ export const validateChatSettings = (
   modelData: LLM | undefined,
   profile: Tables<"profiles"> | null,
   selectedWorkspace: Tables<"workspaces"> | null,
-  messageContent: string
+  isContinuation: boolean,
+  messageContent: string | null
 ) => {
   if (!chatSettings) {
     throw new Error("Chat settings not found")
@@ -47,7 +48,7 @@ export const validateChatSettings = (
     throw new Error("Workspace not found")
   }
 
-  if (!messageContent) {
+  if (!isContinuation && !messageContent) {
     throw new Error("Message content not found")
   }
 }
@@ -80,14 +81,20 @@ export const handleRetrieval = async (
   return results
 }
 
+const CONTINUE_PROMPT =
+  "You got cut off in the middle of your message. Continue exactly from where you stopped. Whatever you output will be appended to your last message, so DO NOT repeat any of the previous message text. Do NOT apologize or add any unrelated text; just continue."
+
 export const createTempMessages = (
-  messageContent: string,
+  messageContent: string | null,
   chatMessages: ChatMessage[],
   chatSettings: ChatSettings,
   b64Images: string[],
   isRegeneration: boolean,
+  isContinuation: boolean,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 ) => {
+  if (!messageContent || isContinuation) messageContent = CONTINUE_PROMPT
+
   let tempUserChatMessage: ChatMessage = {
     message: {
       chat_id: "",
@@ -125,6 +132,8 @@ export const createTempMessages = (
   if (isRegeneration) {
     const lastMessageIndex = chatMessages.length - 1
     chatMessages[lastMessageIndex].message.content = ""
+    newMessages = [...chatMessages]
+  } else if (isContinuation) {
     newMessages = [...chatMessages]
   } else {
     newMessages = [
@@ -179,7 +188,6 @@ export const handleLocalChat = async (
     isRegeneration
       ? payload.chatMessages[payload.chatMessages.length - 1]
       : tempAssistantMessage,
-    false,
     newAbortController,
     setFirstTokenReceived,
     setChatMessages,
@@ -193,6 +201,7 @@ export const handleHostedChat = async (
   modelData: LLM,
   tempAssistantChatMessage: ChatMessage,
   isRegeneration: boolean,
+  isContinuation: boolean,
   newAbortController: AbortController,
   newMessageImages: MessageImage[],
   chatImages: MessageImage[],
@@ -234,8 +243,9 @@ export const handleHostedChat = async (
     response,
     isRegeneration
       ? payload.chatMessages[payload.chatMessages.length - 1]
-      : tempAssistantChatMessage,
-    true,
+      : isContinuation
+        ? payload.chatMessages[payload.chatMessages.length - 2]
+        : tempAssistantChatMessage,
     newAbortController,
     setFirstTokenReceived,
     setChatMessages,
@@ -283,12 +293,11 @@ export const handleHostedPluginsChat = async (
     alertDispatch
   )
 
-  return await processResponse(
+  return await processResponsePlugins(
     response,
     isRegeneration
       ? payload.chatMessages[payload.chatMessages.length - 1]
       : tempAssistantChatMessage,
-    true,
     newAbortController,
     setFirstTokenReceived,
     setChatMessages,
@@ -339,7 +348,102 @@ export const fetchChatResponse = async (
 export const processResponse = async (
   response: Response,
   lastChatMessage: ChatMessage,
-  isHosted: boolean,
+  controller: AbortController,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+) => {
+  let fullText = ""
+  let contentToAdd = ""
+  let finishReason = ""
+
+  if (!response.ok) {
+    const result = await response.json()
+    let errorMessage = result.error?.message || "An unknown error occurred"
+
+    switch (response.status) {
+      case 400:
+        throw new Error(`Bad Request: ${errorMessage}`)
+      case 401:
+        throw new Error(`Invalid Credentials: ${errorMessage}`)
+      case 402:
+        throw new Error(`Out of Credits: ${errorMessage}`)
+      case 403:
+        throw new Error(`Moderation Required: ${errorMessage}`)
+      case 408:
+        throw new Error(`Request Timeout: ${errorMessage}`)
+      case 429:
+        throw new Error(`Rate Limited: ${errorMessage}`)
+      case 502:
+        Error
+        throw new Error(`Service Unavailable: ${errorMessage}`)
+      default:
+        throw new Error(`HTTP Error: ${errorMessage}`)
+    }
+  }
+
+  if (response.body) {
+    await consumeReadableStream(
+      response.body,
+      chunk => {
+        setFirstTokenReceived(true)
+        setToolInUse("none")
+        contentToAdd = ""
+        try {
+          contentToAdd = chunk
+            .trimEnd()
+            .split("\n")
+            .reduce((acc, line) => {
+              if (line.startsWith("data: ")) {
+                const substring = line.substring(6)
+                if (substring.startsWith("[DONE]")) return acc
+                const data = JSON.parse(substring) // Remove 'data: ' prefix
+                finishReason = data.choices[0].finish_reason
+                  ? data.choices[0].finish_reason
+                  : finishReason
+                const content = data.choices[0].delta.content
+                if (!content) return acc
+                return acc + content
+              }
+              return acc
+            }, "")
+          if (contentToAdd) fullText += contentToAdd
+        } catch (error) {
+          console.error("Error parsing JSON:", error)
+        }
+
+        if (contentToAdd) {
+          setChatMessages(prev =>
+            prev.map(chatMessage => {
+              if (chatMessage.message.id === lastChatMessage.message.id) {
+                const updatedChatMessage: ChatMessage = {
+                  message: {
+                    ...chatMessage.message,
+                    content: chatMessage.message.content + contentToAdd
+                  },
+                  fileItems: chatMessage.fileItems
+                }
+
+                return updatedChatMessage
+              }
+
+              return chatMessage
+            })
+          )
+        }
+      },
+      controller.signal
+    )
+
+    return { fullText, finishReason }
+  } else {
+    throw new Error("Response body is null")
+  }
+}
+
+export const processResponsePlugins = async (
+  response: Response,
+  lastChatMessage: ChatMessage,
   controller: AbortController,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
@@ -354,33 +458,14 @@ export const processResponse = async (
       chunk => {
         setFirstTokenReceived(true)
         setToolInUse("none")
-
-        try {
-          contentToAdd = isHosted
-            ? chunk
-            : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
-                .trimEnd()
-                .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
-          fullText += contentToAdd
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
-        }
-
+        fullText += chunk
         setChatMessages(prev =>
           prev.map(chatMessage => {
             if (chatMessage.message.id === lastChatMessage.message.id) {
               const updatedChatMessage: ChatMessage = {
                 message: {
                   ...chatMessage.message,
-                  content: chatMessage.message.content + contentToAdd
+                  content: chatMessage.message.content + chunk
                 },
                 fileItems: chatMessage.fileItems
               }
@@ -395,7 +480,7 @@ export const processResponse = async (
       controller.signal
     )
 
-    return fullText
+    return { fullText, finishReason: "" }
   } else {
     throw new Error("Response body is null")
   }
@@ -408,6 +493,7 @@ export const handleCreateChat = async (
   messageContent: string,
   selectedAssistant: Tables<"assistants">,
   newMessageFiles: ChatFile[],
+  finishReason: string,
   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
@@ -423,7 +509,8 @@ export const handleCreateChat = async (
     name: messageContent.substring(0, 100),
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
-    embeddings_provider: chatSettings.embeddingsProvider
+    embeddings_provider: chatSettings.embeddingsProvider,
+    finish_reason: finishReason
   })
 
   setSelectedChat(createdChat)
@@ -447,10 +534,11 @@ export const handleCreateMessages = async (
   currentChat: Tables<"chats">,
   profile: Tables<"profiles">,
   modelData: LLM,
-  messageContent: string,
+  messageContent: string | null,
   generatedText: string,
   newMessageImages: MessageImage[],
   isRegeneration: boolean,
+  isContinuation: boolean,
   retrievedFileItems: Tables<"file_items">[],
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setChatFileItems: React.Dispatch<
@@ -461,7 +549,7 @@ export const handleCreateMessages = async (
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     user_id: profile.user_id,
-    content: messageContent,
+    content: messageContent || "",
     model: modelData.modelId,
     role: "user",
     sequence_number: chatMessages.length,
@@ -486,6 +574,19 @@ export const handleCreateMessages = async (
     const updatedMessage = await updateMessage(lastStartingMessage.id, {
       ...lastStartingMessage,
       content: generatedText
+    })
+
+    chatMessages[chatMessages.length - 1].message = updatedMessage
+
+    finalChatMessages = [...chatMessages]
+
+    setChatMessages(finalChatMessages)
+  } else if (isContinuation) {
+    const lastStartingMessage = chatMessages[chatMessages.length - 1].message
+
+    const updatedMessage = await updateMessage(lastStartingMessage.id, {
+      ...lastStartingMessage,
+      content: lastStartingMessage.content + generatedText
     })
 
     chatMessages[chatMessages.length - 1].message = updatedMessage

@@ -1,0 +1,1 @@
+ALTER TABLE chats ADD COLUMN finish_reason VARCHAR(255);

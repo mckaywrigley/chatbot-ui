@@ -9,8 +9,10 @@ import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, MessageImage } from "@/types"
+import { IconPlayerTrackNext } from "@tabler/icons-react"
 import { useParams } from "next/navigation"
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
+import { Button } from "../ui/button"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
 import { ChatInput } from "./chat-input"
@@ -32,6 +34,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatSettings,
     setChatImages,
     assistants,
+    isGenerating,
     setSelectedAssistant,
     setChatFileItems,
     setChatFiles,
@@ -39,7 +42,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setUseRetrieval
   } = useContext(ChatbotUIContext)
 
-  const { handleNewChat, handleFocusChatInput } = useChatHandler()
+  const { handleNewChat, handleFocusChatInput, handleSendContinuation } =
+    useChatHandler()
 
   const {
     messagesStartRef,
@@ -210,6 +214,19 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {!isGenerating && selectedChat?.finish_reason === "length" && (
+        <div className="bg-secondary flex w-full justify-center p-2">
+          <Button
+            onClick={handleSendContinuation}
+            variant="outline"
+            className="flex items-center space-x-1 px-4 py-2"
+          >
+            <IconPlayerTrackNext size={16} />
+            <span>Continue generating</span>
+          </Button>
+        </div>
+      )}
 
       <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
         <ChatInput />

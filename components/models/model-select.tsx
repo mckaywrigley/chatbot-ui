@@ -133,8 +133,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
             const filteredModels = models
               .filter(model => model.provider !== "openrouter")
               .filter(model => {
-                if (tab === "hosted") return model.provider !== "ollama"
-                if (tab === "local") return model.provider === "ollama"
+                if (tab === "hosted") return true
+                if (tab === "local") return false
                 if (tab === "openrouter") return model.provider === "openrouter"
               })
               .filter(model =>
