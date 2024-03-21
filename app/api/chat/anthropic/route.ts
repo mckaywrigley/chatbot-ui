@@ -24,20 +24,25 @@ export async function POST(request: NextRequest) {
       (message: any) => {
         return {
           ...message,
-          content: message?.content.map((content: any) => {
-            if (content?.type === "image_url" && content?.image_url?.length) {
-              return {
-                type: "image",
-                source: {
-                  type: "base64",
-                  media_type: getMediaTypeFromDataURL(content.image_url),
-                  data: getBase64FromDataURL(content.image_url)
+          content: Array.isArray(message?.content)
+            ? message?.content?.map((content: any) => {
+                if (
+                  content?.type === "image_url" &&
+                  content?.image_url?.length
+                ) {
+                  return {
+                    type: "image",
+                    source: {
+                      type: "base64",
+                      media_type: getMediaTypeFromDataURL(content.image_url),
+                      data: getBase64FromDataURL(content.image_url)
+                    }
+                  }
+                } else {
+                  return content
                 }
-              }
-            } else {
-              return content
-            }
-          })
+              })
+            : message?.content
         }
       }
     )
