@@ -11,7 +11,7 @@ interface BrandProps {
 export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
     <Link
-      className="flex cursor-pointer flex-col items-center hover:opacity-30"
+      className="flex cursor-pointer flex-col items-center hover:opacity-10"
       href="#"
       rel="noopener noreferrer"
     >
