@@ -9,6 +9,10 @@ import OpenAI from "openai"
 import MistralClient from "@mistralai/mistralai"
 import { parseISO, formatDistanceToNow } from "date-fns/esm"
 
+// export const runtime = "edge"
+export const dynamic = "force-dynamic"
+export const maxDuration = 30
+
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
@@ -26,6 +30,8 @@ const callLLM = async (
   Given this source information, copy edit the content. In addition outline the key facts in a list.
   Next, ask the student if they would like to change anything. Wait for a response.`
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
+
+  console.log({ maxDuration })
 
   switch (studyState) {
     case "topic_creation":
@@ -288,6 +294,8 @@ Original topic source material:
         ]
       })
 
+      console.log("recall_hinting streaming ")
+
       stream = MistralStream(chatStreamResponse)
       newStudyState = "recall_finished"
       return new StreamingTextResponse(stream, {
@@ -321,9 +329,6 @@ Original topic source material:
       throw new Error("Invalid study state")
   }
 }
-
-export const dynamic = "force-dynamic"
-export const maxDuration = 30
 
 export async function POST(request: Request) {
   try {
