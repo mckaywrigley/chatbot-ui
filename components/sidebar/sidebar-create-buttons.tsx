@@ -111,49 +111,54 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   const getCreateFunction = () => {
+    const prepareAction = (action: Function) => async () => {
+      setIsMenuOpen(false)
+      await action()
+    }
+
     switch (contentType) {
       case "chats":
-        return async () => {
+        return prepareAction(async () => {
           handleNewChat()
-        }
+        })
 
       case "presets":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingPreset(true)
-        }
+        })
 
       case "prompts":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingPrompt(true)
-        }
+        })
 
       case "files":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingFile(true)
-        }
+        })
 
       case "collections":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingCollection(true)
-        }
+        })
 
       case "assistants":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingAssistant(true)
-        }
+        })
 
       case "tools":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingTool(true)
-        }
+        })
 
       case "models":
-        return async () => {
+        return prepareAction(async () => {
           setIsCreatingModel(true)
-        }
+        })
 
       default:
-        break
+        return async () => {}
     }
   }
 
