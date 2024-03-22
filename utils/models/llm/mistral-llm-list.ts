@@ -34,4 +34,19 @@ const MISTRAL_MEDIUM: LLM = {
   imageInput: false
 }
 
-export const MISTRAL_LLM_LIST: LLM[] = [MISTRAL_7B, MIXTRAL, MISTRAL_MEDIUM]
+// Mistral Large (UPDATED 03/05/24)
+const MISTRAL_LARGE: LLM = {
+  modelId: "mistral-large-2402",
+  modelName: "Mistral Large",
+  provider: "mistral",
+  hostedId: "mistral-large-2402",
+  platformLink: MISTRAL_PLATORM_LINK,
+  imageInput: false
+}
+
+export const MISTRAL_LLM_LIST: LLM[] = [
+  MISTRAL_7B,
+  MIXTRAL,
+  MISTRAL_MEDIUM,
+  MISTRAL_LARGE
+]
