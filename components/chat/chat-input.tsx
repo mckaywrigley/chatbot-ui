@@ -190,9 +190,23 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const onAudioClick = async () => {
     setContent(content ? content : "")
     try {
-      const audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      })
+      let audioStream: MediaStream | undefined
+
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: true
+        })
+        .then(stream => {
+          audioStream = stream
+        })
+        .catch(e => {
+          console.log("error", e)
+          console.log("No se otorgó permiso para acceder al micrófono.")
+        })
+
+      if (!audioStream) {
+        return
+      }
 
       const isSafari =
         window.navigator.userAgent.search("Safari") >= 0 &&
