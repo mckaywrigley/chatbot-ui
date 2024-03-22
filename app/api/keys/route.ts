@@ -6,7 +6,6 @@ import { createResponse } from "@/utils/server/server-utils"
 export const runtime = "edge"
 
 export async function GET() {
-  console.log("test test test")
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
     azure: VALID_ENV_KEYS.AZURE_OPENAI_API_KEY,
     openai: VALID_ENV_KEYS.OPENAI_API_KEY,

@@ -13,7 +13,6 @@ import {
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
@@ -45,8 +44,6 @@ export const ChatInput: FC<ChatInputProps> = ({
   tools,
   assistants
 }) => {
-  const { t } = useTranslation()
-
   useHotkey("o", () => handleNewChat(workspaceId))
   useHotkey("l", () => {
     handleFocusChatInput()
@@ -274,9 +271,7 @@ export const ChatInput: FC<ChatInputProps> = ({
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={t(
-            `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
-          )}
+          placeholder={`Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`}
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}

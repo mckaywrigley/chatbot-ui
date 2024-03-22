@@ -12,7 +12,6 @@ import { LLM_LIST } from "@/utils/models/llm/llm-list"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import {
@@ -32,8 +31,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({
   presets,
   assistants
 }) => {
-  const { t } = useTranslation()
-
   useHotkey("p", () => setIsOpen(prevState => !prevState))
 
   const {
@@ -231,7 +228,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({
 
                 {selectedPreset?.name ||
                   selectedAssistant?.name ||
-                  t("Quick Settings")}
+                  "Quick Settings"}
               </div>
 
               <IconChevronDown className="ml-1" />
