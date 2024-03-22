@@ -31,8 +31,6 @@ const callLLM = async (
   Next, ask the student if they would like to change anything. Wait for a response.`
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
 
-  console.log({ maxDuration })
-
   switch (studyState) {
     case "topic_creation":
       chatResponse = await mistral.chatStream({
