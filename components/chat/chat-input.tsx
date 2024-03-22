@@ -190,38 +190,33 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const onAudioClick = async () => {
     setContent(content ? content : "")
     try {
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: true
-        })
-        .then((audioStream: MediaStream) => {
-          const isSafari =
-            window.navigator.userAgent.search("Safari") >= 0 &&
-            window.navigator.userAgent.search("Chrome") < 0
-          let mimeType = "audio/webm;codecs=opus"
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      })
+      const isSafari =
+        window.navigator.userAgent.search("Safari") >= 0 &&
+        window.navigator.userAgent.search("Chrome") < 0
+      let mimeType = "audio/webm;codecs=opus" // default mimeType
 
-          if (isSafari) {
-            if (MediaRecorder.isTypeSupported("audio/mp4")) {
-              mimeType = "audio/mp4"
-            } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
-              mimeType = "audio/x-m4a"
-            }
-          }
+      if (isSafari) {
+        if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
+          console.log("Safari detected, using mp4")
+          mimeType = "audio/mp4;codecs=h264"
+        } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+          console.log("Safari detected, using m4a")
+          mimeType = "audio/x-m4a"
+        }
+      }
 
-          const mediaRecorder = new window.MediaRecorder(audioStream, {
-            mimeType: mimeType
-          })
+      const mediaRecorder = new window.MediaRecorder(audioStream, {
+        mimeType: mimeType
+      })
 
-          setStream(audioStream)
-          setVoiceRecorder(mediaRecorder)
-          setAuxContent(content)
-          setContent("")
-          setIsRecording(true)
-        })
-        .catch(e => {
-          console.log(e)
-          console.log("No se otorgó permiso para acceder al micrófono.")
-        })
+      setStream(audioStream)
+      setVoiceRecorder(mediaRecorder)
+      setAuxContent(content)
+      setContent("")
+      setIsRecording(true)
     } catch (e) {
       console.log(e)
       console.log("No se otorgó permiso para acceder al micrófono.")
