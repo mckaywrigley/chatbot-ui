@@ -14,12 +14,14 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
     }
 
     const response = await fetch("/api/keys")
+    console.log("response", response)
 
     if (!response.ok) {
       throw new Error(`Server is not responding.`)
     }
 
     const data = await response.json()
+    console.log("data", data)
 
     let modelsToAdd: LLM[] = []
 

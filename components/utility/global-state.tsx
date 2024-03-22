@@ -120,6 +120,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)
+        console.log("hostedModelRes", hostedModelRes)
         if (!hostedModelRes) return
 
         setEnvKeyMap(hostedModelRes.envKeyMap)

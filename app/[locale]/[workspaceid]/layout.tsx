@@ -36,7 +36,6 @@ export default async function WorkspaceLayout({
 
   const profile = await getProfile(data.user.id)
   const workspaces = await getWorkspaces(data.user.id)
-  console.log(workspaces)
 
   const workspaceId = params.workspaceid as string
 

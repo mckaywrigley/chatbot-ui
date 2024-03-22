@@ -1,3 +1,5 @@
+"use client"
+
 export function exportLocalStorageAsJSON() {
   const data: { [key: string]: string | null } = {}
   for (let i = 0; i < localStorage.length; i++) {

@@ -36,7 +36,6 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({
   const [search, setSearch] = useState("")
 
   useEffect(() => {
-    console.log("selectedWorkspace", selectedWorkspace)
     if (!selectedWorkspace) return
 
     setValue(selectedWorkspace.id)

@@ -22,7 +22,6 @@ import {
 } from "../ui/dropdown-menu"
 import { Input } from "../ui/input"
 import { QuickSettingOption } from "./quick-setting-option"
-import { set } from "date-fns"
 
 interface QuickSettingsProps {
   presets: Tables<"presets">[]
@@ -69,7 +68,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({
     item: Tables<"presets"> | Tables<"assistants"> | null,
     contentType: "presets" | "assistants" | "remove"
   ) => {
-    console.log({ item, contentType })
     if (contentType === "assistants" && item) {
       setSelectedAssistant(item as Tables<"assistants">)
       setLoading(true)
