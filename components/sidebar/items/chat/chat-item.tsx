@@ -22,6 +22,12 @@ import {
   faTrash
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger
+} from "@radix-ui/react-dialog"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -35,6 +41,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     assistantImages,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+
+  const [showChatDialog, setShowChatDialog] = useState(false)
 
   const [isMouseInside, setIsMouseInside] = useState(false)
 
@@ -55,7 +63,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const handleMenuButtonClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation()
 
-    setIsMenuOpen(!isMenuOpen)
     const rect = e.currentTarget.getBoundingClientRect()
 
     const menuHeight = 150
@@ -83,22 +90,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   useEffect(() => {
     setRenderOnTop(shouldRenderMenuOnTop(position))
   }, [position])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
-
-  // End menu context logic
 
   const itemRef = useRef<HTMLDivElement>(null)
 
@@ -153,26 +144,28 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       <div className="ml-3 flex-1 truncate py-[6px] text-sm font-semibold">
         {chat.name}
       </div>
-      <div
-        role="button"
-        className="size-[14px] text-white hover:text-neutral-100"
-        onClick={e => {
-          e.stopPropagation()
-          handleMenuButtonClick(e)
-        }}
-        onMouseEnter={() => setIsMouseInside(true)}
-        onMouseLeave={() => setIsMouseInside(false)}
-      >
-        {isMouseInside || selectedChat?.id === chat?.id ? (
-          <FontAwesomeIcon
-            className="text-pixelspace-gray-20 flex"
-            icon={faEllipsisH}
-          />
-        ) : null}
-      </div>
+      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+        <DialogTrigger asChild>
+          <div
+            role="button"
+            className="size-[14px] text-white hover:text-neutral-100"
+            onClick={e => {
+              e.stopPropagation()
+              handleMenuButtonClick(e)
+            }}
+            onMouseEnter={() => setIsMouseInside(true)}
+            onMouseLeave={() => setIsMouseInside(false)}
+          >
+            {isMouseInside || selectedChat?.id === chat?.id ? (
+              <FontAwesomeIcon
+                className="text-pixelspace-gray-20 flex"
+                icon={faEllipsisH}
+              />
+            ) : null}
+          </div>
+        </DialogTrigger>
 
-      {isMenuOpen && (
-        <div
+        <DialogContent
           ref={menuRef}
           style={{
             top: `${position.y}px`,
@@ -191,7 +184,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           >
             <li>
               <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
-                <UpdateChat chat={chat} />
+                <UpdateChat chat={chat} setShowChatDialog={setShowChatDialog} />
               </div>
             </li>
 
@@ -202,8 +195,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
               </div>
             </li>
           </ul>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

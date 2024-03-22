@@ -19,9 +19,13 @@ import { FC, useContext, useRef, useState } from "react"
 
 interface UpdateChatProps {
   chat: Tables<"chats">
+  setShowChatDialog: (value: boolean) => void
 }
 
-export const UpdateChat: FC<UpdateChatProps> = ({ chat }) => {
+export const UpdateChat: FC<UpdateChatProps> = ({
+  chat,
+  setShowChatDialog: isSetShowDialog
+}) => {
   const { setChats } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -37,6 +41,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({ chat }) => {
       prevState.map(c => (c.id === chat.id ? updatedChat : c))
     )
 
+    isSetShowDialog(false)
     setShowChatDialog(false)
   }
 
@@ -70,7 +75,13 @@ export const UpdateChat: FC<UpdateChatProps> = ({ chat }) => {
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setShowChatDialog(false)}>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowChatDialog(false)
+              isSetShowDialog(false)
+            }}
+          >
             Cancel
           </Button>
 
