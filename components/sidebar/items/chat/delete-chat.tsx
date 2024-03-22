@@ -54,7 +54,6 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
         <div
           role="button"
           className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
-          onClick={handleDeleteChat}
         >
           <FontAwesomeIcon icon={faTrash} className="mr-2" />
           <span>Delete</span>

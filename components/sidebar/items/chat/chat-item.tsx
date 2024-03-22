@@ -15,19 +15,9 @@ import {
   Position,
   shouldRenderMenuOnTop
 } from "@/Core/Utils/context-menu-helper"
-import {
-  faCircle,
-  faEllipsisH,
-  faPencil,
-  faTrash
-} from "@fortawesome/free-solid-svg-icons"
+import { faEllipsisH } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger
-} from "@radix-ui/react-dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -45,8 +35,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const [showChatDialog, setShowChatDialog] = useState(false)
 
   const [isMouseInside, setIsMouseInside] = useState(false)
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const [renderOnTop, setRenderOnTop] = useState(false)
 
