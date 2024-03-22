@@ -4,7 +4,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
-import { FC, useContext, useMemo } from "react"
+import { FC, useContext } from "react"
 import { ModelSelect } from "../models/model-select"
 import { AdvancedSettings } from "./advanced-settings"
 import { Checkbox } from "./checkbox"
@@ -19,7 +19,6 @@ import {
 import { Slider } from "./slider"
 import { TextareaAutosize } from "./textarea-autosize"
 import { WithTooltip } from "./with-tooltip"
-import { AIMaskClient } from "@ai-mask/sdk"
 import { Button } from "./button"
 
 interface ChatSettingsFormProps {
