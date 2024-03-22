@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -97,7 +98,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     chatInputRef,
     handleSendMessage,
     handleStopMessage,
-    handleFocusChatInput
+    handleFocusChatInput,
+    processTranscription
   } = useChatHandler()
   const { handleInputChange } = usePromptAndCommand()
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
@@ -183,6 +185,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
+
   // Lógica del AudioRecorder
   const onAudioClick = async () => {
     setContent(content ? content : "")
@@ -190,20 +193,28 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       const audioStream = await navigator.mediaDevices.getUserMedia({
         audio: true
       })
+
       const isSafari =
         window.navigator.userAgent.search("Safari") >= 0 &&
         window.navigator.userAgent.search("Chrome") < 0
-      let mimeType = "audio/webm;codecs=opus"
+      let mimeType = "audio/webm;codecs=opus" // default mimeType
+
       if (isSafari) {
-        if (MediaRecorder.isTypeSupported("audio/mp4")) {
-          mimeType = "audio/mp4"
+        if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
+          console.log("Safari detected, using mp4")
+          mimeType = "audio/mp4;codecs=h264"
         } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+          console.log("Safari detected, using m4a")
           mimeType = "audio/x-m4a"
         }
       }
+
+      console.log("mimeType", mimeType)
+
       const mediaRecorder = new window.MediaRecorder(audioStream, {
         mimeType: mimeType
       })
+
       setStream(audioStream)
       setVoiceRecorder(mediaRecorder)
       setAuxContent(content)
@@ -214,22 +225,81 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       console.log("No se otorgó permiso para acceder al micrófono.")
     }
   }
+
   const onStopRecording = () => {
     if (!isRecording || !stream || !voiceRecorder) return
     const tracks = stream.getAudioTracks()
+
     for (const track of tracks) {
       track.stop()
     }
+
     voiceRecorder.stop()
     setContent(auxContent)
     setAuxContent("")
     setIsRecording(false)
     setStartProcessingAudio(true)
   }
+
   const handleSetTime = (time: number) => {
     setTime(getMinutesAndSeconds(time))
     setTimeSeconds(time)
   }
+
+  useEffect(() => {
+    async function fetchTranscription(audio: any) {
+      try {
+        setTranscriptionLoading(true)
+        const result = await processTranscription(audio)
+        // TODO: Implement error handling
+        const error = result?.error
+
+        const transcription = result?.transcription
+
+        if (transcription) {
+          handleInputChange(transcription)
+        }
+
+        setStartProcessingAudio(false)
+        setVoiceRecorder(null)
+        setTranscriptionLoading(false)
+        setTime("")
+      } catch (error) {
+        console.log("error", error)
+        setStartProcessingAudio(false)
+        setVoiceRecorder(null)
+        setTranscriptionLoading(false)
+        setTime("")
+      }
+    }
+    if (startProcessingAudio && timeSeconds > 1) {
+      const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
+      void fetchTranscription(audio)
+    } else {
+      setSendDirectFromButton(false)
+      setStartProcessingAudio(false)
+      setVoiceRecorder(null)
+      setTranscriptionLoading(false)
+      setTime("")
+    }
+  }, [startProcessingAudio])
+
+  useEffect(() => {
+    if (!isRecording || !voiceRecorder) return
+    voiceRecorder.start(800)
+
+    voiceRecorder.ondataavailable = ({ data }) => {
+      chunks.push(data)
+    }
+  }, [isRecording, voiceRecorder, chunks])
+
+  useEffect(() => {
+    if (isRecording || !chunks || !stream) return
+
+    setStream(null)
+    setChunks([])
+  }, [isRecording, stream, chunks])
+
   return (
     <>
       <div className="flex flex-col flex-wrap  gap-2">
@@ -327,7 +397,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 />
               )}
               {transcriptionLoading ? (
-                <div className="w-[200px]">
+                <div className="ml-2 w-[200px]">
                   <span className="text-sm text-[#F6F6F9]">{time} </span>
                   <span className="text-sm text-[#F6F6F9]">total duration</span>
                 </div>
