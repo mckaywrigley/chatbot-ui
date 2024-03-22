@@ -209,6 +209,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         }
       }
 
+      console.log("mimeType", mimeType)
+
       const mediaRecorder = new window.MediaRecorder(audioStream, {
         mimeType: mimeType
       })
