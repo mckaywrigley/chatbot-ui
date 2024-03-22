@@ -143,14 +143,16 @@ Now go to your `.env.local` file and fill in the values.
 
 If the environment variable is set, it will disable the input in the user settings.
 
-#### 2. SQL Setup
 
-In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
+#### 2. Edit credentials in functions
 
-- `project_url` (line 53): `http://supabase_kong_chatbotui:8000` (default) can remain unchanged if you don't change your `project_id` in the `config.toml` file
-- `service_role_key` (line 54): You got this value from running `supabase status`
+Open the [Supabase Studio](http://127.0.0.1:54323/) and open page Database -> Functions.
 
-This prevents issues with storage files not being deleted properly.
+Edit the `delete_storage_object` function and replace 2 values with the values you got above:
+
+- `project_url` (line 3): `http://supabase_kong_chatbotui:8000` (default) can remain unchanged if you don't change your `project_id` in the `config.toml` file
+- `service_role_key` (line 4): You got this value from running `supabase status`
+
 
 ### 5. Install Ollama (optional for local models)
 
@@ -218,13 +220,6 @@ We recommend turning off "Confirm email" for your own personal instance.
 
 #### 4. Connect to Hosted DB
 
-Open up your repository for your hosted instance of Chatbot UI.
-
-In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
-
-- `project_url` (line 53): Use the `Project URL` value from above
-- `service_role_key` (line 54): Use the `Service role key` value from above
-
 Now, open a terminal in the root directory of your local Chatbot UI repository. We will execute a few commands here.
 
 Login to Supabase by running:
@@ -246,6 +241,17 @@ Finally, push your database to Supabase by running:
 ```bash
 supabase db push
 ```
+
+#### 5. Edit credentials in functions
+
+Open the Supabase Studio of your hosted DB and go to the page Database -> Functions.
+
+Edit the `delete_storage_object` function and replace 2 values with the values you got above:
+
+- `project_url` (line 3): Use the `Project URL` value from above
+- `service_role_key` (line 4): Use the `Service role key` value from above
+
+
 
 Your hosted database should now be set up!
 
