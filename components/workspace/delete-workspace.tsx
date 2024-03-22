@@ -29,6 +29,7 @@ export const DeleteWorkspace: FC<DeleteWorkspaceProps> = ({
   onDelete
 }) => {
   const { handleNewChat } = useChatHandler({
+    workspaceId: workspace.id,
     profile,
     models
   })

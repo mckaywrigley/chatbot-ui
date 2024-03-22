@@ -35,6 +35,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   hasData
 }) => {
   const { handleNewChat } = useChatHandler({
+    workspaceId,
     profile,
     models
   })

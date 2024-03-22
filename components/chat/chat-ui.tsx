@@ -61,6 +61,7 @@ export const ChatUI: FC<ChatUIProps> = ({
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler({
+    workspaceId,
     profile,
     models
   })
@@ -216,7 +217,11 @@ export const ChatUI: FC<ChatUIProps> = ({
       </div>
 
       <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        <ChatSecondaryButtons profile={profile} models={models} />
+        <ChatSecondaryButtons
+          workspaceId={workspaceId}
+          profile={profile}
+          models={models}
+        />
       </div>
 
       <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-20 font-bold">
@@ -232,6 +237,7 @@ export const ChatUI: FC<ChatUIProps> = ({
         <div ref={messagesStartRef} />
 
         <ChatMessages
+          workspaceId={workspaceId}
           assistants={assistants}
           profile={profile}
           files={files}

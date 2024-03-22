@@ -75,7 +75,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ profile }) => {
       anthropic_api_key: formData.get("anthropicAPIKey") as string,
       google_gemini_api_key: formData.get("googleGeminiAPIKey") as string,
       mistral_api_key: formData.get("mistralAPIKey") as string,
-      groq_api_key: groqAPIKey,
+      groq_api_key: formData.get("groqAPIKey") as string,
       perplexity_api_key: formData.get("perplexityAPIKey") as string,
       use_azure_openai: formData.get("useAzureOpenai") === "true",
       azure_openai_api_key: formData.get("azureOpenaiAPIKey") as string,
@@ -486,10 +486,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ profile }) => {
                     <>
                       <Label>Groq API Key</Label>
                       <Input
+                        name="groqAPIKey"
                         placeholder="Groq API Key"
                         type="password"
-                        value={groqAPIKey}
-                        onChange={e => setGroqAPIKey(e.target.value)}
+                        value={profile.groq_api_key || ""}
                       />
                     </>
                   )}

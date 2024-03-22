@@ -24,10 +24,12 @@ import {
 
 export const useChatHandler = ({
   profile,
-  models
+  models,
+  workspaceId
 }: {
   profile: Tables<"profiles">
   models: Tables<"models">[]
+  workspaceId: string
 }) => {
   const router = useRouter()
 
@@ -156,23 +158,6 @@ export const useChatHandler = ({
           | "openai"
           | "local"
       })
-    } else if (selectedWorkspace) {
-      // setChatSettings({
-      //   model: (selectedWorkspace.default_model ||
-      //     "gpt-4-1106-preview") as LLMID,
-      //   prompt:
-      //     selectedWorkspace.default_prompt ||
-      //     "You are a friendly, helpful AI assistant.",
-      //   temperature: selectedWorkspace.default_temperature || 0.5,
-      //   contextLength: selectedWorkspace.default_context_length || 4096,
-      //   includeProfileContext:
-      //     selectedWorkspace.include_profile_context || true,
-      //   includeWorkspaceInstructions:
-      //     selectedWorkspace.include_workspace_instructions || true,
-      //   embeddingsProvider:
-      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-      //     "openai"
-      // })
     }
 
     return router.push(`/${workspaceId}/chat`)
@@ -219,13 +204,7 @@ export const useChatHandler = ({
         ...availableOpenRouterModels
       ].find(llm => llm.modelId === chatSettings?.model)
 
-      validateChatSettings(
-        chatSettings,
-        modelData,
-        profile,
-        selectedWorkspace,
-        messageContent
-      )
+      validateChatSettings(chatSettings, modelData, profile, messageContent)
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 
@@ -261,7 +240,7 @@ export const useChatHandler = ({
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        workspaceInstructions: selectedWorkspace!.instructions || "",
+        workspaceInstructions: "",
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
@@ -342,7 +321,7 @@ export const useChatHandler = ({
         currentChat = await handleCreateChat({
           chatSettings: chatSettings!,
           profile: profile!,
-          selectedWorkspace: selectedWorkspace!,
+          workspaceId: workspaceId,
           messageContent: messageContent,
           selectedAssistant: selectedAssistant!,
           newMessageFiles: newMessageFiles,

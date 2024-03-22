@@ -1,23 +1,20 @@
-import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
-import { IconArrowRight } from "@tabler/icons-react"
-import Link from "next/link"
+import { getHomeWorkspace } from "@/actions/workspaces"
+import { createClient } from "@/utils/supabase/server"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export default async function HomePage() {
-  return (
-    <div className="flex size-full flex-col items-center justify-center">
-      <div>
-        <ChatbotUISVG scale={0.3} />
-      </div>
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
-      <div className="mt-2 text-4xl font-bold">Chatbot UI</div>
+  const { data, error } = await supabase.auth.getUser()
 
-      <Link
-        className="mt-4 flex w-[200px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold"
-        href="/login"
-      >
-        Start Chatting
-        <IconArrowRight className="ml-1" size={20} />
-      </Link>
-    </div>
-  )
+  if (data.user) {
+    const homeWorkspace = await getHomeWorkspace(data.user.id)
+    return redirect(`/${homeWorkspace.id}/chat`)
+  } else {
+    return redirect("/login")
+  }
+
+  return <></>
 }

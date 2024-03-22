@@ -6,17 +6,20 @@ import { FC, useContext } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
 
 interface ChatSecondaryButtonsProps {
+  workspaceId: string
   profile: Tables<"profiles">
   models: Tables<"models">[]
 }
 
 export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({
+  workspaceId,
   profile,
   models
 }) => {
   const { selectedChat } = useContext(ChatbotUIContext)
 
   const { handleNewChat } = useChatHandler({
+    workspaceId,
     profile,
     models
   })

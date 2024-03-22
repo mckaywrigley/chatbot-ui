@@ -32,6 +32,7 @@ export default async function ChatIdPage({ children, params }: any) {
 
   return (
     <ChatUI
+      workspaceId={workspaceId}
       profile={profile}
       models={models}
       prompts={prompts}

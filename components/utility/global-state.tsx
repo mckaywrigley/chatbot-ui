@@ -3,6 +3,7 @@
 "use client"
 
 import { getProfile } from "@/actions/profiles"
+import { getWorkspace } from "@/actions/workspaces"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import {
@@ -22,7 +23,7 @@ import {
   fetchOpenRouterModels
 } from "@/utils/models/fetch-models"
 import { createClient } from "@/utils/supabase/client"
-import { redirect } from "next/navigation"
+import { redirect, useParams } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 
 interface GlobalStateProps {
@@ -103,6 +104,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
   const [toolInUse, setToolInUse] = useState<string>("none")
 
+  const params = useParams()
+
   useEffect(() => {
     ;(async () => {
       const supabase = createClient()
@@ -112,6 +115,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
 
       const profile = await getProfile(data.user.id)
+      const workspace = await getWorkspace(params.workspaceid as string)
+      setSelectedWorkspace(workspace)
 
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)

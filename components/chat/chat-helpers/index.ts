@@ -27,7 +27,6 @@ export const validateChatSettings = (
   chatSettings: ChatSettings | null,
   modelData: LLM | undefined,
   profile: Tables<"profiles"> | null,
-  selectedWorkspace: Tables<"workspaces"> | null,
   messageContent: string
 ) => {
   if (!chatSettings) {
@@ -40,10 +39,6 @@ export const validateChatSettings = (
 
   if (!profile) {
     throw new Error("Profile not found")
-  }
-
-  if (!selectedWorkspace) {
-    throw new Error("Workspace not found")
   }
 
   if (!messageContent) {
@@ -349,7 +344,7 @@ export const processResponse = async (
 export const handleCreateChat = async ({
   chatSettings,
   profile,
-  selectedWorkspace,
+  workspaceId,
   messageContent,
   selectedAssistant,
   newMessageFiles,
@@ -358,7 +353,7 @@ export const handleCreateChat = async ({
 }: {
   chatSettings: ChatSettings
   profile: Tables<"profiles">
-  selectedWorkspace: Tables<"workspaces">
+  workspaceId: string
   messageContent: string
   selectedAssistant: Tables<"assistants">
   newMessageFiles: ChatFile[]
@@ -367,7 +362,7 @@ export const handleCreateChat = async ({
 }) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
-    workspace_id: selectedWorkspace.id,
+    workspace_id: workspaceId,
     assistant_id: selectedAssistant?.id || null,
     context_length: chatSettings.contextLength,
     include_profile_context: chatSettings.includeProfileContext,

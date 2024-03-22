@@ -25,6 +25,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ profile, models, chat }) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
 
   const { handleNewChat } = useChatHandler({
+    workspaceId: chat.workspace_id,
     profile,
     models
   })

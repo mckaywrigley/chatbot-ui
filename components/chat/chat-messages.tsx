@@ -5,6 +5,7 @@ import { FC, useContext, useState } from "react"
 import { Message } from "../messages/message"
 
 interface ChatMessagesProps {
+  workspaceId: string
   assistants: Tables<"assistants">[]
   profile: Tables<"profiles">
   files: Tables<"files">[]
@@ -12,6 +13,7 @@ interface ChatMessagesProps {
 }
 
 export const ChatMessages: FC<ChatMessagesProps> = ({
+  workspaceId,
   assistants,
   profile,
   files,
@@ -20,6 +22,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
   const { chatMessages, chatFileItems } = useContext(ChatbotUIContext)
 
   const { handleSendEdit } = useChatHandler({
+    workspaceId,
     profile,
     models
   })
@@ -38,6 +41,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
       return (
         <Message
           key={chatMessage.message.sequence_number}
+          workspaceId={workspaceId}
           assistants={assistants}
           profile={profile}
           files={files}
