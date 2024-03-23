@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
-    let latestUserMessage = cleanedMessages[cleanedMessages.length - 1].content
+    let latestUserMessage = cleanedMessages[cleanedMessages.length - 2].content
 
     if (!latestUserMessage.startsWith("Assist with the user's query:")) {
       if (
