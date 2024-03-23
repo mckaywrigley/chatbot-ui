@@ -206,7 +206,7 @@ async function generateStandaloneQuestion(
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any
 ) {
-  if (messages.length < 4) {
+  if (messages.length < 4 || latestUserMessage.length > 256) {
     return latestUserMessage
   }
 
