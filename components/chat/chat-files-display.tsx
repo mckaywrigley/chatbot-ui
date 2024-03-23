@@ -98,7 +98,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         />
       )}
 
-    <div className="max-w-full space-y-2">
+      <div className="max-w-full space-y-2">
         <div className="flex w-full items-center justify-center">
           <Button
             className="flex h-[32px] w-[140px] space-x-2"
