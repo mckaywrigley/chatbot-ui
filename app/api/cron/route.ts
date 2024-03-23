@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     cutoffDate.setHours(23, 59, 59, 999)
 
     // Search all chats in DB and return array where revise_date is before now
-    const chats = await getChatsByReviseDate(cutoffDate)
 
+    const chats = await getChatsByReviseDate(cutoffDate, request)
     console.log("Chats to send email to", chats.length)
 
     // Group chats by user_id

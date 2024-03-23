@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import * as ebisu from "ebisu-js"
 import { AssertionError } from "assert"
+import { createClient } from "@/lib/supabase/middleware"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -122,22 +123,11 @@ export async function getUserEmailById(userId: string) {
 }
 
 // Function that returns all chats where revise_date is before the current time
-export async function getChatsByReviseDate(cutoffDate: Date) {
+export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
   const cutoffDateString = cutoffDate.toISOString()
+  console.log("Cutoff date", cutoffDateString)
 
-  // Setup the Supabase client
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          const cookieStore = cookies()
-          return cookieStore.get(name)?.value
-        }
-      }
-    }
-  )
+  const { supabase, response } = createClient(request)
 
   // Perform the query to get chats where revise_date is less than the current time
   const { data: chats, error } = await supabase
