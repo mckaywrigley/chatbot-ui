@@ -6,13 +6,13 @@ import { PROFILE_CONTEXT_MAX, PROFILE_DISPLAY_NAME_MAX } from "@/db/limits"
 import { uploadProfileImage } from "@/db/storage/profile-images"
 import { Tables } from "@/supabase/types"
 import { OpenRouterLLM } from "@/types"
-import { exportLocalStorageAsJSON } from "@/utils/export-old-data"
 import { fetchOpenRouterModels } from "@/utils/models/fetch-models"
 import { LLM_LIST_MAP } from "@/utils/models/llm/llm-list"
 import { cn } from "@/utils/utils"
-import { IconFileDownload, IconUser } from "@tabler/icons-react"
+import { IconUser } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useState } from "react"
+import { toast } from "sonner"
 import { LogoutButton } from "../logout-button"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
@@ -29,7 +29,6 @@ import {
 } from "../ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
-import { WithTooltip } from "../ui/with-tooltip"
 import { UsernameInput } from "../username-input"
 import { ThemeSwitcher } from "./theme-switcher"
 
@@ -182,6 +181,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ profile }) => {
     })
 
     setIsOpen(false)
+
+    toast.success("Profile updated")
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -574,21 +575,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ profile }) => {
         <div className="mt-6 flex items-center">
           <div className="flex items-center space-x-1">
             <ThemeSwitcher />
-
-            <WithTooltip
-              display={
-                <div>
-                  Download Chatbot UI 1.0 data as JSON. Import coming soon!
-                </div>
-              }
-              trigger={
-                <IconFileDownload
-                  className="cursor-pointer hover:opacity-50"
-                  size={32}
-                  onClick={exportLocalStorageAsJSON}
-                />
-              }
-            />
           </div>
 
           <div className="ml-auto space-x-2">

@@ -1,3 +1,5 @@
+"use client"
+
 import { PROFILE_USERNAME_MAX, PROFILE_USERNAME_MIN } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import {
