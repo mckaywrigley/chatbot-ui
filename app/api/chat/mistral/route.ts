@@ -81,10 +81,10 @@ export async function POST(request: Request) {
       if (
         llmConfig.usePinecone &&
         cleanedMessages.length > 0 &&
-        cleanedMessages[cleanedMessages.length - 1].role === "user" &&
-        cleanedMessages[cleanedMessages.length - 1].content.length >
+        cleanedMessages[cleanedMessages.length - 2].role === "user" &&
+        cleanedMessages[cleanedMessages.length - 2].content.length >
           llmConfig.pinecone.messageLength.min &&
-        cleanedMessages[cleanedMessages.length - 1].content.length <
+        cleanedMessages[cleanedMessages.length - 2].content.length <
           llmConfig.pinecone.messageLength.max
       ) {
         if (!(await isEnglish(latestUserMessage))) {
@@ -206,7 +206,7 @@ async function generateStandaloneQuestion(
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any
 ) {
-  if (messages.length === 2) {
+  if (messages.length < 4) {
     return latestUserMessage
   }
 
