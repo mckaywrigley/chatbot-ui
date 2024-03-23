@@ -69,7 +69,7 @@ export const useScroll = () => {
       }
 
       isAutoScrolling.current = false
-    }, 0)
+    }, 100)
   }, [])
 
   return {
