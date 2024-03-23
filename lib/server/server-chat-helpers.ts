@@ -97,6 +97,66 @@ export const getChatById = async (chatId: string) => {
   return chat
 }
 
+// getUserEmailById
+export async function getUserEmailById(userId: string) {
+  // Implement the logic to get the user email by ID
+  const cookieStore = cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+  const { data: user } = await supabase
+    .from("users")
+    .select("email")
+    .eq("id", userId)
+    .single()
+
+  return user?.email ?? null
+}
+
+// Function that returns all chats where revise_date is before the current time
+export async function getChatsByReviseDate(cutoffDate: Date) {
+  const cutoffDateString = cutoffDate.toISOString()
+
+  // Setup the Supabase client
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          const cookieStore = cookies()
+          return cookieStore.get(name)?.value
+        }
+      }
+    }
+  )
+
+  // Perform the query to get chats where revise_date is less than the current time
+  const { data: chats, error } = await supabase
+    .from("chats")
+    .select("*")
+    .lt("revise_date", cutoffDateString)
+
+  // Error handling
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  if (!chats) {
+    return []
+  }
+
+  return chats
+}
+
 const updateChat = async (chatId: string, chat: TablesUpdate<"chats">) => {
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(

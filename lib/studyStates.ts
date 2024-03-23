@@ -44,10 +44,7 @@ export const studyStates: StudyStateObject[] = [
     ]
   },
   {
-    name: "recall_first_attempt"
-  },
-  {
-    name: "recall_hinting",
+    name: "recall_first_attempt",
     quickResponses: [
       {
         quickText: "Show full topic description.",
@@ -55,6 +52,9 @@ export const studyStates: StudyStateObject[] = [
         newStudyState: "reviewing"
       }
     ]
+  },
+  {
+    name: "recall_hinting"
   },
   {
     name: "recall_finished",

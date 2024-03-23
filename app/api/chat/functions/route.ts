@@ -9,6 +9,10 @@ import OpenAI from "openai"
 import MistralClient from "@mistralai/mistralai"
 import { parseISO, formatDistanceToNow } from "date-fns/esm"
 
+// export const runtime = "edge"
+export const dynamic = "force-dynamic"
+export const maxDuration = 30
+
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
@@ -287,6 +291,8 @@ Original topic source material:
           ...messages
         ]
       })
+
+      console.log("recall_hinting streaming ")
 
       stream = MistralStream(chatStreamResponse)
       newStudyState = "recall_finished"

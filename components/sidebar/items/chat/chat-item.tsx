@@ -11,6 +11,10 @@ interface ChatItemProps {
   chat: Tables<"chats">
 }
 
+interface ExtendedChat extends Tables<"chats"> {
+  predictedRecall: number
+}
+
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const { selectedWorkspace, selectedChat } = useContext(ChatbotUIContext)
 
@@ -43,7 +47,10 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       onKeyDown={handleKeyDown}
       onClick={handleClick}
     >
-      <DynamicPieChart value={chat.predictedRecall * 100} scale={0.6} />
+      <DynamicPieChart
+        value={(chat as ExtendedChat).predictedRecall * 100}
+        scale={0.6}
+      />
 
       <div className="ml-3 flex-1 truncate text-sm font-semibold">
         {chat.name}
