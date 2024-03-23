@@ -58,18 +58,13 @@ export const viewport: Viewport = {
   themeColor: "#000000"
 }
 
-const i18nNamespaces = ["translation"]
-
-export default async function RootLayout({
-  children,
-  params: { locale }
-}: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers attribute="class" defaultTheme="dark">
           <Toaster richColors position="top-center" duration={3000} />
-          <div className="bg-background text-foreground flex h-screen flex-col items-center">
+          <div className="bg-background text-foreground flex h-dvh flex-col items-center overflow-x-auto">
             {children}
           </div>
         </Providers>
