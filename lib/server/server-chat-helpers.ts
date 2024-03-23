@@ -130,10 +130,7 @@ export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
   const { supabase, response } = createClient(request)
 
   // Perform the query to get chats where revise_date is less than the current time
-  const { data: chats, error } = await supabase
-    .from("chats")
-    .select("*")
-    .lt("revise_date", cutoffDateString)
+  const { data: chats, error } = await supabase.from("chats").select("*")
 
   // Error handling
   if (error) {
