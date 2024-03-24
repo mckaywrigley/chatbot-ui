@@ -1,6 +1,6 @@
 {
-  "short_name": "Chatbot UI",
-  "name": "Chatbot UI",
+  "short_name": "LearnTime",
+  "name": "LearnTime",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -16,7 +16,7 @@
       "src": "/icon-512x512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose":"maskable"
+      "purpose": "maskable"
     }
   ],
   "start_url": "/",
