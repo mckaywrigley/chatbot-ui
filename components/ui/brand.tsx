@@ -20,7 +20,7 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
         <LearnTimeSVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
       </div>
 
-      <div className="text-4xl font-bold tracking-wide">LearnTime</div>
+      <div className="text-4xl font-bold">LearnTime</div>
     </Link>
   )
 }
