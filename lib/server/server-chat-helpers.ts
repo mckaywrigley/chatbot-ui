@@ -100,17 +100,19 @@ export const getChatById = async (chatId: string) => {
 
 // getUserEmailById
 export async function getUserEmailById(userId: string) {
-  const supabaseAdmin = createClient<Database>(
+  const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  const { data: user } = await supabaseAdmin
-    .from("users")
-    .select("email")
-    .eq("id", userId)
-    .single()
 
-  return user?.email ?? null
+  // This gets the user details from the auth users
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data.user.email
 }
 
 // Function that returns all chats where revise_date is before the current time
