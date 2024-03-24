@@ -263,7 +263,7 @@ export const Message: FC<MessageProps> = ({
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
-                {message.role === "user" ? "You" : ""}
+                {message.role === "user" ? " (You)" : ""}
               </div>
             </div>
           )}
