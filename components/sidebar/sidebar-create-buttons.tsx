@@ -12,6 +12,7 @@ import { CreateModel } from "./items/models/create-model"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
+import { toast } from "sonner"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -45,6 +46,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       description: "",
       type: contentType
     })
+
+    if (!createdFolder) {
+      toast.error(
+        `You reached the maximum amount of folders!\n You can have a maximum of ${process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_FOLDERS || "100"} folders per workspace.`
+      )
+      return
+    }
     setFolders([...folders, createdFolder])
   }
 

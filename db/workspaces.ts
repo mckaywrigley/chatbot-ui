@@ -30,6 +30,18 @@ export const getWorkspaceById = async (workspaceId: string) => {
   return workspace
 }
 
+export const getWorkspaceCount = async () => {
+  const { count, error } = await supabase
+    .from("workspaces")
+    .select("*", { count: "exact" })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return count
+}
+
 export const getWorkspacesByUserId = async (userId: string) => {
   const { data: workspaces, error } = await supabase
     .from("workspaces")
@@ -47,6 +59,13 @@ export const getWorkspacesByUserId = async (userId: string) => {
 export const createWorkspace = async (
   workspace: TablesInsert<"workspaces">
 ) => {
+  const workspaceCount = (await getWorkspaceCount()) || 0
+  const maxWorkspaces = parseInt(
+    process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_WORKSPACES || "10"
+  )
+
+  if (workspaceCount >= maxWorkspaces) return false
+
   const { data: createdWorkspace, error } = await supabase
     .from("workspaces")
     .insert([workspace])

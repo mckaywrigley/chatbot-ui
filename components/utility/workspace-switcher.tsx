@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { toast } from "sonner"
 
 interface WorkspaceSwitcherProps {}
 
@@ -61,6 +62,13 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
       is_home: false,
       name: "New Workspace"
     })
+
+    if (!createdWorkspace) {
+      toast.error(
+        `You reached the maximum amount of workspaces!\n You can have a maximum of ${process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_WORKSPACES || "10"} workspace.`
+      )
+      return
+    }
 
     setWorkspaces([...workspaces, createdWorkspace])
     setSelectedWorkspace(createdWorkspace)

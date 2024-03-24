@@ -113,6 +113,19 @@ export const useSelectFileHandler = () => {
             chatSettings.embeddingsProvider
           )
 
+          if (!createdFile) {
+            toast.error(
+              "You reached the maximum amount of files! Please delete some in the files tab."
+            )
+            setNewMessageImages(prev =>
+              prev.filter(img => img.messageId !== "temp")
+            )
+            setNewMessageFiles(prev =>
+              prev.filter(file => file.id !== "loading")
+            )
+            return
+          }
+
           setFiles(prev => [...prev, createdFile])
 
           setNewMessageFiles(prev =>
@@ -173,6 +186,19 @@ export const useSelectFileHandler = () => {
               selectedWorkspace.id,
               chatSettings.embeddingsProvider
             )
+
+            if (!createdFile) {
+              toast.error(
+                "You reached the maximum amount of files! Please delete some in the files tab."
+              )
+              setNewMessageImages(prev =>
+                prev.filter(img => img.messageId !== "temp")
+              )
+              setNewMessageFiles(prev =>
+                prev.filter(file => file.id !== "loading")
+              )
+              return
+            }
 
             setFiles(prev => [...prev, createdFile])
 

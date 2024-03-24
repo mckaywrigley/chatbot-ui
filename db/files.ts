@@ -18,6 +18,18 @@ export const getFileById = async (fileId: string) => {
   return file
 }
 
+export const getAllFilesCount = async () => {
+  const { count, error } = await supabase
+    .from("files")
+    .select("*", { count: "exact" })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return count
+}
+
 export const getFileWorkspacesByWorkspaceId = async (workspaceId: string) => {
   const { data: workspace, error } = await supabase
     .from("workspaces")
@@ -100,6 +112,13 @@ export const createFile = async (
   }
   fileRecord.name = validFilename
 
+  const filesCounts = (await getAllFilesCount()) || 0
+  const maxFiles = parseInt(
+    process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_FILES || "100"
+  )
+
+  if (filesCounts >= maxFiles) return false
+
   const { data: createdFile, error } = await supabase
     .from("files")
     .insert([fileRecord])
@@ -153,6 +172,13 @@ export const createDocXFile = async (
   workspace_id: string,
   embeddingsProvider: "openai" | "local"
 ) => {
+  const filesCounts = (await getAllFilesCount()) || 0
+  const maxFiles = parseInt(
+    process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_FILES || "100"
+  )
+
+  if (filesCounts >= maxFiles) return false
+
   const { data: createdFile, error } = await supabase
     .from("files")
     .insert([fileRecord])

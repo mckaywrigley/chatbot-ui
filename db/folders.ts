@@ -14,7 +14,28 @@ export const getFoldersByWorkspaceId = async (workspaceId: string) => {
   return folders
 }
 
+export const getFoldersByWorkspaceIdCount = async (workspaceId: string) => {
+  const { count, error } = await supabase
+    .from("folders")
+    .select("*", { count: "exact" })
+    .eq("workspace_id", workspaceId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return count
+}
+
 export const createFolder = async (folder: TablesInsert<"folders">) => {
+  const folderCount =
+    (await getFoldersByWorkspaceIdCount(folder.workspace_id)) || 0
+  const maxFolders = parseInt(
+    process.env.NEXT_PUBLIC_RATELIMITER_LIMIT_FOLDERS || "50"
+  )
+
+  if (folderCount >= maxFolders) return false
+
   const { data: createdFolder, error } = await supabase
     .from("folders")
     .insert([folder])
