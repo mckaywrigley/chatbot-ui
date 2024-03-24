@@ -13,13 +13,6 @@ export async function GET(request: NextRequest) {
       return new Response("Unauthorized", { status: 401 })
     }
 
-    const serverToken = process.env.POSTMARK_SERVER_TOKEN
-    if (!serverToken) {
-      throw new Error("POSTMARK_SERVER_TOKEN is not defined")
-    }
-
-    let client = new postmark.ServerClient(serverToken)
-
     // Set cutoff date to end of today
     const cutoffDate = new Date()
     cutoffDate.setHours(23, 59, 59, 999)
@@ -62,6 +55,13 @@ export async function GET(request: NextRequest) {
     }
 
     let success = false
+
+    const serverToken = process.env.POSTMARK_SERVER_TOKEN
+    if (!serverToken) {
+      throw new Error("POSTMARK_SERVER_TOKEN is not defined")
+    }
+
+    let client = new postmark.ServerClient(serverToken)
 
     // Send emails in batch
     if (emailsToSend.length > 0) {

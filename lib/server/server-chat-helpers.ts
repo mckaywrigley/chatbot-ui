@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import * as ebisu from "ebisu-js"
 import { AssertionError } from "assert"
-import { createClient } from "@/lib/supabase/middleware"
+import { createClient } from "@supabase/supabase-js"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -100,26 +100,19 @@ export const getChatById = async (chatId: string) => {
 
 // getUserEmailById
 export async function getUserEmailById(userId: string) {
-  // Implement the logic to get the user email by ID
-  const cookieStore = cookies()
-  const supabase = createServerClient<Database>(
+  const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        }
-      }
-    }
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  const { data: user } = await supabase
-    .from("users")
-    .select("email")
-    .eq("id", userId)
-    .single()
 
-  return user?.email ?? null
+  // This gets the user details from the auth users
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data.user.email
 }
 
 // Function that returns all chats where revise_date is before the current time
@@ -127,10 +120,12 @@ export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
   const cutoffDateString = cutoffDate.toISOString()
   console.log("Cutoff date", cutoffDateString)
 
-  const { supabase, response } = createClient(request)
-
+  const supabaseAdmin = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   // Perform the query to get chats where revise_date is less than the current time
-  const { data: chats, error } = await supabase
+  const { data: chats, error } = await supabaseAdmin
     .from("chats")
     .select("*")
     .lt("revise_date", cutoffDateString)
