@@ -95,13 +95,15 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     }
   }
 
+  const tempText = `New ${contentType.charAt(0).toUpperCase() + contentType.slice(1, contentType.length - 1)}`
+  // if content type is "chats", then buttonText will be "New Topic"
+  const buttonText = contentType === "chats" ? "New Topic" : tempText
+
   return (
     <div className="flex w-full space-x-2">
       <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
         <IconPlus className="mr-1" size={20} />
-        New{" "}
-        {contentType.charAt(0).toUpperCase() +
-          contentType.slice(1, contentType.length - 1)}
+        {buttonText}
       </Button>
 
       {hasData && (
