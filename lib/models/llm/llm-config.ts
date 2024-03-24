@@ -6,14 +6,15 @@ const llmConfig = {
     apiKey: process.env.OPENAI_API_KEY
   },
   pinecone: {
-    apiKey: process.env.SECRET_PINECONE_API_KEY,
-    index: process.env.SECRET_PINECONE_INDEX,
-    projectId: process.env.SECRET_PINECONE_PROJECT_ID,
-    environment: process.env.SECRET_PINECONE_ENVIRONMENT,
+    apiKey: process.env.SECRET_PINECONE_API_KEY || "defaultApiKey",
+    index: process.env.SECRET_PINECONE_INDEX || "defaultIndex",
+    projectId: process.env.SECRET_PINECONE_PROJECT_ID || "defaultProjectId",
+    environment:
+      process.env.SECRET_PINECONE_ENVIRONMENT || "defaultEnvironment",
     namespace: process.env.SECRET_PINECONE_NAMESPACE,
     temperature: 0.6,
     messageLength: {
-      min: parseInt(process.env.MIN_LAST_MESSAGE_LENGTH || "50", 10),
+      min: parseInt(process.env.MIN_LAST_MESSAGE_LENGTH || "25", 10),
       max: parseInt(process.env.MAX_LAST_MESSAGE_LENGTH || "1000", 10)
     }
   },

@@ -8,7 +8,8 @@ import {
   wordReplacements
 } from "@/lib/ai-helper"
 import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
-import queryPineconeVectorStore from "@/lib/models/query-pinecone"
+// import queryPineconeVectorStore from "@/lib/models/query-pinecone"
+import PineconeRetriever from "@/lib/models/query-pinecone-2v"
 
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
@@ -104,11 +105,20 @@ export async function POST(request: Request) {
           openRouterHeaders
         )
 
-        const pineconeResults = await queryPineconeVectorStore(
-          standaloneQuestion,
+        // const pineconeResults = await queryPineconeVectorStore(
+        //   standaloneQuestion,
+        //   llmConfig.openai.apiKey,
+        //   llmConfig.pinecone
+        // )
+
+        const pineconeRetriever = new PineconeRetriever(
           llmConfig.openai.apiKey,
-          llmConfig.pinecone
+          llmConfig.pinecone,
+          3
         )
+
+        const pineconeResults =
+          await pineconeRetriever.retrieve(standaloneQuestion)
 
         if (pineconeResults !== "None") {
           modelTemperature = llmConfig.pinecone.temperature
