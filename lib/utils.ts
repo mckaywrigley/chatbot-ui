@@ -19,3 +19,13 @@ export function isDateBeforeToday(date: Date): boolean {
   const today = startOfDay(new Date())
   return isBefore(date, today)
 }
+
+export function getMediaTypeFromDataURL(dataURL: string): string | null {
+  const matches = dataURL.match(/^data:([A-Za-z-+\/]+);base64/)
+  return matches ? matches[1] : null
+}
+
+export function getBase64FromDataURL(dataURL: string): string | null {
+  const matches = dataURL.match(/^data:[A-Za-z-+\/]+;base64,(.*)$/)
+  return matches ? matches[1] : null
+}
