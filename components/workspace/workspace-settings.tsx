@@ -172,7 +172,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           trigger={
             <div
               role="button"
-              className=" border-pixelspace-60 ml-2 flex size-[42px] items-center justify-center rounded-md border"
+              className=" border-pixelspace-60 ml-3 flex size-[42px] items-center justify-center rounded-md border"
               onClick={() => setIsOpen(true)}
             >
               <i

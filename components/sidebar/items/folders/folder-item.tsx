@@ -70,6 +70,7 @@ export const Folder: FC<FolderProps> = ({
   }
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     setIsExpanded(!isExpanded)
   }
 
@@ -85,8 +86,8 @@ export const Folder: FC<FolderProps> = ({
 
     let menuPositionY
 
-    const offsetX = -5
-    let offsetY = 18
+    const offsetX = -178
+    let offsetY = 1
 
     if (rect.bottom + menuHeight > window.innerHeight) {
       menuPositionY = rect.top - menuHeight
@@ -133,18 +134,26 @@ export const Folder: FC<FolderProps> = ({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onKeyDown={handleKeyDown}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      onMouseEnter={e => {
+        e.stopPropagation()
+        setIsHovering(true)
+      }}
+      onMouseLeave={e => {
+        e.stopPropagation()
+        setIsHovering(false)
+      }}
     >
       <div
         tabIndex={0}
         className={cn(
-          "hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between px-3 py-4"
+          " hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between px-3 py-[11px]"
         )}
         onClick={handleClick}
       >
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center py-[2px]">
+          <div
+            className={`flex items-center text-sm font-bold  ${isExpanded ? "text-pixelspace-gray-20" : "text-pixelspace-gray-3"}`}
+          >
             <div>{folder.name}</div>
           </div>
           <div
@@ -154,15 +163,13 @@ export const Folder: FC<FolderProps> = ({
               e.stopPropagation()
               handleMenuButtonClick(e)
             }}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
           >
-            {isHovering || isExpanded ? (
+            {isHovering && (
               <FontAwesomeIcon
-                className="text-pixelspace-gray-20 flex"
+                className="text-pixelspace-gray-40 hover:text-pixelspace-gray-3 flex"
                 icon={faEllipsisH}
               />
-            ) : null}
+            )}
           </div>
 
           {isMenuOpen && (
@@ -172,24 +179,24 @@ export const Folder: FC<FolderProps> = ({
                 top: `${position.y}px`,
                 left: `${position.x}px`
               }}
-              className={`bg-pixelspace-gray-60 absolute z-20 w-44 divide-y divide-gray-100 rounded text-right shadow dark:divide-gray-600 `}
+              className={`bg-pixelspace-gray-60 divide-pixelspace-gray-70 absolute z-20 w-44 divide-y rounded text-right shadow `}
             >
               <div className="block px-4 py-2 text-left">
-                <span className="text-xs font-semibold text-gray-300 dark:text-gray-200">
+                <span className="text-pixelspace-gray-20 text-sm font-normal dark:text-gray-200">
                   Folder options
                 </span>
               </div>
               <ul
-                className="py-2 text-sm text-gray-200 dark:text-gray-200"
+                className=" py-1 text-sm text-gray-200 dark:text-gray-200"
                 aria-labelledby="dropdownMenuIconHorizontalButton"
               >
                 <li>
-                  <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
+                  <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 mb-1 block w-full cursor-pointer px-4 py-2 text-left text-xs  dark:hover:text-white">
                     <UpdateFolder folder={folder} />
                   </div>
                 </li>
 
-                <hr className="dark:border-gray-600" />
+                <hr className="dark:border-pixelspace-gray-70" />
                 <li className="mt-1">
                   <div className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
                     <DeleteFolder folder={folder} contentType={contentType} />

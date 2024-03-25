@@ -165,7 +165,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   return (
     <div className="flex space-x-2">
       <div
-        className="flex size-[42px] cursor-pointer items-center justify-center rounded border"
+        className="ml-[5px] flex size-[42px] cursor-pointer items-center justify-center rounded border"
         onClick={e => {
           e.stopPropagation()
           handleMenuButtonClick(e)
@@ -200,12 +200,14 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
               <div
                 role="button"
                 onClick={getCreateFunction()}
-                className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-10 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm dark:hover:text-white"
+                className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm font-normal dark:hover:text-white"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
                 New{" "}
-                {contentType.charAt(0).toUpperCase() +
-                  contentType.slice(1, contentType.length - 1)}
+                {contentType === "chats"
+                  ? "threads"
+                  : contentType.charAt(0) +
+                    contentType.slice(1, contentType.length - 1)}
               </div>
             </li>
 
@@ -214,10 +216,10 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
                 <div
                   role="button"
                   onClick={handleCreateFolder}
-                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-10 block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm  dark:hover:text-white"
+                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20  block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm font-normal  dark:hover:text-white"
                 >
                   <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
-                  Create folder
+                  New folder
                 </div>
               </li>
             )}

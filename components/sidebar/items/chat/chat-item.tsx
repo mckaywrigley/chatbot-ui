@@ -57,8 +57,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
 
     let menuPositionY
 
-    const offsetX = -5
-    let offsetY = 18
+    const offsetX = -178
+    let offsetY = 1
 
     if (rect.bottom + menuHeight > window.innerHeight) {
       menuPositionY = rect.top - menuHeight
@@ -106,12 +106,20 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   return (
     <div
       className={cn(
-        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center px-3 py-4 focus:outline-none",
+        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3 focus:outline-none",
         selectedChat?.id === chat.id && "bg-pixelspace-gray-70"
       )}
       tabIndex={0}
       onKeyDown={handleKeyDown}
       onClick={handleClick}
+      onMouseEnter={e => {
+        e.stopPropagation()
+        setIsMouseInside(true)
+      }}
+      onMouseLeave={e => {
+        e.stopPropagation()
+        setIsMouseInside(false)
+      }}
     >
       {chat.assistant_id ? (
         <div
@@ -129,7 +137,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         />
       )}
 
-      <div className="ml-3 flex-1 truncate py-[6px] text-sm font-semibold">
+      <div className="text-pixelspace-gray-20 ml-3 flex-1  truncate text-sm font-normal">
         {chat.name}
       </div>
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
@@ -141,12 +149,18 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
               e.stopPropagation()
               handleMenuButtonClick(e)
             }}
-            onMouseEnter={() => setIsMouseInside(true)}
-            onMouseLeave={() => setIsMouseInside(false)}
+            onMouseEnter={e => {
+              e.stopPropagation()
+              setIsMouseInside(true)
+            }}
+            onMouseLeave={e => {
+              e.stopPropagation()
+              setIsMouseInside(false)
+            }}
           >
-            {isMouseInside || selectedChat?.id === chat?.id ? (
+            {isMouseInside ? (
               <FontAwesomeIcon
-                className="text-pixelspace-gray-20 flex"
+                className="text-pixelspace-gray-40 hover:text-pixelspace-gray-3 flex"
                 icon={faEllipsisH}
               />
             ) : null}
@@ -159,24 +173,24 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
             top: `${position.y}px`,
             left: `${position.x}px`
           }}
-          className={`bg-pixelspace-gray-60 absolute z-20 w-44 divide-y divide-gray-100 rounded text-right shadow dark:divide-gray-600 `}
+          className={`bg-pixelspace-gray-60 divide-pixelspace-gray-70 absolute z-20 w-44 divide-y rounded text-right shadow  `}
         >
           <div className="block px-4 py-2 text-left">
-            <span className="text-xs font-semibold text-gray-300 dark:text-gray-200">
+            <div className="text-pixelspace-gray-20 text-sm font-normal ">
               Thread options
-            </span>
+            </div>
           </div>
           <ul
-            className="py-2 text-sm text-gray-200 dark:text-gray-200"
+            className="py-1 text-sm text-gray-200 dark:text-gray-200"
             aria-labelledby="dropdownMenuIconHorizontalButton"
           >
             <li>
-              <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
+              <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 mb-1 block w-full cursor-pointer px-4 py-2  text-left  text-xs dark:hover:text-white">
                 <UpdateChat chat={chat} setShowChatDialog={setShowChatDialog} />
               </div>
             </li>
 
-            <hr className="dark:border-gray-600" />
+            <hr className="border-pixelspace-gray-70" />
             <li className="mt-1">
               <div className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
                 <DeleteChat chat={chat} />
