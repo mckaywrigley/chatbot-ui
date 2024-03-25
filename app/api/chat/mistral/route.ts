@@ -7,7 +7,6 @@ import {
   updateOrAddSystemMessage,
   wordReplacements
 } from "@/lib/ai-helper"
-import { isEnglish, translateToEnglish } from "@/lib/models/language-utils"
 // import queryPineconeVectorStore from "@/lib/models/query-pinecone"
 import PineconeRetriever from "@/lib/models/query-pinecone-2v"
 
@@ -88,15 +87,6 @@ export async function POST(request: Request) {
         cleanedMessages[cleanedMessages.length - 2].content.length <
           llmConfig.pinecone.messageLength.max
       ) {
-        if (!(await isEnglish(latestUserMessage))) {
-          latestUserMessage = await translateToEnglish(
-            latestUserMessage,
-            openRouterUrl,
-            openRouterHeaders,
-            llmConfig.models.translation
-          )
-        }
-
         const standaloneQuestion = await generateStandaloneQuestion(
           messages,
           latestUserMessage,

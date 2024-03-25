@@ -30,13 +30,11 @@ export default function AboutUsPage() {
               When you ask a question, it&apos;s sent to our server. We verify
               user authenticity and manage your question quota based on whether
               you&apos;re a free or pro user. We then search our hacking
-              database for information that closely matches your question. For
-              questions that are not in English, we translate them to obtain
-              relevant information from our hacking database. If we find a
-              strong match, we integrate it into the AI&apos;s response process.
-              We then securely send your question to OpenRouter for processing
-              without sending any personal information. Responses vary depending
-              on the module:
+              database for information that closely matches your question. If we
+              find a strong match, we integrate it into the AI&apos;s response
+              process. We then securely send your question to OpenRouter for
+              processing without sending any personal information. Responses
+              vary depending on the module:
             </p>
             <ul className="ml-8 list-disc space-y-2">
               <li>

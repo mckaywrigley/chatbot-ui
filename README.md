@@ -4,7 +4,7 @@ HackerGPT is your indispensable digital companion in the world of hacking. Craft
 
 ## How does HackerGPT work?
 
-When you submit a question, it is transmitted to our server. We first check the authenticity of the user and determine their question quota based on whether they are a free or pro user. Next, we search our database for information that closely matches the inquiry. For questions that are not in English, we translate them to obtain relevant information from our database. If we find a strong match, we integrate it into the AI's response process. We then securely send your question to OpenRouter for processing without sending any personal information. Responses vary depending on the module: Responses vary depending on the module:
+When you submit a question, it is transmitted to our server. We first check the authenticity of the user and determine their question quota based on whether they are a free or pro user. Next, we search our database for information that closely matches the inquiry. If we find a strong match, we integrate it into the AI's response process. We then securely send your question to OpenRouter for processing without sending any personal information. Responses vary depending on the module: Responses vary depending on the module:
 
 - **HackerGPT**: A Mixtral 8x7B with a semantic search on our hacking data paired with our unique prompt. 
 - **HackerGPT Pro**: A Mistral Large with a semantic search on our hacking data paired with our unique prompt.
