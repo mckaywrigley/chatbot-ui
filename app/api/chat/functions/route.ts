@@ -101,7 +101,8 @@ Next, ask the student if they would like to change anything or if they would ins
         {
           role: "system",
           content: `${copyEditResponse}
-  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. If you update the topic content, tell the student they should start the recall session immediately.`
+  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. 
+  After updating the topic content, tell the student they should start the recall session immediately.`
         },
         ...messages
       ]

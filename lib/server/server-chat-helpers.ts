@@ -210,7 +210,7 @@ export async function updateTopicOnRecall(
   console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
   const chatUpdateStatus = await updateChat(chatId, {
-    test_result,
+    test_result: Math.round(test_result),
     ebisu_model: newModel,
     revise_date,
     recall_analysis,
