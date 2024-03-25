@@ -19,7 +19,7 @@ class PineconeRetriever {
   constructor(
     openAIApiKey: string | undefined,
     config: PineconeQueryConfig,
-    similarityTopK: number = 3
+    similarityTopK: number
   ) {
     if (!openAIApiKey) {
       throw new Error("OpenAI API key is required.")
@@ -68,12 +68,12 @@ class PineconeRetriever {
       }
 
       const data = await response.json()
-      // Filter out matches with scores below 0.52
+      // Filter out matches with scores below 0.55
       const highScoreMatches = data.matches.filter((match: any) => {
-        if (match.score <= 0.52) return false
+        if (match.score <= 0.55) return false
         const nodeContent = JSON.parse(match.metadata._node_content)
         const textContent = nodeContent.text
-        return textContent.length >= 200
+        return textContent.length >= 70 && textContent.length <= 5000
       })
 
       // Remove duplicates based on nodeContent.text

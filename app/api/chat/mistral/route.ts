@@ -40,15 +40,20 @@ export async function POST(request: Request) {
 
     let selectedModel
     let rateLimitCheckResult
+    let similarityTopK
 
     if (chatSettings.model === "mistral-large") {
       selectedModel = "mistralai/mistral-large"
+
+      similarityTopK = 3
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
     } else {
       const model1 = llmConfig.models.hackerGPT_default
       const model2 = llmConfig.models.hackerGPT_enhance
       selectedModel = Math.random() < 0.8 ? model1 : model2
+
+      similarityTopK = 2
 
       rateLimitCheckResult = await checkRatelimitOnApi(
         profile.user_id,
@@ -104,7 +109,7 @@ export async function POST(request: Request) {
         const pineconeRetriever = new PineconeRetriever(
           llmConfig.openai.apiKey,
           llmConfig.pinecone,
-          3
+          similarityTopK
         )
 
         const pineconeResults =
