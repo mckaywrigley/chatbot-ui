@@ -15,7 +15,7 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
   setSearchTerm
 }) => {
   return (
-    <div className="bg-pixelspace-gray-60 flex h-[42px] w-full items-center rounded-md px-2 py-3">
+    <div className="bg-pixelspace-gray-50 flex h-[42px] w-full items-center rounded-md px-2 py-3">
       <div>
         <i
           className="fa-regular fa-magnifying-glass text-pixelspace-gray-20"
@@ -23,8 +23,8 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
         ></i>
       </div>
       <Input
-        placeholder={`Search ${contentType === "chats" ? "threads" : contentType}...`}
-        className="bg-pixelspace-gray-60"
+        placeholder={`Find ${contentType === "chats" ? "threads" : contentType}`}
+        className="bg-pixelspace-gray-50 text-pixelspace-gray-20 text-sm font-normal"
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />

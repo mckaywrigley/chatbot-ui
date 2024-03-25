@@ -56,7 +56,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
+          className="text-pixelspace-gray-20 flex items-center text-sm font-normal"
         >
           <FontAwesomeIcon icon={faPencil} className="mr-2" />
           <span>Rename</span>
