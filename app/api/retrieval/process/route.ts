@@ -6,12 +6,15 @@ import {
   processPdf,
   processTxt
 } from "@/lib/retrieval/processing"
+import { QdrantClient } from "@qdrant/js-client-rest"
+
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
+import { v4 as uuidv4 } from "uuid"
 
 export async function POST(req: Request) {
   try {
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
-
+    const qclient = new QdrantClient({ url: "http://10.34.224.59:6333" })
     const profile = await getServerProfile()
 
     const formData = await req.formData()
@@ -107,7 +110,7 @@ export async function POST(req: Request) {
       })
     }
 
-    if (embeddingsProvider === "openai") {
+    if (embeddingsProvider === "openaiHHAHAHHAHA") {
       const response = await openai.embeddings.create({
         model: "text-embedding-3-small",
         input: chunks.map(chunk => chunk.content)
@@ -116,7 +119,7 @@ export async function POST(req: Request) {
       embeddings = response.data.map((item: any) => {
         return item.embedding
       })
-    } else if (embeddingsProvider === "local") {
+    } else {
       const embeddingPromises = chunks.map(async chunk => {
         try {
           return await generateLocalEmbedding(chunk.content)
@@ -130,24 +133,32 @@ export async function POST(req: Request) {
       embeddings = await Promise.all(embeddingPromises)
     }
 
+    // console.log(profile.user_id in (await qclient.getCollections()).collections.map(obj => obj.name));
+    if (
+      !(await qclient.getCollections()).collections
+        .map(obj => obj.name)
+        .includes(profile.user_id)
+    ) {
+      await qclient.createCollection(profile.user_id, {
+        vectors: { size: embeddings[0].length, distance: "Dot" }
+      })
+    }
     const file_items = chunks.map((chunk, index) => ({
-      file_id,
-      user_id: profile.user_id,
-      content: chunk.content,
-      tokens: chunk.tokens,
-      openai_embedding:
-        embeddingsProvider === "openai"
-          ? ((embeddings[index] || null) as any)
-          : null,
-      local_embedding:
-        embeddingsProvider === "local"
-          ? ((embeddings[index] || null) as any)
-          : null
+      id: uuidv4(),
+      vector: embeddings[index],
+      payload: {
+        file_id: file_id,
+        tokens: chunk.tokens,
+        content: chunk.content
+      }
     }))
+    await qclient.upsert(profile.user_id, { wait: true, points: file_items })
+    // await supabaseAdmin.from("file_items").upsert(file_items)
 
-    await supabaseAdmin.from("file_items").upsert(file_items)
-
-    const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
+    const totalTokens = file_items.reduce(
+      (acc, item) => acc + item.payload.tokens,
+      0
+    )
 
     await supabaseAdmin
       .from("files")

@@ -3,6 +3,7 @@ import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
+import { QdrantClient } from "@qdrant/js-client-rest"
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
   const uniqueFileIds = [...new Set(fileIds)]
 
   try {
+    const qclient = new QdrantClient({ url: "http://10.34.224.59:6333" })
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -71,24 +73,42 @@ export async function POST(request: Request) {
     } else if (embeddingsProvider === "local") {
       const localEmbedding = await generateLocalEmbedding(userInput)
 
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
+      // const { data: localFileItems, error: localFileItemsError } =
+      //   await supabaseAdmin.rpc("match_file_items_local", {
+      //     query_embedding: localEmbedding as any,
+      //     match_count: sourceCount,
+      //     file_ids: uniqueFileIds
+      //   })
+
+      // if (localFileItemsError) {
+      //   throw localFileItemsError
+      // }
+      const searchResult = []
+      for (const file_id of uniqueFileIds) {
+        const result = await qclient.search(profile.user_id, {
+          vector: localEmbedding,
+          filter: {
+            must: [{ key: "file_id", match: { value: file_id } }]
+          },
+          with_payload: true
         })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
+        for (const tmpDct of result) {
+          searchResult.push({
+            id: tmpDct.id,
+            file_id: tmpDct?.payload?.file_id,
+            content: tmpDct?.payload?.content,
+            tokens: tmpDct?.payload?.tokens,
+            similarity: tmpDct.score
+          })
+        }
       }
-
-      chunks = localFileItems
+      chunks = searchResult
     }
 
     const mostSimilarChunks = chunks?.sort(
       (a, b) => b.similarity - a.similarity
     )
-
+    console.log(mostSimilarChunks)
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })
