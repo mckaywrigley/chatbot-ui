@@ -1,6 +1,6 @@
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
-import { IconInfoCircle, IconMessagePlus } from "@tabler/icons-react"
+
 import { FC, useContext } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
 
@@ -50,24 +50,19 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
             }
             trigger={
               <div className="mt-1">
-                <IconInfoCircle
-                  className="cursor-default hover:opacity-50"
-                  size={24}
-                />
+                <i className="fa-regular fa-circle-info text-pixelspace-gray-3"></i>
               </div>
             }
           />
+
+          <div className="bg-pixelspace-gray-60 h-5 w-[1px]"></div>
 
           <WithTooltip
             delayDuration={200}
             display={<div>Start a new chat</div>}
             trigger={
-              <div className="mt-1">
-                <IconMessagePlus
-                  className="cursor-pointer hover:opacity-50"
-                  size={24}
-                  onClick={handleNewChat}
-                />
+              <div className="mt-1" role="button" onClick={handleNewChat}>
+                <i className="fa-kit fa-thread-plus-simple text-pixelspace-gray-3"></i>
               </div>
             }
           />
