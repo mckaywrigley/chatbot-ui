@@ -441,11 +441,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         />
         <div className="cursor-pointer hover:opacity-50">
           {isGenerating ? (
-            <IconPlayerStopFilled
-              className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+            <button
+              className="bg-pixelspace-pink size-8 rounded-full"
               onClick={handleStopMessage}
-              size={30}
-            />
+            >
+              <FontAwesomeIcon icon={faSquare} />
+            </button>
           ) : (
             <button
               className="bg-pixelspace-pink size-8 rounded-full"

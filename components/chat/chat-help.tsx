@@ -27,7 +27,9 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <IconQuestionMark className="bg-primary text-secondary size-[24px] cursor-pointer rounded-full p-0.5 opacity-60 hover:opacity-50 lg:size-[30px] lg:p-1" />
+        <div className="bg-pixelspace-gray-90 border-pixelspace-gray-40 flex size-6 items-center justify-center rounded-full border">
+          <i className="fa-regular fa-question text-pixelspace-gray-3"></i>
+        </div>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
