@@ -29,7 +29,7 @@ const callLLM = async (
 Only ask one question at a time.
 First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
 Given this source information, copy edit the content. In addition outline the key facts in a list.
-Next, ask the student if they would like to change anything. Wait for a response.`
+Next, ask the student if they would like to change anything or if they would instead like to save the topic.`
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
 
   switch (studyState) {
@@ -101,7 +101,7 @@ Next, ask the student if they would like to change anything. Wait for a response
         {
           role: "system",
           content: `${copyEditResponse}
-  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. If you update the topic content, ask if the student wants to start the recall session immediately.`
+  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. If you update the topic content, tell the student they should start the recall session immediately.`
         },
         ...messages
       ]
@@ -199,26 +199,13 @@ Next, ask the student if they would like to change anything. Wait for a response
       console.log("analysis:", analysis)
       const { score, forgotten_facts } = JSON.parse(analysis)
 
-      serverResult = await functionCalledByLLM(
-        "updateRecallAnalysis",
-        {
-          recall_analysis: JSON.stringify(forgotten_facts)
-        },
-        chatId
-      )
-      if (serverResult.success === false) {
-        throw new Error("Server error")
-      }
-
-      // WORK OUT IF PERFECT SCORE
-      // ROUTE TO HINTING OR SCORE UPDATED
-
       const perfectRecall = score >= 95 // LLM model is not perfect, so we need to set a threshold
 
       serverResult = await functionCalledByLLM(
-        "updateTopicQuizResult",
+        "updateTopicOnRecall",
         {
-          test_result: perfectRecall ? 100 : score
+          test_result: perfectRecall ? 100 : score,
+          recall_analysis: JSON.stringify(forgotten_facts)
         },
         chatId
       )

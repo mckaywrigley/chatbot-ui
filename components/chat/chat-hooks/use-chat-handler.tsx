@@ -227,24 +227,24 @@ export const useChatHandler = () => {
           setChatFiles
         )
       } else {
-        const updatedChat = await updateChat(currentChat.id, {
-          updated_at: new Date().toISOString()
-        })
+        const updatedChat = await getChatById(currentChat.id)
 
-        setChats(prevChats => {
-          const updatedChats = prevChats.map(prevChat =>
-            prevChat.id === updatedChat.id ? updatedChat : prevChat
-          )
+        if (updatedChat) {
+          setChats(prevChats => {
+            const updatedChats = prevChats.map(prevChat =>
+              prevChat.id === updatedChat.id ? updatedChat : prevChat
+            )
 
-          return updatedChats
-        })
+            return updatedChats
+          })
+        }
       }
 
       await handleCreateMessages(
         chatMessages,
         currentChat,
         profile!,
-        { id: "llama2-uncensored:latest" },
+        { modelId: "llama2-uncensored:latest" },
         messageContent,
         generatedText,
         newMessageImages,
@@ -260,6 +260,7 @@ export const useChatHandler = () => {
       setFirstTokenReceived(false)
       setUserInput("")
     } catch (error) {
+      console.log({ error })
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput(startingInput)

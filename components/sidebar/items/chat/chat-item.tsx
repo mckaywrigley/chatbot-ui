@@ -49,7 +49,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     >
       <DynamicPieChart
         value={(chat as ExtendedChat).predictedRecall * 100}
-        scale={0.6}
+        scale={0.7}
       />
 
       <div className="ml-3 flex-1 truncate text-sm font-semibold">

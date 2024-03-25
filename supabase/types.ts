@@ -351,6 +351,7 @@ export interface Database {
           name: string
           prompt: string
           recall_analysis: Json | null
+          recall_date: string | null
           revise_date: string | null
           sharing: string
           temperature: number
@@ -374,6 +375,7 @@ export interface Database {
           name: string
           prompt: string
           recall_analysis?: Json | null
+          recall_date?: string | null
           revise_date?: string | null
           sharing?: string
           temperature: number
@@ -397,6 +399,7 @@ export interface Database {
           name?: string
           prompt?: string
           recall_analysis?: Json | null
+          recall_date?: string | null
           revise_date?: string | null
           sharing?: string
           temperature?: number

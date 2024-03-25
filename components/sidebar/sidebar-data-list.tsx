@@ -61,7 +61,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const divRef = useRef<HTMLDivElement>(null)
 
   const [isOverflowing, setIsOverflowing] = useState(false)
-  const [isDragOver, setIsDragOver] = useState(false)
 
   const currentTime = new Date()
 
@@ -212,37 +211,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     )
   }
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, id: string) => {
-    e.dataTransfer.setData("text/plain", id)
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-
-    const target = e.target as Element
-
-    if (!target.closest("#folder")) {
-      const itemId = e.dataTransfer.getData("text/plain")
-      updateFolder(itemId, null)
-    }
-
-    setIsDragOver(false)
-  }
-
   useEffect(() => {
     if (divRef.current) {
       setIsOverflowing(
@@ -254,13 +222,17 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
   const dataWithPredictedRecall = dataWithoutFolders.map(item => {
-    const updated_at = (item.updated_at || item.created_at) as string
-    const chatEbisuModel = "ebisu_model" in item ? item.ebisu_model : [4, 4, 24]
-    const [arg1, arg2, arg3] = chatEbisuModel || [24, 4, 4] // Add null check and default value
-    const model = ebisu.defaultModel(arg3, arg1, arg2)
-    const elapsed =
-      (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
-    const predictedRecall = ebisu.predictRecall(model, elapsed, true)
+    const last_recall_at = (item.recall_date || "") as string
+    let predictedRecall = -1
+    if (last_recall_at.length > 0) {
+      const chatEbisuModel =
+        "ebisu_model" in item ? item.ebisu_model : [4, 4, 24]
+      const [arg1, arg2, arg3] = chatEbisuModel || [24, 4, 4] // Add null check and default value
+      const model = ebisu.defaultModel(arg3, arg1, arg2)
+      const elapsed =
+        (Date.now() - new Date(last_recall_at).getTime()) / 1000 / 60 / 60
+      predictedRecall = ebisu.predictRecall(model, elapsed, true)
+    }
     return {
       ...item,
       predictedRecall
@@ -269,11 +241,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   return (
     <>
-      <div
-        ref={divRef}
-        className="mt-2 flex flex-col overflow-auto"
-        onDrop={handleDrop}
-      >
+      <div ref={divRef} className="mt-2 flex flex-col overflow-auto">
         {data.length === 0 && (
           <div className="flex grow flex-col items-center justify-center">
             <div className=" text-centertext-muted-foreground p-8 text-lg italic">
@@ -298,11 +266,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 {dataWithFolders
                   .filter(item => item.folder_id === folder.id)
                   .map(item => (
-                    <div
-                      key={item.id}
-                      draggable
-                      onDragStart={e => handleDragStart(e, item.id)}
-                    >
+                    <div key={item.id}>
                       {getDataListComponent(contentType, item)}
                     </div>
                   ))}
@@ -341,22 +305,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                           {dateCategory}
                         </div>
 
-                        <div
-                          className={cn(
-                            "flex grow flex-col",
-                            isDragOver && "bg-accent"
-                          )}
-                          onDrop={handleDrop}
-                          onDragEnter={handleDragEnter}
-                          onDragLeave={handleDragLeave}
-                          onDragOver={handleDragOver}
-                        >
+                        <div className={cn("flex grow flex-col")}>
                           {sortedData.map((item: any) => (
-                            <div
-                              key={item.id}
-                              draggable
-                              onDragStart={e => handleDragStart(e, item.id)}
-                            >
+                            <div key={item.id}>
                               {getDataListComponent(contentType, item)}
                             </div>
                           ))}
@@ -367,20 +318,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 })}
               </>
             ) : (
-              <div
-                className={cn("flex grow flex-col", isDragOver && "bg-accent")}
-                onDrop={handleDrop}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-              >
+              <div className={cn("flex grow flex-col")}>
                 {dataWithoutFolders.map(item => {
                   return (
-                    <div
-                      key={item.id}
-                      draggable
-                      onDragStart={e => handleDragStart(e, item.id)}
-                    >
+                    <div key={item.id}>
                       {getDataListComponent(contentType, item)}
                     </div>
                   )
@@ -391,13 +332,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         )}
       </div>
 
-      <div
-        className={cn("flex grow", isDragOver && "bg-accent")}
-        onDrop={handleDrop}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-      />
+      <div className={cn("flex grow")} />
     </>
   )
 }
