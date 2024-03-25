@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
-    const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
+    //const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 
     let chunks: FileItemChunk[] = []
 
-    switch (fileExtension) {
+    switch (fileMetadata.type) {
       case "csv":
         chunks = await processCSV(blob)
         break
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       case "md":
         chunks = await processMarkdown(blob)
         break
-      case "pdf":
+      case "application/pdf":
         chunks = await processPdf(blob)
         break
       case "txt":
@@ -160,6 +160,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    let errorString = JSON.stringify(error)
+    if (errorString === "{}") {
+      errorString = error
+    }
+    console.log(errorMessage + " - " + errorString)
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

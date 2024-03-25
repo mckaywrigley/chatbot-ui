@@ -30,6 +30,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    console.log(errorMessage + " - " + JSON.stringify(error))
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })
