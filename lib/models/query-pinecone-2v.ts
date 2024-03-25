@@ -106,7 +106,7 @@ class PineconeRetriever {
         })
         .join("")
 
-      return formattedResults
+      return formattedResults.length > 0 ? formattedResults : "None"
     } catch (error) {
       console.error(`Error querying Pinecone: ${error}`)
       return "Error retrieving data"

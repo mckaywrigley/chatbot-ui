@@ -376,8 +376,8 @@ export const useChatHandler = () => {
         finishReasonFromResponse = finishReason
       }
 
-      console.log("generatedText", generatedText)
-      console.log("finishReasonFromResponse", finishReasonFromResponse)
+      // console.log("generatedText", generatedText)
+      // console.log("finishReasonFromResponse", finishReasonFromResponse)
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
