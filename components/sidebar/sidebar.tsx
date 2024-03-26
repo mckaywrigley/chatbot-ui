@@ -50,7 +50,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     )
   }
   return (
-    <div className="flex size-full flex-col border-r-2 pb-5">
+    <div className="flex size-full flex-col border-r-2 pb-3">
       <div
         className="flex-1 flex-col overflow-y-auto"
         style={{
