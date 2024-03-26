@@ -12,7 +12,8 @@ export async function GET() {
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      organization: profile.openai_organization_id,
+	  ...(process.env.ENDPOINT_OPENAI && { baseURL: process.env.ENDPOINT_OPENAI })
     })
 
     const myAssistants = await openai.beta.assistants.list({
