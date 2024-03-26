@@ -224,7 +224,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       >
         <div className="grow overflow-auto">
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold">
+            <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
               Create{" "}
               {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
             </SheetTitle>
@@ -237,13 +237,20 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
           <div className="flex grow justify-end space-x-2">
             <Button
               disabled={creating}
-              variant="outline"
+              size="prompt"
+              variant="cancelPrompt"
               onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
 
-            <Button disabled={creating} ref={buttonRef} onClick={handleCreate}>
+            <Button
+              size="prompt"
+              variant="savePrompt"
+              disabled={creating}
+              ref={buttonRef}
+              onClick={handleCreate}
+            >
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>

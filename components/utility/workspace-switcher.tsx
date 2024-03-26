@@ -110,8 +110,8 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className="border-input hover:bg-pixelspace-gray-50 bg-pixelspace-gray-50
-        text-pixelspace-gray-20 flex h-[42px] w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1 text-sm font-normal"
+        className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 text-pixelspace-gray-20
+        flex h-[42px] w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1 text-sm font-normal`}
       >
         <div className="flex items-center truncate ">
           {selectedWorkspace && (

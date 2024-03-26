@@ -11,7 +11,7 @@ interface SidebarItemProps {
   item: DataItemType
   isTyping: boolean
   contentType: ContentType
-  icon: React.ReactNode
+
   updateState: any
   renderInputs: (renderState: any) => JSX.Element
 }
@@ -21,7 +21,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   contentType,
   updateState,
   renderInputs,
-  icon,
+
   isTyping
 }) => {
   const { selectedWorkspace, setChats, setSelectedAssistant } =
@@ -94,16 +94,20 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-accent flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
+          "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3 focus:outline-none "
         )}
         tabIndex={0}
         onKeyDown={handleKeyDown}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {icon}
-
-        <div className="ml-3 flex-1 truncate text-sm font-semibold">
+        {contentType === "prompts" ? (
+          <i
+            style={{ fontSize: 12 }}
+            className={`fa-solid fa-sparkle ${isHovering ? "text-pixelspace-pink" : "text-pixelspace-gray-40"}`}
+          ></i>
+        ) : null}
+        <div className="text-pixelspace-gray-20 ml-2 flex-1  truncate text-sm font-normal">
           {item.name}
         </div>
 

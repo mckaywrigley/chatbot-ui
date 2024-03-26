@@ -205,7 +205,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
                 <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
                 New{" "}
                 {contentType === "chats"
-                  ? "threads"
+                  ? "thread"
                   : contentType.charAt(0) +
                     contentType.slice(1, contentType.length - 1)}
               </div>

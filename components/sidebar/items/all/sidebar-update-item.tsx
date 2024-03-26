@@ -640,7 +640,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       >
         <div className="grow overflow-auto">
           <SheetHeader>
-            <SheetTitle className="text-2xl font-bold">
+            <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
               Edit {contentType.slice(0, -1)}
             </SheetTitle>
           </SheetHeader>
@@ -664,12 +664,21 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         <SheetFooter className="mt-2 flex justify-between">
           <SidebarDeleteItem item={item} contentType={contentType} />
 
-          <div className="flex grow justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <div className="flex grow justify-end space-x-3">
+            <Button
+              size="prompt"
+              variant="cancelPrompt"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
 
-            <Button ref={buttonRef} onClick={handleUpdate}>
+            <Button
+              size="prompt"
+              variant="savePrompt"
+              ref={buttonRef}
+              onClick={handleUpdate}
+            >
               Save
             </Button>
           </div>

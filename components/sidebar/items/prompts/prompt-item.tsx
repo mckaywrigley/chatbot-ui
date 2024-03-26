@@ -6,6 +6,8 @@ import { Tables } from "@/supabase/types"
 import { IconPencil } from "@tabler/icons-react"
 import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPen } from "@fortawesome/pro-regular-svg-icons"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">
@@ -20,15 +22,14 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
       item={prompt}
       isTyping={isTyping}
       contentType="prompts"
-      icon={<IconPencil size={30} />}
       updateState={{ name, content }}
       renderInputs={() => (
         <>
-          <div className="space-y-1">
+          <div className="text-pixelspace-gray-3  space-y-1 text-sm font-normal leading-[25.20px]">
             <Label>Name</Label>
 
             <Input
-              placeholder="Prompt name..."
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={PROMPT_NAME_MAX}
@@ -37,15 +38,16 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          <div className="text-pixelspace-gray-3  space-y-1 text-sm font-normal leading-[25.20px]">
             <Label>Prompt</Label>
 
             <TextareaAutosize
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
               placeholder="Prompt..."
               value={content}
               onValueChange={setContent}
-              minRows={6}
-              maxRows={20}
+              minRows={19}
+              maxRows={30}
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />

@@ -12,9 +12,10 @@ import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { Tables } from "@/supabase/types"
-import { faPencil } from "@fortawesome/free-solid-svg-icons"
+import { faPen } from "@fortawesome/pro-regular-svg-icons"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { IconEdit } from "@tabler/icons-react"
+
 import { FC, useContext, useRef, useState } from "react"
 
 interface UpdateChatProps {
@@ -58,7 +59,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
           type="button"
           className="text-pixelspace-gray-20 flex items-center text-sm font-normal"
         >
-          <FontAwesomeIcon icon={faPencil} className="mr-2" />
+          <FontAwesomeIcon icon={faPen} className="mr-2" />
           <span>Rename</span>
         </button>
       </DialogTrigger>
