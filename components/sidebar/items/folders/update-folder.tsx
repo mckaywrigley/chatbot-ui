@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { ChatbotUIContext } from "@/context/context"
 import { updateFolder } from "@/db/folders"
 import { Tables } from "@/supabase/types"
-import { faPencil } from "@fortawesome/pro-regular-svg-icons"
+import { faPen, faPencil } from "@fortawesome/pro-regular-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconEdit } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
@@ -53,7 +53,7 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
           type="button"
           className="text-pixelspace-gray-20 flex items-center text-sm font-normal"
         >
-          <FontAwesomeIcon icon={faPencil} className="mr-2" />
+          <FontAwesomeIcon icon={faPen} className="mr-2" />
           <span>Rename</span>
         </button>
       </DialogTrigger>

@@ -39,10 +39,11 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
       }
       renderInputs={() => (
         <>
-          <div className="space-y-1">
+          <div className="text-pixelspace-gray-3  space-y-1 text-sm font-normal leading-[25.20px]">
             <Label>Name</Label>
 
             <Input
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               placeholder="Prompt name..."
               value={name}
               onChange={e => setName(e.target.value)}
@@ -52,15 +53,16 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
             />
           </div>
 
-          <div className="space-y-1">
+          <div className="text-pixelspace-gray-3  space-y-1 text-sm font-normal leading-[25.20px]">
             <Label>Prompt</Label>
 
             <TextareaAutosize
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
               placeholder="Prompt content..."
               value={content}
               onValueChange={setContent}
-              minRows={6}
-              maxRows={20}
+              minRows={19}
+              maxRows={30}
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />

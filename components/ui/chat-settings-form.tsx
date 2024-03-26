@@ -51,10 +51,10 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
       </div>
 
       <div className="space-y-1">
-        <Label>Prompt</Label>
+        <Label>Prompt1</Label>
 
         <TextareaAutosize
-          className="bg-background border-input border-2"
+          className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
           placeholder="You are a helpful AI assistant."
           onValueChange={prompt => {
             onChangeChatSettings({ ...chatSettings, prompt })

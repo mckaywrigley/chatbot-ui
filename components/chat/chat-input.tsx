@@ -426,7 +426,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         </>
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(
             `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
           )}

@@ -91,7 +91,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       }}
     >
       <DropdownMenuTrigger
-        className="bg-background w-full justify-start border-2 px-3 py-5"
+        className="bg-pixelspace-gray-70 w-full justify-start border-2 px-3 py-5"
         asChild
         disabled={allModels.length === 0}
       >

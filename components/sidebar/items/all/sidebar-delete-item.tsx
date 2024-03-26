@@ -113,7 +113,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   return (
     <Dialog open={showDialog} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
-        <Button className="text-red-500" variant="ghost">
+        <Button className="text-pixelspace-gray-3 bg-pixelspace-gray-90 hover:bg-pixelspace-gray-80 h-11">
           Delete
         </Button>
       </DialogTrigger>
