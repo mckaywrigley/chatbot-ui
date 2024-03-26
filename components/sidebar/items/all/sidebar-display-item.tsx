@@ -4,16 +4,16 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType } from "@/types"
 import { useRouter } from "next/navigation"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, ReactNode, useContext, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
 
 interface SidebarItemProps {
   item: DataItemType
   isTyping: boolean
   contentType: ContentType
-
   updateState: any
   renderInputs: (renderState: any) => JSX.Element
+  icon?: ReactNode
 }
 
 export const SidebarItem: FC<SidebarItemProps> = ({
