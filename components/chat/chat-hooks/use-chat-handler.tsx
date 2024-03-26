@@ -190,15 +190,20 @@ export const useChatHandler = () => {
         })
       })
 
-      const newStudyState = response.headers.get("NEW-STUDY-STATE")
+      const newStudyState = response.headers.get(
+        "NEW-STUDY-STATE"
+      ) as StudyState
       if (newStudyState) {
-        setChatStudyState(newStudyState as StudyState)
+        setChatStudyState(newStudyState)
         if (newStudyState === "topic_updated") {
           const newTopicContent = await getChatById(currentChat!.id)
           const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
+          console.log({ topicDescription })
           setTopicDescription(topicDescription)
           // remove files from chat
           setChatFiles([])
+          setNewMessageFiles([])
+          setShowFilesDisplay(false)
         }
       }
 

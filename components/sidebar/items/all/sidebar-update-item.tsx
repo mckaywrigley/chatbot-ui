@@ -648,7 +648,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           <div className="mt-4 space-y-3">
             {workspaces.length > 1 && (
               <div className="space-y-1">
-                <Label>Assigned Workspaces</Label>
+                <Label>Assigned MemoryStacks</Label>
 
                 <AssignWorkspaces
                   selectedWorkspaces={selectedWorkspaces}

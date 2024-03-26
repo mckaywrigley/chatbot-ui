@@ -153,7 +153,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       })
     })
 
-    toast.success("Workspace updated!")
+    toast.success("MemoryStack updated!")
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -168,7 +168,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <WithTooltip
-          display={<div>Workspace Settings</div>}
+          display={<div>MemoryStack Settings</div>}
           trigger={
             <IconSettings
               className="ml-3 cursor-pointer pr-[5px] hover:opacity-50"
@@ -187,7 +187,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between">
-              Workspace Settings
+              MemoryStack Settings
               {selectedWorkspace?.is_home && <IconHome />}
             </SheetTitle>
 
@@ -209,7 +209,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
             <TabsContent className="mt-4 space-y-4" value="main">
               <>
                 <div className="space-y-1">
-                  <Label>Workspace Name</Label>
+                  <Label>MemoryStack Name</Label>
 
                   <Input
                     placeholder="Name..."
@@ -229,7 +229,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                 </div> */}
 
                 <div className="space-y-1">
-                  <Label>Workspace Image</Label>
+                  <Label>MemoryStack Image</Label>
 
                   <ImagePicker
                     src={imageLink}
