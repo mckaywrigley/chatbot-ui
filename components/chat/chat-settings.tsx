@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, ModelProvider } from "@/types"
-import { IconAdjustmentsHorizontal } from "@tabler/icons-react"
+
 import { FC, useContext, useEffect, useRef } from "react"
 import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
@@ -69,14 +69,14 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
       <PopoverTrigger>
         <Button
           ref={buttonRef}
-          className="flex items-center space-x-2"
-          variant="ghost"
+          className="flex items-center justify-center space-x-2"
+          variant="pixelspace"
         >
-          <div className="text-lg">
+          <div className="text-pixelspace-gray-20 text-base font-normal leading-7">
             {fullModel?.modelName || chatSettings.model}
           </div>
 
-          <IconAdjustmentsHorizontal size={28} />
+          <i className="fa-regular fa-gear text-pixelspace-gray-20"></i>
         </Button>
       </PopoverTrigger>
 

@@ -230,11 +230,12 @@ export const Message: FC<MessageProps> = ({
                   <WithTooltip
                     display={<div>{MODEL_DATA?.modelName}</div>}
                     trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
+                      <div className="bg-pixelspace-gray-60 flex size-6 items-center justify-center rounded-full">
+                        <i
+                          className="fa-kit fa-pixelspace-icon text-pixelspace-pink"
+                          style={{ fontSize: 14 }}
+                        ></i>
+                      </div>
                     }
                   />
                 )
@@ -247,13 +248,15 @@ export const Message: FC<MessageProps> = ({
                   alt="user image"
                 />
               ) : (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                  size={ICON_SIZE}
-                />
+                <div className="bg-pixelspace-gray-60 flex size-6 items-center justify-center rounded-full">
+                  <i
+                    className="fa-regular fa-face-smile  relative"
+                    style={{ fontSize: 14 }}
+                  ></i>
+                </div>
               )}
 
-              <div className="font-semibold">
+              <div className="text-base font-semibold  leading-7">
                 {message.role === "assistant"
                   ? message.assistant_id
                     ? assistants.find(

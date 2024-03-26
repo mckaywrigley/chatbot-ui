@@ -19,10 +19,13 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+
         savePrompt:
           " bg-pixelspace-gray-3 text-sm font-normal leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
         cancelPrompt:
-          "bg-pixelspace-gray-90 border border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80"
+          "bg-pixelspace-gray-90 border border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
+
+        pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40"
       },
       size: {
         default: "h-10 px-4 py-2",

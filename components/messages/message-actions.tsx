@@ -46,7 +46,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
   }, [showCheckmark])
 
   return (isLast && isGenerating) || isEditing ? null : (
-    <div className="text-muted-foreground flex items-center space-x-2">
+    <div className="text-muted-foreground flex items-center space-x-3">
       {/* {((isAssistant && isHovering) || isLast) && (
         <WithTooltip
           delayDuration={1000}
@@ -86,11 +86,9 @@ export const MessageActions: FC<MessageActionsProps> = ({
             showCheckmark ? (
               <IconCheck size={MESSAGE_ICON_SIZE} />
             ) : (
-              <IconCopy
-                className="cursor-pointer hover:opacity-50"
-                size={MESSAGE_ICON_SIZE}
-                onClick={handleCopy}
-              />
+              <div onClick={handleCopy}>
+                <i className="fa-regular fa-copy text-pixelspace-gray-40"></i>
+              </div>
             )
           }
         />
@@ -102,11 +100,9 @@ export const MessageActions: FC<MessageActionsProps> = ({
           side="bottom"
           display={<div>Regenerate</div>}
           trigger={
-            <IconRepeat
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onRegenerate}
-            />
+            <div onClick={onRegenerate}>
+              <i className="fa-sharp fa-light fa-rotate-right text-pixelspace-gray-40"></i>
+            </div>
           }
         />
       )}
