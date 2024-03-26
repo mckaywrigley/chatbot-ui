@@ -11,6 +11,7 @@ export default function HomePage() {
   return (
     <div className="flex size-full flex-col items-center justify-center">
       <div>
+        {}
         <LearnTimeSVG theme={theme === "dark" ? "dark" : "light"} scale={0.2} />
       </div>
 

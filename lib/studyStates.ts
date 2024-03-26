@@ -8,12 +8,11 @@ export type StudyState =
   | "reviewing"
 
 export interface QuickResponse {
-  quickText: string // The original quick response text
-  responseText: string // The text to be returned in the response
-  newStudyState: StudyState // The new study state to transition to
+  quickText: string
+  responseText: string
+  newStudyState: StudyState
 }
 
-// Enhanced Interface for objects within the studyStates array
 interface StudyStateObject {
   name: StudyState
   quickResponses?: QuickResponse[]
@@ -84,18 +83,14 @@ export const studyStates: StudyStateObject[] = [
 ]
 
 export function getQuickResponses(studyState: StudyState): QuickResponse[] {
-  // Find the studyState object in the studyStates array
   const stateObject = studyStates.find(state => state.name === studyState)
 
-  // If the stateObject exists and has quickResponses, return them; otherwise, return an empty array
   return stateObject?.quickResponses ?? []
 }
 
-// function that returns quickResponse based on userText
 export function getQuickResponseByUserText(
   userText: string
 ): QuickResponse | undefined {
-  // Iterate over all study states and their quick responses to find a match
   for (const state of studyStates) {
     const quickResponse = state.quickResponses?.find(
       qr => qr.quickText === userText

@@ -170,9 +170,10 @@ const updateChat = async (chatId: string, chat: TablesUpdate<"chats">) => {
   return { success: true }
 }
 
-export async function updateTopicQuizResult(
+export async function updateTopicOnRecall(
   chatId: string,
-  test_result: number
+  test_result: number,
+  recall_analysis: string
 ) {
   const chat = await getChatById(chatId)
 
@@ -209,9 +210,11 @@ export async function updateTopicQuizResult(
   console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
   const chatUpdateStatus = await updateChat(chatId, {
-    test_result,
+    test_result: Math.round(test_result),
     ebisu_model: newModel,
-    revise_date
+    revise_date,
+    recall_analysis,
+    recall_date: new Date().toISOString()
   })
   if (chatUpdateStatus.success === false) {
     return chatUpdateStatus
@@ -243,10 +246,9 @@ export async function updateReviseDate(chatId: string, hours_time: number) {
 
 // Function-specific argument types
 interface FunctionArguments {
-  updateTopicQuizResult: { test_result: number }
+  updateTopicOnRecall: { test_result: number; recall_analysis: string }
   updateTopicContent: { content: string }
   scheduleTestSession: { hours_time: number }
-  updateRecallAnalysis: { recall_analysis: string }
 }
 
 // Helper type for extracting the specific argument type
@@ -260,10 +262,14 @@ export async function functionCalledByLLM<F extends keyof FunctionArguments>(
   let tempData = {}
 
   switch (functionName) {
-    case "updateTopicQuizResult":
+    case "updateTopicOnRecall":
       // Explicitly assert the type of bodyContent for this case
-      const quizResultArgs = bodyContent as FunctionArg<"updateTopicQuizResult">
-      tempData = await updateTopicQuizResult(chatId, quizResultArgs.test_result)
+      const quizResultArgs = bodyContent as FunctionArg<"updateTopicOnRecall">
+      tempData = await updateTopicOnRecall(
+        chatId,
+        quizResultArgs.test_result,
+        quizResultArgs.recall_analysis
+      )
       break
     case "updateTopicContent":
       // Assert the type for this case
@@ -275,10 +281,10 @@ export async function functionCalledByLLM<F extends keyof FunctionArguments>(
       const sessionArgs = bodyContent as FunctionArg<"scheduleTestSession">
       tempData = await updateReviseDate(chatId, sessionArgs.hours_time)
       break
-    case "updateRecallAnalysis":
-      const recallArgs = bodyContent as FunctionArg<"updateRecallAnalysis">
-      tempData = await updateChat(chatId, recallArgs)
-      break
+    // case "updateRecallAnalysis":
+    //   const recallArgs = bodyContent as FunctionArg<"updateRecallAnalysis">
+    //   tempData = await updateChat(chatId, recallArgs)
+    //   break
     default:
       console.error(`Function ${functionName} is not supported.`)
       return { success: false }

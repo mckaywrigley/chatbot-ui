@@ -25,15 +25,16 @@ const callLLM = async (
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
   let defaultModel = "mistral-medium-latest"
-  const copyEditResponse = `You are an upbeat, encouraging instructional designer who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. Only ask one question at a time.
-  First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
-  Given this source information, copy edit the content. In addition outline the key facts in a list.
-  Next, ask the student if they would like to change anything. Wait for a response.`
+  const copyEditResponse = `You are an upbeat, encouraging tutor who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. 
+Only ask one question at a time.
+First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
+Given this source information, copy edit the content. In addition outline the key facts in a list.
+Next, ask the student if they would like to change anything or if they would instead like to save the topic.`
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
 
   switch (studyState) {
     case "topic_creation":
-      chatResponse = await mistral.chatStream({
+      chatStreamResponse = await mistral.chatStream({
         model: defaultModel,
         temperature: 0.4,
         messages: [
@@ -45,7 +46,7 @@ const callLLM = async (
         ]
       })
 
-      stream = MistralStream(chatResponse)
+      stream = MistralStream(chatStreamResponse)
       newStudyState = "topic_edit"
       return new StreamingTextResponse(stream, {
         headers: {
@@ -100,7 +101,8 @@ const callLLM = async (
         {
           role: "system",
           content: `${copyEditResponse}
-  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description.`
+  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. 
+  After updating the topic content, tell the student they should start the recall session immediately.`
         },
         ...messages
       ]
@@ -198,26 +200,13 @@ const callLLM = async (
       console.log("analysis:", analysis)
       const { score, forgotten_facts } = JSON.parse(analysis)
 
-      serverResult = await functionCalledByLLM(
-        "updateRecallAnalysis",
-        {
-          recall_analysis: JSON.stringify(forgotten_facts)
-        },
-        chatId
-      )
-      if (serverResult.success === false) {
-        throw new Error("Server error")
-      }
-
-      // WORK OUT IF PERFECT SCORE
-      // ROUTE TO HINTING OR SCORE UPDATED
-
       const perfectRecall = score >= 95 // LLM model is not perfect, so we need to set a threshold
 
       serverResult = await functionCalledByLLM(
-        "updateTopicQuizResult",
+        "updateTopicOnRecall",
         {
-          test_result: perfectRecall ? 100 : score
+          test_result: perfectRecall ? 100 : score,
+          recall_analysis: JSON.stringify(forgotten_facts)
         },
         chatId
       )

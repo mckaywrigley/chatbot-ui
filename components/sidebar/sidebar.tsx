@@ -3,10 +3,11 @@ import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
-import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
 import { WorkspaceSettings } from "../workspace/workspace-settings"
 import { SidebarContent } from "./sidebar-content"
+import { WithTooltip } from "../ui/with-tooltip"
+import { ProfileSettings } from "../utility/profile-settings"
 
 interface SidebarProps {
   contentType: ContentType
@@ -48,64 +49,77 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       <SidebarContent contentType={contentType} data={data} folders={folders} />
     )
   }
-
   return (
-    <TabsContent
-      className="m-0 w-full space-y-2"
-      style={{
-        // Sidebar - SidebarSwitcher
-        minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-      }}
-      value={contentType}
-    >
-      <div className="flex h-full flex-col p-3">
-        <div className="flex items-center border-b-2 pb-2">
-          <WorkspaceSwitcher />
+    <div className="flex size-full flex-col border-r-2 pb-3">
+      <div
+        className="flex-1 flex-col overflow-y-auto"
+        style={{
+          // Sidebar - SidebarSwitcher
+          minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px",
+          maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px",
+          width: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px"
+        }}
+      >
+        <div className="flex h-full flex-col p-3">
+          <div className="flex items-center border-b-2 pb-2">
+            <WorkspaceSwitcher />
 
-          <WorkspaceSettings />
+            <WorkspaceSettings />
+          </div>
+
+          {(() => {
+            switch (contentType) {
+              case "chats":
+                return renderSidebarContent("chats", chats, chatFolders)
+
+              case "presets":
+                return renderSidebarContent("presets", presets, presetFolders)
+
+              case "prompts":
+                return renderSidebarContent("prompts", prompts, promptFolders)
+
+              case "files":
+                return renderSidebarContent("files", files, filesFolders)
+
+              case "collections":
+                return renderSidebarContent(
+                  "collections",
+                  collections,
+                  collectionFolders
+                )
+
+              case "assistants":
+                return renderSidebarContent(
+                  "assistants",
+                  assistants,
+                  assistantFolders
+                )
+
+              case "tools":
+                return renderSidebarContent("tools", tools, toolFolders)
+
+              case "models":
+                return renderSidebarContent("models", models, modelFolders)
+
+              default:
+                return null
+            }
+          })()}
         </div>
-
-        {(() => {
-          switch (contentType) {
-            case "chats":
-              return renderSidebarContent("chats", chats, chatFolders)
-
-            case "presets":
-              return renderSidebarContent("presets", presets, presetFolders)
-
-            case "prompts":
-              return renderSidebarContent("prompts", prompts, promptFolders)
-
-            case "files":
-              return renderSidebarContent("files", files, filesFolders)
-
-            case "collections":
-              return renderSidebarContent(
-                "collections",
-                collections,
-                collectionFolders
-              )
-
-            case "assistants":
-              return renderSidebarContent(
-                "assistants",
-                assistants,
-                assistantFolders
-              )
-
-            case "tools":
-              return renderSidebarContent("tools", tools, toolFolders)
-
-            case "models":
-              return renderSidebarContent("models", models, modelFolders)
-
-            default:
-              return null
-          }
-        })()}
       </div>
-    </TabsContent>
+
+      <div className="flex flex-col px-3  empty:hidden">
+        {/* TODO */}
+        {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
+
+        {/* TODO */}
+        {/* <Alerts /> */}
+
+        <WithTooltip
+          display={<div>Profile Settings</div>}
+          trigger={<ProfileSettings />}
+        />
+      </div>
+    </div>
   )
 }
