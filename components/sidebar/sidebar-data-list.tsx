@@ -222,7 +222,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
   const dataWithPredictedRecall = dataWithoutFolders.map(item => {
-    const last_recall_at = (item.recall_date || "") as string
+    const chatItem = item as Tables<"chats">
+    const last_recall_at = (chatItem.recall_date || "") as string
+
     let predictedRecall = -1
     if (last_recall_at.length > 0) {
       const chatEbisuModel =
