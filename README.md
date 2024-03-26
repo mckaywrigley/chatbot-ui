@@ -283,6 +283,16 @@ Click "Deploy" and wait for your frontend to deploy.
 
 Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
 
+## Platform Tools
+
+We've introduced a new feature that allows every user to access a set of platform tools directly within the application. These tools are designed to enhance your productivity and streamline your workflow. Here's a quick overview of the tools currently available:
+
+* **Web Scraper Tool**:  This tool fetches data from a URL and returns it in markdown format to the LLM. It's perfect for quickly grabbing content from web pages without having to manually copy and paste or write markdown.
+
+For adding or removing platform tools, consult the [platformToolsList.ts](./lib/platformTools/platformToolsList.ts) document.
+
+To introduce a new tool, utilize the `PlatformTool` interface and incorporate it into the aforementioned list. For a practical illustration, examine the [webScraperTool.ts](./lib/platformTools/library/webScraperTool.ts) example.
+
 ## Contributing
 
 We are working on a guide for contributing.

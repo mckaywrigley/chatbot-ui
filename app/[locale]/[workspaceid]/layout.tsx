@@ -19,6 +19,7 @@ import { LLMID } from "@/types"
 import { useParams, useRouter } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
+import { platformToolDefinitions } from "@/lib/platformTools/utils/platformToolsUtils"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -41,6 +42,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPresets,
     setPrompts,
     setTools,
+    setPlatformTools,
     setModels,
     selectedWorkspace,
     setSelectedWorkspace,
@@ -151,6 +153,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
     setTools(toolData.tools)
+    setPlatformTools(platformToolDefinitions())
 
     const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
     setModels(modelData.models)
