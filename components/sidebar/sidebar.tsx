@@ -3,7 +3,6 @@ import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
-import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
 import { WorkspaceSettings } from "../workspace/workspace-settings"
 import { SidebarContent } from "./sidebar-content"
@@ -50,18 +49,16 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       <SidebarContent contentType={contentType} data={data} folders={folders} />
     )
   }
-  //flex h-full w-full flex-col px-3 pb-3.5
   return (
-    <div className="flex flex-col justify-between border-r-2 pb-5">
-      <TabsContent
-        className="m-0 w-full space-y-2"
+    <div className="flex size-full flex-col border-r-2 pb-5">
+      <div
+        className="flex-1 flex-col overflow-y-auto"
         style={{
           // Sidebar - SidebarSwitcher
           minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px",
           maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px",
           width: showSidebar ? `calc(${SIDEBAR_WIDTH}px)` : "0px"
         }}
-        value={contentType}
       >
         <div className="flex h-full flex-col p-3">
           <div className="flex items-center border-b-2 pb-2">
@@ -109,7 +106,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
             }
           })()}
         </div>
-      </TabsContent>
+      </div>
 
       <div className="flex flex-col px-3  empty:hidden">
         {/* TODO */}
