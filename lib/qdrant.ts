@@ -75,4 +75,18 @@ export class qDrant {
     }))
     return ret
   }
+  public async deleteFile(user_id: string, fileId: string) {
+    this.qclient.delete(user_id, {
+      filter: {
+        must: [
+          {
+            key: "file_id",
+            match: {
+              value: fileId
+            }
+          }
+        ]
+      }
+    })
+  }
 }
