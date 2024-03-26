@@ -13,7 +13,7 @@ import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 
-export const SIDEBAR_WIDTH = 350
+export const SIDEBAR_WIDTH = 290
 
 interface DashboardProps {
   children: React.ReactNode
@@ -91,7 +91,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
           >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+            {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
 
             <Sidebar contentType={contentType} showSidebar={showSidebar} />
           </Tabs>
