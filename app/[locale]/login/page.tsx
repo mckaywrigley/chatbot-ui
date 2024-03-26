@@ -9,7 +9,7 @@ import { get } from "@vercel/edge-config"
 import { Metadata } from "next"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { IconBrandGoogle } from "@tabler/icons-react"
+import { IconBrandGoogle, IconAlertCircle } from "@tabler/icons-react"
 
 export const metadata: Metadata = {
   title: "Login"
@@ -220,6 +220,10 @@ export default async function Login({
             placeholder="you@example.com"
             required
           />
+          <div className="text-muted-foreground mb-3 flex items-center text-sm">
+            <IconAlertCircle className="mr-2" size={16} />
+            Temporary or non-TLS emails will not work
+          </div>
 
           <Label className="text-md" htmlFor="password">
             Password
@@ -248,8 +252,8 @@ export default async function Login({
             </p>
           )}
 
-          <div className="text-muted-foreground mt-1 flex justify-center text-sm">
-            By using HackerGPT, you agree to our&nbsp;
+          <div className="text-muted-foreground mt-1 flex flex-col items-center text-sm sm:flex-row">
+            <span>By using HackerGPT, you agree to our&nbsp;</span>
             <a
               href="/terms"
               target="_blank"
@@ -257,7 +261,6 @@ export default async function Login({
             >
               Terms of Use
             </a>
-            .
           </div>
 
           <div className="text-muted-foreground mt-1 flex justify-center text-sm">
