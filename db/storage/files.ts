@@ -9,14 +9,10 @@ export const uploadFile = async (
     file_id: string
   }
 ) => {
-  const SIZE_LIMIT = parseInt(
-    process.env.NEXT_PUBLIC_USER_FILE_SIZE_LIMIT || "10000000"
-  )
+  const SIZE_LIMIT = 10000000 // 10MB
 
   if (file.size > SIZE_LIMIT) {
-    throw new Error(
-      `File must be less than ${Math.floor(SIZE_LIMIT / 1000000)}MB`
-    )
+    throw new Error(`File must be less than ${SIZE_LIMIT / 1000000}MB`)
   }
 
   const filePath = `${payload.user_id}/${Buffer.from(payload.file_id).toString("base64")}`
@@ -28,6 +24,7 @@ export const uploadFile = async (
     })
 
   if (error) {
+    console.error(`Error uploading file with path: ${filePath}`, error)
     throw new Error("Error uploading file")
   }
 
@@ -49,7 +46,6 @@ export const getFileFromStorage = async (filePath: string) => {
     .createSignedUrl(filePath, 60 * 60 * 24) // 24hrs
 
   if (error) {
-    console.error(`Error uploading file with path: ${filePath}`, error)
     throw new Error("Error downloading file")
   }
 
