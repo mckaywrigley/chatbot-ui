@@ -57,7 +57,7 @@ export async function buildFinalMessages(
   ) {
     CHUNK_SIZE = 8192
   } else if (chatSettings.model === "mistral-medium") {
-    CHUNK_SIZE = 4096
+    CHUNK_SIZE = 6096
   }
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS

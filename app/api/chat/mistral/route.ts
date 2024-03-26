@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     } else {
       const model1 = llmConfig.models.hackerGPT_default
       const model2 = llmConfig.models.hackerGPT_enhance
-      selectedModel = Math.random() < 0.7 ? model1 : model2
+      selectedModel = Math.random() < 0.8 ? model1 : model2
 
       similarityTopK = 2
 
