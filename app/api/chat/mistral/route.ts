@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     } else {
       const model1 = llmConfig.models.hackerGPT_default
       const model2 = llmConfig.models.hackerGPT_enhance
-      selectedModel = Math.random() < 0.8 ? model1 : model2
+      selectedModel = Math.random() < 0.7 ? model1 : model2
 
       similarityTopK = 2
 
@@ -95,7 +95,6 @@ export async function POST(request: Request) {
         const standaloneQuestion = await generateStandaloneQuestion(
           messages,
           latestUserMessage,
-          selectedModel,
           openRouterUrl,
           openRouterHeaders
         )
@@ -207,7 +206,6 @@ export async function POST(request: Request) {
 async function generateStandaloneQuestion(
   messages: any[],
   latestUserMessage: any,
-  selectedModel: any,
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any
 ) {
@@ -215,10 +213,7 @@ async function generateStandaloneQuestion(
     return latestUserMessage
   }
 
-  let modelStandaloneQuestion
-
-  modelStandaloneQuestion =
-    Math.random() < 0.8 ? "mistralai/mixtral-8x7b-instruct" : selectedModel
+  const modelStandaloneQuestion = "mistralai/mixtral-8x7b-instruct:nitro"
 
   let chatHistory = messages
     .slice(1)
