@@ -1,4 +1,5 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import { qDrant } from "@/lib/qdrant"
 import {
   processCSV,
   processJSON,
@@ -6,7 +7,6 @@ import {
   processPdf,
   processTxt
 } from "@/lib/retrieval/processing"
-import { QdrantClient } from "@qdrant/js-client-rest"
 
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
@@ -14,7 +14,7 @@ import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
-import { v4 as uuidv4 } from "uuid"
+import { fi } from "date-fns/locale"
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
-    const qclient = new QdrantClient({ url: "http://10.34.224.59:6333" })
+    const qclient = new qDrant()
     const profile = await getServerProfile()
 
     const formData = await req.formData()
@@ -134,26 +134,13 @@ export async function POST(req: Request) {
     }
 
     // console.log(profile.user_id in (await qclient.getCollections()).collections.map(obj => obj.name));
-    if (
-      !(await qclient.getCollections()).collections
-        .map(obj => obj.name)
-        .includes(profile.user_id)
-    ) {
-      await qclient.createCollection(profile.user_id, {
-        vectors: { size: embeddings[0].length, distance: "Dot" }
-      })
-    }
-    const file_items = chunks.map((chunk, index) => ({
-      id: uuidv4(),
-      vector: embeddings[index],
-      payload: {
-        file_id: file_id,
-        tokens: chunk.tokens,
-        content: chunk.content
-      }
-    }))
-    await qclient.upsert(profile.user_id, { wait: true, points: file_items })
-    // await supabaseAdmin.from("file_items").upsert(file_items)
+
+    const file_items = await qclient.addEmbeddings(
+      profile.user_id,
+      embeddings,
+      file_id,
+      chunks
+    )
 
     const totalTokens = file_items.reduce(
       (acc, item) => acc + item.payload.tokens,
