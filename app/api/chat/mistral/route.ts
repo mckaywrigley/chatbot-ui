@@ -120,7 +120,11 @@ export async function POST(request: Request) {
           cleanedMessages[0].content =
             `${llmConfig.systemPrompts.hackerGPT} ` +
             `${llmConfig.systemPrompts.pinecone} ` +
-            `RAG Context:\n${pineconeResults}`
+            `Context for RAG enrichment:\n` +
+            `---------------------\n` +
+            `${pineconeResults}\n` +
+            `---------------------\n` +
+            `DON'T MENTION USING RAG CONTENT OR ANYTHING RELATED TO RAG.`
         }
       }
     }
