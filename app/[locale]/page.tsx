@@ -1,6 +1,7 @@
 "use client"
 
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
+import { LoginBrand } from "@/components/ui/login-brand"
 import { IconArrowRight } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
@@ -9,15 +10,11 @@ export default function HomePage() {
   const { theme } = useTheme()
 
   return (
-    <div className="flex size-full flex-col items-center justify-center">
-      <div>
-        <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
-      </div>
-
-      <div className="mt-2 text-4xl font-bold">Chatbot UI</div>
+    <div className="bg-pixelspace-gray-90 flex size-full flex-col items-center justify-center space-y-[40px]">
+      <LoginBrand />
 
       <Link
-        className="mt-4 flex w-[200px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold"
+        className="text-pixelspace-gray-90 bg-pixelspace-gray-10 mt-4  flex w-[200px] items-center justify-center rounded-sm p-2 font-bold"
         href="/login"
       >
         Start Chatting

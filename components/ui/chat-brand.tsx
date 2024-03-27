@@ -8,7 +8,7 @@ interface BrandProps {
   theme?: "dark" | "light"
 }
 
-export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
+export const ChatBrand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
     <div className="flex cursor-pointer flex-col items-center">
       <div className="relative size-[100px]">
@@ -20,7 +20,6 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
           <div className="bg-pixelspace-pink absolute left-[21.36px] top-[21.36px] size-[18.64px] rounded-full" />
         </div>
       </div>
-      <div className="mt-6 text-4xl font-bold tracking-wide">Pixelspace AI</div>
     </div>
   )
 }
