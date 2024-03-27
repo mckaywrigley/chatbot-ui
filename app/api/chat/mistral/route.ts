@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       model: selectedModel,
       route: "fallback",
       messages: cleanedMessages
-        .filter(msg => msg.role !== "assistant" && msg.content !== "")
+        .filter(msg => !(msg.role === "assistant" && msg.content === ""))
         .map(msg => ({
           role: msg.role,
           content: msg.content
