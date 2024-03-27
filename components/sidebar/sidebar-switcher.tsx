@@ -73,7 +73,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={
             <i
-              className={`fa-regular fa-files ${contentType === "collections" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
+              className={`fa-regular fa-layer-group ${contentType === "collections" ? " text-pixelspace-pink" : "text-pixelspace-gray-3 text-base"}`}
               style={{ width: 16, height: 16 }}
             ></i>
           }

@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation"
 import { FC, ReactNode, useContext, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
 
+import Image from "next/image"
+
 interface SidebarItemProps {
   item: DataItemType
   isTyping: boolean
@@ -24,7 +26,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
 
   isTyping
 }) => {
-  const { selectedWorkspace, setChats, setSelectedAssistant } =
+  const { selectedWorkspace, setChats, setSelectedAssistant, assistantImages } =
     useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -73,15 +75,83 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     }
   }
 
-  // const handleClickAction = async (
-  //   e: React.MouseEvent<SVGSVGElement, MouseEvent>
-  // ) => {
-  //   e.stopPropagation()
+  let iconComponent
 
-  //   const action = actionMap[contentType]
+  const hoverClass = isHovering
+    ? "text-pixelspace-pink"
+    : "text-pixelspace-gray-40"
 
-  //   await action(item as any)
-  // }
+  switch (contentType) {
+    case "prompts":
+      iconComponent = (
+        <i
+          className={`fa-solid fa-sparkle ${hoverClass}`}
+          style={{ fontSize: 12 }}
+        ></i>
+      )
+      break
+
+    case "files":
+      iconComponent = (
+        <i
+          className={`fa-regular fa-file ${hoverClass}`}
+          style={{ fontSize: 12 }}
+        ></i>
+      )
+      break
+    case "collections":
+      iconComponent = (
+        <i
+          className={`fa-regular fa-layer-group ${hoverClass}`}
+          style={{ fontSize: 12 }}
+        ></i>
+      )
+      break
+    case "assistants":
+      const assistant = item as any
+      iconComponent = (assistant.image_path as any) ? (
+        <Image
+          src={
+            assistantImages.find(image => image.path === assistant.image_path)
+              ?.url || ""
+          }
+          alt={item.name}
+          width={32}
+          height={32}
+          className="mt-2 size-5 cursor-pointer rounded-full hover:opacity-50"
+        />
+      ) : (
+        <div className="bg-pixelspace-gray-60 flex size-5 items-center justify-center rounded-full">
+          <i
+            className="fa-regular fa-robot text-pixelspace-gray-20"
+            style={{ fontSize: 11 }}
+          ></i>
+        </div>
+      )
+      console.log("item", item)
+      break
+    case "tools":
+      iconComponent = (
+        <i
+          className={`fa-regular fa-bolt ${hoverClass}`}
+          style={{ fontSize: 12 }}
+        ></i>
+      )
+      break
+    case "models":
+      iconComponent = (
+        <div className="bg-pixelspace-gray-60 flex size-5 items-center justify-center rounded-full">
+          <i
+            className={`fa-regular fa-microchip-ai ${hoverClass}`}
+            style={{ fontSize: 11 }}
+          ></i>
+        </div>
+      )
+      break
+    default:
+      iconComponent = null
+  }
+  // end of switch statement
 
   return (
     <SidebarUpdateItem
@@ -101,30 +171,10 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {contentType === "prompts" ? (
-          <i
-            style={{ fontSize: 12 }}
-            className={`fa-solid fa-sparkle ${isHovering ? "text-pixelspace-pink" : "text-pixelspace-gray-40"}`}
-          ></i>
-        ) : null}
+        {iconComponent}
         <div className="text-pixelspace-gray-20 ml-2 flex-1  truncate text-sm font-normal">
           {item.name}
         </div>
-
-        {/* TODO */}
-        {/* {isHovering && (
-          <WithTooltip
-            delayDuration={1000}
-            display={<div>Start chat with {contentType.slice(0, -1)}</div>}
-            trigger={
-              <IconSquarePlus
-                className="cursor-pointer hover:text-blue-500"
-                size={20}
-                onClick={handleClickAction}
-              />
-            }
-          />
-        )} */}
       </div>
     </SidebarUpdateItem>
   )
