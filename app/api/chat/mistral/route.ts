@@ -134,10 +134,12 @@ export async function POST(request: Request) {
     const requestBody = {
       model: selectedModel,
       route: "fallback",
-      messages: cleanedMessages.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      })),
+      messages: cleanedMessages
+        .filter(msg => msg.role !== "assistant" && msg.content !== "")
+        .map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })),
       temperature: modelTemperature,
       max_tokens: 1024,
       stream: true
