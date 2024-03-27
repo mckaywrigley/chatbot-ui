@@ -161,6 +161,16 @@ export const Import: FC<ImportProps> = ({}) => {
       const { contentType, ...itemWithoutContentType } = item
       itemWithoutContentType.user_id = profile.user_id
       itemWithoutContentType.workspace_id = selectedWorkspace.id
+      itemWithoutContentType.context_length = 4096
+      itemWithoutContentType.created_at = new Date().toISOString()
+      itemWithoutContentType.embeddings_provider = "openai"
+      itemWithoutContentType.include_profile_context = true
+      itemWithoutContentType.model = "gpt-3.5-turbo"
+      itemWithoutContentType.prompt = ""
+      itemWithoutContentType.sharing = "private"
+      itemWithoutContentType.temperature = 0.5
+      itemWithoutContentType.include_workspace_instructions = true
+
       saveData[contentType].push(itemWithoutContentType)
     })
 
@@ -244,9 +254,7 @@ export const Import: FC<ImportProps> = ({}) => {
                     </Button>
 
                     <div className="flex items-center space-x-2 truncate">
-                      <Badge>
-                        {item.contentType.slice(0, -1).toUpperCase()}
-                      </Badge>
+                      <Badge>Topic</Badge>
 
                       <div className="truncate">{item.name}</div>
                     </div>

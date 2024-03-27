@@ -203,7 +203,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
           }
         />
 
-        <Label>Chats Include Workspace Instructions</Label>
+        <Label>Chats Include MemoryStack Instructions</Label>
 
         {showTooltip && (
           <WithTooltip

@@ -29,62 +29,12 @@ export default function ChatPage() {
       {chatMessages.length === 0 ? (
         <div className="relative flex h-full flex-col items-center justify-center">
           <div className="top-50% left-50% -translate-x-50% -translate-y-50% absolute mb-20">
-            <div className="bg-grey relative px-6 pb-8 pt-10 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
-              <div className="mx-auto max-w-md">
-                <Brand theme={theme === "dark" ? "dark" : "light"} />
-                <div className="divide-y divide-gray-300/50">
-                  <div className="space-y-6 py-8 text-base leading-7 text-gray-600">
-                    <p>Create a new topic to get started:</p>
-                    <ul className="space-y-4">
-                      <li className="flex items-center">
-                        <svg
-                          className="size-6 flex-none fill-sky-100 stroke-sky-500 stroke-2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="11" />
-                          <path
-                            d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9"
-                            fill="none"
-                          />
-                        </svg>
-                        <p className="ml-4">Type the name of new topic.</p>
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="size-6 flex-none fill-sky-100 stroke-sky-500 stroke-2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="11" />
-                          <path
-                            d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9"
-                            fill="none"
-                          />
-                        </svg>
-                        <p className="ml-4">
-                          Upload ⊕ or select file(s) #️⃣ containing the topic
-                          material.
-                        </p>
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="size-6 flex-none fill-sky-100 stroke-sky-500 stroke-2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="11" />
-                          <path
-                            d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9"
-                            fill="none"
-                          />
-                        </svg>
-                        <p className="ml-4">Or describe after title below.</p>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+            <Brand theme={theme === "dark" ? "dark" : "light"} />
+            <div className="mx-16 mt-5 border-t-2 pt-5">
+              <p>
+                Create a new topic to get started; describe, paste or upload
+                below.
+              </p>
             </div>
           </div>
 

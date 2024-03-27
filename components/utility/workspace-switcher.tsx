@@ -60,7 +60,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
         selectedWorkspace.include_workspace_instructions,
       instructions: selectedWorkspace.instructions,
       is_home: false,
-      name: "New Workspace"
+      name: "New MemoryStack"
     })
 
     setWorkspaces([...workspaces, createdWorkspace])
@@ -138,11 +138,11 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
             onClick={handleCreateWorkspace}
           >
             <IconPlus />
-            <div className="ml-2">New Workspace</div>
+            <div className="ml-2">New MemoryStack</div>
           </Button>
 
           <Input
-            placeholder="Search workspaces..."
+            placeholder="Search MemoryStacks..."
             autoFocus
             value={search}
             onChange={e => setSearch(e.target.value)}

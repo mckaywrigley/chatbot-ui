@@ -36,7 +36,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
                   </div>
                   <div>
                     {" "}
-                    Workspace Instructions:{" "}
+                    MemoryStack Instructions:{" "}
                     {selectedChat.include_workspace_instructions
                       ? "Enabled"
                       : "Disabled"}

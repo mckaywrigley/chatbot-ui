@@ -38,16 +38,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
           <div className="flex space-x-2">
             <Link
               className="cursor-pointer hover:opacity-50"
-              href="https://twitter.com/ChatbotUI"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconBrandX />
-            </Link>
-
-            <Link
-              className="cursor-pointer hover:opacity-50"
-              href="https://github.com/mckaywrigley/chatbot-ui"
+              href="https://github.com/Gerosullivan/learntime"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -87,7 +78,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Show Workspaces</div>
+          <div>Show MemoryStacks</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
               ⌘
@@ -127,21 +118,6 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
             </div>
             <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
               L
-            </div>
-          </div>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="flex justify-between">
-          <div>Toggle Files</div>
-          <div className="flex opacity-60">
-            <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
-              ⌘
-            </div>
-            <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
-              Shift
-            </div>
-            <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
-              F
             </div>
           </div>
         </DropdownMenuItem>
