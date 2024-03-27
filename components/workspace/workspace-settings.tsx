@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { DeleteWorkspace } from "./delete-workspace"
+import { Import } from "../utility/import"
 
 interface WorkspaceSettingsProps {}
 
@@ -239,6 +240,12 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                     width={50}
                     height={50}
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <Label>Upload Topics</Label>
+
+                  <Import />
                 </div>
               </>
 
