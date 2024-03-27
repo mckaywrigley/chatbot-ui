@@ -92,14 +92,14 @@ export const createFile = async (
   embeddingsProvider: "openai" | "local"
 ) => {
   let validFilename = fileRecord.name.replace(/[^a-z0-9.]/gi, "_").toLowerCase()
-  const extension = validFilename.split(".").pop()
+  const extension = file.name.split(".").pop()
   const baseName = validFilename.substring(0, validFilename.lastIndexOf("."))
   const maxBaseNameLength = 100 - (extension?.length || 0) - 1
   if (baseName.length > maxBaseNameLength) {
-    validFilename = baseName.substring(0, maxBaseNameLength) + "." + extension
+    fileRecord.name = baseName.substring(0, maxBaseNameLength) + "." + extension
+  } else {
+    fileRecord.name = baseName + "." + extension
   }
-  fileRecord.name = validFilename
-
   const { data: createdFile, error } = await supabase
     .from("files")
     .insert([fileRecord])
