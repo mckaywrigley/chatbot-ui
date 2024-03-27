@@ -72,9 +72,11 @@ export async function POST(req: Request) {
     let chunks: FileItemChunk[] = []
 
     switch (fileMetadata.type) {
+      case "application/csv":
       case "csv":
         chunks = await processCSV(blob)
         break
+      case "application/json":
       case "json":
         chunks = await processJSON(blob)
         break
@@ -82,9 +84,11 @@ export async function POST(req: Request) {
         chunks = await processMarkdown(blob)
         break
       case "application/pdf":
+      case "pdf":
         chunks = await processPdf(blob)
         break
-      case "txt":
+      case "plain/text":
+      case "plain":
         chunks = await processTxt(blob)
         break
       default:
@@ -94,7 +98,6 @@ export async function POST(req: Request) {
     }
 
     let embeddings: any = []
-
     let openai
     if (profile.use_azure_openai) {
       openai = new OpenAI({
@@ -110,7 +113,7 @@ export async function POST(req: Request) {
       })
     }
 
-    if (embeddingsProvider === "openaiHHAHAHHAHA") {
+    if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
         model: "text-embedding-3-small",
         input: chunks.map(chunk => chunk.content)
