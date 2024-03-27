@@ -103,9 +103,9 @@ export const deleteWorkspace = async (workspaceId: string) => {
     .delete()
     .eq("id", workspaceId)
 
-  // if (error) {
-  //   throw new Error(error.message)
-  // }
+  if (error) {
+    throw new Error(error.message)
+  }
 
   return true
 }

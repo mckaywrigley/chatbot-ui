@@ -5,7 +5,7 @@ import {
   IconSearch,
   IconCode,
   IconCircleX,
-  IconCloudDownload,
+  IconCloudDownload
 } from "@tabler/icons-react"
 
 import { PluginSummary, PluginID } from "@/types/plugins"
@@ -61,16 +61,15 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 4,
-    name: 'GoLinkFinder',
-    selectorName: 'GoLinkFinder: URL Extraction',
+    name: "GoLinkFinder",
+    selectorName: "GoLinkFinder: URL Extraction",
     value: PluginID.GOLINKFINDER,
-    icon: 'https://cdn-icons-png.flaticon.com/512/5972/5972097.png',
-    description:
-      'A minimalistic JavaScript endpoint extractor.',
-    categories: ['Free', 'New', 'Popular'],
-    githubRepoUrl: 'https://github.com/0xsha/GoLinkFinder',
+    icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
+    description: "A minimalistic JavaScript endpoint extractor.",
+    categories: ["Free", "New", "Popular"],
+    githubRepoUrl: "https://github.com/0xsha/GoLinkFinder",
     isInstalled: false,
-    isPremium: false,
+    isPremium: false
   },
   {
     id: 5,
