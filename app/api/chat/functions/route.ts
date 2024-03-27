@@ -11,7 +11,7 @@ import { parseISO, formatDistanceToNow } from "date-fns/esm"
 
 // export const runtime = "edge"
 export const dynamic = "force-dynamic"
-export const maxDuration = 30
+export const maxDuration = 180
 
 const callLLM = async (
   chatId: string,
