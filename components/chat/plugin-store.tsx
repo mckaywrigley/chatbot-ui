@@ -6,7 +6,6 @@ import {
   IconCode,
   IconCircleX,
   IconCloudDownload,
-  IconLockOpen
 } from "@tabler/icons-react"
 
 import { PluginSummary, PluginID } from "@/types/plugins"
@@ -62,6 +61,31 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 4,
+    name: 'GoLinkFinder',
+    selectorName: 'GoLinkFinder: URL Extraction',
+    value: PluginID.GOLINKFINDER,
+    icon: 'https://cdn-icons-png.flaticon.com/512/5972/5972097.png',
+    description:
+      'A minimalistic JavaScript endpoint extractor.',
+    categories: ['Free', 'New', 'Popular'],
+    githubRepoUrl: 'https://github.com/0xsha/GoLinkFinder',
+    isInstalled: false,
+    isPremium: false,
+  },
+  {
+    id: 5,
+    name: "Web Scraper",
+    selectorName: "Web Scraper: Extract Data from Websites",
+    value: PluginID.WEB_SCRAPER,
+    icon: "https://avatars.githubusercontent.com/u/50994705",
+    description: "Extract data from websites and chat with the extracted data",
+    categories: ["Free", "Popular", "New"],
+    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
+    isInstalled: false,
+    isPremium: false
+  },
+  {
+    id: 6,
     name: "Nuclei",
     selectorName: "Nuclei: Discover Vulnerabilities",
     value: PluginID.NUCLEI,
@@ -73,7 +97,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: true
   },
   {
-    id: 5,
+    id: 7,
     name: "Katana",
     selectorName: "Katana: Crawl Websites",
     value: PluginID.KATANA,
@@ -86,7 +110,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: true
   },
   {
-    id: 6,
+    id: 8,
     name: "HttpX",
     selectorName: "HttpX: Web Analysis",
     value: PluginID.HTTPX,
@@ -99,7 +123,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: true
   },
   {
-    id: 7,
+    id: 9,
     name: "Naabu",
     selectorName: "Naabu: Discover Ports",
     value: PluginID.NAABU,
@@ -112,7 +136,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: true
   },
   {
-    id: 8,
+    id: 10,
     name: "GAU",
     selectorName: "GAU: Url Enumeration",
     value: PluginID.GAU,
@@ -125,7 +149,7 @@ export const availablePlugins: PluginSummary[] = [
     isPremium: false
   },
   {
-    id: 9,
+    id: 11,
     name: "AlterX",
     selectorName: "AlterX: Subdomain Wordlist Generator",
     value: PluginID.ALTERX,
@@ -133,18 +157,6 @@ export const availablePlugins: PluginSummary[] = [
     description: "Fast and customizable subdomain wordlist generator",
     categories: ["Free"],
     githubRepoUrl: "https://github.com/projectdiscovery/alterx",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 10,
-    name: "Web Scraper",
-    selectorName: "Web Scraper: Extract Data from Websites",
-    value: PluginID.WEB_SCRAPER,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description: "Extract data from websites and chat with the extracted data",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
     isInstalled: false,
     isPremium: false
   },

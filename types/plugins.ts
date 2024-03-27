@@ -18,6 +18,7 @@ export interface Plugin {
 export enum PluginID {
   NONE = "none",
   CVEMAP = "cvemap",
+  GOLINKFINDER = "golinkfinder",
   CYBERCHEF = "cyberchef",
   NUCLEI = "nuclei",
   SUBFINDER = "subfinder",
@@ -41,6 +42,9 @@ export const Plugins: Record<PluginID, Plugin> = {
   },
   [PluginID.CYBERCHEF]: {
     id: PluginID.CYBERCHEF
+  },
+  [PluginID.GOLINKFINDER]: {
+    id: PluginID.GOLINKFINDER
   },
   [PluginID.NUCLEI]: {
     id: PluginID.NUCLEI
