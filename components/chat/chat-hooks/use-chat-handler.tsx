@@ -300,7 +300,8 @@ export const useChatHandler = () => {
         const formattedMessages = await buildFinalMessages(
           payload,
           profile!,
-          chatImages
+          chatImages,
+          selectedPlugin
         )
 
         const response = await fetch("/api/chat/tools", {
@@ -370,7 +371,8 @@ export const useChatHandler = () => {
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse,
-          alertDispatch
+          alertDispatch,
+          selectedPlugin
         )
         generatedText = fullText
         finishReasonFromResponse = finishReason

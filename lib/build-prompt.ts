@@ -1,12 +1,14 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
+import { PluginID, pluginHelp } from "@/types/plugins"
 import { encode } from "gpt-tokenizer"
 
 const buildBasePrompt = (
   prompt: string,
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Tables<"assistants"> | null
+  assistant: Tables<"assistants"> | null,
+  selectedPlugin: PluginID | null
 ) => {
   let fullPrompt = ""
 
@@ -26,13 +28,18 @@ const buildBasePrompt = (
     fullPrompt += `User Instructions:\n${prompt}`
   }
 
+  if (selectedPlugin === PluginID.WEB_SCRAPER) {
+    fullPrompt += pluginHelp(selectedPlugin)
+  }
+
   return fullPrompt
 }
 
 export async function buildFinalMessages(
   payload: ChatPayload,
   profile: Tables<"profiles">,
-  chatImages: MessageImage[]
+  chatImages: MessageImage[],
+  selectedPlugin: PluginID | null
 ) {
   const {
     chatSettings,
@@ -47,7 +54,8 @@ export async function buildFinalMessages(
     chatSettings.prompt,
     chatSettings.includeProfileContext ? profile.profile_context || "" : "",
     chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    assistant,
+    selectedPlugin
   )
 
   let CHUNK_SIZE = chatSettings.contextLength

@@ -9,6 +9,7 @@ import {
   WorkspaceImage
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
+import { PluginID } from "@/types/plugins"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
 
@@ -96,8 +97,8 @@ interface ChatbotUIContext {
   setIsEnhancedMenuOpen: Dispatch<SetStateAction<boolean>>
   selectedPluginType: string
   setSelectedPluginType: Dispatch<SetStateAction<string>>
-  selectedPlugin: string
-  setSelectedPlugin: Dispatch<SetStateAction<string>>
+  selectedPlugin: PluginID
+  setSelectedPlugin: Dispatch<SetStateAction<PluginID>>
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
@@ -228,7 +229,7 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setIsEnhancedMenuOpen: () => {},
   selectedPluginType: "",
   setSelectedPluginType: () => {},
-  selectedPlugin: "",
+  selectedPlugin: PluginID.NONE,
   setSelectedPlugin: () => {},
 
   // CHAT INPUT COMMAND STORE

@@ -49,7 +49,8 @@ export function updateOrAddSystemMessage(
     let existingSystemMessage = messages[existingSystemMessageIndex]
     if (!existingSystemMessage.content.includes(systemInstructions)) {
       // Append new content if "User Instructions:" is not found
-      existingSystemMessage.content += `${systemMessageContent}` // Added a newline for separation
+      existingSystemMessage.content =
+        `${systemMessageContent}\n` + existingSystemMessage.content // Added a newline for separation
     }
     // Move the updated system message to the start
     messages.unshift(messages.splice(existingSystemMessageIndex, 1)[0])

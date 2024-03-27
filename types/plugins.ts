@@ -33,6 +33,12 @@ export enum PluginID {
   PLUGINS_STORE = "pluginselector"
 }
 
+export const pluginHelp = (plugin: PluginID) => {
+  if (plugin === PluginID.WEB_SCRAPER)
+    return `<USER HELP>If the user asks for help or webscraper help, use the following information: The web scrapper plugin is active. The Web Scrapper plugin works automatically. Any url added in the chat by the user will be automatically scraped and converted into markdown and added as a source and added to the context of the conversation.</USER HELP>`
+  return ""
+}
+
 export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.NONE]: {
     id: PluginID.NONE

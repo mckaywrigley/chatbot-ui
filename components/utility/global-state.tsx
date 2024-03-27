@@ -25,6 +25,7 @@ import {
   WorkspaceImage
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
+import { PluginID } from "@/types/plugins"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
@@ -102,7 +103,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // ENHANCE MENU STORE
   const [isEnhancedMenuOpen, setIsEnhancedMenuOpen] = useState(true)
   const [selectedPluginType, setSelectedPluginType] = useState("")
-  const [selectedPlugin, setSelectedPlugin] = useState("")
+  const [selectedPlugin, setSelectedPlugin] = useState(PluginID.NONE)
 
   // CHAT INPUT COMMAND STORE
   const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
