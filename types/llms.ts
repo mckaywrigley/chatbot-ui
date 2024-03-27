@@ -19,6 +19,7 @@ export type OpenAILLMID =
 export type GoogleLLMID =
   | "gemini-pro" // Gemini Pro
   | "gemini-pro-vision" // Gemini Pro Vision
+  | "gemini-pro-1p5"
 
 // Anthropic Models
 export type AnthropicLLMID =
