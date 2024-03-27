@@ -3,13 +3,8 @@
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
-import {
-  IconBolt,
-  IconCirclePlus,
-  IconPlayerStopFilled,
-  IconSend
-} from "@tabler/icons-react"
+
+import { IconBolt } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -23,12 +18,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faArrowUp,
-  faBox,
-  faMicrophone,
-  faSquare
-} from "@fortawesome/free-solid-svg-icons"
+import { faArrowUp, faSquare } from "@fortawesome/free-solid-svg-icons"
 import { faPaperclipVertical } from "@fortawesome/pro-regular-svg-icons"
 // import { LiveAudioVisualizer } from "react-audio-visualize"
 import RecordingTimer, {
@@ -47,8 +37,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
 
   const [voiceRecorder, setVoiceRecorder] = useState<MediaRecorder | null>(null)
-
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>()
 
   const [stream, setStream] = useState<MediaStream | null>(null)
 
