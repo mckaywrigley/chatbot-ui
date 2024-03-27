@@ -351,50 +351,55 @@ export const processResponse = async (
   }
 
   if (response.body) {
+    let jsonBuffer = ""
+
     await consumeReadableStream(
       response.body,
       chunk => {
         setFirstTokenReceived(true)
         setToolInUse("none")
-        contentToAdd = ""
-        try {
-          contentToAdd = chunk
-            .trimEnd()
-            .split("\n")
-            .reduce((acc, line) => {
-              if (line.startsWith("data: ")) {
-                const substring = line.substring(6)
-                if (substring.startsWith("[DONE]")) return acc
-                const data = JSON.parse(substring) // Remove 'data: ' prefix
-                finishReason = data.choices[0].finish_reason
-                  ? data.choices[0].finish_reason
-                  : finishReason
-                const content = data.choices[0].delta.content
-                if (!content) return acc
-                return acc + content
-              }
-              return acc
-            }, "")
-          if (contentToAdd) fullText += contentToAdd
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
+        let contentToAdd = ""
+        jsonBuffer += chunk
+
+        // Process complete JSON objects
+        while (true) {
+          const lastIndex = jsonBuffer.indexOf("\n")
+          if (lastIndex === -1) break
+
+          const jsonLine = jsonBuffer.slice(0, lastIndex).trim()
+          jsonBuffer = jsonBuffer.slice(lastIndex + 1)
+
+          if (jsonLine.startsWith("data: ")) {
+            if (jsonLine.substring(6) === "[DONE]") {
+              // Stream has ended
+              break
+            }
+
+            const data = JSON.parse(jsonLine.substring(6))
+
+            const choice = data.choices[0]
+            finishReason = choice.finish_reason || finishReason
+
+            if (choice.delta.content) {
+              contentToAdd += choice.delta.content
+            }
+          }
         }
 
         if (contentToAdd) {
+          fullText += contentToAdd
+
           setChatMessages(prev =>
             prev.map(chatMessage => {
               if (chatMessage.message.id === lastChatMessage.message.id) {
-                const updatedChatMessage: ChatMessage = {
+                return {
+                  ...chatMessage,
                   message: {
                     ...chatMessage.message,
                     content: chatMessage.message.content + contentToAdd
-                  },
-                  fileItems: chatMessage.fileItems
+                  }
                 }
-
-                return updatedChatMessage
               }
-
               return chatMessage
             })
           )
