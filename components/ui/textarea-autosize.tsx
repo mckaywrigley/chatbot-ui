@@ -17,6 +17,7 @@ interface TextareaAutosizeProps {
   onPaste?: (event: React.ClipboardEvent) => void
   onCompositionStart?: (event: React.CompositionEvent) => void
   onCompositionEnd?: (event: React.CompositionEvent) => void
+  isDisabled?: boolean
 }
 
 export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
@@ -31,13 +32,14 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
   onKeyDown = () => {},
   onPaste = () => {},
   onCompositionStart = () => {},
-  onCompositionEnd = () => {}
+  onCompositionEnd = () => {},
+  isDisabled
 }) => {
   return (
     <ReactTextareaAutosize
       ref={textareaRef}
       className={cn(
-        "bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex resize-none rounded-md border-2 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        "bg-pixelspace-gray-60 placeholder:text-muted-foreground  flex resize-none rounded-md border-2 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       minRows={minRows}
@@ -50,6 +52,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
       onPaste={onPaste}
       onCompositionStart={onCompositionStart}
       onCompositionEnd={onCompositionEnd}
+      disabled={isDisabled}
     />
   )
 }
