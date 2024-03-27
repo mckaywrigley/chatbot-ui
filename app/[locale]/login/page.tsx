@@ -1,6 +1,6 @@
-import { Brand } from "@/components/ui/brand"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoginBrand } from "@/components/ui/login-brand"
 import { SubmitButton } from "@/components/ui/submit-button"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/supabase/types"
@@ -162,56 +162,64 @@ export default async function Login({
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
+    <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md ">
       <form
-        className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2"
+        className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2 space-y-8"
         action={signIn}
       >
-        <Brand />
+        <LoginBrand />
 
-        <Label className="text-md mt-4" htmlFor="email">
-          Email
-        </Label>
-        <Input
-          className="mb-3 rounded-md border bg-inherit px-4 py-2"
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
-
-        <Label className="text-md" htmlFor="password">
-          Password
-        </Label>
-        <Input
-          className="mb-6 rounded-md border bg-inherit px-4 py-2"
-          type="password"
-          name="password"
-          placeholder="••••••••"
-        />
-
-        <SubmitButton className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white">
-          Login
-        </SubmitButton>
-
-        <SubmitButton
-          formAction={signUp}
-          className="border-foreground/20 mb-2 rounded-md border px-4 py-2"
-        >
-          Sign Up
-        </SubmitButton>
-
-        <div className="text-muted-foreground mt-1 flex justify-center text-sm">
-          <span className="mr-1">Forgot your password?</span>
-          <button
-            formAction={handleResetPassword}
-            className="text-primary ml-1 underline hover:opacity-80"
+        <div className="bg-pixelspace-gray-80 flex flex-col p-8 ">
+          <Label
+            className="text-pixelspace-gray-10 text-sm font-normal leading-[25.20px]"
+            htmlFor="email"
           >
-            Reset
-          </button>
+            Email
+          </Label>
+          <Input
+            className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 file:bg-pixelspace-pink mb-4 h-[42px] border`}
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
+
+          <Label
+            className="text-pixelspace-gray-10 text-sm font-normal leading-[25.20px]"
+            htmlFor="password"
+          >
+            Password
+          </Label>
+          <Input
+            className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 mb-8 h-[42px] border`}
+            type="password"
+            name="password"
+            placeholder="••••••••"
+          />
+
+          <SubmitButton className="bg-pixelspace-gray-10 text-pixelspace-gray-90 mb-4 rounded-md px-4 py-2">
+            Login
+          </SubmitButton>
+
+          <SubmitButton
+            formAction={signUp}
+            className="border-pixelspace-gray-90 border-pixelspace-gray-40 hover:bg-pixelspace-gray-80 bg-pixelspace-gray-90 text-pixelspace-gray-3 mb-4 rounded-md border px-4 py-2"
+          >
+            Sign Up
+          </SubmitButton>
+
+          <div className="text-pixelspace-gray-20 mt-1 flex justify-center text-sm">
+            <span className="mr-1">Forgot your password?</span>
+            <button
+              formAction={handleResetPassword}
+              className="text-pixelspace-gray-10 underline-custom ml-1 hover:opacity-80"
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
         {searchParams?.message && (
-          <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
+          <p className="bg-pixelspace-gray-80 text-foreground mt-4 p-4 text-center">
             {searchParams.message}
           </p>
         )}
