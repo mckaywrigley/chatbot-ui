@@ -14,10 +14,10 @@ const GEMINI_PRO: LLM = {
   imageInput: false
 }
 
-// Gemini Pro (UPDATED 12/22/23)
+// Gemini Pro 1.5 (UPDATED 12/22/23)
 const GEMINI_PRO_1p5: LLM = {
   modelId: "gemini-1.5-pro-latest",
-  modelName: "Gemini Pro 1.5 [EXCLUSIVE BETA]",
+  modelName: "Gemini Pro 1.5 (EXCLUSIVE BETA)",
   provider: "google",
   hostedId: "gemini-1.5-pro-latest",
   platformLink: GOOGLE_PLATORM_LINK,
