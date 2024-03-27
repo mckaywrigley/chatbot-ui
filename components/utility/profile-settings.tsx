@@ -447,14 +447,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   limit={PROFILE_CONTEXT_MAX}
                 />
               </div>
-              <div className="flex items-center space-y-1">
+              {/* <div className="flex items-center space-y-1">
                 <Label className="mr-4">Advanced AI interface</Label>
 
                 <Switch
                   checked={advancedSettings ?? false}
                   onCheckedChange={setAdvancedSettings}
                 />
-              </div>
+              </div> */}
             </TabsContent>
             <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">

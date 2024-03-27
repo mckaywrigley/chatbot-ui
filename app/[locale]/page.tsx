@@ -15,7 +15,7 @@ export default function HomePage() {
         <LearnTimeSVG theme={theme === "dark" ? "dark" : "light"} scale={0.2} />
       </div>
 
-      <div className="mt-2 text-4xl font-bold">LearnTime</div>
+      <div className="mt-2 text-4xl font-bold italic">LearnTime</div>
 
       <Link
         className="mt-4 flex w-[200px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold"

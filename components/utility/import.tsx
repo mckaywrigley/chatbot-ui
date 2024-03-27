@@ -254,9 +254,7 @@ export const Import: FC<ImportProps> = ({}) => {
                     </Button>
 
                     <div className="flex items-center space-x-2 truncate">
-                      <Badge>
-                        {item.contentType.slice(0, -1).toUpperCase()}
-                      </Badge>
+                      <Badge>Topic</Badge>
 
                       <div className="truncate">{item.name}</div>
                     </div>

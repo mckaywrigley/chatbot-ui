@@ -14,7 +14,15 @@ export const LearnTimeSVG: FC<LearnTimeSVGProps> = ({ theme, scale = 1 }) => {
       height={600 * scale}
       preserveAspectRatio="xMidYMid meet"
     >
-      <g transform="translate(0,600) scale(0.100000,-0.100000)" stroke="none">
+      <circle
+        cx="300"
+        cy="300"
+        r="290"
+        fill={`${theme === "dark" ? "#000" : "#fff"}`}
+        stroke={`${theme === "dark" ? "#fff" : "#000"}`}
+        stroke-width="20"
+      />
+      <g transform="translate(22,578) scale(0.093,-0.093)" stroke="none">
         <path
           fill={`${theme === "dark" ? "#fff" : "#000"}`}
           d="M2790 5794 c-136 -12 -350 -49 -483 -83 -361 -92 -691 -251 -996
