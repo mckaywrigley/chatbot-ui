@@ -142,7 +142,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       iconComponent = (
         <div className="bg-pixelspace-gray-60 flex size-5 items-center justify-center rounded-full">
           <i
-            className={`fa-regular fa-microchip-ai ${hoverClass}`}
+            className={`fa-solid fa-m ${hoverClass}`}
             style={{ fontSize: 11 }}
           ></i>
         </div>

@@ -77,7 +77,7 @@ const ImagePicker: FC<ImagePickerProps> = ({
       {previewSrc && (
         <Image
           style={{ width: `${width}px`, height: `${width}px` }}
-          className="rounded"
+          className="rounded-full"
           height={width}
           width={width}
           src={previewSrc}
@@ -98,9 +98,21 @@ const ImagePicker: FC<ImagePickerProps> = ({
             no filed selected
           </span>
         ) : (
-          <span className="font-['Libre Franklin'] truncate text-sm font-normal leading-[25.20px]">
-            {image?.name}
-          </span>
+          <div className="flex items-center space-x-1 overflow-hidden">
+            <Image
+              style={{ width: 16, height: 16 }}
+              className="rounded-full  "
+              height={width}
+              width={width}
+              src={previewSrc}
+              alt={"Image"}
+            />
+            <div className=" flex-1">
+              <span className="font-['Libre Franklin'] truncate text-sm font-normal leading-[25.20px]">
+                {image?.name}
+              </span>
+            </div>
+          </div>
         )}
       </div>
       <input

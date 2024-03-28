@@ -163,8 +163,6 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
           >
             <Label className="flex items-center space-x-1 ">
               <div>Image</div>
-
-              <span className="text-xs">(optional)</span>
             </Label>
 
             <ImagePicker

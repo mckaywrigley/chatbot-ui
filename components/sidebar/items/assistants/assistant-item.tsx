@@ -166,7 +166,10 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
         >
       }) => (
         <>
-          <div style={{ marginTop: 22 }} className="space-y-1">
+          <div
+            style={{ marginTop: 22 }}
+            className="space-y-1 overflow-x-hidden"
+          >
             <Label>Name</Label>
 
             <Input
