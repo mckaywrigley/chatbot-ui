@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { FC, useRef } from "react"
 
-export const SETUP_STEP_COUNT = 3
+export const SETUP_STEP_COUNT = 2
 
 interface StepContainerProps {
   stepDescription: string
