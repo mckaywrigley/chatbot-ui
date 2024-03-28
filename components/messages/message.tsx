@@ -24,7 +24,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
-const ICON_SIZE = 32
+const ICON_SIZE = 24
 
 interface MessageProps {
   message: Tables<"messages">
@@ -183,7 +183,9 @@ export const Message: FC<MessageProps> = ({
     <div
       className={cn(
         "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
+        message.role === "user"
+          ? "bg-pixelspace-gray-90"
+          : "bg-pixelspace-gray-80"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -220,7 +222,7 @@ export const Message: FC<MessageProps> = ({
                       width: `${ICON_SIZE}px`,
                       height: `${ICON_SIZE}px`
                     }}
-                    className="rounded"
+                    className="rounded-full"
                     src={messageAssistantImage}
                     alt="assistant image"
                     height={ICON_SIZE}
@@ -230,28 +232,28 @@ export const Message: FC<MessageProps> = ({
                   <WithTooltip
                     display={<div>{MODEL_DATA?.modelName}</div>}
                     trigger={
-                      <div className="bg-pixelspace-gray-60 flex size-6 items-center justify-center rounded-full">
-                        <i
-                          className="fa-kit fa-pixelspace-icon text-pixelspace-pink"
-                          style={{ fontSize: 14 }}
-                        ></i>
-                      </div>
+                      <ModelIcon
+                        className="rounded-full"
+                        provider={modelDetails?.provider || "custom"}
+                        height={ICON_SIZE}
+                        width={ICON_SIZE}
+                      />
                     }
                   />
                 )
               ) : profile?.image_url ? (
                 <Image
-                  className={`size-[32px] rounded`}
+                  className={`size-6 rounded-full`}
                   src={profile?.image_url}
-                  height={32}
-                  width={32}
+                  height={14}
+                  width={14}
                   alt="user image"
                 />
               ) : (
                 <div className="bg-pixelspace-gray-60 flex size-6 items-center justify-center rounded-full">
                   <i
                     className="fa-regular fa-face-smile  relative"
-                    style={{ fontSize: 14 }}
+                    style={{ fontSize: 24 }}
                   ></i>
                 </div>
               )}
@@ -302,7 +304,7 @@ export const Message: FC<MessageProps> = ({
           ) : isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
-              className="text-md"
+              className="text-md bg-pixelspace-gray-90 w-full"
               value={editedMessage}
               onValueChange={setEditedMessage}
               maxRows={20}
