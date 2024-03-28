@@ -146,7 +146,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             />
           </div>
 
-          <div className="space-y-1 pt-2">
+          <div style={{ marginTop: 22 }} className="space-y-1 pt-2">
             <Label>Description</Label>
 
             <Input
@@ -157,11 +157,12 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
             />
           </div>
 
-          <div className="space-y-1 pt-2">
-            <Label className="flex space-x-1">
+          <div
+            style={{ marginTop: 22, marginBottom: 22 }}
+            className="space-y-1 pt-2"
+          >
+            <Label className="flex items-center space-x-1 ">
               <div>Image</div>
-
-              <div className="text-xs">(optional)</div>
             </Label>
 
             <ImagePicker

@@ -166,7 +166,10 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
         >
       }) => (
         <>
-          <div className="space-y-1">
+          <div
+            style={{ marginTop: 22 }}
+            className="space-y-1 overflow-x-hidden"
+          >
             <Label>Name</Label>
 
             <Input
@@ -177,7 +180,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
             />
           </div>
 
-          <div className="space-y-1 pt-2">
+          <div style={{ marginTop: 22 }} className="space-y-1 pt-2">
             <Label>Description</Label>
 
             <Input
@@ -188,7 +191,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          <div style={{ marginTop: 22 }} className="space-y-1">
             <Label>Image</Label>
 
             <ImagePicker

@@ -38,7 +38,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
   if (!profile) return null
 
   return (
-    <div className="space-y-3">
+    <div style={{ marginTop: 22 }} className="space-y-3">
       <div className="space-y-1">
         <Label>Model</Label>
 
@@ -50,7 +50,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         />
       </div>
 
-      <div className="space-y-1">
+      <div style={{ marginTop: 22 }} className="space-y-1">
         <Label>Prompt1</Label>
 
         <TextareaAutosize

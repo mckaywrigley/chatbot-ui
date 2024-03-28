@@ -51,7 +51,7 @@ export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
       }}
     >
       <DropdownMenuTrigger
-        className="bg-background w-full justify-start border-2 px-3 py-5"
+        className="bg-pixelspace-gray-70 w-full justify-start border-2 px-3 py-5"
         asChild
       >
         <Button
@@ -75,6 +75,7 @@ export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
         align="start"
       >
         <Input
+          className="bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border"
           ref={inputRef}
           placeholder="Search files..."
           value={search}
