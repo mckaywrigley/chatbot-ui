@@ -312,21 +312,21 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
         {selectedAssistant && (
-          <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
+          <div className=" mx-auto flex w-fit items-center space-x-2 rounded-lg  p-1.5">
             {selectedAssistant.image_path && (
               <Image
-                className="rounded"
+                className="rounded-full "
                 src={
                   assistantImages.find(
                     img => img.path === selectedAssistant.image_path
                   )?.base64
                 }
-                width={28}
-                height={28}
+                width={24}
+                height={24}
                 alt={selectedAssistant.name}
               />
             )}
-            <div className="text-sm font-bold">
+            <div className="text-sm font-medium ">
               Talking to {selectedAssistant.name}
             </div>
           </div>

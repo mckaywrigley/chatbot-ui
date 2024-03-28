@@ -37,11 +37,16 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
           <div className="flex space-x-2">
             <Link
               className="cursor-pointer hover:opacity-50"
-              href="https://twitter.com/ChatbotUI"
+              href="https://pixelspace.com/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <IconBrandX />
+              <div className="bg-pixelspace-gray-60 flex size-6 items-center justify-center rounded-full">
+                <i
+                  className="fa-kit fa-pixelspace-icon text-pixelspace-pink"
+                  style={{ fontSize: 14 }}
+                ></i>
+              </div>
             </Link>
 
             <Link
@@ -49,14 +54,10 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
               href="https://github.com/mckaywrigley/chatbot-ui"
               target="_blank"
               rel="noopener noreferrer"
-            >
-              <IconBrandGithub />
-            </Link>
+            ></Link>
           </div>
 
           <div className="flex space-x-2">
-            <Announcements />
-
             <Link
               className="cursor-pointer hover:opacity-50"
               href="/help"
