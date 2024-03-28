@@ -58,17 +58,37 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
           <div className="space-y-1">
             <Label>File</Label>
 
-            <Input
+            <div
+              role="button"
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50  focus:border-pixelspace-gray-40 text-pixelspace-gray-20 flex h-[42px] cursor-pointer items-center rounded-sm border px-3`}
+              onClick={() => document.getElementById("fileInput")?.click()}
+            >
+              <span className="hover:text-pixelspace-gray-3 font-['Libre Franklin'] mr-3 text-sm font-normal leading-[25.20px]">
+                Choose files
+              </span>
+              {!selectedFile ? (
+                <span className="font-['Libre Franklin'] text-sm font-normal leading-[25.20px]">
+                  no filed selected
+                </span>
+              ) : (
+                name
+              )}
+            </div>
+            <input
               type="file"
+              id="fileInput"
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               onChange={handleSelectedFile}
               accept={ACCEPTED_FILE_TYPES}
+              style={{ display: "none" }} // Hace que el cursor sea un puntero sobre el área del input
             />
           </div>
 
-          <div className="space-y-1">
+          <div style={{ marginTop: 22 }}>
             <Label>Name</Label>
 
             <Input
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               placeholder="File name..."
               value={name}
               onChange={e => setName(e.target.value)}
@@ -76,12 +96,13 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          <div style={{ marginTop: 22 }}>
             <Label>Description</Label>
 
             <Input
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               placeholder="File description..."
-              value={name}
+              value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={FILE_DESCRIPTION_MAX}
             />
