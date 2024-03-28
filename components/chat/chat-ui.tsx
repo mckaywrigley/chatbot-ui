@@ -29,6 +29,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const {
     setChatMessages,
+    chatMessages,
     selectedChat,
     setSelectedChat,
     setChatSettings,
@@ -61,14 +62,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchMessages()
-      await fetchChat()
+      await Promise.all([fetchMessages(), fetchChat()])
 
       scrollToBottom()
       setIsAtBottom(true)
     }
 
-    if (params.chatid) {
+    if ((chatMessages?.length === 0 && !params.chatid) || params.chatid) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)
