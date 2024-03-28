@@ -26,8 +26,9 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
         ></i>
       </div>
       <Input
+        style={{ border: "none", outline: "none" }}
         placeholder={`Find ${contentType === "chats" ? "threads" : contentType}`}
-        className={`bg-pixelspace-gray-70  text-sm ${searchTerm.length > 0 ? "text-pixelspace-gray-3" : "text-pixelspace-gray-20 "} font-normal`}
+        className={`bg-pixelspace-gray-70  text-sm ${searchTerm.length > 0 ? "text-pixelspace-gray-3" : "text-pixelspace-gray-20 "} h-[40px] border-none font-normal`}
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
         onFocus={() => setIsFocused(true)}

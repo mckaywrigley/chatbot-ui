@@ -85,11 +85,31 @@ const ImagePicker: FC<ImagePickerProps> = ({
         />
       )}
 
-      <Input
-        className="mt-1 cursor-pointer hover:opacity-50"
-        type="file"
+      <div
+        role="button"
+        className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40  text-pixelspace-gray-20 mt-1 flex h-[42px] cursor-pointer items-center rounded-sm border px-3`}
+        onClick={() => document.getElementById("fileInput")?.click()}
+      >
+        <span className="hover:text-pixelspace-gray-3 font-['Libre Franklin'] mr-3 whitespace-nowrap text-sm font-normal leading-[25.20px]">
+          Choose files
+        </span>
+        {!previewSrc ? (
+          <span className="font-['Libre Franklin'] text-sm font-normal leading-[25.20px]">
+            no filed selected
+          </span>
+        ) : (
+          <span className="font-['Libre Franklin'] truncate text-sm font-normal leading-[25.20px]">
+            {image?.name}
+          </span>
+        )}
+      </div>
+      <input
         accept="image/png, image/jpeg, image/jpg"
+        type="file"
+        id="fileInput"
+        className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
         onChange={handleImageSelect}
+        style={{ display: "none" }} // Hace que el cursor sea un puntero sobre el área del input
       />
     </div>
   )
