@@ -45,10 +45,11 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
             <div>{file.tokens.toLocaleString()} tokens</div>
           </div>
 
-          <div className="space-y-1">
+          <div style={{ marginTop: 22 }}>
             <Label>Name</Label>
 
             <Input
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               placeholder="File name..."
               value={name}
               onChange={e => setName(e.target.value)}
@@ -56,10 +57,11 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
             />
           </div>
 
-          <div className="space-y-1">
+          <div style={{ marginTop: 22 }}>
             <Label>Description</Label>
 
             <Input
+              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
               placeholder="File description..."
               value={description}
               onChange={e => setDescription(e.target.value)}

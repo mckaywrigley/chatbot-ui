@@ -230,7 +230,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
             </SheetTitle>
           </SheetHeader>
 
-          <div className="mt-4 space-y-3">{renderInputs()}</div>
+          <div className="mt-[22px] space-y-3">{renderInputs()}</div>
         </div>
 
         <SheetFooter className="mt-2 flex justify-between">
