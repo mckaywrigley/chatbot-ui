@@ -37,7 +37,7 @@ class PineconeRetriever {
     this.embedModel = new OpenAIEmbeddings({
       openAIApiKey: openAIApiKey,
       modelName: "text-embedding-3-large",
-      dimensions: 1536
+      dimensions: 3072
     })
     this.config = config
     this.similarityTopK = similarityTopK
@@ -68,9 +68,10 @@ class PineconeRetriever {
       }
 
       const data = await response.json()
-      // Filter out matches with scores below 0.55
+      // Filter out matches with scores below 0.45
+      console.log(data.matches)
       const highScoreMatches = data.matches.filter((match: any) => {
-        if (match.score <= 0.55) return false
+        if (match.score <= 0.45) return false
         const nodeContent = JSON.parse(match.metadata._node_content)
         const textContent = nodeContent.text
         return textContent.length >= 70 && textContent.length <= 5000
