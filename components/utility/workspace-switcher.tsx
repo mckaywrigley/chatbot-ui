@@ -155,7 +155,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
           </Button>
 
           <Input
-            placeholder="Search workspaces..."
+            placeholder="Search workspaces"
             autoFocus
             value={search}
             onChange={e => setSearch(e.target.value)}
