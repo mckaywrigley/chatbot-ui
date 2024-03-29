@@ -77,7 +77,8 @@ export const UpdateChat: FC<UpdateChatProps> = ({
 
         <DialogFooter>
           <Button
-            variant="ghost"
+            className="mr-4"
+            variant="cancelPrompt"
             onClick={() => {
               setShowChatDialog(false)
               isSetShowDialog(false)
@@ -86,7 +87,11 @@ export const UpdateChat: FC<UpdateChatProps> = ({
             Cancel
           </Button>
 
-          <Button ref={buttonRef} onClick={handleUpdateChat}>
+          <Button
+            variant="savePrompt"
+            ref={buttonRef}
+            onClick={handleUpdateChat}
+          >
             Save
           </Button>
         </DialogFooter>

@@ -123,21 +123,24 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
         </DialogHeader>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setShowFolderDialog(false)}>
+          <Button
+            variant="cancelPrompt"
+            onClick={() => setShowFolderDialog(false)}
+          >
             Cancel
           </Button>
 
           <Button
+            variant="savePrompt"
             ref={buttonRef}
-            variant="destructive"
             onClick={handleDeleteFolderAndItems}
           >
             Delete Folder & Included Items
           </Button>
 
           <Button
+            variant="savePrompt"
             ref={buttonRef}
-            variant="destructive"
             onClick={handleDeleteFolderOnly}
           >
             Delete Folder Only

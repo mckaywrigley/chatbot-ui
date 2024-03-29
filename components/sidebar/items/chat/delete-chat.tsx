@@ -70,11 +70,15 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
         </DialogHeader>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setShowChatDialog(false)}>
+          <Button
+            className="mr-4"
+            variant="cancelPrompt"
+            onClick={() => setShowChatDialog(false)}
+          >
             Cancel
           </Button>
 
-          <Button variant="destructive" onClick={handleDeleteChat}>
+          <Button variant="savePrompt" onClick={handleDeleteChat}>
             Delete
           </Button>
         </DialogFooter>
