@@ -194,15 +194,15 @@ Next, ask the student if they would like to change anything or if they would ins
         messages: [
           {
             role: "user",
-            content: `Given the original topic source material and a student's recall attempt, perform the following tasks:
-            1. Calculate a recall score representing how accurately the student's recall matches the original material. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
-            2. Identify any significant omissions in the student's recall. List these omissions as succinctly as possible, providing clear and educational summaries for review.
+            content: `Given the Topic source and a Student's recall attempt below, perform the following tasks:
+            1. Calculate a recall score representing how accurately the student's recall matches the Topic source only. Important: Only compare against the Topic source below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
+            2. Identify any significant omissions in the student's recall when compared against the Topic source below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
             
             Output the results in JSON format with the following structure:
             - "score": A numerical value between 0 and 100 indicating the recall accuracy.
-            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall.
+            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic source.
             
-            Original topic source material:
+            Topic source:
             """${topicDescription}"""
             
             Student's recall attempt:
@@ -287,11 +287,11 @@ Student recall: """${studentMessage.content}"""`
           {
             role: "system",
             content: `Act as a study mentor, guiding student through active recall sessions. Do not calculate the score again.
-Given the original topic source material and the student's attempt at recalling after you provided hints, perform the following tasks:
-1. Provide friendly supportive constructive feedback with the answers to each hint using the topic description below.
+Given the Topic source below and the student's attempt at recalling after you provided hints, perform the following tasks:
+1. Provide friendly supportive constructive feedback with the answers to each hint using the Topic source below.
 2. ${finalFeedback}
             
-Original topic source material:
+Topic source:
 """${topicDescription}"""`
           },
           ...messages
