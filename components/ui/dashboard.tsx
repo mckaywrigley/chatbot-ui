@@ -29,7 +29,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     tabValue as ContentType
   )
   const [showSidebar, setShowSidebar] = useState(
-    localStorage.getItem("showSidebar") === "true"
+    localStorage.getItem("showSidebar") !== "false"
   )
   const [isDragging, setIsDragging] = useState(false)
 
