@@ -88,7 +88,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                     itemsRef.current[index] = ref
                   }}
                   tabIndex={0}
-                  className="hover:bg-accent focus:bg-accent flex cursor-pointer items-center rounded p-2 focus:outline-none"
+                  className="hover:bg-accent focus:bg-accent flex h-[56px] cursor-pointer items-center rounded p-2 focus:outline-none"
                   onClick={() =>
                     callSelectAssistant(item as Tables<"assistants">)
                   }
@@ -104,10 +104,15 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                       alt={item.name}
                       width={32}
                       height={32}
-                      className="rounded"
+                      className="rounded-full"
                     />
                   ) : (
-                    <IconRobotFace size={32} />
+                    <div className="bg-pixelspace-gray-60 flex size-8 items-center justify-center rounded-full">
+                      <i
+                        className="fa-regular fa-robot text-pixelspace-gray-20"
+                        style={{ fontSize: 14 }}
+                      ></i>
+                    </div>
                   )}
 
                   <div className="ml-3 flex flex-col">

@@ -305,9 +305,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 )
               }
             >
-              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 py-1 pr-3 hover:opacity-50">
-                <IconBolt size={20} />
-                <div>{tool.name}</div>
+              <div className="bg-pixelspace-teal-500 flex h-10 cursor-pointer items-center justify-center space-x-1 rounded-full px-4 py-1 hover:opacity-50">
+                <div className="text-pixelspace-gray-90 text-center text-sm font-medium">
+                  {tool.name}
+                </div>
+                <i
+                  className={`fa-regular fa-bolt text-pixelspace-gray-90`}
+                  style={{ fontSize: 14 }}
+                ></i>
               </div>
             </div>
           ))}
