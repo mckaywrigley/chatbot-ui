@@ -7,7 +7,7 @@ import { createPresets } from "@/db/presets"
 import { createPrompts } from "@/db/prompts"
 import { createTools } from "@/db/tools"
 import { IconUpload, IconX } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Badge } from "../ui/badge"
@@ -20,10 +20,13 @@ import {
   DialogHeader
 } from "../ui/dialog"
 import { Input } from "../ui/input"
+import demoImport from "./demo_import.json"
 
-interface ImportProps {}
+interface ImportProps {
+  demo_mode_text?: string
+}
 
-export const Import: FC<ImportProps> = ({}) => {
+export const Import: FC<ImportProps> = ({ demo_mode_text }) => {
   const {
     profile,
     selectedWorkspace,
@@ -213,6 +216,16 @@ export const Import: FC<ImportProps> = ({}) => {
     setIsOpen(false)
   }
 
+  useEffect(() => {
+    if (importList.length > 0 && demo_mode_text) {
+      handleSaveData()
+    }
+  }, [importList])
+
+  const handleDemoMode = () => {
+    setImportList(demoImport)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -220,7 +233,11 @@ export const Import: FC<ImportProps> = ({}) => {
     }
   }
 
-  return (
+  return demo_mode_text ? (
+    <Button variant="outline" onClick={handleDemoMode}>
+      {demo_mode_text}
+    </Button>
+  ) : (
     <>
       <IconUpload
         className="cursor-pointer hover:opacity-50"

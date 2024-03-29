@@ -7,6 +7,7 @@ import { ChatSettings } from "@/components/chat/chat-settings"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { Brand } from "@/components/ui/brand"
+import { Import } from "@/components/utility/import"
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
@@ -32,9 +33,12 @@ export default function ChatPage() {
             <Brand theme={theme === "dark" ? "dark" : "light"} />
             <div className="mx-16 mt-5 border-t-2 pt-5">
               <p>
-                Create a new topic to get started; describe, paste or upload
-                below.
+                Start by creating a topic—describe, paste, or upload below. Need
+                ideas?
               </p>
+              <div className="mt-3 flex items-center justify-center">
+                <Import demo_mode_text=" 🪐 Add solar system topics 🌞" />
+              </div>
             </div>
           </div>
 
