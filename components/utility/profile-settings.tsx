@@ -428,7 +428,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label className="text-sm">
                   What would you like the AI to know about you to provide better
                   responses?
@@ -447,7 +447,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   limit={PROFILE_CONTEXT_MAX}
                 />
               </div>
-              {/* <div className="flex items-center space-y-1">
+              <div className="flex items-center space-y-1">
                 <Label className="mr-4">Advanced AI interface</Label>
 
                 <Switch
