@@ -43,7 +43,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
             <Label>Name</Label>
 
             <Input
-              className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
+              className={`bg-pixelspace-gray-70  text-pixelspace-gray-20 h-[42px] `}
               placeholder="Prompt name..."
               value={name}
               onChange={e => setName(e.target.value)}

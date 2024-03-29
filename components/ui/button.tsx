@@ -22,9 +22,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         savePrompt:
-          " bg-pixelspace-gray-3 text-sm font-normal leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
+          " bg-pixelspace-gray-3 text-sm font-normal rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
         cancelPrompt:
-          "bg-pixelspace-gray-90 border border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
+          "bg-pixelspace-gray-90 border rounded-sm border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
 
         pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40"
       },

@@ -70,11 +70,19 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setShowFolderDialog(false)}>
+          <Button
+            className="mr-4"
+            variant="cancelPrompt"
+            onClick={() => setShowFolderDialog(false)}
+          >
             Cancel
           </Button>
 
-          <Button ref={buttonRef} onClick={handleUpdateFolder}>
+          <Button
+            variant="savePrompt"
+            ref={buttonRef}
+            onClick={handleUpdateFolder}
+          >
             Save
           </Button>
         </DialogFooter>
