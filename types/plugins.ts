@@ -1,3 +1,9 @@
+export interface ChatStarter {
+  title: string
+  description: string
+  chatMessage: string
+}
+
 export interface PluginSummary {
   id: number
   name: string
@@ -9,6 +15,7 @@ export interface PluginSummary {
   githubRepoUrl?: string
   isInstalled: boolean
   isPremium: boolean
+  starters: ChatStarter[]
 }
 
 export interface Plugin {

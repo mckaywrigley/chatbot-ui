@@ -4,6 +4,7 @@ import { ChatHelp } from "@/components/chat/chat-help"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatInput } from "@/components/chat/chat-input"
 import { ChatSettings } from "@/components/chat/chat-settings"
+import ChatStarters from "@/components/chat/chat-starters"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { Brand, BrandSmall } from "@/components/ui/brand"
@@ -18,7 +19,7 @@ export default function ChatPage() {
     handleFocusChatInput()
   })
 
-  const { chatMessages } = useContext(ChatbotUIContext)
+  const { chatMessages, selectedPlugin } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
@@ -28,12 +29,12 @@ export default function ChatPage() {
     <>
       {chatMessages.length === 0 ? (
         <div className="relative flex h-full flex-col items-center justify-center">
-          <div className="top-50% left-50% -translate-x-50% -translate-y-50% absolute mb-32">
-            <div className="sm:hidden">
+          <div className="absolute left-1/2 -translate-x-1/2 -translate-y-3/4">
+            <div className="logo-sm:hidden logo-xs:hidden mb-12">
               <BrandSmall theme={theme === "dark" ? "dark" : "light"} />
             </div>
 
-            <div className="hidden sm:block">
+            <div className="logo-sm:block logo-xs:hidden hidden">
               <Brand theme={theme === "dark" ? "dark" : "light"} />
             </div>
           </div>
@@ -48,7 +49,14 @@ export default function ChatPage() {
 
           <div className="flex grow flex-col items-center justify-center" />
 
-          <div className="z-10 w-full min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[650px] lg:w-[650px] xl:w-[800px]">
+          <div className="z-10 -mx-2 w-full min-w-[300px] items-end px-2 sm:w-[600px] md:w-[650px] lg:w-[650px] xl:w-[800px]">
+            <ChatStarters
+              selectedPlugin={selectedPlugin}
+              chatMessages={chatMessages}
+            />
+          </div>
+
+          <div className="z-10 w-full min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 md:w-[650px] lg:w-[650px] xl:w-[800px]">
             <ChatInput />
           </div>
 

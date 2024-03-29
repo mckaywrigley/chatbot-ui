@@ -8,167 +8,8 @@ import {
   IconCloudDownload
 } from "@tabler/icons-react"
 
-import { PluginSummary, PluginID } from "@/types/plugins"
-
-export const availablePlugins: PluginSummary[] = [
-  {
-    id: 0,
-    name: "None",
-    selectorName: "No plugin selected",
-    value: PluginID.NONE,
-    categories: ["Uncategorized"],
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 1,
-    name: "Subfinder",
-    selectorName: "Subfinder: Discover Subdomains",
-    value: PluginID.SUBFINDER,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "A robust discovery tool for passive enumeration on valid subdomains",
-    categories: ["Free", "Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/subfinder",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 2,
-    name: "CVEMap",
-    selectorName: "CVEMap: Explore CVEs",
-    value: PluginID.CVEMAP,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "Efficiently explore CVE databases, linking vulnerabilities to exploits and remediations.",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/projectdiscovery/cvemap",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 3,
-    name: "CyberChef",
-    selectorName: "CyberChef: Data Manipulation",
-    value: PluginID.CYBERCHEF,
-    icon: "https://gchq.github.io/CyberChef/images/cyberchef-128x128.png",
-    description:
-      "A tool for for encryption, encoding, compression, and data analysis.",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/gchq/CyberChef",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 4,
-    name: "GoLinkFinder",
-    selectorName: "GoLinkFinder: URL Extraction",
-    value: PluginID.GOLINKFINDER,
-    icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
-    description: "A minimalistic JavaScript endpoint extractor.",
-    categories: ["Free", "New", "Popular"],
-    githubRepoUrl: "https://github.com/0xsha/GoLinkFinder",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 5,
-    name: "Web Scraper",
-    selectorName: "Web Scraper: Extract Data from Websites",
-    value: PluginID.WEB_SCRAPER,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description: "Extract data from websites and chat with the extracted data",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 6,
-    name: "Nuclei",
-    selectorName: "Nuclei: Discover Vulnerabilities",
-    value: PluginID.NUCLEI,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description: "Fast and customisable vulnerability scanner",
-    categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/nuclei",
-    isInstalled: false,
-    isPremium: true
-  },
-  {
-    id: 7,
-    name: "Katana",
-    selectorName: "Katana: Crawl Websites",
-    value: PluginID.KATANA,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "A web crawling framework designed to navigate and parse for hidden details",
-    categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/katana",
-    isInstalled: false,
-    isPremium: true
-  },
-  {
-    id: 8,
-    name: "HttpX",
-    selectorName: "HttpX: Web Analysis",
-    value: PluginID.HTTPX,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "An HTTP toolkit that probes services, web servers, and other valuable metadata",
-    categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/httpx",
-    isInstalled: false,
-    isPremium: true
-  },
-  {
-    id: 9,
-    name: "Naabu",
-    selectorName: "Naabu: Discover Ports",
-    value: PluginID.NAABU,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "A fast port scanner designed to scan large networks at high speed",
-    categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/naabu",
-    isInstalled: false,
-    isPremium: true
-  },
-  {
-    id: 10,
-    name: "GAU",
-    selectorName: "GAU: Url Enumeration",
-    value: PluginID.GAU,
-    icon: "https://avatars.githubusercontent.com/u/19563282",
-    description:
-      "Fetches known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, Common Crawl, and URLScan.",
-    categories: ["Free"],
-    githubRepoUrl: "https://github.com/lc/gau",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 11,
-    name: "AlterX",
-    selectorName: "AlterX: Subdomain Wordlist Generator",
-    value: PluginID.ALTERX,
-    icon: "https://avatars.githubusercontent.com/u/50994705",
-    description: "Fast and customizable subdomain wordlist generator",
-    categories: ["Free"],
-    githubRepoUrl: "https://github.com/projectdiscovery/alterx",
-    isInstalled: false,
-    isPremium: false
-  },
-  {
-    id: 99,
-    name: "Plugins Store",
-    selectorName: "Plugins Store",
-    value: PluginID.PLUGINS_STORE,
-    categories: ["Uncategorized"],
-    isInstalled: false,
-    isPremium: false
-  }
-]
+import { PluginSummary } from "@/types/plugins"
+import Image from "next/image"
 
 function getPluginsPerPage() {
   const width = window.innerWidth
@@ -279,7 +120,7 @@ function PluginStoreModal({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-[25]" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -378,9 +219,14 @@ function PluginStoreModal({
                           >
                             <div className="flex items-center">
                               <div className="mr-4 size-[70px] shrink-0">
-                                <img
-                                  src={plugin.icon}
+                                <Image
+                                  src={
+                                    plugin.icon ||
+                                    "https://avatars.githubusercontent.com/u/50994705"
+                                  }
                                   alt={plugin.name}
+                                  width={70}
+                                  height={70}
                                   className="size-full rounded object-cover"
                                 />
                               </div>

@@ -11,12 +11,12 @@ import {
   IconBuildingStore
 } from "@tabler/icons-react"
 import PluginStoreModal from "./plugin-store"
-import { availablePlugins } from "./plugin-store"
 import { PluginID, PluginSummary } from "@/types/plugins"
 import { ChatbotUIContext } from "@/context/context"
 import Modal from "./dialog-portal"
 import { PlanDialog } from "../utility/plan-dialog"
 import { usePluginContext } from "./chat-hooks/PluginProvider"
+import { availablePlugins } from "@/lib/plugins/available-plugins"
 
 interface PluginSelectorProps {
   onPluginSelect: (type: string) => void

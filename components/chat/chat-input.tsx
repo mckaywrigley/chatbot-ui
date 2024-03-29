@@ -1,17 +1,20 @@
+import Modal from "@/components/chat/dialog-portal"
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
+import { PluginID } from "@/types/plugins"
 import {
   IconBolt,
   IconPaperclip,
+  IconPlayerStopFilled,
   IconPuzzle,
   IconPuzzleOff,
-  IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -20,9 +23,6 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { EnhancedMenuPicker } from "./enhance-menu"
-import Modal from "@/components/chat/dialog-portal"
-import { toast } from "sonner"
-import { PluginID } from "@/types/plugins"
 
 interface ChatInputProps {}
 

@@ -10,7 +10,7 @@ import React, {
 
 import { PluginSummary } from "@/types/plugins"
 
-import { availablePlugins } from "@/components/chat/plugin-store"
+import { availablePlugins } from "@/lib/plugins/available-plugins"
 
 enum ActionTypes {
   INSTALL_PLUGIN = "INSTALL_PLUGIN",
