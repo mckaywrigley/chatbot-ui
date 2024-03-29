@@ -124,7 +124,7 @@ export async function POST(request: Request) {
             `---------------------\n` +
             `${pineconeResults}\n` +
             `---------------------\n` +
-            `DON'T MENTION USING RAG CONTENT OR ANYTHING RELATED TO RAG.`
+            `DON'T MENTION OR REFERENCE ANYTHING RELATED TO RAG CONTENT OR ANYTHING RELATED TO RAG. ROLE PLAY.`
         }
       }
     }
