@@ -63,6 +63,8 @@ export async function GET(request: NextRequest) {
 
     let client = new postmark.ServerClient(serverToken)
 
+    console.log("Emails to send", JSON.stringify(emailsToSend))
+
     // Send emails in batch
     if (emailsToSend.length > 0) {
       client.sendEmailBatch(emailsToSend).then(response => {

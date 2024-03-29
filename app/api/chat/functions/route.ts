@@ -13,6 +13,22 @@ import { parseISO, formatDistanceToNow } from "date-fns/esm"
 export const dynamic = "force-dynamic"
 export const maxDuration = 180
 
+function extractAnalysisInfoWithComments(response: string) {
+  // First, try to isolate the JSON part of the response
+  const jsonMatch = response.match(/{[\s\S]*}/)
+  if (!jsonMatch) throw new Error("No JSON in response")
+
+  try {
+    // Attempt to parse the isolated JSON part of the response
+    const parsedResponse = JSON.parse(jsonMatch[0])
+    const score: number = parsedResponse.score
+    const forgotten_facts: string[] = parsedResponse.forgotten_facts
+    return { score, forgotten_facts }
+  } catch (error) {
+    throw new Error("Error parsing JSON from response")
+  }
+}
+
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
@@ -173,7 +189,7 @@ Next, ask the student if they would like to change anything or if they would ins
       // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
       chatResponse = await mistral.chat({
         model: defaultModel,
-        temperature: 0.1,
+        temperature: 0.3,
         response_format: { type: "json_object" },
         messages: [
           {
@@ -198,9 +214,10 @@ Next, ask the student if they would like to change anything or if they would ins
 
       analysis = await chatResponse.choices[0]?.message?.content
       console.log("analysis:", analysis)
-      const { score, forgotten_facts } = JSON.parse(analysis)
+      const { score, forgotten_facts } =
+        extractAnalysisInfoWithComments(analysis)
 
-      const perfectRecall = score >= 95 // LLM model is not perfect, so we need to set a threshold
+      const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
 
       serverResult = await functionCalledByLLM(
         "updateTopicOnRecall",
