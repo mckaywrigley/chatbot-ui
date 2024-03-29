@@ -43,15 +43,13 @@ export async function POST(request: Request) {
     let similarityTopK
 
     if (chatSettings.model === "mistral-large") {
-      selectedModel = "mistralai/mistral-large"
+      selectedModel = llmConfig.models.hackerGPT_pro
 
       similarityTopK = 3
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
     } else {
-      const model1 = llmConfig.models.hackerGPT_default
-      const model2 = llmConfig.models.hackerGPT_enhance
-      selectedModel = Math.random() < 0.8 ? model1 : model2
+      selectedModel = llmConfig.models.hackerGPT_default
 
       similarityTopK = 2
 
@@ -116,6 +114,7 @@ export async function POST(request: Request) {
 
         if (pineconeResults !== "None") {
           modelTemperature = llmConfig.pinecone.temperature
+          selectedModel = llmConfig.models.hackerGPT_RAG
 
           cleanedMessages[0].content =
             `${llmConfig.systemPrompts.hackerGPT} ` +

@@ -69,7 +69,6 @@ class PineconeRetriever {
 
       const data = await response.json()
       // Filter out matches with scores below 0.45
-      console.log(data.matches)
       const highScoreMatches = data.matches.filter((match: any) => {
         if (match.score <= 0.45) return false
         const nodeContent = JSON.parse(match.metadata._node_content)

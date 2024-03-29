@@ -23,7 +23,6 @@ class APIError extends Error {
 }
 
 export async function POST(request: Request) {
-  console.log("OpenAI request received")
   const json = await request.json()
   const { chatSettings, messages } = json as {
     chatSettings: ChatSettings

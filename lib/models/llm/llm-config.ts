@@ -23,9 +23,9 @@ const llmConfig = {
     pinecone: process.env.PINECONE_SYSTEM_PROMPT
   },
   models: {
-    translation: process.env.OPENROUTER_TRANSLATION_MODEL,
     hackerGPT_default: process.env.OPENROUTER_HACKERGPT_DEFUALT_MODEL,
-    hackerGPT_enhance: process.env.OPENROUTER_HACKERGPT_ENHANCE_MODEL
+    hackerGPT_RAG: process.env.OPENROUTER_HACKERGPT_RAG_MODEL,
+    hackerGPT_pro: process.env.OPENROUTER_HACKERGPT_PRO_MODEL
   },
   usePinecone: process.env.USE_PINECONE === "TRUE"
 }
