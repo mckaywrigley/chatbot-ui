@@ -29,36 +29,34 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
       className="cursor-pointer items-center"
       onSelect={onSelect}
     >
-      <div className="w-[32px]">
+      <div className="w-[24px]">
         {contentType === "presets" ? (
           <ModelIcon
             provider={modelDetails?.provider || "custom"}
-            width={32}
-            height={32}
+            width={24}
+            height={24}
           />
         ) : image ? (
           <Image
-            style={{ width: "32px", height: "32px" }}
-            className="rounded"
+            style={{ width: "24px", height: "24px" }}
+            className="rounded-full"
             src={image}
             alt="Assistant"
-            width={32}
-            height={32}
+            width={24}
+            height={24}
           />
         ) : (
-          <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={32}
-          />
+          <div className="bg-pixelspace-gray-70 flex size-6 items-center justify-center rounded-full">
+            <i
+              className="fa-regular fa-robot text-pixelspace-gray-20"
+              style={{ fontSize: 11 }}
+            ></i>
+          </div>
         )}
       </div>
 
       <div className="ml-4 flex grow flex-col space-y-1">
         <div className="text-md font-bold">{item.name}</div>
-
-        {item.description && (
-          <div className="text-sm font-light">{item.description}</div>
-        )}
       </div>
 
       <div className="min-w-[40px]">

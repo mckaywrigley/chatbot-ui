@@ -39,7 +39,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
     <ReactTextareaAutosize
       ref={textareaRef}
       className={cn(
-        "bg-pixelspace-gray-60 placeholder:text-muted-foreground  flex resize-none rounded-sm  text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        "bg-pixelspace-gray-60 placeholder:text-muted-foreground flex w-full resize-none rounded-sm  text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       minRows={minRows}

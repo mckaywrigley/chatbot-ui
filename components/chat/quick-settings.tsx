@@ -202,11 +202,11 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
           {selectedAssistant &&
             (selectedAssistantImage ? (
               <Image
-                className="rounded"
+                className="rounded-full"
                 src={selectedAssistantImage}
                 alt="Assistant"
-                width={28}
-                height={28}
+                width={24}
+                height={24}
               />
             ) : (
               <IconRobotFace
@@ -226,7 +226,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
 
                 {selectedPreset?.name ||
                   selectedAssistant?.name ||
-                  t("Quick Settings")}
+                  t("Assistants")}
               </div>
 
               <IconChevronDown className=" text-pixelspace-gray-20" />
@@ -246,7 +246,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
             <Input
               ref={inputRef}
               className="w-full"
-              placeholder="Search..."
+              placeholder="Search"
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.stopPropagation()}

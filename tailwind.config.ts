@@ -34,7 +34,7 @@ module.exports = {
           "blue-700": "#1D4ED8",
           "blue-800": "#1e40af",
           "teal-50": "#F0FDFA",
-          "teal-500": "#3B82F6",
+          "teal-500": "#14B8A6",
           "teal-800": "#115E59",
           "red-400": "#F87171",
           "red-500": "#EF4444",
