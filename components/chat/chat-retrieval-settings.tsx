@@ -27,10 +27,10 @@ export const ChatRetrievalSettings: FC<ChatRetrievalSettingsProps> = ({}) => {
           side="top"
           display={<div>Adjust retrieval settings.</div>}
           trigger={
-            <IconAdjustmentsHorizontal
-              className="cursor-pointer pt-[4px] hover:opacity-50"
-              size={24}
-            />
+            <i
+              style={{ fontSize: 20 }}
+              className="fa-regular fa-slider text-pixelspace-gray-3"
+            ></i>
           }
         />
       </DialogTrigger>
