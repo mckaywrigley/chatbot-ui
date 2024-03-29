@@ -193,11 +193,14 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between">
               Workspace Settings
-              {selectedWorkspace?.is_home && <IconHome />}
+              {selectedWorkspace?.is_home}
             </SheetTitle>
 
             {selectedWorkspace?.is_home && (
-              <div className="text-sm font-light">
+              <div
+                style={{ marginTop: 22, marginBottom: 6 }}
+                className="text-sm font-light"
+              >
                 This is your home workspace for personal use.
               </div>
             )}
@@ -205,13 +208,23 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
 
           <Tabs defaultValue="main">
             <TabsList className="mt-4 grid w-full grid-cols-2">
-              <TabsTrigger value="main">Main</TabsTrigger>
-              <TabsTrigger value="defaults">Defaults</TabsTrigger>
+              <TabsTrigger
+                className="data-[state=active]:bg-pixelspace-gray-60 ml-1 h-[36px]"
+                value="main"
+              >
+                Main
+              </TabsTrigger>
+              <TabsTrigger
+                className="data-[state=active]:bg-pixelspace-gray-60 mr-1 h-[36px]"
+                value="defaults"
+              >
+                Defaults
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="main">
               <>
-                <div className="space-y-1">
+                <div style={{ marginTop: 22 }} className="space-y-1">
                   <Label>Workspace Name</Label>
 
                   <Input
@@ -231,7 +244,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                   />
                 </div> */}
 
-                <div className="space-y-1">
+                <div style={{ marginTop: 22 }} className="space-y-1">
                   <Label>Workspace Image</Label>
 
                   <ImagePicker
@@ -245,12 +258,13 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                 </div>
               </>
 
-              <div className="space-y-1">
+              <div style={{ marginTop: 22 }} className="space-y-1">
                 <Label>
                   How would you like the AI to respond in this workspace?
                 </Label>
 
                 <TextareaAutosize
+                  className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
                   placeholder="Instructions... (optional)"
                   value={instructions}
                   onValueChange={setInstructions}
@@ -267,7 +281,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
             </TabsContent>
 
             <TabsContent className="mt-5" value="defaults">
-              <div className="mb-4 text-sm">
+              <div style={{ marginTop: 22 }} className="mb-4 text-sm">
                 These are the settings your workspace begins with when selected.
               </div>
 

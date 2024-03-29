@@ -50,7 +50,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         />
       </div>
 
-      <div style={{ marginTop: 22 }} className="space-y-1">
+      <div style={{ marginTop: 22, marginBottom: 22 }} className="space-y-1">
         <Label>Prompt1</Label>
 
         <TextareaAutosize
@@ -166,6 +166,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
 
       <div className="mt-7 flex items-center space-x-2">
         <Checkbox
+          className="border-pixelspace-gray-3 bg-pixelspace-gray-90 data-[state=checked]:bg-pixelspace-gray-90"
           checked={chatSettings.includeProfileContext}
           onCheckedChange={(value: boolean) =>
             onChangeChatSettings({
@@ -194,6 +195,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
 
       <div className="mt-4 flex items-center space-x-2">
         <Checkbox
+          className="border-pixelspace-gray-3 bg-pixelspace-gray-90 data-[state=checked]:bg-pixelspace-gray-90"
           checked={chatSettings.includeWorkspaceInstructions}
           onCheckedChange={(value: boolean) =>
             onChangeChatSettings({
@@ -233,7 +235,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
             })
           }}
         >
-          <SelectTrigger>
+          <SelectTrigger className="bg-pixelspace-gray-70 border-pixelspace-60 rounde-sm mt-1 h-[42px] border">
             <SelectValue defaultValue="openai" />
           </SelectTrigger>
 
