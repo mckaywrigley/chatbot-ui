@@ -26,9 +26,10 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages } = json as {
+  const { chatSettings, messages, isRetrieval } = json as {
     chatSettings: ChatSettings
     messages: any[]
+    isRetrieval: boolean
   }
 
   try {
@@ -80,11 +81,11 @@ export async function POST(request: Request) {
 
     let latestUserMessage = cleanedMessages[cleanedMessages.length - 2].content
 
-    if (!latestUserMessage.startsWith("Assist with the user's query:")) {
+    if (!isRetrieval) {
       if (
         llmConfig.usePinecone &&
         cleanedMessages.length > 0 &&
-        cleanedMessages[cleanedMessages.length - 2].role === "user" &&
+        // cleanedMessages[cleanedMessages.length - 2].role === "user" &&
         cleanedMessages[cleanedMessages.length - 2].content.length >
           llmConfig.pinecone.messageLength.min &&
         cleanedMessages[cleanedMessages.length - 2].content.length <

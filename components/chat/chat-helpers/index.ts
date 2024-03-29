@@ -189,7 +189,8 @@ export const handleHostedChat = async (
   const requestBody = {
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : ""
+    customModelId: provider === "custom" ? modelData.hostedId : "",
+    isRetrieval: payload.chatFileItems && payload.chatFileItems.length > 0
   }
 
   const response = await fetchChatResponse(
