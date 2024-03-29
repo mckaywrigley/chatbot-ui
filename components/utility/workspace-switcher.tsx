@@ -155,13 +155,13 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
           </Button>
 
           <Input
-            placeholder="Search workspaces..."
+            placeholder="Search workspaces"
             autoFocus
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
 
-          <div className="flex flex-col space-y-1">
+          <div className="flex flex-col ">
             {workspaces
               .filter(workspace => workspace.is_home)
               .map(workspace => {
@@ -172,26 +172,20 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
                 return (
                   <Button
                     key={workspace.id}
-                    className="flex items-center justify-start"
-                    variant="ghost"
+                    className="flex items-center justify-between "
+                    variant="workspaceButton"
                     onClick={() => handleSelect(workspace.id)}
+                    size="workspaceButton"
                   >
-                    {image ? (
-                      <Image
-                        style={{ width: "28px", height: "28px" }}
-                        className="mr-3 rounded"
-                        src={image.url || ""}
-                        width={28}
-                        height={28}
-                        alt={workspace.name}
-                      />
-                    ) : (
-                      <IconHome className="mr-3" size={28} />
-                    )}
-
-                    <div className="text-lg font-semibold">
+                    <div className="h-[26px] text-sm font-normal leading-[25.20px]">
                       {workspace.name}
                     </div>
+                    {workspace.id === selectedWorkspace?.id ? (
+                      <i
+                        style={{ fontSize: 24 }}
+                        className="fa-sharp fa-solid fa-circle-check text-pixelspace-gray-3"
+                      ></i>
+                    ) : null}
                   </Button>
                 )
               })}
@@ -211,26 +205,20 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
                 return (
                   <Button
                     key={workspace.id}
-                    className="flex items-center justify-start"
+                    className="flex items-center justify-between"
                     variant="ghost"
                     onClick={() => handleSelect(workspace.id)}
+                    size="workspaceButton"
                   >
-                    {image ? (
-                      <Image
-                        style={{ width: "28px", height: "28px" }}
-                        className="mr-3 rounded"
-                        src={image.url || ""}
-                        width={28}
-                        height={28}
-                        alt={workspace.name}
-                      />
-                    ) : (
-                      <IconBuilding className="mr-3" size={28} />
-                    )}
-
-                    <div className="text-lg font-semibold">
+                    <div className="h-[26px] text-sm font-normal leading-[25.20px]">
                       {workspace.name}
                     </div>
+                    {workspace.id === selectedWorkspace?.id ? (
+                      <i
+                        style={{ fontSize: 24 }}
+                        className="fa-sharp fa-solid fa-circle-check text-pixelspace-gray-3"
+                      ></i>
+                    ) : null}
                   </Button>
                 )
               })}
