@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
           " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",
+        workspaceButton:
+          " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",
         link: "text-primary underline-offset-4 hover:underline",
 
         savePrompt:
@@ -30,6 +32,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-4 py-2",
+        workspaceButton: "py-[15px]",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "size-10",
