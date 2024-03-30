@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
         From: "ger@learntime.ai",
         To: userEmail,
         Subject: "LearnTime: Recall Session Reminder",
-        HtmlBody: htmlBody
+        HtmlBody: htmlBody,
+        MessageStream: "outbound"
       })
     }
 
@@ -65,10 +66,26 @@ export async function GET(request: NextRequest) {
 
     console.log("Emails to send", JSON.stringify(emailsToSend))
 
+    client
+      .getMessageStreams({
+        includeArchivedStreams: true,
+        messageStreamType: "Transactional"
+      })
+      .then(result => {
+        const stream = result.MessageStreams[0]
+        console.log(result.TotalCount)
+        console.log(stream.Name)
+        console.log(stream.Description)
+      })
+
     // Send emails in batch
     if (emailsToSend.length > 0) {
       client.sendEmailBatch(emailsToSend).then(response => {
-        response.forEach(res => console.log(res.Message))
+        console.log(response[0].To)
+        console.log(response[0].SubmittedAt)
+        console.log(response[0].Message) // Ok
+        console.log(response[0].MessageID)
+        console.log(response[0].ErrorCode)
       })
       success = true
     }
