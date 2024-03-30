@@ -5,6 +5,9 @@ import { ServerRuntime } from "next"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import { StreamingTextResponse } from "ai"
 
+import { pluginIdToHandlerMapping } from "@/app/api/chat/plugins/plugins"
+import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
+
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
@@ -54,11 +57,29 @@ export async function POST(request: Request) {
       return rateLimitCheckResultForChatSettingsModel.response
     }
 
-    // if (model === "mistral-large" || model === "gpt-4-turbo-preview") {
+    let invokedByPluginId = false
     model = "gpt-4"
-    // } else {
-    //   model = "gpt-3.5-turbo-instruct"
-    // }
+
+    if (pluginIdToHandlerMapping.hasOwnProperty(selectedPlugin)) {
+      invokedByPluginId = true
+      let cleanMessages = messages.slice(1, -1)
+      let latestUserMessage = cleanMessages[cleanMessages.length - 1]
+      let answerMessage = { role: "user", content: "" }
+
+      const toolHandler = pluginIdToHandlerMapping[selectedPlugin]
+      const response = await toolHandler(
+        latestUserMessage,
+        process.env[`ENABLE_${selectedPlugin.toUpperCase()}_PLUGIN`] !==
+          "FALSE",
+        OpenAIStream,
+        model,
+        cleanMessages,
+        answerMessage,
+        invokedByPluginId
+      )
+
+      return response
+    }
 
     const chatBody = {
       model: model,

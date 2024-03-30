@@ -67,7 +67,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "CVEMap Help",
         description: "How does the CVEMap plugin work?",
-        chatMessage: "How does the CVEMap plugin work?"
+        chatMessage: "/cvemap -help"
       }
     ]
   },
@@ -141,7 +141,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Subfinder Help",
         description: "How does the Subfinder plugin work?",
-        chatMessage: "How does the Subfinder plugin work?"
+        chatMessage: "/subfinder -help"
       }
     ]
   },
@@ -177,7 +177,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "GoLinkFinder Help",
         description: "How does the GoLinkFinder plugin work?",
-        chatMessage: "How does the GoLinkFinder plugin work?"
+        chatMessage: "/golinkfinder -help"
       }
     ]
   },
@@ -246,7 +246,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Nuclei Help",
         description: "How does the Nuclei plugin work?",
-        chatMessage: "How does the Nuclei plugin work?"
+        chatMessage: "/nuclei -help"
       }
     ]
   },
@@ -281,7 +281,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Katana Help",
         description: "How does the Katana plugin work?",
-        chatMessage: "How does the Katana plugin work?"
+        chatMessage: "/katana -help"
       }
     ]
   },
@@ -316,7 +316,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "HttpX Help",
         description: "How does the HttpX plugin work?",
-        chatMessage: "How does the HttpX plugin work?"
+        chatMessage: "/httpx -help"
       }
     ]
   },
@@ -351,7 +351,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Naabu Help",
         description: "How does the Naabu plugin work?",
-        chatMessage: "How does the Naabu plugin work?"
+        chatMessage: "/naabu -help"
       }
     ]
   },
@@ -386,7 +386,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "GAU Help",
         description: "How does the GAU plugin work?",
-        chatMessage: "How does the GAU plugin work?"
+        chatMessage: "/gau -help"
       }
     ]
   },
@@ -405,13 +405,15 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Generate Subdomain Wordlist",
         description: "for hackerone.com",
-        chatMessage: "Generate custom subdomain wordlist for hackerone.com"
+        chatMessage: "Generate subdomain wordlist for hackerone.com"
       },
-      // {
-      //   title: "AlterX Help",
-      //   description: "Learn how to use AlterX for wordlist generation.",
-      //   chatMessage: "/alterx-help"
-      // },
+      {
+        title: "Map Subdomains Covering",
+        description:
+          "hackerone.com and its related subdomains: ...",
+        chatMessage:
+          "Map subdomains covering hackerone.com and its related subdomains: hackerone.com, api.hackerone.com, docs.hackerone.com, events.hackerone.com, resources.hackerone.com, reports.hackerone.com"
+      },
       // {
       //   title: "Customize Wordlist Generation",
       //   description: "Customize parameters for targeted wordlist generation.",
@@ -420,7 +422,7 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "AlterX Help",
         description: "How does the AlterX plugin work?",
-        chatMessage: "How does the AlterX plugin work?"
+        chatMessage: "/alterx -help"
       }
     ]
   },
