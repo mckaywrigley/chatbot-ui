@@ -157,23 +157,23 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: false,
     starters: [
-      {
-        title: "Start URL Extraction",
-        description: "targeted at shopify.com",
-        chatMessage: "Start URL Extraction for shopify.com"
-      },
+      // {
+      //   title: "Start URL Extraction",
+      //   description: "targeted at shopify.com",
+      //   chatMessage: "Start URL Extraction for shopify.com"
+      // },
       {
         title: "Extract URLs",
         description: "from https://www.hackerone.com/product/...",
         chatMessage:
           "Extract URLs from https://www.hackerone.com/product/overview"
       },
-      {
-        title: "Get HTML URLs",
-        description: "from https://github.com/Hacker-GPT/...",
-        chatMessage:
-          "Get HTML URLs from https://github.com/Hacker-GPT/HackerGPT-2.0"
-      },
+      // {
+      //   title: "Get HTML URLs",
+      //   description: "from https://github.com/Hacker-GPT/...",
+      //   chatMessage:
+      //     "Get HTML URLs from https://github.com/Hacker-GPT/HackerGPT-2.0"
+      // },
       {
         title: "GoLinkFinder Help",
         description: "How does the GoLinkFinder plugin work?",
@@ -193,6 +193,11 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: false,
     starters: [
+      {
+        title: "Scrape Data",
+        description: "from https://github.com/Hacker-GPT/...",
+        chatMessage: "https://github.com/Hacker-GPT/HackerGPT-2.0"
+      },
       // {
       //   title: "Initiate Scraping",
       //   description: "Start scraping data from specified websites.",
@@ -202,11 +207,6 @@ export const availablePlugins: PluginSummary[] = [
       //   title: "Web Scraper Help",
       //   description: "Learn how to use the Web Scraper for data extraction.",
       //   chatMessage: "/web-scraper-help"
-      // },
-      // {
-      //   title: "Customize Scraping",
-      //   description: "Customize scraping parameters for optimized results.",
-      //   chatMessage: "/customize-scraping"
       // },
       {
         title: "Web Scraper Help",
