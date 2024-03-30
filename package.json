@@ -101,7 +101,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^14.0.2",
+    "@next/bundle-analyzer": "^14.1.4",
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
