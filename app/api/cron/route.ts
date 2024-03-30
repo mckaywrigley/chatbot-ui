@@ -20,7 +20,10 @@ export async function GET(request: NextRequest) {
     // Search all chats in DB and return array where revise_date is before now
 
     const chats = await getChatsByReviseDate(cutoffDate, request)
-    console.log("Chats to send email to", chats.length)
+    console.log(
+      "Valid topics due for revision in this time period: ",
+      chats.length
+    )
 
     // Group chats by user_id
     let emailsToSend = []
@@ -63,6 +66,8 @@ export async function GET(request: NextRequest) {
     }
 
     let client = new postmark.ServerClient(serverToken)
+
+    console.log("Client", { client })
 
     console.log("Emails to send", JSON.stringify(emailsToSend))
 
