@@ -7,7 +7,6 @@ import {
   updateOrAddSystemMessage,
   wordReplacements
 } from "@/lib/ai-helper"
-// import queryPineconeVectorStore from "@/lib/models/query-pinecone"
 import PineconeRetriever from "@/lib/models/query-pinecone-2v"
 
 import llmConfig from "@/lib/models/llm/llm-config"
@@ -80,6 +79,7 @@ export async function POST(request: Request) {
 
     let latestUserMessage = cleanedMessages[cleanedMessages.length - 2].content
 
+    // RAG logic will only be used if the user doesn't chat with their own files and the last user message is between 25 and 2500.
     if (!latestUserMessage.startsWith("Assist with the user's query:")) {
       if (
         llmConfig.usePinecone &&
@@ -96,12 +96,6 @@ export async function POST(request: Request) {
           openRouterUrl,
           openRouterHeaders
         )
-
-        // const pineconeResults = await queryPineconeVectorStore(
-        //   standaloneQuestion,
-        //   llmConfig.openai.apiKey,
-        //   llmConfig.pinecone
-        // )
 
         const pineconeRetriever = new PineconeRetriever(
           llmConfig.openai.apiKey,
@@ -126,6 +120,16 @@ export async function POST(request: Request) {
             `DON'T MENTION OR REFERENCE ANYTHING RELATED TO RAG CONTENT OR ANYTHING RELATED TO RAG. ROLE PLAY.`
         }
       }
+    }
+
+    // If the user uses the web scraper plugin, we must switch to the rag model.
+    if (cleanedMessages[0].content.includes("<USER HELP>")) {
+      selectedModel = llmConfig.models.hackerGPT_RAG
+    }
+
+    // If the user is using the mistral-large model, we must always switch to the pro model.
+    if (chatSettings.model === "mistral-large") {
+      selectedModel = llmConfig.models.hackerGPT_pro
     }
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
