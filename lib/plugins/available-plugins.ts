@@ -73,6 +73,44 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 2,
+    name: "CyberChef",
+    selectorName: "CyberChef: Data Manipulation",
+    value: PluginID.CYBERCHEF,
+    icon: "https://gchq.github.io/CyberChef/images/cyberchef-128x128.png",
+    description:
+      "A tool for for encryption, encoding, compression, and data analysis.",
+    categories: ["Free", "Popular", "New"],
+    githubRepoUrl: "https://github.com/gchq/CyberChef",
+    isInstalled: false,
+    isPremium: false,
+    starters: [
+      {
+        title: "Encode The Following",
+        description: "to base64: 'This is your last chance. After this...",
+        chatMessage:
+          "Encode the following to base64: 'This is your last chance. After this, there is no turning back. You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill - you stay in Wonderland and I show you how deep the rabbit hole goes.'"
+      },
+      {
+        title: "Decode The Following",
+        description: "sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73...",
+        chatMessage:
+          "Decode the following sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73 20 61 20 64 61 6e 67 65 72 6f 75 73 20 70 6c 61 63 65 2c 20 6e 6f 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 64 6f 20 65 76 69 6c 2c 20 62 75 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 6c 6f 6f 6b 20 6f 6e 20 61 6e 64 20 64 6f 20 6e 6f 74 68 69 6e 67 2e'"
+      },
+      {
+        title: "Help Me Decode",
+        description: "this Morse Code-based 64 encoding: 'Li4uLiAu...",
+        chatMessage:
+          "Help me decode this Morse Code-based 64 encoding: 'Li4uLiAuLSAuLS0uIC4tLS4gLS4tLQouLi4uIC4tIC0uLS4gLS4tIC4uIC0uIC0tLg=='"
+      },
+      {
+        title: "CyberChef Help",
+        description: "How does the CyberChef plugin work?",
+        chatMessage: "How does the CyberChef plugin work?"
+      }
+    ]
+  },
+  {
+    id: 3,
     name: "Subfinder",
     selectorName: "Subfinder: Discover Subdomains",
     value: PluginID.SUBFINDER,
@@ -108,42 +146,6 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 3,
-    name: "CyberChef",
-    selectorName: "CyberChef: Data Manipulation",
-    value: PluginID.CYBERCHEF,
-    icon: "https://gchq.github.io/CyberChef/images/cyberchef-128x128.png",
-    description:
-      "A tool for for encryption, encoding, compression, and data analysis.",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/gchq/CyberChef",
-    isInstalled: false,
-    isPremium: false,
-    starters: [
-      // {
-      //   title: "Encode/Decode",
-      //   description: "Quickly encode or decode data.",
-      //   chatMessage: "/encode-decode"
-      // },
-      {
-        title: "Decode The Following",
-        description: "sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73...",
-        chatMessage:
-          "Decode the following sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73 20 61 20 64 61 6e 67 65 72 6f 75 73 20 70 6c 61 63 65 2c 20 6e 6f 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 64 6f 20 65 76 69 6c 2c 20 62 75 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 6c 6f 6f 6b 20 6f 6e 20 61 6e 64 20 64 6f 20 6e 6f 74 68 69 6e 67 2e'"
-      },
-      // {
-      //   title: "CyberChef Help",
-      //   description: "Learn how to use CyberChef with tutorials and guides.",
-      //   chatMessage: "/cyberchef-help"
-      // },
-      {
-        title: "CyberChef Help",
-        description: "How does the CyberChef plugin work?",
-        chatMessage: "How does the CyberChef plugin work?"
-      }
-    ]
-  },
-  {
     id: 4,
     name: "GoLinkFinder",
     selectorName: "GoLinkFinder: URL Extraction",
@@ -155,21 +157,23 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: false,
     starters: [
-      // {
-      //   title: "Start URL Extraction",
-      //   description: "Extract URLs from JavaScript files.",
-      //   chatMessage: "/start-url-extraction"
-      // },
-      // {
-      //   title: "GoLinkFinder Settings",
-      //   description: "Adjust GoLinkFinder settings for your needs.",
-      //   chatMessage: "/golinkfinder-settings"
-      // },
-      // {
-      //   title: "GoLinkFinder Help",
-      //   description: "Get help on how to use GoLinkFinder effectively.",
-      //   chatMessage: "/golinkfinder-help"
-      // },
+      {
+        title: "Start URL Extraction",
+        description: "targeted at shopify.com",
+        chatMessage: "Start URL Extraction for shopify.com"
+      },
+      {
+        title: "Extract URLs",
+        description: "from https://www.hackerone.com/product/...",
+        chatMessage:
+          "Extract URLs from https://www.hackerone.com/product/overview"
+      },
+      {
+        title: "Get HTML URLs",
+        description: "from https://github.com/Hacker-GPT/...",
+        chatMessage:
+          "Get HTML URLs from https://github.com/Hacker-GPT/HackerGPT-2.0"
+      },
       {
         title: "GoLinkFinder Help",
         description: "How does the GoLinkFinder plugin work?",
