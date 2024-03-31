@@ -24,6 +24,12 @@ Oh, and yes, you can effortlessly use these tools without typing complex command
 
 Along with these, there are more tools available with HackerGPT
 
+## A Special Note of Thanks
+
+Thank you so much, [@fkesheh](https://github.com/fkesheh) and [@Fx64b](https://github.com/Fx64b), for your amazing work and dedication to this project. 
+
+Thank you for being part of the HackerGPT family.
+
 ## Updating
 
 In your terminal at the root of your local Chatbot UI repository, run:
@@ -255,7 +261,7 @@ Click "Deploy" and wait for your frontend to deploy.
 
 Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
 
-## Have a feature request, question, comment?
+## Have a feature request, question, or comment?
 
 You can get in touch with us through email at [github@hackergpt.chat](mailto:github@hackergpt.chat) or connect with us on [X](https://twitter.com/thehackergpt).
 
