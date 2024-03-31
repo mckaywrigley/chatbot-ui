@@ -4,7 +4,7 @@ import {
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import type { NextRequest } from "next/server"
-import * as postmark from "postmark"
+import { ServerClient } from "postmark"
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
@@ -62,11 +62,11 @@ export async function GET(request: NextRequest) {
     return console.log("POSTMARK_SERVER_TOKEN is not defined")
   }
 
-  let postmarkClient = new postmark.ServerClient(serverToken)
+  let postmarkClient = new ServerClient(serverToken)
 
   console.log("Client", { client: postmarkClient })
 
-  console.log("Emails to send: ", JSON.stringify(emailsToSend))
+  console.log("Emails to send: ", JSON.stringify(emailsToSend.map(e => e.To)))
 
   // postmarkClient
   //   .getMessageStreams({
@@ -83,9 +83,19 @@ export async function GET(request: NextRequest) {
   // Send emails in batch
   if (emailsToSend.length > 0) {
     try {
-      await postmarkClient.sendEmailBatch(emailsToSend)
+      const result = await postmarkClient.sendEmailBatch(emailsToSend)
+      console.log(
+        "Emails sent",
+        JSON.stringify({ messageIds: result.map(r => r.MessageID) })
+      )
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { "Content-Type": "application/json" }
+      })
     } catch (postmarkClientError: any) {
-      throw Error(postmarkClientError ?? "There was an error sending the email")
+      console.log(postmarkClientError ?? "There was an error sending the email")
+      return new Response(JSON.stringify({ success: false }), {
+        headers: { "Content-Type": "application/json" }
+      })
     }
   }
 }
