@@ -167,8 +167,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       return "thread"
     } else {
       return (
-        contentType.charAt(0).toUpperCase() +
-        contentType.slice(1, contentType.length - 1)
+        contentType.charAt(0) + contentType.slice(1, contentType.length - 1)
       )
     }
   }
