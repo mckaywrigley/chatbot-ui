@@ -113,4 +113,12 @@
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
     }
+    .scrollbar-show {
+      scrollbar-width: auto; /* Firefox */
+      -ms-overflow-style: auto; /* IE and Edge */
+    }
+    .scrollbar-show::-webkit-scrollbar {
+      display: block; /* Chrome, Safari, Opera */
+    }
   }
+

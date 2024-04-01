@@ -21,6 +21,7 @@ import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
+import { dragHelper } from "@/components/chat/chat-helpers/drag"
 
 interface ChatFilesDisplayProps {}
 
@@ -115,7 +116,10 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         </div>
 
         <div className="overflow-auto">
-          <div className="flex gap-2 overflow-auto pt-2">
+          <div
+            className="scrollbar-hide sm:scrollbar-show flex gap-2 overflow-auto pt-2"
+            onMouseDown={dragHelper}
+          >
             {messageImages.map((image, index) => (
               <div
                 key={index}
