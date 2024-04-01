@@ -227,12 +227,12 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: true,
     starters: [
-      // {
-      //   title: "Start Vulnerability Scan",
-      //   description:
-      //     "Scan for vulnerabilities in your network or applications.",
-      //   chatMessage: "/start-vulnerability-scan"
-      // },
+      {
+        title: "Start Vulnerability Scan",
+        description: "for hackerone.com with a focus on cves and osint",
+        chatMessage:
+          "Start vulnerability scan for hackerone.com with a focus on cves and osint."
+      },
       // {
       //   title: "Nuclei Templates",
       //   description: "Use or contribute to Nuclei's vast template library.",

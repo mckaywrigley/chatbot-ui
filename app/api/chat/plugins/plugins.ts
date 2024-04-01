@@ -1,6 +1,8 @@
 import { handleCvemapRequest } from "./cvemap/cvemap.content"
+import { handleCyberChefRequest } from "./cyberchef/cyberchef.content"
 import { handleSubfinderRequest } from "./subfinder/subfinder.content"
 import { handleGoLinkFinderRequest } from "./golinkfinder/golinkfinder.content"
+import { handleNucleiRequest } from "./nuclei/nuclei.content"
 import { handleKatanaRequest } from "./katana/katana.content"
 import { handleHttpxRequest } from "./httpx/httpx.content"
 import { handleNaabuRequest } from "./naabu/naabu.content"
@@ -13,6 +15,7 @@ type pluginUrls = {
 
 export const pluginUrls: pluginUrls = {
   CVEmap: "https://github.com/projectdiscovery/cvemap",
+  Cyberchef: "https://github.com/gchq/CyberChef",
   Subfinder: "https://github.com/projectdiscovery/subfinder",
   GoLinkFinder: "https://github.com/0xsha/GoLinkFinder",
   Nuclei: "https://github.com/projectdiscovery/nuclei",
@@ -39,8 +42,10 @@ type pluginIdToHandlerMapping = {
 
 export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   cvemap: handleCvemapRequest,
+  cyberchef: handleCyberChefRequest,
   subfinder: handleSubfinderRequest,
   golinkfinder: handleGoLinkFinderRequest,
+  nuclei: handleNucleiRequest,
   katana: handleKatanaRequest,
   httpx: handleHttpxRequest,
   naabu: handleNaabuRequest,
