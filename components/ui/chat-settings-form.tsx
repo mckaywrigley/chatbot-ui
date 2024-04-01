@@ -51,7 +51,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
       </div>
 
       <div style={{ marginTop: 22, marginBottom: 22 }} className="space-y-1">
-        <Label>Prompt1</Label>
+        <Label>Prompt</Label>
 
         <TextareaAutosize
           className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}

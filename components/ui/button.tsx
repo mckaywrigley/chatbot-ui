@@ -17,14 +17,13 @@ const buttonVariants = cva(
           "border-input bg-background hover:bg-accent hover:text-accent-foreground border",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",
+        ghost: " hover:text-pixelspace-gray-3 border-1",
         workspaceButton:
           " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",
         link: "text-primary underline-offset-4 hover:underline",
 
         savePrompt:
-          " bg-pixelspace-gray-3 text-sm font-normal rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
+          " bg-pixelspace-gray-10 text-sm font-normal rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
         cancelPrompt:
           "bg-pixelspace-gray-90 border rounded-sm border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
 
