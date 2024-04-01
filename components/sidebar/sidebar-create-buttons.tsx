@@ -162,6 +162,17 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     }
   }
 
+  const getContentTypeText = (contentType: string): string => {
+    if (contentType === "chats") {
+      return "thread"
+    } else {
+      return (
+        contentType.charAt(0).toUpperCase() +
+        contentType.slice(1, contentType.length - 1)
+      )
+    }
+  }
+
   return (
     <div className="flex space-x-2">
       <div
@@ -203,11 +214,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
                 className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm font-normal dark:hover:text-white"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
-                New{" "}
-                {contentType === "chats"
-                  ? "thread"
-                  : contentType.charAt(0) +
-                    contentType.slice(1, contentType.length - 1)}
+                New {getContentTypeText(contentType)}
               </div>
             </li>
 

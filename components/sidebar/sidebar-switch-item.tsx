@@ -14,11 +14,25 @@ export const SidebarSwitchItem: FC<SidebarSwitchItemProps> = ({
   icon,
   onContentTypeChange
 }) => {
+  let labelTooltip
+
+  switch (contentType) {
+    case "chats":
+      labelTooltip = <div>Threads</div>
+      break
+    case "collections":
+      labelTooltip = <div>File collections</div>
+      break
+    default:
+      labelTooltip = (
+        <div>{contentType[0].toUpperCase() + contentType.slice(1)}</div>
+      )
+      break
+  }
+
   return (
     <WithTooltip
-      display={
-        <div>{contentType[0].toUpperCase() + contentType.substring(1)}</div>
-      }
+      display={labelTooltip}
       trigger={
         <TabsTrigger
           className="hover:opacity-50"
