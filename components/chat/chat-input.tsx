@@ -337,7 +337,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           </div>
         )}
       </div>
-      <div className="border-input bg-pixelspace-gray-60 relative mt-3 flex min-h-[56px] w-[714px] items-center rounded-[50px] border-2 px-[14px] py-[6px]">
+      <div className="border-input bg-pixelspace-gray-60  mt-3 flex min-h-[56px] w-[714px] items-center rounded-[50px] border-2 px-[14px] py-[6px]">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
