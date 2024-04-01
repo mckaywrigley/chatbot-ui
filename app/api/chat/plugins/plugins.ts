@@ -1,6 +1,10 @@
 import { handleCvemapRequest } from "./cvemap/cvemap.content"
 import { handleSubfinderRequest } from "./subfinder/subfinder.content"
 import { handleGoLinkFinderRequest } from "./golinkfinder/golinkfinder.content"
+import { handleKatanaRequest } from "./katana/katana.content"
+import { handleHttpxRequest } from "./httpx/httpx.content"
+import { handleNaabuRequest } from "./naabu/naabu.content"
+import { handleGauRequest } from "./gau/gau.content"
 import { handleAlterxRequest } from "./alterx/alterx.content"
 
 type pluginUrls = {
@@ -37,5 +41,9 @@ export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   cvemap: handleCvemapRequest,
   subfinder: handleSubfinderRequest,
   golinkfinder: handleGoLinkFinderRequest,
+  katana: handleKatanaRequest,
+  httpx: handleHttpxRequest,
+  naabu: handleNaabuRequest,
+  gau: handleGauRequest,
   alterx: handleAlterxRequest
 }

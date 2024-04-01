@@ -287,8 +287,8 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 8,
-    name: "HttpX",
-    selectorName: "HttpX: Web Analysis",
+    name: "HTTPX",
+    selectorName: "HTTPX: Web Analysis",
     value: PluginID.HTTPX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
@@ -314,8 +314,8 @@ export const availablePlugins: PluginSummary[] = [
       //   chatMessage: "/httpx-help"
       // },
       {
-        title: "HttpX Help",
-        description: "How does the HttpX plugin work?",
+        title: "HTTPX Help",
+        description: "How does the HTTPX plugin work?",
         chatMessage: "/httpx -help"
       }
     ]
@@ -338,16 +338,18 @@ export const availablePlugins: PluginSummary[] = [
         description: "for shopify.com",
         chatMessage: "Start port scanning for shopify.com"
       },
-      // {
-      //   title: "Naabu Configuration",
-      //   description: "Adjust Naabu settings for optimized port scanning.",
-      //   chatMessage: "/naabu-configuration"
-      // },
-      // {
-      //   title: "Naabu Usage Guide",
-      //   description: "Learn how to use Naabu for efficient port scanning.",
-      //   chatMessage: "/naabu-usage-guide"
-      // },
+      {
+        title: "Scan ports 80, 443, and 8080",
+        description: "for hackerone.com and its subdomains: ...",
+        chatMessage:
+          "Scan ports 80, 443, and 8080 for hackerone.com and its subdomains: api.hackerone.com, docs.hackerone.com, resources.hackerone.com, gslink.hackerone.com"
+      },
+      {
+        title: "Scan Top 1000 Ports",
+        description: "on tesla.com, excluding ports 21 and 22",
+        chatMessage:
+          "Scan top 1000 ports on tesla.com, excluding ports 21 and 22."
+      },
       {
         title: "Naabu Help",
         description: "How does the Naabu plugin work?",
@@ -409,10 +411,9 @@ export const availablePlugins: PluginSummary[] = [
       },
       {
         title: "Map Subdomains Covering",
-        description:
-          "hackerone.com and its related subdomains: ...",
+        description: "hackerone.com and its related subdomains: ...",
         chatMessage:
-          "Map subdomains covering hackerone.com and its related subdomains: hackerone.com, api.hackerone.com, docs.hackerone.com, events.hackerone.com, resources.hackerone.com, reports.hackerone.com"
+          "Map subdomains covering hackerone.com and its related subdomains: hackerone.com, api.hackerone.com, docs.hackerone.com, resources.hackerone.com, gslink.hackerone.com"
       },
       // {
       //   title: "Customize Wordlist Generation",

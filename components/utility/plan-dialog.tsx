@@ -147,7 +147,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
               <ProsStatement>Access to our HackerGPT Pro model</ProsStatement>
               <ProsStatement>Access to GPT-4 Turbo model</ProsStatement>
               <ProsStatement>
-                Access to additional tools like Nuclei, Katana, HttpX and more
+                Access to additional tools like Nuclei, Katana, HTTPX and more
               </ProsStatement>
               <ProsStatement>Faster response speed</ProsStatement>
             </div>
