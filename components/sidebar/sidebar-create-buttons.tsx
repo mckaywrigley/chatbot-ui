@@ -166,9 +166,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     if (contentType === "chats") {
       return "thread"
     } else {
-      return (
-        contentType.charAt(0) + contentType.slice(1, contentType.length - 1)
-      )
+      return contentType.slice(0, -1)
     }
   }
 
