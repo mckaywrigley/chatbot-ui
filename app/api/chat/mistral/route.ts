@@ -25,9 +25,11 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages } = json as {
+  const { chatSettings, messages, isRetrieval, isContinuation } = json as {
     chatSettings: ChatSettings
     messages: any[]
+    isRetrieval: boolean
+    isContinuation: boolean
   }
 
   try {
@@ -77,22 +79,27 @@ export async function POST(request: Request) {
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
-    let latestUserMessage = cleanedMessages[cleanedMessages.length - 2].content
+    // On normal chat, the last user message is the target standalone message
+    // On continuation, the tartget is the last generated message by the system
+    const targetStandAloneMessage =
+      cleanedMessages[cleanedMessages.length - 2].content
+    const filterTargetMessage = isContinuation
+      ? cleanedMessages[cleanedMessages.length - 3]
+      : cleanedMessages[cleanedMessages.length - 2]
 
-    // RAG logic will only be used if the user doesn't chat with their own files and the last user message is between 25 and 2500.
-    if (!latestUserMessage.startsWith("Assist with the user's query:")) {
+    if (!isRetrieval) {
       if (
         llmConfig.usePinecone &&
         cleanedMessages.length > 0 &&
-        cleanedMessages[cleanedMessages.length - 2].role === "user" &&
-        cleanedMessages[cleanedMessages.length - 2].content.length >
+        filterTargetMessage.role === "user" &&
+        filterTargetMessage.content.length >
           llmConfig.pinecone.messageLength.min &&
-        cleanedMessages[cleanedMessages.length - 2].content.length <
+        filterTargetMessage.content.length <
           llmConfig.pinecone.messageLength.max
       ) {
         const standaloneQuestion = await generateStandaloneQuestion(
           messages,
-          latestUserMessage,
+          targetStandAloneMessage,
           openRouterUrl,
           openRouterHeaders
         )
@@ -132,7 +139,7 @@ export async function POST(request: Request) {
       selectedModel = llmConfig.models.hackerGPT_pro
     }
 
-    replaceWordsInLastUserMessage(messages, wordReplacements)
+    replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
 
     const requestBody = {
       model: selectedModel,
