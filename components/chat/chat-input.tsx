@@ -118,10 +118,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
-  }, [selectedPreset, selectedAssistant])
+  }, [selectedPreset, selectedAssistant, handleFocusChatInput])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && event.key === "Enter" && !event.shiftKey) {
+    if (!isTyping && event.key === "Enter" && !event.shiftKey && !isMobile) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
       handleSendMessage(userInput, chatMessages, false)
