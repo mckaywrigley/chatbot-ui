@@ -284,7 +284,12 @@ export const deleteFile = async (fileId: string) => {
   if (error) {
     throw new Error(error.message)
   }
-
+  const qclient = new qDrant()
+  // const qclient = new QdrantClient({ url: "http://10.34.224.59:6333" })
+  qclient.deleteFile(
+    (await supabase.auth.getUser()).data.user?.id || "",
+    fileId
+  )
   return true
 }
 

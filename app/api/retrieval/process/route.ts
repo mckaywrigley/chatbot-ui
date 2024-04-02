@@ -1,4 +1,5 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import { qDrant } from "@/lib/qdrant"
 import {
   processCSV,
   processJSON,
@@ -6,6 +7,7 @@ import {
   processPdf,
   processTxt
 } from "@/lib/retrieval/processing"
+
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
-
+    const qclient = new qDrant()
     const profile = await getServerProfile()
 
     const formData = await req.formData()
@@ -44,20 +46,24 @@ export async function POST(req: Request) {
 
     let chunks: FileItemChunk[] = []
 
-    switch (fileExtension) {
+    switch (fileMetadata.type) {
+      case "application/csv":
       case "csv":
         chunks = await processCSV(blob)
         break
+      case "application/json":
       case "json":
         chunks = await processJSON(blob)
         break
       case "md":
         chunks = await processMarkdown(blob)
         break
+      case "application/pdf":
       case "pdf":
         chunks = await processPdf(blob)
         break
-      case "txt":
+      case "plain/text":
+      case "plain":
         chunks = await processTxt(blob)
         break
       default:
@@ -67,7 +73,6 @@ export async function POST(req: Request) {
     }
 
     let embeddings: any = []
-
     let openai
     if (profile.use_azure_openai) {
       openai = new OpenAI({
@@ -92,7 +97,7 @@ export async function POST(req: Request) {
       embeddings = response.data.map((item: any) => {
         return item.embedding
       })
-    } else if (embeddingsProvider === "local") {
+    } else {
       const embeddingPromises = chunks.map(async chunk => {
         try {
           return await generateLocalEmbedding(chunk.content)
@@ -151,6 +156,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    let errorString = JSON.stringify(error)
+    if (errorString === "{}") {
+      errorString = error
+    }
+    console.log(errorMessage + " - " + errorString)
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

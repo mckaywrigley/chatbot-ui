@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   const uniqueFileIds = [...new Set(fileIds)]
 
   try {
+    const qclient = new qDrant()
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -98,13 +99,14 @@ export async function POST(request: Request) {
     const mostSimilarChunks = chunks?.sort(
       (a, b) => b.similarity - a.similarity
     )
-
+    console.log(mostSimilarChunks)
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    console.log(errorMessage + " - " + JSON.stringify(error))
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })
