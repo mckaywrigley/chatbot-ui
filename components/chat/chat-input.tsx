@@ -306,7 +306,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               }
             >
               <div className="bg-pixelspace-teal-500 flex h-10 cursor-pointer items-center justify-center space-x-1 rounded-full px-4 py-1 hover:opacity-50">
-                <div className="text-pixelspace-gray-90 text-center text-sm font-medium">
+                <div className="text-pixelspace-gray-90 font-inter text-center text-sm font-medium">
                   {tool.name}
                 </div>
                 <i
@@ -331,7 +331,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 alt={selectedAssistant.name}
               />
             )}
-            <div className="text-sm font-medium ">
+            <div className="font-inter text-sm font-medium ">
               Talking to {selectedAssistant.name}
             </div>
           </div>
@@ -419,7 +419,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         </>
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+          className={`bg-pixelspace-gray-60 placeholder:font-libre-franklin ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
           placeholder={t(
             `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
           )}

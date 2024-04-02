@@ -66,7 +66,7 @@ export const AssistantRetrievalSelect: FC<AssistantRetrievalSelectProps> = ({
           variant="ghost"
         >
           <div className="flex items-center">
-            <div className="ml-2 flex items-center">
+            <div className="font-libre-franklin ml-2 flex items-center">
               {selectedAssistantRetrievalItems.length} files selected
             </div>
           </div>

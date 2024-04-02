@@ -233,7 +233,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                     })()}
                   </div>
 
-                  <div className="text-pixelspace-gray-3 truncate text-sm font-medium leading-[21px]">
+                  <div className="text-pixelspace-gray-3 font-inter truncate text-sm font-medium leading-[21px]">
                     <div className="truncate">{file.name}</div>
                   </div>
 
