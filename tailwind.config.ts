@@ -16,6 +16,11 @@ module.exports = {
       }
     },
     extend: {
+      fontFamily: {
+        "helvetica-now": ['"Helvetica Now Text"'],
+        "helvetica-micro": ['"Helvetica Now Micro"'],
+        "libre-franklin": ["Libre Franklin"]
+      },
       colors: {
         pixelspace: {
           white: "#FFFFFF",

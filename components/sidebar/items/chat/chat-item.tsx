@@ -137,7 +137,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         />
       )}
 
-      <div className="text-pixelspace-gray-20 ml-3 flex-1  truncate text-sm font-normal">
+      <div className="text-pixelspace-gray-20 font-helvetica-now ml-3 flex-1 truncate text-sm font-normal">
         {chat.name}
       </div>
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
