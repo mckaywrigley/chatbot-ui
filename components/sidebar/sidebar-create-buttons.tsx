@@ -165,6 +165,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const getContentTypeText = (contentType: string): string => {
     if (contentType === "chats") {
       return "thread"
+    } else if (contentType === "tools") {
+      return "action"
     } else {
       return contentType.slice(0, -1)
     }
