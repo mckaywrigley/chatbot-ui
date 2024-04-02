@@ -337,11 +337,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           </div>
         )}
       </div>
-      <div className="border-input bg-pixelspace-gray-60  mt-3 flex min-h-[56px] w-[714px] items-center rounded-[50px] border-2 px-[14px] py-[6px]">
+      <div
+        style={{
+          paddingTop: 20,
+          paddingBottom: 20
+        }}
+        className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-[714px] items-end justify-center rounded-[50px] border-2"
+      >
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
-        <>
+        <div>
           {/* Hidden input to select files from device */}
           <div className="flex items-center">
             <button
@@ -416,23 +422,26 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             }}
             accept={filesToAccept}
           />
-        </>
-        <TextareaAutosize
-          textareaRef={chatInputRef}
-          className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
-          placeholder={t(
-            `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
-          )}
-          onValueChange={handleInputChange}
-          value={userInput}
-          minRows={1}
-          maxRows={18}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-          isDisabled={isGenerating || isRecording || transcriptionLoading}
-        />
+        </div>
+        <div className="flex items-center justify-center">
+          <TextareaAutosize
+            textareaRef={chatInputRef}
+            className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+            placeholder={t(
+              `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
+            )}
+            onValueChange={handleInputChange}
+            value={userInput}
+            minRows={1}
+            maxRows={18}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => setIsTyping(true)}
+            onCompositionEnd={() => setIsTyping(false)}
+            isDisabled={isGenerating || isRecording || transcriptionLoading}
+          />
+        </div>
+
         <div className="cursor-pointer hover:opacity-50">
           {isGenerating ? (
             <button
