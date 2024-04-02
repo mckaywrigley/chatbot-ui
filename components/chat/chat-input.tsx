@@ -317,7 +317,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
         {selectedAssistant && (
-          <div className=" mx-auto flex w-fit items-center space-x-[10px] rounded-lg  p-1.5">
+          <div className=" bg-pixelspace-gray-90 hover:bg-pixelspace-gray-80 mx-auto flex w-fit items-center space-x-[10px] rounded-full p-2">
             {selectedAssistant.image_path ? (
               <Image
                 style={{ width: "24px", height: "24px" }}
@@ -432,9 +432,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <div className="flex items-center justify-center">
           <TextareaAutosize
             textareaRef={chatInputRef}
-            className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+            className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} placeholder:font-libre-franklin focus-visible:ring-ring mx-3 flex w-[550px] resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
             placeholder={t(
-              `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files, and “!” for tools."}`
+              `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files & “!” for actions"}`
             )}
             onValueChange={handleInputChange}
             value={userInput}
