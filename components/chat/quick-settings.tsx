@@ -202,6 +202,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
           {selectedAssistant &&
             (selectedAssistantImage ? (
               <Image
+                style={{ width: "24px", height: "24px" }}
                 className="rounded-full"
                 src={selectedAssistantImage}
                 alt="Assistant"
@@ -209,10 +210,12 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                 height={24}
               />
             ) : (
-              <IconRobotFace
-                className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                size={28}
-              />
+              <div className="bg-pixelspace-gray-60 flex size-[24px] items-center justify-center rounded-full">
+                <i
+                  className="fa-regular fa-robot text-pixelspace-gray-20"
+                  style={{ fontSize: 12 }}
+                ></i>
+              </div>
             ))}
 
           {loading ? (

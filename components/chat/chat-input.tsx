@@ -18,7 +18,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowUp, faSquare } from "@fortawesome/free-solid-svg-icons"
+import { faArrowUp, faRobot, faSquare } from "@fortawesome/free-solid-svg-icons"
 import { faPaperclipVertical } from "@fortawesome/pro-regular-svg-icons"
 // import { LiveAudioVisualizer } from "react-audio-visualize"
 import RecordingTimer, {
@@ -306,7 +306,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               }
             >
               <div className="bg-pixelspace-teal-500 flex h-10 cursor-pointer items-center justify-center space-x-1 rounded-full px-4 py-1 hover:opacity-50">
-                <div className="text-pixelspace-gray-90 text-center text-sm font-medium">
+                <div className="text-pixelspace-gray-90 font-inter text-center text-sm font-medium">
                   {tool.name}
                 </div>
                 <i
@@ -317,9 +317,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
         {selectedAssistant && (
-          <div className=" mx-auto flex w-fit items-center space-x-2 rounded-lg p-1.5">
-            {selectedAssistant.image_path && (
+          <div className=" mx-auto flex w-fit items-center space-x-[10px] rounded-lg  p-1.5">
+            {selectedAssistant.image_path ? (
               <Image
+                style={{ width: "24px", height: "24px" }}
                 className="rounded-full "
                 src={
                   assistantImages.find(
@@ -330,8 +331,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 height={24}
                 alt={selectedAssistant.name}
               />
+            ) : (
+              <i
+                className="fa-regular fa-robot text-pixelspace-gray-20"
+                style={{ fontSize: 14 }}
+              ></i>
             )}
-            <div className="text-sm font-medium ">
+            <div className="font-inter text-sm font-medium">
               Talking to {selectedAssistant.name}
             </div>
           </div>

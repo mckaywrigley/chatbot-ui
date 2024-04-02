@@ -113,7 +113,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                     width={26}
                     height={26}
                   />
-                  <div className="ml-2 flex items-center">
+                  <div className="font-libre-franklin ml-2 flex items-center">
                     {selectedModel?.modelName}
                   </div>
                 </>

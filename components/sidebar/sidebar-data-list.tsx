@@ -217,6 +217,18 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
 
+  const getContentTypeText = (contentType: string): string => {
+    if (contentType === "chats") {
+      return "threads"
+    } else if (contentType === "collections") {
+      return "file collections"
+    } else if (contentType === "tools") {
+      return "actions"
+    } else {
+      return contentType
+    }
+  }
+
   return (
     <>
       <div
@@ -227,7 +239,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         {data.length === 0 && (
           <div className="flex grow flex-col items-center justify-center">
             <div className=" text-centertext-muted-foreground p-8 text-lg italic">
-              No {contentType}.
+              No {getContentTypeText(contentType)}.
             </div>
           </div>
         )}

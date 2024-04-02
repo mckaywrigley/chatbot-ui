@@ -118,7 +118,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
           alt={item.name}
           width={32}
           height={32}
-          className="mt-2 size-5 cursor-pointer rounded-full hover:opacity-50"
+          className=" flex size-5 cursor-pointer items-center justify-center rounded-full hover:opacity-50"
         />
       ) : (
         <div className="bg-pixelspace-gray-60 flex size-5 items-center justify-center rounded-full">
@@ -152,6 +152,18 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       iconComponent = null
   }
   // end of switch statement
+
+  const getContentTypeText = (contentType: string): string => {
+    if (contentType === "chats") {
+      return "threads"
+    } else if (contentType === "collections") {
+      return "file collections"
+    } else if (contentType === "tools") {
+      return "actions"
+    } else {
+      return contentType
+    }
+  }
 
   return (
     <SidebarUpdateItem

@@ -63,7 +63,7 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
           variant="ghost"
         >
           <div className="flex items-center">
-            <div className="ml-2 flex items-center">
+            <div className="font-libre-franklin ml-2 flex items-center">
               {selectedAssistantTools.length} tools selected
             </div>
           </div>
