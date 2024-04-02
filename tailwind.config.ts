@@ -19,7 +19,8 @@ module.exports = {
       fontFamily: {
         "helvetica-now": ['"Helvetica Now Text"'],
         "helvetica-micro": ['"Helvetica Now Micro"'],
-        "libre-franklin": ["Libre Franklin"]
+        "libre-franklin": ["Libre Franklin", "sans-serif"],
+        inter: ["Inter", "sans-serif"]
       },
       colors: {
         pixelspace: {

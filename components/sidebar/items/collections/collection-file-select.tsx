@@ -60,7 +60,7 @@ export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
           variant="ghost"
         >
           <div className="flex items-center">
-            <div className="ml-2 flex items-center">
+            <div className="font-libre-franklin ml-2 flex items-center">
               {selectedCollectionFiles.length} files selected
             </div>
           </div>

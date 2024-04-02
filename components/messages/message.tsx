@@ -258,7 +258,7 @@ export const Message: FC<MessageProps> = ({
                 </div>
               )}
 
-              <div className="text-base font-semibold  leading-7">
+              <div className="font-libre-franklin text-base font-semibold leading-7">
                 {message.role === "assistant"
                   ? message.assistant_id
                     ? assistants.find(
