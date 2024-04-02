@@ -290,7 +290,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   return (
     <>
-      <div className="flex flex-col flex-wrap  gap-2">
+      <div className="flex flex-col flex-wrap gap-2">
         <ChatFilesDisplay />
         {selectedTools &&
           selectedTools.map((tool, index) => (
@@ -317,7 +317,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           ))}
         {selectedAssistant && (
-          <div className=" mx-auto flex w-fit items-center space-x-2 rounded-lg  p-1.5">
+          <div className=" mx-auto flex w-fit items-center space-x-2 rounded-lg p-1.5">
             {selectedAssistant.image_path && (
               <Image
                 className="rounded-full "
@@ -342,12 +342,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           paddingTop: 20,
           paddingBottom: 20
         }}
-        className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-[714px] items-end justify-center rounded-[50px] border-2"
+        className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-[714px] justify-center rounded-[50px] border-2"
       >
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
-        <div>
+        <div className="flex items-end justify-center">
           {/* Hidden input to select files from device */}
           <div className="flex items-center">
             <button
@@ -442,7 +442,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           />
         </div>
 
-        <div className="cursor-pointer hover:opacity-50">
+        <div className="flex cursor-pointer items-end justify-center hover:opacity-50">
           {isGenerating ? (
             <button
               className="bg-pixelspace-pink size-8 rounded-full"
