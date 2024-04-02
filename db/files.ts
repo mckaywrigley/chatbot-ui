@@ -3,6 +3,7 @@ import { TablesInsert, TablesUpdate } from "@/supabase/types"
 import mammoth from "mammoth"
 import { toast } from "sonner"
 import { uploadFile } from "./storage/files"
+import { qDrant } from "@/lib/qdrant"
 
 export const getFileById = async (fileId: string) => {
   const { data: file, error } = await supabase
@@ -268,6 +269,16 @@ export const updateFile = async (
 }
 
 export const deleteFile = async (fileId: string) => {
+  if (process.env.EMBEDDING_STORAGE == "qdrant") {
+    const qclient = new qDrant()
+    // const qclient = new QdrantClient({ url: "http://10.34.224.59:6333" })
+    qclient.deleteFile(
+      (await supabase.auth.getUser()).data.user?.id || "",
+      fileId
+    )
+    return true
+  }
+
   const { error } = await supabase.from("files").delete().eq("id", fileId)
 
   if (error) {

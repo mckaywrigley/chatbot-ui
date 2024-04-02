@@ -4,6 +4,8 @@ import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
+import { qDrant } from "@/lib/qdrant"
+
 export async function POST(request: Request) {
   const json = await request.json()
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
@@ -71,18 +73,26 @@ export async function POST(request: Request) {
     } else if (embeddingsProvider === "local") {
       const localEmbedding = await generateLocalEmbedding(userInput)
 
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
+      if (process.env.EMBEDDING_STORAGE == "qdrant") {
+        const qclient = new qDrant()
+        chunks = await qclient.searchEmbeddings(
+          uniqueFileIds,
+          profile.user_id,
+          localEmbedding
+        )
+      } else {
+        const { data: localFileItems, error: localFileItemsError } =
+          await supabaseAdmin.rpc("match_file_items_local", {
+            query_embedding: localEmbedding as any,
+            match_count: sourceCount,
+            file_ids: uniqueFileIds
+          })
 
-      if (localFileItemsError) {
-        throw localFileItemsError
+        if (localFileItemsError) {
+          throw localFileItemsError
+        }
+        chunks = localFileItems
       }
-
-      chunks = localFileItems
     }
 
     const mostSimilarChunks = chunks?.sort(
