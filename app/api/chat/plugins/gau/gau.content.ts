@@ -24,6 +24,7 @@ const displayHelpGuide = () => {
        --from string         fetch URLs from date (format: YYYYMM)
        --to string           fetch URLs to date (format: YYYYMM)
        --providers strings   list of providers to use (wayback, commoncrawl, otx, urlscan)
+       --subs                include subdomains of target domain
 
     FILTER:
        --blacklist strings   list of extensions to skip
@@ -153,6 +154,9 @@ const parseGauCommandLine = (input: string): GauParams => {
             return params
           }
           break
+        case "--subs":
+          params.includeSubdomains = true
+          break
         case "--to":
           params.toDate = args[++i]
           if (!isDateFormat(params.toDate)) {
@@ -277,7 +281,7 @@ export async function handleGauRequest(
     gauUrl += `&fc=${params.fc.join(",")}`
   }
   if (params.fromDate) {
-    gauUrl += `&from=${params.fromDate}`
+    gauUrl += `&fromDate=${params.fromDate}`
   }
   if (params.ft.length > 0) {
     gauUrl += `&ft=${params.ft.join(",")}`
@@ -298,7 +302,7 @@ export async function handleGauRequest(
     gauUrl += `&subs=true`
   }
   if (params.toDate) {
-    gauUrl += `&to=${params.toDate}`
+    gauUrl += `&toDate=${params.toDate}`
   }
 
   const headers = new Headers()
@@ -413,6 +417,7 @@ const transformUserQueryToGAUCommand = (lastMessage: Message) => {
     - --from: Fetch URLs from date (format: YYYYMM). (optional)
     - --to: Fetch URLs to date (format: YYYYMM). (optional)
     - --providers: List of providers to use (wayback, commoncrawl, otx, urlscan). (optional)
+    - --subs: Include subdomains of target domain. Use it if user asks for it. (optional)
   3. **Filter Flags**:
     - --blacklist: List of extensions to skip. (optional)
     - --fc: List of status codes to filter. (optional)
@@ -426,7 +431,7 @@ const transformUserQueryToGAUCommand = (lastMessage: Message) => {
   Example Commands:
   For fetching URLs for a specific target with certain filters directly:
   \`\`\`json
-  { "command": "gau example.com --from 202001 --to 202012 --blacklist js,css --fc 404" }
+  { "command": "gau example.com --from 202401 --to 202403 --blacklist js,css --fc 404" }
   \`\`\`
 
   For a request for help or to see all flags:

@@ -157,23 +157,12 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: false,
     starters: [
-      // {
-      //   title: "Start URL Extraction",
-      //   description: "targeted at shopify.com",
-      //   chatMessage: "Start URL Extraction for shopify.com"
-      // },
       {
         title: "Extract URLs",
         description: "from https://www.hackerone.com/product/...",
         chatMessage:
           "Extract URLs from https://www.hackerone.com/product/overview"
       },
-      // {
-      //   title: "Get HTML URLs",
-      //   description: "from https://github.com/Hacker-GPT/...",
-      //   chatMessage:
-      //     "Get HTML URLs from https://github.com/Hacker-GPT/HackerGPT-2.0"
-      // },
       {
         title: "GoLinkFinder Help",
         description: "How does the GoLinkFinder plugin work?",
@@ -198,16 +187,6 @@ export const availablePlugins: PluginSummary[] = [
         description: "from https://github.com/Hacker-GPT/...",
         chatMessage: "https://github.com/Hacker-GPT/HackerGPT-2.0"
       },
-      // {
-      //   title: "Initiate Scraping",
-      //   description: "Start scraping data from specified websites.",
-      //   chatMessage: "/initiate-scraping"
-      // },
-      // {
-      //   title: "Web Scraper Help",
-      //   description: "Learn how to use the Web Scraper for data extraction.",
-      //   chatMessage: "/web-scraper-help"
-      // },
       {
         title: "Web Scraper Help",
         description: "How does the Web Scraper plugin work?",
@@ -233,16 +212,16 @@ export const availablePlugins: PluginSummary[] = [
         chatMessage:
           "Start vulnerability scan for hackerone.com with a focus on cves and osint."
       },
-      // {
-      //   title: "Nuclei Templates",
-      //   description: "Use or contribute to Nuclei's vast template library.",
-      //   chatMessage: "/nuclei-templates"
-      // },
-      // {
-      //   title: "Nuclei Help",
-      //   description: "Get help on how to configure and use Nuclei effectively.",
-      //   chatMessage: "/nuclei-help"
-      // },
+      {
+        title: "Initiate Web Tech Detection Scan",
+        description: "on hackerone.com",
+        chatMessage: "/nuclei -u hackerone.com -tags tech"
+      },
+      {
+        title: "Perform Automatic Scan",
+        description: "for hackerone.com",
+        chatMessage: "/nuclei -target hackerone.com -automatic-scan"
+      },
       {
         title: "Nuclei Help",
         description: "How does the Nuclei plugin work?",
@@ -263,21 +242,21 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: true,
     starters: [
-      // {
-      //   title: "Initiate Web Crawling",
-      //   description: "Start crawling websites for information gathering.",
-      //   chatMessage: "/initiate-web-crawling"
-      // },
-      // {
-      //   title: "Katana Configuration",
-      //   description: "Configure Katana for targeted web crawling.",
-      //   chatMessage: "/katana-configuration"
-      // },
-      // {
-      //   title: "Katana Usage Guide",
-      //   description: "Learn how to use Katana effectively for web crawling.",
-      //   chatMessage: "/katana-usage-guide"
-      // },
+      {
+        title: "Crawl With JavaScript Parsing",
+        description: "for dynamic content on hackerone.com",
+        chatMessage: "/katana -u hackerone.com -js-crawl"
+      },
+      {
+        title: "Perform Scope-Defined Crawling",
+        description: "on hackerone.com",
+        chatMessage: "/katana -u hackerone.com -crawl-scope '.*hackerone.com*'"
+      },
+      {
+        title: "Filter Content by Extension",
+        description: "on target.com, excluding CSS and PNG",
+        chatMessage: "/katana -u hackerone.com -extension-filter png,css"
+      },
       {
         title: "Katana Help",
         description: "How does the Katana plugin work?",
@@ -298,21 +277,21 @@ export const availablePlugins: PluginSummary[] = [
     isInstalled: false,
     isPremium: true,
     starters: [
-      // {
-      //   title: "Start HTTP Analysis",
-      //   description: "Analyze HTTP servers for useful information.",
-      //   chatMessage: "/start-http-analysis"
-      // },
-      // {
-      //   title: "HttpX Configuration",
-      //   description: "Configure HttpX for your specific analysis needs.",
-      //   chatMessage: "/httpx-configuration"
-      // },
-      // {
-      //   title: "HttpX Help",
-      //   description: "Get help on how to use HttpX for web analysis.",
-      //   chatMessage: "/httpx-help"
-      // },
+      {
+        title: "Start HTTP Analysis",
+        description: "on hackerone.com, revealing server details ...",
+        chatMessage: "/httpx -u hackerone.com"
+      },
+      {
+        title: "Detect Web Technologies",
+        description: "on hackerone.com, utilizing Wappalyzer dataset...",
+        chatMessage: "/httpx -u hackerone.com -tech-detect"
+      },
+      {
+        title: "Security Headers Analysis",
+        description: "on hackerone.com, inspecting for security-...",
+        chatMessage: "/httpx -u hackerone.com -include-response-header -json"
+      },
       {
         title: "HTTPX Help",
         description: "How does the HTTPX plugin work?",
@@ -375,16 +354,16 @@ export const availablePlugins: PluginSummary[] = [
         description: "for tesla.com",
         chatMessage: "Enumerate URLs for tesla.com"
       },
-      // {
-      //   title: "GAU Guide",
-      //   description: "Learn how to use GAU for URL enumeration.",
-      //   chatMessage: "/gau-guide"
-      // },
-      // {
-      //   title: "GAU Settings",
-      //   description: "Configure GAU settings for your enumeration needs.",
-      //   chatMessage: "/gau-settings"
-      // },
+      {
+        title: "Enumerate URLs with Date Range",
+        description: "for tesla.com, fetching from January to ...",
+        chatMessage: "/gau tesla.com --from 202301 --to 202306"
+      },
+      {
+        title: "Enumerate URLs Including Subdomains",
+        description: "for tesla.com, capturing URLs across ...",
+        chatMessage: "/gau tesla.com --subs"
+      },
       {
         title: "GAU Help",
         description: "How does the GAU plugin work?",
@@ -415,11 +394,11 @@ export const availablePlugins: PluginSummary[] = [
         chatMessage:
           "Map subdomains covering hackerone.com and its related subdomains: hackerone.com, api.hackerone.com, docs.hackerone.com, resources.hackerone.com, gslink.hackerone.com"
       },
-      // {
-      //   title: "Customize Wordlist Generation",
-      //   description: "Customize parameters for targeted wordlist generation.",
-      //   chatMessage: "/customize-wordlist-generation"
-      // },
+      {
+        title: "Generate Custom Enriched Wordlist",
+        description: "for tesla.com, enriching with '{{word}}-...",
+        chatMessage: "/alterx -enrich -p '{{word}}-{{suffix}}' -list tesla.com"
+      },
       {
         title: "AlterX Help",
         description: "How does the AlterX plugin work?",
