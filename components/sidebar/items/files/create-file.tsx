@@ -64,11 +64,11 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
               onClick={() => document.getElementById("fileInput")?.click()}
             >
               <span className="hover:text-pixelspace-gray-3 font-['Libre Franklin'] mr-3 text-sm font-normal leading-[25.20px]">
-                Choose files
+                Choose file
               </span>
               {!selectedFile ? (
                 <span className="font-['Libre Franklin'] text-sm font-normal leading-[25.20px]">
-                  no filed selected
+                  no file selected
                 </span>
               ) : (
                 name
@@ -89,7 +89,7 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
 
             <Input
               className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
-              placeholder="File name..."
+              placeholder="File name"
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={FILE_NAME_MAX}
@@ -101,7 +101,7 @@ export const CreateFile: FC<CreateFileProps> = ({ isOpen, onOpenChange }) => {
 
             <Input
               className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
-              placeholder="File description..."
+              placeholder="File description"
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={FILE_DESCRIPTION_MAX}
