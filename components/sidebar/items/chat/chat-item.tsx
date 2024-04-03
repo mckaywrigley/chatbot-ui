@@ -123,7 +123,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     >
       {chat.assistant_id ? (
         <div
-          className={`size-1.5 rounded-full${selectedChat?.id === chat?.id ? "bg-pixelspace-pink" : "bg-pixelspace-gray-40"}`}
+          className={`size-1.5 rounded-full ${selectedChat?.id === chat?.id ? "bg-pixelspace-pink" : "bg-pixelspace-gray-40"}`}
         ></div>
       ) : (
         <WithTooltip

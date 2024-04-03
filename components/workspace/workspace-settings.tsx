@@ -168,7 +168,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <WithTooltip
-          display={<div>Workspace Settings</div>}
+          display={<div>Workspace Settings1</div>}
           trigger={
             <div
               role="button"
@@ -185,8 +185,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       </SheetTrigger>
 
       <SheetContent
-        className="flex flex-col justify-between"
-        side="left"
+        className="flex min-w-[450px] flex-col justify-between overflow-auto"
+        side="workspaceSetting"
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
@@ -207,7 +207,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="main">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
+            <TabsList className="bg-pixelspace-gray-80 mt-[22px] grid w-[202px] grid-cols-2">
               <TabsTrigger
                 className="data-[state=active]:bg-pixelspace-gray-60 ml-1 h-[36px]"
                 value="main"
@@ -265,7 +265,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
 
                 <TextareaAutosize
                   className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
-                  placeholder="Instructions... (optional)"
+                  placeholder="Instructions"
                   value={instructions}
                   onValueChange={setInstructions}
                   minRows={5}
@@ -281,7 +281,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
             </TabsContent>
 
             <TabsContent className="mt-5" value="defaults">
-              <div style={{ marginTop: 22 }} className="mb-4 text-sm">
+              <div
+                style={{ marginTop: 22, marginBottom: 22 }}
+                className=" text-pixelspace-gray-3 text-sm font-normal leading-[25.20px]"
+              >
                 These are the settings your workspace begins with when selected.
               </div>
 
@@ -304,11 +307,20 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           </div>
 
           <div className="space-x-2">
-            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            <Button
+              size="cancelPrompt"
+              variant="cancelPrompt"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
 
-            <Button ref={buttonRef} onClick={handleSave}>
+            <Button
+              size="savePrompt"
+              variant="savePrompt"
+              ref={buttonRef}
+              onClick={handleSave}
+            >
               Save
             </Button>
           </div>
