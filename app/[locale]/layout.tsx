@@ -16,7 +16,7 @@ import { PluginProvider } from "@/components/chat/chat-hooks/PluginProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 const APP_NAME = "HackerGPT"
-const APP_DEFAULT_TITLE = "HackerGPT"
+const APP_DEFAULT_TITLE = "HackerGPT | #1 Trusted Ethical Hacking AI"
 const APP_TITLE_TEMPLATE = "%s - HackerGPT"
 const APP_DESCRIPTION =
   "Unlock the power of HackerGPT, your AI ethical hacking assistant, trained extensively on hacking knowledge. Swiftly identify, exploit, and mitigate vulnerabilities using cutting-edge AI expertise in hacking."
