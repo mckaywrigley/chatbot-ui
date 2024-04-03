@@ -5,7 +5,12 @@ import { ServerRuntime } from "next"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import { StreamingTextResponse } from "ai"
 
-import { pluginIdToHandlerMapping } from "@/app/api/chat/plugins/plugins"
+import {
+  pluginIdToHandlerMapping,
+  isCommand,
+  pluginUrls,
+  handleCommand
+} from "@/app/api/chat/plugins/plugins"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
 export const runtime: ServerRuntime = "edge"
@@ -58,13 +63,26 @@ export async function POST(request: Request) {
     }
 
     let invokedByPluginId = false
+    let cleanMessages = messages.slice(1, -1)
+    let latestUserMessage = cleanMessages[cleanMessages.length - 1]
+    let answerMessage = { role: "user", content: "" }
     model = "gpt-4"
 
-    if (pluginIdToHandlerMapping.hasOwnProperty(selectedPlugin)) {
+    if (latestUserMessage.content.startsWith("/")) {
+      const plugins = Object.keys(pluginUrls)
+      for (const plugin of plugins) {
+        if (isCommand(plugin.toLowerCase(), latestUserMessage.content)) {
+          return await handleCommand(
+            plugin.toLowerCase(),
+            latestUserMessage,
+            model,
+            cleanMessages,
+            answerMessage
+          )
+        }
+      }
+    } else if (pluginIdToHandlerMapping.hasOwnProperty(selectedPlugin)) {
       invokedByPluginId = true
-      let cleanMessages = messages.slice(1, -1)
-      let latestUserMessage = cleanMessages[cleanMessages.length - 1]
-      let answerMessage = { role: "user", content: "" }
 
       const toolHandler = pluginIdToHandlerMapping[selectedPlugin]
       const response = await toolHandler(

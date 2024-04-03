@@ -280,17 +280,17 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Start HTTP Analysis",
         description: "on hackerone.com, revealing server details ...",
-        chatMessage: "/httpx -u hackerone.com"
+        chatMessage: "httpx -u hackerone.com"
       },
       {
         title: "Detect Web Technologies",
         description: "on hackerone.com, utilizing Wappalyzer dataset...",
-        chatMessage: "/httpx -u hackerone.com -tech-detect"
+        chatMessage: "httpx -u hackerone.com -tech-detect"
       },
       {
         title: "Security Headers Analysis",
         description: "on hackerone.com, inspecting for security-...",
-        chatMessage: "/httpx -u hackerone.com -include-response-header -json"
+        chatMessage: "httpx -u hackerone.com -include-response-header -json"
       },
       {
         title: "HTTPX Help",

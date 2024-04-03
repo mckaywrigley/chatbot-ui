@@ -3,14 +3,14 @@ import endent from "endent"
 
 import { pluginUrls } from "@/app/api/chat/plugins/plugins"
 
-// export const isGoLinkFinderCommand = (message: string) => {
-//   if (!message.startsWith('/')) return false;
+export const isGolinkfinderCommand = (message: string) => {
+  if (!message.startsWith("/")) return false
 
-//   const trimmedMessage = message.trim();
-//   const commandPattern = /^\/golinkfinder(?:\s+(-[a-z]+|\S+))*$/;
+  const trimmedMessage = message.trim()
+  const commandPattern = /^\/golinkfinder(?:\s+(-[a-z]+|\S+))*$/
 
-//   return commandPattern.test(trimmedMessage);
-// };
+  return commandPattern.test(trimmedMessage)
+}
 
 const displayHelpGuide = () => {
   return `
@@ -76,7 +76,7 @@ const parseGoLinkFinderCommandLine = (input: string): GoLinkFinderParams => {
   return params
 }
 
-export async function handleGoLinkFinderRequest(
+export async function handleGolinkfinderRequest(
   lastMessage: Message,
   enableGoLinkFinderFeature: boolean,
   OpenAIStream: {

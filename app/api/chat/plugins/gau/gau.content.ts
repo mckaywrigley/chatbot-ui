@@ -3,14 +3,14 @@ import endent from "endent"
 
 import { pluginUrls } from "@/app/api/chat/plugins/plugins"
 
-// export const isGauCommand = (message: string) => {
-//   if (!message.startsWith('/')) return false;
+export const isGauCommand = (message: string) => {
+  if (!message.startsWith("/")) return false
 
-//   const trimmedMessage = message.trim();
-//   const commandPattern = /^\/gau(?:\s+(-[a-z]+|\S+))*$/;
+  const trimmedMessage = message.trim()
+  const commandPattern = /^\/gau(?:\s+(-[a-z]+|\S+))*$/
 
-//   return commandPattern.test(trimmedMessage);
-// };
+  return commandPattern.test(trimmedMessage)
+}
 
 const displayHelpGuide = () => {
   return `

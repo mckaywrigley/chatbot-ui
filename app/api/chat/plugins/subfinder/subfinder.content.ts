@@ -2,16 +2,15 @@ import { Message } from "@/types/chat"
 import endent from "endent"
 
 import { pluginUrls } from "@/app/api/chat/plugins/plugins"
-import { t } from "i18next"
 
-// export const isSubfinderCommand = (message: string) => {
-//   if (!message.startsWith('/')) return false;
+export const isSubfinderCommand = (message: string) => {
+  if (!message.startsWith("/")) return false
 
-//   const trimmedMessage = message.trim();
-//   const commandPattern = /^\/subfinder(?:\s+(-[a-z]+|\S+))*$/;
+  const trimmedMessage = message.trim()
+  const commandPattern = /^\/subfinder(?:\s+(-[a-z]+|\S+))*$/
 
-//   return commandPattern.test(trimmedMessage);
-// };
+  return commandPattern.test(trimmedMessage)
+}
 
 const displayHelpGuide = () => {
   return `
