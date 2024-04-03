@@ -345,8 +345,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       </div>
       <div
         style={{
-          paddingTop: 20,
-          paddingBottom: 20
+          paddingTop: 10,
+          paddingBottom: 10
         }}
         className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-[714px] justify-center rounded-[50px] border-2"
       >
