@@ -152,6 +152,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const fetchChat = async () => {
     const chat = await getChatById(params?.chatid as string)
+
     if (!chat) return
 
     if (chat.assistant_id) {
@@ -167,6 +168,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         ).tools
         setSelectedTools(assistantTools)
       }
+    } else {
+      setSelectedAssistant(null)
+      // setSelectedTools(null)
     }
 
     setSelectedChat(chat)
