@@ -215,6 +215,18 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     }
   }
 
+  let createLabel = "Create"
+
+  switch (contentType) {
+    case "files":
+      createLabel = "Add"
+
+      break
+    default: {
+      return createLabel
+    }
+  }
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
@@ -225,7 +237,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
-              Create{" "}
+              {createLabel}{" "}
               {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
             </SheetTitle>
           </SheetHeader>
