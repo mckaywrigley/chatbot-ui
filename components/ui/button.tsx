@@ -23,9 +23,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         savePrompt:
-          " bg-pixelspace-gray-10 text-sm font-normal rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
+          " bg-pixelspace-gray-10 text-sm font-normal text-pixelspace-gray-90 rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
         cancelPrompt:
-          "bg-pixelspace-gray-90 border rounded-sm border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
+          "bg-pixelspace-gray-90 border text-pixelspace-gray-3 rounded-sm border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
 
         pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40"
       },
@@ -39,7 +39,8 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "size-10",
-        prompt: "h-11 px-4 py-[10px]"
+        prompt: "h-11 px-4 py-[10px]",
+        delete: "w-[81px] h-[44px] p-[10px]"
       }
     },
     defaultVariants: {

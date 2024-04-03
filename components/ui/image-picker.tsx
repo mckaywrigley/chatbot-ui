@@ -91,11 +91,11 @@ const ImagePicker: FC<ImagePickerProps> = ({
         onClick={() => document.getElementById("fileInput")?.click()}
       >
         <span className="hover:text-pixelspace-gray-3 font-['Libre Franklin'] mr-3 whitespace-nowrap text-sm font-normal leading-[25.20px]">
-          Choose files
+          Choose file
         </span>
         {!previewSrc ? (
           <span className="font-['Libre Franklin'] text-sm font-normal leading-[25.20px]">
-            no filed selected
+            no file selected
           </span>
         ) : (
           <div className="flex items-center space-x-1 overflow-hidden">
