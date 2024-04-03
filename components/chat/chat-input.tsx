@@ -362,7 +362,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               className="border-pixelspace-gray-50 mr-3 inline-flex size-6 items-center justify-center"
               onClick={() => fileInputRef.current?.click()}
             >
-              <FontAwesomeIcon icon={faPaperclipVertical} />
+              <FontAwesomeIcon
+                className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                icon={faPaperclipVertical}
+              />
             </button>
             <div
               className={`h-8 border-l ${
@@ -372,7 +375,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               <button
                 disabled={transcriptionLoading}
                 onClick={!isRecording ? onAudioClick : onStopRecording}
-                className={`px-1 hover:text-neutral-900 hover:opacity-60 dark:bg-opacity-60 dark:text-white dark:hover:text-neutral-200  `}
+                className={`dark:text-pixelspace-gray-20 dark:hover:text-pixelspace-gray-3  px-1 hover:text-neutral-900 dark:bg-opacity-60  `}
               >
                 {isRecording ? (
                   <div className="bg-pixelspace-pink flex size-6 items-center justify-center rounded-full">
@@ -387,7 +390,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                     <i
                       style={{ fontSize: 16, display: "flex" }}
                       className={`fa-solid fa-microphone flex items-center justify-center ${
-                        transcriptionLoading ? "0 text-pixelspace-gray-3 " : ""
+                        transcriptionLoading ? "0 text-pixelspace-gray-20 " : ""
                       }`}
                     >
                       {transcriptionLoading ? (
