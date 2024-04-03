@@ -113,7 +113,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="min-w-[550px]">
+      <DialogContent className="h-[177px] w-[640px]">
         <DialogHeader>
           <DialogTitle>Delete {folder.name}</DialogTitle>
 
@@ -124,6 +124,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
 
         <DialogFooter>
           <Button
+            size={"cancelPrompt"}
             variant="cancelPrompt"
             onClick={() => setShowFolderDialog(false)}
           >
@@ -131,6 +132,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
           </Button>
 
           <Button
+            size={"deleteFolderItems"}
             variant="savePrompt"
             ref={buttonRef}
             onClick={handleDeleteFolderAndItems}
@@ -139,6 +141,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
           </Button>
 
           <Button
+            size={"deleteFolder"}
             variant="savePrompt"
             ref={buttonRef}
             onClick={handleDeleteFolderOnly}

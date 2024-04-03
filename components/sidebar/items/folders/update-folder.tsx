@@ -58,19 +58,24 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
         </button>
       </DialogTrigger>
 
-      <DialogContent onKeyDown={handleKeyDown}>
+      <DialogContent className="h-[223px] w-[640px]" onKeyDown={handleKeyDown}>
         <DialogHeader>
-          <DialogTitle>Edit Folder</DialogTitle>
+          <DialogTitle className="font-bolt text-pixelspace-gray-10">
+            Edit Folder
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-1">
-          <Label>Name</Label>
+          <Label className="text-pixelspace-gray-10 font-normal leading-[25.20px]">
+            Folder name
+          </Label>
 
           <Input value={name} onChange={e => setName(e.target.value)} />
         </div>
 
         <DialogFooter>
           <Button
+            size="cancelPrompt"
             className="mr-4"
             variant="cancelPrompt"
             onClick={() => setShowFolderDialog(false)}
@@ -79,6 +84,7 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
           </Button>
 
           <Button
+            size={"savePrompt"}
             variant="savePrompt"
             ref={buttonRef}
             onClick={handleUpdateFolder}

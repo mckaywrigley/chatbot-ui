@@ -30,6 +30,10 @@ const buttonVariants = cva(
         pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40"
       },
       size: {
+        cancelPrompt: "p-[10px] w-[130px] h-[44px]",
+        savePrompt: "p-[10px] w-[117px] h-[44px]",
+        deleteFolder: "p-[10px] w-[168px] h-[44px]",
+        deleteFolderItems: "p-[10px] w-[223px] h-[44px]",
         default: "h-10 px-4 py-2",
         workspaceButton: "py-[15px]",
         sm: "h-9 rounded-md px-3",
