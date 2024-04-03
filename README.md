@@ -55,7 +55,7 @@ You can watch the full video tutorial [here](https://www.youtube.com/watch?v=9Qq
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
+git clone https://github.com/Hacker-GPT/HackerGPT-2.0.git
 ```
 
 ### 2. Install Dependencies
