@@ -60,7 +60,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@supabase/ssr": "^0.0.10",
-    "@supabase/supabase-js": "^2.38.4",
+    "@supabase/supabase-js": "^2.42.0",
     "@tabler/icons-react": "^2.40.0",
     "@vercel/analytics": "^1.1.1",
     "@vercel/edge-config": "^0.4.1",
