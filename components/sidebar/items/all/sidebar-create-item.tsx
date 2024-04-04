@@ -222,9 +222,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       createLabel = "Add"
 
       break
-    default: {
-      return createLabel
-    }
+    default:
+      break
   }
 
   return (
