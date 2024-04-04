@@ -62,7 +62,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
 
             <Input
               className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border`}
-              placeholder="File description..."
+              placeholder="File description"
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={FILE_DESCRIPTION_MAX}

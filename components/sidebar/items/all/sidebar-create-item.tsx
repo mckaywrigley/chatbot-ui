@@ -215,16 +215,14 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     }
   }
 
-  let createLabel = "Create"
+  let createLabel = contentType === "files" ? "Add" : "Create"
 
-  switch (contentType) {
-    case "files":
-      createLabel = "Add"
-
-      break
-    default:
-      break
-  }
+  const formattedContentType =
+    contentType === "collections"
+      ? "file collection"
+      : contentType === "tools"
+        ? "action"
+        : contentType.charAt(0) + contentType.slice(1, -1)
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -236,8 +234,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
-              {createLabel}{" "}
-              {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
+              {createLabel} {formattedContentType}
             </SheetTitle>
           </SheetHeader>
 
@@ -248,7 +245,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
           <div className="flex grow justify-end space-x-2">
             <Button
               disabled={creating}
-              size="prompt"
+              size="cancelPrompt"
               variant="cancelPrompt"
               onClick={() => onOpenChange(false)}
             >
@@ -256,7 +253,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
             </Button>
 
             <Button
-              size="prompt"
+              size="savePrompt"
               variant="savePrompt"
               disabled={creating}
               ref={buttonRef}

@@ -77,7 +77,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
 
             <Input
               className="bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border"
-              placeholder="Collection name..."
+              placeholder="Collection name"
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={COLLECTION_NAME_MAX}
@@ -89,7 +89,7 @@ export const CreateCollection: FC<CreateCollectionProps> = ({
 
             <Input
               className="bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 h-[42px] border"
-              placeholder="Collection description..."
+              placeholder="Collection description"
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={COLLECTION_DESCRIPTION_MAX}
