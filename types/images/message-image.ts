@@ -4,4 +4,5 @@ export interface MessageImage {
   base64: any // base64 image
   url: string
   file: File | null
+  id?: string
 }
