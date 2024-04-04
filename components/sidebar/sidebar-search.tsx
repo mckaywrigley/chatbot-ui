@@ -13,9 +13,15 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
   searchTerm,
   setSearchTerm
 }) => {
+  let placeHolderText
+  if (contentType === "chats") {
+    placeHolderText = "Search topic names..."
+  } else {
+    placeHolderText = `Search ${contentType}...`
+  }
   return (
     <Input
-      placeholder={`Search ${contentType}...`}
+      placeholder={placeHolderText}
       value={searchTerm}
       onChange={e => setSearchTerm(e.target.value)}
     />
