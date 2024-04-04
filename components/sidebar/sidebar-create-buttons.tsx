@@ -108,6 +108,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       type: contentType
     })
     setFolders([...folders, createdFolder])
+    setIsMenuOpen(false)
   }
 
   const getCreateFunction = () => {
