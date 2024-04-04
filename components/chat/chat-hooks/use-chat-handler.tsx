@@ -296,6 +296,8 @@ export const useChatHandler = () => {
   const handleStartTutorial = async () => {
     setIsGenerating(true)
     setChatStudyState("tutorial")
+    localStorage.setItem("tutorialDone", "true")
+
     const messageContent = `👋 Hi there! I am your AI Study Mentor.
 I will help you learn more effectively by helping you create topics for revision and performing appropiatly spaced free recall study sessions.
 In this tutorial, I will guide you through the process of creating a topic for revision.

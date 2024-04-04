@@ -197,14 +197,15 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     if (chat.topic_description) {
       setTopicDescription(chat.topic_description)
 
-      await setChatStudyState("recall_first_attempt")
+      setChatStudyState("topic_default")
 
       setChatMessages([
         {
           message: {
             id: "1",
             user_id: "1",
-            content: `Try to recall as much as possible about the topic ${chat.name}.`,
+            content: `Welcome back to the topic "${chat.name}".
+Please select from the options below.`,
             created_at: new Date().toISOString(),
             image_paths: [],
             model: "",

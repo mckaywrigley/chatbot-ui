@@ -2,6 +2,7 @@ export type StudyState =
   | "topic_creation"
   | "topic_edit"
   | "topic_updated"
+  | "topic_default"
   | "recall_first_attempt"
   | "recall_hinting"
   | "recall_finished"
@@ -46,6 +47,21 @@ export const studyStates: StudyStateObject[] = [
   },
   {
     name: "topic_updated",
+    quickResponses: [
+      {
+        quickText: "Start recall now.",
+        responseText: "Try to recall as much as you can about the topic.",
+        newStudyState: "recall_first_attempt"
+      },
+      {
+        quickText: "Show full topic description.",
+        responseText: "{{topicDescription}}",
+        newStudyState: "reviewing"
+      }
+    ]
+  },
+  {
+    name: "topic_default",
     quickResponses: [
       {
         quickText: "Start recall now.",

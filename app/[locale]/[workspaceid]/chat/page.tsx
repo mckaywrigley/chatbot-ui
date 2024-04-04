@@ -32,18 +32,27 @@ export default function ChatPage() {
           <div className="top-50% left-50% -translate-x-50% -translate-y-50% absolute mb-20">
             <Brand theme={theme === "dark" ? "dark" : "light"} />
             <div className="mx-16 mt-5 border-t-2 pt-5">
-              <p>
-                Welcome! Let&apos;s get started by creating a new tutorial
-                topic:
-              </p>
-              <div className="mt-3 flex items-center justify-center">
+              {localStorage.getItem("tutorialDone") === "true" ? (
                 <p>
-                  <Button onClick={handleStartTutorial}>
-                    <IconPlanet className="mr-1" />
-                    Start tutorial
-                  </Button>
+                  Create a topic by describing below. You can also upload a file
+                  using the ⨁ button.
                 </p>
-              </div>
+              ) : (
+                <>
+                  <p>
+                    Welcome! Let&apos;s get started by creating a new tutorial
+                    topic:
+                  </p>
+                  <div className="mt-3 flex items-center justify-center">
+                    <p>
+                      <Button onClick={handleStartTutorial}>
+                        <IconPlanet className="mr-1" />
+                        Start tutorial
+                      </Button>
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
