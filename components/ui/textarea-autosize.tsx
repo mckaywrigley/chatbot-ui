@@ -8,6 +8,7 @@ interface TextareaAutosizeProps {
 
   textareaRef?: React.RefObject<HTMLTextAreaElement>
   className?: string
+  disabled?: boolean
 
   placeholder?: string
   minRows?: number
@@ -22,7 +23,7 @@ interface TextareaAutosizeProps {
 export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
   value,
   onValueChange,
-
+  disabled,
   textareaRef,
   className,
   placeholder = "",
@@ -45,6 +46,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
       maxRows={minRows > maxRows ? minRows : maxRows}
       placeholder={placeholder}
       value={value}
+      disabled={disabled}
       onChange={event => onValueChange(event.target.value)}
       onKeyDown={onKeyDown}
       onPaste={onPaste}

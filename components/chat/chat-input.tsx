@@ -332,6 +332,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           value={userInput}
           minRows={1}
           maxRows={18}
+          disabled={isGenerating}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           onCompositionStart={() => setIsTyping(true)}
