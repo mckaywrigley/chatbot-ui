@@ -26,10 +26,11 @@ interface StudyStateObject {
   quickResponses?: QuickResponse[]
 }
 
-const tutorialFinalText = `Well done! You'll notice the icon next to the topic name has now changed to a green circle with a lock. This signifies that you've successfully reviewed the topic. As time progresses towards your next review session, this circle will gradually decrease, reflecting an estimate of your recall strength. We'll notify you when it's time for a refresher session.
-Feel free to start creating topics by clicking on the "+ New topic" button on the top left.
-You're also welcome to revisit and reinforce your understanding of The Solar System!
-Happy studying!`
+const tutorialFinalText = `Amazing work! 
+You've probably noticed the icon next to the topic name has changed into a green circle with a lock. This is a happy indicator that you've successfully reviewed the topic. As days go by leading up to your next review session, this circle will slowly diminish, mirroring an estimate of your recall strength. Don't worry, we'll give you a gentle nudge when it's nearly time for a refresh.
+Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
+And of course, feel free to dive back in to further solidify your mastery of The Solar System!
+Enjoy your learning journey!`
 
 export const studyStates: StudyStateObject[] = [
   {
@@ -50,7 +51,8 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Start recall now.",
-        responseText: "Try to recall as much as you can about the topic.",
+        responseText:
+          "Let's try to recall as much as we can about the topic. Ready?",
         newStudyState: "recall_first_attempt"
       },
       {
@@ -65,7 +67,8 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Start recall now.",
-        responseText: "Try to recall as much as you can about the topic.",
+        responseText:
+          "Let's see what you remember about the topic. Give it your best shot!",
         newStudyState: "recall_first_attempt"
       },
       {
@@ -91,7 +94,7 @@ export const studyStates: StudyStateObject[] = [
       },
       {
         quickText: "Edit topic.",
-        responseText: "How can I update the topic content?",
+        responseText: "What updates should we make to the topic content?",
         newStudyState: "topic_edit"
       }
     ]
@@ -101,7 +104,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Edit topic.",
-        responseText: "How can I update the topic content?",
+        responseText: "What updates should we make to the topic content?",
         newStudyState: "topic_edit"
       }
     ]
@@ -112,7 +115,7 @@ export const studyStates: StudyStateObject[] = [
       {
         quickText: "Next.",
         responseText:
-          "Great, let's proceed. I'll show you how to add a topic description. We can collaborate to create a new topic. Let's start with 'The Solar System.' Click below.",
+          "Brilliant! Next up, I'll guide you on how to add a topic description. It's quite exciting to create a new topic together. Let's start with 'The Solar System.' Click on it below.",
         newStudyState: "tutorial_2"
       }
     ]
@@ -122,7 +125,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "The Solar System.",
-        responseText: `If you've only entered a topic name so far, like here, I'll help by creating a topic description for you. Alternatively, you can manually add a description by uploading a file or typing directly into the chat. For now, I'll generate the description for you. Please 'View topic.' now, and then 'Save topic.'`,
+        responseText: `If at this stage you've only entered a topic name, like now, I'll step in to help craft a suitable topic description for you. Alternatively, you're more than welcome to add a description yourself, whether by uploading a document or typing directly into our chat. For the moment, I'll take care of generating the description for you. Please 'View topic.' now, and afterwards, 'Save topic.'`,
         newStudyState: "tutorial_3"
       }
     ]
@@ -142,9 +145,9 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Save topic description.",
-        responseText: `Ready to test your memory? After reviewing the topic, it's time for your first recall attempt. Remember, no peeking! 👀😉
-I'll evaluate your attempt and schedule a recall session for you. Do your best to recall as much as you can about The Solar System topic now; click on chat below and then the microphone key on your keyboard or manually type your response.
-Click "Finish Tutorial" when you're ready to proceed.`,
+        responseText: `Now comes the fun part! After taking some time to study the topic, it's time for your first recall attempt. Let's make it a good one, no peeking allowed! 👀😉
+I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about The Solar System topic now; click on chat below then hit the microphone 🎙️ key on your keyboard.
+When you feel ready, click "Finish Tutorial" to move forward.`,
         newStudyState: "recall_tutorial_first_attempt"
       }
     ]
