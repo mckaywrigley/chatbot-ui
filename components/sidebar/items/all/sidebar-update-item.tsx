@@ -663,10 +663,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           </div>
         </div>
 
-        <SheetFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mr-5 mt-2 flex justify-between">
           <SidebarDeleteItem item={item} contentType={contentType} />
 
-          <div className="flex grow justify-end space-x-3">
+          <div className="mr-5 flex grow justify-end space-x-3">
             <Button
               size="cancelPrompt"
               variant="cancelPrompt"
@@ -676,6 +676,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
             </Button>
 
             <Button
+              className=""
               size="savePrompt"
               variant="savePrompt"
               ref={buttonRef}
