@@ -44,7 +44,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
 
             <Input
               className={`bg-pixelspace-gray-70  text-pixelspace-gray-20 h-[42px] `}
-              placeholder="Prompt name..."
+              placeholder="Prompt name"
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={PROMPT_NAME_MAX}
@@ -58,7 +58,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
 
             <TextareaAutosize
               className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
-              placeholder="Prompt content..."
+              placeholder="Prompt content"
               value={content}
               onValueChange={setContent}
               minRows={19}

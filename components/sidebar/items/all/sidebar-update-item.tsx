@@ -634,30 +634,32 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       <SheetTrigger asChild>{children}</SheetTrigger>
 
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between"
+        className="flex min-w-[450px] flex-col justify-between pr-2"
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow overflow-auto">
-          <SheetHeader>
-            <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
-              Edit {contentType.slice(0, -1)}
-            </SheetTitle>
-          </SheetHeader>
+        <div className="overflow-auto">
+          <div className="mr-[6px] grow">
+            <SheetHeader>
+              <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
+                Edit {contentType.slice(0, -1)}
+              </SheetTitle>
+            </SheetHeader>
 
-          <div className="mt-4 space-y-3">
-            {workspaces.length > 1 && (
-              <div className="space-y-1">
-                <Label>Assigned Workspaces</Label>
+            <div className="mt-4 space-y-3">
+              {workspaces.length > 1 && (
+                <div className="space-y-1">
+                  <Label>Assigned Workspaces</Label>
 
-                <AssignWorkspaces
-                  selectedWorkspaces={selectedWorkspaces}
-                  onSelectWorkspace={handleSelectWorkspace}
-                />
-              </div>
-            )}
+                  <AssignWorkspaces
+                    selectedWorkspaces={selectedWorkspaces}
+                    onSelectWorkspace={handleSelectWorkspace}
+                  />
+                </div>
+              )}
 
-            {renderInputs(renderState[contentType])}
+              {renderInputs(renderState[contentType])}
+            </div>
           </div>
         </div>
 
@@ -666,7 +668,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
           <div className="flex grow justify-end space-x-3">
             <Button
-              size="prompt"
+              size="cancelPrompt"
               variant="cancelPrompt"
               onClick={() => setIsOpen(false)}
             >
@@ -674,7 +676,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
             </Button>
 
             <Button
-              size="prompt"
+              size="savePrompt"
               variant="savePrompt"
               ref={buttonRef}
               onClick={handleUpdate}

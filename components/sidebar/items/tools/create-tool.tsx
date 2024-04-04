@@ -47,7 +47,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
             <Label>Name</Label>
 
             <Input
-              placeholder="Tool name..."
+              placeholder="Action name"
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={TOOL_NAME_MAX}
@@ -58,7 +58,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
             <Label>Description</Label>
 
             <Input
-              placeholder="Tool description..."
+              placeholder="Action description"
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
