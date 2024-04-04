@@ -634,12 +634,12 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       <SheetTrigger asChild>{children}</SheetTrigger>
 
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between pr-2"
+        className="flex min-w-[450px] flex-col justify-between pr-0"
         side="left"
         onKeyDown={handleKeyDown}
       >
         <div className="overflow-auto">
-          <div className="mr-[6px] grow">
+          <div className="mr-[14px] grow">
             <SheetHeader>
               <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
                 Edit {contentType.slice(0, -1)}
@@ -663,7 +663,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           </div>
         </div>
 
-        <SheetFooter className="mt-2 flex justify-between">
+        <SheetFooter className="mr-5 mt-2 flex justify-between">
           <SidebarDeleteItem item={item} contentType={contentType} />
 
           <div className="flex grow justify-end space-x-3">
