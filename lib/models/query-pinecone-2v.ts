@@ -48,7 +48,7 @@ class PineconeRetriever {
     const PINECONE_QUERY_URL = `https://${this.config.index}-${this.config.projectId}.svc.${this.config.environment}.pinecone.io/query`
     const requestBody = {
       vector: queryEmbedding,
-      topK: this.similarityTopK,
+      topK: this.similarityTopK * 2, // Double the topK to account for filtering
       includeMetadata: true,
       namespace: this.config.namespace
     }
@@ -95,6 +95,7 @@ class PineconeRetriever {
 
       // Map the filtered and unique matches to the specified format
       let formattedResults = uniqueMatches
+        .slice(0, this.similarityTopK)
         .map((match: any, index: number) => {
           // Parse the _node_content string to access its properties
           const nodeContent = JSON.parse(match.metadata._node_content)
@@ -105,6 +106,18 @@ class PineconeRetriever {
           return `[CONTEXT ${index}]:\n${textContent}\n[END CONTEXT ${index}]\n\n`
         })
         .join("")
+
+      // Log the question, data, and formatted results for debugging
+      console.log({
+        question,
+        data: data.matches.map((d: any) => ({
+          id: d.id,
+          file_name: d.metadata.file_name,
+          score: d.score,
+          text: JSON.parse(d.metadata._node_content).text.slice(0, 100) + "..."
+        })),
+        formattedResults
+      })
 
       return formattedResults.length > 0 ? formattedResults : "None"
     } catch (error) {
