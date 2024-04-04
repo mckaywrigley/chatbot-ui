@@ -170,8 +170,8 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
               image={selectedImage}
               onSrcChange={setImageLink}
               onImageChange={setSelectedImage}
-              width={100}
-              height={100}
+              width={60}
+              height={60}
             />
           </div>
 
