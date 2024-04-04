@@ -1,9 +1,8 @@
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
+import { MessageImage } from "@/types"
 import {
   IconBolt,
   IconCaretDownFilled,
@@ -38,27 +37,17 @@ export const Message: FC<MessageProps> = ({
   fileItems,
   isEditing,
   isLast,
-  onStartEdit,
   onCancelEdit,
   onSubmitEdit
 }) => {
   const {
     profile,
     isGenerating,
-    setIsGenerating,
     firstTokenReceived,
-    availableLocalModels,
-    availableOpenRouterModels,
-    chatMessages,
-    selectedAssistant,
     chatImages,
-    assistantImages,
     toolInUse,
-    files,
-    models
+    files
   } = useContext(ChatbotUIContext)
-
-  const { handleSendMessage } = useChatHandler()
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 

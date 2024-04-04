@@ -8,7 +8,7 @@ import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { IconInfoCircle, IconPlanet, IconSun } from "@tabler/icons-react"
+import { IconPlanet } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import { useContext } from "react"
 
