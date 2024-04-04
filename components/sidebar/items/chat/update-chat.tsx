@@ -64,7 +64,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
         </button>
       </DialogTrigger>
 
-      <DialogContent onKeyDown={handleKeyDown}>
+      <DialogContent className="h-[223px] w-[640px]" onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle>Edit Chat</DialogTitle>
         </DialogHeader>
@@ -78,6 +78,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
         <DialogFooter>
           <Button
             className="mr-4"
+            size="cancelPrompt"
             variant="cancelPrompt"
             onClick={() => {
               setShowChatDialog(false)
@@ -88,6 +89,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
           </Button>
 
           <Button
+            size="savePrompt"
             variant="savePrompt"
             ref={buttonRef}
             onClick={handleUpdateChat}
