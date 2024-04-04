@@ -60,7 +60,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
         </div>
       </DialogTrigger>
 
-      <DialogContent onKeyDown={handleKeyDown}>
+      <DialogContent className="h-[177px] w-[640px]" onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle>Delete {chat.name}</DialogTitle>
 
@@ -71,6 +71,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
 
         <DialogFooter>
           <Button
+            size="cancelPrompt"
             className="mr-4"
             variant="cancelPrompt"
             onClick={() => setShowChatDialog(false)}
@@ -78,7 +79,11 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
             Cancel
           </Button>
 
-          <Button variant="savePrompt" onClick={handleDeleteChat}>
+          <Button
+            size="savePrompt"
+            variant="savePrompt"
+            onClick={handleDeleteChat}
+          >
             Delete
           </Button>
         </DialogFooter>
