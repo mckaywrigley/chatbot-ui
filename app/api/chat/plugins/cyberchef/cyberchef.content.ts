@@ -191,7 +191,6 @@ export async function handleCyberchefRequest(
 
         lastMessage.content = `\`\`\`json\n${formattedJsonString}\n\`\`\``
       } else {
-        console.error("No valid JSON command found in the AI response.")
         return new Response(
           `${aiResponse}\n\nNo valid JSON command found in the AI response.`,
           { status: 200 }

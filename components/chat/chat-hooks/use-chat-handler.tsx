@@ -163,7 +163,6 @@ export const useChatHandler = () => {
   }
 
   const handleSendContinuation = async () => {
-    console.log("handleSendContinuation")
     await handleSendMessage(null, chatMessages, false, true)
   }
 
@@ -340,6 +339,23 @@ export const useChatHandler = () => {
       ) {
         const isPremium = subscription !== null
 
+        let fileContent = ""
+        let fileName = ""
+
+        if (newMessageFiles.length > 0 && newMessageFiles[0].type === "text") {
+          const fileId = newMessageFiles[0].id
+          const response = await fetch(`/api/retrieval/file/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ fileId: fileId })
+          })
+          const fileData = await response.json()
+          fileContent = fileData.content
+          fileName = newMessageFiles[0].name
+        }
+
         const { fullText, finishReason } = await handleHostedPluginsChat(
           payload,
           profile!,
@@ -355,7 +371,9 @@ export const useChatHandler = () => {
           setToolInUse,
           alertDispatch,
           selectedPlugin,
-          isPremium
+          isPremium,
+          fileContent,
+          fileName
         )
         generatedText = fullText
         finishReasonFromResponse = finishReason
@@ -380,9 +398,6 @@ export const useChatHandler = () => {
         generatedText = fullText
         finishReasonFromResponse = finishReason
       }
-
-      // console.log("generatedText", generatedText)
-      // console.log("finishReasonFromResponse", finishReasonFromResponse)
 
       if (!currentChat) {
         currentChat = await handleCreateChat(

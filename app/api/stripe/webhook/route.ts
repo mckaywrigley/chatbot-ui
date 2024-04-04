@@ -89,8 +89,6 @@ async function upsertSubscription(
   customerId: string,
   attempt = 0
 ) {
-  console.log("upsertSubscription", subscriptionId, customerId)
-
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -133,7 +131,6 @@ async function upsertSubscription(
     }
   } else if (attempt < MAX_RETRY_ATTEMPTS) {
     // If profile is not found and maximum retry attempts are not reached, retry after a delay
-    console.log(`Profile not found, retrying... Attempt ${attempt + 1}`)
     setTimeout(
       () => upsertSubscription(subscriptionId, customerId, attempt + 1),
       RETRY_DELAY_MS
@@ -153,7 +150,6 @@ async function upsertSubscription(
 }
 
 async function deleteSubscription(subscription: Stripe.Subscription) {
-  console.log("deleteSubscription", subscription.id)
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!

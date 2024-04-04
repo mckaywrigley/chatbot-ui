@@ -45,7 +45,9 @@ type pluginHandlerFunction = (
   model: string,
   messagesToSend: any,
   answerMessage: any,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent: string,
+  fileName: string
 ) => Promise<any>
 
 type pluginIdToHandlerMapping = {
@@ -93,8 +95,7 @@ export const isCommand = (commandName: string, message: string) => {
   if (typeof commandHandlers[checkFunction] === "function") {
     return commandHandlers[checkFunction](message)
   } else {
-    console.error(`Function ${checkFunction} is not defined.`)
-    return false // Or handle the error as appropriate
+    return false
   }
 }
 

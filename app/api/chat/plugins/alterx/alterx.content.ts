@@ -35,6 +35,7 @@ interface AlterxParams {
   enrich: boolean
   limit: number
   payload: Map<string, string>
+  fileContent: string
   error: string | null
 }
 
@@ -50,6 +51,7 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
     enrich: false,
     limit: 0,
     payload: new Map(),
+    fileContent: "",
     error: null
   }
 
@@ -137,7 +139,9 @@ export async function handleAlterxRequest(
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent?: string,
+  fileName?: string
 ) {
   if (!enableAlterxFeature) {
     return new Response("The Alterx is disabled.", {
@@ -148,8 +152,18 @@ export async function handleAlterxRequest(
   const toolId = "alterx"
   let aiResponse = ""
 
+  // Adjusted logic to ensure fileContentIncluded is true only if fileContent is provided
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  // Ensure fileName is only considered if fileContent is included
+  const fileNameIncluded =
+    fileContentIncluded && fileName && fileName.length > 0
+
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToAlterxCommand(lastMessage)
+    const answerPrompt = transformUserQueryToAlterxCommand(
+      lastMessage,
+      fileContentIncluded,
+      fileNameIncluded ? fileName : "target.txt"
+    )
     answerMessage.content = answerPrompt
 
     const openAIResponseStream = await OpenAIStream(
@@ -206,19 +220,24 @@ export async function handleAlterxRequest(
     return new Response(params.error, { status: 200 })
   }
 
-  let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx?`
+  let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx`
+
+  let requestBody: Partial<AlterxParams> = {}
 
   if (params.list.length > 0) {
-    alterxUrl += `&list=${encodeURIComponent(params.list.join(","))}`
+    requestBody.list = params.list
   }
   if (params.pattern.length > 0) {
-    alterxUrl += `&pattern=${encodeURIComponent(params.pattern.join(","))}`
+    requestBody.pattern = params.pattern
   }
   if (params.enrich) {
-    alterxUrl += `&enrich=true`
+    requestBody.enrich = true
   }
   if (params.limit > 0) {
-    alterxUrl += `&limit=${encodeURIComponent(params.limit.toString())}`
+    requestBody.limit = params.limit
+  }
+  if (fileContentIncluded) {
+    requestBody.fileContent = fileContent
   }
 
   const headers = new Headers()
@@ -252,12 +271,13 @@ export async function handleAlterxRequest(
 
       try {
         const alterxResponse = await fetch(alterxUrl, {
-          method: "GET",
+          method: "POST",
           headers: {
-            Authorization: `${process.env.SECRET_AUTH_PLUGINS}`
-          }
+            Authorization: `${process.env.SECRET_AUTH_PLUGINS}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestBody)
         })
-
         isFetching = false
 
         const jsonResponse = await alterxResponse.json()
@@ -303,11 +323,38 @@ export async function handleAlterxRequest(
   return new Response(stream, { headers })
 }
 
-const transformUserQueryToAlterxCommand = (lastMessage: Message) => {
+const transformUserQueryToAlterxCommand = (
+  lastMessage: Message,
+  fileContentIncluded: boolean,
+  fileName?: string
+) => {
+  const alterxIntroduction = fileContentIncluded
+    ? `Based on this query, generate a command for the 'Alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-l' or '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'Alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-l' or '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+
+  const domainOrFilenameInclusionText = fileContentIncluded
+    ? `Filename Inclusion: Use the -l flag followed by the file name (e.g., -l ${fileName}) containing the domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains.`
+    : "Domain/Subdomain Inclusion: Directly specify the main domain or subdomains using the -l flag. For a single domain, format it as -l domain.com. For multiple subdomains, separate them with commas (e.g., -l subdomain1.domain.com,subdomain2.domain.com)."
+
+  const alterxExampleText = fileContentIncluded
+    ? `For generating a wordlist using a file named '${fileName}' containing domains:
+\`\`\`json
+{ "command": "alterx -l ${fileName}" }
+\`\`\``
+    : `For generating a wordlist with a single subdomain:
+\`\`\`json
+{ "command": "alterx -l subdomain1.com" }
+\`\`\`
+
+For generating a wordlist with multiple subdomains:
+\`\`\`json
+{ "command": "alterx -l subdomain1.com,subdomain2.com" }
+\`\`\``
+
   const answerMessage = endent`
   Query: "${lastMessage.content}"
 
-  Based on this query, generate a command for the 'Alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-l' or '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:  
+  ${alterxIntroduction}
   
   ALWAYS USE THIS FORMAT:
   \`\`\`json
@@ -316,9 +363,7 @@ const transformUserQueryToAlterxCommand = (lastMessage: Message) => {
   Replace '[flags]' with the actual flags and values. Include additional flags only if they are specifically relevant to the request. Ensure the command is properly escaped to be valid JSON.
 
   Command Construction Guidelines:
-  1. Direct Domain/Subdomain Inclusion: Directly include the main domain or specific subdomains in the command as follows:
-    - For a single main domain, use -l followed by the domain (e.g., -l hackerone.com).
-    - For multiple specific subdomains, list them with -l, separated by commas (e.g., -l subdomain1.hackerone.com,subdomain2.hackerone.com).
+  1. ${domainOrFilenameInclusionText}
   2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'Alterx' tool include:
     - -pattern: Custom permutation patterns input to generate (optional).
     - -enrich: Enrich wordlist by extracting words from input (optional).
@@ -329,15 +374,7 @@ const transformUserQueryToAlterxCommand = (lastMessage: Message) => {
 
   Example Commands:
 
-  For generating a wordlist with a single subdomain:
-  \`\`\`json
-  { "command": "alterx -l subdomain1.com" }
-  \`\`\`
-
-  For generating a wordlist with multiple subdomains:
-  \`\`\`json
-  { "command": "alterx -l subdomain1.com,subdomain2.com" }
-  \`\`\`
+  ${alterxExampleText}
 
   For a request for help or all flags or if the user asked about how the plugin works:
   \`\`\`json

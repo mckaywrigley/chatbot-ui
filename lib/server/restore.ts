@@ -79,7 +79,6 @@ async function restoreToDatabase(
   // Retrieve the subscription details from Stripe
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
-  console.log(subscription.cancel_at_period_end)
   // Check if the subscription is already set to cancel at the period end
   if (subscription.cancel_at_period_end) {
     // If not, update the subscription to ensure it does not cancel at the period end

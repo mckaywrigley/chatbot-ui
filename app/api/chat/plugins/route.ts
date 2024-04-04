@@ -12,21 +12,36 @@ import {
   handleCommand
 } from "@/app/api/chat/plugins/plugins"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
+import { PluginID } from "@/types/plugins"
 
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, selectedPlugin, isPremium } = json as {
+  const {
+    chatSettings,
+    messages,
+    selectedPlugin,
+    isPremium,
+    fileContent,
+    fileName
+  } = json as {
     chatSettings: ChatSettings
     messages: any[]
     selectedPlugin: string
     isPremium: any
+    fileContent: string
+    fileName: string
   }
 
-  const premiumPlugins = ["nuclei", "katana", "httpx", "naabu"]
+  const premiumPlugins: PluginID[] = [
+    PluginID.NUCLEI,
+    PluginID.KATANA,
+    PluginID.HTTPX,
+    PluginID.NAABU
+  ]
 
-  if (premiumPlugins.includes(selectedPlugin) && !isPremium) {
+  if (premiumPlugins.includes(selectedPlugin as PluginID) && !isPremium) {
     return new Response(
       "Access Denied: The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
     )
@@ -68,7 +83,10 @@ export async function POST(request: Request) {
     let answerMessage = { role: "user", content: "" }
     model = "gpt-4"
 
-    if (latestUserMessage.content.startsWith("/")) {
+    if (
+      latestUserMessage.content.startsWith("/") &&
+      (selectedPlugin as PluginID) !== PluginID.CYBERCHEF
+    ) {
       const plugins = Object.keys(pluginUrls)
       for (const plugin of plugins) {
         if (isCommand(plugin.toLowerCase(), latestUserMessage.content)) {
@@ -93,33 +111,13 @@ export async function POST(request: Request) {
         model,
         cleanMessages,
         answerMessage,
-        invokedByPluginId
+        invokedByPluginId,
+        fileContent,
+        fileName
       )
 
       return response
     }
-
-    const chatBody = {
-      model: model,
-      messages: messages,
-      toolId: selectedPlugin
-    }
-
-    const controller = new AbortController()
-    const endpoint = `${process.env.SECRET_ENDPOINT_PLUGINS_HACKERGPT_V2}`
-    const fetchResponse = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${process.env.SECRET_AUTH_PLUGINS_HACKERGPT_V2}`
-      },
-      signal: controller.signal,
-      body: JSON.stringify(chatBody)
-    })
-
-    return new StreamingTextResponse(
-      fetchResponse.body as ReadableStream<Uint8Array>
-    )
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
