@@ -19,6 +19,7 @@ export default async function Login({
 }: {
   searchParams: { message: string }
 }) {
+  const origin = headers().get("origin")
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -93,7 +94,7 @@ export default async function Login({
   const signUp = async (formData: FormData) => {
     "use server"
 
-    const email = formData.get("email") as string
+    const email = (formData.get("email") as string).toLowerCase()
     const password = formData.get("password") as string
 
     const emailDomainWhitelistPatternsString = await getEnvVarOrEdgeConfigValue(
@@ -121,7 +122,6 @@ export default async function Login({
 
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
-    const origin = headers().get("origin")
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -145,7 +145,6 @@ export default async function Login({
   const handleResetPassword = async (formData: FormData) => {
     "use server"
 
-    const origin = headers().get("origin")
     const email = formData.get("email") as string
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
