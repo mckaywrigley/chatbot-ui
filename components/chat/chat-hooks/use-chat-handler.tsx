@@ -298,12 +298,12 @@ export const useChatHandler = () => {
     setChatStudyState("tutorial")
     localStorage.setItem("tutorialDone", "true")
 
-    const messageContent = `👋 Hi there! I am your AI Study Mentor.
-I will help you learn more effectively by helping you create topics for revision and performing appropiatly spaced free recall study sessions.
-In this tutorial, I will guide you through the process of creating a topic for revision.
-A topic appears as an item in the panel to the left of the chat window. 👈
-Open the panel now and you should see "The Solar System"; our tutorial demo topic.
-Please select 'Next' below to continue the tutorial.`
+    const messageContent = `👋 Hello! I'm your AI Study Mentor.
+I'm here to boost your learning by assisting with topic creation and guiding you through optimally spaced free recall study sessions.
+This tutorial will walk you through how to craft a revision topic.
+You'll find topics listed in the panel on the left side of the chat window. 👈
+Open the panel, and you'll see "The Solar System" as our example topic for this tutorial.
+Please click 'Next' below to proceed with the tutorial.`
 
     const topic_description = `* The Solar System consists of the Sun and everything that orbits around it, including planets, moons, asteroids, comets, and meteoroids.
 * The Sun is the center of the Solar System, a star that provides light and heat, making life on Earth possible.
