@@ -8,20 +8,17 @@ import {
   IconBolt,
   IconCaretDownFilled,
   IconCaretRightFilled,
-  IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil
+  IconPencil,
+  IconSparkles
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
 import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
-import { WithTooltip } from "../ui/with-tooltip"
-import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
 const ICON_SIZE = 32
@@ -46,7 +43,6 @@ export const Message: FC<MessageProps> = ({
   onSubmitEdit
 }) => {
   const {
-    assistants,
     profile,
     isGenerating,
     setIsGenerating,
@@ -78,20 +74,6 @@ export const Message: FC<MessageProps> = ({
 
   const [viewSources, setViewSources] = useState(false)
 
-  const handleCopy = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(message.content)
-    } else {
-      const textArea = document.createElement("textarea")
-      textArea.value = message.content
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      document.execCommand("copy")
-      document.body.removeChild(textArea)
-    }
-  }
-
   const handleSendEdit = () => {
     onSubmitEdit(editedMessage, message.sequence_number)
     onCancelEdit()
@@ -103,19 +85,6 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
-  const handleRegenerate = async () => {
-    setIsGenerating(true)
-    await handleSendMessage(
-      editedMessage || chatMessages[chatMessages.length - 2].message.content,
-      chatMessages,
-      true
-    )
-  }
-
-  const handleStartEdit = () => {
-    onStartEdit(message)
-  }
-
   useEffect(() => {
     setEditedMessage(message.content)
 
@@ -125,30 +94,6 @@ export const Message: FC<MessageProps> = ({
       input.setSelectionRange(input.value.length, input.value.length)
     }
   }, [isEditing])
-
-  const MODEL_DATA = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false
-    })),
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === message.model) as LLM
-
-  const messageAssistantImage = assistantImages.find(
-    image => image.assistantId === message.assistant_id
-  )?.base64
-
-  const selectedAssistantImage = assistantImages.find(
-    image => image.path === selectedAssistant?.image_path
-  )?.base64
-
-  const modelDetails = LLM_LIST.find(model => model.modelId === message.model)
 
   const fileAccumulator: Record<
     string,
@@ -190,17 +135,6 @@ export const Message: FC<MessageProps> = ({
       onKeyDown={handleKeyDown}
     >
       <div className="relative flex w-full flex-col p-6 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
-        <div className="absolute right-5 top-7 sm:right-0">
-          <MessageActions
-            onCopy={handleCopy}
-            onEdit={handleStartEdit}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            isHovering={isHovering}
-            onRegenerate={handleRegenerate}
-          />
-        </div>
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -214,30 +148,7 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <div className="flex items-center space-x-3">
               {message.role === "assistant" ? (
-                messageAssistantImage ? (
-                  <Image
-                    style={{
-                      width: `${ICON_SIZE}px`,
-                      height: `${ICON_SIZE}px`
-                    }}
-                    className="rounded"
-                    src={messageAssistantImage}
-                    alt="assistant image"
-                    height={ICON_SIZE}
-                    width={ICON_SIZE}
-                  />
-                ) : (
-                  <WithTooltip
-                    display={<div>{MODEL_DATA?.modelName}</div>}
-                    trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
-                    }
-                  />
-                )
+                <IconSparkles size={ICON_SIZE} />
               ) : profile?.image_url ? (
                 <Image
                   className={`size-[32px] rounded`}
@@ -269,7 +180,26 @@ export const Message: FC<MessageProps> = ({
                 switch (toolInUse) {
                   case "none":
                     return (
-                      <IconCircleFilled className="animate-pulse" size={20} />
+                      <svg
+                        className="-ml-1 mr-3 size-5 animate-spin text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="indigo"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          className="fill-blue-500"
+                          fill="indigo"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
                     )
                   case "retrieval":
                     return (

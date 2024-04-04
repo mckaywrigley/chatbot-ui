@@ -230,7 +230,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
             role: "assistant",
             sequence_number: 0,
             updated_at: null,
-            assistant_id: selectedAssistant!.id,
+            assistant_id: selectedAssistant?.id || null,
             chat_id: chat.id
           },
           fileItems: []

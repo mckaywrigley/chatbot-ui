@@ -3,7 +3,7 @@
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
-import { createMessages, updateMessage } from "@/db/messages"
+import { createMessage, createMessages, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import {
   buildFinalMessages,
@@ -355,7 +355,9 @@ export const handleCreateChat = async (
   newMessageFiles: ChatFile[],
   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
-  setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
+  setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
+  isTutorial = false,
+  topic_description = ""
 ) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
@@ -365,11 +367,12 @@ export const handleCreateChat = async (
     include_profile_context: chatSettings.includeProfileContext,
     include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
     model: chatSettings.model,
-    name: messageContent.substring(0, 100),
+    name: isTutorial ? "The Solar System" : messageContent.substring(0, 100),
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
     embeddings_provider: chatSettings.embeddingsProvider,
-    ebisu_model: [4, 4, 24]
+    ebisu_model: [4, 4, 24],
+    topic_description
   })
 
   setSelectedChat(createdChat)
@@ -512,4 +515,32 @@ export const handleCreateMessages = async (
 
     setChatMessages(finalChatMessages)
   }
+}
+export const handleCreateAssistantMessage = async (
+  chatMessages: ChatMessage[],
+  currentChat: Tables<"chats">,
+  profile: Tables<"profiles">,
+  messageContent: string,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+) => {
+  const finalAssistantMessage: TablesInsert<"messages"> = {
+    chat_id: currentChat.id,
+    assistant_id: null,
+    user_id: profile!.user_id,
+    content: messageContent,
+    model: "llama2-uncensored:latest",
+    role: "assistant",
+    sequence_number: 0,
+    image_paths: []
+  }
+
+  const createdMessage = await createMessage(finalAssistantMessage)
+
+  setChatMessages([
+    ...chatMessages,
+    {
+      message: createdMessage,
+      fileItems: []
+    }
+  ])
 }

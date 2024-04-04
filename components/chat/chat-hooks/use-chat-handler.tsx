@@ -1,5 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { getChatById, updateChat } from "@/db/chats"
+import { getChatById } from "@/db/chats"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
 import {
   createTempMessages,
+  handleCreateAssistantMessage,
   handleCreateChat,
   handleCreateMessages,
   handleRetrieval,
@@ -292,6 +293,66 @@ export const useChatHandler = () => {
     handleSendMessage(editedContent, filteredMessages, false)
   }
 
+  const handleStartTutorial = async () => {
+    setIsGenerating(true)
+    setChatStudyState("tutorial")
+    const messageContent = `👋 Hi there! I am your AI Study Mentor.
+I will help you learn more effectively by helping you create topics for revision and performing appropiatly spaced free recall study sessions.
+In this tutorial, I will guide you through the process of creating a topic for revision.
+A topic appears as an item in the panel to the left of the chat window. 👈
+Open the panel now and you should see "The Solar System"; our tutorial demo topic.
+Please select 'Next' below to continue the tutorial.`
+
+    const topic_description = `* The Solar System consists of the Sun and everything that orbits around it, including planets, moons, asteroids, comets, and meteoroids.
+* The Sun is the center of the Solar System, a star that provides light and heat, making life on Earth possible.
+* Mercury is the closest planet to the Sun, known for having extreme temperature fluctuations.
+* Venus, the second planet, is the hottest due to its thick, toxic atmosphere that traps heat.
+* Earth is the third planet and the only known world to support life, with a unique atmosphere that protects and sustains its inhabitants.
+* Mars, the fourth planet, is known as the Red Planet because of its iron oxide-rich soil and dust.
+* Jupiter is the fifth planet and the largest in our Solar System, with a famous giant red spot that is actually a storm.
+* Saturn, the sixth planet, is most well-known for its spectacular ring system, made up of ice and rock particles.
+* Uranus, the seventh planet, rotates on its side, making it unique among the Solar System's planets.
+* Neptune is the eighth and most distant planet in our Solar System, known for its intense blue color and strong winds.`
+
+    try {
+      setUserInput("")
+      setIsGenerating(true)
+      setIsPromptPickerOpen(false)
+      setIsFilePickerOpen(false)
+      setNewMessageImages([])
+
+      const currentChat = await handleCreateChat(
+        chatSettings!,
+        profile!,
+        selectedWorkspace!,
+        messageContent,
+        selectedAssistant!,
+        newMessageFiles,
+        setSelectedChat,
+        setChats,
+        setChatFiles,
+        true,
+        topic_description
+      )
+
+      await handleCreateAssistantMessage(
+        chatMessages,
+        currentChat,
+        profile!,
+        messageContent,
+        setChatMessages
+      )
+
+      setIsGenerating(false)
+      setFirstTokenReceived(false)
+    } catch (error) {
+      console.log({ error })
+      setIsGenerating(false)
+      setFirstTokenReceived(false)
+      setUserInput(messageContent)
+    }
+  }
+
   return {
     chatInputRef,
     prompt,
@@ -299,6 +360,7 @@ export const useChatHandler = () => {
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
-    handleSendEdit
+    handleSendEdit,
+    handleStartTutorial
   }
 }

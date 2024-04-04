@@ -184,7 +184,7 @@ Next, ask the student if they would like to change anything or if they would ins
           "NEW-STUDY-STATE": newStudyState
         }
       })
-
+    case "recall_tutorial_first_attempt":
     case "recall_first_attempt":
       // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
       chatResponse = await mistral.chat({
@@ -243,14 +243,20 @@ Next, ask the student if they would like to change anything or if they would ins
 2. Go through each fact recalled by the student and Correct any inaccuracies WITHOUT providing answers to forgotten facts.
 3. Offer a hints to help the student recall facts they have omitted by referring to the Topic source only. Make sure the hints are not about the facts they recalled.
 4. ${scoreFeedback}`
-      newStudyState = "recall_hinting"
+      newStudyState =
+        studyState === "recall_tutorial_first_attempt"
+          ? "recall_tutorial_hinting"
+          : "recall_hinting"
 
       if (perfectRecall) {
         systemMessage = "You are a helpful and friendly study tutor."
         userMessage = `Generate upbeat feedback based on the students recall performance. 
 ${scoreFeedback}
 ${finalFeedback}`
-        newStudyState = "recall_finished"
+        newStudyState =
+          studyState === "recall_tutorial_first_attempt"
+            ? "recall_tutorial_finished"
+            : "recall_finished"
       }
 
       chatStreamResponse = await mistral.chatStream({
@@ -278,6 +284,7 @@ Student recall: """${studentMessage.content}"""`
           "NEW-STUDY-STATE": newStudyState
         }
       })
+    case "recall_tutorial_hinting":
     case "recall_hinting":
       // PROVIDE ANSWER TO HINTS  ////////////////////
       chatStreamResponse = await mistral.chatStream({
@@ -301,7 +308,10 @@ Topic source:
       console.log("recall_hinting streaming ")
 
       stream = MistralStream(chatStreamResponse)
-      newStudyState = "recall_finished"
+      newStudyState =
+        studyState === "recall_tutorial_hinting"
+          ? "recall_tutorial_finished"
+          : "recall_finished"
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
