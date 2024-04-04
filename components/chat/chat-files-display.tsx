@@ -72,6 +72,53 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     window.open(link, "_blank")
   }
 
+  function getIconByFileType(fileType: string) {
+    let fileExtension = fileType.includes("/")
+      ? fileType.split("/")[1]
+      : fileType
+
+    switch (fileExtension) {
+      case "pdf":
+        return (
+          <i
+            style={{ fontSize: 20 }}
+            className="fa-regular fa-file-lines px-[2.5px]"
+          ></i>
+        )
+      case "pptx":
+        return (
+          <i
+            style={{ fontSize: 20 }}
+            className="fa-solid fa-presentation-screen px-[2.5px]"
+          ></i>
+        )
+      case "markdown":
+        return <IconMarkdown />
+      case "txt":
+      case "csv":
+      case "docx":
+        return (
+          <i style={{ fontSize: 20 }} className="fa-regular fa-file-lines"></i>
+        )
+      case "json":
+      case "js":
+      case "html":
+      case "css":
+      case "tsx":
+      case "py":
+        return (
+          <i style={{ fontSize: 20 }} className="fa-regular fa-file-code"></i>
+        )
+      default:
+        return (
+          <i
+            className="fa-regular fa-file px-[2.5px]"
+            style={{ fontSize: 20 }}
+          ></i>
+        )
+    }
+  }
+
   return showFilesDisplay && combinedMessageFiles.length > 0 ? (
     <>
       {showPreview && selectedImage && (
@@ -114,8 +161,8 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
           </button>
         </div>
 
-        <div className="overflow-auto">
-          <div className="flex gap-2 overflow-auto pt-2">
+        <div className="overflow-hidden">
+          <div className="flex h-auto max-w-[712px] flex-wrap gap-2 overflow-hidden pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
@@ -179,58 +226,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   onClick={() => getLinkAndView(file)}
                 >
                   <div className="rounded bg-blue-500 px-[10px] py-2 ">
-                    {(() => {
-                      let fileExtension = file.type.includes("/")
-                        ? file.type.split("/")[1]
-                        : file.type
-
-                      switch (fileExtension) {
-                        case "pdf":
-                          return (
-                            <i
-                              style={{ fontSize: 20 }}
-                              className="fa-regular fa-file-pdf"
-                            ></i>
-                          )
-                        case "markdown":
-                          return <IconMarkdown />
-                        case "txt":
-                          return (
-                            <i
-                              style={{ fontSize: 20 }}
-                              className="fa-regular fa-file-lines"
-                            ></i>
-                          )
-                        case "json":
-                          return (
-                            <i
-                              style={{ fontSize: 20 }}
-                              className="fa-regular fa-file-code"
-                            ></i>
-                          )
-                        case "csv":
-                          return (
-                            <i
-                              style={{ fontSize: 20 }}
-                              className="fa-regular fa-file-csv"
-                            ></i>
-                          )
-                        case "docx":
-                          return (
-                            <i
-                              className="fa-regular fa-file-doc"
-                              style={{ fontSize: 20 }}
-                            ></i>
-                          )
-                        default:
-                          return (
-                            <i
-                              className="fa-regular fa-file px-[2.5px]"
-                              style={{ fontSize: 20 }}
-                            ></i>
-                          )
-                      }
-                    })()}
+                    {getIconByFileType(file.type)}
                   </div>
 
                   <div className="text-pixelspace-gray-3 font-inter truncate text-sm font-medium leading-[21px]">
