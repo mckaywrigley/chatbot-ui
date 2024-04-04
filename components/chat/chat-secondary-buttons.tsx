@@ -17,34 +17,61 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
         <>
           <WithTooltip
             delayDuration={200}
+            className="p-[24px]"
             side="left"
             display={
               <div>
-                <div className="text-xl font-bold">Chat Info</div>
+                <div className="mb-4 text-base font-bold ">Thread Info</div>
 
-                <div className="mx-auto mt-2 max-w-xs space-y-2 sm:max-w-sm md:max-w-md lg:max-w-lg">
-                  <div>Model: {selectedChat.model}</div>
-                  <div>Prompt: {selectedChat.prompt}</div>
-
-                  <div>Temperature: {selectedChat.temperature}</div>
-                  <div>Context Length: {selectedChat.context_length}</div>
-
-                  <div>
-                    Profile Context:{" "}
-                    {selectedChat.include_profile_context
-                      ? "Enabled"
-                      : "Disabled"}
+                <div className="mx-auto mt-2 max-w-xs space-y-2 text-sm sm:max-w-sm md:max-w-md lg:max-w-lg">
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Model:{" "}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {selectedChat.model}
+                    </span>
                   </div>
-                  <div>
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Prompt:{" "}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {selectedChat.prompt}
+                    </span>
+                  </div>
+
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Temperature:{" "}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {selectedChat.temperature}
+                    </span>
+                  </div>
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Context Length:{" "}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {selectedChat.context_length}
+                    </span>
+                  </div>
+
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Profile Context:{" "}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {selectedChat.include_profile_context
+                        ? "Enabled"
+                        : "Disabled"}
+                    </span>
+                  </div>
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
                     {" "}
                     Workspace Instructions:{" "}
-                    {selectedChat.include_workspace_instructions
-                      ? "Enabled"
-                      : "Disabled"}
+                    <span className="text-pixelspace-gray-3 font-normal leading-[25.20px]">
+                      {" "}
+                      {selectedChat.include_workspace_instructions
+                        ? "Enabled"
+                        : "Disabled"}
+                    </span>
                   </div>
 
-                  <div>
-                    Embeddings Provider: {selectedChat.embeddings_provider}
+                  <div className="text-pixelspace-gray-3 font-bold leading-[25.20px]">
+                    Embeddings Provider:{" "}
+                    <span>{selectedChat.embeddings_provider}</span>
                   </div>
                 </div>
               </div>

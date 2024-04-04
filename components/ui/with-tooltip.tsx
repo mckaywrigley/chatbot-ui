@@ -9,7 +9,7 @@ import {
 interface WithTooltipProps {
   display: React.ReactNode
   trigger: React.ReactNode
-
+  className?: string
   delayDuration?: number
   side?: "left" | "right" | "top" | "bottom"
 }
@@ -17,7 +17,7 @@ interface WithTooltipProps {
 export const WithTooltip: FC<WithTooltipProps> = ({
   display,
   trigger,
-
+  className,
   delayDuration = 500,
   side = "right"
 }) => {
@@ -26,7 +26,9 @@ export const WithTooltip: FC<WithTooltipProps> = ({
       <Tooltip>
         <TooltipTrigger>{trigger}</TooltipTrigger>
 
-        <TooltipContent side={side}>{display}</TooltipContent>
+        <TooltipContent className={className} side={side}>
+          {display}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )
