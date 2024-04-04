@@ -23,6 +23,22 @@ export async function POST(request: Request) {
 
     const profile = await getServerProfile()
 
+    const { data: userFiles, error: userFilesError } = await supabaseAdmin
+      .from("files")
+      .select("id")
+      .in("id", uniqueFileIds)
+      .eq("user_id", profile.user_id)
+
+    if (userFilesError) {
+      throw new Error(
+        `Failed to retrieve user files: ${userFilesError.message}`
+      )
+    }
+
+    if (userFiles.length !== uniqueFileIds.length) {
+      throw new Error("One or more files are not accessible by the user")
+    }
+
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
         checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
