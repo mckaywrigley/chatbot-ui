@@ -225,51 +225,40 @@ async function generateStandaloneQuestion(
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any
 ) {
-  if (messages.length < 4 || latestUserMessage.length > 256) {
-    return latestUserMessage
-  }
+  // Removed the filter for the standalone question as we already have one before this function is called
+  //if (messages.length < 4 || latestUserMessage.length > 256) {
+  //return latestUserMessage
+  //}
 
-  const modelStandaloneQuestion = "mistralai/mixtral-8x7b-instruct"
+  // Faster and smaller model for standalone questions for reduced latency
+  const modelStandaloneQuestion = "mistralai/mistral-7b-instruct:nitro"
 
   let chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))
-    .slice(1)
+    .slice(1, -1) // Remove the first (system prompt) and the last message (user message)
+    .slice(-3) // Get the last 3 messages only (assistant, user, assistant)
     .map(msg => `${msg.role}: ${msg.content}`)
     .join("\n")
 
-  const template = `Objective: Craft the follow-up question into a direct, actionable, standalone question optimized for searching an RAG index of documents. The question should be specifically formulated to leverage indexing best practices, focusing on keywords and clear actions. Ensure the question is concise, includes all necessary context, and is phrased to retrieve the most relevant information or steps from the RAG index based on user wants.
+  // Compressed prompt with HyDE
+  const template = `
+  Your are HackerGPT is an expert in hacking, particularly in the areas of bug bounty, hacking, penetration testing. You are having a conversation with an user and you want to enrich your answer with some expert knowledge.
+  Objective 1: Craft a standalone question for a specialist who is unfamiliar with the conversation, based on the given follow-up question and chat history. The question should:
 
-    Guidelines:
-    
-    1. **Keyword Emphasis**: Incorporate key terms related to the topic that are likely indexed or highlighted within the RAG documents. This helps directly target the relevant sections or information.
-    2. **Action-Oriented**: Phrase the question to seek specific actions, steps, or methods. This approach facilitates retrieving actionable content from the documents.
-    3. **Clarity and Context**: While maintaining conciseness, ensure the question is self-contained, providing sufficient detail to be understood in isolation. Specify the context or area of application where necessary.
-    4. **Optimization for Search**: Formulate the question in a way that it could directly match or closely align with headings, titles, or key sections in the RAG documents, enhancing the precision of retrieved information.
-    5. **Don't include irrelevant context**: Don't include irrelevant context like "within the scope of authorized penetration testing or bug bounty hunting?"; the shorter and more precise, the better.
-   
-    Examples:
-    
-    1. Original Follow Up: Will she win the award?
-       - Chat History discusses a specific author being nominated for a literary prize.
-       - Standalone, Concise Question: Will author Jane Doe win the 2024 Booker Prize for her novel "The Lost Chapter"?
-    
-    2. Original Follow Up: What's the procedure?
-       - Chat History refers to applying for a specific visa.
-       - Standalone, Concise Question: What is the application procedure for the U.S. tourist visa B-2 as of 2024?
-    
-    Task:
-    Given the chat history and follow-up question below, create a standalone question that is concise and contains all relevant context. RAG doesn't have access to chat history, only to a standalone question, so create a question that way so RAG can find them. 
-    
-    Note: RAG contains information in the format of tutorials and guides from Git Hub.
-    Note: If the inquiry seems outside the scope of the RAG index's information, such as a code, return the original question or query as is.
-    
-    Chat History:
-    """${chatHistory}"""
-    
-    Follow Up Input:
-    """${latestUserMessage}"""
-    
-    Your Rephrased Standalone Question:`
+1. Emphasize relevant keywords
+2. Seek specific actions or information 
+3. Provide full context while being concise
+4. Be phrased as a clear, direct question
+5. Exclude irrelevant details
+
+Input:
+- Chat History: """${chatHistory}"""
+- Follow Up: """${latestUserMessage}"""
+
+Objective 2: Generate an answer for the user question using the best of your knowledge.
+
+Output:
+The rephrased standalone question to ask the specialist and then your answer to the user question.`
 
   const firstMessage = messages[0]
     ? messages[0]
@@ -283,7 +272,7 @@ async function generateStandaloneQuestion(
         { role: firstMessage.role, content: firstMessage.content },
         { role: "user", content: template }
       ],
-      temperature: 0.1,
+      temperature: 1.0, // High temperature for creativity
       max_tokens: 256
     }
 
