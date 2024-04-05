@@ -316,7 +316,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
       <SheetContent
         className="flex flex-col justify-between"
-        side="left"
+        style={{ width: 450 }}
+        side="userSetting"
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
@@ -325,9 +326,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               <div>User Settings</div>
 
               <Button
+                variant="savePrompt"
                 tabIndex={-1}
                 className="text-xs"
-                size="sm"
+                size="savePrompt"
                 onClick={handleSignOut}
               >
                 <IconLogout className="mr-1" size={20} />
@@ -337,13 +339,24 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              {/* <TabsTrigger value="keys">API Keys</TabsTrigger> */}
+            <TabsList className="bg-pixelspace-gray-80 mt-[22px] grid w-[202px] grid-cols-2">
+              <TabsTrigger
+                className="data-[state=active]:bg-pixelspace-gray-60 ml-1 h-[36px]"
+                value="profile"
+              >
+                Profile
+              </TabsTrigger>
+              <TabsTrigger
+                disabled
+                className="data-[state=active]:bg-pixelspace-gray-60 mr-1 h-[36px]"
+                value="keys"
+              >
+                API Keys
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
-              <div className="space-y-1">
+              <div style={{ marginTop: 22 }} className="space-y-1">
                 <div className="flex items-center space-x-2">
                   <Label>Username</Label>
 
@@ -390,7 +403,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div style={{ marginTop: 22 }} className="space-y-1">
                 <Label>Profile Image</Label>
 
                 <ImagePicker
@@ -403,7 +416,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div style={{ marginTop: 22 }} className="space-y-1">
                 <Label>Chat Display Name</Label>
 
                 <Input
@@ -414,16 +427,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div style={{ marginTop: 22 }} className="space-y-1">
                 <Label className="text-sm">
                   What would you like the AI to know about you to provide better
                   responses?
                 </Label>
 
                 <TextareaAutosize
+                  className={`bg-pixelspace-gray-70 border-pixelspace-gray-50 focus:border-pixelspace-gray-40 text-pixelspace-gray-20 w-full border p-3`}
                   value={profileInstructions}
                   onValueChange={setProfileInstructions}
-                  placeholder="Profile context... (optional)"
+                  placeholder="Profile context"
                   minRows={6}
                   maxRows={10}
                 />
@@ -732,7 +746,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
         <div className="mt-6 flex items-center">
           <div className="flex items-center space-x-1">
-            <ThemeSwitcher />
+            {/* <ThemeSwitcher /> */}
 
             <WithTooltip
               display={
@@ -741,21 +755,29 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 </div>
               }
               trigger={
-                <IconFileDownload
-                  className="cursor-pointer hover:opacity-50"
-                  size={32}
-                  onClick={exportLocalStorageAsJSON}
-                />
+                <i
+                  style={{ fontSize: 32 }}
+                  className="fa-light fa-file-arrow-down text-pixelspace-gray-20 hover:text-pixelspace-gray-10 "
+                ></i>
               }
             />
           </div>
 
           <div className="ml-auto space-x-2">
-            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            <Button
+              size="cancelPrompt"
+              variant="cancelPrompt"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
 
-            <Button ref={buttonRef} onClick={handleSave}>
+            <Button
+              size="savePrompt"
+              variant="savePrompt"
+              ref={buttonRef}
+              onClick={handleSave}
+            >
               Save
             </Button>
           </div>
