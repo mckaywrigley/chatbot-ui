@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     model = "gpt-4"
 
     if (
-      (latestUserMessage.content.startsWith("/") || latestUserMessage.content.startsWith(`Assist with the user's query: '/`)) &&
+      latestUserMessage.content.startsWith("/") &&
       (selectedPlugin as PluginID) !== PluginID.CYBERCHEF
     ) {
       const plugins = Object.keys(pluginUrls)
