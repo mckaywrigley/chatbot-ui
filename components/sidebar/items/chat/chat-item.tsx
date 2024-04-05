@@ -185,14 +185,14 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
             aria-labelledby="dropdownMenuIconHorizontalButton"
           >
             <li>
-              <div className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 mb-1 block w-full cursor-pointer px-4 py-2  text-left  text-xs dark:hover:text-white">
+              <div>
                 <UpdateChat chat={chat} setShowChatDialog={setShowChatDialog} />
               </div>
             </li>
 
             <hr className="border-pixelspace-gray-70" />
             <li className="mt-1">
-              <div className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left  text-xs  dark:hover:text-white">
+              <div>
                 <DeleteChat chat={chat} />
               </div>
             </li>

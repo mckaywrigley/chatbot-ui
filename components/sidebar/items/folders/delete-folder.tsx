@@ -106,7 +106,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="text-pixelspace-gray-20 flex items-center text-sm font-medium"
+          className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium dark:hover:text-white"
         >
           <FontAwesomeIcon icon={faTrash} className="mr-2" />
           <span>Delete</span>
