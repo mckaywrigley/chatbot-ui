@@ -11,6 +11,7 @@ import {
 import { FolderClosed } from "lucide-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons"
+import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
 
 interface FolderProps {
   folder: Tables<"folders">
@@ -32,7 +33,7 @@ export const Folder: FC<FolderProps> = ({
   const [isDragOver, setIsDragOver] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
-
+  const [showChatDialog, setShowChatDialog] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const [renderOnTop, setRenderOnTop] = useState(false)
@@ -156,24 +157,26 @@ export const Folder: FC<FolderProps> = ({
           >
             <div>{folder.name}</div>
           </div>
-          <div
-            role="button"
-            className="size-[14px] text-white hover:text-neutral-100"
-            onClick={e => {
-              e.stopPropagation()
-              handleMenuButtonClick(e)
-            }}
-          >
-            {isHovering && (
-              <FontAwesomeIcon
-                className="text-pixelspace-gray-40 hover:text-pixelspace-gray-3 flex"
-                icon={faEllipsisH}
-              />
-            )}
-          </div>
+          <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+            <DialogTrigger asChild>
+              <div
+                role="button"
+                className="size-[14px] text-white hover:text-neutral-100"
+                onClick={e => {
+                  e.stopPropagation()
+                  handleMenuButtonClick(e)
+                }}
+              >
+                {isHovering && (
+                  <FontAwesomeIcon
+                    className="text-pixelspace-gray-40 hover:text-pixelspace-gray-3 flex"
+                    icon={faEllipsisH}
+                  />
+                )}
+              </div>
+            </DialogTrigger>
 
-          {isMenuOpen && (
-            <div
+            <DialogContent
               ref={menuRef}
               style={{
                 top: `${position.y}px`,
@@ -192,7 +195,10 @@ export const Folder: FC<FolderProps> = ({
               >
                 <li>
                   <div>
-                    <UpdateFolder folder={folder} />
+                    <UpdateFolder
+                      setShowChatDialog={setShowChatDialog}
+                      folder={folder}
+                    />
                   </div>
                 </li>
 
@@ -203,25 +209,10 @@ export const Folder: FC<FolderProps> = ({
                   </div>
                 </li>
               </ul>
-            </div>
-          )}
-
-          {/* {isHovering && (
-            <div
-              onClick={e => {
-                e.stopPropagation()
-                e.preventDefault()
-              }}
-              className="ml-2 flex space-x-2"
-            >
-              <UpdateFolder folder={folder} />
-
-              <DeleteFolder folder={folder} contentType={contentType} />
-            </div>
-          )} */}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
-
       {isExpanded && <div className=" mt-2 space-y-[1px]">{children}</div>}
     </div>
   )
