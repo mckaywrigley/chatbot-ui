@@ -329,26 +329,26 @@ const transformUserQueryToAlterxCommand = (
   fileName?: string
 ) => {
   const alterxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'Alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-l' or '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'Alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-l' or '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains filename directly in the command. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
-    ? `Filename Inclusion: Use the -l flag followed by the file name (e.g., -l ${fileName}) containing the domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains.`
-    : "Domain/Subdomain Inclusion: Directly specify the main domain or subdomains using the -l flag. For a single domain, format it as -l domain.com. For multiple subdomains, separate them with commas (e.g., -l subdomain1.domain.com,subdomain2.domain.com)."
+    ? `**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : "**Domain/Subdomain Inclusion**: Directly specify the main domain or subdomains using the -list string[] flag. For a single domain, format it as -list domain.com. For multiple subdomains, separate them with commas (e.g., -list subdomain1.domain.com,subdomain2.domain.com). (required)"
 
   const alterxExampleText = fileContentIncluded
-    ? `For generating a wordlist using a file named '${fileName}' containing domains:
+    ? `For generating a wordlist using a file named '${fileName}' containing list of domains:
 \`\`\`json
-{ "command": "alterx -l ${fileName}" }
+{ "command": "alterx -list ${fileName}" }
 \`\`\``
     : `For generating a wordlist with a single subdomain:
 \`\`\`json
-{ "command": "alterx -l subdomain1.com" }
+{ "command": "alterx -list subdomain1.com" }
 \`\`\`
 
 For generating a wordlist with multiple subdomains:
 \`\`\`json
-{ "command": "alterx -l subdomain1.com,subdomain2.com" }
+{ "command": "alterx -list subdomain1.com,subdomain2.com" }
 \`\`\``
 
   const answerMessage = endent`
