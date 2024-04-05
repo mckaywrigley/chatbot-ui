@@ -19,9 +19,13 @@ import { FC, useContext, useRef, useState } from "react"
 
 interface UpdateFolderProps {
   folder: Tables<"folders">
+  setShowChatDialog: (value: boolean) => void
 }
 
-export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
+export const UpdateFolder: FC<UpdateFolderProps> = ({
+  folder,
+  setShowChatDialog: isSetShowDialog
+}) => {
   const { setFolders } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -36,7 +40,7 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
     setFolders(prevState =>
       prevState.map(c => (c.id === folder.id ? updatedFolder : c))
     )
-
+    isSetShowDialog(false)
     setShowFolderDialog(false)
   }
 
@@ -78,7 +82,10 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
             size="cancelPrompt"
             className="mr-4"
             variant="cancelPrompt"
-            onClick={() => setShowFolderDialog(false)}
+            onClick={() => {
+              setShowFolderDialog(false)
+              isSetShowDialog(false)
+            }}
           >
             Cancel
           </Button>
