@@ -33,10 +33,25 @@ export default function ChatPage() {
             <Brand theme={theme === "dark" ? "dark" : "light"} />
             <div className="mx-16 mt-5 border-t-2 pt-5">
               {localStorage.getItem("tutorialDone") === "true" ? (
-                <p>
-                  Create a topic by describing below. You can also upload a file
-                  using the ⨁ button.
-                </p>
+                <>
+                  <p>
+                    Please create a topic by describing it below and/or upload a
+                    file using the ⨁ button.
+                  </p>
+                  <div className="mt-3 border-t-2 pt-5">
+                    <p className="text-grey-600/75 dark:text-grey-400/50">
+                      🪐
+                      <a
+                        href="#"
+                        onClick={handleStartTutorial}
+                        className="pl-1 underline"
+                      >
+                        Restart tutorial
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </>
               ) : (
                 <>
                   <p>
@@ -45,10 +60,10 @@ export default function ChatPage() {
                   </p>
                   <div className="mt-3 flex items-center justify-center">
                     <p>
-                      <Button onClick={handleStartTutorial}>
+                      <a href="#" onClick={handleStartTutorial}>
                         <IconPlanet className="mr-1" />
                         Start tutorial
-                      </Button>
+                      </a>
                     </p>
                   </div>
                 </>
