@@ -147,6 +147,30 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 4,
+    name: "Web Scraper",
+    selectorName: "Web Scraper: Extract Data from Websites",
+    value: PluginID.WEB_SCRAPER,
+    icon: "https://cdn-icons-png.flaticon.com/512/11892/11892629.png",
+    description: "Extract data from websites and chat with the extracted data",
+    categories: ["Free", "Popular", "New"],
+    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
+    isInstalled: false,
+    isPremium: false,
+    starters: [
+      {
+        title: "Scrape Data",
+        description: "from https://github.com/Hacker-GPT/...",
+        chatMessage: "https://github.com/Hacker-GPT/HackerGPT-2.0"
+      },
+      {
+        title: "Web Scraper Help",
+        description: "How does the Web Scraper plugin work?",
+        chatMessage: "How does the Web Scraper plugin work?"
+      }
+    ]
+  },
+  {
+    id: 5,
     name: "GoLinkFinder",
     selectorName: "GoLinkFinder: URL Extraction",
     value: PluginID.GOLINKFINDER,
@@ -167,30 +191,6 @@ export const availablePlugins: PluginSummary[] = [
         title: "GoLinkFinder Help",
         description: "How does the GoLinkFinder plugin work?",
         chatMessage: "/golinkfinder -help"
-      }
-    ]
-  },
-  {
-    id: 5,
-    name: "Web Scraper",
-    selectorName: "Web Scraper: Extract Data from Websites",
-    value: PluginID.WEB_SCRAPER,
-    icon: "https://cdn-icons-png.flaticon.com/512/11892/11892629.png",
-    description: "Extract data from websites and chat with the extracted data",
-    categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
-    isInstalled: false,
-    isPremium: false,
-    starters: [
-      {
-        title: "Scrape Data",
-        description: "from https://github.com/Hacker-GPT/...",
-        chatMessage: "https://github.com/Hacker-GPT/HackerGPT-2.0"
-      },
-      {
-        title: "Web Scraper Help",
-        description: "How does the Web Scraper plugin work?",
-        chatMessage: "How does the Web Scraper plugin work?"
       }
     ]
   },
