@@ -157,8 +157,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [])
 
   const fetchStartingData = async () => {
-    // console.warn("logging out!")
-    // supabase.auth.signOut()
     const session = (await supabase.auth.getSession()).data.session
 
     if (session) {

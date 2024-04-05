@@ -245,7 +245,7 @@ Next, ask the student if they would like to change anything or if they would ins
 4. ${scoreFeedback}`
       newStudyState =
         studyState === "recall_tutorial_first_attempt"
-          ? "recall_tutorial_hinting"
+          ? "tutorial_hinting"
           : "recall_hinting"
 
       if (perfectRecall) {
@@ -255,7 +255,7 @@ ${scoreFeedback}
 ${finalFeedback}`
         newStudyState =
           studyState === "recall_tutorial_first_attempt"
-            ? "recall_tutorial_finished"
+            ? "tutorial_hinting"
             : "recall_finished"
       }
 
@@ -287,6 +287,8 @@ Student recall: """${studentMessage.content}"""`
     case "recall_tutorial_hinting":
     case "recall_hinting":
       // PROVIDE ANSWER TO HINTS  ////////////////////
+      const messagesToAppend =
+        studyState === "recall_tutorial_hinting" ? messages.slice(-5) : messages
       chatStreamResponse = await mistral.chatStream({
         model: defaultModel,
         temperature: 0.4,
@@ -294,14 +296,14 @@ Student recall: """${studentMessage.content}"""`
           {
             role: "system",
             content: `Act as a study mentor, guiding student through active recall sessions. Do not calculate the score again.
-Given the Topic source below and the student's attempt at recalling after you provided hints, perform the following tasks:
-1. Provide friendly supportive constructive feedback with the answers to each hint using the Topic source below.
-2. ${finalFeedback}
-            
-Topic source:
-"""${topicDescription}"""`
+    Given the Topic source below and the student's attempt at recalling after you provided hints, perform the following tasks:
+    1. Provide friendly supportive constructive feedback with the answers to each hint using the Topic source below.
+    2. ${finalFeedback}
+        
+    Topic source:
+    """${topicDescription}"""`
           },
-          ...messages
+          ...messagesToAppend
         ]
       })
 
@@ -310,7 +312,7 @@ Topic source:
       stream = MistralStream(chatStreamResponse)
       newStudyState =
         studyState === "recall_tutorial_hinting"
-          ? "recall_tutorial_finished"
+          ? "tutorial_final_stage"
           : "recall_finished"
       return new StreamingTextResponse(stream, {
         headers: {

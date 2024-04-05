@@ -260,7 +260,6 @@ export const useChatHandler = () => {
         setChatImages,
         selectedAssistant
       )
-
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput("")

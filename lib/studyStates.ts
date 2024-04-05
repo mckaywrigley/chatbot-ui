@@ -12,8 +12,11 @@ export type StudyState =
   | "tutorial_3"
   | "tutorial_4"
   | "recall_tutorial_first_attempt"
+  | "tutorial_hinting"
   | "recall_tutorial_hinting"
-  | "recall_tutorial_finished"
+  | "tutorial_final_stage"
+  | "tutorial_final_review"
+  | "tutorial_finished"
 
 export interface QuickResponse {
   quickText: string
@@ -25,12 +28,6 @@ interface StudyStateObject {
   name: StudyState
   quickResponses?: QuickResponse[]
 }
-
-const tutorialFinalText = `Amazing work! 
-You've probably noticed the icon next to the topic name has changed into a green circle with a lock. This is a happy indicator that you've successfully reviewed the topic. As days go by leading up to your next review session, this circle will slowly diminish, mirroring an estimate of your recall strength. Don't worry, we'll give you a gentle nudge when it's nearly time for a refresh.
-Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
-And of course, feel free to dive back in to further solidify your mastery of The Solar System!
-Enjoy your learning journey!`
 
 export const studyStates: StudyStateObject[] = [
   {
@@ -146,8 +143,8 @@ export const studyStates: StudyStateObject[] = [
       {
         quickText: "Save topic description.",
         responseText: `Now comes the fun part! After taking some time to study the topic, it's time for your first recall attempt. Let's make it a good one, no peeking allowed! 👀😉
-I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about The Solar System topic now; click on chat below then hit the microphone 🎙️ key on your keyboard.
-When you feel ready, click "Finish Tutorial" to move forward.`,
+I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about "The Solar System" topic but leave out some facts for the purpose of this tutorial; select the chat area below (Message Mentor...) then type or hit the microphone key on your keyboard.
+After you receive feedback on your attempt, select "Next step..." to move forward.`,
         newStudyState: "recall_tutorial_first_attempt"
       }
     ]
@@ -156,21 +153,50 @@ When you feel ready, click "Finish Tutorial" to move forward.`,
     name: "recall_tutorial_first_attempt"
   },
   {
-    name: "recall_tutorial_hinting",
+    name: "tutorial_hinting",
     quickResponses: [
       {
-        quickText: "Finish tutorial.",
-        responseText: tutorialFinalText,
-        newStudyState: "topic_creation"
+        quickText: "Next step - reply to hints.",
+        responseText:
+          "Great work so far! So now that some hints have been provided, try your best to recall the missing facts.",
+        newStudyState: "recall_tutorial_hinting"
       }
     ]
   },
   {
-    name: "recall_tutorial_finished",
+    name: "recall_tutorial_hinting"
+  },
+  {
+    name: "tutorial_final_stage",
+    quickResponses: [
+      {
+        quickText: "Final stage - review.",
+        responseText: `Amazing work! 
+The final stage of an effective study session is reviewing the topic one last time with an eye on what was missed. This is where you'll get a chance to solidify your understanding of the topic.`,
+        newStudyState: "tutorial_final_review"
+      }
+    ]
+  },
+  {
+    name: "tutorial_final_review",
+    quickResponses: [
+      {
+        quickText: "Show topic content for final review.",
+        responseText: "{{topicDescription}}",
+        newStudyState: "tutorial_finished"
+      }
+    ]
+  },
+  {
+    name: "tutorial_finished",
     quickResponses: [
       {
         quickText: "Finish tutorial.",
-        responseText: tutorialFinalText,
+        responseText: `Amazing work! 
+On the topic list to the left, you will notice the icon next to the topic name has changed into a green circle with a lock. This is a happy indicator that you've successfully reviewed the topic. As days go by leading up to your next review session, this circle will slowly diminish, mirroring an estimate of your recall strength. Don't worry, we'll give you a gentle nudge when it's nearly time for a refresh.
+Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
+And of course, feel free to dive back in to further solidify your mastery of The Solar System!
+Enjoy your learning journey!`,
         newStudyState: "topic_creation"
       }
     ]
