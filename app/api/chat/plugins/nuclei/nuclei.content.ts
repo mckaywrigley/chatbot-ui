@@ -1038,7 +1038,7 @@ export async function handleNucleiRequest(
         sendMessage("✅ Scan done! Now processing the results...", true)
 
         const urls = processurls(outputString)
-        const target = params.target ? params.target : params.list
+        const target = params.list ? params.list : params.target
         const formattedResponse = formatResponseString(urls, target)
         sendMessage(formattedResponse, true)
 
