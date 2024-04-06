@@ -162,7 +162,7 @@ export async function handleAlterxRequest(
     const answerPrompt = transformUserQueryToAlterxCommand(
       lastMessage,
       fileContentIncluded,
-      fileNameIncluded ? fileName : "target.txt"
+      fileNameIncluded ? fileName : "hosts.txt"
     )
     answerMessage.content = answerPrompt
 

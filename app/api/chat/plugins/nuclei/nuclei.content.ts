@@ -22,6 +22,7 @@ const displayHelpGuide = () => {
     Flags:
     TARGET:
        -u, -target string[]          target URLs/hosts to scan
+       -l, -list string              path to file containing a list of target URLs/hosts to scan (one per line)
        -eh, -exclude-hosts string[]  hosts to exclude to scan from the input list (ip, cidr, hostname)
        -sa, -scan-all-ips            scan all the IP's associated with dns record
        -iv, -ip-version string[]     IP version to scan of hostname (4,6) - (default 4)
@@ -83,6 +84,7 @@ const displayHelpGuide = () => {
 interface NucleiParams {
   // TARGET
   target: string[]
+  list: string
   excludeHosts: string[]
   scanAllIPs: boolean
   ipVersion: string[]
@@ -140,12 +142,16 @@ interface NucleiParams {
   scanStrategy: string
   noHttpx: boolean
 
+  // FILE
+  fileContent: string
+
   // ERROR
   error: string | null
 }
 
 interface NucleiRequestBody {
   target?: string[]
+  list?: string
   exclude_hosts?: string
   scan_all_ips?: boolean
   ip_version?: string
@@ -192,6 +198,9 @@ interface NucleiRequestBody {
   no_max_host_error?: boolean
   scan_strategy?: string
   no_httpx?: boolean
+
+  // FILE
+  fileContent?: string
 }
 
 const parseCommandLine = (input: string) => {
@@ -202,6 +211,7 @@ const parseCommandLine = (input: string) => {
   const params: NucleiParams = {
     // TARGET
     target: [],
+    list: "",
     excludeHosts: [],
     scanAllIPs: false,
     ipVersion: ["4"],
@@ -258,6 +268,9 @@ const parseCommandLine = (input: string) => {
     noMaxHostError: false,
     scanStrategy: "auto",
     noHttpx: false,
+
+    // FILE
+    fileContent: "",
 
     // ERROR
     error: null
@@ -359,6 +372,18 @@ const parseCommandLine = (input: string) => {
               params.error = `Invalid target: ${target}`
               return params
             }
+          }
+        }
+        break
+      case "-l":
+      case "-list":
+        if (args[i + 1] && !args[i + 1].startsWith("-")) {
+          const listFilePath = args[++i]
+          if (listFilePath.endsWith(".txt")) {
+            params.list = listFilePath
+          } else {
+            params.error = `Invalid list file: ${listFilePath}. Only .txt files are supported.`
+            return params
           }
         }
         break
@@ -744,8 +769,8 @@ const parseCommandLine = (input: string) => {
     }
   }
 
-  if (!params.target.length || params.target.length === 0) {
-    params.error = "🚨 Error: -u/-target parameter is required."
+  if ((!params.target || params.target.length === 0) && !params.list) {
+    params.error = "🚨 Error: -u/-target or -l/-list parameter is required."
   }
 
   return params
@@ -765,7 +790,9 @@ export async function handleNucleiRequest(
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent?: string,
+  fileName?: string
 ) {
   if (!enableNucleiFeature) {
     return new Response("The Nuclei is disabled.", {
@@ -775,8 +802,18 @@ export async function handleNucleiRequest(
 
   let aiResponse = ""
 
+  // Adjusted logic to ensure fileContentIncluded is true only if fileContent is provided
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  // Ensure fileName is only considered if fileContent is included
+  const fileNameIncluded =
+    fileContentIncluded && fileName && fileName.length > 0
+
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToNucleiCommand(lastMessage)
+    const answerPrompt = transformUserQueryToNucleiCommand(
+      lastMessage,
+      fileContentIncluded,
+      fileNameIncluded ? fileName : "hosts.txt"
+    )
     answerMessage.content = answerPrompt
 
     const openAIResponseStream = await OpenAIStream(
@@ -929,6 +966,11 @@ export async function handleNucleiRequest(
     requestBody.scan_strategy = params.scanStrategy
   if (params.noHttpx) requestBody.no_httpx = true
 
+  // FILE
+  if (fileContentIncluded) {
+    requestBody.fileContent = fileContent
+  }
+
   const headers = new Headers()
   headers.set("Content-Type", "text/event-stream")
   headers.set("Cache-Control", "no-cache")
@@ -996,7 +1038,8 @@ export async function handleNucleiRequest(
         sendMessage("✅ Scan done! Now processing the results...", true)
 
         const urls = processurls(outputString)
-        const formattedResponse = formatResponseString(urls, params)
+        const target = params.target ? params.target : params.list
+        const formattedResponse = formatResponseString(urls, target)
         sendMessage(formattedResponse, true)
 
         controller.close()
@@ -1019,12 +1062,35 @@ export async function handleNucleiRequest(
   return new Response(stream, { headers })
 }
 
-const transformUserQueryToNucleiCommand = (lastMessage: Message) => {
+const transformUserQueryToNucleiCommand = (
+  lastMessage: Message,
+  fileContentIncluded: boolean,
+  fileName?: string
+) => {
+  const nucleiIntroduction = fileContentIncluded
+    ? `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should use the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should utilize the most relevant flags, with '-target' being essential to specify the target host(s) to scan. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+
+  const domainOrFilenameInclusionText = fileContentIncluded
+    ? `**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Nuclei supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : `**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
+  - -target (string[]): Specify the target host(s) to scan. (required)`
+
+  const nucleiExampleText = fileContentIncluded
+    ? `For probing a list of hosts directly using a file named '${fileName}':
+\`\`\`json
+{ "command": "alterx -list ${fileName}" }
+\`\`\``
+    : `For probing a list of hosts directly:
+\`\`\`json
+{ "command": "nuclei -target host1.com,host2.com" }
+\`\`\``
+
   const answerMessage = endent`
   Query: "${lastMessage.content}"
 
-  Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should utilize the most relevant flags, with '-target' being essential to specify the target host(s) to scan. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
-  
+  ${nucleiIntroduction}
+
   ALWAYS USE THIS FORMAT:
   \`\`\`json
   { "command": "nuclei [flags]" }
@@ -1039,9 +1105,8 @@ const transformUserQueryToNucleiCommand = (lastMessage: Message) => {
   This command will instruct the 'nuclei' tool to provide its help documentation, making it easier for users to understand how to use the tool and which flags are at their disposal for specific tasks. It's important to ensure that the command remains simple and directly addresses the user's request for help.
 
   Command Construction Guidelines:
-  1. **Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
-      - -target (string[]): Specify the target host(s) to scan. (required)
-    2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'nuclei' tool include:
+  1. ${domainOrFilenameInclusionText}
+  2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'nuclei' tool include:
     - **TARGET**:
       - -exclude-hosts (string[]): Hosts to exclude from the input list (ip, cidr, hostname).
       - -scan-all-ips: Scan all the IP's associated with a DNS record.
@@ -1098,10 +1163,7 @@ const transformUserQueryToNucleiCommand = (lastMessage: Message) => {
   3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient scanning process.
 
   Example Commands:
-  For probing a list of hosts directly:
-  \`\`\`json
-  { "command": "nuclei -target host1.com,host2.com" }
-  \`\`\`
+  ${nucleiExampleText}
 
   For a request for help or all flags or if the user asked about how the plugin works:
   \`\`\`json
@@ -1117,7 +1179,7 @@ function processurls(outputString: string) {
   return outputString.split("\n").filter(target => target.trim().length > 0)
 }
 
-function formatResponseString(urls: any[], params: NucleiParams) {
+function formatResponseString(urls: any[], target: string | string[]) {
   const date = new Date()
   const timezone = "UTC-5"
   const formattedDateTime = date.toLocaleString("en-US", {
@@ -1129,7 +1191,7 @@ function formatResponseString(urls: any[], params: NucleiParams) {
   return (
     `# [Nuclei](${pluginUrls.Nuclei}) Results\n` +
     '**Target**: "' +
-    params.target +
+    target +
     '"\n\n' +
     "**Scan Date & Time**:" +
     ` ${formattedDateTime} (${timezone}) \n\n` +
