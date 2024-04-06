@@ -17,25 +17,10 @@ import { handleAlterxRequest, isAlterxCommand } from "./alterx/alterx.content"
 
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
+import { Message } from "@/types/chat"
+
 type CommandHandler = {
   [key: string]: (...args: any[]) => any
-}
-
-type pluginUrls = {
-  [key: string]: string
-}
-
-export const pluginUrls: pluginUrls = {
-  CVEmap: "https://github.com/projectdiscovery/cvemap",
-  Cyberchef: "https://github.com/gchq/CyberChef",
-  Subfinder: "https://github.com/projectdiscovery/subfinder",
-  GoLinkFinder: "https://github.com/0xsha/GoLinkFinder",
-  Nuclei: "https://github.com/projectdiscovery/nuclei",
-  Katana: "https://github.com/projectdiscovery/katana",
-  Httpx: "https://github.com/projectdiscovery/httpx",
-  Naabu: "https://github.com/projectdiscovery/naabu",
-  Gau: "https://github.com/lc/gau",
-  Alterx: "https://github.com/projectdiscovery/alterx"
 }
 
 type pluginHandlerFunction = (
@@ -114,5 +99,105 @@ export const handleCommand = async (
     model,
     messagesToSend,
     answerMessage
+  )
+}
+
+type TransformQueryFunction = (
+  message: Message,
+  fileContentIncluded?: boolean,
+  fileName?: string
+) => string
+
+export async function processAIResponseAndUpdateMessage(
+  lastMessage: Message,
+  transformQueryFunction: TransformQueryFunction,
+  OpenAIStream: {
+    (
+      model: string,
+      messages: Message[],
+      answerMessage: Message
+    ): Promise<ReadableStream<any>>
+  },
+  model: string,
+  messagesToSend: Message[],
+  answerMessage: Message,
+  fileContentIncluded: boolean = false,
+  fileName?: string
+): Promise<{ updatedLastMessageContent: string; aiResponseText: string }> {
+  const fileNameIncluded =
+    fileContentIncluded && fileName && fileName.length > 0
+
+  const answerPrompt = transformQueryFunction(
+    lastMessage,
+    fileContentIncluded,
+    fileNameIncluded ? fileName : "hosts.txt"
+  )
+  answerMessage.content = answerPrompt
+
+  const openAIResponseStream = await OpenAIStream(
+    model,
+    messagesToSend,
+    answerMessage
+  )
+
+  let aiResponse = ""
+  const reader = openAIResponseStream.getReader()
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    aiResponse += new TextDecoder().decode(value, { stream: true })
+  }
+
+  try {
+    const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
+    if (jsonMatch) {
+      const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
+      const jsonResponse = JSON.parse(jsonResponseString)
+      lastMessage.content = jsonResponse.command
+    } else {
+      throw new Error("No JSON command found in the AI response.")
+    }
+  } catch (error) {
+    console.error(
+      `Error extracting and parsing JSON from AI response: ${error}`
+    )
+    throw error
+  }
+
+  return {
+    updatedLastMessageContent: lastMessage.content,
+    aiResponseText: aiResponse
+  }
+}
+
+export function formatScanResults({
+  pluginName,
+  pluginUrl,
+  target,
+  results
+}: {
+  pluginName: string
+  pluginUrl: string
+  target: string | string[]
+  results: any[]
+}) {
+  const formattedDateTime = new Date().toLocaleString("en-US", {
+    timeZone: "Etc/GMT+5",
+    timeZoneName: "short"
+  })
+
+  const resultsFormatted = results.join("\n")
+  return (
+    `# [${pluginName}](${pluginUrl}) Results\n` +
+    '**Target**: "' +
+    target +
+    '"\n\n' +
+    "**Scan Date & Time**:" +
+    ` ${formattedDateTime} (UTC-5) \n\n` +
+    "## Results:\n" +
+    "```\n" +
+    resultsFormatted +
+    "\n" +
+    "```\n"
   )
 }

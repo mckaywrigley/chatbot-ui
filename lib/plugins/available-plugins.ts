@@ -1,4 +1,4 @@
-import { PluginID, PluginSummary } from "@/types/plugins"
+import { PluginID, pluginUrls, PluginSummary } from "@/types/plugins"
 
 export const availablePlugins: PluginSummary[] = [
   {
@@ -42,7 +42,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "Efficiently explore CVE databases, linking vulnerabilities to exploits and remediations.",
     categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/projectdiscovery/cvemap",
+    githubRepoUrl: pluginUrls.CVEmap,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -80,7 +80,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "A tool for for encryption, encoding, compression, and data analysis.",
     categories: ["Free", "Popular", "New"],
-    githubRepoUrl: "https://github.com/gchq/CyberChef",
+    githubRepoUrl: pluginUrls.Cyberchef,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -118,7 +118,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "A robust discovery tool for passive enumeration on valid subdomains",
     categories: ["Free", "Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/subfinder",
+    githubRepoUrl: pluginUrls.Subfinder,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -177,7 +177,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
     description: "A minimalistic JavaScript endpoint extractor.",
     categories: ["Free", "New", "Popular"],
-    githubRepoUrl: "https://github.com/0xsha/GoLinkFinder",
+    githubRepoUrl: pluginUrls.GoLinkFinder,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -202,7 +202,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customisable vulnerability scanner",
     categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/nuclei",
+    githubRepoUrl: pluginUrls.Nuclei,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -238,7 +238,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "A web crawling framework designed to navigate and parse for hidden details",
     categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/katana",
+    githubRepoUrl: pluginUrls.Katana,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -273,7 +273,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "An HTTP toolkit that probes services, web servers, and other valuable metadata",
     categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/httpx",
+    githubRepoUrl: pluginUrls.Httpx,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -308,7 +308,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "A fast port scanner designed to scan large networks at high speed",
     categories: ["Popular"],
-    githubRepoUrl: "https://github.com/projectdiscovery/naabu",
+    githubRepoUrl: pluginUrls.Naabu,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -345,7 +345,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "Fetches known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, Common Crawl, and URLScan.",
     categories: ["Free"],
-    githubRepoUrl: "https://github.com/lc/gau",
+    githubRepoUrl: pluginUrls.Gau,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -379,7 +379,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customizable subdomain wordlist generator",
     categories: ["Free"],
-    githubRepoUrl: "https://github.com/projectdiscovery/alterx",
+    githubRepoUrl: pluginUrls.Alterx,
     isInstalled: false,
     isPremium: false,
     starters: [

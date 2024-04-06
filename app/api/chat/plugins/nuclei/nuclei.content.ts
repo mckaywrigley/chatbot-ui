@@ -1,7 +1,11 @@
 import { Message } from "@/types/chat"
+import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { pluginUrls } from "@/app/api/chat/plugins/plugins"
+import {
+  processAIResponseAndUpdateMessage,
+  formatScanResults
+} from "@/app/api/chat/plugins/plugins"
 
 export const isNucleiCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -800,56 +804,28 @@ export async function handleNucleiRequest(
     })
   }
 
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
+
   let aiResponse = ""
 
-  // Adjusted logic to ensure fileContentIncluded is true only if fileContent is provided
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
-  // Ensure fileName is only considered if fileContent is included
-  const fileNameIncluded =
-    fileContentIncluded && fileName && fileName.length > 0
-
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToNucleiCommand(
-      lastMessage,
-      fileContentIncluded,
-      fileNameIncluded ? fileName : "hosts.txt"
-    )
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToNucleiCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage,
+          fileContentIncluded,
+          fileName
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
@@ -1039,8 +1015,13 @@ export async function handleNucleiRequest(
 
         const urls = processurls(outputString)
         const target = params.list ? params.list : params.target
-        const formattedResponse = formatResponseString(urls, target)
-        sendMessage(formattedResponse, true)
+        const formattedResults = formatScanResults({
+          pluginName: "Nuclei",
+          pluginUrl: pluginUrls.Nuclei,
+          target: target,
+          results: urls
+        })
+        sendMessage(formattedResults, true)
 
         controller.close()
       } catch (error) {
@@ -1064,7 +1045,7 @@ export async function handleNucleiRequest(
 
 const transformUserQueryToNucleiCommand = (
   lastMessage: Message,
-  fileContentIncluded: boolean,
+  fileContentIncluded?: boolean,
   fileName?: string
 ) => {
   const nucleiIntroduction = fileContentIncluded
@@ -1079,7 +1060,7 @@ const transformUserQueryToNucleiCommand = (
   const nucleiExampleText = fileContentIncluded
     ? `For probing a list of hosts directly using a file named '${fileName}':
 \`\`\`json
-{ "command": "alterx -list ${fileName}" }
+{ "command": "nuclei -list ${fileName}" }
 \`\`\``
     : `For probing a list of hosts directly:
 \`\`\`json
@@ -1177,28 +1158,4 @@ const transformUserQueryToNucleiCommand = (
 
 function processurls(outputString: string) {
   return outputString.split("\n").filter(target => target.trim().length > 0)
-}
-
-function formatResponseString(urls: any[], target: string | string[]) {
-  const date = new Date()
-  const timezone = "UTC-5"
-  const formattedDateTime = date.toLocaleString("en-US", {
-    timeZone: "Etc/GMT+5",
-    timeZoneName: "short"
-  })
-
-  const urlsFormatted = urls.join("\n")
-  return (
-    `# [Nuclei](${pluginUrls.Nuclei}) Results\n` +
-    '**Target**: "' +
-    target +
-    '"\n\n' +
-    "**Scan Date & Time**:" +
-    ` ${formattedDateTime} (${timezone}) \n\n` +
-    "## Results:\n" +
-    "```\n" +
-    urlsFormatted +
-    "\n" +
-    "```\n"
-  )
 }

@@ -95,3 +95,20 @@ export const Plugins: Record<PluginID, Plugin> = {
 }
 
 export const PluginList = Object.values(Plugins)
+
+type pluginUrls = {
+  [key: string]: string
+}
+
+export const pluginUrls: pluginUrls = {
+  CVEmap: "https://github.com/projectdiscovery/cvemap",
+  Cyberchef: "https://github.com/gchq/CyberChef",
+  Subfinder: "https://github.com/projectdiscovery/subfinder",
+  GoLinkFinder: "https://github.com/0xsha/GoLinkFinder",
+  Nuclei: "https://github.com/projectdiscovery/nuclei",
+  Katana: "https://github.com/projectdiscovery/katana",
+  Httpx: "https://github.com/projectdiscovery/httpx",
+  Naabu: "https://github.com/projectdiscovery/naabu",
+  Gau: "https://github.com/lc/gau",
+  Alterx: "https://github.com/projectdiscovery/alterx"
+}

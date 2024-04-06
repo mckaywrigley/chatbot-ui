@@ -1,7 +1,6 @@
 import { Message } from "@/types/chat"
+import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
-
-import { pluginUrls } from "@/app/api/chat/plugins/plugins"
 
 export const isGauCommand = (message: string) => {
   if (!message.startsWith("/")) return false

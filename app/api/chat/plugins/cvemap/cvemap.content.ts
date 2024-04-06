@@ -1,7 +1,7 @@
 import { Message } from "@/types/chat"
-import endent from "endent"
+import { pluginUrls } from "@/types/plugins"
 
-import { pluginUrls } from "@/app/api/chat/plugins/plugins"
+import endent from "endent"
 
 export const isCvemapCommand = (message: string) => {
   if (!message.startsWith("/")) return false

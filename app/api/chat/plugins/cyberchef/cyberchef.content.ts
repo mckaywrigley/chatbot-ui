@@ -1,6 +1,5 @@
 import { Message } from "@/types/chat"
-
-import { pluginUrls } from "@/app/api/chat/plugins/plugins"
+import { pluginUrls } from "@/types/plugins"
 
 interface CyberChefParams {
   input: string

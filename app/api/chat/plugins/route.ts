@@ -8,11 +8,10 @@ import { StreamingTextResponse } from "ai"
 import {
   pluginIdToHandlerMapping,
   isCommand,
-  pluginUrls,
   handleCommand
 } from "@/app/api/chat/plugins/plugins"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
-import { PluginID } from "@/types/plugins"
+import { PluginID, pluginUrls } from "@/types/plugins"
 
 export const runtime: ServerRuntime = "edge"
 

@@ -1,7 +1,11 @@
 import { Message } from "@/types/chat"
+import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { pluginUrls } from "@/app/api/chat/plugins/plugins"
+import {
+  processAIResponseAndUpdateMessage,
+  formatScanResults
+} from "@/app/api/chat/plugins/plugins"
 
 export const isNaabuCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -21,7 +25,8 @@ const displayHelpGuide = () => {
 
     Flags:
     INPUT:
-       -host string[]   hosts to scan ports for (comma-separated)
+       -host string[]     hosts to scan ports for (comma-separated)
+       -list, -l string   list of hosts to scan ports (file)
 
     PORT:
        -port, -p string             ports to scan (80,443, 100-200)
@@ -51,6 +56,7 @@ const displayHelpGuide = () => {
 
 interface NaabuParams {
   host: string[] | string
+  list: string
   port: string
   topPorts: string
   excludePorts: string
@@ -79,6 +85,7 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
 
   const params: NaabuParams = {
     host: [],
+    list: "",
     port: "",
     topPorts: "",
     excludePorts: "",
@@ -155,6 +162,15 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
           return params
         }
         params.host = hosts
+        break
+      case "-l":
+      case "-list":
+        const listArg = args[++i]
+        if (!listArg.endsWith(".txt")) {
+          params.error = "🚨 List file must be a .txt file"
+          return params
+        }
+        params.list = listArg
         break
       case "-port":
       case "-p":
@@ -258,8 +274,8 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
     }
   }
 
-  if (!params.host || params.host.length === 0) {
-    params.error = `🚨 Error: -host parameter is required.`
+  if ((!params.host || params.host.length === 0) && !params.list) {
+    params.error = `🚨 Error: -host or -l/-list parameter is required.`
   }
 
   return params
@@ -279,54 +295,36 @@ export async function handleNaabuRequest(
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent?: string,
+  fileName?: string
 ) {
   if (!enableNaabuFeature) {
-    return new Response("The Naabu feature is disabled.", {
-      status: 200
-    })
+    return new Response("The Naabu feature is disabled.")
   }
+
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
 
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToNaabuCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToNaabuCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage,
+          fileContentIncluded,
+          fileName
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
@@ -340,11 +338,9 @@ export async function handleNaabuRequest(
   const params = parseNaabuCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let naabuUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/naabu`
@@ -368,6 +364,7 @@ export async function handleNaabuRequest(
     arpPing?: boolean
     ndPing?: boolean
     revPtr?: boolean
+    fileContent?: string
   }
 
   let requestBody: NaabuRequestBody = {}
@@ -427,6 +424,11 @@ export async function handleNaabuRequest(
     requestBody.revPtr = params.revPtr
   }
 
+  // FILE
+  if (fileContentIncluded) {
+    requestBody.fileContent = fileContent
+  }
+
   const headers = new Headers()
   headers.set("Content-Type", "text/event-stream")
   headers.set("Cache-Control", "no-cache")
@@ -481,9 +483,7 @@ export async function handleNaabuRequest(
           clearInterval(intervalId)
           sendMessage(errorMessage, true)
           controller.close()
-          return new Response(errorMessage, {
-            status: 200
-          })
+          return new Response(errorMessage)
         }
 
         if (!outputString || outputString.length === 0) {
@@ -491,17 +491,21 @@ export async function handleNaabuRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
         const portsFormatted = processPorts(outputString)
-        const formattedResponse = formatResponseString(portsFormatted, params)
-        sendMessage(formattedResponse, true)
+        const target = params.list ? params.list : params.host
+        const formattedResults = formatScanResults({
+          pluginName: "Naabu",
+          pluginUrl: pluginUrls.Naabu,
+          target: target,
+          results: portsFormatted
+        })
+        sendMessage(formattedResults, true)
 
         controller.close()
       } catch (error) {
@@ -513,9 +517,7 @@ export async function handleNaabuRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })
@@ -523,11 +525,34 @@ export async function handleNaabuRequest(
   return new Response(stream, { headers })
 }
 
-const transformUserQueryToNaabuCommand = (lastMessage: Message) => {
+const transformUserQueryToNaabuCommand = (
+  lastMessage: Message,
+  fileContentIncluded?: boolean,
+  fileName?: string
+) => {
+  const naabuIntroduction = fileContentIncluded
+    ? `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-host' being essential. If the request involves scanning a list of hosts, embed the hosts directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+
+  const domainOrFilenameInclusionText = fileContentIncluded
+    ? `**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Naabu supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : `**Direct Host Inclusion**: When scanning a list of hosts, directly embed them in the command instead of using file references.
+    - -host string[]: Identifies the target host(s) for port scanning directly in the command. (required)`
+
+  const naabuExampleText = fileContentIncluded
+    ? `For scaning a list of hosts directly using a file named '${fileName}':
+\`\`\`json
+{ "command": "naabu -list ${fileName} -top-ports 100" }
+\`\`\``
+    : `For scanning a list of hosts directly:
+\`\`\`json
+{ "command": "naabu -host host1.com,host2.com,host3.com -top-ports 100" }
+\`\`\``
+
   const answerMessage = endent`
   Query: "${lastMessage.content}"
 
-  Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-host' being essential. If the request involves scanning a list of hosts, embed the hosts directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
+  ${naabuIntroduction}
 
   ALWAYS USE THIS FORMAT:
   \`\`\`json
@@ -537,8 +562,7 @@ const transformUserQueryToNaabuCommand = (lastMessage: Message) => {
   IMPORTANT: Ensure the command is properly escaped to be valid JSON. Ensure the command uses simpler regex patterns compatible with the 'naabu' tool's regex engine. Avoid advanced regex features like negative lookahead.
 
   Command Construction Guidelines for Naabu:
-  1. **Direct Host Inclusion**: When scanning a list of hosts, directly embed them in the command instead of using file references.
-    - -host string[]: Identifies the target host(s) for port scanning directly in the command. (required)
+  1. ${domainOrFilenameInclusionText}
   2. **Selective Flag Use**: Include only the flags that are essential to the request. The available flags for Naabu are:
     - -port string: Specify ports to scan (e.g., 80,443, 100-200). (optional)
     - -top-ports string: Scan top N ports (e.g., 100, 1000). (optional)
@@ -563,9 +587,7 @@ const transformUserQueryToNaabuCommand = (lastMessage: Message) => {
 
   Example Commands:
   For scanning a list of hosts directly:
-  \`\`\`json
-  { "command": "naabu -host host1.com,host2.com,host3.com -top-ports 100" }
-  \`\`\`
+  ${naabuExampleText}
 
   For a request for help or all flags or if the user asked about how the plugin works:
   \`\`\`json
@@ -581,29 +603,4 @@ function processPorts(outputString: string) {
   return outputString
     .split("\n")
     .filter(subdomain => subdomain.trim().length > 0)
-}
-
-function formatResponseString(ports: any[], params: NaabuParams) {
-  const date = new Date()
-  const timezone = "UTC-5"
-  const formattedDateTime = date.toLocaleString("en-US", {
-    timeZone: "Etc/GMT+5",
-    timeZoneName: "short"
-  })
-
-  const portsFormatted = ports.join("\n")
-
-  return (
-    `# [Naabu](${pluginUrls.Naabu}) Results\n` +
-    '**Target**: "' +
-    params.host +
-    '"\n\n' +
-    "**Scan Date & Time**:" +
-    ` ${formattedDateTime} (${timezone}) \n\n` +
-    "## Identified Ports:\n" +
-    "```\n" +
-    portsFormatted +
-    "\n" +
-    "```\n"
-  )
 }
