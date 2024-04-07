@@ -109,19 +109,21 @@ const PluginSelector: React.FC<PluginSelectorProps> = ({ onPluginSelect }) => {
   return (
     <div className="flex items-center justify-start space-x-4">
       <span className="text-sm font-medium">Plugins</span>
-      <div className="flex items-center space-x-2 rounded border border-gray-300 p-2">
-        <span className="text-sm">{selectedPluginName}</span>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex items-center space-x-2 rounded border border-gray-300 p-2 hover:cursor-pointer">
+            <span className="text-sm">{selectedPluginName}</span>
             <button className="flex items-center border-none bg-transparent p-0">
               <IconChevronDown size={18} />
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContentTop side="top" className="mb-3 mr-6">
+          </div>
+        </DropdownMenuTrigger>
+        <div className="flex">
+          <DropdownMenuContentTop side="top" className="mx-14 mb-3 sm:mx-0">
             {renderPluginOptions()}
           </DropdownMenuContentTop>
-        </DropdownMenu>
-      </div>
+        </div>
+      </DropdownMenu>
       <PluginStoreModal
         isOpen={isPluginStoreModalOpen}
         setIsOpen={setIsPluginStoreModalOpen}
