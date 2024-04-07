@@ -3,7 +3,9 @@ import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
 import {
+  ProcessAIResponseOptions,
   createGKEHeaders,
+  formatScanResults,
   processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
@@ -341,28 +343,27 @@ const parseKatanaCommandLine = (input: string): KatanaParams => {
 export async function handleKatanaRequest(
   lastMessage: Message,
   enableKatanaFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent?: string,
+  fileName?: string
 ) {
   if (!enableKatanaFeature) {
-    return new Response("The Katana feature is disabled.", {
-      status: 200
-    })
+    return new Response("The Katana feature is disabled.")
   }
 
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
   if (invokedByToolId) {
+    const options: ProcessAIResponseOptions = {
+      fileContentIncluded: fileContentIncluded,
+      fileName: fileName
+    }
+
     try {
       const { updatedLastMessageContent, aiResponseText } =
         await processAIResponseAndUpdateMessage(
@@ -371,7 +372,8 @@ export async function handleKatanaRequest(
           OpenAIStream,
           model,
           messagesToSend,
-          answerMessage
+          answerMessage,
+          options
         )
       lastMessage.content = updatedLastMessageContent
       aiResponse = aiResponseText
@@ -383,22 +385,14 @@ export async function handleKatanaRequest(
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseKatanaCommandLine(lastMessage.content)
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
-  }
-
-  if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let katanaUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/katana`
@@ -420,6 +414,7 @@ export async function handleKatanaRequest(
     matchCondition?: string
     filterCondition?: string
     timeout?: number
+    fileContent?: string
   }
 
   let requestBody: KatanaRequestBody = {}
@@ -473,6 +468,11 @@ export async function handleKatanaRequest(
     requestBody.timeout = params.timeout
   }
 
+  // FILE
+  if (fileContentIncluded) {
+    requestBody.fileContent = fileContent
+  }
+
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -522,9 +522,7 @@ export async function handleKatanaRequest(
           clearInterval(intervalId)
           sendMessage(errorMessage, true)
           controller.close()
-          return new Response(errorMessage, {
-            status: 200
-          })
+          return new Response(errorMessage)
         }
 
         if (!outputString && outputString.length === 0) {
@@ -532,17 +530,20 @@ export async function handleKatanaRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
         const urls = processurls(outputString)
-        const formattedResponse = formatResponseString(urls, params)
-        sendMessage(formattedResponse, true)
+        const formattedResults = formatScanResults({
+          pluginName: "Katana",
+          pluginUrl: pluginUrls.Katana,
+          target: params.urls,
+          results: urls
+        })
+        sendMessage(formattedResults, true)
 
         controller.close()
       } catch (error) {
@@ -554,9 +555,7 @@ export async function handleKatanaRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })
@@ -564,11 +563,34 @@ export async function handleKatanaRequest(
   return new Response(stream, { headers })
 }
 
-const transformUserQueryToKatanaCommand = (lastMessage: Message) => {
+const transformUserQueryToKatanaCommand = (
+  lastMessage: Message,
+  fileContentIncluded?: boolean,
+  fileName?: string
+) => {
+  const katanaIntroduction = fileContentIncluded
+    ? `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-u' or '-list' being essential to specify the target URL or list. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+
+  const domainOrFilenameInclusionText = fileContentIncluded
+    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Katana supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : endent`**Direct Domain Inclusion**: When scanning a list of domains, directly embed them in the command instead of using file references.
+    - -u, -list: Specify the target URL or list to crawl. (required)`
+
+  const katanaExampleText = fileContentIncluded
+    ? endent`For scanning a list of hosts directly using a file named '${fileName}':
+      \`\`\`json
+      { "command": "katana -list ${fileName}" }
+      \`\`\``
+    : endent`For scanning a list of domains directly:
+      \`\`\`json
+      { "command": "katana -list domain1.com,domain2.com,domain3.com" }
+      \`\`\``
+
   const answerMessage = endent`
   Query: "${lastMessage.content}"
 
-  Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-u' or '-list' being essential to specify the target URL or list. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
+  ${katanaIntroduction}
 
   ALWAYS USE THIS FORMAT:
   \`\`\`json
@@ -584,8 +606,7 @@ const transformUserQueryToKatanaCommand = (lastMessage: Message) => {
   This command will instruct the 'katana' tool to provide its help documentation, making it easier for users to understand how to use the tool and which flags are at their disposal for specific tasks. It's important to ensure that the command remains simple and directly addresses the user's request for help.
 
   Command Construction Guidelines:
-  1. **Direct Domain Inclusion**: When scanning a list of domains, directly embed them in the command instead of using file references.
-    - -u, -list: Specify the target URL or list to crawl. (required)
+  1. ${domainOrFilenameInclusionText}
   2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'katana' tool include:
     - -js-crawl: Enable crawling of JavaScript files. (optional)
     - -ignore-query-params: Ignore different query parameters in the same path. (optional)
@@ -605,10 +626,7 @@ const transformUserQueryToKatanaCommand = (lastMessage: Message) => {
   3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient URL crawling and filtering process.
 
   Example Commands:
-  For scanning a list of domains directly:
-  \`\`\`json
-  { "command": "katana -list domain1.com,domain2.com,domain3.com" }
-  \`\`\`
+  ${katanaExampleText}
 
   For a request for help or to see all flags:
   \`\`\`json
@@ -624,28 +642,4 @@ function processurls(outputString: string) {
   return outputString
     .split("\n")
     .filter(subdomain => subdomain.trim().length > 0)
-}
-
-function formatResponseString(urls: any[], params: KatanaParams) {
-  const date = new Date()
-  const timezone = "UTC-5"
-  const formattedDateTime = date.toLocaleString("en-US", {
-    timeZone: "Etc/GMT+5",
-    timeZoneName: "short"
-  })
-
-  const urlsFormatted = urls.join("\n")
-  return (
-    `# [Katana](${pluginUrls.Katana}) Results\n` +
-    '**Target**: "' +
-    params.urls +
-    '"\n\n' +
-    "**Scan Date & Time**:" +
-    ` ${formattedDateTime} (${timezone}) \n\n` +
-    "## Identified Urls:\n" +
-    "```\n" +
-    urlsFormatted +
-    "\n" +
-    "```\n"
-  )
 }

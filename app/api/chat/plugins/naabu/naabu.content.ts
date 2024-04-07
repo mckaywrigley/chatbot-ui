@@ -5,7 +5,8 @@ import endent from "endent"
 import {
   processAIResponseAndUpdateMessage,
   formatScanResults,
-  createGKEHeaders
+  createGKEHeaders,
+  ProcessAIResponseOptions
 } from "../chatpluginhandlers"
 
 export const isNaabuCommand = (message: string) => {
@@ -285,14 +286,7 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
 export async function handleNaabuRequest(
   lastMessage: Message,
   enableNaabuFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
@@ -305,11 +299,15 @@ export async function handleNaabuRequest(
   }
 
   const fileContentIncluded = !!fileContent && fileContent.length > 0
-
   let aiResponse = ""
 
   if (invokedByToolId) {
     try {
+      const options: ProcessAIResponseOptions = {
+        fileContentIncluded: fileContentIncluded,
+        fileName: fileName
+      }
+
       const { updatedLastMessageContent, aiResponseText } =
         await processAIResponseAndUpdateMessage(
           lastMessage,
@@ -318,8 +316,7 @@ export async function handleNaabuRequest(
           model,
           messagesToSend,
           answerMessage,
-          fileContentIncluded,
-          fileName
+          options
         )
       lastMessage.content = updatedLastMessageContent
       aiResponse = aiResponseText
@@ -531,19 +528,19 @@ const transformUserQueryToNaabuCommand = (
     : `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-host' being essential. If the request involves scanning a list of hosts, embed the hosts directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
-    ? `**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Naabu supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : `**Direct Host Inclusion**: When scanning a list of hosts, directly embed them in the command instead of using file references.
+    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Naabu supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : endent`**Direct Host Inclusion**: When scanning a list of hosts, directly embed them in the command instead of using file references.
     - -host string[]: Identifies the target host(s) for port scanning directly in the command. (required)`
 
   const naabuExampleText = fileContentIncluded
-    ? `For scaning a list of hosts directly using a file named '${fileName}':
-\`\`\`json
-{ "command": "naabu -list ${fileName} -top-ports 100" }
-\`\`\``
-    : `For scanning a list of hosts directly:
-\`\`\`json
-{ "command": "naabu -host host1.com,host2.com,host3.com -top-ports 100" }
-\`\`\``
+    ? endent`For scaning a list of hosts directly using a file named '${fileName}':
+      \`\`\`json
+      { "command": "naabu -list ${fileName} -top-ports 100" }
+      \`\`\``
+    : endent`For scanning a list of hosts directly:
+      \`\`\`json
+      { "command": "naabu -host host1.com,host2.com,host3.com -top-ports 100" }
+      \`\`\``
 
   const answerMessage = endent`
   Query: "${lastMessage.content}"

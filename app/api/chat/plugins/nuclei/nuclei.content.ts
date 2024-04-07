@@ -5,7 +5,8 @@ import endent from "endent"
 import {
   processAIResponseAndUpdateMessage,
   formatScanResults,
-  createGKEHeaders
+  createGKEHeaders,
+  ProcessAIResponseOptions
 } from "../chatpluginhandlers"
 
 export const isNucleiCommand = (message: string) => {
@@ -784,14 +785,7 @@ const parseCommandLine = (input: string) => {
 export async function handleNucleiRequest(
   lastMessage: Message,
   enableNucleiFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
@@ -800,17 +794,19 @@ export async function handleNucleiRequest(
   fileName?: string
 ) {
   if (!enableNucleiFeature) {
-    return new Response("The Nuclei is disabled.", {
-      status: 200
-    })
+    return new Response("The Nuclei is disabled.")
   }
 
   const fileContentIncluded = !!fileContent && fileContent.length > 0
-
   let aiResponse = ""
 
   if (invokedByToolId) {
     try {
+      const options: ProcessAIResponseOptions = {
+        fileContentIncluded: fileContentIncluded,
+        fileName: fileName
+      }
+
       const { updatedLastMessageContent, aiResponseText } =
         await processAIResponseAndUpdateMessage(
           lastMessage,
@@ -819,8 +815,7 @@ export async function handleNucleiRequest(
           model,
           messagesToSend,
           answerMessage,
-          fileContentIncluded,
-          fileName
+          options
         )
       lastMessage.content = updatedLastMessageContent
       aiResponse = aiResponseText
@@ -832,19 +827,15 @@ export async function handleNucleiRequest(
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let nucleiUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/nuclei`
@@ -993,9 +984,7 @@ export async function handleNucleiRequest(
           clearInterval(intervalId)
           sendMessage(errorMessage, true)
           controller.close()
-          return new Response(errorMessage, {
-            status: 200
-          })
+          return new Response(errorMessage)
         }
 
         if (!outputString && outputString.length === 0) {
@@ -1003,9 +992,7 @@ export async function handleNucleiRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
@@ -1031,9 +1018,7 @@ export async function handleNucleiRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })
@@ -1051,19 +1036,19 @@ const transformUserQueryToNucleiCommand = (
     : `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should utilize the most relevant flags, with '-target' being essential to specify the target host(s) to scan. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
-    ? `**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Nuclei supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : `**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
+    ? endent`**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Nuclei supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : endent`**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
   - -target (string[]): Specify the target host(s) to scan. (required)`
 
   const nucleiExampleText = fileContentIncluded
-    ? `For probing a list of hosts directly using a file named '${fileName}':
-\`\`\`json
-{ "command": "nuclei -list ${fileName}" }
-\`\`\``
-    : `For probing a list of hosts directly:
-\`\`\`json
-{ "command": "nuclei -target host1.com,host2.com" }
-\`\`\``
+    ? endent`For probing a list of hosts directly using a file named '${fileName}':
+      \`\`\`json
+      { "command": "nuclei -list ${fileName}" }
+      \`\`\``
+    : endent`For probing a list of hosts directly:
+      \`\`\`json
+      { "command": "nuclei -target host1.com,host2.com" }
+      \`\`\``
 
   const answerMessage = endent`
   Query: "${lastMessage.content}"

@@ -3,6 +3,7 @@ import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
 import {
+  ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
   processAIResponseAndUpdateMessage
@@ -697,14 +698,7 @@ const parseCommandLine = (input: string) => {
 export async function handleHttpxRequest(
   lastMessage: Message,
   enableHttpxFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
@@ -717,11 +711,15 @@ export async function handleHttpxRequest(
   }
 
   const fileContentIncluded = !!fileContent && fileContent.length > 0
-
   let aiResponse = ""
 
   if (invokedByToolId) {
     try {
+      const options: ProcessAIResponseOptions = {
+        fileContentIncluded: fileContentIncluded,
+        fileName: fileName
+      }
+
       const { updatedLastMessageContent, aiResponseText } =
         await processAIResponseAndUpdateMessage(
           lastMessage,
@@ -730,8 +728,7 @@ export async function handleHttpxRequest(
           model,
           messagesToSend,
           answerMessage,
-          fileContentIncluded,
-          fileName
+          options
         )
       lastMessage.content = updatedLastMessageContent
       aiResponse = aiResponseText
@@ -1084,19 +1081,19 @@ const transformUserQueryToHttpxCommand = (
     : `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-u' or '-target' being essential to specify the target host(s) to probe. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
-    ? `**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Httpx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : `**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
+    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Httpx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : endent`**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
     - -u, -target (string[]): Specify the target host(s) to probe. (required)`
 
   const httpxExampleText = fileContentIncluded
-    ? `For probing a list of hosts directly using a file named '${fileName}':
-\`\`\`json
-{ "command": "httpx -list ${fileName}" }
-\`\`\``
-    : `For probing a list of hosts directly:
-\`\`\`json
-{ "command": "httpx -u host1.com,host2.com" }
-\`\`\``
+    ? endent`For probing a list of hosts directly using a file named '${fileName}':
+      \`\`\`json
+      { "command": "httpx -list ${fileName}" }
+      \`\`\``
+    : endent`For probing a list of hosts directly:
+      \`\`\`json
+      { "command": "httpx -u host1.com,host2.com" }
+      \`\`\``
 
   const answerMessage = endent`
   Query: "${lastMessage.content}"

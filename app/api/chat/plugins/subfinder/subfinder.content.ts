@@ -1,6 +1,9 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-import { createGKEHeaders } from "../chatpluginhandlers"
+import {
+  createGKEHeaders,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
 
 import endent from "endent"
 
@@ -204,86 +207,48 @@ const parseCommandLine = (input: string) => {
 export async function handleSubfinderRequest(
   lastMessage: Message,
   enableSubfinderFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message,
-      toolId: string
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean
 ) {
   if (!enableSubfinderFeature) {
-    return new Response("The Subfinder is disabled.", {
-      status: 200
-    })
+    return new Response("The Subfinder is disabled.")
   }
 
-  const toolId = "subfinder"
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToSubfinderCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      toolId
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToSubfinderCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let subfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/subfinder?`
@@ -357,9 +322,7 @@ export async function handleSubfinderRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
@@ -372,9 +335,7 @@ export async function handleSubfinderRequest(
           )
           sendMessage(responseString, true)
           controller.close()
-          return new Response(subfinderData, {
-            status: 200
-          })
+          return new Response(subfinderData)
         }
 
         if (params.includeSources) {
@@ -384,9 +345,7 @@ export async function handleSubfinderRequest(
           )
           sendMessage(responseString, true)
           controller.close()
-          return new Response(subfinderData, {
-            status: 200
-          })
+          return new Response(subfinderData)
         }
 
         if (params.ip) {
@@ -396,9 +355,7 @@ export async function handleSubfinderRequest(
           )
           sendMessage(responseString, true)
           controller.close()
-          return new Response(subfinderData, {
-            status: 200
-          })
+          return new Response(subfinderData)
         }
 
         const responseString = createResponseString(
@@ -417,9 +374,7 @@ export async function handleSubfinderRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })

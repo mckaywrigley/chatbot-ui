@@ -2,7 +2,10 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { createGKEHeaders } from "../chatpluginhandlers"
+import {
+  createGKEHeaders,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
 
 export const isGolinkfinderCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -95,53 +98,27 @@ export async function handleGolinkfinderRequest(
   invokedByToolId: boolean
 ) {
   if (!enableGoLinkFinderFeature) {
-    return new Response("The GoLinkFinder is disabled.", {
-      status: 200
-    })
+    return new Response("The GoLinkFinder is disabled.")
   }
 
-  const toolId = "golinkfinder"
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToGoLinkFinderCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      toolId
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToGoLinkFinderCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
@@ -151,19 +128,15 @@ export async function handleGolinkfinderRequest(
     parts.includes("-help") ||
     parts.includes("--help")
   ) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseGoLinkFinderCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let golinkfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/golinkfinder?`
@@ -196,7 +169,7 @@ export async function handleGolinkfinderRequest(
 
       const intervalId = setInterval(() => {
         sendMessage("⏳ Still working on it, please hold on...", true)
-      }, 20000)
+      }, 15000)
 
       try {
         const golinkfinderResponse = await fetch(golinkfinderUrl, {
@@ -215,9 +188,7 @@ export async function handleGolinkfinderRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         if (golinkfinderData.length > 50000) {
@@ -260,9 +231,7 @@ export async function handleGolinkfinderRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })

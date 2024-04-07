@@ -62,17 +62,8 @@ export const OpenAIStream = async (
       : {})
   }
 
-  if (model === "gpt-4") {
-    if (answerMessage.content.trim()) {
-      commonBody["messages"].push(answerMessage)
-    }
-  } else if (
-    (tools && Object.keys(tools).length > 0) ||
-    (toolId && toolId.length > 0)
-  ) {
-    if (answerMessage.content.trim()) {
-      commonBody["messages"].push(answerMessage)
-    }
+  if (answerMessage.content.trim()) {
+    commonBody["messages"].push(answerMessage)
   }
 
   const requestOptions = {

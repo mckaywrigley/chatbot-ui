@@ -2,7 +2,11 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { createGKEHeaders } from "../chatpluginhandlers"
+import {
+  createGKEHeaders,
+  formatScanResults,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
 
 export const isGauCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -202,71 +206,41 @@ export async function handleGauRequest(
   invokedByToolId: boolean
 ) {
   if (!enableGauFeature) {
-    return new Response("The GAU is disabled.", {
-      status: 200
-    })
+    return new Response("The GAU is disabled.")
   }
 
-  const toolId = "gau"
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToGAUCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      toolId
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToGAUCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseGauCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let gauUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/gau?`
@@ -343,9 +317,7 @@ export async function handleGauRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         if (gauData.length > 50000) {
@@ -387,9 +359,7 @@ export async function handleGauRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })

@@ -2,7 +2,12 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { createGKEHeaders } from "../chatpluginhandlers"
+import {
+  ProcessAIResponseOptions,
+  createGKEHeaders,
+  formatScanResults,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
 
 export const isAlterxCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -128,15 +133,7 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
 export async function handleAlterxRequest(
   lastMessage: Message,
   enableAlterxFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message,
-      toolId: string
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
@@ -145,80 +142,47 @@ export async function handleAlterxRequest(
   fileName?: string
 ) {
   if (!enableAlterxFeature) {
-    return new Response("The Alterx is disabled.", {
-      status: 200
-    })
+    return new Response("The Alterx is disabled.")
   }
 
-  const toolId = "alterx"
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
-  // Adjusted logic to ensure fileContentIncluded is true only if fileContent is provided
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
-  // Ensure fileName is only considered if fileContent is included
-  const fileNameIncluded =
-    fileContentIncluded && fileName && fileName.length > 0
-
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToAlterxCommand(
-      lastMessage,
-      fileContentIncluded,
-      fileNameIncluded ? fileName : "hosts.txt"
-    )
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      toolId
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
+    const options: ProcessAIResponseOptions = {
+      fileContentIncluded: fileContentIncluded,
+      fileName: fileName
     }
 
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToAlterxCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage,
+          options
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseAlterxCommandLine(lastMessage.content)
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx`
@@ -237,6 +201,8 @@ export async function handleAlterxRequest(
   if (params.limit > 0) {
     requestBody.limit = params.limit
   }
+
+  // FILE
   if (fileContentIncluded) {
     requestBody.fileContent = fileContent
   }
@@ -272,7 +238,8 @@ export async function handleAlterxRequest(
           method: "POST",
           headers: {
             Authorization: `${process.env.SECRET_AUTH_PLUGINS}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Host: "plugins.hackergpt.co"
           },
           body: JSON.stringify(requestBody)
         })
@@ -288,9 +255,7 @@ export async function handleAlterxRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
@@ -300,8 +265,13 @@ export async function handleAlterxRequest(
         )
 
         const subdomains = processSubdomains(outputString)
-        const formattedResponse = formatResponseString(subdomains, params)
-        sendMessage(formattedResponse, true)
+        const formattedResults = formatScanResults({
+          pluginName: "AlterX",
+          pluginUrl: pluginUrls.Alterx,
+          target: params.list,
+          results: subdomains
+        })
+        sendMessage(formattedResults, true)
 
         controller.close()
       } catch (error) {
@@ -323,7 +293,7 @@ export async function handleAlterxRequest(
 
 const transformUserQueryToAlterxCommand = (
   lastMessage: Message,
-  fileContentIncluded: boolean,
+  fileContentIncluded?: boolean,
   fileName?: string
 ) => {
   const alterxIntroduction = fileContentIncluded
@@ -331,23 +301,23 @@ const transformUserQueryToAlterxCommand = (
     : `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
-    ? `**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : "**Domain/Subdomain Inclusion**: Directly specify the main domain or subdomains using the -list string[] flag. For a single domain, format it as -list domain.com. For multiple subdomains, separate them with commas (e.g., -list subdomain1.domain.com,subdomain2.domain.com). (required)"
+    ? endent`**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : endent`**Domain/Subdomain Inclusion**: Directly specify the main domain or subdomains using the -list string[] flag. For a single domain, format it as -list domain.com. For multiple subdomains, separate them with commas (e.g., -list subdomain1.domain.com,subdomain2.domain.com). (required)`
 
   const alterxExampleText = fileContentIncluded
-    ? `For generating a wordlist using a file named '${fileName}' containing list of domains:
-\`\`\`json
-{ "command": "alterx -list ${fileName}" }
-\`\`\``
-    : `For generating a wordlist with a single subdomain:
-\`\`\`json
-{ "command": "alterx -list subdomain1.com" }
-\`\`\`
+    ? endent`For generating a wordlist using a file named '${fileName}' containing list of domains:
+      \`\`\`json
+      { "command": "alterx -list ${fileName}" }
+      \`\`\``
+    : endent`For generating a wordlist with a single subdomain:
+      \`\`\`json
+      { "command": "alterx -list subdomain1.com" }
+      \`\`\`
 
-For generating a wordlist with multiple subdomains:
-\`\`\`json
-{ "command": "alterx -list subdomain1.com,subdomain2.com" }
-\`\`\``
+      For generating a wordlist with multiple subdomains:
+      \`\`\`json
+      { "command": "alterx -list subdomain1.com,subdomain2.com" }
+      \`\`\``
 
   const answerMessage = endent`
   Query: "${lastMessage.content}"
@@ -388,19 +358,4 @@ function processSubdomains(outputString: string) {
   return outputString
     .split("\n")
     .filter(subdomain => subdomain.trim().length > 0)
-}
-
-function formatResponseString(subdomains: any[], params: AlterxParams) {
-  const urlsFormatted = subdomains.join("\n")
-  return (
-    `# [Alterx](${pluginUrls.Alterx}) Results\n` +
-    '**Input Domain**: "' +
-    params.list +
-    '"\n\n' +
-    "## Generated Subdomains:\n" +
-    "```\n" +
-    urlsFormatted +
-    "\n" +
-    "```\n"
-  )
 }

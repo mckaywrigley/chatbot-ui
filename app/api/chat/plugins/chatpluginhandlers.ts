@@ -19,6 +19,8 @@ import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
 import { Message } from "@/types/chat"
 
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
 type CommandHandler = {
   [key: string]: (...args: any[]) => any
 }
@@ -38,6 +40,12 @@ type pluginHandlerFunction = (
 type pluginIdToHandlerMapping = {
   [key: string]: pluginHandlerFunction
 }
+
+type TransformQueryFunction = (
+  message: Message,
+  fileContentIncluded?: boolean,
+  fileName?: string
+) => string
 
 export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   cvemap: handleCvemapRequest,
@@ -73,8 +81,6 @@ const commandHandlers: CommandHandler = {
   handleAlterxRequest
 }
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-
 export const isCommand = (commandName: string, message: string) => {
   const checkFunction = `is${capitalize(commandName)}Command`
   if (typeof commandHandlers[checkFunction] === "function") {
@@ -102,11 +108,10 @@ export const handleCommand = async (
   )
 }
 
-type TransformQueryFunction = (
-  message: Message,
-  fileContentIncluded?: boolean,
+export interface ProcessAIResponseOptions {
+  fileContentIncluded?: boolean
   fileName?: string
-) => string
+}
 
 export async function processAIResponseAndUpdateMessage(
   lastMessage: Message,
@@ -121,9 +126,10 @@ export async function processAIResponseAndUpdateMessage(
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  fileContentIncluded: boolean = false,
-  fileName?: string
+  options: ProcessAIResponseOptions = {}
 ): Promise<{ updatedLastMessageContent: string; aiResponseText: string }> {
+  const { fileContentIncluded = false, fileName } = options
+
   const fileNameIncluded =
     fileContentIncluded && fileName && fileName.length > 0
 
