@@ -1,5 +1,6 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
+import { createGKEHeaders } from "../chatpluginhandlers"
 
 import endent from "endent"
 
@@ -313,10 +314,7 @@ export async function handleSubfinderRequest(
     subfinderUrl += `&timeout=${params.timeout}`
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {

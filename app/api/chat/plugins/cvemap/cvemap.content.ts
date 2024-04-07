@@ -1,7 +1,8 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-
 import endent from "endent"
+
+import { createGKEHeaders } from "../chatpluginhandlers"
 
 export const isCvemapCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -370,10 +371,7 @@ export async function handleCvemapRequest(
     return requestBody
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const requestBodyJson = JSON.stringify(buildCvemapRequestBody(params))
 

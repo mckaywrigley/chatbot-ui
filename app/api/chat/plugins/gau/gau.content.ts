@@ -2,6 +2,8 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
+import { createGKEHeaders } from "../chatpluginhandlers"
+
 export const isGauCommand = (message: string) => {
   if (!message.startsWith("/")) return false
 
@@ -304,10 +306,7 @@ export async function handleGauRequest(
     gauUrl += `&toDate=${params.toDate}`
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {

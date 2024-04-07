@@ -2,6 +2,12 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
+import {
+  createGKEHeaders,
+  formatScanResults,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
+
 export const isHttpxCommand = (message: string) => {
   if (!message.startsWith("/")) return false
 
@@ -23,6 +29,7 @@ const displayHelpGuide = () => {
     Flags:
     INPUT:
        -u, -target string[]  input target host(s) to probe
+       -l, -list string      input file containing list of hosts to process
 
     PROBES:
        -sc, -status-code     display response status-code
@@ -90,6 +97,7 @@ const displayHelpGuide = () => {
 
 interface HttpxParams {
   target: string[]
+  list: string
   // PROBES
   status_code: boolean
   content_length: boolean
@@ -160,6 +168,7 @@ const parseCommandLine = (input: string) => {
 
   const params: HttpxParams = {
     target: [],
+    list: "",
     // PROBES
     status_code: false,
     content_length: false,
@@ -315,6 +324,15 @@ const parseCommandLine = (input: string) => {
             return params
           }
         }
+        break
+      case "-l":
+      case "-list":
+        const listArg = args[++i]
+        if (!listArg.endsWith(".txt")) {
+          params.error = "🚨 List file must be a .txt file"
+          return params
+        }
+        params.list = listArg
         break
       case "-sc":
       case "-status-code":
@@ -669,8 +687,8 @@ const parseCommandLine = (input: string) => {
     }
   }
 
-  if (!params.target.length || params.target.length === 0) {
-    params.error = "🚨 Error: -u/-target parameter is required."
+  if ((!params.target.length || params.target.length === 0) && !params.list) {
+    params.error = "🚨 Error: -u/-target or -l/-list parameter is required."
   }
 
   return params
@@ -690,72 +708,50 @@ export async function handleHttpxRequest(
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
-  invokedByToolId: boolean
+  invokedByToolId: boolean,
+  fileContent?: string,
+  fileName?: string
 ) {
   if (!enableHttpxFeature) {
-    return new Response("The Httpx is disabled.", {
-      status: 200
-    })
+    return new Response("The Httpx is disabled.")
   }
+
+  const fileContentIncluded = !!fileContent && fileContent.length > 0
 
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToHttpxCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToHttpxCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage,
+          fileContentIncluded,
+          fileName
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
   const parts = lastMessage.content.split(" ")
   if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
+    return new Response(displayHelpGuide())
   }
 
   const params = parseCommandLine(lastMessage.content)
 
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let httpxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/httpx`
@@ -813,6 +809,7 @@ export async function handleHttpxRequest(
     include_response_base64?: boolean
     include_chain?: boolean
     timeout?: number
+    fileContent?: string
   }
 
   let requestBody: HttpxRequestBody = {}
@@ -985,10 +982,12 @@ export async function handleHttpxRequest(
     requestBody.timeout = params.timeout
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  // FILE
+  if (fileContentIncluded) {
+    requestBody.fileContent = fileContent
+  }
+
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1033,9 +1032,7 @@ export async function handleHttpxRequest(
           clearInterval(intervalId)
           sendMessage(errorMessage, true)
           controller.close()
-          return new Response(errorMessage, {
-            status: 200
-          })
+          return new Response(errorMessage)
         }
 
         if (!outputString && outputString.length === 0) {
@@ -1043,17 +1040,21 @@ export async function handleHttpxRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const urls = processurls(outputString)
-        const formattedResponse = formatResponseString(urls, params)
-        sendMessage(formattedResponse, true)
+        const urlsFormatted = processurls(outputString)
+        const target = params.list ? params.list : params.target
+        const formattedResults = formatScanResults({
+          pluginName: "httpX",
+          pluginUrl: pluginUrls.Httpx,
+          target: target,
+          results: urlsFormatted
+        })
+        sendMessage(formattedResults, true)
 
         controller.close()
       } catch (error) {
@@ -1065,9 +1066,7 @@ export async function handleHttpxRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })
@@ -1075,11 +1074,34 @@ export async function handleHttpxRequest(
   return new Response(stream, { headers })
 }
 
-const transformUserQueryToHttpxCommand = (lastMessage: Message) => {
+const transformUserQueryToHttpxCommand = (
+  lastMessage: Message,
+  fileContentIncluded?: boolean,
+  fileName?: string
+) => {
+  const httpxIntroduction = fileContentIncluded
+    ? `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    : `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-u' or '-target' being essential to specify the target host(s) to probe. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+
+  const domainOrFilenameInclusionText = fileContentIncluded
+    ? `**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Httpx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
+    : `**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
+    - -u, -target (string[]): Specify the target host(s) to probe. (required)`
+
+  const httpxExampleText = fileContentIncluded
+    ? `For probing a list of hosts directly using a file named '${fileName}':
+\`\`\`json
+{ "command": "httpx -list ${fileName}" }
+\`\`\``
+    : `For probing a list of hosts directly:
+\`\`\`json
+{ "command": "httpx -u host1.com,host2.com" }
+\`\`\``
+
   const answerMessage = endent`
   Query: "${lastMessage.content}"
 
-  Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-u' or '-target' being essential to specify the target host(s) to probe. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
+  ${httpxIntroduction}
   
   ALWAYS USE THIS FORMAT:
   \`\`\`json
@@ -1089,8 +1111,7 @@ const transformUserQueryToHttpxCommand = (lastMessage: Message) => {
   IMPORTANT: Ensure the command is properly escaped to be valid JSON. Ensure the command uses simpler regex patterns compatible with the 'httpx' tool's regex engine. Avoid advanced regex features like negative lookahead.
 
   Command Construction Guidelines:
-  1. **Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
-    - -u, -target (string[]): Specify the target host(s) to probe. (required)
+  1. ${domainOrFilenameInclusionText}
   2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'httpx' tool include:
     - **Probes**: Include specific probes for detailed HTTP response information. Available probes:
       - -status-code (boolean): Display response status code.
@@ -1153,10 +1174,7 @@ const transformUserQueryToHttpxCommand = (lastMessage: Message) => {
   3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient HTTP probing process.
 
   Example Commands:
-  For probing a list of hosts directly:
-  \`\`\`json
-  { "command": "httpx -u host1.com,host2.com" }
-  \`\`\`
+  ${httpxExampleText}
 
   For a request for help or all flags:
   \`\`\`json
@@ -1172,28 +1190,4 @@ function processurls(outputString: string) {
   return outputString
     .split("\n")
     .filter(subdomain => subdomain.trim().length > 0)
-}
-
-function formatResponseString(urls: any[], params: HttpxParams) {
-  const date = new Date()
-  const timezone = "UTC-5"
-  const formattedDateTime = date.toLocaleString("en-US", {
-    timeZone: "Etc/GMT+5",
-    timeZoneName: "short"
-  })
-
-  const urlsFormatted = urls.join("\n")
-  return (
-    `# [httpx](${pluginUrls.Httpx}) Results\n` +
-    '**Target**: "' +
-    params.target +
-    '"\n\n' +
-    "**Scan Date & Time**:" +
-    ` ${formattedDateTime} (${timezone}) \n\n` +
-    "## Results:\n" +
-    "```\n" +
-    urlsFormatted +
-    "\n" +
-    "```\n"
-  )
 }

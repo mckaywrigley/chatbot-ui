@@ -4,8 +4,9 @@ import endent from "endent"
 
 import {
   processAIResponseAndUpdateMessage,
-  formatScanResults
-} from "@/app/api/chat/plugins/plugins"
+  formatScanResults,
+  createGKEHeaders
+} from "../chatpluginhandlers"
 
 export const isNucleiCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -947,10 +948,7 @@ export async function handleNucleiRequest(
     requestBody.fileContent = fileContent
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {

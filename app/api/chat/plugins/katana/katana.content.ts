@@ -2,6 +2,11 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
+import {
+  createGKEHeaders,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
+
 export const isKatanaCommand = (message: string) => {
   if (!message.startsWith("/")) return false
 
@@ -358,43 +363,21 @@ export async function handleKatanaRequest(
   let aiResponse = ""
 
   if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToKatanaCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
     try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
+      const { updatedLastMessageContent, aiResponseText } =
+        await processAIResponseAndUpdateMessage(
+          lastMessage,
+          transformUserQueryToKatanaCommand,
+          OpenAIStream,
+          model,
+          messagesToSend,
+          answerMessage
         )
-      }
+      lastMessage.content = updatedLastMessageContent
+      aiResponse = aiResponseText
     } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
+      console.error("Error processing AI response and updating message:", error)
+      return new Response(`Error processing AI response: ${error}`)
     }
   }
 
@@ -490,10 +473,7 @@ export async function handleKatanaRequest(
     requestBody.timeout = params.timeout
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {

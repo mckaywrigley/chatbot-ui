@@ -3,13 +3,12 @@ import { ChatSettings } from "@/types"
 import { ServerRuntime } from "next"
 
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
-import { StreamingTextResponse } from "ai"
 
 import {
   pluginIdToHandlerMapping,
   isCommand,
   handleCommand
-} from "@/app/api/chat/plugins/plugins"
+} from "./chatpluginhandlers"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 import { PluginID, pluginUrls } from "@/types/plugins"
 

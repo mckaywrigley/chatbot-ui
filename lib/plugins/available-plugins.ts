@@ -36,7 +36,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 1,
     name: "CVEMap",
-    selectorName: "CVEMap: Explore CVEs",
+    selectorName: "CVEMap: CVE Database",
     value: PluginID.CVEMAP,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
@@ -112,7 +112,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 3,
     name: "Subfinder",
-    selectorName: "Subfinder: Discover Subdomains",
+    selectorName: "Subfinder: Subdomain Finder",
     value: PluginID.SUBFINDER,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
@@ -148,7 +148,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 4,
     name: "Web Scraper",
-    selectorName: "Web Scraper: Extract Data from Websites",
+    selectorName: "Web Scraper: Website Data Extractor",
     value: PluginID.WEB_SCRAPER,
     icon: "https://cdn-icons-png.flaticon.com/512/11892/11892629.png",
     description: "Extract data from websites and chat with the extracted data",
@@ -172,7 +172,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 5,
     name: "GoLinkFinder",
-    selectorName: "GoLinkFinder: URL Extraction",
+    selectorName: "GoLinkFinder: Endpoint Extractor",
     value: PluginID.GOLINKFINDER,
     icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
     description: "A minimalistic JavaScript endpoint extractor.",
@@ -197,7 +197,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 6,
     name: "Nuclei",
-    selectorName: "Nuclei: Discover Vulnerabilities",
+    selectorName: "Nuclei: Website Vulnerability Scanner",
     value: PluginID.NUCLEI,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customisable vulnerability scanner",
@@ -232,7 +232,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 7,
     name: "Katana",
-    selectorName: "Katana: Crawl Websites",
+    selectorName: "Katana: Web Crawling",
     value: PluginID.KATANA,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
@@ -266,8 +266,8 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 8,
-    name: "HTTPX",
-    selectorName: "HTTPX: Web Analysis",
+    name: "HttpX",
+    selectorName: "HttpX: Web Analysis",
     value: PluginID.HTTPX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
@@ -302,7 +302,7 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 9,
     name: "Naabu",
-    selectorName: "Naabu: Discover Ports",
+    selectorName: "Naabu: Port Scanner",
     value: PluginID.NAABU,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:

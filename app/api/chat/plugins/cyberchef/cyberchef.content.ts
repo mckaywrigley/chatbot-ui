@@ -1,6 +1,8 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 
+import { createGKEHeaders } from "../chatpluginhandlers"
+
 interface CyberChefParams {
   input: string
   recipe?: string | object | Array<any> // recipe is optional
@@ -253,10 +255,7 @@ export async function handleCyberchefRequest(
     requestBody.outputType = params.outputType
   }
 
-  const headers = new Headers()
-  headers.set("Content-Type", "text/event-stream")
-  headers.set("Cache-Control", "no-cache")
-  headers.set("Connection", "keep-alive")
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {

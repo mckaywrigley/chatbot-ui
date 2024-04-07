@@ -201,3 +201,11 @@ export function formatScanResults({
     "```\n"
   )
 }
+
+export function createGKEHeaders(): Headers {
+  const headers = new Headers()
+  headers.set("Content-Type", "text/event-stream")
+  headers.set("Cache-Control", "no-cache")
+  headers.set("Connection", "keep-alive")
+  return headers
+}
