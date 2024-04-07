@@ -283,6 +283,8 @@ Click "Deploy" and wait for your frontend to deploy.
 
 Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
 
+https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability
+
 ## Contributing
 
 We are working on a guide for contributing.
