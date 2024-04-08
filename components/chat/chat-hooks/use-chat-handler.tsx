@@ -383,7 +383,6 @@ export const useChatHandler = () => {
 
       setIsGenerating(false)
       setFirstTokenReceived(false)
-      setUserInput("")
     } catch (error) {
       setIsGenerating(false)
       setFirstTokenReceived(false)

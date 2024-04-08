@@ -102,10 +102,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault()
-      setIsPromptPickerOpen(false)
-      handleSendMessage(userInput, chatMessages, false)
+    if (!isGenerating) {
+      if (!isTyping && event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault()
+        setIsPromptPickerOpen(false)
+        handleSendMessage(userInput, chatMessages, false)
+      }
     }
     // Consolidate conditions to avoid TypeScript error
     if (
@@ -451,7 +453,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             onPaste={handlePaste}
             onCompositionStart={() => setIsTyping(true)}
             onCompositionEnd={() => setIsTyping(false)}
-            isDisabled={isGenerating || isRecording || transcriptionLoading}
+            isDisabled={isRecording || transcriptionLoading}
           />
         </div>
 
