@@ -22,14 +22,14 @@ export const availablePlugins: PluginSummary[] = [
           "Explain how to identify information disclosure vulnerabilities."
       },
       {
-        title: "Recommend",
-        description: "some CLI tools for network hacking?",
-        chatMessage: "Recommend some CLI tools for network hacking?"
+        title: "Provide General Methodology",
+        description: "for file upload vulnerabilities",
+        chatMessage: "Provide General Methodology for file upload vulnerabilities."
       },
       {
         title: "Provide Techniques",
         description: "to bypass two-factor authentication",
-        chatMessage: "Provide techniques to bypass two-factor authentication"
+        chatMessage: "Provide techniques to bypass two-factor authentication."
       }
     ]
   },
