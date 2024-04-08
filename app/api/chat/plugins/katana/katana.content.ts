@@ -6,7 +6,8 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isKatanaCommand = (message: string) => {
@@ -510,8 +511,10 @@ export async function handleKatanaRequest(
         }
 
         const jsonResponse = await katanaResponse.json()
-
         const outputString = jsonResponse.output
+
+        let urlsFormatted = processurls(outputString)
+        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&
@@ -525,7 +528,7 @@ export async function handleKatanaRequest(
           return new Response(errorMessage)
         }
 
-        if (!outputString && outputString.length === 0) {
+        if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -536,12 +539,11 @@ export async function handleKatanaRequest(
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const urls = processurls(outputString)
         const formattedResults = formatScanResults({
           pluginName: "Katana",
           pluginUrl: pluginUrls.Katana,
           target: params.urls,
-          results: urls
+          results: urlsFormatted
         })
         sendMessage(formattedResults, true)
 

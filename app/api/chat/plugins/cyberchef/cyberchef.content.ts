@@ -74,7 +74,6 @@ export async function handleCyberchefRequest(
       model: string,
       messages: Message[],
       answerMessage: Message,
-      toolId: undefined,
       tools: any
     ): Promise<ReadableStream<any>>
     (arg0: any, arg1: any, arg2: any, arg3: any): any
@@ -85,9 +84,7 @@ export async function handleCyberchefRequest(
   invokedByToolId: boolean
 ) {
   if (!enableCyberChefFeature) {
-    return new Response("The CyberChef is disabled.", {
-      status: 200
-    })
+    return new Response("The CyberChef is disabled.")
   }
 
   let aiResponse = ""
@@ -166,7 +163,6 @@ export async function handleCyberchefRequest(
       model,
       messagesToSend,
       answerMessage,
-      undefined,
       tools
     )
     const reader = openAIResponseStream.getReader()
@@ -193,27 +189,21 @@ export async function handleCyberchefRequest(
         lastMessage.content = `\`\`\`json\n${formattedJsonString}\n\`\`\``
       } else {
         return new Response(
-          `${aiResponse}\n\nNo valid JSON command found in the AI response.`,
-          { status: 200 }
+          `${aiResponse}\n\nNo valid JSON command found in the AI response.`
         )
       }
     } catch (error) {
       console.error("Error parsing JSON input:", error)
       console.error("Original String:", aiResponse)
-      return new Response(
-        `${aiResponse}\n\nError parsing JSON input: ${error}`,
-        { status: 200 }
-      )
+      return new Response(`${aiResponse}\n\nError parsing JSON input: ${error}`)
     }
   }
 
   const params = parseCyberChefJSONInput(lastMessage.content)
   if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
+    return new Response(`${aiResponse}\n\n${params.error}`)
   } else if (params.error) {
-    return new Response(params.error, { status: 200 })
+    return new Response(params.error)
   }
 
   let cyberchefUrl = `${process.env.SECRET_CYBERCHEF_BASE_URL}`
@@ -292,9 +282,7 @@ export async function handleCyberchefRequest(
             "Access forbidden: received 403 response from CyberChef server."
           sendMessage(forbiddenMessage, true)
           controller.close()
-          return new Response(forbiddenMessage, {
-            status: 200
-          })
+          return new Response(forbiddenMessage)
         }
 
         const jsonResponse = await cyberchefResponse.json()
@@ -323,9 +311,7 @@ export async function handleCyberchefRequest(
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
-          return new Response(noDataMessage, {
-            status: 200
-          })
+          return new Response(noDataMessage)
         }
 
         clearInterval(intervalId)

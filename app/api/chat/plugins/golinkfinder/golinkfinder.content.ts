@@ -4,7 +4,8 @@ import endent from "endent"
 
 import {
   createGKEHeaders,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isGolinkfinderCommand = (message: string) => {
@@ -182,17 +183,14 @@ export async function handleGolinkfinderRequest(
         let golinkfinderData = await golinkfinderResponse.text()
 
         let urlsFormatted = processGoLinkFinderData(golinkfinderData)
+        urlsFormatted = truncateData(urlsFormatted, 300000)
 
-        if (urlsFormatted.length === 0) {
+        if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 Didn't find any URLs based on the provided command.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
           controller.close()
           return new Response(noDataMessage)
-        }
-
-        if (golinkfinderData.length > 50000) {
-          golinkfinderData = golinkfinderData.slice(0, 50000)
         }
 
         clearInterval(intervalId)

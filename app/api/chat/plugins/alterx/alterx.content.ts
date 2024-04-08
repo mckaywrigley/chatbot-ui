@@ -6,7 +6,8 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isAlterxCommand = (message: string) => {
@@ -238,8 +239,7 @@ export async function handleAlterxRequest(
           method: "POST",
           headers: {
             Authorization: `${process.env.SECRET_AUTH_PLUGINS}`,
-            "Content-Type": "application/json",
-            Host: "plugins.hackergpt.co"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(requestBody)
         })
@@ -248,7 +248,10 @@ export async function handleAlterxRequest(
         const jsonResponse = await alterxResponse.json()
         const outputString = jsonResponse.output
 
-        if (!outputString || outputString.length === 0) {
+        let subdomains = processSubdomains(outputString)
+        subdomains = truncateData(subdomains, 300000)
+
+        if (!subdomains || subdomains.length === 0) {
           const noDataMessage = `🔍 Unable to generate wordlist for "${params.list.join(
             ", "
           )}"`
@@ -264,7 +267,6 @@ export async function handleAlterxRequest(
           true
         )
 
-        const subdomains = processSubdomains(outputString)
         const formattedResults = formatScanResults({
           pluginName: "AlterX",
           pluginUrl: pluginUrls.Alterx,

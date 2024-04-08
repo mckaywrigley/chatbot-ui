@@ -6,7 +6,8 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isHttpxCommand = (message: string) => {
@@ -1017,8 +1018,10 @@ export async function handleHttpxRequest(
         })
 
         const jsonResponse = await httpxResponse.json()
-
         const outputString = jsonResponse.output
+
+        let urlsFormatted = processurls(outputString)
+        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&
@@ -1032,7 +1035,7 @@ export async function handleHttpxRequest(
           return new Response(errorMessage)
         }
 
-        if (!outputString && outputString.length === 0) {
+        if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -1043,7 +1046,6 @@ export async function handleHttpxRequest(
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const urlsFormatted = processurls(outputString)
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
           pluginName: "httpX",

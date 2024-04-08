@@ -6,7 +6,8 @@ import {
   processAIResponseAndUpdateMessage,
   formatScanResults,
   createGKEHeaders,
-  ProcessAIResponseOptions
+  ProcessAIResponseOptions,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isNucleiCommand = (message: string) => {
@@ -972,8 +973,10 @@ export async function handleNucleiRequest(
         })
 
         const jsonResponse = await nucleiResponse.json()
-
         const outputString = jsonResponse.output
+
+        let urlsFormatted = processurls(outputString)
+        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&
@@ -987,7 +990,7 @@ export async function handleNucleiRequest(
           return new Response(errorMessage)
         }
 
-        if (!outputString && outputString.length === 0) {
+        if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -998,13 +1001,12 @@ export async function handleNucleiRequest(
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const urls = processurls(outputString)
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
           pluginName: "Nuclei",
           pluginUrl: pluginUrls.Nuclei,
           target: target,
-          results: urls
+          results: urlsFormatted
         })
         sendMessage(formattedResults, true)
 

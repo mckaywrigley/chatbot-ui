@@ -185,14 +185,17 @@ export function formatScanResults({
   pluginName: string
   pluginUrl: string
   target: string | string[]
-  results: any[]
+  results: any
 }) {
   const formattedDateTime = new Date().toLocaleString("en-US", {
     timeZone: "Etc/GMT+5",
     timeZoneName: "short"
   })
 
-  const resultsFormatted = results.join("\n")
+  const resultsFormatted = Array.isArray(results)
+    ? results.join("\n")
+    : results.split("\n").join("\n")
+
   return (
     `# [${pluginName}](${pluginUrl}) Results\n` +
     '**Target**: "' +
@@ -206,6 +209,26 @@ export function formatScanResults({
     "\n" +
     "```\n"
   )
+}
+
+export function truncateData(data: any, maxLength: number): any {
+  if (Array.isArray(data)) {
+    if (data.length > maxLength) {
+      const truncatedArray = data.slice(0, maxLength)
+      truncatedArray.push("... [output truncated]")
+      return truncatedArray
+    } else {
+      return data
+    }
+  } else if (typeof data === "string") {
+    if (data.length > maxLength) {
+      return `${data.slice(0, maxLength)}\n... [output truncated]`
+    } else {
+      return data
+    }
+  } else {
+    return data
+  }
 }
 
 export function createGKEHeaders(): Headers {

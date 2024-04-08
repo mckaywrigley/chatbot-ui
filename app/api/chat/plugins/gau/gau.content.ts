@@ -4,8 +4,8 @@ import endent from "endent"
 
 import {
   createGKEHeaders,
-  formatScanResults,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isGauCommand = (message: string) => {
@@ -312,7 +312,10 @@ export async function handleGauRequest(
 
         let gauData = await gauResponse.text()
 
-        if (gauData.length === 0) {
+        let urlsFormatted = processGauData(gauData)
+        urlsFormatted = truncateData(urlsFormatted, 300000)
+
+        if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 Didn't find any URLs based on the provided command.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -320,14 +323,8 @@ export async function handleGauRequest(
           return new Response(noDataMessage)
         }
 
-        if (gauData.length > 50000) {
-          gauData = gauData.slice(0, 50000)
-        }
-
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
-
-        let urlsFormatted = processGauData(gauData)
 
         const date = new Date()
         const timezone = "UTC-5"

@@ -6,7 +6,8 @@ import {
   processAIResponseAndUpdateMessage,
   formatScanResults,
   createGKEHeaders,
-  ProcessAIResponseOptions
+  ProcessAIResponseOptions,
+  truncateData
 } from "../chatpluginhandlers"
 
 export const isNaabuCommand = (message: string) => {
@@ -464,8 +465,10 @@ export async function handleNaabuRequest(
         }
 
         const jsonResponse = await naabuResponse.json()
-
         const outputString = jsonResponse.output
+
+        let portsFormatted = processPorts(outputString)
+        portsFormatted = truncateData(portsFormatted, 300000)
 
         if (
           outputString &&
@@ -479,7 +482,7 @@ export async function handleNaabuRequest(
           return new Response(errorMessage)
         }
 
-        if (!outputString || outputString.length === 0) {
+        if (!portsFormatted || portsFormatted.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -490,7 +493,6 @@ export async function handleNaabuRequest(
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const portsFormatted = processPorts(outputString)
         const target = params.list ? params.list : params.host
         const formattedResults = formatScanResults({
           pluginName: "Naabu",

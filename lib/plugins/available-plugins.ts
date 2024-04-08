@@ -24,7 +24,8 @@ export const availablePlugins: PluginSummary[] = [
       {
         title: "Provide General Methodology",
         description: "for file upload vulnerabilities",
-        chatMessage: "Provide General Methodology for file upload vulnerabilities."
+        chatMessage:
+          "Provide General Methodology for file upload vulnerabilities."
       },
       {
         title: "Provide Techniques",
@@ -39,8 +40,7 @@ export const availablePlugins: PluginSummary[] = [
     selectorName: "CVEMap: CVE Database",
     value: PluginID.CVEMAP,
     icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "Efficiently explore CVE databases, linking vulnerabilities to exploits and remediations.",
+    description: "Navigate the CVE jungle with ease",
     categories: ["Free", "Popular", "New"],
     githubRepoUrl: pluginUrls.CVEmap,
     isInstalled: false,
@@ -78,7 +78,7 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.CYBERCHEF,
     icon: "https://gchq.github.io/CyberChef/images/cyberchef-128x128.png",
     description:
-      "A tool for for encryption, encoding, compression, and data analysis.",
+      "A tool for for encryption, encoding, compression, and data analysis",
     categories: ["Free", "Popular", "New"],
     githubRepoUrl: pluginUrls.Cyberchef,
     isInstalled: false,
@@ -115,8 +115,7 @@ export const availablePlugins: PluginSummary[] = [
     selectorName: "Subfinder: Subdomain Finder",
     value: PluginID.SUBFINDER,
     icon: "https://avatars.githubusercontent.com/u/50994705",
-    description:
-      "A robust discovery tool for passive enumeration on valid subdomains",
+    description: "Fast passive subdomain enumeration tool",
     categories: ["Free", "Popular"],
     githubRepoUrl: pluginUrls.Subfinder,
     isInstalled: false,
@@ -175,7 +174,7 @@ export const availablePlugins: PluginSummary[] = [
     selectorName: "GoLinkFinder: Endpoint Extractor",
     value: PluginID.GOLINKFINDER,
     icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
-    description: "A minimalistic JavaScript endpoint extractor.",
+    description: "Fast and minimal JS endpoint extractor",
     categories: ["Free", "New", "Popular"],
     githubRepoUrl: pluginUrls.GoLinkFinder,
     isInstalled: false,
@@ -236,7 +235,7 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.KATANA,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
-      "A web crawling framework designed to navigate and parse for hidden details",
+      "Web crawling framework designed to navigate and parse for hidden details",
     categories: ["Popular"],
     githubRepoUrl: pluginUrls.Katana,
     isInstalled: false,
@@ -271,7 +270,7 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.HTTPX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
-      "An HTTP toolkit that probes services, web servers, and other valuable metadata",
+      "Fast and multi-purpose HTTP toolkit that allows running multiple probes",
     categories: ["Popular"],
     githubRepoUrl: pluginUrls.Httpx,
     isInstalled: false,
@@ -306,7 +305,7 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.NAABU,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
-      "A fast port scanner designed to scan large networks at high speed",
+      "Fast port scanner written in go with a focus on reliability and simplicity",
     categories: ["Popular"],
     githubRepoUrl: pluginUrls.Naabu,
     isInstalled: false,
@@ -343,7 +342,7 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.GAU,
     icon: "https://avatars.githubusercontent.com/u/19563282",
     description:
-      "Fetches known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, Common Crawl, and URLScan.",
+      "Fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl",
     categories: ["Free"],
     githubRepoUrl: pluginUrls.Gau,
     isInstalled: false,

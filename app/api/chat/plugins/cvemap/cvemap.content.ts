@@ -2,7 +2,7 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { createGKEHeaders } from "../chatpluginhandlers"
+import { truncateData } from "../chatpluginhandlers"
 
 export const isCvemapCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -371,8 +371,6 @@ export async function handleCvemapRequest(
     return requestBody
   }
 
-  const headers = createGKEHeaders()
-
   const requestBodyJson = JSON.stringify(buildCvemapRequestBody(params))
 
   const stream = new ReadableStream({
@@ -409,8 +407,8 @@ export async function handleCvemapRequest(
         })
 
         let cvemapData = await cvemapResponse.text()
-
         cvemapData = processCvemapData(cvemapData)
+        cvemapData = truncateData(cvemapData, 300000)
 
         if (!cvemapData || cvemapData.length <= 300) {
           sendMessage(
@@ -449,9 +447,7 @@ export async function handleCvemapRequest(
         }
         sendMessage(errorMessage, true)
         controller.close()
-        return new Response(errorMessage, {
-          status: 200
-        })
+        return new Response(errorMessage)
       }
     }
   })

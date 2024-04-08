@@ -36,7 +36,6 @@ export const OpenAIStream = async (
   model: OpenAIModel["id"],
   messages: Message[],
   answerMessage: Message,
-  toolId?: string | null | undefined,
   tools?: any
 ) => {
   const SYSTEM_PROMPT = process.env.SECRET_OPENAI_SYSTEM_PROMPT
@@ -54,7 +53,7 @@ export const OpenAIStream = async (
       },
       ...messages
     ],
-    max_tokens: 512,
+    max_tokens: 1024,
     temperature: 0.1,
     stream: true,
     ...(tools && Object.keys(tools).length > 0

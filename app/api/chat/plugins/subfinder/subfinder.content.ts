@@ -2,7 +2,8 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import {
   createGKEHeaders,
-  processAIResponseAndUpdateMessage
+  processAIResponseAndUpdateMessage,
+  truncateData
 } from "../chatpluginhandlers"
 
 import endent from "endent"
@@ -310,7 +311,6 @@ export async function handleSubfinderRequest(
         })
 
         let subfinderData = await subfinderResponse.text()
-
         subfinderData = processSubfinderData(subfinderData)
 
         if (!subfinderData || subfinderData.length === 0) {
