@@ -29,7 +29,7 @@
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
     "@headlessui/react": "^1.7.18",
     "@hookform/resolvers": "^3.3.2",
-    "@langchain/openai": "^0.0.24",
+    "@langchain/openai": "^0.0.26",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
