@@ -2,7 +2,12 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import endent from "endent"
 
-import { truncateData } from "../chatpluginhandlers"
+import {
+  createGKEHeaders,
+  getCommandFromAIResponse,
+  processAIResponseAndUpdateMessage,
+  truncateData
+} from "../chatpluginhandlers"
 
 export const isCvemapCommand = (message: string) => {
   if (!message.startsWith("/")) return false
@@ -213,8 +218,7 @@ export async function handleCvemapRequest(
     (
       model: string,
       messages: Message[],
-      answerMessage: Message,
-      toolId: string
+      answerMessage: Message
     ): Promise<ReadableStream<any>>
     (arg0: any, arg1: any, arg2: any): any
   },
@@ -224,154 +228,12 @@ export async function handleCvemapRequest(
   invokedByToolId: boolean
 ) {
   if (!enableCvemapFeature) {
-    return new Response("The CVEMap is disabled.", {
-      status: 200
-    })
+    return new Response("The CVEMap is disabled.")
   }
-  const toolId = "cvemap"
+
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToCvemapCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      toolId
-    )
-
-    const reader = openAIResponseStream.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
-    try {
-      const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
-      if (jsonMatch) {
-        const jsonResponseString = jsonMatch[0].replace(/```json\n|\n```/g, "")
-        const jsonResponse = JSON.parse(jsonResponseString)
-        lastMessage.content = jsonResponse.command
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo JSON command found in the AI response.`,
-          {
-            status: 200
-          }
-        )
-      }
-    } catch (error) {
-      return new Response(
-        `${aiResponse}\n\n'Error extracting and parsing JSON from AI response: ${error}`,
-        {
-          status: 200
-        }
-      )
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide(), {
-      status: 200
-    })
-  }
-
-  const params = parseCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`, {
-      status: 200
-    })
-  } else if (params.error) {
-    return new Response(params.error, { status: 200 })
-  }
-
-  interface CvemapRequestBody {
-    ids?: string[]
-    cwes?: string[]
-    vendors?: string
-    products?: string
-    excludeProducts?: string
-    severity?: string
-    cvssScores?: string
-    cpe?: string
-    epssScores?: string
-    epssPercentiles?: string
-    age?: string
-    assignees?: string
-    vstatus?: string
-    search?: string
-    kev?: boolean
-    template?: boolean
-    poc?: boolean
-    hackerone?: boolean
-    remote?: boolean
-    fields?: string
-    excludeFields?: string
-    listId?: boolean
-    limit?: number
-    offset?: number
-    json?: boolean
-  }
-
-  let cvemapUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/cvemap`
-
-  const buildCvemapRequestBody = (
-    userInputs: Partial<CvemapRequestBody>
-  ): CvemapRequestBody => {
-    let requestBody: CvemapRequestBody = {}
-
-    // Only add properties to requestBody if they are provided by the user
-    if (userInputs.ids && userInputs.ids.length)
-      requestBody.ids = userInputs.ids
-    if (userInputs.cwes && userInputs.cwes.length)
-      requestBody.cwes = userInputs.cwes
-    if (userInputs.vendors && userInputs.vendors.length)
-      requestBody.vendors = `'${userInputs.vendors}'`
-    if (userInputs.products && userInputs.products.length)
-      requestBody.products = `'${userInputs.products}'`
-    if (userInputs.excludeProducts && userInputs.excludeProducts.length)
-      requestBody.excludeProducts = `'${userInputs.excludeProducts}'`
-    if (userInputs.severity && userInputs.severity.length)
-      requestBody.severity = `'${userInputs.severity}'`
-    if (userInputs.cvssScores && userInputs.cvssScores.length)
-      requestBody.cvssScores = `'${userInputs.cvssScores}'`
-    if (userInputs.cpe) requestBody.cpe = `'${userInputs.cpe}'`
-    if (userInputs.epssScores)
-      requestBody.epssScores = `'${userInputs.epssScores}'`
-    if (userInputs.epssPercentiles && userInputs.epssPercentiles.length)
-      requestBody.epssPercentiles = `'${userInputs.epssPercentiles}'`
-    if (userInputs.age) requestBody.age = `'${userInputs.age}'`
-    if (userInputs.assignees && userInputs.assignees.length)
-      requestBody.assignees = `'${userInputs.assignees}'`
-    if (userInputs.vstatus) requestBody.vstatus = `'${userInputs.vstatus}'`
-    if (userInputs.search) requestBody.search = `'${userInputs.search}'`
-    if (userInputs.kev !== undefined) requestBody.kev = userInputs.kev
-    if (userInputs.template !== undefined)
-      requestBody.template = userInputs.template
-    if (userInputs.poc !== undefined) requestBody.poc = userInputs.poc
-    if (userInputs.hackerone !== undefined)
-      requestBody.hackerone = userInputs.hackerone
-    if (userInputs.remote !== undefined) requestBody.remote = userInputs.remote
-    if (userInputs.fields && userInputs.fields.length > 0) {
-      requestBody.fields = `'${userInputs.fields}'`
-    }
-    if (userInputs.excludeFields && userInputs.excludeFields.length > 0) {
-      requestBody.excludeFields = `'${userInputs.excludeFields}'`
-    }
-    if (userInputs.listId !== undefined) requestBody.listId = userInputs.listId
-    if (userInputs.limit !== undefined) requestBody.limit = userInputs.limit
-    if (userInputs.offset !== undefined) requestBody.offset = userInputs.offset
-    if (userInputs.json !== undefined) requestBody.json = userInputs.json
-
-    return requestBody
-  }
-
-  const requestBodyJson = JSON.stringify(buildCvemapRequestBody(params))
+  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -384,14 +246,138 @@ export async function handleCvemapRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToCvemapCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
       }
 
-      // sendMessage('🚀 Starting the scan. It might take a minute.', true);
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      interface CvemapRequestBody {
+        ids?: string[]
+        cwes?: string[]
+        vendors?: string
+        products?: string
+        excludeProducts?: string
+        severity?: string
+        cvssScores?: string
+        cpe?: string
+        epssScores?: string
+        epssPercentiles?: string
+        age?: string
+        assignees?: string
+        vstatus?: string
+        search?: string
+        kev?: boolean
+        template?: boolean
+        poc?: boolean
+        hackerone?: boolean
+        remote?: boolean
+        fields?: string
+        excludeFields?: string
+        listId?: boolean
+        limit?: number
+        offset?: number
+        json?: boolean
+      }
+
+      let cvemapUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/cvemap`
+
+      const buildCvemapRequestBody = (
+        userInputs: Partial<CvemapRequestBody>
+      ): CvemapRequestBody => {
+        let requestBody: CvemapRequestBody = {}
+
+        // Only add properties to requestBody if they are provided by the user
+        if (userInputs.ids && userInputs.ids.length)
+          requestBody.ids = userInputs.ids
+        if (userInputs.cwes && userInputs.cwes.length)
+          requestBody.cwes = userInputs.cwes
+        if (userInputs.vendors && userInputs.vendors.length)
+          requestBody.vendors = `'${userInputs.vendors}'`
+        if (userInputs.products && userInputs.products.length)
+          requestBody.products = `'${userInputs.products}'`
+        if (userInputs.excludeProducts && userInputs.excludeProducts.length)
+          requestBody.excludeProducts = `'${userInputs.excludeProducts}'`
+        if (userInputs.severity && userInputs.severity.length)
+          requestBody.severity = `'${userInputs.severity}'`
+        if (userInputs.cvssScores && userInputs.cvssScores.length)
+          requestBody.cvssScores = `'${userInputs.cvssScores}'`
+        if (userInputs.cpe) requestBody.cpe = `'${userInputs.cpe}'`
+        if (userInputs.epssScores)
+          requestBody.epssScores = `'${userInputs.epssScores}'`
+        if (userInputs.epssPercentiles && userInputs.epssPercentiles.length)
+          requestBody.epssPercentiles = `'${userInputs.epssPercentiles}'`
+        if (userInputs.age) requestBody.age = `'${userInputs.age}'`
+        if (userInputs.assignees && userInputs.assignees.length)
+          requestBody.assignees = `'${userInputs.assignees}'`
+        if (userInputs.vstatus) requestBody.vstatus = `'${userInputs.vstatus}'`
+        if (userInputs.search) requestBody.search = `'${userInputs.search}'`
+        if (userInputs.kev !== undefined) requestBody.kev = userInputs.kev
+        if (userInputs.template !== undefined)
+          requestBody.template = userInputs.template
+        if (userInputs.poc !== undefined) requestBody.poc = userInputs.poc
+        if (userInputs.hackerone !== undefined)
+          requestBody.hackerone = userInputs.hackerone
+        if (userInputs.remote !== undefined)
+          requestBody.remote = userInputs.remote
+        if (userInputs.fields && userInputs.fields.length > 0) {
+          requestBody.fields = `'${userInputs.fields}'`
+        }
+        if (userInputs.excludeFields && userInputs.excludeFields.length > 0) {
+          requestBody.excludeFields = `'${userInputs.excludeFields}'`
+        }
+        if (userInputs.listId !== undefined)
+          requestBody.listId = userInputs.listId
+        if (userInputs.limit !== undefined) requestBody.limit = userInputs.limit
+        if (userInputs.offset !== undefined)
+          requestBody.offset = userInputs.offset
+        if (userInputs.json !== undefined) requestBody.json = userInputs.json
+
+        return requestBody
+      }
+
+      const requestBodyJson = JSON.stringify(buildCvemapRequestBody(params))
 
       const intervalId = setInterval(() => {
         sendMessage(
-          "⏳ Scanning in progress. We appreciate your patience.",
+          "⏳ Searching in progress. We appreciate your patience.",
           true
         )
       }, 15000)
@@ -412,26 +398,21 @@ export async function handleCvemapRequest(
 
         if (!cvemapData || cvemapData.length <= 300) {
           sendMessage(
-            "🔍 The scan is complete. No CVE entries were found based on your parameters.",
+            "🔍 The search is complete. No CVE entries were found based on your parameters.",
             true
           )
           clearInterval(intervalId)
           controller.close()
-          return new Response("No CVE entries found.", {
-            status: 200
-          })
+          return new Response("No CVE entries found.")
         }
 
         clearInterval(intervalId)
-        // sendMessage('✅ CVE scan completed! Processing the results...', true);
 
         if (params.json && !cvemapData.includes("╭──────")) {
           const responseString = createResponseString(cvemapData)
           sendMessage(responseString, true)
           controller.close()
-          return new Response(cvemapData, {
-            status: 200
-          })
+          return new Response(cvemapData)
         }
 
         const responseString = formatCvemapOutput(cvemapData)
@@ -452,7 +433,7 @@ export async function handleCvemapRequest(
     }
   })
 
-  return new Response(stream)
+  return new Response(stream, { headers })
 }
 
 function formatCvemapOutput(output: string): string {
@@ -670,11 +651,8 @@ const createResponseString = (cvemapData: string) => {
 
       if (poc?.length) {
         markdownOutput += `### Proof of Concept:\n\n`
-        markdownOutput += `| URL | Source | Added At |\n`
-        markdownOutput += `| --- | ------ | -------- |\n`
         poc.forEach((p: { added_at: string | Date; url: any; source: any }) => {
-          const addedAtFormatted = formatTime(p.added_at)
-          markdownOutput += `| [${p.url}](${p.url}) | ${p.source} | ${addedAtFormatted} |\n`
+          markdownOutput += `- [${p.url}](${p.url}) (Source: ${p.source}, Added: ${formatTime(p.added_at)})\n`
         })
       } else {
         markdownOutput += `\n### Proof of Concept Available: ${is_poc ? "Yes" : "No"}\n`

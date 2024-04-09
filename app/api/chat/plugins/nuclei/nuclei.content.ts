@@ -7,7 +7,8 @@ import {
   formatScanResults,
   createGKEHeaders,
   ProcessAIResponseOptions,
-  truncateData
+  truncateData,
+  getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
 export const isNucleiCommand = (message: string) => {
@@ -801,145 +802,6 @@ export async function handleNucleiRequest(
   const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const options: ProcessAIResponseOptions = {
-        fileContentIncluded: fileContentIncluded,
-        fileName: fileName
-      }
-
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToNucleiCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage,
-          options
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let nucleiUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/nuclei`
-
-  let requestBody: NucleiRequestBody = {}
-
-  // TARGET
-  if (params.target && params.target.length > 0)
-    requestBody.target = params.target
-  if (params.excludeHosts && params.excludeHosts.length > 0)
-    requestBody.exclude_hosts = params.excludeHosts.join(",")
-  if (params.scanAllIPs) requestBody.scan_all_ips = true
-  if (
-    params.ipVersion &&
-    params.ipVersion.length > 0 &&
-    params.ipVersion.join(",") !== "4"
-  )
-    requestBody.ip_version = params.ipVersion.join(",")
-
-  // TEMPLATES
-  if (params.newTemplates) requestBody.new_templates = true
-  if (params.newTemplatesVersion && params.newTemplatesVersion.length > 0)
-    requestBody.new_templates_version = params.newTemplatesVersion.join(",")
-  if (params.automaticScan) requestBody.automatic_scan = true
-  if (params.templates && params.templates.length > 0)
-    requestBody.templates = params.templates.join(",")
-  if (params.templateUrl && params.templateUrl.length > 0)
-    requestBody.template_url = params.templateUrl.join(",")
-  if (params.workflows && params.workflows.length > 0)
-    requestBody.workflows = params.workflows.join(",")
-  if (params.workflowUrl && params.workflowUrl.length > 0)
-    requestBody.workflow_url = params.workflowUrl.join(",")
-  if (params.templateDisplay) requestBody.template_display = true
-  if (params.listTemplates) requestBody.list_templates = true
-  if (params.enableCodeProtocol) requestBody.enable_code_protocol = true
-
-  // FILTERING
-  if (params.author && params.author.length > 0)
-    requestBody.author = params.author.join(",")
-  if (params.tags && params.tags.length > 0)
-    requestBody.tags = params.tags.join(",")
-  if (params.excludeTags && params.excludeTags.length > 0)
-    requestBody.exclude_tags = params.excludeTags.join(",")
-  if (params.includeTags && params.includeTags.length > 0)
-    requestBody.include_tags = params.includeTags.join(",")
-  if (params.templateId && params.templateId.length > 0)
-    requestBody.template_id = params.templateId.join(",")
-  if (params.excludeId && params.excludeId.length > 0)
-    requestBody.exclude_id = params.excludeId.join(",")
-  if (params.includeTemplates && params.includeTemplates.length > 0)
-    requestBody.include_templates = params.includeTemplates.join(",")
-  if (params.excludeTemplates && params.excludeTemplates.length > 0)
-    requestBody.exclude_templates = params.excludeTemplates.join(",")
-  if (params.excludeMatchers && params.excludeMatchers.length > 0)
-    requestBody.exclude_matchers = params.excludeMatchers.join(",")
-  if (params.severity && params.severity.length > 0)
-    requestBody.severity = params.severity.join(",")
-  if (params.excludeSeverity && params.excludeSeverity.length > 0)
-    requestBody.exclude_severity = params.excludeSeverity.join(",")
-  if (params.type && params.type.length > 0)
-    requestBody.type = params.type.join(",")
-  if (params.excludeType && params.excludeType.length > 0)
-    requestBody.exclude_type = params.excludeType.join(",")
-  if (params.templateCondition && params.templateCondition.length > 0)
-    requestBody.template_condition = params.templateCondition.join(",")
-
-  // OUTPUT
-  if (params.jsonl) requestBody.jsonl = true
-
-  // CONFIGURATIONS
-  if (params.followRedirects) requestBody.follow_redirects = true
-  if (params.followHostRedirects) requestBody.follow_host_redirects = true
-  if (params.maxRedirects !== 10)
-    requestBody.max_redirects = params.maxRedirects
-  if (params.disableRedirects) requestBody.disable_redirects = true
-  if (params.header && params.header.length > 0)
-    requestBody.header = params.header.join(",")
-  if (params.vars && params.vars.length > 0)
-    requestBody.vars = params.vars.join(",")
-  if (params.systemResolvers) requestBody.system_resolvers = true
-  if (params.disableClustering) requestBody.disable_clustering = true
-  if (params.passive) requestBody.passive = true
-  if (params.forceHttp2) requestBody.force_http2 = true
-  if (params.dialerTimeout && params.dialerTimeout !== 10)
-    requestBody.dialer_timeout = params.dialerTimeout
-  if (params.dialerKeepAlive && params.dialerKeepAlive !== 30)
-    requestBody.dialer_keep_alive = params.dialerKeepAlive
-  if (params.attackType) requestBody.attack_type = params.attackType
-
-  // OPTIMIZATIONS
-  if (params.timeout !== 30) requestBody.timeout = params.timeout
-  if (params.maxHostError !== 30)
-    requestBody.max_host_error = params.maxHostError
-  if (params.noMaxHostError) requestBody.no_max_host_error = true
-  if (params.scanStrategy !== "auto")
-    requestBody.scan_strategy = params.scanStrategy
-  if (params.noHttpx) requestBody.no_httpx = true
-
-  // FILE
-  if (fileContentIncluded) {
-    requestBody.fileContent = fileContent
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -953,7 +815,154 @@ export async function handleNucleiRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          fileContentIncluded: fileContentIncluded,
+          fileName: fileName
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToNucleiCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let nucleiUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/nuclei`
+
+      let requestBody: NucleiRequestBody = {}
+
+      // TARGET
+      if (params.target && params.target.length > 0)
+        requestBody.target = params.target
+      if (params.excludeHosts && params.excludeHosts.length > 0)
+        requestBody.exclude_hosts = params.excludeHosts.join(",")
+      if (params.scanAllIPs) requestBody.scan_all_ips = true
+      if (
+        params.ipVersion &&
+        params.ipVersion.length > 0 &&
+        params.ipVersion.join(",") !== "4"
+      )
+        requestBody.ip_version = params.ipVersion.join(",")
+
+      // TEMPLATES
+      if (params.newTemplates) requestBody.new_templates = true
+      if (params.newTemplatesVersion && params.newTemplatesVersion.length > 0)
+        requestBody.new_templates_version = params.newTemplatesVersion.join(",")
+      if (params.automaticScan) requestBody.automatic_scan = true
+      if (params.templates && params.templates.length > 0)
+        requestBody.templates = params.templates.join(",")
+      if (params.templateUrl && params.templateUrl.length > 0)
+        requestBody.template_url = params.templateUrl.join(",")
+      if (params.workflows && params.workflows.length > 0)
+        requestBody.workflows = params.workflows.join(",")
+      if (params.workflowUrl && params.workflowUrl.length > 0)
+        requestBody.workflow_url = params.workflowUrl.join(",")
+      if (params.templateDisplay) requestBody.template_display = true
+      if (params.listTemplates) requestBody.list_templates = true
+      if (params.enableCodeProtocol) requestBody.enable_code_protocol = true
+
+      // FILTERING
+      if (params.author && params.author.length > 0)
+        requestBody.author = params.author.join(",")
+      if (params.tags && params.tags.length > 0)
+        requestBody.tags = params.tags.join(",")
+      if (params.excludeTags && params.excludeTags.length > 0)
+        requestBody.exclude_tags = params.excludeTags.join(",")
+      if (params.includeTags && params.includeTags.length > 0)
+        requestBody.include_tags = params.includeTags.join(",")
+      if (params.templateId && params.templateId.length > 0)
+        requestBody.template_id = params.templateId.join(",")
+      if (params.excludeId && params.excludeId.length > 0)
+        requestBody.exclude_id = params.excludeId.join(",")
+      if (params.includeTemplates && params.includeTemplates.length > 0)
+        requestBody.include_templates = params.includeTemplates.join(",")
+      if (params.excludeTemplates && params.excludeTemplates.length > 0)
+        requestBody.exclude_templates = params.excludeTemplates.join(",")
+      if (params.excludeMatchers && params.excludeMatchers.length > 0)
+        requestBody.exclude_matchers = params.excludeMatchers.join(",")
+      if (params.severity && params.severity.length > 0)
+        requestBody.severity = params.severity.join(",")
+      if (params.excludeSeverity && params.excludeSeverity.length > 0)
+        requestBody.exclude_severity = params.excludeSeverity.join(",")
+      if (params.type && params.type.length > 0)
+        requestBody.type = params.type.join(",")
+      if (params.excludeType && params.excludeType.length > 0)
+        requestBody.exclude_type = params.excludeType.join(",")
+      if (params.templateCondition && params.templateCondition.length > 0)
+        requestBody.template_condition = params.templateCondition.join(",")
+
+      // OUTPUT
+      if (params.jsonl) requestBody.jsonl = true
+
+      // CONFIGURATIONS
+      if (params.followRedirects) requestBody.follow_redirects = true
+      if (params.followHostRedirects) requestBody.follow_host_redirects = true
+      if (params.maxRedirects !== 10)
+        requestBody.max_redirects = params.maxRedirects
+      if (params.disableRedirects) requestBody.disable_redirects = true
+      if (params.header && params.header.length > 0)
+        requestBody.header = params.header.join(",")
+      if (params.vars && params.vars.length > 0)
+        requestBody.vars = params.vars.join(",")
+      if (params.systemResolvers) requestBody.system_resolvers = true
+      if (params.disableClustering) requestBody.disable_clustering = true
+      if (params.passive) requestBody.passive = true
+      if (params.forceHttp2) requestBody.force_http2 = true
+      if (params.dialerTimeout && params.dialerTimeout !== 10)
+        requestBody.dialer_timeout = params.dialerTimeout
+      if (params.dialerKeepAlive && params.dialerKeepAlive !== 30)
+        requestBody.dialer_keep_alive = params.dialerKeepAlive
+      if (params.attackType) requestBody.attack_type = params.attackType
+
+      // OPTIMIZATIONS
+      if (params.timeout !== 30) requestBody.timeout = params.timeout
+      if (params.maxHostError !== 30)
+        requestBody.max_host_error = params.maxHostError
+      if (params.noMaxHostError) requestBody.no_max_host_error = true
+      if (params.scanStrategy !== "auto")
+        requestBody.scan_strategy = params.scanStrategy
+      if (params.noHttpx) requestBody.no_httpx = true
+
+      // FILE
+      if (fileContentIncluded) {
+        requestBody.fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)

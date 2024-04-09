@@ -6,6 +6,7 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -714,277 +715,6 @@ export async function handleHttpxRequest(
   const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const options: ProcessAIResponseOptions = {
-        fileContentIncluded: fileContentIncluded,
-        fileName: fileName
-      }
-
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToHttpxCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage,
-          options
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let httpxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/httpx`
-
-  interface HttpxRequestBody {
-    target?: string[]
-    status_code?: boolean
-    content_length?: boolean
-    content_type?: boolean
-    location?: boolean
-    favicon?: boolean
-    hash?: string
-    jarm?: boolean
-    response_time?: boolean
-    line_count?: boolean
-    word_count?: boolean
-    title?: boolean
-    body_preview?: string
-    web_server?: boolean
-    tech_detect?: boolean
-    method?: boolean
-    websocket?: boolean
-    ip?: boolean
-    cname?: boolean
-    asn?: boolean
-    cdn?: boolean
-    probe?: boolean
-    match_code?: string
-    match_length?: string
-    match_line_count?: string
-    match_word_count?: string
-    match_favicon?: string[]
-    match_string?: string
-    match_regex?: string
-    match_cdn?: string[]
-    match_response_time?: string
-    match_condition?: string
-    extract_regex?: string
-    extract_preset?: string
-    filter_code?: string
-    filter_error_page?: boolean
-    filter_length?: string
-    filter_line_count?: string
-    filter_word_count?: string
-    filter_favicon?: string
-    filter_string?: string
-    filter_regex?: string
-    filter_cdn?: string
-    filter_response_time?: string
-    filter_condition?: string
-    strip?: string
-    json?: boolean
-    include_response_header?: boolean
-    include_response?: boolean
-    include_response_base64?: boolean
-    include_chain?: boolean
-    timeout?: number
-    fileContent?: string
-  }
-
-  let requestBody: HttpxRequestBody = {}
-
-  // INPUT
-  if (params.target && params.target.length > 0) {
-    requestBody.target = params.target
-  }
-
-  // PROBES
-  if (params.status_code) {
-    requestBody.status_code = params.status_code
-  }
-  if (params.content_length) {
-    requestBody.content_length = params.content_length
-  }
-  if (params.content_type) {
-    requestBody.content_type = params.content_type
-  }
-  if (params.location) {
-    requestBody.location = params.location
-  }
-  if (params.favicon) {
-    requestBody.favicon = params.favicon
-  }
-  if (params.hash) {
-    requestBody.hash = params.hash
-  }
-  if (params.jarm) {
-    requestBody.jarm = params.jarm
-  }
-  if (params.response_time) {
-    requestBody.response_time = params.response_time
-  }
-  if (params.line_count) {
-    requestBody.line_count = params.line_count
-  }
-  if (params.word_count) {
-    requestBody.word_count = params.word_count
-  }
-  if (params.title) {
-    requestBody.title = params.title
-  }
-  if (params.body_preview !== undefined) {
-    requestBody.body_preview = params.body_preview.toString()
-  }
-  if (params.web_server) {
-    requestBody.web_server = params.web_server
-  }
-  if (params.tech_detect) {
-    requestBody.tech_detect = params.tech_detect
-  }
-  if (params.method) {
-    requestBody.method = params.method
-  }
-  if (params.websocket) {
-    requestBody.websocket = params.websocket
-  }
-  if (params.ip) {
-    requestBody.ip = params.ip
-  }
-  if (params.cname) {
-    requestBody.cname = params.cname
-  }
-  if (params.asn) {
-    requestBody.asn = params.asn
-  }
-  if (params.cdn) {
-    requestBody.cdn = params.cdn
-  }
-  if (params.probe) {
-    requestBody.probe = params.probe
-  }
-
-  // MATCHERS
-  if (params.match_code) {
-    requestBody.match_code = params.match_code
-  }
-  if (params.match_length) {
-    requestBody.match_length = params.match_length
-  }
-  if (params.match_line_count) {
-    requestBody.match_line_count = params.match_line_count
-  }
-  if (params.match_word_count) {
-    requestBody.match_word_count = params.match_word_count
-  }
-  if (params.match_favicon && params.match_favicon.length > 0) {
-    requestBody.match_favicon = params.match_favicon
-  }
-  if (params.match_string) {
-    requestBody.match_string = params.match_string
-  }
-  if (params.match_regex) {
-    requestBody.match_regex = params.match_regex
-  }
-  if (params.match_cdn && params.match_cdn.length > 0) {
-    requestBody.match_cdn = params.match_cdn
-  }
-  if (params.match_response_time) {
-    requestBody.match_response_time = params.match_response_time
-  }
-  if (params.match_condition) {
-    requestBody.match_condition = params.match_condition
-  }
-
-  // EXTRACTORS
-  if (params.extract_regex && params.extract_regex.length > 0) {
-    requestBody.extract_regex = params.extract_regex.join(",")
-  }
-  if (params.extract_preset && params.extract_preset.length > 0) {
-    requestBody.extract_preset = params.extract_preset.join(",")
-  }
-
-  // FILTERS
-  if (params.filter_code) {
-    requestBody.filter_code = params.filter_code
-  }
-  if (params.filter_error_page) {
-    requestBody.filter_error_page = params.filter_error_page
-  }
-  if (params.filter_length) {
-    requestBody.filter_length = params.filter_length
-  }
-  if (params.filter_line_count) {
-    requestBody.filter_line_count = params.filter_line_count
-  }
-  if (params.filter_word_count) {
-    requestBody.filter_word_count = params.filter_word_count
-  }
-  if (params.filter_favicon && params.filter_favicon.length > 0) {
-    requestBody.filter_favicon = params.filter_favicon.join(",")
-  }
-  if (params.filter_string) {
-    requestBody.filter_string = params.filter_string
-  }
-  if (params.filter_regex) {
-    requestBody.filter_regex = params.filter_regex
-  }
-  if (params.filter_cdn && params.filter_cdn.length > 0) {
-    requestBody.filter_cdn = params.filter_cdn.join(",")
-  }
-  if (params.filter_response_time) {
-    requestBody.filter_response_time = params.filter_response_time
-  }
-  if (params.filter_condition) {
-    requestBody.filter_condition = params.filter_condition
-  }
-
-  // ADDITIONAL SETTINGS
-  if (params.strip) {
-    requestBody.strip = params.strip
-  }
-  if (params.json) {
-    requestBody.json = params.json
-  }
-  if (params.include_response_header) {
-    requestBody.include_response_header = params.include_response_header
-  }
-  if (params.include_response) {
-    requestBody.include_response = params.include_response
-  }
-  if (params.include_response_base64) {
-    requestBody.include_response_base64 = params.include_response_base64
-  }
-  if (params.include_chain) {
-    requestBody.include_chain = params.include_chain
-  }
-  if (params.timeout && params.timeout !== 15) {
-    requestBody.timeout = params.timeout
-  }
-
-  // FILE
-  if (fileContentIncluded) {
-    requestBody.fileContent = fileContent
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -998,7 +728,286 @@ export async function handleHttpxRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          fileContentIncluded: fileContentIncluded,
+          fileName: fileName
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToHttpxCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let httpxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/httpx`
+
+      interface HttpxRequestBody {
+        target?: string[]
+        status_code?: boolean
+        content_length?: boolean
+        content_type?: boolean
+        location?: boolean
+        favicon?: boolean
+        hash?: string
+        jarm?: boolean
+        response_time?: boolean
+        line_count?: boolean
+        word_count?: boolean
+        title?: boolean
+        body_preview?: string
+        web_server?: boolean
+        tech_detect?: boolean
+        method?: boolean
+        websocket?: boolean
+        ip?: boolean
+        cname?: boolean
+        asn?: boolean
+        cdn?: boolean
+        probe?: boolean
+        match_code?: string
+        match_length?: string
+        match_line_count?: string
+        match_word_count?: string
+        match_favicon?: string[]
+        match_string?: string
+        match_regex?: string
+        match_cdn?: string[]
+        match_response_time?: string
+        match_condition?: string
+        extract_regex?: string
+        extract_preset?: string
+        filter_code?: string
+        filter_error_page?: boolean
+        filter_length?: string
+        filter_line_count?: string
+        filter_word_count?: string
+        filter_favicon?: string
+        filter_string?: string
+        filter_regex?: string
+        filter_cdn?: string
+        filter_response_time?: string
+        filter_condition?: string
+        strip?: string
+        json?: boolean
+        include_response_header?: boolean
+        include_response?: boolean
+        include_response_base64?: boolean
+        include_chain?: boolean
+        timeout?: number
+        fileContent?: string
+      }
+
+      let requestBody: HttpxRequestBody = {}
+
+      // INPUT
+      if (params.target && params.target.length > 0) {
+        requestBody.target = params.target
+      }
+
+      // PROBES
+      if (params.status_code) {
+        requestBody.status_code = params.status_code
+      }
+      if (params.content_length) {
+        requestBody.content_length = params.content_length
+      }
+      if (params.content_type) {
+        requestBody.content_type = params.content_type
+      }
+      if (params.location) {
+        requestBody.location = params.location
+      }
+      if (params.favicon) {
+        requestBody.favicon = params.favicon
+      }
+      if (params.hash) {
+        requestBody.hash = params.hash
+      }
+      if (params.jarm) {
+        requestBody.jarm = params.jarm
+      }
+      if (params.response_time) {
+        requestBody.response_time = params.response_time
+      }
+      if (params.line_count) {
+        requestBody.line_count = params.line_count
+      }
+      if (params.word_count) {
+        requestBody.word_count = params.word_count
+      }
+      if (params.title) {
+        requestBody.title = params.title
+      }
+      if (params.body_preview !== undefined) {
+        requestBody.body_preview = params.body_preview.toString()
+      }
+      if (params.web_server) {
+        requestBody.web_server = params.web_server
+      }
+      if (params.tech_detect) {
+        requestBody.tech_detect = params.tech_detect
+      }
+      if (params.method) {
+        requestBody.method = params.method
+      }
+      if (params.websocket) {
+        requestBody.websocket = params.websocket
+      }
+      if (params.ip) {
+        requestBody.ip = params.ip
+      }
+      if (params.cname) {
+        requestBody.cname = params.cname
+      }
+      if (params.asn) {
+        requestBody.asn = params.asn
+      }
+      if (params.cdn) {
+        requestBody.cdn = params.cdn
+      }
+      if (params.probe) {
+        requestBody.probe = params.probe
+      }
+
+      // MATCHERS
+      if (params.match_code) {
+        requestBody.match_code = params.match_code
+      }
+      if (params.match_length) {
+        requestBody.match_length = params.match_length
+      }
+      if (params.match_line_count) {
+        requestBody.match_line_count = params.match_line_count
+      }
+      if (params.match_word_count) {
+        requestBody.match_word_count = params.match_word_count
+      }
+      if (params.match_favicon && params.match_favicon.length > 0) {
+        requestBody.match_favicon = params.match_favicon
+      }
+      if (params.match_string) {
+        requestBody.match_string = params.match_string
+      }
+      if (params.match_regex) {
+        requestBody.match_regex = params.match_regex
+      }
+      if (params.match_cdn && params.match_cdn.length > 0) {
+        requestBody.match_cdn = params.match_cdn
+      }
+      if (params.match_response_time) {
+        requestBody.match_response_time = params.match_response_time
+      }
+      if (params.match_condition) {
+        requestBody.match_condition = params.match_condition
+      }
+
+      // EXTRACTORS
+      if (params.extract_regex && params.extract_regex.length > 0) {
+        requestBody.extract_regex = params.extract_regex.join(",")
+      }
+      if (params.extract_preset && params.extract_preset.length > 0) {
+        requestBody.extract_preset = params.extract_preset.join(",")
+      }
+
+      // FILTERS
+      if (params.filter_code) {
+        requestBody.filter_code = params.filter_code
+      }
+      if (params.filter_error_page) {
+        requestBody.filter_error_page = params.filter_error_page
+      }
+      if (params.filter_length) {
+        requestBody.filter_length = params.filter_length
+      }
+      if (params.filter_line_count) {
+        requestBody.filter_line_count = params.filter_line_count
+      }
+      if (params.filter_word_count) {
+        requestBody.filter_word_count = params.filter_word_count
+      }
+      if (params.filter_favicon && params.filter_favicon.length > 0) {
+        requestBody.filter_favicon = params.filter_favicon.join(",")
+      }
+      if (params.filter_string) {
+        requestBody.filter_string = params.filter_string
+      }
+      if (params.filter_regex) {
+        requestBody.filter_regex = params.filter_regex
+      }
+      if (params.filter_cdn && params.filter_cdn.length > 0) {
+        requestBody.filter_cdn = params.filter_cdn.join(",")
+      }
+      if (params.filter_response_time) {
+        requestBody.filter_response_time = params.filter_response_time
+      }
+      if (params.filter_condition) {
+        requestBody.filter_condition = params.filter_condition
+      }
+
+      // ADDITIONAL SETTINGS
+      if (params.strip) {
+        requestBody.strip = params.strip
+      }
+      if (params.json) {
+        requestBody.json = params.json
+      }
+      if (params.include_response_header) {
+        requestBody.include_response_header = params.include_response_header
+      }
+      if (params.include_response) {
+        requestBody.include_response = params.include_response
+      }
+      if (params.include_response_base64) {
+        requestBody.include_response_base64 = params.include_response_base64
+      }
+      if (params.include_chain) {
+        requestBody.include_chain = params.include_chain
+      }
+      if (params.timeout && params.timeout !== 15) {
+        requestBody.timeout = params.timeout
+      }
+
+      // FILE
+      if (fileContentIncluded) {
+        requestBody.fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)

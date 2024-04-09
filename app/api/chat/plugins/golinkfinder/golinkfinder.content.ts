@@ -4,6 +4,7 @@ import endent from "endent"
 
 import {
   createGKEHeaders,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -104,49 +105,6 @@ export async function handleGolinkfinderRequest(
 
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToGoLinkFinderCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (
-    parts.includes("-h") ||
-    parts.includes("-help") ||
-    parts.includes("--help")
-  ) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseGoLinkFinderCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let golinkfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/golinkfinder?`
-
-  if (Array.isArray(params.domain)) {
-    const targetsString = params.domain.join(" ")
-    golinkfinderUrl += `domain=${encodeURIComponent(targetsString)}`
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -160,7 +118,58 @@ export async function handleGolinkfinderRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToGoLinkFinderCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (
+        parts.includes("-h") ||
+        parts.includes("-help") ||
+        parts.includes("--help")
+      ) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseGoLinkFinderCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let golinkfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/golinkfinder?`
+
+      if (Array.isArray(params.domain)) {
+        const targetsString = params.domain.join(" ")
+        golinkfinderUrl += `domain=${encodeURIComponent(targetsString)}`
       }
 
       sendMessage(

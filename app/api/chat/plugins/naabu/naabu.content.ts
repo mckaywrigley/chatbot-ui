@@ -7,7 +7,8 @@ import {
   formatScanResults,
   createGKEHeaders,
   ProcessAIResponseOptions,
-  truncateData
+  truncateData,
+  getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
 export const isNaabuCommand = (message: string) => {
@@ -302,130 +303,6 @@ export async function handleNaabuRequest(
   const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const options: ProcessAIResponseOptions = {
-        fileContentIncluded: fileContentIncluded,
-        fileName: fileName
-      }
-
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToNaabuCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage,
-          options
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseNaabuCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let naabuUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/naabu`
-
-  interface NaabuRequestBody {
-    host?: string | string[]
-    port?: string
-    timeout?: number
-    scanAllIPs?: boolean
-    outputJson?: boolean
-    topPorts?: string
-    excludePorts?: string
-    portThreshold?: number
-    excludeCDN?: boolean
-    displayCDN?: boolean
-    hostDiscovery?: boolean
-    skipHostDiscovery?: boolean
-    probeIcmpEcho?: boolean
-    probeIcmpTimestamp?: boolean
-    probeIcmpAddressMask?: boolean
-    arpPing?: boolean
-    ndPing?: boolean
-    revPtr?: boolean
-    fileContent?: string
-  }
-
-  let requestBody: NaabuRequestBody = {}
-
-  if (params.host) {
-    requestBody.host = params.host
-  }
-  if (params.port) {
-    requestBody.port = params.port
-  }
-  if (params.timeout && params.timeout !== 10) {
-    requestBody.timeout = params.timeout * 1000
-  }
-  if (params.scanAllIPs) {
-    requestBody.scanAllIPs = params.scanAllIPs
-  }
-  if (params.outputJson) {
-    requestBody.outputJson = params.outputJson
-  }
-  if (params.topPorts) {
-    requestBody.topPorts = params.topPorts
-  }
-  if (params.excludePorts) {
-    requestBody.excludePorts = params.excludePorts
-  }
-  if (params.portThreshold && params.portThreshold > 0) {
-    requestBody.portThreshold = params.portThreshold
-  }
-  if (params.excludeCDN) {
-    requestBody.excludeCDN = params.excludeCDN
-  }
-  if (params.displayCDN) {
-    requestBody.displayCDN = params.displayCDN
-  }
-  if (params.hostDiscovery) {
-    requestBody.hostDiscovery = params.hostDiscovery
-  }
-  if (params.skipHostDiscovery) {
-    requestBody.skipHostDiscovery = params.skipHostDiscovery
-  }
-  if (params.probeIcmpEcho) {
-    requestBody.probeIcmpEcho = params.probeIcmpEcho
-  }
-  if (params.probeIcmpTimestamp) {
-    requestBody.probeIcmpTimestamp = params.probeIcmpTimestamp
-  }
-  if (params.probeIcmpAddressMask) {
-    requestBody.probeIcmpAddressMask = params.probeIcmpAddressMask
-  }
-  if (params.arpPing) {
-    requestBody.arpPing = params.arpPing
-  }
-  if (params.ndPing) {
-    requestBody.ndPing = params.ndPing
-  }
-  if (params.revPtr) {
-    requestBody.revPtr = params.revPtr
-  }
-
-  // FILE
-  if (fileContentIncluded) {
-    requestBody.fileContent = fileContent
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -439,7 +316,139 @@ export async function handleNaabuRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          fileContentIncluded: fileContentIncluded,
+          fileName: fileName
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToNaabuCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseNaabuCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let naabuUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/naabu`
+
+      interface NaabuRequestBody {
+        host?: string | string[]
+        port?: string
+        timeout?: number
+        scanAllIPs?: boolean
+        outputJson?: boolean
+        topPorts?: string
+        excludePorts?: string
+        portThreshold?: number
+        excludeCDN?: boolean
+        displayCDN?: boolean
+        hostDiscovery?: boolean
+        skipHostDiscovery?: boolean
+        probeIcmpEcho?: boolean
+        probeIcmpTimestamp?: boolean
+        probeIcmpAddressMask?: boolean
+        arpPing?: boolean
+        ndPing?: boolean
+        revPtr?: boolean
+        fileContent?: string
+      }
+
+      let requestBody: NaabuRequestBody = {}
+
+      if (params.host) {
+        requestBody.host = params.host
+      }
+      if (params.port) {
+        requestBody.port = params.port
+      }
+      if (params.timeout && params.timeout !== 10) {
+        requestBody.timeout = params.timeout * 1000
+      }
+      if (params.scanAllIPs) {
+        requestBody.scanAllIPs = params.scanAllIPs
+      }
+      if (params.outputJson) {
+        requestBody.outputJson = params.outputJson
+      }
+      if (params.topPorts) {
+        requestBody.topPorts = params.topPorts
+      }
+      if (params.excludePorts) {
+        requestBody.excludePorts = params.excludePorts
+      }
+      if (params.portThreshold && params.portThreshold > 0) {
+        requestBody.portThreshold = params.portThreshold
+      }
+      if (params.excludeCDN) {
+        requestBody.excludeCDN = params.excludeCDN
+      }
+      if (params.displayCDN) {
+        requestBody.displayCDN = params.displayCDN
+      }
+      if (params.hostDiscovery) {
+        requestBody.hostDiscovery = params.hostDiscovery
+      }
+      if (params.skipHostDiscovery) {
+        requestBody.skipHostDiscovery = params.skipHostDiscovery
+      }
+      if (params.probeIcmpEcho) {
+        requestBody.probeIcmpEcho = params.probeIcmpEcho
+      }
+      if (params.probeIcmpTimestamp) {
+        requestBody.probeIcmpTimestamp = params.probeIcmpTimestamp
+      }
+      if (params.probeIcmpAddressMask) {
+        requestBody.probeIcmpAddressMask = params.probeIcmpAddressMask
+      }
+      if (params.arpPing) {
+        requestBody.arpPing = params.arpPing
+      }
+      if (params.ndPing) {
+        requestBody.ndPing = params.ndPing
+      }
+      if (params.revPtr) {
+        requestBody.revPtr = params.revPtr
+      }
+
+      // FILE
+      if (fileContentIncluded) {
+        requestBody.fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)

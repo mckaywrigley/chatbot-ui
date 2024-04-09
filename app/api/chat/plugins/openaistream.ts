@@ -62,6 +62,13 @@ export const OpenAIStream = async (
   }
 
   if (answerMessage.content.trim()) {
+    if (
+      commonBody["messages"].length > 0 &&
+      commonBody["messages"][commonBody["messages"].length - 1].role === "user"
+    ) {
+      commonBody["messages"].pop()
+    }
+
     commonBody["messages"].push(answerMessage)
   }
 

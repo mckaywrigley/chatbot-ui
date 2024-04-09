@@ -6,6 +6,7 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -359,121 +360,6 @@ export async function handleKatanaRequest(
   const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    const options: ProcessAIResponseOptions = {
-      fileContentIncluded: fileContentIncluded,
-      fileName: fileName
-    }
-
-    try {
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToKatanaCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage,
-          options
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseKatanaCommandLine(lastMessage.content)
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let katanaUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/katana`
-
-  interface KatanaRequestBody {
-    urls?: string[]
-    depth?: number
-    jsCrawl?: boolean
-    ignoreQueryParams?: boolean
-    headless?: boolean
-    xhrExtraction?: boolean
-    crawlScope?: string[]
-    crawlOutScope?: string[]
-    displayOutScope?: boolean
-    matchRegex?: string[]
-    filterRegex?: string[]
-    extensionMatch?: string[]
-    extensionFilter?: string[]
-    matchCondition?: string
-    filterCondition?: string
-    timeout?: number
-    fileContent?: string
-  }
-
-  let requestBody: KatanaRequestBody = {}
-
-  if (params.urls && params.urls.length > 0) {
-    requestBody.urls = params.urls
-  }
-  if (params.depth && params.depth !== 3) {
-    requestBody.depth = params.depth
-  }
-  if (params.jsCrawl) {
-    requestBody.jsCrawl = params.jsCrawl
-  }
-  if (params.ignoreQueryParams) {
-    requestBody.ignoreQueryParams = params.ignoreQueryParams
-  }
-  if (params.headless) {
-    requestBody.headless = params.headless
-  }
-  if (params.xhrExtraction) {
-    requestBody.xhrExtraction = params.xhrExtraction
-  }
-  if (params.crawlScope && params.crawlScope.length > 0) {
-    requestBody.crawlScope = params.crawlScope
-  }
-  if (params.crawlOutScope && params.crawlOutScope.length > 0) {
-    requestBody.crawlOutScope = params.crawlOutScope
-  }
-  if (params.displayOutScope) {
-    requestBody.displayOutScope = params.displayOutScope
-  }
-  if (params.matchRegex && params.matchRegex.length > 0) {
-    requestBody.matchRegex = params.matchRegex
-  }
-  if (params.filterRegex && params.filterRegex.length > 0) {
-    requestBody.filterRegex = params.filterRegex
-  }
-  if (params.extensionMatch && params.extensionMatch.length > 0) {
-    requestBody.extensionMatch = params.extensionMatch
-  }
-  if (params.extensionFilter && params.extensionFilter.length > 0) {
-    requestBody.extensionFilter = params.extensionFilter
-  }
-  if (params.matchCondition) {
-    requestBody.matchCondition = params.matchCondition
-  }
-  if (params.filterCondition) {
-    requestBody.filterCondition = params.filterCondition
-  }
-  if (params.timeout && params.timeout !== 15) {
-    requestBody.timeout = params.timeout
-  }
-
-  // FILE
-  if (fileContentIncluded) {
-    requestBody.fileContent = fileContent
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -487,7 +373,130 @@ export async function handleKatanaRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          fileContentIncluded: fileContentIncluded,
+          fileName: fileName
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToKatanaCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseKatanaCommandLine(lastMessage.content)
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let katanaUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/katana`
+
+      interface KatanaRequestBody {
+        urls?: string[]
+        depth?: number
+        jsCrawl?: boolean
+        ignoreQueryParams?: boolean
+        headless?: boolean
+        xhrExtraction?: boolean
+        crawlScope?: string[]
+        crawlOutScope?: string[]
+        displayOutScope?: boolean
+        matchRegex?: string[]
+        filterRegex?: string[]
+        extensionMatch?: string[]
+        extensionFilter?: string[]
+        matchCondition?: string
+        filterCondition?: string
+        timeout?: number
+        fileContent?: string
+      }
+
+      let requestBody: KatanaRequestBody = {}
+
+      if (params.urls && params.urls.length > 0) {
+        requestBody.urls = params.urls
+      }
+      if (params.depth && params.depth !== 3) {
+        requestBody.depth = params.depth
+      }
+      if (params.jsCrawl) {
+        requestBody.jsCrawl = params.jsCrawl
+      }
+      if (params.ignoreQueryParams) {
+        requestBody.ignoreQueryParams = params.ignoreQueryParams
+      }
+      if (params.headless) {
+        requestBody.headless = params.headless
+      }
+      if (params.xhrExtraction) {
+        requestBody.xhrExtraction = params.xhrExtraction
+      }
+      if (params.crawlScope && params.crawlScope.length > 0) {
+        requestBody.crawlScope = params.crawlScope
+      }
+      if (params.crawlOutScope && params.crawlOutScope.length > 0) {
+        requestBody.crawlOutScope = params.crawlOutScope
+      }
+      if (params.displayOutScope) {
+        requestBody.displayOutScope = params.displayOutScope
+      }
+      if (params.matchRegex && params.matchRegex.length > 0) {
+        requestBody.matchRegex = params.matchRegex
+      }
+      if (params.filterRegex && params.filterRegex.length > 0) {
+        requestBody.filterRegex = params.filterRegex
+      }
+      if (params.extensionMatch && params.extensionMatch.length > 0) {
+        requestBody.extensionMatch = params.extensionMatch
+      }
+      if (params.extensionFilter && params.extensionFilter.length > 0) {
+        requestBody.extensionFilter = params.extensionFilter
+      }
+      if (params.matchCondition) {
+        requestBody.matchCondition = params.matchCondition
+      }
+      if (params.filterCondition) {
+        requestBody.filterCondition = params.filterCondition
+      }
+      if (params.timeout && params.timeout !== 15) {
+        requestBody.timeout = params.timeout
+      }
+
+      // FILE
+      if (fileContentIncluded) {
+        requestBody.fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)

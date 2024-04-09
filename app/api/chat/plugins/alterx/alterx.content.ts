@@ -6,6 +6,7 @@ import {
   ProcessAIResponseOptions,
   createGKEHeaders,
   formatScanResults,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -146,69 +147,10 @@ export async function handleAlterxRequest(
     return new Response("The Alterx is disabled.")
   }
 
+  const headers = createGKEHeaders()
+
   const fileContentIncluded = !!fileContent && fileContent.length > 0
   let aiResponse = ""
-
-  if (invokedByToolId) {
-    const options: ProcessAIResponseOptions = {
-      fileContentIncluded: fileContentIncluded,
-      fileName: fileName
-    }
-
-    try {
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToAlterxCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage,
-          options
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseAlterxCommandLine(lastMessage.content)
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx`
-
-  let requestBody: Partial<AlterxParams> = {}
-
-  if (params.list.length > 0) {
-    requestBody.list = params.list
-  }
-  if (params.pattern.length > 0) {
-    requestBody.pattern = params.pattern
-  }
-  if (params.enrich) {
-    requestBody.enrich = true
-  }
-  if (params.limit > 0) {
-    requestBody.limit = params.limit
-  }
-
-  // FILE
-  if (fileContentIncluded) {
-    requestBody.fileContent = fileContent
-  }
-
-  const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -218,7 +160,74 @@ export async function handleAlterxRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          fileContentIncluded: fileContentIncluded,
+          fileName: fileName
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToAlterxCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseAlterxCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx`
+
+      let requestBody: Partial<AlterxParams> = {}
+
+      if (params.list.length > 0) {
+        requestBody.list = params.list
+      }
+      if (params.pattern.length > 0) {
+        requestBody.pattern = params.pattern
+      }
+      if (params.enrich) {
+        requestBody.enrich = true
+      }
+      if (params.limit > 0) {
+        requestBody.limit = params.limit
+      }
+      // FILE
+      if (fileContentIncluded) {
+        requestBody.fileContent = fileContent
       }
 
       sendMessage(
@@ -255,13 +264,10 @@ export async function handleAlterxRequest(
           const noDataMessage = `🔍 Unable to generate wordlist for "${params.list.join(
             ", "
           )}"`
-          clearInterval(intervalId)
           sendMessage(noDataMessage, true)
-          controller.close()
-          return new Response(noDataMessage)
+          return
         }
 
-        clearInterval(intervalId)
         sendMessage(
           "✅ Wordlist generation complete! Now finalizing the results...'",
           true
@@ -274,17 +280,16 @@ export async function handleAlterxRequest(
           results: subdomains
         })
         sendMessage(formattedResults, true)
-
-        controller.close()
       } catch (error) {
-        isFetching = false
-        clearInterval(intervalId)
         console.error("Error:", error)
         const errorMessage =
           error instanceof Error
             ? `🚨 Error: ${error.message}`
             : "🚨 There was a problem during the scan. Please try again."
         sendMessage(errorMessage, true)
+      } finally {
+        isFetching = false
+        clearInterval(intervalId)
         controller.close()
       }
     }

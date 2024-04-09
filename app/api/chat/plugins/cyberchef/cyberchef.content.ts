@@ -1,7 +1,11 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 
-import { createGKEHeaders } from "../chatpluginhandlers"
+import {
+  ProcessAIResponseOptions,
+  createGKEHeaders,
+  processAIResponseAndUpdateMessage
+} from "../chatpluginhandlers"
 
 interface CyberChefParams {
   input: string
@@ -87,163 +91,74 @@ export async function handleCyberchefRequest(
     return new Response("The CyberChef is disabled.")
   }
 
-  let aiResponse = ""
-  if (invokedByToolId) {
-    const answerPrompt = transformUserQueryToCyberChefCommand(lastMessage)
-    answerMessage.content = answerPrompt
-
-    const tools = [
-      {
-        type: "function",
-        function: {
-          name: "cyberchef_bake",
-          description: "Process input data using a specified CyberChef recipe.",
-          parameters: {
-            type: "object",
-            properties: {
-              input: {
-                type: "string",
-                description: "The input data to be processed by CyberChef"
-              },
-              recipe: {
-                type: ["object", "array"],
-                description:
-                  "The recipe defining operations to be applied to the input. Can be a single operation object or an array of operation objects",
-                items: {
-                  type: "object",
-                  properties: {
-                    op: {
-                      type: "string",
-                      description: "The operation name"
-                    },
-                    args: {
-                      type: "object",
-                      description: "Arguments for the operation, if any"
-                    }
-                  },
-                  required: ["op"]
-                }
-              },
-              outputType: {
-                type: "string",
-                enum: ["string", "number", "byteArray"],
-                description: "Always included, string by default"
-              }
+  const tools = [
+    {
+      type: "function",
+      function: {
+        name: "cyberchef_bake",
+        description: "Process input data using a specified CyberChef recipe.",
+        parameters: {
+          type: "object",
+          properties: {
+            input: {
+              type: "string",
+              description: "The input data to be processed by CyberChef"
             },
-            required: ["input", "recipe", "outputType"]
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
-          name: "cyberchef_magic",
-          description:
-            "Automatically identify and decode/encode the input data using the best-fit CyberChef recipe.",
-          parameters: {
-            type: "object",
-            properties: {
-              input: {
-                type: "string",
-                description: "The input data to be automatically processed."
-              },
-              args: {
+            recipe: {
+              type: ["object", "array"],
+              description:
+                "The recipe defining operations to be applied to the input. Can be a single operation object or an array of operation objects",
+              items: {
                 type: "object",
-                description:
-                  "Optional arguments to fine-tune the processing, such as depth of analysis."
+                properties: {
+                  op: {
+                    type: "string",
+                    description: "The operation name"
+                  },
+                  args: {
+                    type: "object",
+                    description: "Arguments for the operation, if any"
+                  }
+                },
+                required: ["op"]
               }
             },
-            required: ["input"]
-          }
+            outputType: {
+              type: "string",
+              enum: ["string", "number", "byteArray"],
+              description: "Always included, string by default"
+            }
+          },
+          required: ["input", "recipe", "outputType"]
         }
       }
-    ]
-
-    const openAIResponseStream = await OpenAIStream(
-      model,
-      messagesToSend,
-      answerMessage,
-      tools
-    )
-    const reader = openAIResponseStream.getReader()
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      aiResponse += new TextDecoder().decode(value, { stream: true })
-    }
-
-    try {
-      const jsonMatch =
-        aiResponse.match(/```json\n([\s\S]*?)\n```/s) ||
-        aiResponse.match(/{[\s\S]*}/)
-      if (jsonMatch && jsonMatch[0]) {
-        let jsonResponseString = jsonMatch[0]
-          .replace(/```json\n|```/g, "")
-          .trim()
-
-        const jsonResponse = JSON.parse(jsonResponseString)
-
-        const formattedJsonString = JSON.stringify(jsonResponse, null, 4)
-
-        lastMessage.content = `\`\`\`json\n${formattedJsonString}\n\`\`\``
-      } else {
-        return new Response(
-          `${aiResponse}\n\nNo valid JSON command found in the AI response.`
-        )
+    },
+    {
+      type: "function",
+      function: {
+        name: "cyberchef_magic",
+        description:
+          "Automatically identify and decode/encode the input data using the best-fit CyberChef recipe.",
+        parameters: {
+          type: "object",
+          properties: {
+            input: {
+              type: "string",
+              description: "The input data to be automatically processed."
+            },
+            args: {
+              type: "object",
+              description:
+                "Optional arguments to fine-tune the processing, such as depth of analysis."
+            }
+          },
+          required: ["input"]
+        }
       }
-    } catch (error) {
-      console.error("Error parsing JSON input:", error)
-      console.error("Original String:", aiResponse)
-      return new Response(`${aiResponse}\n\nError parsing JSON input: ${error}`)
     }
-  }
+  ]
 
-  const params = parseCyberChefJSONInput(lastMessage.content)
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let cyberchefUrl = `${process.env.SECRET_CYBERCHEF_BASE_URL}`
-
-  if (
-    !params.recipe ||
-    (Array.isArray(params.recipe) && params.recipe.length === 0)
-  ) {
-    cyberchefUrl += "/magic"
-  } else {
-    cyberchefUrl += "/bake"
-  }
-
-  interface CyberChefRequestBody {
-    input?: string
-    recipe?: string | object | Array<any>
-    args?: object | Array<any>
-    outputType?: string
-  }
-
-  let requestBody: CyberChefRequestBody = {}
-
-  if (params.input) {
-    requestBody.input = params.input
-  }
-  if (
-    params.recipe &&
-    !(Array.isArray(params.recipe) && params.recipe.length === 0)
-  ) {
-    requestBody.recipe = params.recipe
-  }
-  if (
-    params.args &&
-    !(Array.isArray(params.args) && params.args.length === 0)
-  ) {
-    requestBody.args = params.args
-  }
-  if (params.outputType) {
-    requestBody.outputType = params.outputType
-  }
+  let aiResponse = ""
 
   const headers = createGKEHeaders()
 
@@ -258,7 +173,92 @@ export async function handleCyberchefRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        const options: ProcessAIResponseOptions = {
+          tools: tools
+        }
+
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToCyberChefCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage,
+            options
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+
+          // Attempt to find and parse the JSON command from the AI response
+          const jsonMatch =
+            aiResponse.match(/```json\n([\s\S]*?)\n```/s) ||
+            aiResponse.match(/{[\s\S]*}/)
+          if (!jsonMatch || !jsonMatch[0]) {
+            throw new Error("No valid JSON command found in the AI response.")
+          }
+
+          let jsonResponseString = jsonMatch[0]
+            .replace(/```json\n|```/g, "")
+            .trim()
+          const jsonResponse = JSON.parse(jsonResponseString)
+          const formattedJsonString = JSON.stringify(jsonResponse, null, 4)
+          lastMessage.content = `\`\`\`json\n${formattedJsonString}\n\`\`\``
+        } catch (error) {
+          console.error("Error during CyberChef operation:", error)
+          console.error("Original String:", aiResponse)
+          return new Response(`\n\nError during CyberChef operation: ${error}`)
+        }
+      }
+
+      const params = parseCyberChefJSONInput(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let cyberchefUrl = `${process.env.SECRET_CYBERCHEF_BASE_URL}`
+
+      if (
+        !params.recipe ||
+        (Array.isArray(params.recipe) && params.recipe.length === 0)
+      ) {
+        cyberchefUrl += "/magic"
+      } else {
+        cyberchefUrl += "/bake"
+      }
+
+      interface CyberChefRequestBody {
+        input?: string
+        recipe?: string | object | Array<any>
+        args?: object | Array<any>
+        outputType?: string
+      }
+
+      let requestBody: CyberChefRequestBody = {}
+
+      if (params.input) {
+        requestBody.input = params.input
+      }
+      if (
+        params.recipe &&
+        !(Array.isArray(params.recipe) && params.recipe.length === 0)
+      ) {
+        requestBody.recipe = params.recipe
+      }
+      if (
+        params.args &&
+        !(Array.isArray(params.args) && params.args.length === 0)
+      ) {
+        requestBody.args = params.args
+      }
+      if (params.outputType) {
+        requestBody.outputType = params.outputType
       }
 
       sendMessage("🚀 Starting CyberChef operation. Please wait...", true)

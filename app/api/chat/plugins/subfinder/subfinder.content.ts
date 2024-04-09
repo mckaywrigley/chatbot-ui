@@ -2,6 +2,7 @@ import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
 import {
   createGKEHeaders,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -220,66 +221,6 @@ export async function handleSubfinderRequest(
 
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToSubfinderCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let subfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/subfinder?`
-
-  subfinderUrl += params.domain.map(d => `domain=${d}`).join("&")
-  if (params.match && params.match.length > 0) {
-    subfinderUrl += "&" + params.match.map(m => `match=${m}`).join("&")
-  }
-  if (params.resolvers && params.resolvers.length > 0) {
-    subfinderUrl += "&" + params.resolvers.map(r => `resolver=${r}`).join("&")
-  }
-  if (params.filter && params.filter.length > 0) {
-    subfinderUrl += "&" + params.filter.map(f => `filter=${f}`).join("&")
-  }
-  if (params.onlyActive) {
-    subfinderUrl += `&onlyActive=true`
-  }
-  if (params.excludeIP) {
-    subfinderUrl += `&excludeIP=true`
-  }
-  if (params.includeSources) {
-    subfinderUrl += `&includeSources=true`
-  }
-  if (params.ip) {
-    subfinderUrl += `&ip=true`
-  }
-  if (params.timeout !== 30) {
-    subfinderUrl += `&timeout=${params.timeout}`
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -293,7 +234,76 @@ export async function handleSubfinderRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToSubfinderCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`${aiResponse}\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(params.error)
+      }
+
+      let subfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/subfinder?`
+
+      subfinderUrl += params.domain.map(d => `domain=${d}`).join("&")
+      if (params.match && params.match.length > 0) {
+        subfinderUrl += "&" + params.match.map(m => `match=${m}`).join("&")
+      }
+      if (params.resolvers && params.resolvers.length > 0) {
+        subfinderUrl +=
+          "&" + params.resolvers.map(r => `resolver=${r}`).join("&")
+      }
+      if (params.filter && params.filter.length > 0) {
+        subfinderUrl += "&" + params.filter.map(f => `filter=${f}`).join("&")
+      }
+      if (params.onlyActive) {
+        subfinderUrl += `&onlyActive=true`
+      }
+      if (params.excludeIP) {
+        subfinderUrl += `&excludeIP=true`
+      }
+      if (params.includeSources) {
+        subfinderUrl += `&includeSources=true`
+      }
+      if (params.ip) {
+        subfinderUrl += `&ip=true`
+      }
+      if (params.timeout !== 30) {
+        subfinderUrl += `&timeout=${params.timeout}`
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)

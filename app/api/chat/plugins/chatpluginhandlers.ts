@@ -111,24 +111,26 @@ export const handleCommand = async (
 export interface ProcessAIResponseOptions {
   fileContentIncluded?: boolean
   fileName?: string
+  tools?: any
 }
 
-export async function processAIResponseAndUpdateMessage(
+export async function* processAIResponseAndUpdateMessage(
   lastMessage: Message,
   transformQueryFunction: TransformQueryFunction,
   OpenAIStream: {
     (
       model: string,
       messages: Message[],
-      answerMessage: Message
+      answerMessage: Message,
+      tools?: any
     ): Promise<ReadableStream<any>>
   },
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
   options: ProcessAIResponseOptions = {}
-): Promise<{ updatedLastMessageContent: string; aiResponseText: string }> {
-  const { fileContentIncluded = false, fileName } = options
+): AsyncGenerator<string, { aiResponseText: string }, undefined> {
+  const { fileContentIncluded = false, fileName, tools } = options
 
   const fileNameIncluded =
     fileContentIncluded && fileName && fileName.length > 0
@@ -143,17 +145,31 @@ export async function processAIResponseAndUpdateMessage(
   const openAIResponseStream = await OpenAIStream(
     model,
     messagesToSend,
-    answerMessage
+    answerMessage,
+    tools
   )
 
   let aiResponse = ""
   const reader = openAIResponseStream.getReader()
+
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
-    aiResponse += new TextDecoder().decode(value, { stream: true })
+    const chunk = new TextDecoder().decode(value, { stream: true })
+    aiResponse += chunk
+    yield chunk
   }
 
+  return {
+    aiResponseText: aiResponse
+  }
+}
+
+export function getCommandFromAIResponse(
+  lastMessage: Message,
+  messagesToSend: Message[],
+  aiResponse: string
+) {
   try {
     const jsonMatch = aiResponse.match(/```json\n\{.*?\}\n```/s)
     if (jsonMatch) {
@@ -165,15 +181,16 @@ export async function processAIResponseAndUpdateMessage(
     }
   } catch (error) {
     console.error(
-      `Error extracting and parsing JSON from AI response: ${error}`
+      `Error extracting and parsing JSON from AI response: ${error}`,
+      {
+        aiResponse,
+        messagesToSend
+      }
     )
     throw error
   }
 
-  return {
-    updatedLastMessageContent: lastMessage.content,
-    aiResponseText: aiResponse
-  }
+  return lastMessage.content
 }
 
 export function formatScanResults({

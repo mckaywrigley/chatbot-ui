@@ -4,6 +4,7 @@ import endent from "endent"
 
 import {
   createGKEHeaders,
+  getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
   truncateData
 } from "../chatpluginhandlers"
@@ -211,75 +212,6 @@ export async function handleGauRequest(
 
   let aiResponse = ""
 
-  if (invokedByToolId) {
-    try {
-      const { updatedLastMessageContent, aiResponseText } =
-        await processAIResponseAndUpdateMessage(
-          lastMessage,
-          transformUserQueryToGAUCommand,
-          OpenAIStream,
-          model,
-          messagesToSend,
-          answerMessage
-        )
-      lastMessage.content = updatedLastMessageContent
-      aiResponse = aiResponseText
-    } catch (error) {
-      console.error("Error processing AI response and updating message:", error)
-      return new Response(`Error processing AI response: ${error}`)
-    }
-  }
-
-  const parts = lastMessage.content.split(" ")
-  if (parts.includes("-h") || parts.includes("-help")) {
-    return new Response(displayHelpGuide())
-  }
-
-  const params = parseGauCommandLine(lastMessage.content)
-
-  if (params.error && invokedByToolId) {
-    return new Response(`${aiResponse}\n\n${params.error}`)
-  } else if (params.error) {
-    return new Response(params.error)
-  }
-
-  let gauUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/gau?`
-
-  if (Array.isArray(params.targets)) {
-    const targetsString = params.targets.join(" ")
-    gauUrl += `target=${encodeURIComponent(targetsString)}`
-  }
-  if (params.blacklist.length > 0) {
-    gauUrl += `&blacklist=${params.blacklist.join(",")}`
-  }
-  if (params.fc.length > 0) {
-    gauUrl += `&fc=${params.fc.join(",")}`
-  }
-  if (params.fromDate) {
-    gauUrl += `&fromDate=${params.fromDate}`
-  }
-  if (params.ft.length > 0) {
-    gauUrl += `&ft=${params.ft.join(",")}`
-  }
-  if (params.fp) {
-    gauUrl += `&fp=true`
-  }
-  if (params.mc.length > 0) {
-    gauUrl += `&mc=${params.mc.join(",")}`
-  }
-  if (params.mt.length > 0) {
-    gauUrl += `&mt=${params.mt.join(",")}`
-  }
-  if (params.providers.length > 0) {
-    gauUrl += `&providers=${params.providers.join(",")}`
-  }
-  if (params.includeSubdomains) {
-    gauUrl += `&subs=true`
-  }
-  if (params.toDate) {
-    gauUrl += `&toDate=${params.toDate}`
-  }
-
   const headers = createGKEHeaders()
 
   const stream = new ReadableStream({
@@ -293,7 +225,84 @@ export async function handleGauRequest(
       }
 
       if (invokedByToolId) {
-        sendMessage(aiResponse, true)
+        try {
+          for await (const chunk of processAIResponseAndUpdateMessage(
+            lastMessage,
+            transformUserQueryToGAUCommand,
+            OpenAIStream,
+            model,
+            messagesToSend,
+            answerMessage
+          )) {
+            sendMessage(chunk, false)
+            aiResponse += chunk
+          }
+
+          sendMessage("\n\n")
+          lastMessage.content = getCommandFromAIResponse(
+            lastMessage,
+            messagesToSend,
+            aiResponse
+          )
+        } catch (error) {
+          console.error(
+            "Error processing AI response and updating message:",
+            error
+          )
+          return new Response(`Error processing AI response: ${error}`)
+        }
+      }
+
+      const parts = lastMessage.content.split(" ")
+      if (parts.includes("-h") || parts.includes("-help")) {
+        sendMessage(displayHelpGuide(), true)
+        controller.close()
+        return
+      }
+
+      const params = parseGauCommandLine(lastMessage.content)
+
+      if (params.error && invokedByToolId) {
+        return new Response(`\n\n${params.error}`)
+      } else if (params.error) {
+        return new Response(`${params.error}`)
+      }
+
+      let gauUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/gau?`
+
+      if (Array.isArray(params.targets)) {
+        const targetsString = params.targets.join(" ")
+        gauUrl += `target=${encodeURIComponent(targetsString)}`
+      }
+      if (params.blacklist.length > 0) {
+        gauUrl += `&blacklist=${params.blacklist.join(",")}`
+      }
+      if (params.fc.length > 0) {
+        gauUrl += `&fc=${params.fc.join(",")}`
+      }
+      if (params.fromDate) {
+        gauUrl += `&fromDate=${params.fromDate}`
+      }
+      if (params.ft.length > 0) {
+        gauUrl += `&ft=${params.ft.join(",")}`
+      }
+      if (params.fp) {
+        gauUrl += `&fp=true`
+      }
+      if (params.mc.length > 0) {
+        gauUrl += `&mc=${params.mc.join(",")}`
+      }
+      if (params.mt.length > 0) {
+        gauUrl += `&mt=${params.mt.join(",")}`
+      }
+      if (params.providers.length > 0) {
+        gauUrl += `&providers=${params.providers.join(",")}`
+      }
+      if (params.includeSubdomains) {
+        gauUrl += `&subs=true`
+      }
+      if (params.toDate) {
+        gauUrl += `&toDate=${params.toDate}`
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
