@@ -11,7 +11,11 @@ export async function POST(request: Request) {
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider:
+      | "openai"
+      | "local"
+      | "multilingual-e5-large"
+      | "multilingual-e5-small"
     sourceCount: number
   }
 
@@ -94,12 +98,44 @@ export async function POST(request: Request) {
         }
         chunks = localFileItems
       }
+    } else if (
+      embeddingsProvider === "multilingual-e5-large" ||
+      embeddingsProvider === "multilingual-e5-small"
+    ) {
+      const customOpenai = new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: "DUMMY"
+      })
+      const response = await customOpenai.embeddings.create({
+        model: embeddingsProvider,
+        input: userInput
+      })
+
+      const openaiEmbedding = response.data.map(item => item.embedding)[0]
+      if (process.env.EMBEDDING_STORAGE == "qdrant") {
+        const qclient = new qDrant()
+        chunks = await qclient.searchEmbeddings(
+          uniqueFileIds,
+          profile.user_id,
+          openaiEmbedding
+        )
+      } else {
+        const { data: openaiFileItems, error: openaiError } =
+          await supabaseAdmin.rpc("match_file_items_openai", {
+            query_embedding: openaiEmbedding as any,
+            match_count: sourceCount,
+            file_ids: uniqueFileIds
+          })
+        if (openaiError) {
+          throw openaiError
+        }
+        chunks = openaiFileItems
+      }
     }
 
     const mostSimilarChunks = chunks?.sort(
       (a, b) => b.similarity - a.similarity
     )
-    console.log(mostSimilarChunks)
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })

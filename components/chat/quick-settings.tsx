@@ -116,6 +116,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
           embeddingsProvider: selectedWorkspace.embeddings_provider as
             | "openai"
             | "local"
+            | "multilingual-e5-large"
+            | "multilingual-e5-small"
         })
       }
       return
@@ -128,7 +130,11 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       contextLength: item.context_length,
       includeProfileContext: item.include_profile_context,
       includeWorkspaceInstructions: item.include_workspace_instructions,
-      embeddingsProvider: item.embeddings_provider as "openai" | "local"
+      embeddingsProvider: item.embeddings_provider as
+        | "openai"
+        | "local"
+        | "multilingual-e5-large"
+        | "multilingual-e5-small"
     })
   }
 

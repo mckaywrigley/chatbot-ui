@@ -166,7 +166,11 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       includeWorkspaceInstructions:
         workspace?.include_workspace_instructions || true,
       embeddingsProvider:
-        (workspace?.embeddings_provider as "openai" | "local") || "openai"
+        (workspace?.embeddings_provider as
+          | "openai"
+          | "local"
+          | "multilingual-e5-large",
+        "multilingual-e5-small") || "openai"
     })
 
     setLoading(false)

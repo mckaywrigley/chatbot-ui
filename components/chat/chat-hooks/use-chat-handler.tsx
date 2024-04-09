@@ -111,6 +111,8 @@ export const useChatHandler = () => {
         embeddingsProvider: selectedAssistant.embeddings_provider as
           | "openai"
           | "local"
+          | "multilingual-e5-large"
+          | "multilingual-e5-small"
       })
 
       let allFiles = []
@@ -155,6 +157,8 @@ export const useChatHandler = () => {
         embeddingsProvider: selectedPreset.embeddings_provider as
           | "openai"
           | "local"
+          | "multilingual-e5-large"
+          | "multilingual-e5-small"
       })
     } else if (selectedWorkspace) {
       // setChatSettings({

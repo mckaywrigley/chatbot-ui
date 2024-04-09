@@ -104,6 +104,22 @@ export async function POST(req: Request) {
       })
 
       embeddings = await Promise.all(embeddingPromises)
+    } else if (
+      embeddingsProvider === "multilingual-e5-large" ||
+      embeddingsProvider === "multilingual-e5-small"
+    ) {
+      const customOpenai = new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: "DUMMY"
+      })
+      const response = await customOpenai.embeddings.create({
+        model: embeddingsProvider,
+        input: chunks.map(chunk => chunk.content)
+      })
+
+      embeddings = response.data.map((item: any) => {
+        return item.embedding
+      })
     }
     let totalTokens: number
     if (process.env.EMBEDDING_STORAGE == "qdrant") {
