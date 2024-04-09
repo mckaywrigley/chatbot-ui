@@ -35,7 +35,7 @@ export class qDrant {
       await this.qclient.getCollection(user_id)
     } catch {
       await this.qclient.createCollection(user_id, {
-        vectors: { size: embeddings[0].length, distance: "Dot" }
+        vectors: { size: embeddings[0].length, distance: "Cosine" }
       })
     }
     const file_items = chunks.map((chunk, index) => ({

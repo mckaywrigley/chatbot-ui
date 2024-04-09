@@ -45,6 +45,7 @@ export async function POST(req: Request) {
     let chunks: FileItemChunk[] = []
 
     switch (fileExtension) {
+      case "application/csv":
       case "csv":
         chunks = await processCSV(blob)
         break
