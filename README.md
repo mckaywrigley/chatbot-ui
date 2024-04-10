@@ -1,6 +1,6 @@
 # Chatbot UI
 
-[![Community Discord](https://dcbadge.vercel.app/api/server/bQeGME3U?style=flat)](https://discord.gg/bQeGME3U)
+[![Community Discord](https://dcbadge.vercel.app/api/server/bm89NuxyHX?style=flat)](https://discord.gg/bm89NuxyHX)
 
 The open-source AI chat app for everyone.
 
