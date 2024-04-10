@@ -202,7 +202,6 @@ export const Folder: FC<FolderProps> = ({
                   </div>
                 </li>
 
-                <hr className="dark:border-pixelspace-gray-70" />
                 <li className="mt-1">
                   <div>
                     <DeleteFolder folder={folder} contentType={contentType} />
