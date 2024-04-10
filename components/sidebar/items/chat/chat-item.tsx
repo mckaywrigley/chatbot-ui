@@ -190,7 +190,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
               </div>
             </li>
 
-            <hr className="border-pixelspace-gray-70" />
             <li className="mt-1">
               <div>
                 <DeleteChat chat={chat} />
