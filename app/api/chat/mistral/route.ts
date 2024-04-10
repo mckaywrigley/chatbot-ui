@@ -7,7 +7,7 @@ import {
   updateOrAddSystemMessage,
   wordReplacements
 } from "@/lib/ai-helper"
-import PineconeRetriever from "@/lib/models/query-pinecone-2v"
+import RetrieverReranker from "@/lib/models/query-pinecone-2v"
 
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
@@ -46,13 +46,13 @@ export async function POST(request: Request) {
     if (chatSettings.model === "mistral-large") {
       selectedModel = llmConfig.models.hackerGPT_pro
 
-      similarityTopK = 3
+      similarityTopK = 4
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
     } else {
       selectedModel = llmConfig.models.hackerGPT_default
 
-      similarityTopK = 2
+      similarityTopK = 3
 
       rateLimitCheckResult = await checkRatelimitOnApi(
         profile.user_id,
@@ -104,9 +104,10 @@ export async function POST(request: Request) {
           openRouterHeaders
         )
 
-        const pineconeRetriever = new PineconeRetriever(
+        const pineconeRetriever = new RetrieverReranker(
           llmConfig.openai.apiKey,
           llmConfig.pinecone,
+          llmConfig.cohere,
           similarityTopK
         )
 
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
             `---------------------\n` +
             `${pineconeResults}\n` +
             `---------------------\n` +
-            `DON'T MENTION OR REFERENCE ANYTHING RELATED TO RAG CONTENT OR ANYTHING RELATED TO RAG. ROLE PLAY.`
+            `DON'T MENTION OR REFERENCE ANYTHING RELATED TO RAG CONTENT OR ANYTHING RELATED TO RAG. USER DOESN'T HAVE DIRECT ACCESS TO THIS CONTENT, ITS PURPOSE IS TO ENRICH YOUR OWN KNOWLEDGE. ROLE PLAY.`
         }
       }
     }
@@ -255,10 +256,19 @@ Input:
 - Chat History: """${chatHistory}"""
 - Follow Up: """${latestUserMessage}"""
 
-Objective 2: Generate an answer for the user question using the best of your knowledge.
+Objective 2: Generate five diverse answers for the user question using the best of your knowledge. 
 
 Output:
-The rephrased standalone question to ask the specialist and then your answer to the user question.`
+The rephrased standalone question to ask the specialist and then your answer to the user question. Use the following format:
+<Standalone Question>{Your standalone question here}</Standalone Question>
+<Answers>
+  <Answer>{Your Answer 1}</Answer>
+  <Answer>{Your Answer 2}</Answer>
+  <Answer>{Your Answer 3}</Answer>
+  <Answer>{Your Answer 4}</Answer>
+  <Answer>{Your Answer 5}</Answer>
+</Answers>
+`
 
   const firstMessage = messages[0]
     ? messages[0]
@@ -273,7 +283,7 @@ The rephrased standalone question to ask the specialist and then your answer to 
         { role: "user", content: template }
       ],
       temperature: 1.0, // High temperature for creativity
-      max_tokens: 256
+      max_tokens: 1024
     }
 
     const res = await fetch(openRouterUrl, {

@@ -18,6 +18,10 @@ const llmConfig = {
       max: parseInt(process.env.MAX_LAST_MESSAGE_LENGTH || "1000", 10)
     }
   },
+  cohere: {
+    rerank: (process.env.USE_COHERE_RERANK || "false").toLowerCase() == "true",
+    apiKey: process.env.SECRET_COHERE_API_KEY || "defaultApiKey"
+  },
   systemPrompts: {
     hackerGPT: process.env.SECRET_HACKERGPT_SYSTEM_PROMPT,
     pinecone: process.env.PINECONE_SYSTEM_PROMPT
