@@ -11,6 +11,7 @@ import RetrieverReranker from "@/lib/models/query-pinecone-2v"
 
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
+import endent from "endent"
 
 class APIError extends Error {
   code: any
@@ -242,33 +243,23 @@ async function generateStandaloneQuestion(
     .join("\n")
 
   // Compressed prompt with HyDE
-  const template = `
+  const template = endent`
   Your are HackerGPT is an expert in hacking, particularly in the areas of bug bounty, hacking, penetration testing. You are having a conversation with an user and you want to enrich your answer with some expert knowledge.
   Objective 1: Craft a standalone question for a specialist who is unfamiliar with the conversation, based on the given follow-up question and chat history. The question should:
 
-1. Emphasize relevant keywords
-2. Seek specific actions or information 
-3. Provide full context while being concise
-4. Be phrased as a clear, direct question
-5. Exclude irrelevant details
+  1. Emphasize relevant keywords
+  2. Seek specific actions or information 
+  3. Provide full context while being concise
+  4. Be phrased as a clear, direct question
+  5. Exclude irrelevant details
 
-Input:
-- Chat History: """${chatHistory}"""
-- Follow Up: """${latestUserMessage}"""
+  Input:
+  - Chat History: """${chatHistory}"""
+  - Follow Up: """${latestUserMessage}"""
 
-Objective 2: Generate five diverse answers for the user question using the best of your knowledge. 
-
-Output:
-The rephrased standalone question to ask the specialist and then your answer to the user question. Use the following format:
-<Standalone Question>{Your standalone question here}</Standalone Question>
-<Answers>
-  <Answer>{Your Answer 1}</Answer>
-  <Answer>{Your Answer 2}</Answer>
-  <Answer>{Your Answer 3}</Answer>
-  <Answer>{Your Answer 4}</Answer>
-  <Answer>{Your Answer 5}</Answer>
-</Answers>
-`
+  Output:
+  The rephrased standalone question to ask the specialist. Use the following format:
+  <Standalone Question>{Your standalone question here}</Standalone Question>`
 
   const firstMessage = messages[0]
     ? messages[0]
@@ -283,7 +274,7 @@ The rephrased standalone question to ask the specialist and then your answer to 
         { role: "user", content: template }
       ],
       temperature: 1.0, // High temperature for creativity
-      max_tokens: 1024
+      max_tokens: 256
     }
 
     const res = await fetch(openRouterUrl, {

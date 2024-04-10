@@ -29,7 +29,13 @@ class RetrieverReranker {
       .replace(/{% content-ref url="[^"]+" %}.*?{% endcontent-ref %}/gs, "")
   }
 
-  private textBuilder(match: { metadata: { _node_content: string; document_title: string; section_summary: string } }): string {
+  private textBuilder(match: {
+    metadata: {
+      _node_content: string
+      document_title: string
+      section_summary: string
+    }
+  }): string {
     const nodeContent = JSON.parse(match.metadata._node_content)
     return (
       match.metadata.document_title +
@@ -70,21 +76,13 @@ class RetrieverReranker {
   }
 
   async retrieve(question: string): Promise<string> {
+    // Adjusted RegExp to match both closed and unclosed <Standalone Question> tags
     const standaloneQuestionRegExp =
-      /<Standalone Question>(.*?)<\/Standalone Question>/gs
-    const standaloneQuestionMatch = question.match(standaloneQuestionRegExp)
-    const answersRegExp = /<Answer>(.*?)<\/Answer>/gs
-    const matches = question.match(answersRegExp)
+      /<Standalone Question>(.*?)<\/?Standalone Question>/gs
+    const matches = question.match(standaloneQuestionRegExp)
     const docsToEmbed = matches
-      ? matches.map(match => match.replace(/<\/?Answer>/g, ""))
+      ? matches.map(match => match.replace(/<\/?Standalone Question>/g, ""))
       : [question]
-    if (standaloneQuestionMatch) {
-      docsToEmbed.push(
-        ...standaloneQuestionMatch.map(match =>
-          match.replace(/<\/?Standalone Question>/g, "")
-        )
-      )
-    }
     // console.log("docsToEmbed: ", docsToEmbed)
     const queryEmbedding = await this.embedModel.embedDocuments(docsToEmbed)
 
@@ -126,9 +124,7 @@ class RetrieverReranker {
     // Remove duplicates based on nodeContent.text
     const uniqueMatches = retrievedData.reduce((acc: any[], match: any) => {
       const textContent = this.textBuilder(match)
-      if (
-        !acc.find(m => this.textBuilder(m) === textContent)
-      ) {
+      if (!acc.find(m => this.textBuilder(m) === textContent)) {
         acc.push(match)
       }
       return acc
@@ -144,8 +140,8 @@ class RetrieverReranker {
 
       const isolatedQuestion =
         question
-          .match(/<Standalone Question>(.*?)<\/Standalone Question>/)?.[1]
-          .trim() || question
+          .match(/<Standalone Question>(.*?)<\/?Standalone Question>/)?.[1]
+          ?.trim() || question
 
       // Rerank the chunks using cohere
       const rerankedMatches = await cohere.rerank({
@@ -168,7 +164,7 @@ class RetrieverReranker {
 
       return cohereFormattedResults.length > 0 ? cohereFormattedResults : "None"
     }
-    // console.log(uniqueMatches)
+
     // Filter out matches with scores below 0.5
     const highScoreMatches = uniqueMatches.filter((match: any) => {
       if (match.score <= 0.5) return false
