@@ -264,10 +264,13 @@ export async function handleAlterxRequest(
           const noDataMessage = `🔍 Unable to generate wordlist for "${params.list.join(
             ", "
           )}"`
+          clearInterval(intervalId)
           sendMessage(noDataMessage, true)
+          controller.close()
           return
         }
 
+        clearInterval(intervalId)
         sendMessage(
           "✅ Wordlist generation complete! Now finalizing the results...'",
           true
@@ -280,16 +283,17 @@ export async function handleAlterxRequest(
           results: subdomains
         })
         sendMessage(formattedResults, true)
+
+        controller.close()
       } catch (error) {
+        isFetching = false
+        clearInterval(intervalId)
         console.error("Error:", error)
         const errorMessage =
           error instanceof Error
             ? `🚨 Error: ${error.message}`
             : "🚨 There was a problem during the scan. Please try again."
         sendMessage(errorMessage, true)
-      } finally {
-        isFetching = false
-        clearInterval(intervalId)
         controller.close()
       }
     }
