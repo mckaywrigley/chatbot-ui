@@ -63,7 +63,6 @@ export default function SetupPage() {
 
   useEffect(() => {
     ;(async () => {
-      console.log("SetupPage useEffect")
       const session = (await supabase.auth.getSession()).data.session
 
       if (!session) {
