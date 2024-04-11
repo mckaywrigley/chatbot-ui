@@ -265,8 +265,8 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 8,
-    name: "HttpX",
-    selectorName: "HttpX: Web Analysis",
+    name: "HTTPX",
+    selectorName: "HTTPX: Web Analysis",
     value: PluginID.HTTPX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:

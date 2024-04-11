@@ -24,6 +24,14 @@ const displayHelpGuide = () => {
   return `
   [Nuclei](${pluginUrls.Nuclei}) is a fast exploitable vulnerability scanner designed to probe modern applications, infrastructure, cloud platforms, and networks, aiding in the identification and mitigation of vulnerabilities. 
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Engage with Nuclei by describing your vulnerability scanning needs in plain language. The AI will interpret your request and automatically configure and execute the appropriate command using Nuclei, simplifying the user experience.
+  
+  **Direct Commands:**
+  Utilize direct commands to precisely control the scanning process. Begin your command with "/" followed by the necessary flags to tailor your scans to specific targets and conditions.
+  
     Usage:
        /nuclei [flags]
   
@@ -859,9 +867,13 @@ export async function handleNucleiRequest(
       const params = parseCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let nucleiUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/nuclei`

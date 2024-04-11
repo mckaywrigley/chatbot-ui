@@ -22,6 +22,14 @@ const displayHelpGuide = () => {
   return `
   [GoLinkFinder](${pluginUrls.GoLinkFinder}) is a minimalistic JavaScript endpoint extractor that efficiently pulls endpoints from HTML and embedded JavaScript files. 
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Interact with GoLinkFinder using plain language to describe your endpoint extraction needs. The AI will understand your input and automatically execute the corresponding command with GoLinkFinder, simplifying the process for intuitive use.
+  
+  **Direct Commands:**
+  For precise and specific tasks, use direct commands. Begin your command with "/" and include necessary flags to control the extraction process effectively.
+  
     Usage:
        /golinkfinder --domain [domain]
 
@@ -160,9 +168,13 @@ export async function handleGolinkfinderRequest(
       const params = parseGoLinkFinderCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let golinkfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/golinkfinder?`

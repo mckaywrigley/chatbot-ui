@@ -24,6 +24,14 @@ const displayHelpGuide = () => {
   return `
   [Alterx](${pluginUrls.Alterx}) is a fast and customizable subdomain wordlist generator using DSL.
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Interact with AlterX using plain language to describe your requirements for generating subdomain wordlists. The AI understands your input and performs the necessary operations, offering a user-friendly and intuitive experience.
+
+  **Direct Commands:**
+  For precise control, use direct commands. Begin with "/" followed by the command and specific flags to accurately configure your subdomain wordlist generation tasks.
+
     Usage:
        /alterx [flags]
 
@@ -43,7 +51,6 @@ interface AlterxParams {
   enrich: boolean
   limit: number
   payload: Map<string, string>
-  fileContent: string
   error: string | null
 }
 
@@ -59,7 +66,6 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
     enrich: false,
     limit: 0,
     payload: new Map(),
-    fileContent: "",
     error: null
   }
 
@@ -204,30 +210,36 @@ export async function handleAlterxRequest(
       const params = parseAlterxCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let alterxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/alterx`
 
       let requestBody: Partial<AlterxParams> = {}
 
-      if (params.list.length > 0) {
-        requestBody.list = params.list
+      for (const [key, value] of Object.entries(params)) {
+        if (
+          (Array.isArray(value) && value.length > 0) ||
+          (typeof value === "boolean" && value) ||
+          (typeof value === "number" && value > 0) ||
+          (typeof value === "string" && value.length > 0)
+        ) {
+          ;(requestBody as any)[key] = value
+        }
       }
-      if (params.pattern.length > 0) {
-        requestBody.pattern = params.pattern
-      }
-      if (params.enrich) {
-        requestBody.enrich = true
-      }
-      if (params.limit > 0) {
-        requestBody.limit = params.limit
-      }
-      // FILE
-      if (fileContentIncluded) {
-        requestBody.fileContent = fileContent
+
+      if (
+        fileContentIncluded &&
+        typeof fileContent === "string" &&
+        fileContent.length > 0
+      ) {
+        ;(requestBody as any).fileContent = fileContent
       }
 
       sendMessage(

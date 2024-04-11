@@ -24,6 +24,14 @@ const displayHelpGuide = () => {
   return `
   [Naabu](${pluginUrls.Naabu}) is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists all ports that return a reply. 
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Engage with Naabu by describing your port scanning needs in plain language. The AI will understand your requirements and automatically execute the appropriate command with Naabu, facilitating an intuitive and streamlined user experience.
+  
+  **Direct Commands:**
+  Utilize direct commands for detailed control over the scanning process. Commands start with "/" and are followed by relevant options and flags to specifically tailor your port scans.
+  
     Usage:
        /naabu [flags]
 
@@ -42,7 +50,7 @@ const displayHelpGuide = () => {
 
     CONFIGURATION:
        -scan-all-ips, -sa   scan all the IP's associated with DNS record
-       -timeout int         seconds to wait before timing out (default 10)
+       -timeout int         milliseconds to wait before timing out (default 1000)
     
     HOST-DISCOVERY:
        -sn, -host-discovery            Perform Only Host Discovery
@@ -105,7 +113,7 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
     arpPing: false,
     ndPing: false,
     revPtr: false,
-    timeout: 10,
+    timeout: 10000,
     outputJson: false,
     error: null
   }
@@ -258,8 +266,8 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
       case "-timeout":
         if (args[i + 1] && isInteger(args[i + 1])) {
           let timeoutValue = parseInt(args[++i])
-          if (timeoutValue > 90) {
-            params.error = `🚨 Timeout value exceeds the maximum limit of 90 seconds`
+          if (timeoutValue > 90000) {
+            params.error = `🚨 Timeout value exceeds the maximum limit of 90000 milliseconds`
             return params
           }
           params.timeout = timeoutValue
@@ -360,95 +368,38 @@ export async function handleNaabuRequest(
       const params = parseNaabuCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let naabuUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/naabu`
 
-      interface NaabuRequestBody {
-        host?: string | string[]
-        port?: string
-        timeout?: number
-        scanAllIPs?: boolean
-        outputJson?: boolean
-        topPorts?: string
-        excludePorts?: string
-        portThreshold?: number
-        excludeCDN?: boolean
-        displayCDN?: boolean
-        hostDiscovery?: boolean
-        skipHostDiscovery?: boolean
-        probeIcmpEcho?: boolean
-        probeIcmpTimestamp?: boolean
-        probeIcmpAddressMask?: boolean
-        arpPing?: boolean
-        ndPing?: boolean
-        revPtr?: boolean
-        fileContent?: string
+      let requestBody: Partial<NaabuParams> = {}
+
+      for (const [key, value] of Object.entries(params)) {
+        if (
+          (Array.isArray(value) && value.length > 0) ||
+          (typeof value === "boolean" && value) ||
+          (typeof value === "number" &&
+            value > 0 &&
+            !(key === "timeout" && value === 10000)) ||
+          (typeof value === "string" && value.length > 0)
+        ) {
+          ;(requestBody as any)[key] = value
+        }
       }
 
-      let requestBody: NaabuRequestBody = {}
-
-      if (params.host) {
-        requestBody.host = params.host
-      }
-      if (params.port) {
-        requestBody.port = params.port
-      }
-      if (params.timeout && params.timeout !== 10) {
-        requestBody.timeout = params.timeout * 1000
-      }
-      if (params.scanAllIPs) {
-        requestBody.scanAllIPs = params.scanAllIPs
-      }
-      if (params.outputJson) {
-        requestBody.outputJson = params.outputJson
-      }
-      if (params.topPorts) {
-        requestBody.topPorts = params.topPorts
-      }
-      if (params.excludePorts) {
-        requestBody.excludePorts = params.excludePorts
-      }
-      if (params.portThreshold && params.portThreshold > 0) {
-        requestBody.portThreshold = params.portThreshold
-      }
-      if (params.excludeCDN) {
-        requestBody.excludeCDN = params.excludeCDN
-      }
-      if (params.displayCDN) {
-        requestBody.displayCDN = params.displayCDN
-      }
-      if (params.hostDiscovery) {
-        requestBody.hostDiscovery = params.hostDiscovery
-      }
-      if (params.skipHostDiscovery) {
-        requestBody.skipHostDiscovery = params.skipHostDiscovery
-      }
-      if (params.probeIcmpEcho) {
-        requestBody.probeIcmpEcho = params.probeIcmpEcho
-      }
-      if (params.probeIcmpTimestamp) {
-        requestBody.probeIcmpTimestamp = params.probeIcmpTimestamp
-      }
-      if (params.probeIcmpAddressMask) {
-        requestBody.probeIcmpAddressMask = params.probeIcmpAddressMask
-      }
-      if (params.arpPing) {
-        requestBody.arpPing = params.arpPing
-      }
-      if (params.ndPing) {
-        requestBody.ndPing = params.ndPing
-      }
-      if (params.revPtr) {
-        requestBody.revPtr = params.revPtr
-      }
-
-      // FILE
-      if (fileContentIncluded) {
-        requestBody.fileContent = fileContent
+      if (
+        fileContentIncluded &&
+        typeof fileContent === "string" &&
+        fileContent.length > 0
+      ) {
+        ;(requestBody as any).fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -575,7 +526,7 @@ const transformUserQueryToNaabuCommand = (
     - -exclude-cdn: Exclude full port scans for CDN/WAF. (optional)
     - -display-cdn: Display CDN in use. (optional)
     - -scan-all-ips: Scan all IPs associated with a DNS record. (optional)
-    - -timeout int: Set a timeout limit in seconds (default is 10). (optional)
+    - -timeout int: Milliseconds to wait before timing out (default 1000). (optional)
     - -host-discovery: Perform only host discovery. (optional)
     - -skip-host-discovery: Skip host discovery. (optional)
     - -probe-icmp-echo: Use ICMP echo request ping. (optional)

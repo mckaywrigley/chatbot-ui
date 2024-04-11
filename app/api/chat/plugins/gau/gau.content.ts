@@ -22,6 +22,14 @@ const displayHelpGuide = () => {
   return `
   [GAU](${pluginUrls.Gau}) is a powerful web scraping tool that fetches known URLs from multiple sources, including AlienVault&apos;s Open Threat Exchange, the Wayback Machine, and Common Crawl. 
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Engage with GAU conversationally by simply describing your URL fetching needs in plain language. The AI will interpret your input and carry out the necessary operations automatically, providing an intuitive and user-friendly experience.
+  
+  **Direct Commands:**
+  Use direct commands for meticulous control. Start with "/" followed by the command and applicable flags to perform specific URL fetching tasks tailored to your requirements.
+  
     Usage:
        /gau [target] [flags]
 
@@ -263,9 +271,13 @@ export async function handleGauRequest(
       const params = parseGauCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let gauUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/gau?`

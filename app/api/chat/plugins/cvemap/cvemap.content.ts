@@ -22,6 +22,14 @@ const displayHelpGuide = () => {
   return `
   [CVEMap](${pluginUrls.CVEmap}) is an open-source command-line interface (CLI) tool that allows you to explore Common Vulnerabilities and Exposures (CVEs).
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Engage conversationally by describing your CVE search needs in plain language. The AI will interpret your request and seamlessly execute the relevant command using CVEMap, making it user-friendly for those who prefer intuitive interactions.
+  
+  **Direct Commands:**
+  Use direct commands by starting with "/" followed by the command and its specific flags. This method provides exact control, enabling detailed and targeted searches within the CVE database.
+  
     Usage:
        /cvemap [flags]
   
@@ -284,9 +292,13 @@ export async function handleCvemapRequest(
       const params = parseCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       interface CvemapRequestBody {

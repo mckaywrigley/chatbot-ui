@@ -22,6 +22,14 @@ const displayHelpGuide = () => {
   return `
   [Subfinder](${pluginUrls.Subfinder}) is a powerful subdomain discovery tool designed to enumerate and uncover valid subdomains of websites efficiently through passive online sources. 
 
+  ## Interaction Methods
+
+  **Conversational AI Requests:**
+  Engage with Subfinder by describing your subdomain discovery needs in plain language. The AI will interpret your request and automatically execute the relevant command with Subfinder, offering a user-friendly interface for those who prefer intuitive interactions.
+  
+  **Direct Commands:**
+  Utilize direct commands for granular control over subdomain discovery. Start your command with "/" followed by the necessary flags to specify detailed parameters for the scan.
+  
     Usage:
        /subfinder [flags]
   
@@ -272,9 +280,13 @@ export async function handleSubfinderRequest(
       const params = parseCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`${aiResponse}\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(params.error)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let subfinderUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/subfinder?`

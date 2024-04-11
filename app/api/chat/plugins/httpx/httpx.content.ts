@@ -22,10 +22,16 @@ export const isHttpxCommand = (message: string) => {
 
 const displayHelpGuide = () => {
   return `
-  [HTTPX](${pluginUrls.Httpx}) is a fast and multi-purpose HTTP toolkit built to support running multiple probes using a public library. Probes are specific tests or checks to gather information about web servers, URLs, or other HTTP elements. Httpx is designed to maintain result reliability with an increased number of threads. 
+  [HTTPX](${pluginUrls.Httpx}) is a fast and multi-purpose HTTP toolkit built to support running multiple probes using a public library. Probes are specific tests or checks to gather information about web servers, URLs, or other HTTP elements. HTTPX is designed to maintain result reliability with an increased number of threads. 
 
-  Typically, users employ httpx to efficiently identify and analyze web server configurations, verify HTTP responses, and diagnose potential vulnerabilities or misconfigurations. It can also be in a pipeline that transitions from asset identification to technology enrichment and then feeds into detection of vulnerabilities.
+  ## Interaction Methods
 
+  **Conversational AI Requests:**
+  Engage with HttpX by describing your web server analysis needs in plain language. The AI will interpret your request and automatically configure and execute the appropriate command using HTTPX, making it user-friendly for intuitive use.
+  
+  **Direct Commands:**
+  Use direct commands to exert granular control over the probing process. Start your command with "/" followed by the necessary flags to specifically tailor your HTTP investigations.
+  
     Usage:
        /httpx [flags]
   
@@ -772,9 +778,13 @@ export async function handleHttpxRequest(
       const params = parseCommandLine(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let httpxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/httpx`
@@ -1057,7 +1067,7 @@ export async function handleHttpxRequest(
 
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
-          pluginName: "httpX",
+          pluginName: "HTTPX",
           pluginUrl: pluginUrls.Httpx,
           target: target,
           results: urlsFormatted

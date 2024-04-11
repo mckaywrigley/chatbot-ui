@@ -222,9 +222,13 @@ export async function handleCyberchefRequest(
       const params = parseCyberChefJSONInput(lastMessage.content)
 
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let cyberchefUrl = `${process.env.SECRET_CYBERCHEF_BASE_URL}`

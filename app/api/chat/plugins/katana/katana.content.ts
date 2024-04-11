@@ -21,49 +21,44 @@ export const isKatanaCommand = (message: string) => {
 }
 
 const displayHelpGuide = () => {
-  const helpPrefix = "```\nUsage:\n" + "   katana [flags]\n\n" + "Flags:\n"
+  return `
+  [Katana](${pluginUrls.Katana}) is a fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.
+  ## Interaction Methods
 
-  const sections = {
-    input: "INPUT:\n" + "  -u, -list string[]  target url / list to crawl\n",
-    configuration:
-      "CONFIGURATION:\n" +
-      "  -jc, -js-crawl               enable endpoint parsing / crawling in javascript file\n" +
-      "  -iqp, -ignore-query-params   Ignore crawling same path with different query-param values\n" +
-      "  -timeout int                 time to wait for request in seconds (default 15)\n",
-    headless:
-      "HEADLESS:\n" +
-      // '  -hl, -headless          enable headless hybrid crawling (experimental)\n' +
-      "  -xhr, -xhr-extraction   extract xhr request url,method in jsonl output\n",
-    scope:
-      "SCOPE:\n" +
-      "  -cs, -crawl-scope string[]        in scope url regex to be followed by crawler\n" +
-      "  -cos, -crawl-out-scope string[]   out of scope url regex to be excluded by crawler\n" +
-      "  -do, -display-out-scope           display external endpoint from scoped crawling\n",
-    filter:
-      "FILTER:\n" +
-      "  -mr, -match-regex string[]        regex or list of regex to match on output url (cli, file)\n" +
-      "  -fr, -filter-regex string[]       regex or list of regex to filter on output url (cli, file)\n" +
-      "  -em, -extension-match string[]    match output for given extension (eg, -em php,html,js)\n" +
-      "  -ef, -extension-filter string[]   filter output for given extension (eg, -ef png,css)\n" +
-      "  -mdc, -match-condition string     match response with dsl based condition\n" +
-      "  -fdc, -filter-condition string    filter response with dsl based condition\n"
-  }
+  **Conversational AI Requests:**
+  Interact with Katana conversationally by simply describing your web crawling needs in plain language. The AI will understand your requirements and automatically configure and execute the appropriate Katana command, facilitating an intuitive user experience.
+    
+  **Direct Commands:**
+  Use direct commands to specifically control the crawling process. Begin your command with the program name followed by relevant flags to precisely define the crawling scope and parameters.
+  
+    Usage:
+       /katana [flags]
+  
+    Flags:
+    INPUT:
+       -u, -list string[]  target url / list to crawl
 
-  const fullHelpGuide =
-    `[Katana](${pluginUrls.Katana}) is a fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.\n\n` +
-    helpPrefix +
-    sections.input +
-    "\n" +
-    sections.configuration +
-    "\n" +
-    sections.headless +
-    "\n" +
-    sections.scope +
-    "\n" +
-    sections.filter +
-    "\n```"
+    CONFIGURATION:
+       -d, -depth int               maximum depth to crawl (default 3)
+       -jc, -js-crawl               enable endpoint parsing / crawling in javascript file
+       -timeout int                 time to wait for request in seconds (default 15)
+       -iqp, -ignore-query-params   Ignore crawling same path with different query-param values
 
-  return fullHelpGuide
+    HEADLESS:
+       -xhr, -xhr-extraction   extract xhr request url,method in jsonl output
+
+    SCOPE:
+       -cs, -crawl-scope string[]        in scope url regex to be followed by crawler
+       -cos, -crawl-out-scope string[]   out of scope url regex to be excluded by crawler
+       -do, -display-out-scope           display external endpoint from scoped crawling
+
+    FILTER:
+       -mr, -match-regex string[]        regex or list of regex to match on output url (cli, file)
+       -fr, -filter-regex string[]       regex or list of regex to filter on output url (cli, file)
+       -em, -extension-match string[]    match output for given extension (eg, -em php,html,js)
+       -ef, -extension-filter string[]   filter output for given extension (eg, -ef png,css)
+       -mdc, -match-condition string     match response with dsl based condition
+       -fdc, -filter-condition string    filter response with dsl based condition`
 }
 
 interface KatanaParams {
@@ -84,7 +79,6 @@ interface KatanaParams {
   filterCondition: string
   timeout: number
   error: string | null
-  help?: string
 }
 
 const parseKatanaCommandLine = (input: string): KatanaParams => {
@@ -109,8 +103,7 @@ const parseKatanaCommandLine = (input: string): KatanaParams => {
     matchCondition: "",
     filterCondition: "",
     timeout: 15,
-    error: null,
-    help: undefined
+    error: null
   }
 
   if (input.length > MAX_INPUT_LENGTH) {
@@ -416,9 +409,13 @@ export async function handleKatanaRequest(
 
       const params = parseKatanaCommandLine(lastMessage.content)
       if (params.error && invokedByToolId) {
-        return new Response(`\n\n${params.error}`)
+        sendMessage(`\n\n${params.error}`, true)
+        controller.close()
+        return
       } else if (params.error) {
-        return new Response(`${params.error}`)
+        sendMessage(`${params.error}`, true)
+        controller.close()
+        return
       }
 
       let katanaUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/katana`
@@ -443,60 +440,28 @@ export async function handleKatanaRequest(
         fileContent?: string
       }
 
-      let requestBody: KatanaRequestBody = {}
+      let requestBody: Partial<KatanaParams> = {}
 
-      if (params.urls && params.urls.length > 0) {
-        requestBody.urls = params.urls
-      }
-      if (params.depth && params.depth !== 3) {
-        requestBody.depth = params.depth
-      }
-      if (params.jsCrawl) {
-        requestBody.jsCrawl = params.jsCrawl
-      }
-      if (params.ignoreQueryParams) {
-        requestBody.ignoreQueryParams = params.ignoreQueryParams
-      }
-      if (params.headless) {
-        requestBody.headless = params.headless
-      }
-      if (params.xhrExtraction) {
-        requestBody.xhrExtraction = params.xhrExtraction
-      }
-      if (params.crawlScope && params.crawlScope.length > 0) {
-        requestBody.crawlScope = params.crawlScope
-      }
-      if (params.crawlOutScope && params.crawlOutScope.length > 0) {
-        requestBody.crawlOutScope = params.crawlOutScope
-      }
-      if (params.displayOutScope) {
-        requestBody.displayOutScope = params.displayOutScope
-      }
-      if (params.matchRegex && params.matchRegex.length > 0) {
-        requestBody.matchRegex = params.matchRegex
-      }
-      if (params.filterRegex && params.filterRegex.length > 0) {
-        requestBody.filterRegex = params.filterRegex
-      }
-      if (params.extensionMatch && params.extensionMatch.length > 0) {
-        requestBody.extensionMatch = params.extensionMatch
-      }
-      if (params.extensionFilter && params.extensionFilter.length > 0) {
-        requestBody.extensionFilter = params.extensionFilter
-      }
-      if (params.matchCondition) {
-        requestBody.matchCondition = params.matchCondition
-      }
-      if (params.filterCondition) {
-        requestBody.filterCondition = params.filterCondition
-      }
-      if (params.timeout && params.timeout !== 15) {
-        requestBody.timeout = params.timeout
+      for (const [key, value] of Object.entries(params)) {
+        if (
+          (Array.isArray(value) && value.length > 0) ||
+          (typeof value === "boolean" && value) ||
+          (typeof value === "number" &&
+            value > 0 &&
+            !(key === "depth" && value === 3) &&
+            !(key === "timeout" && value === 15)) ||
+          (typeof value === "string" && value.length > 0)
+        ) {
+          ;(requestBody as any)[key] = value
+        }
       }
 
-      // FILE
-      if (fileContentIncluded) {
-        requestBody.fileContent = fileContent
+      if (
+        fileContentIncluded &&
+        typeof fileContent === "string" &&
+        fileContent.length > 0
+      ) {
+        ;(requestBody as any).fileContent = fileContent
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -619,6 +584,7 @@ const transformUserQueryToKatanaCommand = (
   Command Construction Guidelines:
   1. ${domainOrFilenameInclusionText}
   2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'katana' tool include:
+    - -depth int: maximum depth to crawl (default 3) (optional)
     - -js-crawl: Enable crawling of JavaScript files. (optional)
     - -ignore-query-params: Ignore different query parameters in the same path. (optional)
     - -timeout: Set a time limit in seconds (default 15 seconds). (optional)

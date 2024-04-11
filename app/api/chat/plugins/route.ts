@@ -81,20 +81,40 @@ export async function POST(request: Request) {
     let answerMessage = { role: "user", content: "" }
     model = "gpt-4"
 
-    if (
-      latestUserMessage.content.startsWith("/") &&
-      (selectedPlugin as PluginID) !== PluginID.CYBERCHEF
-    ) {
-      const plugins = Object.keys(pluginUrls)
-      for (const plugin of plugins) {
-        if (isCommand(plugin.toLowerCase(), latestUserMessage.content)) {
-          return await handleCommand(
-            plugin.toLowerCase(),
-            latestUserMessage,
-            model,
-            cleanMessages,
-            answerMessage
-          )
+    if (latestUserMessage.content.startsWith("/")) {
+      const commandPlugin = Object.keys(pluginUrls)
+        .find(plugin =>
+          isCommand(plugin.toLowerCase(), latestUserMessage.content)
+        )
+        ?.toLowerCase()
+
+      if (
+        commandPlugin &&
+        premiumPlugins.includes(commandPlugin as PluginID) &&
+        !isPremium
+      ) {
+        return new Response(
+          "Access Denied: The command you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this command."
+        )
+      }
+
+      if (!commandPlugin) {
+        return new Response(
+          "Error: Command not recognized. Please check the command and try again."
+        )
+      }
+
+      if ((selectedPlugin as PluginID) !== PluginID.CYBERCHEF) {
+        for (const plugin of Object.keys(pluginUrls)) {
+          if (isCommand(plugin.toLowerCase(), latestUserMessage.content)) {
+            return await handleCommand(
+              plugin.toLowerCase(),
+              latestUserMessage,
+              model,
+              cleanMessages,
+              answerMessage
+            )
+          }
         }
       }
     } else if (pluginIdToHandlerMapping.hasOwnProperty(selectedPlugin)) {
