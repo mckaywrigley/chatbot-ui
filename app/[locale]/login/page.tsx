@@ -110,17 +110,10 @@ export default async function Login({
       ? emailWhitelistPatternsString?.split(",")
       : []
 
-    console.log(
-      { emailWhitelistPatternsString },
-      { emailDomainWhitelist },
-      { emailWhitelist }
-    )
-
     // If there are whitelist patterns, check if the email is allowed to sign up
     if (emailDomainWhitelist.length > 0 || emailWhitelist.length > 0) {
       const domainMatch = emailDomainWhitelist?.includes(email.split("@")[1])
       const emailMatch = emailWhitelist?.includes(email)
-      console.log({ domainMatch }, { emailMatch })
       if (!domainMatch && !emailMatch) {
         return redirect(
           `/login?message=Email ${email} is not allowed to sign up.`

@@ -6,7 +6,6 @@ interface LearnTimeSVGProps {
 }
 
 export const LearnTimeSVG: FC<LearnTimeSVGProps> = ({ theme, scale = 1 }) => {
-  console.log("theme learntime", theme)
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

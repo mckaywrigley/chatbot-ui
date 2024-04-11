@@ -9,8 +9,6 @@ interface BrandProps {
 }
 
 export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
-  console.log("theme brand", theme)
-
   return (
     <Link
       className="flex cursor-pointer flex-col items-center hover:opacity-50"

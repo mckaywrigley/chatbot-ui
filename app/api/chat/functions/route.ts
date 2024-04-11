@@ -213,7 +213,6 @@ Next, ask the student if they would like to change anything or if they would ins
       } as any)
 
       analysis = await chatResponse.choices[0]?.message?.content
-      console.log("analysis:", analysis)
       const { score, forgotten_facts } =
         extractAnalysisInfoWithComments(analysis)
 
@@ -306,8 +305,6 @@ Student recall: """${studentMessage.content}"""`
           ...messagesToAppend
         ]
       })
-
-      console.log("recall_hinting streaming ")
 
       stream = MistralStream(chatStreamResponse)
       newStudyState =

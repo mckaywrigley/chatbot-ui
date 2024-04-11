@@ -118,7 +118,6 @@ export async function getUserEmailById(userId: string) {
 // Function that returns all chats where revise_date is before the current time
 export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
   const cutoffDateString = cutoffDate.toISOString()
-  console.log("Cutoff date", cutoffDateString)
 
   const supabaseAdmin = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -207,7 +206,7 @@ export async function updateTopicOnRecall(
     now.getTime() + halfLifeHours * 60 * 60 * 1000
   ).toISOString()
 
-  console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
+  // console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
 
   const chatUpdateStatus = await updateChat(chatId, {
     test_result: Math.round(test_result),
