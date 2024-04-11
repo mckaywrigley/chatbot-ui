@@ -180,7 +180,7 @@ export async function POST(request: Request) {
           case 408:
             throw new APIError(`Request Timeout: ${errorMessage}`, 408)
           case 429:
-            throw new APIError(`Rate Limited: ${errorMessage}`, 429)
+            throw new APIError(`Rate Limited: ${errorMessage}`, 503)
           case 502:
             throw new APIError(`Service Unavailable: ${errorMessage}`, 502)
           default:
