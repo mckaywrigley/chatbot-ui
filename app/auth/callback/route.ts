@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   if (next) {
     // requestUrl.origin returns `localhost:3000`, manually override from .env.local
     return NextResponse.redirect(
-      process.env.NEXT_PUBLIC_PRODUCTION_ORIGIN! || requestUrl.origin + next
+      (process.env.NEXT_PUBLIC_PRODUCTION_ORIGIN! || requestUrl.origin) + next
     )
   } else {
     return NextResponse.redirect(
