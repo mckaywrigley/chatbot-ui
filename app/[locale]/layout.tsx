@@ -13,9 +13,9 @@ import "./globals.css"
 import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] })
-const APP_NAME = "LearnTime"
-const APP_DEFAULT_TITLE = "LearnTime"
-const APP_TITLE_TEMPLATE = "%s - LearnTime"
+const APP_NAME = "Learntime"
+const APP_DEFAULT_TITLE = "Learntime"
+const APP_TITLE_TEMPLATE = "%s - Learntime"
 const APP_DESCRIPTION = "Chabot UI PWA!"
 
 interface RootLayoutProps {

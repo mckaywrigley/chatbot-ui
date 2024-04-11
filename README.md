@@ -1,3 +1,3 @@
-# LearnTime
+# Learntime
 
 Coming soon.

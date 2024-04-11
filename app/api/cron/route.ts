@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     emailsToSend.push({
       From: "ger@learntime.ai",
       To: userEmail,
-      Subject: "LearnTime: Recall Session Reminder",
+      Subject: "Learntime: Recall Session Reminder",
       HtmlBody: htmlBody,
       MessageStream: "outbound"
     })

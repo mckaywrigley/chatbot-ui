@@ -1,11 +1,11 @@
 import { FC } from "react"
 
-interface LearnTimeSVGProps {
+interface LearntimeSVGProps {
   theme: "dark" | "light"
   scale?: number
 }
 
-export const LearnTimeSVG: FC<LearnTimeSVGProps> = ({ theme, scale = 1 }) => {
+export const LearntimeSVG: FC<LearntimeSVGProps> = ({ theme, scale = 1 }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
