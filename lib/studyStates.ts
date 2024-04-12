@@ -17,6 +17,7 @@ export type StudyState =
   | "tutorial_final_stage_hide_input"
   | "tutorial_final_review_hide_input"
   | "tutorial_finished_hide_input"
+  | "final_review_hide_input"
 
 export interface QuickResponse {
   quickText: string
@@ -89,11 +90,14 @@ export const studyStates: StudyStateObject[] = [
     name: "recall_finished_hide_input",
     quickResponses: [
       {
-        quickText: "Show full topic description.",
+        quickText: "Show topic description.",
         responseText: "{{topicDescription}}",
-        newStudyState: "reviewing"
+        newStudyState: "final_review_hide_input"
       }
     ]
+  },
+  {
+    name: "final_review_hide_input"
   },
   {
     name: "reviewing",
