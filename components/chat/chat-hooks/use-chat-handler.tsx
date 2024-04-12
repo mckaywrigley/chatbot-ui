@@ -58,7 +58,9 @@ export const useChatHandler = () => {
     chatStudyState,
     setChatStudyState,
     topicDescription,
-    setTopicDescription
+    setTopicDescription,
+    setChatRecallMetadata,
+    chatRecallMetadata
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -187,13 +189,15 @@ export const useChatHandler = () => {
           messages: formattedMessagesWithoutSystem,
           chatId: currentChat?.id,
           chatStudyState,
-          topicDescription
+          topicDescription,
+          chatRecallMetadata
         })
       })
 
       const newStudyState = response.headers.get(
         "NEW-STUDY-STATE"
       ) as StudyState
+
       if (newStudyState) {
         setChatStudyState(newStudyState)
         if (newStudyState === "topic_updated") {
@@ -205,6 +209,17 @@ export const useChatHandler = () => {
           setNewMessageFiles([])
           setShowFilesDisplay(false)
         }
+      }
+
+      const score = response.headers.get("SCORE")
+      if (score) {
+        // there will be a DUE-DATE-FROM-NOW
+        const dueDateFromNow = response.headers.get("DUE-DATE-FROM-NOW")
+
+        setChatRecallMetadata({
+          score: parseInt(score),
+          dueDateFromNow: dueDateFromNow!
+        })
       }
 
       generatedText = await processResponse(
@@ -294,7 +309,7 @@ export const useChatHandler = () => {
 
   const handleStartTutorial = async () => {
     setIsGenerating(true)
-    setChatStudyState("tutorial")
+    setChatStudyState("tutorial_hide_input")
     localStorage.setItem("tutorialDone", "true")
 
     const messageContent = `👋 Hello! I'm your AI Study Mentor.

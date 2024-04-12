@@ -15,6 +15,7 @@ import {
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
+import { ChatRecallMetadata } from "@/lib/studyStates"
 import {
   ChatFile,
   ChatMessage,
@@ -91,6 +92,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [chatStudyState, setChatStudyState] =
     useState<StudyState>("topic_creation")
+  const [chatRecallMetadata, setChatRecallMetadata] =
+    useState<ChatRecallMetadata | null>(null)
 
   // ACTIVE CHAT STORE
   const [isGenerating, setIsGenerating] = useState<boolean>(false)
@@ -273,6 +276,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setTopicDescription,
         chatStudyState,
         setChatStudyState,
+        chatRecallMetadata,
+        setChatRecallMetadata,
 
         // ACTIVE CHAT STORE
         isGenerating,

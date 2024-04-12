@@ -60,9 +60,13 @@ export default function ChatPage() {
                   </p>
                   <div className="mt-3 flex items-center justify-center">
                     <p>
-                      <a href="#" onClick={handleStartTutorial}>
+                      <a
+                        href="#"
+                        onClick={handleStartTutorial}
+                        className="flex"
+                      >
                         <IconPlanet className="mr-1" />
-                        Start tutorial
+                        <span>Start tutorial</span>
                       </a>
                     </p>
                   </div>

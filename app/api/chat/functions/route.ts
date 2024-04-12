@@ -1,4 +1,8 @@
-import { StudyState, getQuickResponseByUserText } from "@/lib/studyStates"
+import {
+  ChatRecallMetadata,
+  StudyState,
+  getQuickResponseByUserText
+} from "@/lib/studyStates"
 import {
   checkApiKey,
   getServerProfile,
@@ -7,7 +11,7 @@ import {
 import { OpenAIStream, StreamingTextResponse, MistralStream } from "ai"
 import OpenAI from "openai"
 import MistralClient from "@mistralai/mistralai"
-import { parseISO, formatDistanceToNow } from "date-fns/esm"
+import { formatDistanceToNow } from "date-fns/esm"
 
 // export const runtime = "edge"
 export const dynamic = "force-dynamic"
@@ -36,17 +40,33 @@ const callLLM = async (
   topicDescription: string,
   messages: any[],
   studyState: StudyState,
-  studentMessage: { content: string; role: string }
+  studentMessage: { content: string; role: string },
+  chatRecallMetadata: ChatRecallMetadata
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
   let defaultModel = "mistral-medium-latest"
+  const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
   const copyEditResponse = `You are an upbeat, encouraging tutor who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. 
 Only ask one question at a time.
 First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
 Given this source information, copy edit the content. In addition outline the key facts in a list.
 Next, ask the student if they would like to change anything or if they would instead like to save the topic.`
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
+  const mentor_shot_hint_response = `You've done a great job recalling some key facts about Venus! You're definitely on the right track. Let’s look at what you’ve got and fine-tune some details:
+      
+  Correct Recall:
+  You're right that Venus is the second planet from the Sun and named after the Roman goddess of love. 🏆
+  Absolutely, Venus is super hot with high surface temperatures. 🔥
+  Spot on about Venus having a thick atmosphere and the rotation being in the opposite direction of most planets! That's a tricky one but you nailed it! 🔄
+  Corrections:
+  The surface temperature you mentioned is a bit off; it actually reaches up to 480 degrees Celsius, not 400. It’s even hotter than you thought! 🌡️
+  You mentioned the atmosphere contains oxygen, but it's mostly carbon dioxide with clouds of sulfuric acid. No breathable oxygen there, unfortunately! 😷
+  Regarding Venus’ past, it wasn’t just the heat that caused the water to disappear; scientists believe a runaway greenhouse effect turned all surface water into vapor, which then slowly escaped into space. 🌍➡️🚀
+  Hints for Forgotten Facts:
+  Think about how long a day on Venus is compared to its year. It's quite a unique aspect of the planet. Can you remember which one is longer? 🤔
+  There's an interesting point about the past state of Venus related to water. What do you think Venus might have looked like a billion years ago? 💧🌐
+  Take a moment to think about these hints and see if you can recall more about those specific points. You’re doing wonderfully so far, and digging a bit deeper will help solidify your understanding even more! 🚀💡`
 
   switch (studyState) {
     case "topic_creation":
@@ -230,32 +250,77 @@ Next, ask the student if they would like to change anything or if they would ins
         throw new Error("Server error saving score.")
       }
 
-      const { revise_date } = serverResult
-      const date = parseISO(revise_date)
-      const dateFromNow = formatDistanceToNow(date)
+      const result = serverResult
+      const due_date: Date = result.due_date
+      // const date = parseISO(revise_date)
+      const dateFromNow = formatDistanceToNow(due_date)
 
-      const scoreFeedback = `Inform the student of their recall score: ${score}% and the next recall session date; ${dateFromNow} from now, to ensure consistent study progress.`
+      let systemMessage = mentor_system_message
+      let userMessage = `Topic source:
+      """
+      Venus
+      * Venus is the second planet from the Sun.
+      * It is named after the Roman goddess of love and beauty.
+      * Venus is the hottest planet in our solar system, with surface temperatures reaching up to 480 degrees celsuis.
+      * Venus has a longer day than its year. 
+      * Scientists believe that Venus may have once been a habitable ocean world like Earth, but that was at least a billion years ago. A runaway greenhouse effect turned all surface water into vapor, which then leaked slowly into space.
+      * Venus has the densest atmosphere of the terrestrial planets, composed mostly of carbon dioxide with a thick, global sulfuric acid cloud cover.
+      * The rotation of Venus has been slowed and turned against its orbital direction (retrograde) by the strong currents and drag of its atmosphere.
+      """
+      
+      Student recall:
+      """
+      Venus is the second planet from the Sun and named after the Roman goddess of love. It's known for being extremely hot, with temperatures reaching around 400 degrees Celsius. Venus actually spins backwards compared to its orbital direction because of the thick atmosphere which consists mainly of sulfuric acid clouds.
+      
+      It's said that Venus might have been similar to Earth with oceans a long time ago, maybe even a billion years or so. But I think it was the intense heat that eventually made the water disappear, turning it all into steam. As far as I remember, Venus has a day that is longer than its year, but I'm not too sure why that is.
+      
+      I believe it's mostly carbon dioxide in the atmosphere, but there might be some oxygen too. I don't recall much about why it rotates the way it does, maybe something to do with solar winds?
+      """
+      
+      
+      Mentor response:
+      """
+      ${mentor_shot_hint_response}
+      """
+      ---
+      Topic source: 
+      """
+      ${topicDescription}
+      """
 
-      let systemMessage = `You are a study mentor. You help students remember facts on their own by providing hints and clues without giving away answers.`
-      let userMessage = `Follow these steps:
-1. Commend the student on the facts they've correctly recalled, providing positive reinforcement.
-2. Go through each fact recalled by the student and Correct any inaccuracies WITHOUT providing answers to forgotten facts.
-3. Offer a hints to help the student recall facts they have omitted by referring to the Topic source only. Make sure the hints are not about the facts they recalled.
-4. ${scoreFeedback}`
+      Student recall: 
+      """
+      ${studentMessage.content}
+      """
+
+      Mentor response:
+      `
+
       newStudyState =
         studyState === "recall_tutorial_first_attempt"
-          ? "tutorial_hinting"
+          ? "tutorial_hinting_hide_input"
           : "recall_hinting"
 
       if (perfectRecall) {
-        systemMessage = "You are a helpful and friendly study tutor."
+        systemMessage = mentor_system_message
         userMessage = `Generate upbeat feedback based on the students recall performance. 
-${scoreFeedback}
-${finalFeedback}`
+          Topic source: 
+          """
+          ${topicDescription}
+          """
+
+          Student recall: 
+          """
+          ${studentMessage.content}
+          """
+
+          Inform the student of their recall score: ${score}% and the next recall session date; ${dateFromNow} from now, to ensure consistent study progress.
+          ${finalFeedback}`
+
         newStudyState =
           studyState === "recall_tutorial_first_attempt"
-            ? "tutorial_hinting"
-            : "recall_finished"
+            ? "tutorial_hinting_hide_input"
+            : "recall_finished_hide_input"
       }
 
       chatStreamResponse = await mistral.chatStream({
@@ -268,11 +333,7 @@ ${finalFeedback}`
           },
           {
             role: "user",
-            content: `${userMessage}
-
-Topic source: """${topicDescription}"""
-
-Student recall: """${studentMessage.content}"""`
+            content: userMessage
           }
         ]
       })
@@ -280,44 +341,106 @@ Student recall: """${studentMessage.content}"""`
       stream = MistralStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
-          "NEW-STUDY-STATE": newStudyState
+          "NEW-STUDY-STATE": newStudyState,
+          SCORE: score.toString(),
+          "DUE-DATE-FROM-NOW": dateFromNow
         }
       })
     case "recall_tutorial_hinting":
     case "recall_hinting":
       // PROVIDE ANSWER TO HINTS  ////////////////////
-      const messagesToAppend =
-        studyState === "recall_tutorial_hinting" ? messages.slice(-5) : messages
+      let mentorHintsMessage: { content: string; role: string } =
+        messages.slice(-2, -1)[0]
+      studentMessage
+
+      if (studyState === "recall_tutorial_hinting") {
+        mentorHintsMessage = messages.slice(-4, -3)[0]
+      }
+
       chatStreamResponse = await mistral.chatStream({
         model: defaultModel,
         temperature: 0.4,
         messages: [
           {
             role: "system",
-            content: `Act as a study mentor, guiding student through active recall sessions. Do not calculate the score again.
-    Given the Topic source below and the student's attempt at recalling after you provided hints, perform the following tasks:
-    1. Provide friendly supportive constructive feedback with the answers to each hint using the Topic source below.
-    2. ${finalFeedback}
-        
-    Topic source:
-    """${topicDescription}"""`
+            content: `${mentor_system_message}
+            Use this topic source only when responding to the student ${topicDescription}`
           },
-          ...messagesToAppend
+          {
+            role: "user",
+            content: `
+            Mentor hint response:
+            """
+            ${mentor_shot_hint_response}
+            """
+
+            Student answer to hints:
+            """
+            Venus has a day that's longer than its year because of its slow rotation, right? As for Venus a long time ago, I think it used to be completely dry and desert-like, without any oceans or water.
+            """
+
+            Pre-hint Score:
+            """
+            50%
+            """
+
+            Next review:
+            """
+            2 days time
+            """
+
+            Mentor:
+            """
+            Great effort! 🌟 You got the first part right; indeed, Venus has a day that is longer than its year due to its incredibly slow rotation. That's an interesting fact not many remember! 🕒
+
+            However, about Venus's past, it was actually thought to have been a habitable ocean world similar to Earth, not a dry desert. Scientists believe it may have had large amounts of surface water which later disappeared due to a runaway greenhouse effect. 🌊➡️🔥
+
+            You're doing well with a 50% correct recall before we went through the hints. Keep it up! 📈
+
+            Your next recall session is due in 2 days. 📅 Review the topic material now to help reinforce and expand your memory on Venus. 📚
+
+            Take some time to go over the details, especially the parts about Venus's past climate and its atmospheric composition. This will set us up perfectly for enhancing your understanding in our upcoming session.
+            """
+
+            ---
+            Mentor hint response:
+            """
+            ${mentorHintsMessage.content}
+            """
+
+            Student answer to hints:
+            """
+            ${studentMessage.content}
+            """
+
+            Pre-hint Score:
+            """
+            ${chatRecallMetadata?.score}
+            """
+
+            Next review:
+            """
+            ${chatRecallMetadata?.dueDateFromNow}
+            """
+
+            Mentor:
+            `
+          }
         ]
       })
 
       stream = MistralStream(chatStreamResponse)
       newStudyState =
         studyState === "recall_tutorial_hinting"
-          ? "tutorial_final_stage"
-          : "recall_finished"
+          ? "tutorial_final_stage_hide_input"
+          : "recall_finished_hide_input"
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
         }
       })
 
-    case "recall_finished":
+    case "recall_finished_hide_input":
     case "reviewing":
       // SHOW FULL TOPIC DESCRIPTION ///////////////////////////////
 
@@ -348,7 +471,13 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
     checkApiKey(profile.openai_api_key, "OpenAI")
     const json = await request.json()
-    const { messages, chatId, chatStudyState, topicDescription } = json
+    const {
+      messages,
+      chatId,
+      chatStudyState,
+      topicDescription,
+      chatRecallMetadata
+    } = json
 
     const studentMessage = messages[messages.length - 1]
 
@@ -381,7 +510,8 @@ export async function POST(request: Request) {
       topicDescription,
       messages,
       chatStudyState,
-      studentMessage
+      studentMessage,
+      chatRecallMetadata
     )
 
     return response

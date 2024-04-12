@@ -2,9 +2,16 @@ import { Database, Tables, TablesUpdate } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import * as ebisu from "ebisu-js"
-import { AssertionError } from "assert"
 import { createClient } from "@supabase/supabase-js"
+import {
+  Card,
+  createEmptyCard,
+  fsrs,
+  generatorParameters,
+  Rating,
+  RecordLog,
+  RecordLogItem
+} from "ts-fsrs"
 
 export async function getServerProfile() {
   const cookieStore = cookies()
@@ -116,7 +123,7 @@ export async function getUserEmailById(userId: string) {
 }
 
 // Function that returns all chats where revise_date is before the current time
-export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
+export async function getChatsByDueDate(cutoffDate: Date, request: any) {
   const cutoffDateString = cutoffDate.toISOString()
 
   const supabaseAdmin = createClient<Database>(
@@ -127,7 +134,7 @@ export async function getChatsByReviseDate(cutoffDate: Date, request: any) {
   const { data: chats, error } = await supabaseAdmin
     .from("chats")
     .select("*")
-    .lt("revise_date", cutoffDateString)
+    .lt("due_date", cutoffDateString)
 
   // Error handling
   if (error) {
@@ -176,44 +183,40 @@ export async function updateTopicOnRecall(
 ) {
   const chat = await getChatById(chatId)
 
-  // if updated_at is null, set it to created_at
-  const updated_at = (chat?.updated_at || chat?.created_at) as string
-
-  const chatEbisuModel = chat?.ebisu_model || [4, 4, 24]
-  const [arg1, arg2, arg3] = chatEbisuModel
-
-  const model = ebisu.defaultModel(arg3, arg1, arg2)
-  var successes = test_result / 100
-  var total = 1
-  // elapsed time in hours from last update to now
-  var elapsed = (Date.now() - new Date(updated_at).getTime()) / 1000 / 60 / 60
-  let newModel
-  try {
-    newModel = ebisu.updateRecall(model, successes, total, elapsed)
-  } catch (error) {
-    if (error instanceof AssertionError) {
-      // Handle the AssertionError by using a more reasonable elapsed time
-      newModel = ebisu.updateRecall(model, successes, total, 2)
-    } else {
-      // If it's not an AssertionError, rethrow the error
-      throw error
-    }
+  if (!chat) {
+    return { success: false, error: "Chat not found" }
   }
-  const now = new Date()
-  const halfLifeHours = ebisu.modelToPercentileDecay(newModel)
 
-  const revise_date = new Date(
-    now.getTime() + halfLifeHours * 60 * 60 * 1000
-  ).toISOString()
+  const params = generatorParameters({ enable_fuzz: true })
+  const f = fsrs(params)
 
-  // console.log({ test_result }, { elapsed }, { newModel }, { revise_date })
+  const card: Card =
+    chat.srs_card === null
+      ? createEmptyCard()
+      : typeof chat.srs_card === "string"
+        ? JSON.parse(chat.srs_card)
+        : chat.srs_card
+
+  // map test_result to a rating
+  let rating: Rating
+  if (test_result < 10) {
+    rating = Rating.Again
+  } else if (test_result < 50) {
+    rating = Rating.Hard
+  } else if (test_result < 85) {
+    rating = Rating.Good
+  } else {
+    rating = Rating.Easy
+  }
+
+  const scheduling_cards: RecordLog = f.repeat(card, Date.now())
+  const record: RecordLogItem = scheduling_cards[rating]
 
   const chatUpdateStatus = await updateChat(chatId, {
     test_result: Math.round(test_result),
-    ebisu_model: newModel,
-    revise_date,
+    srs_card: JSON.stringify(record.card),
     recall_analysis,
-    recall_date: new Date().toISOString()
+    due_date: record.card.due.toISOString()
   })
   if (chatUpdateStatus.success === false) {
     return chatUpdateStatus
@@ -221,7 +224,7 @@ export async function updateTopicOnRecall(
 
   return {
     success: true,
-    revise_date
+    due_date: record.card.due
   }
 }
 
@@ -232,22 +235,10 @@ export async function updateTopicContent(chatId: string, content: string) {
   return chatUpdateStatus
 }
 
-// update revise date by chat id and hours time
-export async function updateReviseDate(chatId: string, hours_time: number) {
-  let currentTime = new Date()
-  const reviseDate = currentTime.setHours(currentTime.getHours() + 12)
-
-  const chatUpdateStatus = await updateChat(chatId, {
-    revise_date: new Date(reviseDate).toISOString()
-  })
-  return chatUpdateStatus
-}
-
 // Function-specific argument types
 interface FunctionArguments {
   updateTopicOnRecall: { test_result: number; recall_analysis: string }
   updateTopicContent: { content: string }
-  scheduleTestSession: { hours_time: number }
 }
 
 // Helper type for extracting the specific argument type
@@ -275,15 +266,6 @@ export async function functionCalledByLLM<F extends keyof FunctionArguments>(
       const contentArgs = bodyContent as FunctionArg<"updateTopicContent">
       tempData = await updateTopicContent(chatId, contentArgs.content)
       break
-    case "scheduleTestSession":
-      // And so on for each case...
-      const sessionArgs = bodyContent as FunctionArg<"scheduleTestSession">
-      tempData = await updateReviseDate(chatId, sessionArgs.hours_time)
-      break
-    // case "updateRecallAnalysis":
-    //   const recallArgs = bodyContent as FunctionArg<"updateRecallAnalysis">
-    //   tempData = await updateChat(chatId, recallArgs)
-    //   break
     default:
       console.error(`Function ${functionName} is not supported.`)
       return { success: false }

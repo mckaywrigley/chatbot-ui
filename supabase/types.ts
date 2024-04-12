@@ -341,7 +341,7 @@ export interface Database {
           assistant_id: string | null
           context_length: number
           created_at: string
-          ebisu_model: number[] | null
+          due_date: string | null
           embeddings_provider: string
           folder_id: string | null
           id: string
@@ -351,9 +351,8 @@ export interface Database {
           name: string
           prompt: string
           recall_analysis: Json | null
-          recall_date: string | null
-          revise_date: string | null
           sharing: string
+          srs_card: Json | null
           temperature: number
           test_result: number | null
           topic_description: string | null
@@ -365,7 +364,7 @@ export interface Database {
           assistant_id?: string | null
           context_length: number
           created_at?: string
-          ebisu_model?: number[] | null
+          due_date?: string | null
           embeddings_provider: string
           folder_id?: string | null
           id?: string
@@ -375,9 +374,8 @@ export interface Database {
           name: string
           prompt: string
           recall_analysis?: Json | null
-          recall_date?: string | null
-          revise_date?: string | null
           sharing?: string
+          srs_card?: Json | null
           temperature: number
           test_result?: number | null
           topic_description?: string | null
@@ -389,7 +387,7 @@ export interface Database {
           assistant_id?: string | null
           context_length?: number
           created_at?: string
-          ebisu_model?: number[] | null
+          due_date?: string | null
           embeddings_provider?: string
           folder_id?: string | null
           id?: string
@@ -399,9 +397,8 @@ export interface Database {
           name?: string
           prompt?: string
           recall_analysis?: Json | null
-          recall_date?: string | null
-          revise_date?: string | null
           sharing?: string
+          srs_card?: Json | null
           temperature?: number
           test_result?: number | null
           topic_description?: string | null
