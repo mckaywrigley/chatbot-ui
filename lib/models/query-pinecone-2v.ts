@@ -145,7 +145,7 @@ class RetrieverReranker {
 
       // Rerank the chunks using cohere
       const rerankedMatches = await cohere.rerank({
-        model: "rerank-english-v2.0",
+        model: "rerank-english-v3.0",
         documents: uniqueMatchesText.map((d: any) => ({
           text: d
         })),
