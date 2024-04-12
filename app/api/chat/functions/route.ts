@@ -230,9 +230,10 @@ Next, ask the student if they would like to change anything or if they would ins
         throw new Error("Server error saving score.")
       }
 
-      const { revise_date } = serverResult
-      const date = parseISO(revise_date)
-      const dateFromNow = formatDistanceToNow(date)
+      const result = serverResult
+      const due_date: Date = result.due_date
+      // const date = parseISO(revise_date)
+      const dateFromNow = formatDistanceToNow(due_date)
 
       const scoreFeedback = `Inform the student of their recall score: ${score}% and the next recall session date; ${dateFromNow} from now, to ensure consistent study progress.`
 

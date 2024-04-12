@@ -1,5 +1,5 @@
 import {
-  getChatsByReviseDate,
+  getChatsByDueDate,
   getUserEmailById
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   // Search all chats in DB and return array where revise_date is before now
 
-  const chats = await getChatsByReviseDate(cutoffDate, request)
+  const chats = await getChatsByDueDate(cutoffDate, request)
   console.log(
     "Valid topics due for revision in this time period: ",
     chats.length

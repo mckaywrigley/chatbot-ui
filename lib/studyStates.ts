@@ -48,8 +48,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Start recall now.",
-        responseText:
-          "Let's try to recall as much as we can about the topic. Ready?",
+        responseText: "Try to recall as much as you can about the topic now.",
         newStudyState: "recall_first_attempt"
       },
       {

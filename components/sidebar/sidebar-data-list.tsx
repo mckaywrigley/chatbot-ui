@@ -34,7 +34,7 @@ import {
   endOfDay,
   addDays
 } from "date-fns"
-import * as ebisu from "ebisu-js"
+import { Card, createEmptyCard } from "ts-fsrs"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -121,44 +121,41 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   ) => {
     return data
       .filter((item: any) => {
-        const reviseDate = item.revise_date
-          ? new Date(item.revise_date)
-          : currentTime
+        const dueDate = item.due_date ? new Date(item.due_date) : currentTime
 
         const revisionNextWeek =
-          reviseDate >= addWeeks(startOfWeek(currentTime), 1) &&
-          reviseDate <= endOfWeek(addWeeks(currentTime, 1))
+          dueDate >= addWeeks(startOfWeek(currentTime), 1) &&
+          dueDate <= endOfWeek(addWeeks(currentTime, 1))
 
-        const notTomorrow = isTomorrow(reviseDate)
+        const notTomorrow = isTomorrow(dueDate)
 
         const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
-            return isToday(reviseDate) || isDateBeforeToday(reviseDate)
+            return isToday(dueDate) || isDateBeforeToday(dueDate)
           case "Tomorrow":
             return notTomorrow
           case "Later this week":
             return (
-              reviseDate > endOfDay(addDays(new Date(), 1)) &&
-              isThisWeek(reviseDate)
+              dueDate > endOfDay(addDays(new Date(), 1)) && isThisWeek(dueDate)
             )
           case "Next week":
             return revisionNextWeek
           case "Later this month":
             return (
-              reviseDate > currentTime &&
-              !isThisWeek(reviseDate) &&
+              dueDate > currentTime &&
+              !isThisWeek(dueDate) &&
               !revisionNextWeek &&
-              isThisMonth(reviseDate)
+              isThisMonth(dueDate)
             )
           case "Next month":
             return (
               notTomorrow &&
-              reviseDate > endOfMonth(currentTime) &&
-              reviseDate <= endOfNextMonth
+              dueDate > endOfMonth(currentTime) &&
+              dueDate <= endOfNextMonth
             )
           case "After next month":
-            return reviseDate > endOfNextMonth
+            return dueDate > endOfNextMonth
           default:
             return true
         }
@@ -222,19 +219,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
   const dataWithPredictedRecall = dataWithoutFolders.map(item => {
-    const chatItem = item as Tables<"chats">
-    const last_recall_at = (chatItem.recall_date || "") as string
-
     let predictedRecall = -1
-    if (last_recall_at.length > 0) {
-      const chatEbisuModel =
-        "ebisu_model" in item ? item.ebisu_model : [4, 4, 24]
-      const [arg1, arg2, arg3] = chatEbisuModel || [24, 4, 4] // Add null check and default value
-      const model = ebisu.defaultModel(arg3, arg1, arg2)
-      const elapsed =
-        (Date.now() - new Date(last_recall_at).getTime()) / 1000 / 60 / 60
-      predictedRecall = ebisu.predictRecall(model, elapsed, true)
+
+    if ("srs_card" in item && typeof item.srs_card === "string") {
+      const srs_card: Card = JSON.parse(item.srs_card)
+      const { scheduled_days, elapsed_days } = srs_card
+      predictedRecall = scheduled_days / (scheduled_days + elapsed_days)
     }
+
     return {
       ...item,
       predictedRecall

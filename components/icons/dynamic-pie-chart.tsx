@@ -6,13 +6,13 @@ interface ChatbotUISVGProps {
 }
 
 const DynamicPieChart: FC<ChatbotUISVGProps> = ({ value, scale = 1 }) => {
-  const radius = 20 // Radius of the circle
-  const circumference = 2 * Math.PI * radius // Circumference of the circle
-  const filledPercentage = value // Percentage of the pie chart filled
-  const dashOffset = ((100 - filledPercentage) / 100) * circumference // Calculating dash offset
+  const radius = 20
+  const circumference = 2 * Math.PI * radius
+  const filledPercentage = value === 0 ? 50 : value
+  const dashOffset = ((100 - filledPercentage) / 100) * circumference
 
   const linked = value > 50
-  const hasRecalled = value > 0
+  const hasRecalled = value >= 0
 
   const strokeColor = linked ? "ForestGreen" : "coral" // Set stroke color based on value
 

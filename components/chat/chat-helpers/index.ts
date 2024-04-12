@@ -22,6 +22,7 @@ import {
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
+import { createEmptyCard } from "ts-fsrs"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -371,8 +372,9 @@ export const handleCreateChat = async (
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
     embeddings_provider: chatSettings.embeddingsProvider,
-    ebisu_model: [4, 4, 24],
-    topic_description
+    srs_card: createEmptyCard(),
+    topic_description,
+    due_date: new Date().toISOString()
   })
 
   setSelectedChat(createdChat)
