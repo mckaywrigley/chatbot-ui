@@ -1,4 +1,5 @@
 import { Tables } from "@/supabase/types"
+import { ChatRecallMetadata } from "@/lib/studyStates"
 import {
   ChatFile,
   ChatMessage,
@@ -83,6 +84,8 @@ interface ChatbotUIContext {
   setTopicDescription: Dispatch<SetStateAction<string>>
   chatStudyState: StudyState
   setChatStudyState: Dispatch<SetStateAction<StudyState>>
+  chatRecallMetadata: ChatRecallMetadata | null
+  setChatRecallMetadata: Dispatch<SetStateAction<ChatRecallMetadata | null>>
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
@@ -213,6 +216,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setTopicDescription: () => {},
   chatStudyState: "topic_creation",
   setChatStudyState: () => {},
+  chatRecallMetadata: null,
+  setChatRecallMetadata: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,

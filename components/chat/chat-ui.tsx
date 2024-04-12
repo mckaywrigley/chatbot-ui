@@ -197,7 +197,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     if (chat.topic_description) {
       setTopicDescription(chat.topic_description)
 
-      setChatStudyState("topic_default")
+      setChatStudyState("topic_default_hide_input")
 
       setChatMessages([
         {

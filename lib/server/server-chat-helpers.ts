@@ -193,7 +193,9 @@ export async function updateTopicOnRecall(
   const card: Card =
     chat.srs_card === null
       ? createEmptyCard()
-      : JSON.parse(chat.srs_card as string)
+      : typeof chat.srs_card === "string"
+        ? JSON.parse(chat.srs_card)
+        : chat.srs_card
 
   // map test_result to a rating
   let rating: Rating

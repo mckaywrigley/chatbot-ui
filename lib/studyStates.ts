@@ -2,21 +2,21 @@ export type StudyState =
   | "topic_creation"
   | "topic_edit"
   | "topic_updated"
-  | "topic_default"
+  | "topic_default_hide_input"
   | "recall_first_attempt"
   | "recall_hinting"
-  | "recall_finished"
+  | "recall_finished_hide_input"
   | "reviewing"
-  | "tutorial"
-  | "tutorial_2"
-  | "tutorial_3"
-  | "tutorial_4"
+  | "tutorial_hide_input"
+  | "tutorial_2_hide_input"
+  | "tutorial_3_hide_input"
+  | "tutorial_4_hide_input"
   | "recall_tutorial_first_attempt"
-  | "tutorial_hinting"
+  | "tutorial_hinting_hide_input"
   | "recall_tutorial_hinting"
-  | "tutorial_final_stage"
-  | "tutorial_final_review"
-  | "tutorial_finished"
+  | "tutorial_final_stage_hide_input"
+  | "tutorial_final_review_hide_input"
+  | "tutorial_finished_hide_input"
 
 export interface QuickResponse {
   quickText: string
@@ -27,6 +27,11 @@ export interface QuickResponse {
 interface StudyStateObject {
   name: StudyState
   quickResponses?: QuickResponse[]
+}
+
+export interface ChatRecallMetadata {
+  score: number
+  dueDateFromNow: string
 }
 
 export const studyStates: StudyStateObject[] = [
@@ -48,7 +53,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Start recall now.",
-        responseText: "Try to recall as much as you can about the topic now.",
+        responseText: "Try to recall as much as you can. Good luck!",
         newStudyState: "recall_first_attempt"
       },
       {
@@ -59,7 +64,7 @@ export const studyStates: StudyStateObject[] = [
     ]
   },
   {
-    name: "topic_default",
+    name: "topic_default_hide_input",
     quickResponses: [
       {
         quickText: "Start recall now.",
@@ -81,17 +86,12 @@ export const studyStates: StudyStateObject[] = [
     name: "recall_hinting"
   },
   {
-    name: "recall_finished",
+    name: "recall_finished_hide_input",
     quickResponses: [
       {
         quickText: "Show full topic description.",
         responseText: "{{topicDescription}}",
         newStudyState: "reviewing"
-      },
-      {
-        quickText: "Edit topic.",
-        responseText: "What updates should we make to the topic content?",
-        newStudyState: "topic_edit"
       }
     ]
   },
@@ -106,38 +106,38 @@ export const studyStates: StudyStateObject[] = [
     ]
   },
   {
-    name: "tutorial",
+    name: "tutorial_hide_input",
     quickResponses: [
       {
         quickText: "Next.",
         responseText:
-          "Brilliant! Next up, I'll guide you on how to add a topic description. It's quite exciting to create a new topic together. Let's start with 'The Solar System.' Click on it below.",
-        newStudyState: "tutorial_2"
+          "Now I'll guide you on how to add a topic description. It's quite exciting to create a new topic together. Let's start with 'The Solar System.' Click on it below.",
+        newStudyState: "tutorial_2_hide_input"
       }
     ]
   },
   {
-    name: "tutorial_2",
+    name: "tutorial_2_hide_input",
     quickResponses: [
       {
         quickText: "The Solar System.",
         responseText: `If at this stage you've only entered a topic name, like now, I'll step in to help craft a suitable topic description for you. Alternatively, you're more than welcome to add a description yourself, whether by uploading a document or typing directly into our chat. For the moment, I'll take care of generating the description for you. Please 'View topic.' now, and afterwards, 'Save topic.'`,
-        newStudyState: "tutorial_3"
+        newStudyState: "tutorial_3_hide_input"
       }
     ]
   },
   {
-    name: "tutorial_3",
+    name: "tutorial_3_hide_input",
     quickResponses: [
       {
         quickText: "View topic.",
         responseText: "{{topicDescription}}",
-        newStudyState: "tutorial_4"
+        newStudyState: "tutorial_4_hide_input"
       }
     ]
   },
   {
-    name: "tutorial_4",
+    name: "tutorial_4_hide_input",
     quickResponses: [
       {
         quickText: "Save topic description.",
@@ -152,7 +152,7 @@ After you receive feedback on your attempt, select "Next step..." to move forwar
     name: "recall_tutorial_first_attempt"
   },
   {
-    name: "tutorial_hinting",
+    name: "tutorial_hinting_hide_input",
     quickResponses: [
       {
         quickText: "Next step - reply to hints.",
@@ -166,33 +166,33 @@ After you receive feedback on your attempt, select "Next step..." to move forwar
     name: "recall_tutorial_hinting"
   },
   {
-    name: "tutorial_final_stage",
+    name: "tutorial_final_stage_hide_input",
     quickResponses: [
       {
         quickText: "Final stage - review.",
         responseText: `Amazing work! 
 The final stage of an effective study session is reviewing the topic one last time with an eye on what was missed. This is where you'll get a chance to solidify your understanding of the topic.`,
-        newStudyState: "tutorial_final_review"
+        newStudyState: "tutorial_final_review_hide_input"
       }
     ]
   },
   {
-    name: "tutorial_final_review",
+    name: "tutorial_final_review_hide_input",
     quickResponses: [
       {
         quickText: "Show topic content for final review.",
         responseText: "{{topicDescription}}",
-        newStudyState: "tutorial_finished"
+        newStudyState: "tutorial_finished_hide_input"
       }
     ]
   },
   {
-    name: "tutorial_finished",
+    name: "tutorial_finished_hide_input",
     quickResponses: [
       {
         quickText: "Finish tutorial.",
         responseText: `Amazing work! 
-On the topic list to the left, you will notice the icon next to the topic name has changed into a green circle with a lock. This is a happy indicator that you've successfully reviewed the topic. As days go by leading up to your next review session, this circle will slowly diminish, mirroring an estimate of your recall strength. Don't worry, we'll give you a gentle nudge when it's nearly time for a refresh.
+On the topic list to the left, you will notice the icon next to this topic name has changed to indicat that you've successfully reviewed the topic. As days go by leading up to your next review session, this icon will change, reflecting an estimate of your recall strength. Don't worry, we'll email you on that day with a gentle nudge when it's time for a refresh.
 Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
 And of course, feel free to dive back in to further solidify your mastery of The Solar System!
 Enjoy your learning journey!`,

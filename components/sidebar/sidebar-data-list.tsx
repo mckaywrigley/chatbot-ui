@@ -224,7 +224,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     if ("srs_card" in item && typeof item.srs_card === "string") {
       const srs_card: Card = JSON.parse(item.srs_card)
       const { scheduled_days, elapsed_days } = srs_card
-      predictedRecall = scheduled_days / (scheduled_days + elapsed_days)
+      predictedRecall = (scheduled_days / (scheduled_days + elapsed_days)) | 0
     }
 
     return {

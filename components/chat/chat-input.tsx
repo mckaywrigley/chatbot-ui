@@ -163,13 +163,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
-        {/* <div className="text-grey-400/25 absolute bottom-0 right-0 text-xs">
+        <div className="text-grey-400/25 absolute bottom-0 right-0 text-xs">
           {chatStudyState}
-        </div> */}
+        </div>
         <QuickResponse />
       </div>
 
-      {!chatStudyState.startsWith("tutorial") && (
+      {!chatStudyState.endsWith("hide_input") && (
         <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
           <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
             <ChatCommandInput />
