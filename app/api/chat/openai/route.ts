@@ -41,12 +41,6 @@ export async function POST(request: Request) {
       Authorization: `Bearer ${profile.openai_api_key}`
     }
 
-    replaceWordsInLastUserMessage(messages, wordReplacements)
-
-    const systemMessageContent = `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}`
-
-    updateOrAddSystemMessage(messages, systemMessageContent)
-
     // rate limit check
     const rateLimitCheckResult = await checkRatelimitOnApi(
       profile.user_id,
@@ -56,11 +50,17 @@ export async function POST(request: Request) {
       return rateLimitCheckResult.response
     }
 
+    replaceWordsInLastUserMessage(messages, wordReplacements)
+
+    const systemMessageContent = `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}`
+
+    updateOrAddSystemMessage(messages, systemMessageContent)
+
     const res = await fetch(openAiUrl, {
       method: "POST",
       headers: openAiHeaders,
       body: JSON.stringify({
-        model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+        model: "gpt-4-turbo-preview",
         messages: messages as ChatCompletionCreateParamsBase["messages"],
         // temperature: chatSettings.temperature,
         temperature: 0.4,

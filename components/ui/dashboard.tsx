@@ -11,7 +11,6 @@ import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
-import { CommandK } from "../utility/command-k"
 import Modal from "@/components/chat/dialog-portal"
 
 export const SIDEBAR_WIDTH = 350
@@ -142,8 +141,6 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           </div>
         </div>
       </Modal>
-
-      <CommandK />
 
       <Button
         className={cn(

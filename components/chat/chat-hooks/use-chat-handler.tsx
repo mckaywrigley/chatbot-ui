@@ -296,49 +296,47 @@ export const useChatHandler = () => {
       let generatedText = ""
       let finishReasonFromResponse = ""
 
-      if (!isContinuation && selectedTools.length > 0) {
-        setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
+      // if (!isContinuation && selectedTools.length > 0) {
+      //   setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
 
-        const formattedMessages = await buildFinalMessages(
-          payload,
-          profile!,
-          chatImages,
-          selectedPlugin
-        )
+      //   const formattedMessages = await buildFinalMessages(
+      //     payload,
+      //     profile!,
+      //     chatImages,
+      //     selectedPlugin
+      //   )
 
-        const response = await fetch("/api/chat/tools", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
-            selectedTools
-          })
-        })
+      //   const response = await fetch("/api/chat/tools", {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json"
+      //     },
+      //     body: JSON.stringify({
+      //       chatSettings: payload.chatSettings,
+      //       messages: formattedMessages,
+      //       selectedTools
+      //     })
+      //   })
 
-        setToolInUse("none")
+      //   setToolInUse("none")
 
-        const { fullText, finishReason } = await processResponse(
-          response,
-          isRegeneration
-            ? payload.chatMessages[payload.chatMessages.length - 1]
-            : tempAssistantChatMessage,
-          newAbortController,
-          setFirstTokenReceived,
-          setChatMessages,
-          setToolInUse
-        )
-        generatedText = fullText
-        finishReasonFromResponse = finishReason
-      } else if (
+      //   const { fullText, finishReason } = await processResponse(
+      //     response,
+      //     isRegeneration
+      //       ? payload.chatMessages[payload.chatMessages.length - 1]
+      //       : tempAssistantChatMessage,
+      //     newAbortController,
+      //     setFirstTokenReceived,
+      //     setChatMessages,
+      //     setToolInUse
+      //   )
+      //   generatedText = fullText
+      //   finishReasonFromResponse = finishReason
+      if (
         selectedPlugin.length > 0 &&
         selectedPlugin !== PluginID.NONE &&
         selectedPlugin !== PluginID.WEB_SCRAPER
       ) {
-        const isPremium = subscription !== null
-
         let fileContent = ""
         let fileName = ""
 
@@ -371,7 +369,6 @@ export const useChatHandler = () => {
           setToolInUse,
           alertDispatch,
           selectedPlugin,
-          isPremium,
           fileContent,
           fileName
         )

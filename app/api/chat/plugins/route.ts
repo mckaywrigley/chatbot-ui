@@ -11,27 +11,21 @@ import {
 } from "./chatpluginhandlers"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 import { PluginID, pluginUrls } from "@/types/plugins"
+import { isPremiumUser } from "@/lib/server/subscription-utils"
 
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const {
-    chatSettings,
-    messages,
-    selectedPlugin,
-    isPremium,
-    fileContent,
-    fileName
-  } = json as {
-    chatSettings: ChatSettings
-    messages: any[]
-    selectedPlugin: string
-    isPremium: any
-    fileContent: string
-    fileName: string
-  }
-
+  const { chatSettings, messages, selectedPlugin, fileContent, fileName } =
+    json as {
+      chatSettings: ChatSettings
+      messages: any[]
+      selectedPlugin: string
+      isPremium: any
+      fileContent: string
+      fileName: string
+    }
   const premiumPlugins: PluginID[] = [
     PluginID.NUCLEI,
     PluginID.KATANA,
@@ -39,14 +33,15 @@ export async function POST(request: Request) {
     PluginID.NAABU
   ]
 
-  if (premiumPlugins.includes(selectedPlugin as PluginID) && !isPremium) {
-    return new Response(
-      "Access Denied: The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
-    )
-  }
-
   try {
     const profile = await getServerProfile()
+    const isPremium = await isPremiumUser(profile.user_id)
+
+    if (premiumPlugins.includes(selectedPlugin as PluginID) && !isPremium) {
+      return new Response(
+        "Access Denied: The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
+      )
+    }
 
     checkApiKey(profile.openai_api_key, "OpenAI")
 

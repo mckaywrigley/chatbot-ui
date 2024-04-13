@@ -234,7 +234,6 @@ export const handleHostedPluginsChat = async (
   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
   alertDispatch: React.Dispatch<AlertAction>,
   selectedPlugin: PluginID,
-  isPremium: boolean,
   fileContent: string,
   fileName: string
 ) => {
@@ -253,7 +252,6 @@ export const handleHostedPluginsChat = async (
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
     selectedPlugin,
-    isPremium,
     fileContent,
     fileName
   }
