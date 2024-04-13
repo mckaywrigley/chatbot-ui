@@ -15,11 +15,21 @@ export const metadata: Metadata = {
   title: "Login"
 }
 
+const errorMessages: any = {
+  "1": "Email is not allowed to sign up.",
+  "2": "Check your email to continue the sign-in process.",
+  "3": "Check email to reset password.",
+  "4": "Invalid credentials provided.",
+  default: "An unexpected error occurred."
+}
+
 export default async function Login({
   searchParams
 }: {
   searchParams: { message: string }
 }) {
+  const errorKey = searchParams.message
+  const errorMessage = errorMessages[errorKey] || errorMessages["default"]
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -63,7 +73,7 @@ export default async function Login({
     })
 
     if (error) {
-      return redirect(`/login?message=${error.message}`)
+      return redirect(`/login?message=4`)
     }
 
     const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
@@ -101,9 +111,7 @@ export default async function Login({
         emailDomainWhitelist.length > 0 &&
         !emailDomainWhitelist.includes(email.split("@")[1])
       ) {
-        return redirect(
-          `/login?message=Email ${email} is not allowed to sign up.`
-        )
+        return redirect(`/login?message=1`)
       }
     }
 
@@ -116,9 +124,7 @@ export default async function Login({
       const emailWhitelist = patternsString?.split(",") ?? []
 
       if (emailWhitelist.length > 0 && !emailWhitelist.includes(email)) {
-        return redirect(
-          `/login?message=Email ${email} is not allowed to sign up.`
-        )
+        return redirect(`/login?message=1`)
       }
     }
 
@@ -135,14 +141,13 @@ export default async function Login({
     })
 
     if (error) {
-      console.error(error)
       return redirect(`/login?message=${error.message}`)
     }
 
     // return redirect("/setup")
 
     // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-    return redirect("/login?message=Check email to continue sign in process")
+    return redirect("/login?message=2")
   }
 
   const handleResetPassword = async (formData: FormData) => {
@@ -161,7 +166,7 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect("/login?message=Check email to reset password")
+    return redirect("/login?message=2")
   }
 
   const handleSignInWithGoogle = async () => {
@@ -177,9 +182,7 @@ export default async function Login({
       }
     })
 
-    console.log(data)
     if (error) {
-      console.log(error)
       return redirect(`/login?message=${error.message}`)
     }
 
@@ -248,7 +251,7 @@ export default async function Login({
 
           {searchParams?.message && (
             <p className="bg-foreground/10 text-foreground mt-2 p-4 text-center">
-              {searchParams.message}
+              {errorMessage}
             </p>
           )}
 
