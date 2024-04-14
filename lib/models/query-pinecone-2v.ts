@@ -155,7 +155,7 @@ class RetrieverReranker {
 
       const cohereFormattedResults = rerankedMatches.results
         .map((result: any, index: number) => {
-          return `[CONTEXT ${index}]:\n${uniqueMatchesText[result.index]}\n[END CONTEXT ${index}]\n\n`
+          return `[CONTEXT ${index}]:${uniqueMatchesText[result.index]}\n[END CONTEXT ${index}]\n\n`
         })
         .join("")
 
