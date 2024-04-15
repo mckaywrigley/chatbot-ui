@@ -51,39 +51,12 @@ export const useSelectFileHandler = () => {
 
   const handleSelectDeviceFile = async (file: File) => {
     if (!profile || !selectedWorkspace || !chatSettings) return
-    if (file && ACCEPTED_DOCUMENT_FILE_TYPES.split(",").includes(file.type)) {
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("userId", profile.user_id)
-      try {
-        const response = await axios.post(
-          `${process.env.SERVER_API_URL}/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        )
-        setNewMessageFiles(prev => [
-          ...prev,
-          {
-            id: "loading",
-            name: file.name,
-            type: file.type,
-            file: file
-          }
-        ])
-        console.log("File uploaded successfully", response.data)
-      } catch (error) {
-        console.error("Error uploading file", error)
-      }
-    }
+    // Todo send file to server
 
     setShowFilesDisplay(true)
     setUseRetrieval(true)
-    // Todo working on this
-    /* if (file) {
+
+    if (file) {
       let simplifiedFileType = file.type.split("/")[1]
 
       let reader = new FileReader()
@@ -225,7 +198,7 @@ export const useSelectFileHandler = () => {
           setNewMessageFiles(prev => prev.filter(file => file.id !== "loading"))
         }
       }
-    }*/
+    }
   }
 
   return {
