@@ -176,7 +176,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3 focus:outline-none "
+          "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3 focus:outline-none ",
+          item.folder_id ? "pl-5" : ""
         )}
         tabIndex={0}
         onKeyDown={handleKeyDown}

@@ -147,7 +147,8 @@ export const Folder: FC<FolderProps> = ({
       <div
         tabIndex={0}
         className={cn(
-          " hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between px-3 py-[11px]"
+          " hover:bg-pixelspace-gray-70 flex w-full cursor-pointer items-center justify-between px-3 py-[11px]",
+          isExpanded && "mt-[2px]"
         )}
         onClick={handleClick}
       >
@@ -212,7 +213,7 @@ export const Folder: FC<FolderProps> = ({
           </Dialog>
         </div>
       </div>
-      {isExpanded && <div className=" mt-2 space-y-[1px]">{children}</div>}
+      {isExpanded && <div className=" mt-[2px] space-y-[1px]">{children}</div>}
     </div>
   )
 }
