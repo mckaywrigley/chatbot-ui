@@ -106,7 +106,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   return (
     <div
       className={cn(
-        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3 focus:outline-none",
+        "hover:bg-pixelspace-gray-70  group flex w-full cursor-pointer items-center p-[11px] px-3  focus:outline-none",
+        chat.folder_id ? "pl-5" : "",
         selectedChat?.id === chat.id && "bg-pixelspace-gray-70"
       )}
       tabIndex={0}
