@@ -1,6 +1,5 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-import endent from "endent"
 
 import {
   createGKEHeaders,
@@ -9,45 +8,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-export const isGauCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/gau(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [GAU](${pluginUrls.Gau}) is a powerful web scraping tool that fetches known URLs from multiple sources, including AlienVault&apos;s Open Threat Exchange, the Wayback Machine, and Common Crawl. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Engage with GAU conversationally by simply describing your URL fetching needs in plain language. The AI will interpret your input and carry out the necessary operations automatically, providing an intuitive and user-friendly experience.
-  
-  **Direct Commands:**
-  Use direct commands for meticulous control. Start with "/" followed by the command and applicable flags to perform specific URL fetching tasks tailored to your requirements.
-  
-    Usage:
-       /gau [target] [flags]
-
-    Flags:
-    CONFIGURATION:
-       --from string         fetch URLs from date (format: YYYYMM)
-       --to string           fetch URLs to date (format: YYYYMM)
-       --providers strings   list of providers to use (wayback, commoncrawl, otx, urlscan)
-       --subs                include subdomains of target domain
-
-    FILTER:
-       --blacklist strings   list of extensions to skip
-       --fc strings          list of status codes to filter
-       --ft strings          list of mime-types to filter
-       --mc strings          list of status codes to match
-       --mt strings          list of mime-types to match
-       --fp                  remove different parameters of the same endpoint`
-}
+import { displayHelpGuideForGau } from "../plugin-helper/help-guides"
+import { transformUserQueryToGAUCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface GauParams {
   targets: string[]
@@ -263,20 +226,20 @@ export async function handleGauRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForGau(), true)
         controller.close()
         return
       }
 
       const params = parseGauCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -383,51 +346,6 @@ export async function handleGauRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToGAUCommand = (lastMessage: Message) => {
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  Based on this query, generate a command for the 'GAU' tool, designed for fetching URLs from various sources. The command should use the most relevant flags, tailored to the specifics of the target and the user's requirements. If the request involves fetching URLs for a specific target, embed the target directly in the command rather than referencing an external file. The command should follow this structured format for clarity and accuracy:
-
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "gau [target] [flags]" }
-  \`\`\`
-  Replace '[target]' with the actual target directly included in the command, and '[flags]' with the actual flags and values. Include additional flags only if they are specifically relevant to the request.
-
-  Command Construction Guidelines for Gau:
-  1. **Direct Target Inclusion**: When fetching URLs for a specific target, directly embed the target in the command instead of using file references.
-  2. **Configuration Flags**:
-    - --from: Fetch URLs from date (format: YYYYMM). (optional)
-    - --to: Fetch URLs to date (format: YYYYMM). (optional)
-    - --providers: List of providers to use (wayback, commoncrawl, otx, urlscan). (optional)
-    - --subs: Include subdomains of target domain. Use it if user asks for it. (optional)
-  3. **Filter Flags**:
-    - --blacklist: List of extensions to skip. (optional)
-    - --fc: List of status codes to filter. (optional)
-    - --ft: List of mime-types to filter. (optional)
-    - --mc: List of status codes to match. (optional)
-    - --mt: List of mime-types to match. (optional)
-    - --fp: Remove different parameters of the same endpoint. (optional)
-  4. **Relevance and Efficiency**:
-    Ensure that the selected flags are relevant and contribute to an effective and efficient URL fetching process.
-
-  Example Commands:
-  For fetching URLs for a specific target with certain filters directly:
-  \`\`\`json
-  { "command": "gau example.com --from 202401 --to 202403 --blacklist js,css --fc 404" }
-  \`\`\`
-
-  For a request for help or to see all flags:
-  \`\`\`json
-  { "command": "gau -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 const processGauData = (data: string): string => {

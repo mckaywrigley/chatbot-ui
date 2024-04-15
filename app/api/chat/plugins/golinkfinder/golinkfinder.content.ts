@@ -9,34 +9,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-export const isGolinkfinderCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/golinkfinder(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [GoLinkFinder](${pluginUrls.GoLinkFinder}) is a minimalistic JavaScript endpoint extractor that efficiently pulls endpoints from HTML and embedded JavaScript files. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Interact with GoLinkFinder using plain language to describe your endpoint extraction needs. The AI will understand your input and automatically execute the corresponding command with GoLinkFinder, simplifying the process for intuitive use.
-  
-  **Direct Commands:**
-  For precise and specific tasks, use direct commands. Begin your command with "/" and include necessary flags to control the extraction process effectively.
-  
-    Usage:
-       /golinkfinder --domain [domain]
-
-    Flags:
-    CONFIGURATION:
-       -d --domain string   Input a URL.`
-}
+import { displayHelpGuideForGoLinkFinder } from "../plugin-helper/help-guides"
+import { transformUserQueryToGoLinkFinderCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface GoLinkFinderParams {
   domain: string[]
@@ -160,20 +135,20 @@ export async function handleGolinkfinderRequest(
         parts.includes("-help") ||
         parts.includes("--help")
       ) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForGoLinkFinder(), true)
         controller.close()
         return
       }
 
       const params = parseGoLinkFinderCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -256,44 +231,6 @@ export async function handleGolinkfinderRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToGoLinkFinderCommand = (lastMessage: Message) => {
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  Based on this query, generate a command for the 'GoLinkFinder' tool, tailored to efficiently extract URLs from HTML content. Ensure to utilize the most pertinent flag, '--domain', to specify the target website. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
-
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "golinkfinder --domain [target-domain]" }
-  \`\`\`
-  Substitute '[target-domain]' with the actual domain you intend to investigate. It's crucial to directly incorporate the target domain within the command, bypassing the need for external file references.
-
-  **Command Construction Guidelines for GoLinkFinder**:
-  1. **Single Domain Focus**: Direct inclusion of the target domain in the command is mandatory. 
-      - --domain (string): Specify the target website URL. (required)
-
-  Note: **Selective Flag Application**: Choose flags that directly contribute to the scope of your query. The key flags include:
-      - --help: Display a help guide or a full list of available commands and flags.
-  Note: **Limitation on Command and Domain Quantity**: 'GoLinkFinder' is designed to process a single command and a single domain at a time. Should there be attempts to include multiple domains or generate multiple commands by user query, respond back with tool's functionality restricts such operations.  
-
-  **Example Commands**:
-  - For extracting URLs from a specific domain:
-  \`\`\`json
-  { "command": "golinkfinder --domain example.com" }
-  \`\`\`
-
-  - For a request for help or all flags or if the user asked about how the plugin works:
-  \`\`\`json
-  { "command": "golinkfinder --help" }
-  \`\`\`
-
-  Please adjust the command based on your specific requirements or inquire further if assistance with additional flags is needed.
-  
-  Response:`
-
-  return answerMessage
 }
 
 const processGoLinkFinderData = (data: string): string => {

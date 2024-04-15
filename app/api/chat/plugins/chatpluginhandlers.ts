@@ -1,19 +1,13 @@
-import { handleCvemapRequest, isCvemapCommand } from "./cvemap/cvemap.content"
+import { handleCvemapRequest } from "./cvemap/cvemap.content"
 import { handleCyberchefRequest } from "./cyberchef/cyberchef.content"
-import {
-  handleSubfinderRequest,
-  isSubfinderCommand
-} from "./subfinder/subfinder.content"
-import {
-  handleGolinkfinderRequest,
-  isGolinkfinderCommand
-} from "./golinkfinder/golinkfinder.content"
-import { handleNucleiRequest, isNucleiCommand } from "./nuclei/nuclei.content"
-import { handleKatanaRequest, isKatanaCommand } from "./katana/katana.content"
-import { handleHttpxRequest, isHttpxCommand } from "./httpx/httpx.content"
-import { handleNaabuRequest, isNaabuCommand } from "./naabu/naabu.content"
-import { handleGauRequest, isGauCommand } from "./gau/gau.content"
-import { handleAlterxRequest, isAlterxCommand } from "./alterx/alterx.content"
+import { handleSubfinderRequest } from "./subfinder/subfinder.content"
+import { handleGolinkfinderRequest } from "./golinkfinder/golinkfinder.content"
+import { handleNucleiRequest } from "./nuclei/nuclei.content"
+import { handleKatanaRequest } from "./katana/katana.content"
+import { handleHttpxRequest } from "./httpx/httpx.content"
+import { handleNaabuRequest } from "./naabu/naabu.content"
+import { handleGauRequest } from "./gau/gau.content"
+import { handleAlterxRequest } from "./alterx/alterx.content"
 
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
@@ -61,33 +55,26 @@ export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
 }
 
 const commandHandlers: CommandHandler = {
-  isCvemapCommand,
   handleCvemapRequest,
-  isGolinkfinderCommand,
   handleGolinkfinderRequest,
-  isNucleiCommand,
   handleNucleiRequest,
-  isSubfinderCommand,
   handleSubfinderRequest,
-  isKatanaCommand,
   handleKatanaRequest,
-  isHttpxCommand,
   handleHttpxRequest,
-  isNaabuCommand,
   handleNaabuRequest,
-  isGauCommand,
   handleGauRequest,
-  isAlterxCommand,
   handleAlterxRequest
 }
 
 export const isCommand = (commandName: string, message: string) => {
-  const checkFunction = `is${capitalize(commandName)}Command`
-  if (typeof commandHandlers[checkFunction] === "function") {
-    return commandHandlers[checkFunction](message)
-  } else {
-    return false
-  }
+  if (!message.startsWith("/")) return false
+
+  const trimmedMessage = message.trim()
+  const commandPattern = new RegExp(
+    `^\\/${commandName}(?:\\s+(-[a-z]+|\\S+))*$`
+  )
+
+  return commandPattern.test(trimmedMessage)
 }
 
 export const handleCommand = async (

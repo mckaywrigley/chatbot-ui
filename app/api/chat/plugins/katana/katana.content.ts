@@ -11,55 +11,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-export const isKatanaCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/katana(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [Katana](${pluginUrls.Katana}) is a fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Interact with Katana conversationally by simply describing your web crawling needs in plain language. The AI will understand your requirements and automatically configure and execute the appropriate Katana command, facilitating an intuitive user experience.
-    
-  **Direct Commands:**
-  Use direct commands to specifically control the crawling process. Begin your command with the program name followed by relevant flags to precisely define the crawling scope and parameters.
-  
-    Usage:
-       /katana [flags]
-  
-    Flags:
-    INPUT:
-       -u, -list string[]  target url / list to crawl
-
-    CONFIGURATION:
-       -d, -depth int               maximum depth to crawl (default 3)
-       -jc, -js-crawl               enable endpoint parsing / crawling in javascript file
-       -timeout int                 time to wait for request in seconds (default 15)
-       -iqp, -ignore-query-params   Ignore crawling same path with different query-param values
-
-    HEADLESS:
-       -xhr, -xhr-extraction   extract xhr request url,method in jsonl output
-
-    SCOPE:
-       -cs, -crawl-scope string[]        in scope url regex to be followed by crawler
-       -cos, -crawl-out-scope string[]   out of scope url regex to be excluded by crawler
-       -do, -display-out-scope           display external endpoint from scoped crawling
-
-    FILTER:
-       -mr, -match-regex string[]        regex or list of regex to match on output url (cli, file)
-       -fr, -filter-regex string[]       regex or list of regex to filter on output url (cli, file)
-       -em, -extension-match string[]    match output for given extension (eg, -em php,html,js)
-       -ef, -extension-filter string[]   filter output for given extension (eg, -ef png,css)
-       -mdc, -match-condition string     match response with dsl based condition
-       -fdc, -filter-condition string    filter response with dsl based condition`
-}
+import { displayHelpGuideForKatana } from "../plugin-helper/help-guides"
+import { transformUserQueryToKatanaCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface KatanaParams {
   urls: string[]
@@ -402,43 +356,23 @@ export async function handleKatanaRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForKatana(), true)
         controller.close()
         return
       }
 
       const params = parseKatanaCommandLine(lastMessage.content)
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
       let katanaUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/katana`
-
-      interface KatanaRequestBody {
-        urls?: string[]
-        depth?: number
-        jsCrawl?: boolean
-        ignoreQueryParams?: boolean
-        headless?: boolean
-        xhrExtraction?: boolean
-        crawlScope?: string[]
-        crawlOutScope?: string[]
-        displayOutScope?: boolean
-        matchRegex?: string[]
-        filterRegex?: string[]
-        extensionMatch?: string[]
-        extensionFilter?: string[]
-        matchCondition?: string
-        filterCondition?: string
-        timeout?: number
-        fileContent?: string
-      }
 
       let requestBody: Partial<KatanaParams> = {}
 
@@ -537,82 +471,6 @@ export async function handleKatanaRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToKatanaCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => {
-  const katanaIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-u' or '-list' being essential to specify the target URL or list. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-
-  const domainOrFilenameInclusionText = fileContentIncluded
-    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Katana supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : endent`**Direct Domain Inclusion**: When scanning a list of domains, directly embed them in the command instead of using file references.
-    - -u, -list: Specify the target URL or list to crawl. (required)`
-
-  const katanaExampleText = fileContentIncluded
-    ? endent`For scanning a list of hosts directly using a file named '${fileName}':
-      \`\`\`json
-      { "command": "katana -list ${fileName}" }
-      \`\`\``
-    : endent`For scanning a list of domains directly:
-      \`\`\`json
-      { "command": "katana -list domain1.com,domain2.com,domain3.com" }
-      \`\`\``
-
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  ${katanaIntroduction}
-
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "katana [flags]" }
-  \`\`\`
-  In this context, replace '[flags]' with '-help' to generate the appropriate help command. The '-help' flag is crucial as it instructs the 'katana' tool to display its help guide, offering an overview of all available flags and their purposes. This format ensures the command is both valid JSON and specifically tailored to users' inquiries about help or flag functionalities. 
-
-  Example Command for Requesting Help:
-  \`\`\`json
-  { "command": "katana -help" }
-  \`\`\`
-
-  This command will instruct the 'katana' tool to provide its help documentation, making it easier for users to understand how to use the tool and which flags are at their disposal for specific tasks. It's important to ensure that the command remains simple and directly addresses the user's request for help.
-
-  Command Construction Guidelines:
-  1. ${domainOrFilenameInclusionText}
-  2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'katana' tool include:
-    - -depth int: maximum depth to crawl (default 3) (optional)
-    - -js-crawl: Enable crawling of JavaScript files. (optional)
-    - -ignore-query-params: Ignore different query parameters in the same path. (optional)
-    - -timeout: Set a time limit in seconds (default 15 seconds). (optional)
-    - -xhr-extraction: Extract XHR request URL and method in JSONL format. (optional)
-    - -crawl-scope: Define in-scope URL regex for crawling. (optional)
-    - -crawl-out-scope: Define out-of-scope URL regex to exclude from crawling. (optional)
-    - -display-out-scope: Show external endpoints from scoped crawling. (optional)
-    - -match-regex: Match output URLs with specified regex patterns. (optional)
-    - -filter-regex: Filter output URLs using regex patterns. (optional)
-    - -extension-match: Match output for specified file extensions. (optional)
-    - -extension-filter: Filter output for specified file extensions. (optional)
-    - -match-condition: Apply DSL-based conditions for matching responses. (optional)
-    - -filter-condition: Apply DSL-based conditions for filtering responses. (optional)
-    - -help: Display help and all available flags. (optional)
-    Use these flags to align with the request's specific requirements or when '-help' is requested for help.
-  3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient URL crawling and filtering process.
-
-  Example Commands:
-  ${katanaExampleText}
-
-  For a request for help or to see all flags:
-  \`\`\`json
-  { "command": "katana -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 function processurls(outputString: string) {

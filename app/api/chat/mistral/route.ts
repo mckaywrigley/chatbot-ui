@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     if (chatSettings.model === "mistral-large") {
       selectedModel = llmConfig.models.hackerGPT_pro
 
-      similarityTopK = 4
+      similarityTopK = 3
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
     } else {

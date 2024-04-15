@@ -7,53 +7,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-import endent from "endent"
-
-export const isSubfinderCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/subfinder(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [Subfinder](${pluginUrls.Subfinder}) is a powerful subdomain discovery tool designed to enumerate and uncover valid subdomains of websites efficiently through passive online sources. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Engage with Subfinder by describing your subdomain discovery needs in plain language. The AI will interpret your request and automatically execute the relevant command with Subfinder, offering a user-friendly interface for those who prefer intuitive interactions.
-  
-  **Direct Commands:**
-  Utilize direct commands for granular control over subdomain discovery. Start your command with "/" followed by the necessary flags to specify detailed parameters for the scan.
-  
-    Usage:
-       /subfinder [flags]
-  
-    Flags:
-    INPUT:
-       -d, -domain string[]   domains to find subdomains for
-
-    CONFIGURATION:
-       -r string[]        comma separated list of resolvers to use
-       -nW, -active       display active subdomains only
-       -ei, -exclude-ip   exclude IPs from the list of domains
-
-    FILTER:
-       -m, -match string[]    subdomain or list of subdomain to match (comma separated)
-       -f, -filter string[]   subdomain or list of subdomain to filter (comma separated)
-
-    OUTPUT:
-       -oJ, -json              write output in JSONL(ines) format
-       -cs, -collect-sources   include all sources in the output
-       -oI, -ip                include host IP in output (-active only)
-       
-    OPTIMIZATIONS:
-       -timeout int   seconds to wait before timing out (default 30)`
-}
+import { displayHelpGuideForSubfinder } from "../plugin-helper/help-guides"
+import { transformUserQueryToSubfinderCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface SubfinderParams {
   domain: string[]
@@ -272,20 +228,20 @@ export async function handleSubfinderRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForSubfinder(), true)
         controller.close()
         return
       }
 
       const params = parseCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -402,51 +358,6 @@ export async function handleSubfinderRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToSubfinderCommand = (lastMessage: Message) => {
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  Based on this query, generate a command for the 'subfinder' tool, focusing on subdomain discovery. The command should use only the most relevant flags, with '-domain' being essential. If the request involves discovering subdomains for a specific domain, embed the domain directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:
-  
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "subfinder -domain [domain] [additional flags as needed]" }
-  \`\`\`
-  Replace '[domain]' with the actual domain name and directly include it in the command. Include any of the additional flags only if they align with the specifics of the request. Ensure the command is properly escaped to be valid JSON.
-
-  Command Construction Guidelines:
-  1. **Direct Domain Inclusion**: When discovering subdomains for a specific domain, directly embed the domain in the command instead of using file references.
-    - -domain string[]: Identifies the target domain(s) for subdomain discovery directly in the command. (required)
-  2. **Selective Flag Use**: Carefully select flags that are directly pertinent to the task. The available flags are:
-    - -r string[]: Use specified resolvers. (e.g., 8.8.8.8) (optional)
-    - -active: Display only active subdomains. (optional)
-    - -exclude-ip: Exclude IPs from the domain list. (optional)
-    - -match string[]: Match specific subdomains in comma-separated format. (optional)
-    - -filter string[]: Exclude certain subdomains in comma-separated format. (optional)
-    - -json: Output in JSON format. (optional)
-    - -collect-sources: Include source information for each subdomain. (optional)
-    - -ip: Include host IP in output (always should go with -active flag). (optional)
-    - -timeout int: Set timeout limit (default 30 seconds). (optional)
-    - -help: Display help and all available flags. (optional)
-    Do not include any flags not listed here. Use these flags to align with the request's specific requirements or when '-help' is requested for help.
-  3. **Relevance and Efficiency**: Ensure that the flags chosen for the command are relevant and contribute to an effective and efficient subdomain discovery process.
-
-  Example Commands:
-  For discovering subdomains for a specific domain directly:
-  \`\`\`json
-  { "command": "subfinder -domain example.com" }
-  \`\`\`
-
-  For a request for help or all flags or if the user asked about how the plugin works:
-  \`\`\`json
-  { "command": "subfinder -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 const processSubfinderData = (data: string) => {

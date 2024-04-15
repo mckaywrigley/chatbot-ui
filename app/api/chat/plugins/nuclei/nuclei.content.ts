@@ -1,6 +1,5 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-import endent from "endent"
 
 import {
   processAIResponseAndUpdateMessage,
@@ -11,91 +10,9 @@ import {
   getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
-export const isNucleiCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/nuclei(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [Nuclei](${pluginUrls.Nuclei}) is a fast exploitable vulnerability scanner designed to probe modern applications, infrastructure, cloud platforms, and networks, aiding in the identification and mitigation of vulnerabilities. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Engage with Nuclei by describing your vulnerability scanning needs in plain language. The AI will interpret your request and automatically configure and execute the appropriate command using Nuclei, simplifying the user experience.
-  
-  **Direct Commands:**
-  Utilize direct commands to precisely control the scanning process. Begin your command with "/" followed by the necessary flags to tailor your scans to specific targets and conditions.
-  
-    Usage:
-       /nuclei [flags]
-  
-    Flags:
-    TARGET:
-       -u, -target string[]          target URLs/hosts to scan
-       -l, -list string              path to file containing a list of target URLs/hosts to scan (one per line)
-       -eh, -exclude-hosts string[]  hosts to exclude to scan from the input list (ip, cidr, hostname)
-       -sa, -scan-all-ips            scan all the IP's associated with dns record
-       -iv, -ip-version string[]     IP version to scan of hostname (4,6) - (default 4)
-
-    TEMPLATES:
-       -nt, -new-templates                    run only new templates added in latest nuclei-templates release
-       -ntv, -new-templates-version string[]  run new templates added in specific version
-       -as, -automatic-scan                   automatic web scan using wappalyzer technology detection to tags mapping
-       -t, -templates string[]                list of template to run (comma-separated)
-       -turl, -template-url string[]          template url to run (comma-separated)
-       -w, -workflows string[]                list of workflow to run (comma-separated)
-       -wurl, -workflow-url string[]          workflow url to run (comma-separated)
-       -td, -template-display                 displays the templates content
-       -tl                                    list all available templates
-       -code                                  enable loading code protocol-based templates
-      
-    FILTERING:
-       -a, -author string[]               templates to run based on authors (comma-separated)
-       -tags string[]                     templates to run based on tags (comma-separated) Possible values: cves, osint, tech ...)
-       -etags, -exclude-tags string[]     templates to exclude based on tags (comma-separated)
-       -itags, -include-tags string[]     tags to be executed even if they are excluded either by default or configuration
-       -id, -template-id string[]         templates to run based on template ids (comma-separated, allow-wildcard)
-       -eid, -exclude-id string[]         templates to exclude based on template ids (comma-separated)
-       -it, -include-templates string[]   templates to be executed even if they are excluded either by default or configuration
-       -et, -exclude-templates string[]   template or template directory to exclude (comma-separated)
-       -em, -exclude-matchers string[]    template matchers to exclude in result
-       -s, -severity value[]              templates to run based on severity. Possible values: info, low, medium, high, critical, unknown
-       -es, -exclude-severity value[]     templates to exclude based on severity. Possible values: info, low, medium, high, critical, unknown
-       -pt, -type value[]                 templates to run based on protocol type. Possible values: dns, file, http, headless, tcp, workflow, ssl, websocket, whois, code, javascript
-       -ept, -exclude-type value[]        templates to exclude based on protocol type. Possible values: dns, file, http, headless, tcp, workflow, ssl, websocket, whois, code, javascript
-       -tc, -template-condition string[]  templates to run based on expression condition
-
-    OUTPUT:
-       -j, -jsonl  write output in JSONL(ines) format
-
-    CONFIGURATIONS:
-       -fr, -follow-redirects          enable following redirects for http templates
-       -fhr, -follow-host-redirects    follow redirects on the same host
-       -mr, -max-redirects int         max number of redirects to follow for http templates (default 10)
-       -dr, -disable-redirects         disable redirects for http templates
-       -H, -header string[]            custom header/cookie to include in all http request in header:value format (cli)
-       -V, -var value                  custom vars in key=value format
-       -sr, -system-resolvers          use system DNS resolving as error fallback
-       -dc, -disable-clustering        disable clustering of requests
-       -passive                        enable passive HTTP response processing mode
-       -fh2, -force-http2              force http2 connection on requests
-       -dt, -dialer-timeout value      timeout for network requests.
-       -dka, -dialer-keep-alive value  keep-alive duration for network requests.
-       -at, -attack-type string        type of payload combinations to perform (batteringram,pitchfork,clusterbomb)
-
-    OPTIMIZATIONS:
-       -timeout int               time to wait in seconds before timeout (default 30)
-       -mhe, -max-host-error int  max errors for a host before skipping from scan (default 30)
-       -nmhe, -no-mhe             disable skipping host from scan based on errors
-       -ss, -scan-strategy value  strategy to use while scanning(auto/host-spray/template-spray) (default auto)
-       -nh, -no-httpx             disable httpx probing for non-url input`
-}
+import { displayHelpGuideForNuclei } from "../plugin-helper/help-guides"
+import { transformUserQueryToNucleiCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface NucleiParams {
   // TARGET
@@ -859,20 +776,20 @@ export async function handleNucleiRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForNuclei(), true)
         controller.close()
         return
       }
 
       const params = parseCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -1047,119 +964,6 @@ export async function handleNucleiRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToNucleiCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => {
-  const nucleiIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should use the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should utilize the most relevant flags, with '-target' being essential to specify the target host(s) to scan. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-
-  const domainOrFilenameInclusionText = fileContentIncluded
-    ? endent`**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Nuclei supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : endent`**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
-  - -target (string[]): Specify the target host(s) to scan. (required)`
-
-  const nucleiExampleText = fileContentIncluded
-    ? endent`For probing a list of hosts directly using a file named '${fileName}':
-      \`\`\`json
-      { "command": "nuclei -list ${fileName}" }
-      \`\`\``
-    : endent`For probing a list of hosts directly:
-      \`\`\`json
-      { "command": "nuclei -target host1.com,host2.com" }
-      \`\`\``
-
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  ${nucleiIntroduction}
-
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "nuclei [flags]" }
-  \`\`\`
-  In this context, replace '[flags]' with '-help' to generate the appropriate help command. The '-help' flag is crucial as it instructs the 'nuclei' tool to display its help guide, offering an overview of all available flags and their purposes. This format ensures the command is both valid JSON and specifically tailored to users' inquiries about help or flag functionalities. 
-
-  Example Command for Requesting Help:
-  \`\`\`json
-  { "command": "nuclei -help" }
-  \`\`\`
-
-  This command will instruct the 'nuclei' tool to provide its help documentation, making it easier for users to understand how to use the tool and which flags are at their disposal for specific tasks. It's important to ensure that the command remains simple and directly addresses the user's request for help.
-
-  Command Construction Guidelines:
-  1. ${domainOrFilenameInclusionText}
-  2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'nuclei' tool include:
-    - **TARGET**:
-      - -exclude-hosts (string[]): Hosts to exclude from the input list (ip, cidr, hostname).
-      - -scan-all-ips: Scan all the IP's associated with a DNS record.
-      - -ip-version (string[]): IP version to scan of hostname (4,6) - (default 4).
-    - **TEMPLATES**:
-      - -new-templates: Run only new templates added in the latest nuclei-templates release.
-      - -new-templates-version (string[]): Run new templates added in a specific version.
-      - -automatic-scan: Automatic web scan using Wappalyzer technology detection to tags mapping.
-      - -templates (string[]): List of templates to run (comma-separated).
-      - -template-url (string[]): Template URL to run (comma-separated).
-      - -workflows (string[]): List of workflows to run (comma-separated).
-      - -workflow-url (string[]): Workflow URL to run (comma-separated).
-      - -template-display: Displays the template's content.
-      - -list-templates: List all available templates.
-      - -code: Enable loading code protocol-based templates.
-    - **FILTERING**:
-      - -author (string[]): Templates to run based on authors (comma-separated).
-      - -tags (string[]): Templates to run based on tags (comma-separated).
-      - -exclude-tags (string[]): Templates to exclude based on tags (comma-separated).
-      - -include-tags (string[]): Tags to be executed even if they are excluded either by default or configuration.
-      - -template-id (string[]): Templates to run based on template ids (comma-separated, allow-wildcard).
-      - -exclude-id (string[]): Templates to exclude based on template ids (comma-separated).
-      - -include-templates (string[]): Templates to be executed even if they are excluded either by default or configuration.
-      - -exclude-templates (string[]): Template or template directory to exclude (comma-separated).
-      - -exclude-matchers (string[]): Template matchers to exclude in result.
-      - -severity (value[]): Templates to run based on severity. Possible values: info, low, medium, high, critical, unknown.
-      - -exclude-severity (value[]): Templates to exclude based on severity.
-      - -type (value[]): Templates to run based on protocol type.
-      - -exclude-type (value[]): Templates to exclude based on protocol type.
-      - -template-condition (string[]): Templates to run based on expression condition.
-    - **OUTPUT**:
-      - -jsonl: Write output in JSONL(ines) format. 
-    - **CONFIGURATIONS**:
-      - -follow-redirects: Enable following redirects for HTTP templates.
-      - -follow-host-redirects: Follow redirects on the same host.
-      - -max-redirects (int): Max number of redirects to follow for HTTP templates (default 10).
-      - -disable-redirects: Disable redirects for HTTP templates.
-      - -header (string[]): Custom header/cookie to include in all HTTP requests in header:value format (cli).
-      - -var (value): Custom vars in key=value format.
-      - -system-resolvers: Use system DNS resolving as error fallback.
-      - -disable-clustering: Disable clustering of requests.
-      - -passive: Enable passive HTTP response processing mode.
-      - -force-http2: Force HTTP2 connection on requests.
-      - -dialer-timeout (value): Timeout for network requests.
-      - -dialer-keep-alive (value): Keep-alive duration for network requests.
-      - -attack-type (string): Type of payload combinations to perform.
-    - **OPTIMIZATIONS**:
-      - -timeout (int): Time to wait in seconds before timeout (default 30).
-      - -max-host-error (int): Max errors for a host before skipping from scan (default 30).
-      - -no-max-host-error: Disable skipping host from scan based on errors.
-      - -scan-strategy (value): Strategy to use while scanning.
-      - -no-httpx: Disable HTTPX probing for non-URL input.
-    Do not include any flags not listed here, this are only flags you can use. Use these flags to align with the request's specific requirements or when '-help' is requested for help. Only provide output flag '-jsonl' if the user asks for it.
-  3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient scanning process.
-
-  Example Commands:
-  ${nucleiExampleText}
-
-  For a request for help or all flags or if the user asked about how the plugin works:
-  \`\`\`json
-  { "command": "nuclei -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 function processurls(outputString: string) {

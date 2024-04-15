@@ -11,60 +11,9 @@ import {
   getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
-export const isNaabuCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/naabu(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [Naabu](${pluginUrls.Naabu}) is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists all ports that return a reply. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Engage with Naabu by describing your port scanning needs in plain language. The AI will understand your requirements and automatically execute the appropriate command with Naabu, facilitating an intuitive and streamlined user experience.
-  
-  **Direct Commands:**
-  Utilize direct commands for detailed control over the scanning process. Commands start with "/" and are followed by relevant options and flags to specifically tailor your port scans.
-  
-    Usage:
-       /naabu [flags]
-
-    Flags:
-    INPUT:
-       -host string[]     hosts to scan ports for (comma-separated)
-       -list, -l string   list of hosts to scan ports (file)
-
-    PORT:
-       -port, -p string             ports to scan (80,443, 100-200)
-       -top-ports, -tp string       top ports to scan (default 100) [100,1000]
-       -exclude-ports, -ep string   ports to exclude from scan (comma-separated)
-       -port-threshold, -pts int    port threshold to skip port scan for the host
-       -exclude-cdn, -ec            skip full port scans for CDN/WAF (only scan for port 80,443)
-       -display-cdn, -cdn           display cdn in use    
-
-    CONFIGURATION:
-       -scan-all-ips, -sa   scan all the IP's associated with DNS record
-       -timeout int         milliseconds to wait before timing out (default 1000)
-    
-    HOST-DISCOVERY:
-       -sn, -host-discovery            Perform Only Host Discovery
-       -Pn, -skip-host-discovery       Skip Host discovery
-       -pe, -probe-icmp-echo           ICMP echo request Ping (host discovery needs to be enabled)
-       -pp, -probe-icmp-timestamp      ICMP timestamp request Ping (host discovery needs to be enabled)
-       -pm, -probe-icmp-address-mask   ICMP address mask request Ping (host discovery needs to be enabled)
-       -arp, -arp-ping                 ARP ping (host discovery needs to be enabled)
-       -nd, -nd-ping                   IPv6 Neighbor Discovery (host discovery needs to be enabled)
-       -rev-ptr                        Reverse PTR lookup for input ips
-
-    OUTPUT:
-       -j, -json   write output in JSON lines format`
-}
+import { displayHelpGuideForNaabu } from "../plugin-helper/help-guides"
+import { transformUserQueryToNaabuCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface NaabuParams {
   host: string[] | string
@@ -360,20 +309,20 @@ export async function handleNaabuRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForNaabu(), true)
         controller.close()
         return
       }
 
       const params = parseNaabuCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -478,80 +427,6 @@ export async function handleNaabuRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToNaabuCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => {
-  const naabuIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-host' being essential. If the request involves scanning a list of hosts, embed the hosts directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-
-  const domainOrFilenameInclusionText = fileContentIncluded
-    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Naabu supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : endent`**Direct Host Inclusion**: When scanning a list of hosts, directly embed them in the command instead of using file references.
-    - -host string[]: Identifies the target host(s) for port scanning directly in the command. (required)`
-
-  const naabuExampleText = fileContentIncluded
-    ? endent`For scaning a list of hosts directly using a file named '${fileName}':
-      \`\`\`json
-      { "command": "naabu -list ${fileName} -top-ports 100" }
-      \`\`\``
-    : endent`For scanning a list of hosts directly:
-      \`\`\`json
-      { "command": "naabu -host host1.com,host2.com,host3.com -top-ports 100" }
-      \`\`\``
-
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  ${naabuIntroduction}
-
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "naabu [flags]" }
-  \`\`\`
-  Replace '[flags]' with the actual flags and values, directly including the hosts if necessary. Include additional flags only if they are specifically relevant to the request.
-  IMPORTANT: Ensure the command is properly escaped to be valid JSON. Ensure the command uses simpler regex patterns compatible with the 'naabu' tool's regex engine. Avoid advanced regex features like negative lookahead.
-
-  Command Construction Guidelines for Naabu:
-  1. ${domainOrFilenameInclusionText}
-  2. **Selective Flag Use**: Include only the flags that are essential to the request. The available flags for Naabu are:
-    - -port string: Specify ports to scan (e.g., 80,443, 100-200). (optional)
-    - -top-ports string: Scan top N ports (e.g., 100, 1000). (optional)
-    - -exclude-ports string: Exclude specific ports from the scan. (optional)
-    - -port-threshold int: Set a port threshold to skip port scan for the host. (optional)
-    - -exclude-cdn: Exclude full port scans for CDN/WAF. (optional)
-    - -display-cdn: Display CDN in use. (optional)
-    - -scan-all-ips: Scan all IPs associated with a DNS record. (optional)
-    - -timeout int: Milliseconds to wait before timing out (default 1000). (optional)
-    - -host-discovery: Perform only host discovery. (optional)
-    - -skip-host-discovery: Skip host discovery. (optional)
-    - -probe-icmp-echo: Use ICMP echo request ping. (optional)
-    - -probe-icmp-timestamp: Use ICMP timestamp request ping. (optional)
-    - -probe-icmp-address-mask: Use ICMP address mask request ping. (optional)
-    - -arp-ping: Use ARP ping. (optional)
-    - -nd-ping: Use IPv6 Neighbor Discovery ping. (optional)
-    - -rev-ptr: Perform a reverse PTR lookup. (optional)
-    - -json: Output results in JSON format. (optional)
-    - -help: Display help and all available flags. (optional)
-    Use these flags to align with the request's specific requirements or when '-help' is requested for help.
-  3. **Relevance and Efficiency**: Ensure that the flags chosen for the command are relevant and contribute to an effective and efficient port discovery process.
-
-  Example Commands:
-  For scanning a list of hosts directly:
-  ${naabuExampleText}
-
-  For a request for help or all flags or if the user asked about how the plugin works:
-  \`\`\`json
-  { "command": "naabu -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 function processPorts(outputString: string) {

@@ -11,39 +11,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-export const isAlterxCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/alterx(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [Alterx](${pluginUrls.Alterx}) is a fast and customizable subdomain wordlist generator using DSL.
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Interact with AlterX using plain language to describe your requirements for generating subdomain wordlists. The AI understands your input and performs the necessary operations, offering a user-friendly and intuitive experience.
-
-  **Direct Commands:**
-  For precise control, use direct commands. Begin with "/" followed by the command and specific flags to accurately configure your subdomain wordlist generation tasks.
-
-    Usage:
-       /alterx [flags]
-
-    Flags:
-    INPUT:
-       -l, -list string[]      subdomains to use when creating permutations (stdin, comma-separated, file)
-       -p, -pattern string[]   custom permutation patterns input to generate (comma-seperated, file)
-
-    CONFIGURATION:
-       -en, -enrich   enrich wordlist by extracting words from input
-       -limit int     limit the number of results to return (default 0)`
-}
+import { displayHelpGuideForAlterx } from "../plugin-helper/help-guides"
+import { transformUserQueryToAlterxCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface AlterxParams {
   list: string[]
@@ -202,20 +172,20 @@ export async function handleAlterxRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForAlterx(), true)
         controller.close()
         return
       }
 
       const params = parseAlterxCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -312,69 +282,6 @@ export async function handleAlterxRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToAlterxCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => {
-  const alterxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains filename directly in the command. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-
-  const domainOrFilenameInclusionText = fileContentIncluded
-    ? endent`**Filename Inclusion**: Use the -list string[] flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Alterx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : endent`**Domain/Subdomain Inclusion**: Directly specify the main domain or subdomains using the -list string[] flag. For a single domain, format it as -list domain.com. For multiple subdomains, separate them with commas (e.g., -list subdomain1.domain.com,subdomain2.domain.com). (required)`
-
-  const alterxExampleText = fileContentIncluded
-    ? endent`For generating a wordlist using a file named '${fileName}' containing list of domains:
-      \`\`\`json
-      { "command": "alterx -list ${fileName}" }
-      \`\`\``
-    : endent`For generating a wordlist with a single subdomain:
-      \`\`\`json
-      { "command": "alterx -list subdomain1.com" }
-      \`\`\`
-
-      For generating a wordlist with multiple subdomains:
-      \`\`\`json
-      { "command": "alterx -list subdomain1.com,subdomain2.com" }
-      \`\`\``
-
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  ${alterxIntroduction}
-  
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "alterx [flags]" }
-  \`\`\`
-  Replace '[flags]' with the actual flags and values. Include additional flags only if they are specifically relevant to the request. Ensure the command is properly escaped to be valid JSON.
-
-  Command Construction Guidelines:
-  1. ${domainOrFilenameInclusionText}
-  2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'Alterx' tool include:
-    - -pattern: Custom permutation patterns input to generate (optional).
-    - -enrich: Enrich wordlist by extracting words from input (optional).
-    - -limit: Limit the number of results to return, with the default being 0 (optional).
-    - -help: Display help and all available flags. (optional)
-    Use these flags to align with the request's specific requirements or when '-help' is requested for help.
-  3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient wordlist generation process.
-
-  Example Commands:
-
-  ${alterxExampleText}
-
-  For a request for help or all flags or if the user asked about how the plugin works:
-  \`\`\`json
-  { "command": "alterx -help" }
-  \`\`\`
-  
-  Response:`
-
-  return answerMessage
 }
 
 function processSubdomains(outputString: string) {

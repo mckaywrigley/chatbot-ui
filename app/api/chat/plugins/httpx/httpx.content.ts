@@ -11,98 +11,9 @@ import {
   truncateData
 } from "../chatpluginhandlers"
 
-export const isHttpxCommand = (message: string) => {
-  if (!message.startsWith("/")) return false
-
-  const trimmedMessage = message.trim()
-  const commandPattern = /^\/httpx(?:\s+(-[a-z]+|\S+))*$/
-
-  return commandPattern.test(trimmedMessage)
-}
-
-const displayHelpGuide = () => {
-  return `
-  [HTTPX](${pluginUrls.Httpx}) is a fast and multi-purpose HTTP toolkit built to support running multiple probes using a public library. Probes are specific tests or checks to gather information about web servers, URLs, or other HTTP elements. HTTPX is designed to maintain result reliability with an increased number of threads. 
-
-  ## Interaction Methods
-
-  **Conversational AI Requests:**
-  Engage with HttpX by describing your web server analysis needs in plain language. The AI will interpret your request and automatically configure and execute the appropriate command using HTTPX, making it user-friendly for intuitive use.
-  
-  **Direct Commands:**
-  Use direct commands to exert granular control over the probing process. Start your command with "/" followed by the necessary flags to specifically tailor your HTTP investigations.
-  
-    Usage:
-       /httpx [flags]
-  
-    Flags:
-    INPUT:
-       -u, -target string[]  input target host(s) to probe
-       -l, -list string      input file containing list of hosts to process
-
-    PROBES:
-       -sc, -status-code     display response status-code
-       -cl, -content-length  display response content-length
-       -ct, -content-type    display response content-type
-       -location             display response redirect location
-       -favicon              display mmh3 hash for '/favicon.ico' file
-       -hash string          display response body hash (supported: md5,mmh3,simhash,sha1,sha256,sha512)
-       -jarm                 display jarm fingerprint hash
-       -rt, -response-time   display response time
-       -lc, -line-count      display response body line count
-       -wc, -word-count      display response body word count
-       -title                display page title
-       -bp, -body-preview    display first N characters of response body (default 100)
-       -server, -web-server  display server name
-       -td, -tech-detect     display technology in use based on wappalyzer dataset
-       -method               display http request method
-       -websocket            display server using websocket
-       -ip                   display host ip
-       -cname                display host cname
-       -asn                  display host asn information
-       -cdn                  display cdn/waf in use
-       -probe                display probe status
-
-    MATCHERS:
-       -mc, -match-code string            match response with specified status code (-mc 200,302)
-       -ml, -match-length string          match response with specified content length (-ml 100,102)
-       -mlc, -match-line-count string     match response body with specified line count (-mlc 423,532)
-       -mwc, -match-word-count string     match response body with specified word count (-mwc 43,55)
-       -mfc, -match-favicon string[]      match response with specified favicon hash (-mfc 1494302000)
-       -ms, -match-string string          match response with specified string (-ms admin)
-       -mr, -match-regex string           match response with specified regex (-mr admin)
-       -mcdn, -match-cdn string[]         match host with specified cdn provider (cloudfront, fastly, google, leaseweb, stackpath)
-       -mrt, -match-response-time string  match response with specified response time in seconds (-mrt '< 1')
-       -mdc, -match-condition string      match response with dsl expression condition
-
-    EXTRACTOR:
-       -er, -extract-regex string[]   display response content with matched regex
-       -ep, -extract-preset string[]  display response content matched by a pre-defined regex (ipv4,mail,url)
-
-    FILTERS:
-       -fc, -filter-code string            filter response with specified status code (-fc 403,401)
-       -fep, -filter-error-page            filter response with ML based error page detection
-       -fl, -filter-length string          filter response with specified content length (-fl 23,33)
-       -flc, -filter-line-count string     filter response body with specified line count (-flc 423,532)
-       -fwc, -filter-word-count string     filter response body with specified word count (-fwc 423,532)
-       -ffc, -filter-favicon string[]      filter response with specified favicon hash (-ffc 1494302000)
-       -fs, -filter-string string          filter response with specified string (-fs admin)
-       -fe, -filter-regex string           filter response with specified regex (-fe admin)
-       -fcdn, -filter-cdn string[]         filter host with specified cdn provider (cloudfront, fastly, google, leaseweb, stackpath)
-       -frt, -filter-response-time string  filter response with specified response time in seconds (-frt '> 1')
-       -fdc, -filter-condition string      filter response with dsl expression condition
-       -strip                              strips all tags in response. supported formats: html,xml (default html)
-    
-    OUTPUT:
-       -j, -json                         write output in JSONL(ines) format
-       -irh, -include-response-header    include http response (headers) in JSON output (-json only)
-       -irr, -include-response           include http request/response (headers + body) in JSON output (-json only)
-       -irrb, -include-response-base64   include base64 encoded http request/response in JSON output (-json only)
-       -include-chain                    include redirect http chain in JSON output (-json only)
-       
-    OPTIMIZATIONS:
-       -timeout int   timeout in seconds (default 15)`
-}
+import { displayHelpGuideForHttpx } from "../plugin-helper/help-guides"
+import { transformUserQueryToHttpxCommand } from "../plugin-helper/transform-query-to-command"
+import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface HttpxParams {
   target: string[]
@@ -770,20 +681,20 @@ export async function handleHttpxRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuide(), true)
+        sendMessage(displayHelpGuideForHttpx(), true)
         controller.close()
         return
       }
 
       const params = parseCommandLine(lastMessage.content)
 
-      if (params.error && invokedByToolId) {
-        sendMessage(`\n\n${params.error}`, true)
-        controller.close()
-        return
-      } else if (params.error) {
-        sendMessage(`${params.error}`, true)
-        controller.close()
+      if (params.error) {
+        handlePluginStreamError(
+          params.error,
+          invokedByToolId,
+          sendMessage,
+          controller
+        )
         return
       }
 
@@ -1090,118 +1001,6 @@ export async function handleHttpxRequest(
   })
 
   return new Response(stream, { headers })
-}
-
-const transformUserQueryToHttpxCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => {
-  const httpxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-    : `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-u' or '-target' being essential to specify the target host(s) to probe. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
-
-  const domainOrFilenameInclusionText = fileContentIncluded
-    ? endent`**Filename Inclusion**: Use the -list string flag followed by the file name (e.g., -list ${fileName}) containing the list of domains in the correct format. Httpx supports direct file inclusion, making it convenient to use files like '${fileName}' that already contain the necessary domains. (required)`
-    : endent`**Direct Host Inclusion**: Directly embed target hosts in the command instead of using file references.
-    - -u, -target (string[]): Specify the target host(s) to probe. (required)`
-
-  const httpxExampleText = fileContentIncluded
-    ? endent`For probing a list of hosts directly using a file named '${fileName}':
-      \`\`\`json
-      { "command": "httpx -list ${fileName}" }
-      \`\`\``
-    : endent`For probing a list of hosts directly:
-      \`\`\`json
-      { "command": "httpx -u host1.com,host2.com" }
-      \`\`\``
-
-  const answerMessage = endent`
-  Query: "${lastMessage.content}"
-
-  ${httpxIntroduction}
-  
-  ALWAYS USE THIS FORMAT:
-  \`\`\`json
-  { "command": "httpx [flags]" }
-  \`\`\`
-  Replace '[flags]' with the actual flags and values. Include additional flags only if they are specifically relevant to the request. 
-  IMPORTANT: Ensure the command is properly escaped to be valid JSON. Ensure the command uses simpler regex patterns compatible with the 'httpx' tool's regex engine. Avoid advanced regex features like negative lookahead.
-
-  Command Construction Guidelines:
-  1. ${domainOrFilenameInclusionText}
-  2. **Selective Flag Use**: Carefully choose flags that are pertinent to the task. The available flags for the 'httpx' tool include:
-    - **Probes**: Include specific probes for detailed HTTP response information. Available probes:
-      - -status-code (boolean): Display response status code.
-      - -content-length (boolean): Display response content length.
-      - -content-type (boolean): Display response content type.
-      - -location (boolean): Display response redirect location.
-      - -favicon (boolean): Display mmh3 hash for '/favicon.ico' file.
-      - -hash (string): Display response body hash (supports md5, mmh3, simhash, sha1, sha256, sha512).
-      - -jarm (boolean): Display JARM fingerprint hash.
-      - -response-time (boolean): Display response time.
-      - -line-count (boolean): Display response body line count.
-      - -word-count (boolean): Display response body word count.
-      - -title (boolean): Display page title.
-      - -body-preview (number): Display first N characters of the response body.
-      - -web-server (boolean): Display server name.
-      - -tech-detect (boolean): Display technology in use based on Wappalyzer dataset.
-      - -method (boolean): Display HTTP request method.
-      - -websocket (boolean): Display server using WebSocket.
-      - -ip (boolean): Display host IP.
-      - -cname (boolean): Display host CNAME.
-      - -asn (boolean): Display host ASN information.
-      - -cdn (boolean): Display CDN/WAF in use.
-      - -probe (boolean): Display probe status.
-    - **Matchers**: Utilize matchers to filter responses based on specific criteria:
-      - -match-code (string): Match response with specified status code (e.g., '-match-code 200,302').
-      - -match-length (string): Match response with specified content length (e.g., '-match-length 100,102').
-      - -match-line-count (string): Match response body with specified line count (e.g., '-match-line-count 423,532').
-      - -match-word-count (string): Match response body with specified word count (e.g., '-match-word-count 43,55').
-      - -match-favicon (string[]): Match response with specified favicon hash (e.g., '-match-favicon 1494302000').
-      - -match-string (string): Match response with specified string (e.g., '-match-string admin').
-      - -match-regex (string): Match response with specified regex (e.g., '-match-regex admin').
-      - -match-cdn (string[]): Match host with specified CDN provider (e.g., '-match-cdn cloudfront,fastly,google,leaseweb,stackpath').
-      - -match-response-time (string): Match response with specified response time in seconds (e.g., '-match-response-time <1').
-      - -match-condition (string): Match response with DSL expression condition.
-    - **Extractor**: Extract specific information from the response:
-      - -extract-regex (string[]): Display response content with matched regex.
-      - -extract-preset (string[]): Display response content matched by a pre-defined regex (e.g., '-extract-preset ipv4,mail').
-    - **Filters**: Apply filters to refine the results. Available filters include:
-      - -filter-code (string): Filter response with specified status code (e.g., '-filter-code 403,401').
-      - -filter-error-page (boolean): Filter response with ML-based error page detection.
-      - -filter-length (string): Filter response with specified content length (e.g., '-filter-length 23,33').
-      - -filter-line-count (string): Filter response body with specified line count (e.g., '-filter-line-count 423,532').
-      - -filter-word-count (string): Filter response body with specified word count (e.g., '-filter-word-count 423,532').
-      - -filter-favicon (string[]): Filter response with specified favicon hash (e.g., '-filter-favicon 1494302000').
-      - -filter-string (string): Filter response with specified string (e.g., '-filter-string admin').
-      - -filter-regex (string): Filter response with specified regex (e.g., '-filter-regex admin').
-      - -filter-cdn (string[]): Filter host with specified CDN provider (e.g., '-filter-cdn cloudfront,fastly,google,leaseweb,stackpath').
-      - -filter-response-time (string): Filter response with specified response time (e.g., '-filter-response-time '>1'').
-      - -filter-condition (string): Filter response with DSL expression condition.
-      - -strip (string): Strips all tags in response (e.g., '-strip html'). supported formats: html,xml (default html)
-    - **Output Options**: Customize the output format with these flags:
-      - -json (boolean): Write output in JSONL(ines) format.
-      - -include-response-header (boolean): Include HTTP response headers in JSON output. (-json only)
-      - -include-response (boolean): Include HTTP request/response in JSON output. (-json only)
-      - -include-response-base64 (boolean): Include base64 encoded request/response in JSON output. (-json only)
-      - -include-chain (boolean): Include redirect HTTP chain in JSON output. (-json only)
-    - **Optimizations**: Enhance the probing efficiency with:
-      - -timeout (number): Set a timeout in seconds. (default is 15).
-    Do not include any flags not listed here. Use these flags to align with the request's specific requirements or when '-help' is requested for help.
-  3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient HTTP probing process.
-
-  Example Commands:
-  ${httpxExampleText}
-
-  For a request for help or all flags:
-  \`\`\`json
-  { "command": "httpx -help" }
-  \`\`\`
-
-  Response:`
-
-  return answerMessage
 }
 
 function processurls(outputString: string) {
