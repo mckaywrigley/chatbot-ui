@@ -123,8 +123,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey && !isMobile) {
       event.preventDefault()
-      setIsPromptPickerOpen(false)
-      handleSendMessage(userInput, chatMessages, false)
+      if (!isGenerating) {
+        setIsPromptPickerOpen(false)
+        handleSendMessage(userInput, chatMessages, false)
+      }
     }
 
     if (
@@ -332,7 +334,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           value={userInput}
           minRows={1}
           maxRows={18}
-          disabled={isGenerating}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           onCompositionStart={() => setIsTyping(true)}

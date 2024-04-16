@@ -173,7 +173,9 @@ export const useChatHandler = () => {
     isContinuation: boolean = false
   ) => {
     try {
-      setUserInput("")
+      if (!isRegeneration) {
+        setUserInput("")
+      }
       setIsGenerating(true)
       setIsPromptPickerOpen(false)
       setIsAtPickerOpen(false)
@@ -446,7 +448,6 @@ export const useChatHandler = () => {
 
       setIsGenerating(false)
       setFirstTokenReceived(false)
-      setUserInput("")
     } catch (error) {
       setIsGenerating(false)
       setFirstTokenReceived(false)
