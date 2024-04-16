@@ -184,9 +184,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       if (navigator.mediaDevices != undefined) {
         //Req microphone permissions
         navigator.mediaDevices
-          .getUserMedia({ audio: true, video: true })
+          .getUserMedia({ audio: true })
           .then(function (stream) {
             // Mic permissions granted, handle however you wish
+            console.log(
+              "window.navigator.userAgent",
+              window.navigator.userAgent
+            )
             const isSafari =
               window.navigator.userAgent.search("Safari") >= 0 &&
               window.navigator.userAgent.search("Chrome") < 0
