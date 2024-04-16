@@ -18,6 +18,7 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { Toaster } from "react-hot-toast"
 
 interface ChatUIProps {}
 
@@ -229,6 +230,18 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
         <ChatHelp />
       </div>
+      <Toaster
+        toastOptions={{
+          // Define default options
+          className: "",
+          duration: 5000,
+          style: {
+            border: "1px solid #14B8A6",
+            background: "#191617",
+            color: "#E6E4E5"
+          }
+        }}
+      />
     </div>
   )
 }

@@ -84,6 +84,16 @@ import { FC, useContext, useEffect, useRef, useState } from "react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
+import { toast as toast2 } from "react-hot-toast"
+
+const notify = () =>
+  toast2.success(`The thread messages has been successfully downloaded.`, {
+    duration: 2000,
+    iconTheme: {
+      primary: "#14B8A6",
+      secondary: "#191617"
+    }
+  })
 
 interface SidebarUpdateItemProps {
   isTyping: boolean
@@ -151,6 +161,28 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const [selectedAssistantTools, setSelectedAssistantTools] = useState<
     Tables<"tools">[]
   >([])
+
+  const handleDownload = () => {
+    const jsonStringAssistant = JSON.stringify(item)
+
+    console.log("jsonStringAssistant", jsonStringAssistant)
+
+    const blob = new Blob([jsonStringAssistant], {
+      type: "application/json"
+    })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = item.name
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+
+    setIsOpen(false)
+
+    notify()
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -584,6 +616,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   const handleUpdate = async () => {
     try {
+      console.log("updateState", updateState)
       const updateFunction = updateFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
 
@@ -644,6 +677,23 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               <SheetTitle className="text-pixelspace-gray-3 text-xl font-bold leading-7 text-neutral-200">
                 Edit {contentType.slice(0, -1)}
               </SheetTitle>
+              {contentType === "assistants" && (
+                <div
+                  className="m-0 flex h-[1.875rem] cursor-pointer items-center gap-1 rounded border border-[#8c8484] p-2"
+                  onClick={handleDownload}
+                >
+                  <div className="flex size-4 items-center justify-center">
+                    <div className="flex size-4 shrink-0 items-center justify-center p-px px-[0.1875rem]">
+                      <div className="flex h-[0.8125rem] items-center justify-center text-right text-[.8125rem] leading-[normal] text-[#cdc8c9]">
+                        <i className="fa-regular fa-arrow-down-to-line text-pixelspace-gray-40"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center text-sm leading-[180%] text-[#e6e4e5]">
+                    Download
+                  </div>
+                </div>
+              )}
             </SheetHeader>
 
             <div className="mt-4 space-y-3">

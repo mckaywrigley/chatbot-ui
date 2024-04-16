@@ -18,6 +18,18 @@ import {
 } from "@/Core/Utils/context-menu-helper"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { Input } from "../ui/input"
+import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
+import toast from "react-hot-toast"
+
+const notify = (type: string) =>
+  toast.success(`The ${type} has been successfully created`, {
+    duration: 2000,
+    iconTheme: {
+      primary: "#14B8A6",
+      secondary: "#191617"
+    }
+  })
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -31,6 +43,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const { profile, selectedWorkspace, folders, setFolders } =
     useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
+  const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 
   const [isCreatingPrompt, setIsCreatingPrompt] = useState(false)
   const [isCreatingPreset, setIsCreatingPreset] = useState(false)
@@ -45,6 +58,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
   const [renderOnTop, setRenderOnTop] = useState(false)
   const menuRef = useRef<any>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   // End hooks context menu
 
   // Menu context logic
@@ -230,6 +244,54 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
                 </div>
               </li>
             )}
+
+            {hasData &&
+              (contentType === "assistants" || contentType === "chats") && (
+                <li>
+                  <div
+                    role="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20  block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm font-normal  dark:hover:text-white"
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      className="mr-2 size-[14px]"
+                    />
+                    Upload {getContentTypeText(contentType)}
+                  </div>
+                  <Input
+                    ref={fileInputRef}
+                    className="hidden"
+                    type="file"
+                    onChange={e => {
+                      if (!e.target.files) return
+                      // handleSelectDeviceFile(e.target.files[0])
+
+                      const file = e.target.files[0]
+
+                      if (file) {
+                        const reader = new FileReader()
+                        reader.onload = () => {
+                          try {
+                            const jsonData = JSON.parse(reader.result as string)
+                            //onUpload(jsonData);
+                            console.log("jsonData", jsonData)
+                            notify(
+                              contentType === "chats" ? "thread" : contentType
+                            )
+                            setIsMenuOpen(false)
+                          } catch (error) {
+                            console.error("Error parsing JSON:", error)
+                            // Optionally handle error here, such as displaying a message to the user
+                          }
+                        }
+                        reader.readAsText(file)
+                      }
+                    }}
+                    accept={filesToAccept}
+                  />
+                </li>
+              )}
           </ul>
         </div>
       )}
