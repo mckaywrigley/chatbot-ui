@@ -2,6 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { IconCheck, IconCopy, IconEdit, IconRepeat } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
+import { MessageDownload } from "./message-download"
 
 export const MESSAGE_ICON_SIZE = 18
 
@@ -10,6 +11,7 @@ interface MessageActionsProps {
   isLast: boolean
   isEditing: boolean
   isHovering: boolean
+  message: any
   onCopy: () => void
   onEdit: () => void
   onRegenerate: () => void
@@ -20,6 +22,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isLast,
   isEditing,
   isHovering,
+  message,
   onCopy,
   onEdit,
   onRegenerate
@@ -106,6 +109,8 @@ export const MessageActions: FC<MessageActionsProps> = ({
           }
         />
       )}
+
+      {(isHovering || isLast) && <MessageDownload message={message} />}
 
       {/* {1 > 0 && isAssistant && <MessageReplies />} */}
     </div>

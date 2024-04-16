@@ -180,38 +180,50 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const onAudioClick = async () => {
     setContent(content ? content : "")
     try {
-      const audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      })
+      // Check if mediaDevices loaded.
+      if (navigator.mediaDevices != undefined) {
+        //Req microphone permissions
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then(function (stream) {
+            // Mic permissions granted, handle however you wish
+            const isSafari =
+              window.navigator.userAgent.search("Safari") >= 0 &&
+              window.navigator.userAgent.search("Chrome") < 0
+            let mimeType = "audio/webm;codecs=opus" // default mimeType
 
-      const isSafari =
-        window.navigator.userAgent.search("Safari") >= 0 &&
-        window.navigator.userAgent.search("Chrome") < 0
-      let mimeType = "audio/webm;codecs=opus" // default mimeType
+            if (isSafari) {
+              if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
+                console.log("Safari detected, using mp4")
+                mimeType = "audio/mp4;codecs=h264"
+              } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+                console.log("Safari detected, using m4a")
+                mimeType = "audio/x-m4a"
+              }
+            }
 
-      if (isSafari) {
-        if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
-          console.log("Safari detected, using mp4")
-          mimeType = "audio/mp4;codecs=h264"
-        } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
-          console.log("Safari detected, using m4a")
-          mimeType = "audio/x-m4a"
-        }
+            console.log("mimeType", mimeType)
+
+            const mediaRecorder = new window.MediaRecorder(stream, {
+              mimeType: mimeType
+            })
+
+            setStream(stream)
+            setVoiceRecorder(mediaRecorder)
+            setAuxContent(content)
+            setContent("")
+            setIsRecording(true)
+          })
+          .catch(function (err) {
+            // Mic permissions denied, handle however you wish
+            console.log("Microphone permissions denied")
+          })
+      } else {
+        // Out of luck at this point, handle however you wish.
+        console.log("mediaDevices is not available")
       }
-
-      console.log("mimeType", mimeType)
-
-      const mediaRecorder = new window.MediaRecorder(audioStream, {
-        mimeType: mimeType
-      })
-
-      setStream(audioStream)
-      setVoiceRecorder(mediaRecorder)
-      setAuxContent(content)
-      setContent("")
-      setIsRecording(true)
     } catch (e) {
-      console.log(e)
+      console.log("Unexpected error: ", e)
       console.log("No se otorgó permiso para acceder al micrófono.")
     }
   }

@@ -18,6 +18,7 @@ import {
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
+import { DownloadChat } from "./download-chat"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -44,7 +45,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
 
   const router = useRouter()
   const params = useParams()
-  const isActive = params?.chatid === chat.id || selectedChat?.id === chat.id
 
   // Menu context logic
 
@@ -98,10 +98,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     ...availableLocalModels,
     ...availableOpenRouterModels
   ].find(llm => llm.modelId === chat.model) as LLM
-
-  const assistantImage = assistantImages.find(
-    image => image.assistantId === chat.assistant_id
-  )?.base64
 
   return (
     <div
@@ -187,6 +183,15 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
             <li>
               <div>
                 <UpdateChat chat={chat} setShowChatDialog={setShowChatDialog} />
+              </div>
+            </li>
+
+            <li className="mt-1">
+              <div>
+                <DownloadChat
+                  chat={chat}
+                  setShowChatDialog={setShowChatDialog}
+                />
               </div>
             </li>
 
