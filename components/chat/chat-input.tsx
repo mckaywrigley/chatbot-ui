@@ -191,25 +191,31 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               "window.navigator.userAgent",
               window.navigator.userAgent
             )
+
+            const containsMacintosh = /Macintosh/.test(
+              window.navigator.userAgent
+            )
+            const containsSafari = /Safari/.test(window.navigator.userAgent)
+
             // const isSafari =
             //   window.navigator.userAgent.search("Safari") >= 0 &&
             //   window.navigator.userAgent.search("Chrome") < 0
             let mimeType = "audio/webm;codecs=opus" // default mimeType
 
-            // if (isSafari) {
-            //   if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
-            //     console.log("Safari detected, using mp4")
-            //     mimeType = "audio/mp4;codecs=h264"
-            //   } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
-            //     console.log("Safari detected, using m4a")
-            //     mimeType = "audio/x-m4a"
-            //   }
-            // }
+            if (containsMacintosh && containsSafari) {
+              if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
+                console.log("Safari detected, using mp4")
+                mimeType = "audio/mp4;codecs=h264"
+              } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+                console.log("Safari detected, using m4a")
+                mimeType = "audio/x-m4a"
+              }
+            }
 
             console.log("mimeType", mimeType)
 
             const mediaRecorder = new window.MediaRecorder(audioStream, {
-              mimeType: "audio/mp4;codecs=mp4a.40.5"
+              mimeType: mimeType
             })
 
             setStream(audioStream)
