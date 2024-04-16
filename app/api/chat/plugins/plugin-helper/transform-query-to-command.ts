@@ -608,8 +608,6 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
       - -limit int: Limit the number of results to display (default 50, specify a different number as needed).
       - -offset int: Offset the results to display (use in pagination, starts from 0).
       - -json: Return output in JSON format (use for structured data needs).
-      - -silent: Minimize output to essential information only.
-      - -verbose: Provide detailed output for debugging purposes.
       - -help: Provide all flags avaiable and information about tool. Use this flag if user asked for help or if user asked for all flags or if user asked about plugin.
       - -json: Return output in json format. 
       Do not include any flags not listed here. Use these flags to align with the request's specific requirements. All flags are optional.

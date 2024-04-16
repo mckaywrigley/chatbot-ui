@@ -1,6 +1,5 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-import endent from "endent"
 
 import {
   createGKEHeaders,
@@ -68,15 +67,7 @@ const parseGoLinkFinderCommandLine = (input: string): GoLinkFinderParams => {
 export async function handleGolinkfinderRequest(
   lastMessage: Message,
   enableGoLinkFinderFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message,
-      toolId: string
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,

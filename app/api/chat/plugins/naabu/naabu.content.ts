@@ -1,6 +1,5 @@
 import { Message } from "@/types/chat"
 import { pluginUrls } from "@/types/plugins"
-import endent from "endent"
 
 import {
   processAIResponseAndUpdateMessage,

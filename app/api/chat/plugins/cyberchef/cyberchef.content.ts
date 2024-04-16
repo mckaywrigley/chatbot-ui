@@ -76,15 +76,7 @@ const parseCyberChefJSONInput = (jsonInput: string): CyberChefParams => {
 export async function handleCyberchefRequest(
   lastMessage: Message,
   enableCyberChefFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message,
-      tools: any
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any, arg3: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,

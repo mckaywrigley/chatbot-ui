@@ -163,15 +163,7 @@ const parseGauCommandLine = (input: string): GauParams => {
 export async function handleGauRequest(
   lastMessage: Message,
   enableGauFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message,
-      toolId: string
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,

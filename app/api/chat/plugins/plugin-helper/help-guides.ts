@@ -48,10 +48,6 @@ export const displayHelpGuideForCvemap = () => {
           -l, -limit int       limit the number of results to display (default 50)
           -offset int          offset the results to display
           -j, -json            return output in json format
-  
-      DEBUG:
-          -silent   Silent
-          -verbose  Verbose
     \`\`\``
 }
 

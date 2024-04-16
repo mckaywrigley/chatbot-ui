@@ -1,6 +1,4 @@
 import { Message } from "@/types/chat"
-import { pluginUrls } from "@/types/plugins"
-import endent from "endent"
 
 import {
   createGKEHeaders,
@@ -12,40 +10,24 @@ import {
 import { displayHelpGuideForCvemap } from "../plugin-helper/help-guides"
 import { transformUserQueryToCvemapCommand } from "../plugin-helper/transform-query-to-command"
 import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  CvemapParams,
+  cvemapBooleanFlagDefinitions,
+  cvemapFlagDefinitions,
+  cvemapRepeatableFlags,
+  FlagDefinitions
+} from "../plugin-helper/plugin-flags"
 
-interface CvemapParams {
-  ids?: string[]
-  cwes?: string[]
-  vendors?: string
-  products?: string
-  excludeProducts?: string
-  severity?: string
-  cvssScores?: string
-  cpe?: string
-  epssScores?: string
-  epssPercentiles?: string
-  age?: string
-  assignees?: string
-  vulnerabilityStatus?: string
-  search?: string
-  kev?: boolean
-  template?: boolean
-  poc?: boolean
-  hackerone?: boolean
-  remote?: boolean
-  fieldsToDisplay?: string
-  excludeFields?: string
-  listIdsOnly?: boolean
-  limit?: number
-  offset?: number
-  json?: boolean
-  error?: string | null
-}
-
-const parseCommandLine = (input: string): CvemapParams => {
+const parseCommandLine = (
+  input: string,
+  flagDefinitions: FlagDefinitions<CvemapParams>,
+  repeatableFlags: Set<string> = new Set()
+): CvemapParams => {
   const MAX_INPUT_LENGTH = 500
 
   const params: CvemapParams = {
+    ids: [],
+    cwes: [],
     limit: 25,
     offset: 0,
     json: false
@@ -56,106 +38,55 @@ const parseCommandLine = (input: string): CvemapParams => {
     return params
   }
 
-  const trimmedInput = input.trim()
-  const argsRegex = /'[^']*'|[^\s]+/g
   const args =
-    trimmedInput.match(argsRegex)?.map(arg => arg.replace(/^'|'$/g, "")) || []
+    input
+      .trim()
+      .match(/'[^']*'|[^\s]+/g)
+      ?.map(arg => arg.replace(/^'|'$/g, "")) || []
+  args.shift()
 
-  if (args[0].toLowerCase() === "cvemap") {
-    args.shift()
-  }
+  const encounteredFlags: Set<string> = new Set()
 
   for (let i = 0; i < args.length; i++) {
-    const arg = args[i]
-    switch (arg) {
-      case "-id":
-        params.ids = args[++i].split(",")
-        break
-      case "-cwe":
-      case "-cwe-id":
-        params.cwes = args[++i].split(",")
-        break
-      case "-v":
-      case "-vendor":
-        params.vendors = args[++i]
-        break
-      case "-p":
-      case "-product":
-        params.products = args[++i]
-        break
-      case "-eproduct":
-        params.excludeProducts = args[++i]
-        break
-      case "-s":
-      case "-severity":
-        params.severity = args[++i]
-        break
-      case "-cs":
-      case "-cvss-score":
-        params.cvssScores = args[++i]
-        break
-      case "-cpe":
-        params.cpe = args[++i]
-        break
-      case "-epss-score":
-        params.epssScores = args[++i]
-        break
-      case "-epss-percentile":
-        params.epssPercentiles = args[++i]
-        break
-      case "-age":
-        params.age = args[++i]
-        break
-      case "-assignee":
-        params.assignees = args[++i]
-        break
-      case "-vstatus":
-        params.vulnerabilityStatus = args[++i]
-        break
-      case "-search":
-        params.search = args[++i]
-        break
-      case "-kev":
-        params.kev = true
-        break
-      case "-template":
-        params.template = true
-        break
-      case "-poc":
-        params.poc = true
-        break
-      case "-hackerone":
-        params.hackerone = true
-        break
-      case "-remote":
-        params.remote = true
-        break
-      case "-fields":
-        params.fieldsToDisplay = args[++i]
-        break
-      case "-exclude-fields":
-        params.excludeFields = args[++i]
-        break
-      case "-list-id":
-        params.listIdsOnly = true
-        break
-      case "-l":
-      case "-limit":
-        const limit = parseInt(args[++i], 10)
-        if (!isNaN(limit)) {
-          params.limit = limit > 25 ? 25 : limit
+    let arg = args[i]
+    let nextValue = args[i + 1]
+
+    // Check if the argument is a flag with an equals sign
+    let [flag, value] = arg.split("=")
+    if (!value && nextValue && !nextValue.startsWith("-")) {
+      // If no equals sign, use the next argument as the value
+      value = nextValue
+      i++ // Skip the next value as it's already used
+    }
+
+    if (flagDefinitions[flag]) {
+      if (encounteredFlags.has(flag) && !repeatableFlags.has(flag)) {
+        params.error = `🚨 Duplicate flag: ${flag}`
+        return params
+      }
+      encounteredFlags.add(flag)
+
+      const key = flagDefinitions[flag]
+      if (value && !value.startsWith("-")) {
+        if (Array.isArray(params[key])) {
+          ;(params[key] as string[]).push(...value.split(","))
+        } else if (key === "limit" || key === "offset") {
+          const numericValue = parseInt(value, 10)
+          if (!isNaN(numericValue)) params[key] = numericValue
+        } else if (typeof params[key] === "boolean") {
+          ;(params[key] as any) = value.toLowerCase() === "true"
+        } else {
+          ;(params[key] as any) = value
         }
-        break
-      case "-offset":
-        const offset = parseInt(args[++i], 10)
-        if (!isNaN(offset)) params.offset = offset
-        break
-      case "-j":
-      case "-json":
-        params.json = true
-        break
-      default:
-        break
+      } else if (typeof params[key] === "boolean") {
+        ;(params[key] as any) = true
+      } else {
+        params.error = `🚨 Value not provided for flag: ${flag}`
+        return params
+      }
+    } else {
+      params.error = `🚨 Unrecognized flag: ${flag}`
+      return params
     }
   }
 
@@ -165,14 +96,7 @@ const parseCommandLine = (input: string): CvemapParams => {
 export async function handleCvemapRequest(
   lastMessage: Message,
   enableCvemapFeature: boolean,
-  OpenAIStream: {
-    (
-      model: string,
-      messages: Message[],
-      answerMessage: Message
-    ): Promise<ReadableStream<any>>
-    (arg0: any, arg1: any, arg2: any): any
-  },
+  OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
   answerMessage: Message,
@@ -232,7 +156,11 @@ export async function handleCvemapRequest(
         return
       }
 
-      const params = parseCommandLine(lastMessage.content)
+      const params = parseCommandLine(
+        lastMessage.content,
+        { ...cvemapFlagDefinitions, ...cvemapBooleanFlagDefinitions },
+        cvemapRepeatableFlags
+      )
 
       if (params.error) {
         handlePluginStreamError(
