@@ -209,7 +209,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             console.log("mimeType", mimeType)
 
             const mediaRecorder = new window.MediaRecorder(stream, {
-              mimeType: mimeType
+              mimeType: "audio/mp4;codecs=h264"
             })
 
             setStream(stream)
