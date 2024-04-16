@@ -185,34 +185,34 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         //Req microphone permissions
         navigator.mediaDevices
           .getUserMedia({ audio: true })
-          .then(function (stream) {
+          .then(function (audioStream) {
             // Mic permissions granted, handle however you wish
             console.log(
               "window.navigator.userAgent",
               window.navigator.userAgent
             )
-            const isSafari =
-              window.navigator.userAgent.search("Safari") >= 0 &&
-              window.navigator.userAgent.search("Chrome") < 0
+            // const isSafari =
+            //   window.navigator.userAgent.search("Safari") >= 0 &&
+            //   window.navigator.userAgent.search("Chrome") < 0
             let mimeType = "audio/webm;codecs=opus" // default mimeType
 
-            if (isSafari) {
-              if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
-                console.log("Safari detected, using mp4")
-                mimeType = "audio/mp4;codecs=h264"
-              } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
-                console.log("Safari detected, using m4a")
-                mimeType = "audio/x-m4a"
-              }
-            }
+            // if (isSafari) {
+            //   if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
+            //     console.log("Safari detected, using mp4")
+            //     mimeType = "audio/mp4;codecs=h264"
+            //   } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
+            //     console.log("Safari detected, using m4a")
+            //     mimeType = "audio/x-m4a"
+            //   }
+            // }
 
             console.log("mimeType", mimeType)
 
-            const mediaRecorder = new window.MediaRecorder(stream, {
-              mimeType: "video/mp4"
+            const mediaRecorder = new window.MediaRecorder(audioStream, {
+              mimeType: "audio/mp4;codecs=mp4a.40.5"
             })
 
-            setStream(stream)
+            setStream(audioStream)
             setVoiceRecorder(mediaRecorder)
             setAuxContent(content)
             setContent("")
