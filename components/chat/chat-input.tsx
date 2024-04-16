@@ -202,6 +202,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             //   window.navigator.userAgent.search("Chrome") < 0
             let mimeType = "audio/webm;codecs=opus" // default mimeType
 
+            console.log("containsMacintosh", containsMacintosh)
+            console.log("containsSafari", containsSafari)
+
             if (containsMacintosh && containsSafari) {
               if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
                 console.log("Safari detected, using mp4")
