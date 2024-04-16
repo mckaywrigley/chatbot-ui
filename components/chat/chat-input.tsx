@@ -184,7 +184,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       if (navigator.mediaDevices != undefined) {
         //Req microphone permissions
         navigator.mediaDevices
-          .getUserMedia({ audio: true })
+          .getUserMedia({ audio: true, video: true })
           .then(function (stream) {
             // Mic permissions granted, handle however you wish
             const isSafari =
@@ -216,6 +216,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           })
           .catch(function (err) {
             // Mic permissions denied, handle however you wish
+            console.log("Microphone permissions error: ", err)
             console.log("Microphone permissions denied")
           })
       } else {
