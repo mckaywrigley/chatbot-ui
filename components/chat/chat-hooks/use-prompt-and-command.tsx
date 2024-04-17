@@ -68,7 +68,7 @@ export const usePromptAndCommand = () => {
 
     if (isTranscription) {
       if (currentValue?.length) {
-        setUserInput(currentValue + "\n" + value)
+        setUserInput(currentValue + "\n\n" + value)
       } else {
         setUserInput(value)
       }
