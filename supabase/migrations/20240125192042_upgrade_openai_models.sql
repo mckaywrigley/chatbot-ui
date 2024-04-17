@@ -1,7 +1,7 @@
 -- WORKSPACES
 
 UPDATE workspaces
-SET default_model = 'gpt-4-turbo-preview'
+SET default_model = 'gpt-4-turbo'
 WHERE default_model = 'gpt-4-1106-preview';
 
 UPDATE workspaces
@@ -11,7 +11,7 @@ WHERE default_model = 'gpt-3.5-turbo-1106';
 -- PRESETS
 
 UPDATE presets
-SET model = 'gpt-4-turbo-preview'
+SET model = 'gpt-4-turbo'
 WHERE model = 'gpt-4-1106-preview';
 
 UPDATE presets
@@ -21,7 +21,7 @@ WHERE model = 'gpt-3.5-turbo-1106';
 -- ASSISTANTS
 
 UPDATE assistants
-SET model = 'gpt-4-turbo-preview'
+SET model = 'gpt-4-turbo'
 WHERE model = 'gpt-4-1106-preview';
 
 UPDATE assistants
@@ -31,7 +31,7 @@ WHERE model = 'gpt-3.5-turbo-1106';
 -- CHATS
 
 UPDATE chats
-SET model = 'gpt-4-turbo-preview'
+SET model = 'gpt-4-turbo'
 WHERE model = 'gpt-4-1106-preview';
 
 UPDATE chats
@@ -41,7 +41,7 @@ WHERE model = 'gpt-3.5-turbo-1106';
 -- MESSAGES
 
 UPDATE messages
-SET model = 'gpt-4-turbo-preview'
+SET model = 'gpt-4-turbo'
 WHERE model = 'gpt-4-1106-preview';
 
 UPDATE messages
@@ -93,7 +93,7 @@ BEGIN
         TRUE,
         'Home',
         4096,
-        'gpt-4-turbo-preview', -- Updated default model
+        'gpt-4-turbo', -- Updated default model
         'You are a friendly, helpful AI assistant.',
         0.5,
         'My home workspace.',
