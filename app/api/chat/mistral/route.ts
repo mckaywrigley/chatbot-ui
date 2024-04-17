@@ -222,7 +222,7 @@ export async function POST(request: Request) {
     if (stopSequence && stopSequence.length > 0) {
       requestBody.stop = stopSequence
     }
-    console.log(requestBody)
+
     try {
       const res = await fetch(providerUrl, {
         method: "POST",
