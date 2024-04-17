@@ -295,6 +295,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
     if (startProcessingAudio && timeSeconds > 1) {
       const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
+      const audioUrl = URL.createObjectURL(audio)
+      console.log("blob url: ", audioUrl)
       void fetchTranscription(audio)
     } else {
       setSendDirectFromButton(false)
