@@ -22,6 +22,16 @@ class APIError extends Error {
   }
 }
 
+interface RequestBody {
+  model: string | undefined
+  route: string
+  messages: { role: any; content: any }[]
+  temperature: number
+  max_tokens: number
+  stream: boolean
+  stop?: string[]
+}
+
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
@@ -40,18 +50,64 @@ export async function POST(request: Request) {
 
     const openrouterApiKey = profile.openrouter_api_key || ""
 
-    let selectedModel
-    let rateLimitCheckResult
-    let similarityTopK
+    let selectedModel, rateLimitCheckResult, similarityTopK
+
+    const useOpenRouter = process.env.USE_OPENROUTER?.toLowerCase() === "true"
+    let providerUrl,
+      providerHeaders,
+      selectedStandaloneQuestionModel,
+      stopSequence
 
     if (chatSettings.model === "mistral-large") {
-      selectedModel = llmConfig.models.hackerGPT_pro
+      if (useOpenRouter) {
+        providerUrl = llmConfig.openrouter.url
+        selectedStandaloneQuestionModel =
+          llmConfig.models.hackerGPT_standalone_question_openrouter
+        providerHeaders = {
+          Authorization: `Bearer ${openrouterApiKey}`,
+          "HTTP-Referer": "https://chat.hackerai.co",
+          "X-Title": "HackerGPT",
+          "Content-Type": "application/json"
+        }
+      } else {
+        providerUrl = llmConfig.together.url
+        selectedModel = llmConfig.models.hackerGPT_pro_together
+        selectedStandaloneQuestionModel =
+          llmConfig.models.hackerGPT_standalone_question_together
+        providerHeaders = {
+          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
+          "Content-Type": "application/json"
+        }
+        stopSequence = ["[/INST]", "</s>"]
+      }
 
       similarityTopK = 3
 
       rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
     } else {
-      selectedModel = llmConfig.models.hackerGPT_default
+      if (useOpenRouter) {
+        providerUrl = llmConfig.openrouter.url
+        selectedModel = llmConfig.models.hackerGPT_default
+        selectedStandaloneQuestionModel =
+          llmConfig.models.hackerGPT_standalone_question_openrouter
+        providerHeaders = {
+          Authorization: `Bearer ${openrouterApiKey}`,
+          "HTTP-Referer": "https://chat.hackerai.co",
+          "X-Title": "HackerGPT",
+          "Content-Type": "application/json"
+        }
+        stopSequence
+      } else {
+        providerUrl = llmConfig.together.url
+        selectedModel = llmConfig.models.hackerGPT_RAG_together
+        selectedStandaloneQuestionModel =
+          llmConfig.models.hackerGPT_standalone_question_together
+        providerHeaders = {
+          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
+          "Content-Type": "application/json"
+        }
+        stopSequence = ["[/INST]", "</s>"]
+      }
 
       similarityTopK = 3
 
@@ -66,14 +122,6 @@ export async function POST(request: Request) {
     }
 
     let modelTemperature = 0.4
-
-    const openRouterUrl = llmConfig.openrouter.url
-    const openRouterHeaders = {
-      Authorization: `Bearer ${openrouterApiKey}`,
-      "HTTP-Referer": "https://chat.hackerai.co",
-      "X-Title": "HackerGPT",
-      "Content-Type": "application/json"
-    }
 
     const cleanedMessages = messages
 
@@ -101,8 +149,9 @@ export async function POST(request: Request) {
         const standaloneQuestion = await generateStandaloneQuestion(
           messages,
           targetStandAloneMessage,
-          openRouterUrl,
-          openRouterHeaders
+          providerUrl,
+          providerHeaders,
+          selectedStandaloneQuestionModel
         )
 
         const pineconeRetriever = new RetrieverReranker(
@@ -117,7 +166,12 @@ export async function POST(request: Request) {
 
         if (pineconeResults !== "None") {
           modelTemperature = llmConfig.pinecone.temperature
-          selectedModel = llmConfig.models.hackerGPT_RAG
+
+          if (useOpenRouter) {
+            selectedModel = llmConfig.models.hackerGPT_RAG_openrouter
+          } else {
+            selectedModel = llmConfig.models.hackerGPT_RAG_together
+          }
 
           cleanedMessages[0].content =
             `${llmConfig.systemPrompts.hackerGPT} ` +
@@ -133,17 +187,25 @@ export async function POST(request: Request) {
 
     // If the user uses the web scraper plugin, we must switch to the rag model.
     if (cleanedMessages[0].content.includes("<USER HELP>")) {
-      selectedModel = llmConfig.models.hackerGPT_RAG
+      if (useOpenRouter) {
+        selectedModel = llmConfig.models.hackerGPT_RAG_openrouter
+      } else {
+        selectedModel = llmConfig.models.hackerGPT_RAG_together
+      }
     }
 
     // If the user is using the mistral-large model, we must always switch to the pro model.
     if (chatSettings.model === "mistral-large") {
-      selectedModel = llmConfig.models.hackerGPT_pro
+      if (useOpenRouter) {
+        selectedModel = llmConfig.models.hackerGPT_pro_openrouter
+      } else {
+        selectedModel = llmConfig.models.hackerGPT_pro_together
+      }
     }
 
     replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
 
-    const requestBody = {
+    const requestBody: RequestBody = {
       model: selectedModel,
       route: "fallback",
       messages: cleanedMessages
@@ -157,10 +219,14 @@ export async function POST(request: Request) {
       stream: true
     }
 
+    if (stopSequence && stopSequence.length > 0) {
+      requestBody.stop = stopSequence
+    }
+    console.log(requestBody)
     try {
-      const res = await fetch(openRouterUrl, {
+      const res = await fetch(providerUrl, {
         method: "POST",
-        headers: openRouterHeaders,
+        headers: providerHeaders,
         body: JSON.stringify(requestBody)
       })
 
@@ -225,7 +291,8 @@ async function generateStandaloneQuestion(
   messages: any[],
   latestUserMessage: any,
   openRouterUrl: string | URL | Request,
-  openRouterHeaders: any
+  openRouterHeaders: any,
+  selectedStandaloneQuestionModel: string | undefined
 ) {
   // Removed the filter for the standalone question as we already have one before this function is called
   //if (messages.length < 4 || latestUserMessage.length > 256) {
@@ -233,7 +300,7 @@ async function generateStandaloneQuestion(
   //}
 
   // Faster and smaller model for standalone questions for reduced latency
-  const modelStandaloneQuestion = "mistralai/mistral-7b-instruct:nitro"
+  const modelStandaloneQuestion = selectedStandaloneQuestionModel
 
   let chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))

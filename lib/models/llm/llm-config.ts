@@ -2,6 +2,9 @@ const llmConfig = {
   openrouter: {
     url: `https://openrouter.ai/api/v1/chat/completions`
   },
+  together: {
+    url: `https://api.together.xyz/v1/chat/completions`
+  },
   openai: {
     apiKey: process.env.OPENAI_API_KEY
   },
@@ -28,8 +31,14 @@ const llmConfig = {
   },
   models: {
     hackerGPT_default: process.env.OPENROUTER_HACKERGPT_DEFUALT_MODEL,
-    hackerGPT_RAG: process.env.OPENROUTER_HACKERGPT_RAG_MODEL,
-    hackerGPT_pro: process.env.OPENROUTER_HACKERGPT_PRO_MODEL
+    hackerGPT_RAG_openrouter: process.env.OPENROUTER_HACKERGPT_RAG_MODEL,
+    hackerGPT_RAG_together: process.env.TOGETHER_HACKERGPT_RAG_MODEL,
+    hackerGPT_standalone_question_openrouter:
+      process.env.OPENROUTER_STANDALONE_QUESTION_MODEL,
+    hackerGPT_standalone_question_together:
+      process.env.TOGETHER_STANDALONE_QUESTION_MODEL,
+    hackerGPT_pro_openrouter: process.env.OPENROUTER_HACKERGPT_PRO_MODEL,
+    hackerGPT_pro_together: process.env.TOGETHER_HACKERGPT_PRO_MODEL
   },
   usePinecone: process.env.USE_PINECONE === "TRUE"
 }
