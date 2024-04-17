@@ -29,7 +29,11 @@ export const usePromptAndCommand = () => {
     setChatFiles
   } = useContext(ChatbotUIContext)
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = (
+    value: string,
+    currentValue?: string,
+    isTranscription?: boolean
+  ) => {
     const atTextRegex = /^@([^ ]*)$/
     const slashTextRegex = /^\/([^ ]*)$/
     const hashtagTextRegex = /^#([^ ]*)$/
@@ -62,7 +66,15 @@ export const usePromptAndCommand = () => {
       setAtCommand("")
     }
 
-    setUserInput(value)
+    if (isTranscription) {
+      if (currentValue?.length) {
+        setUserInput(currentValue + "\n" + value)
+      } else {
+        setUserInput(value)
+      }
+    } else {
+      setUserInput(value)
+    }
   }
 
   const handleSelectPrompt = (prompt: Tables<"prompts">) => {

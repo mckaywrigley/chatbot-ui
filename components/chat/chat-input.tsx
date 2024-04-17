@@ -176,6 +176,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  function getSupportedMimeTypes() {
+    const possibleTypes = [
+      "audio/mp4;codecs=mp4a.40.5",
+      "audio/webm;codecs=opus"
+    ]
+    return possibleTypes.filter(mimeType => {
+      return MediaRecorder.isTypeSupported(mimeType)
+    })[0]
+  }
+
   // Lógica del AudioRecorder
   const onAudioClick = async () => {
     setContent(content ? content : "")
@@ -186,41 +196,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         navigator.mediaDevices
           .getUserMedia({ audio: true })
           .then(function (audioStream) {
-            // Mic permissions granted, handle however you wish
-            console.log(
-              "window.navigator.userAgent",
-              window.navigator.userAgent
-            )
-
-            const containsMacintosh = /Macintosh/.test(
-              window.navigator.userAgent
-            )
-            const containsSafari = /Safari/.test(window.navigator.userAgent)
-
-            // const isSafari =
-            //   window.navigator.userAgent.search("Safari") >= 0 &&
-            //   window.navigator.userAgent.search("Chrome") < 0
+            // Mic permissions granted
             let mimeType = "audio/webm;codecs=opus" // default mimeType
 
-            console.log("containsMacintosh", containsMacintosh)
-            console.log("containsSafari", containsSafari)
-
-            if (containsMacintosh && containsSafari) {
-              if (MediaRecorder.isTypeSupported("audio/mp4;codecs=h264")) {
-                console.log("Safari detected, using mp4")
-                mimeType = "audio/mp4;codecs=h264"
-              } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
-                console.log("Safari detected, using m4a")
-                mimeType = "audio/x-m4a"
-              } else if (
-                MediaRecorder.isTypeSupported("audio/mp4;codecs=mp4a.40.5")
-              ) {
-                console.log("Safari detected, using audio/mp4;codecs=mp4a.40.5")
-                mimeType = "audio/mp4;codecs=mp4a.40.5"
-              }
-            }
-
-            console.log("mimeType", mimeType)
+            mimeType = getSupportedMimeTypes()
 
             const mediaRecorder = new window.MediaRecorder(audioStream, {
               mimeType: mimeType
@@ -233,17 +212,15 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             setIsRecording(true)
           })
           .catch(function (err) {
-            // Mic permissions denied, handle however you wish
+            // Mic permissions denied
             console.log("Microphone permissions error: ", err)
-            console.log("Microphone permissions denied")
           })
       } else {
-        // Out of luck at this point, handle however you wish.
+        // Out of luck at this point
         console.log("mediaDevices is not available")
       }
     } catch (e) {
       console.log("Unexpected error: ", e)
-      console.log("No se otorgó permiso para acceder al micrófono.")
     }
   }
 
@@ -278,7 +255,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         const transcription = result?.transcription
 
         if (transcription) {
-          handleInputChange(transcription)
+          handleInputChange(transcription, userInput, true)
         }
 
         setStartProcessingAudio(false)
@@ -295,22 +272,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
     if (startProcessingAudio && timeSeconds > 1) {
       const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
-      // const audioUrl = URL.createObjectURL(audio)
-      // console.log("blob url: ", audioUrl)
-      // // Create an anchor element
-      // const downloadLink = document.createElement("a")
-
-      // // Set the href attribute to the blob URL
-      // downloadLink.href = audioUrl
-
-      // // Set the download attribute to specify the filename
-      // downloadLink.download = "audio_file.mp3" // Change 'audio_file.mp3' to whatever filename you prefer
-
-      // // Programmatically trigger a click event on the anchor element
-      // downloadLink.click()
-
-      // // Clean up: Revoke the blob URL when you're done with it
-      // URL.revokeObjectURL(audioUrl)
       void fetchTranscription(audio)
     } else {
       setSendDirectFromButton(false)
