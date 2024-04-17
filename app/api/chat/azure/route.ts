@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       case "gpt-3.5-turbo":
         DEPLOYMENT_ID = profile.azure_openai_35_turbo_id || ""
         break
-      case "gpt-4-turbo-preview":
+      case "gpt-4-turbo":
         DEPLOYMENT_ID = profile.azure_openai_45_turbo_id || ""
         break
       case "gpt-4-vision-preview":

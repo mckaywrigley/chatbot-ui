@@ -10,7 +10,7 @@ export type LLMID =
 
 // OpenAI Models (UPDATED 1/29/24)
 export type OpenAILLMID =
-  | "gpt-4-turbo-preview" // GPT-4 Turbo
+  | "gpt-4-turbo" // GPT-4 Turbo
   | "gpt-4-vision-preview" // GPT-4 Vision
   | "gpt-4" // GPT-4
   | "gpt-3.5-turbo" // Updated GPT-3.5 Turbo
@@ -31,9 +31,9 @@ export type AnthropicLLMID =
 // Mistral Models
 export type MistralLLMID =
   | "mistral-tiny" // Mistral Tiny
-  | "mistral-small" // Mistral Small
-  | "mistral-medium" // Mistral Medium
-  | "mistral-large-2402" // Mistral Large
+  | "mistral-small-latest" // Mistral Small
+  | "mistral-medium-latest" // Mistral Medium
+  | "mistral-large-latest" // Mistral Large
 
 export type GroqLLMID =
   | "llama2-70b-4096" // LLaMA2-70b
@@ -62,6 +62,12 @@ export interface LLM {
   hostedId: string
   platformLink: string
   imageInput: boolean
+  pricing?: {
+    currency: string
+    unit: string
+    inputCost: number
+    outputCost?: number
+  }
 }
 
 export interface OpenRouterLLM extends LLM {

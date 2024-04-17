@@ -100,6 +100,15 @@ export const createFile = async (
     | "multilingual-e5-large"
     | "multilingual-e5-small"
 ) => {
+  let validFilename = fileRecord.name.replace(/[^a-z0-9.]/gi, "_").toLowerCase()
+  const extension = file.name.split(".").pop()
+  const baseName = validFilename.substring(0, validFilename.lastIndexOf("."))
+  const maxBaseNameLength = 100 - (extension?.length || 0) - 1
+  if (baseName.length > maxBaseNameLength) {
+    fileRecord.name = baseName.substring(0, maxBaseNameLength) + "." + extension
+  } else {
+    fileRecord.name = baseName + "." + extension
+  }
   const { data: createdFile, error } = await supabase
     .from("files")
     .insert([fileRecord])
@@ -127,7 +136,6 @@ export const createFile = async (
   })
 
   const formData = new FormData()
-  formData.append("file", file)
   formData.append("file_id", createdFile.id)
   formData.append("embeddingsProvider", embeddingsProvider)
 
@@ -137,7 +145,12 @@ export const createFile = async (
   })
 
   if (!response.ok) {
-    toast.error("Failed to process file.")
+    const jsonText = await response.text()
+    const json = JSON.parse(jsonText)
+    console.error(`Error processing file:${createdFile.id}, status:${response.status}, response:${json.message}`)
+    toast.error("Failed to process file. Reason:" + json.message, {
+      duration: 10000
+    })
     await deleteFile(createdFile.id)
   }
 
@@ -198,7 +211,12 @@ export const createDocXFile = async (
   })
 
   if (!response.ok) {
-    toast.error("Failed to process file.")
+    const jsonText = await response.text()
+    const json = JSON.parse(jsonText)
+    console.error(`Error processing file:${createdFile.id}, status:${response.status}, response:${json.message}`)
+    toast.error("Failed to process file. Reason:" + json.message, {
+      duration: 10000
+    })
     await deleteFile(createdFile.id)
   }
 
