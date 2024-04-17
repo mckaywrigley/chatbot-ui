@@ -295,22 +295,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
     if (startProcessingAudio && timeSeconds > 1) {
       const audio = new Blob(chunks, { type: voiceRecorder!.mimeType })
-      const audioUrl = URL.createObjectURL(audio)
-      console.log("blob url: ", audioUrl)
-      // Create an anchor element
-      const downloadLink = document.createElement("a")
+      // const audioUrl = URL.createObjectURL(audio)
+      // console.log("blob url: ", audioUrl)
+      // // Create an anchor element
+      // const downloadLink = document.createElement("a")
 
-      // Set the href attribute to the blob URL
-      downloadLink.href = audioUrl
+      // // Set the href attribute to the blob URL
+      // downloadLink.href = audioUrl
 
-      // Set the download attribute to specify the filename
-      downloadLink.download = "audio_file.mp3" // Change 'audio_file.mp3' to whatever filename you prefer
+      // // Set the download attribute to specify the filename
+      // downloadLink.download = "audio_file.mp3" // Change 'audio_file.mp3' to whatever filename you prefer
 
-      // Programmatically trigger a click event on the anchor element
-      downloadLink.click()
+      // // Programmatically trigger a click event on the anchor element
+      // downloadLink.click()
 
-      // Clean up: Revoke the blob URL when you're done with it
-      URL.revokeObjectURL(audioUrl)
+      // // Clean up: Revoke the blob URL when you're done with it
+      // URL.revokeObjectURL(audioUrl)
       void fetchTranscription(audio)
     } else {
       setSendDirectFromButton(false)
