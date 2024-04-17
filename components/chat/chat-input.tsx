@@ -212,6 +212,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               } else if (MediaRecorder.isTypeSupported("audio/x-m4a")) {
                 console.log("Safari detected, using m4a")
                 mimeType = "audio/x-m4a"
+              } else if (
+                MediaRecorder.isTypeSupported("audio/mp4;codecs=mp4a.40.5")
+              ) {
+                console.log("Safari detected, using audio/mp4;codecs=mp4a.40.5")
+                mimeType = "audio/mp4;codecs=mp4a.40.5"
               }
             }
 
