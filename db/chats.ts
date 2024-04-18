@@ -79,3 +79,34 @@ export const deleteChat = async (chatId: string) => {
 
   return true
 }
+
+export const deleteAllChats = async (userId: string) => {
+  const { error: chatDeleteError } = await supabase
+    .from("chats")
+    .delete()
+    .eq("user_id", userId)
+
+  if (chatDeleteError) {
+    throw new Error(chatDeleteError.message)
+  }
+
+  const { error: chatMessageDeleteError } = await supabase
+    .from("chat_files")
+    .delete()
+    .eq("user_id", userId)
+
+  if (chatMessageDeleteError) {
+    throw new Error(chatMessageDeleteError.message)
+  }
+
+  const { error: folders } = await supabase
+    .from("folders")
+    .delete()
+    .eq("user_id", userId)
+
+  if (folders) {
+    throw new Error(folders.message)
+  }
+
+  return true
+}

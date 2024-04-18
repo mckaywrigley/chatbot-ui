@@ -1,6 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
 import {
-  PROFILE_CONTEXT_MAX,
   PROFILE_DISPLAY_NAME_MAX,
   PROFILE_USERNAME_MAX,
   PROFILE_USERNAME_MIN
@@ -8,17 +7,12 @@ import {
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-// import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
 import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { supabase } from "@/lib/supabase/browser-client"
-import { cn } from "@/lib/utils"
-import { OpenRouterLLM } from "@/types"
 import {
-  IconCircleCheckFilled,
-  IconCircleXFilled,
   IconFileDownload,
-  IconLoader2,
   IconLogout,
+  IconTrash,
   IconUser
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -27,10 +21,8 @@ import { FC, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
-import ImagePicker from "../ui/image-picker"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { LimitDisplay } from "../ui/limit-display"
 import {
   Sheet,
   SheetContent,
@@ -39,10 +31,11 @@ import {
   SheetTrigger
 } from "../ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
 import { SubscriptionTab } from "./profile-tabs/subscription-tab"
+import Modal from "@/components/chat/dialog-portal"
+import { deleteAllChats } from "@/db/chats"
 
 interface ProfileSettingsProps {}
 
@@ -55,6 +48,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     setAvailableOpenRouterModels,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+
+  const [showConfirmationDialog, setShowConfirmationDialog] =
+    useState<boolean>(false)
 
   const router = useRouter()
 
@@ -298,6 +294,28 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     }
   }
 
+  const handleConfirm = async () => {
+    setShowConfirmationDialog(false)
+    const deleted = await deleteAllChats(profile?.user_id || "")
+    if (deleted) {
+      window.location.reload()
+    } else {
+      toast.error("Failed to delete all chats")
+    }
+  }
+
+  const handleCancel = () => {
+    setIsOpen(true)
+    setShowConfirmationDialog(false)
+  }
+
+  const handleDeleteAllChats = async () => {
+    setIsOpen(false)
+    showConfirmationDialog
+      ? setShowConfirmationDialog(false)
+      : setShowConfirmationDialog(true)
+  }
+
   if (!profile) return null
 
   return (
@@ -317,6 +335,27 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </Button>
         )}
       </SheetTrigger>
+
+      <Modal isOpen={showConfirmationDialog}>
+        <div className="bg-background/20 size-screen fixed inset-0 z-50 backdrop-blur-sm"></div>
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
+            <p>
+              <b>All chats and folders in all workspaces</b> will be deleted!
+            </p>
+            <p>Are you sure you want to do this?</p>
+            <div className="mt-5 flex justify-center gap-5">
+              <Button onClick={handleCancel} variant="default">
+                Cancel
+              </Button>
+              <Button onClick={handleConfirm} variant="destructive">
+                Delete All
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       <SheetContent
         className="flex flex-col justify-between"
@@ -426,6 +465,18 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   onChange={e => setDisplayName(e.target.value)}
                   maxLength={PROFILE_DISPLAY_NAME_MAX}
                 />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Label>Delete All Chats</Label>
+                <Button
+                  tabIndex={-1}
+                  variant="destructive"
+                  onClick={handleDeleteAllChats}
+                >
+                  <IconTrash className="mr-1" size={20} />
+                  Delete All
+                </Button>
               </div>
 
               {/* <div className="space-y-1">
