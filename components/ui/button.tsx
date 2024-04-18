@@ -17,7 +17,8 @@ const buttonVariants = cva(
           "border-input bg-background hover:bg-accent hover:text-accent-foreground border",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: " hover:text-pixelspace-gray-3 border border-[#8c8484]",
+        ghost: " hover:text-pixelspace-gray-3 border-1",
+        ghost2: " hover:text-pixelspace-gray-3 border border-[#8c8484]",
         download: "  rounded bg-[#e6e4e5] text-[#110e0f] text-center",
         workspaceButton:
           " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",

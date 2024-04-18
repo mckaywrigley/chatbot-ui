@@ -99,45 +99,13 @@ export const DownloadChat: FC<DownloadChatProps> = ({
   }
 
   return (
-    <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-      <DialogTrigger asChild>
-        <div
-          role="button"
-          className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium dark:hover:text-white"
-        >
-          <FontAwesomeIcon icon={faArrowDownToLine} className="mr-2" />
-          <span>Download</span>
-        </div>
-      </DialogTrigger>
-
-      <DialogContent className="h-[177px] w-[640px]" onKeyDown={handleKeyDown}>
-        <DialogHeader>
-          <DialogTitle>Download {chat.name}</DialogTitle>
-
-          <DialogDescription>
-            Are you sure you want to download this chat?
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter>
-          <Button
-            size="cancelPrompt"
-            className="mr-4"
-            variant="cancelPrompt"
-            onClick={() => setShowChatDialog(false)}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            size="savePrompt"
-            variant="savePrompt"
-            onClick={handleDownload}
-          >
-            Download
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <div
+      onClick={handleDownload}
+      role="button"
+      className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium dark:hover:text-white"
+    >
+      <FontAwesomeIcon icon={faArrowDownToLine} className="mr-2" />
+      <span>Download</span>
+    </div>
   )
 }
