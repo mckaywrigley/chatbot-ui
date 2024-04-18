@@ -81,7 +81,7 @@ export const DownloadChat: FC<DownloadChatProps> = ({
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = chat.name
+    a.download = `thread - ${chat.name} - ${new Date().toISOString().slice(0, -5)}`
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
