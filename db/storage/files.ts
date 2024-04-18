@@ -51,3 +51,30 @@ export const getFileFromStorage = async (filePath: string) => {
 
   return data.signedUrl
 }
+
+export const copyFileImagePath = async (filePath: string, userId: string) => {
+  const newFilePath = replaceFirstId(filePath, userId)
+  const { data, error } = await supabase.storage
+    .from("message_images")
+    .copy(filePath, newFilePath) // 24hrs
+
+  if (error) {
+    console.log("error", error)
+    throw new Error("Error downloading file")
+  }
+
+  return data.path
+}
+
+function replaceFirstId(originalString: string, newId: string): string {
+  // Split the string using "/"
+  const parts = originalString.split("/")
+
+  // Replace the first element with the new ID
+  parts[0] = newId
+
+  // Join the parts back into a string with "/"
+  const updatedString = parts.join("/")
+
+  return updatedString
+}

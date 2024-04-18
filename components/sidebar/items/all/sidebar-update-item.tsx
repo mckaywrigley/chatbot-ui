@@ -165,8 +165,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const handleDownload = () => {
     const jsonStringAssistant = JSON.stringify(item)
 
-    console.log("jsonStringAssistant", jsonStringAssistant)
-
     const blob = new Blob([jsonStringAssistant], {
       type: "application/json"
     })
@@ -616,7 +614,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   const handleUpdate = async () => {
     try {
-      console.log("updateState", updateState)
       const updateFunction = updateFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
 

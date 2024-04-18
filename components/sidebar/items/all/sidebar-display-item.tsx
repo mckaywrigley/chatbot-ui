@@ -128,7 +128,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
           ></i>
         </div>
       )
-      console.log("item", item)
       break
     case "tools":
       iconComponent = (

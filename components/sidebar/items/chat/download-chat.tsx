@@ -39,7 +39,7 @@ export const DownloadChat: FC<DownloadChatProps> = ({
 }) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
 
-  const { setChats, chatMessages } = useContext(ChatbotUIContext)
+  const { setChats, chatMessages, chatImages } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -55,20 +55,25 @@ export const DownloadChat: FC<DownloadChatProps> = ({
         contextLength: chat.context_length,
         includeProfileContext: chat.include_profile_context,
         includeWorkspaceInstructions: chat.include_workspace_instructions,
-        embeddingsProvider: chat.embeddings_provider
+        embeddingsProvider: chat.embeddings_provider,
+        name: chat.name
       },
       messages: chatMessages?.map(message => {
         return {
           role: message.message.role,
-          content: message.message.content
+          content: message.message.content,
+          images: chatImages?.filter(
+            image => image.messageId === message.message.id
+          )
         }
       }),
-      customModelId: ""
+      customModelId: "",
+      created_at: chat.created_at,
+      updated_at: chat.updated_at,
+      id: chat.id
     }
 
     const jsonStringChat = JSON.stringify(formattedChat)
-
-    console.log("formattedChat", formattedChat)
 
     const blob = new Blob([jsonStringChat], {
       type: "application/json"

@@ -4,6 +4,7 @@ import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
+import { copyFileImagePath } from "@/db/storage/files"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import {
   buildFinalMessages,
@@ -511,4 +512,102 @@ export const handleCreateMessages = async (
 
     setChatMessages(finalChatMessages)
   }
+}
+
+export const importThread = async (
+  conversation: any,
+  profile: Tables<"profiles">,
+  selectedWorkspace: Tables<"workspaces">,
+  setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
+  setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>
+) => {
+  let messagesToSend: TablesInsert<"messages">[] = []
+
+  const createdChat = await createChat({
+    user_id: profile.user_id,
+    workspace_id: selectedWorkspace.id,
+    assistant_id: null,
+    context_length: conversation?.chatSettings.contextLength,
+    include_profile_context: conversation?.chatSettings.includeProfileContext,
+    include_workspace_instructions:
+      conversation?.chatSettings.includeWorkspaceInstructions,
+    model: conversation?.chatSettings.model,
+    name: conversation?.chatSettings.name.substring(0, 100),
+    prompt: conversation?.chatSettings.prompt,
+    temperature: conversation?.chatSettings.temperature,
+    embeddings_provider: conversation?.chatSettings.embeddingsProvider,
+    created_at: conversation?.created_at,
+    updated_at: conversation?.updated_at
+  })
+
+  let chatMessageCount = 0
+
+  for (const message of conversation.messages) {
+    const authorRole = message?.role
+    const content = message?.content
+    const updatedImagePaths = []
+
+    if (message?.images?.length) {
+      for (const image of message?.images) {
+        let filePath = `${profile.user_id}/${conversation.id}/${
+          message.id
+        }/${uuidv4()}`
+
+        const file = base64ToFile(image.base64, uuidv4())
+
+        const newImagePath = await uploadMessageImage(filePath, file)
+        updatedImagePaths.push(newImagePath)
+      }
+    }
+
+    if (authorRole) {
+      if (content) {
+        const messageToSend = {
+          chat_id: createdChat.id,
+          user_id: profile.user_id,
+          content: content,
+          model: createdChat.model,
+          role: authorRole,
+          sequence_number: chatMessageCount,
+          image_paths: updatedImagePaths
+        }
+        messagesToSend.push(messageToSend)
+
+        chatMessageCount = chatMessageCount + 1
+      }
+    }
+  }
+
+  if (messagesToSend.length > 0) {
+    await createMessages(messagesToSend)
+  } else {
+    console.log("Import failed!")
+  }
+
+  setSelectedChat(createdChat)
+  setChats(chats => [createdChat, ...chats])
+}
+
+function base64ToFile(base64String: string, filename: string): File {
+  // Convert the base64 string to a Blob
+  const blob = base64ToBlob(base64String)
+
+  // Create a File object from the Blob
+  const file = new File([blob], filename, { type: blob.type })
+
+  return file
+}
+
+function base64ToBlob(base64String: string): Blob {
+  const parts = base64String.split(";base64,")
+  const contentType = parts[0].split(":")[1]
+  const raw = window.atob(parts[1])
+  const rawLength = raw.length
+  const uInt8Array = new Uint8Array(rawLength)
+
+  for (let i = 0; i < rawLength; ++i) {
+    uInt8Array[i] = raw.charCodeAt(i)
+  }
+
+  return new Blob([uInt8Array], { type: contentType })
 }
