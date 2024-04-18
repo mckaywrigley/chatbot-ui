@@ -1,11 +1,18 @@
+import { AssistantImage } from "./../../../types/images/assistant-image"
 // Only used in use-chat-handler.tsx to keep it clean
 
+import { createAssistant, updateAssistant } from "@/db/assistants"
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
+import {
+  getAssistantImageFromStorage,
+  uploadAssistantImage
+} from "@/db/storage/assistant-images"
 import { copyFileImagePath } from "@/db/storage/files"
 import { uploadMessageImage } from "@/db/storage/message-images"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   buildFinalMessages,
   buildGoogleGeminiFinalMessages
@@ -586,6 +593,62 @@ export const importThread = async (
 
   setSelectedChat(createdChat)
   setChats(chats => [createdChat, ...chats])
+}
+
+export const importAssistant = async (
+  payload: any,
+  selectedWorkspace: Tables<"workspaces">,
+  setAssistantImages: React.Dispatch<React.SetStateAction<AssistantImage[]>>,
+  setAssistants: React.Dispatch<React.SetStateAction<Tables<"assistants">[]>>
+) => {
+  const createdAssistant = await createAssistant(
+    {
+      context_length: payload.assistant.context_length,
+      description: payload.assistant.description,
+      embeddings_provider: payload.assistant.embeddings_provider,
+      image_path: payload.assistant.image_path,
+      include_profile_context: payload.assistant.include_profile_context,
+      include_workspace_instructions:
+        payload.assistant.include_workspace_instructions,
+      model: payload.assistant.model,
+      name: payload.assistant.name,
+      prompt: payload.assistant.prompt,
+      temperature: payload.assistant.temperature,
+      user_id: payload.assistant.user_id
+    },
+    selectedWorkspace.id
+  )
+
+  let updatedAssistant = createdAssistant
+
+  if (payload?.imageBase64) {
+    const file = base64ToFile(payload?.imageBase64, uuidv4())
+
+    const filePath = await uploadAssistantImage(createdAssistant, file)
+
+    updatedAssistant = await updateAssistant(createdAssistant.id, {
+      image_path: filePath
+    })
+
+    const url = (await getAssistantImageFromStorage(filePath)) || ""
+
+    if (url) {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const base64 = await convertBlobToBase64(blob)
+
+      setAssistantImages(prev => [
+        ...prev,
+        {
+          assistantId: updatedAssistant.id,
+          path: filePath,
+          base64,
+          url
+        }
+      ])
+      setAssistants((prevItems: any) => [...prevItems, updatedAssistant])
+    }
+  }
 }
 
 function base64ToFile(base64String: string, filename: string): File {

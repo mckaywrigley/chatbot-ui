@@ -18,6 +18,7 @@ import {
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
+  importAssistant,
   importThread,
   processResponse,
   validateChatSettings
@@ -68,7 +69,9 @@ export const useChatHandler = () => {
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
-    isToolPickerOpen
+    isToolPickerOpen,
+    setAssistantImages,
+    setAssistants
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -442,6 +445,15 @@ export const useChatHandler = () => {
     )
   }
 
+  const handleImportAssistant = async (payload: any) => {
+    await importAssistant(
+      payload,
+      selectedWorkspace!,
+      setAssistantImages,
+      setAssistants
+    )
+  }
+
   return {
     chatInputRef,
     prompt,
@@ -451,6 +463,7 @@ export const useChatHandler = () => {
     handleStopMessage,
     handleSendEdit,
     processTranscription,
-    handleImportThread
+    handleImportThread,
+    handleImportAssistant
   }
 }

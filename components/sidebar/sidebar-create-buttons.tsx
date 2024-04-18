@@ -42,7 +42,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
 }) => {
   const { profile, selectedWorkspace, folders, setFolders } =
     useContext(ChatbotUIContext)
-  const { handleNewChat, handleImportThread } = useChatHandler()
+  const { handleNewChat, handleImportThread, handleImportAssistant } =
+    useChatHandler()
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 
   const [isCreatingPrompt, setIsCreatingPrompt] = useState(false)
@@ -275,10 +276,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
                           try {
                             setIsMenuOpen(false)
                             const jsonData = JSON.parse(reader.result as string)
-                            await handleImportThread(jsonData)
-                            notify(
-                              contentType === "chats" ? "thread" : contentType
-                            )
+                            if (contentType === "chats") {
+                              await handleImportThread(jsonData)
+                              notify("thread")
+                            } else if (contentType === "assistants") {
+                              await handleImportAssistant(jsonData)
+                              notify("assistant")
+                            }
                           } catch (error) {
                             console.error("Error parsing JSON:", error)
                           }

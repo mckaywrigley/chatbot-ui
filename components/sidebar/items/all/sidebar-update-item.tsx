@@ -115,6 +115,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const {
     workspaces,
     selectedWorkspace,
+    assistantImages,
     setChats,
     setPresets,
     setPrompts,
@@ -163,7 +164,12 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   >([])
 
   const handleDownload = () => {
-    const jsonStringAssistant = JSON.stringify(item)
+    const jsonStringAssistant = JSON.stringify({
+      assistant: item,
+      imageBase64: assistantImages?.find(
+        assistant => assistant.assistantId === item.id
+      )?.base64
+    })
 
     const blob = new Blob([jsonStringAssistant], {
       type: "application/json"
@@ -171,7 +177,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = item.name
+    a.download = `assistant - ${item.name} - ${new Date().toISOString().slice(0, -5)}`
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
