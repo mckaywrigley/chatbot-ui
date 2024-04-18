@@ -246,54 +246,50 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
               </li>
             )}
 
-            {hasData &&
-              (contentType === "assistants" || contentType === "chats") && (
-                <li>
-                  <div
-                    role="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20  block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm font-normal  dark:hover:text-white"
-                  >
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      className="mr-2 size-[14px]"
-                    />
-                    Upload {getContentTypeText(contentType)}
-                  </div>
-                  <Input
-                    ref={fileInputRef}
-                    className="hidden"
-                    type="file"
-                    onChange={e => {
-                      if (!e.target.files) return
-                      // handleSelectDeviceFile(e.target.files[0])
+            {(contentType === "assistants" || contentType === "chats") && (
+              <li>
+                <div
+                  role="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20  block w-full cursor-pointer items-center justify-center rounded-b p-[10px] text-left text-sm font-normal  dark:hover:text-white"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2 size-[14px]" />
+                  Upload {getContentTypeText(contentType)}
+                </div>
+                <Input
+                  ref={fileInputRef}
+                  className="hidden"
+                  type="file"
+                  onChange={e => {
+                    if (!e.target.files) return
+                    // handleSelectDeviceFile(e.target.files[0])
 
-                      const file = e.target.files[0]
+                    const file = e.target.files[0]
 
-                      if (file) {
-                        const reader = new FileReader()
-                        reader.onload = async () => {
-                          try {
-                            setIsMenuOpen(false)
-                            const jsonData = JSON.parse(reader.result as string)
-                            if (contentType === "chats") {
-                              await handleImportThread(jsonData)
-                              notify("thread")
-                            } else if (contentType === "assistants") {
-                              await handleImportAssistant(jsonData)
-                              notify("assistant")
-                            }
-                          } catch (error) {
-                            console.error("Error parsing JSON:", error)
+                    if (file) {
+                      const reader = new FileReader()
+                      reader.onload = async () => {
+                        try {
+                          setIsMenuOpen(false)
+                          const jsonData = JSON.parse(reader.result as string)
+                          if (contentType === "chats") {
+                            await handleImportThread(jsonData)
+                            notify("thread")
+                          } else if (contentType === "assistants") {
+                            await handleImportAssistant(jsonData)
+                            notify("assistant")
                           }
+                        } catch (error) {
+                          console.error("Error parsing JSON:", error)
                         }
-                        reader.readAsText(file)
                       }
-                    }}
-                    accept={filesToAccept}
-                  />
-                </li>
-              )}
+                      reader.readAsText(file)
+                    }
+                  }}
+                  accept={filesToAccept}
+                />
+              </li>
+            )}
           </ul>
         </div>
       )}
