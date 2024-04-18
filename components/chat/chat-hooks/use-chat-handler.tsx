@@ -18,6 +18,7 @@ import {
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
+  importThread,
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
@@ -431,6 +432,16 @@ export const useChatHandler = () => {
     }
   }
 
+  const handleImportThread = async (conversation: any) => {
+    await importThread(
+      conversation,
+      profile!,
+      selectedWorkspace!,
+      setSelectedChat,
+      setChats
+    )
+  }
+
   return {
     chatInputRef,
     prompt,
@@ -439,6 +450,7 @@ export const useChatHandler = () => {
     handleFocusChatInput,
     handleStopMessage,
     handleSendEdit,
-    processTranscription
+    processTranscription,
+    handleImportThread
   }
 }
