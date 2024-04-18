@@ -137,14 +137,9 @@ export async function handleCvemapRequest(
           sendMessage("\n\n")
           lastMessage.content = getCommandFromAIResponse(
             lastMessage,
-            messagesToSend,
             aiResponse
           )
         } catch (error) {
-          console.error(
-            "Error processing AI response and updating message:",
-            error
-          )
           return new Response(`Error processing AI response: ${error}`)
         }
       }

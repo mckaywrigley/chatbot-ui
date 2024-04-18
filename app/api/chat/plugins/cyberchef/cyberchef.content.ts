@@ -203,13 +203,6 @@ export async function handleCyberchefRequest(
           const formattedJsonString = JSON.stringify(jsonResponse, null, 4)
           lastMessage.content = `\`\`\`json\n${formattedJsonString}\n\`\`\``
         } catch (error) {
-          console.error(
-            `Error extracting and parsing JSON from AI response: ${error}`,
-            {
-              aiResponse,
-              messagesToSend
-            }
-          )
           return new Response(`\n\nError during CyberChef operation: ${error}`)
         }
       }

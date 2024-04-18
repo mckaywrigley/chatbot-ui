@@ -154,7 +154,6 @@ export async function* processAIResponseAndUpdateMessage(
 
 export function getCommandFromAIResponse(
   lastMessage: Message,
-  messagesToSend: Message[],
   aiResponse: string
 ) {
   try {
@@ -167,13 +166,6 @@ export function getCommandFromAIResponse(
       throw new Error("No JSON command found in the AI response.")
     }
   } catch (error) {
-    console.error(
-      `Error extracting and parsing JSON from AI response: ${error}`,
-      {
-        aiResponse,
-        messagesToSend
-      }
-    )
     throw error
   }
 
