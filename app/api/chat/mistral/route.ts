@@ -340,7 +340,7 @@ async function generateStandaloneQuestion(
         { role: firstMessage.role, content: firstMessage.content },
         { role: "user", content: template }
       ],
-      temperature: 1.0, // High temperature for creativity
+      temperature: 0.1,
       max_tokens: 256
     }
 
