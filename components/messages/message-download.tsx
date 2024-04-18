@@ -36,7 +36,44 @@ export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
   const [isFocused, setIsFocused] = useState(false)
 
   const handleDownload = () => {
-    const blob = new Blob([message.content], { type: "text/plain" })
+    let fileType = "text/plain" // Default to text type if extension is not defined
+
+    // Check if filename has an extension
+    const fileExtension = fileName.split(".").pop()
+    if (fileExtension) {
+      switch (fileExtension.toLowerCase()) {
+        case "json":
+          fileType = "application/json"
+          break
+        case "txt":
+          fileType = "text/plain"
+          break
+        case "csv":
+          fileType = "text/csv"
+          break
+        case "xml":
+          fileType = "application/xml"
+          break
+        case "html":
+          fileType = "text/html"
+          break
+        case "md":
+          fileType = "text/markdown"
+          break
+        case "js":
+          fileType = "application/javascript"
+          break
+        case "css":
+          fileType = "text/css"
+          break
+        // Add more cases for other file types if needed
+        default:
+          fileType = "text/plain" // Default to text type for unknown extensions
+          break
+      }
+    }
+
+    const blob = new Blob([message.content], { type: fileType })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -75,7 +112,7 @@ export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
             Are you sure you want to delete {item.name}?
           </DialogDescription> */}
           <div className="label flex h-7 flex-col justify-center text-sm font-normal leading-[180%] text-[#e6e4e5]">
-            Save message as (e.g., filename.txt)
+            Save message as (e.g., filename.txt, filename.json)
           </div>
           <div
             className={`bg-pixelspace-gray-70 focus:border-pixelspace-gray-40 flex h-[42px] w-[592px] items-center rounded-md border px-2 py-3  ${!isFocused || fileName.length > 0 ? "border-pixelspace-gray-50" : "border-pixelspace-gray-40"} mb-2`}
@@ -94,7 +131,7 @@ export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
         <DialogFooter>
           <Button
             size={"cancelPrompt"}
-            variant="ghost"
+            variant="ghost2"
             onClick={() => setShowDialog(false)}
           >
             Cancel
