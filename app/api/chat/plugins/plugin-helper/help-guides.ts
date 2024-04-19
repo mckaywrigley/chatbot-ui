@@ -427,3 +427,57 @@ export const displayHelpGuideForSubfinder = () => {
      -timeout int   seconds to wait before timing out (default 30)
    \`\`\``
 }
+
+export const displayHelpGuideForDnsx = () => {
+  return endent`
+   [dnsx](${pluginUrls.dnsx}) is a fast and multi-purpose DNS toolkit allow to run multiple DNS queries of your choice with a list of user-supplied resolvers. 
+  
+   ## Interaction Methods
+
+   **Conversational AI Requests:**
+   Engage with dnsx by describing your DNS query needs in plain language. The AI will interpret your request and automatically execute the appropriate DNS queries using dnsx, providing a user-friendly interface for those who prefer intuitive interactions.
+    
+   **Direct Commands:**
+   Utilize direct commands for detailed control over DNS queries. Begin your command with "/" followed by the necessary flags to specify detailed parameters for the probes.
+    
+   \`\`\`
+   Usage:
+      /dnsx [flags]
+    
+   Flags:
+   INPUT:
+      -l, -list string      list of sub(domains)/hosts to resolve (file)
+      -d, -domain string    list of domain to bruteforce (comma separated)
+      -w, -wordlist string  list of words to bruteforce (comma separated)
+
+   QUERY:
+      -a                       query A record (default)
+      -aaaa                    query AAAA record
+      -cname                   query CNAME record
+      -ns                      query NS record
+      -txt                     query TXT record
+      -srv                     query SRV record
+      -ptr                     query PTR record
+      -mx                      query MX record
+      -soa                     query SOA record
+      -any                     query ANY record
+      -axfr                    query AXFR
+      -caa                     query CAA record
+      -recon                   query all the dns records (a,aaaa,cname,ns,txt,srv,ptr,mx,soa,axfr,caa)
+      -e, -exclude-type value  dns query type to exclude (a,aaaa,cname,ns,txt,srv,ptr,mx,soa,axfr,caa) (default none)
+
+   FILTER:
+      -re, -resp          display dns response
+      -ro, -resp-only     display dns response only
+      -rc, -rcode string  filter result by dns status code (eg. -rcode noerror,servfail,refused)
+
+   PROBE:
+      -cdn  display cdn name
+      -asn  display host asn information
+
+   CONFIGURATIONS:
+      -r, -resolver string          list of resolvers to use (comma separated)
+      -wt, -wildcard-threshold int  wildcard filter threshold (default 5)
+      -wd, -wildcard-domain string  domain name for wildcard filtering (other flags will be ignored - only json output is supported)
+    \`\`\``
+}

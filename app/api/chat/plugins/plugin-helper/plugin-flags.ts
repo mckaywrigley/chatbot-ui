@@ -87,3 +87,94 @@ export const cvemapRepeatableFlags: Set<string> = new Set([
   "-cwe",
   "-cwe-id"
 ])
+
+export const validRcodes = [
+  "noerror",
+  "formerr",
+  "servfail",
+  "nxdomain",
+  "notimp",
+  "refused",
+  "yxdomain",
+  "yxrrset",
+  "nxrrset",
+  "notauth",
+  "notzone",
+  "badsig",
+  "badvers",
+  "badkey",
+  "badtime",
+  "badmode",
+  "badname",
+  "badalg",
+  "badtrunc",
+  "badcookie"
+]
+
+export interface DnsxParams {
+  list?: string
+  domain?: string[]
+  wordlist?: string[]
+  a?: boolean
+  aaaa?: boolean
+  cname?: boolean
+  ns?: boolean
+  txt?: boolean
+  srv?: boolean
+  ptr?: boolean
+  mx?: boolean
+  soa?: boolean
+  axfr?: boolean
+  caa?: boolean
+  any?: boolean
+  resp?: boolean
+  respOnly?: boolean
+  rcode?: string[]
+  cdn?: boolean
+  asn?: boolean
+  json?: boolean
+  error?: string | null
+}
+
+export const dnsxFlagDefinitions: FlagDefinitions<DnsxParams> = {
+  "-l": "list",
+  "-list": "list",
+  "-d": "domain",
+  "-domain": "domain",
+  "-w": "wordlist",
+  "-wordlist": "wordlist",
+  "-rc": "rcode",
+  "-rcode": "rcode"
+}
+
+export const dnsxBooleanFlagDefinitions: FlagDefinitions<DnsxParams> = {
+  "-a": "a",
+  "-aaaa": "aaaa",
+  "-cname": "cname",
+  "-ns": "ns",
+  "-txt": "txt",
+  "-srv": "srv",
+  "-ptr": "ptr",
+  "-mx": "mx",
+  "-soa": "soa",
+  "-axfr": "axfr",
+  "-caa": "caa",
+  "-any": "any",
+  "-re": "resp",
+  "-resp": "resp",
+  "-ro": "respOnly",
+  "-resp-only": "respOnly",
+  "-cdn": "cdn",
+  "-asn": "asn",
+  "-j": "json",
+  "-json": "json"
+}
+
+export const dnsxRepeatableFlags: Set<string> = new Set([
+  "-d",
+  "-domain",
+  "-w",
+  "-wordlist",
+  "-rc",
+  "-rcode"
+])

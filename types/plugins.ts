@@ -36,6 +36,7 @@ export enum PluginID {
   ALTERX = "alterx",
   WEB_SEARCH = "websearch",
   ENHANCED_SEARCH = "enhancedsearch",
+  DNSX = "dnsx",
   WEB_SCRAPER = "webscraper",
   PLUGINS_STORE = "pluginselector"
 }
@@ -86,6 +87,9 @@ export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.ENHANCED_SEARCH]: {
     id: PluginID.ENHANCED_SEARCH
   },
+  [PluginID.DNSX]: {
+    id: PluginID.DNSX
+  },
   [PluginID.WEB_SCRAPER]: {
     id: PluginID.WEB_SCRAPER
   },
@@ -110,5 +114,6 @@ export const pluginUrls: pluginUrls = {
   Httpx: "https://github.com/projectdiscovery/httpx",
   Naabu: "https://github.com/projectdiscovery/naabu",
   Gau: "https://github.com/lc/gau",
-  Alterx: "https://github.com/projectdiscovery/alterx"
+  Alterx: "https://github.com/projectdiscovery/alterx",
+  dnsx: "https://github.com/projectdiscovery/dnsx"
 }
