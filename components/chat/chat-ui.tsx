@@ -228,7 +228,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         </div>
       )}
 
-      <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[650px] lg:w-[650px] xl:w-[800px]">
+      <div className="relative w-screen min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[650px] md:min-w-[300px] lg:w-[650px] xl:w-[800px]">
         <ChatInput />
       </div>
 
