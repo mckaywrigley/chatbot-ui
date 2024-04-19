@@ -338,15 +338,15 @@ export const availablePlugins: PluginSummary[] = [
   {
     id: 10,
     name: "GAU",
-    selectorName: "GAU: Url Enumeration",
+    selectorName: "GAU: URL Enumeration",
     value: PluginID.GAU,
     icon: "https://avatars.githubusercontent.com/u/19563282",
     description:
       "Fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl",
-    categories: ["Free"],
+    categories: ["Popular"],
     githubRepoUrl: pluginUrls.Gau,
     isInstalled: false,
-    isPremium: false,
+    isPremium: true,
     starters: [
       {
         title: "Start URL Enumeration",
