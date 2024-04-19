@@ -65,11 +65,11 @@ export async function buildFinalMessages(
   ) {
     CHUNK_SIZE = 8192
   } else if (chatSettings.model === "mistral-medium") {
-    CHUNK_SIZE = 4096
+    CHUNK_SIZE = 8192
   }
 
   if (selectedPlugin !== PluginID.NONE) {
-    CHUNK_SIZE = 4096
+    CHUNK_SIZE = 8192
   }
 
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
