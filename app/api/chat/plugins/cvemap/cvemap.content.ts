@@ -28,9 +28,30 @@ const parseCommandLine = (
   const params: CvemapParams = {
     ids: [],
     cwes: [],
+    vendors: "",
+    products: "",
+    excludeProducts: "",
+    severity: "",
+    cvssScores: "",
+    cpe: "",
+    epssScores: "",
+    epssPercentiles: "",
+    age: "",
+    assignees: "",
+    vulnerabilityStatus: "",
+    search: "",
+    kev: false,
+    template: false,
+    poc: false,
+    hackerone: false,
+    remote: false,
+    fieldsToDisplay: "",
+    excludeFields: "",
+    listIdsOnly: false,
     limit: 25,
     offset: 0,
-    json: false
+    json: false,
+    error: null
   }
 
   if (input.length > MAX_INPUT_LENGTH) {
