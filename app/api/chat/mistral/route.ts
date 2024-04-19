@@ -65,8 +65,6 @@ export async function POST(request: Request) {
           llmConfig.models.hackerGPT_standalone_question_openrouter
         providerHeaders = {
           Authorization: `Bearer ${openrouterApiKey}`,
-          "HTTP-Referer": "https://chat.hackerai.co",
-          "X-Title": "HackerGPT",
           "Content-Type": "application/json"
         }
       } else {
@@ -92,8 +90,6 @@ export async function POST(request: Request) {
           llmConfig.models.hackerGPT_standalone_question_openrouter
         providerHeaders = {
           Authorization: `Bearer ${openrouterApiKey}`,
-          "HTTP-Referer": "https://chat.hackerai.co",
-          "X-Title": "HackerGPT",
           "Content-Type": "application/json"
         }
         stopSequence
