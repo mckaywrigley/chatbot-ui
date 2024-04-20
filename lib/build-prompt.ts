@@ -63,7 +63,7 @@ export async function buildFinalMessages(
     chatSettings.model === "gpt-4-turbo-preview" ||
     chatSettings.model === "mistral-large"
   ) {
-    CHUNK_SIZE = 8192
+    CHUNK_SIZE = 13368
   } else if (chatSettings.model === "mistral-medium") {
     CHUNK_SIZE = 8192
   }
