@@ -382,7 +382,7 @@ export const availablePlugins: PluginSummary[] = [
     categories: ["Free"],
     githubRepoUrl: pluginUrls.GAU,
     isInstalled: false,
-    isPremium: false,
+    isPremium: true,
     starters: [
       {
         title: "Start URL Enumeration",
