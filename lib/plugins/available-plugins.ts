@@ -343,7 +343,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description:
       "Fast and multi-purpose DNS toolkit allow to run multiple DNS queries of your choice with a list of user-supplied resolvers",
-    categories: ["New"],
+    categories: ["Popular", "New"],
     githubRepoUrl: pluginUrls.DNSX,
     isInstalled: false,
     isPremium: true,
@@ -379,7 +379,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/19563282",
     description:
       "Fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl",
-    categories: ["Free"],
+    categories: ["Popular"],
     githubRepoUrl: pluginUrls.GAU,
     isInstalled: false,
     isPremium: true,
