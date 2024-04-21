@@ -38,7 +38,7 @@ export default function AboutUsPage() {
             </p>
             <ul className="ml-8 list-disc space-y-2">
               <li>
-                HackerGPT: A Mixtral 8x7B with a semantic search on our hacking
+                HackerGPT: A Mixtral 8x22B with a semantic search on our hacking
                 data paired with our unique prompt.
               </li>
               <li>

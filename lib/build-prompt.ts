@@ -176,8 +176,26 @@ export async function buildFinalMessages(
       content
     }
   })
+  console.log(    chatFileItems
+    )
+  console.log(messageFileItems)
+  if (messageFileItems.length > 0 && selectedPlugin === PluginID.NONE) {
+    const retrievalText = buildRetrievalText(messageFileItems)
 
-  if (messageFileItems.length > 0) {
+    finalMessages[finalMessages.length - 2] = {
+      ...finalMessages[finalMessages.length - 2],
+      content: `Assist with the user's query: '${finalMessages[finalMessages.length - 2].content}' using uploaded files. 
+      Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. 
+      Assess each section for information pertinent to the query.
+      
+      \n\n${retrievalText}\n\n
+      
+      Draw insights directly from file content to provide specific guidance. 
+      Ensure answers are actionable, focusing on practical relevance. 
+      Highlight or address any ambiguities found in the content. 
+      State clearly if information related to the query is not available.`
+    }
+  } else if (messageFileItems.length > 0 && selectedPlugin !== PluginID.NONE) {
     const retrievalText = buildRetrievalText(messageFileItems)
 
     finalMessages[finalMessages.length - 2] = {

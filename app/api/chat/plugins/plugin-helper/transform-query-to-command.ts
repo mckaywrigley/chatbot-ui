@@ -52,7 +52,7 @@ export const transformUserQueryToNucleiCommand = (
   joinedFileNames?: string
 ) => {
   const nucleiIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should use the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. User have included the following files: ${joinedFileNames}. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should use the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command.  The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'nuclei' tool, focusing on network and application vulnerability scanning. The command should utilize the most relevant flags, with '-target' being essential to specify the target host(s) to scan. The '-jsonl' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
@@ -165,7 +165,7 @@ export const transformUserQueryToNaabuCommand = (
   joinedFileNames?: string
 ) => {
   const naabuIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. User have included the following files: ${joinedFileNames}. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command.  The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'naabu' tool, focusing on port scanning. The command should use only the most relevant flags, with '-host' being essential. If the request involves scanning a list of hosts, embed the hosts directly in the command rather than referencing an external file. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
@@ -239,7 +239,7 @@ export const transformUserQueryToKatanaCommand = (
   joinedFileNames?: string
 ) => {
   const katanaIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. User have included the following files: ${joinedFileNames}. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file.  Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'katana' tool, focusing on URL crawling and filtering. The command should utilize the most relevant flags, with '-u' or '-list' being essential to specify the target URL or list. If the request involves scanning a list of domains, embed the domains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
@@ -315,7 +315,7 @@ export const transformUserQueryToAlterxCommand = (
   joinedFileNames?: string
 ) => {
   const alterxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains filename directly in the command. User have included the following files: ${joinedFileNames}. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains filename to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains filename directly in the command.  Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'alterx' tool, a customizable subdomain wordlist generator. The command should use the most relevant flags, with '-list' being essential for specifying subdomains to use when creating permutations. If the request involves generating a wordlist from a list of subdomains, embed the subdomains directly in the command rather than referencing an external file. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
@@ -378,7 +378,7 @@ export const transformUserQueryToHttpxCommand = (
   joinedFileNames?: string
 ) => {
   const httpxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command. User have included the following files: ${joinedFileNames}. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-list' being essential for specifying hosts filename to use for scaning. If the request involves scaning from a list of hosts, embed the hosts filename directly in the command.  The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'httpx' tool, focusing on HTTP probing and analysis. The command should utilize the most relevant flags, with '-u' or '-target' being essential to specify the target host(s) to probe. The '-json' flag is optional and should be included only if specified in the user's request. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
@@ -706,15 +706,16 @@ export const transformUserQueryToDnsxCommand = (
   joinedFileNames?: string
 ) => {
   const dnsxIntroduction = fileContentIncluded
-    ? `Based on this query, generate a command for the 'dnsx' tool, focusing on DNS resolution and enumeration. The command should utilize the most relevant flags, with '-list', '-domain', or '-wordlist' being essential for specifying the filename containing the list of subdomains, hosts, domains, or words to resolve or bruteforce. User have included the following files: ${joinedFileNames}. If the request involves resolving a list of domains directly, embed the domains in the command using the '-d' flag. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
+    ? `Based on this query, generate a command for the 'dnsx' tool, focusing on DNS resolution and enumeration. The command should utilize the most relevant flags, with '-list', '-domain', or '-wordlist' being essential for specifying the filename containing the list of subdomains, hosts, domains, or words to resolve or bruteforce. If the request involves resolving a list of domains directly, embed the domains in the command using the '-d' flag. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
     : `Based on this query, generate a command for the 'dnsx' tool, focusing on DNS resolution and enumeration. The command should utilize the most relevant flags, with '-d' being used to specify the target domain(s) to resolve or '-l' to specify a file containing the list of subdomains or hosts. If the request involves resolving a list of domains, embed the domains directly in the command using the '-d' flag. Include the '-help' flag if a help guide or a full list of flags is requested. The command should follow this structured format for clarity and accuracy:`
 
   const domainOrFilenameInclusionText = fileContentIncluded
     ? endent`
-    **Filename Inclusion**: Use the -list, -domain, or -wordlist flags followed by the file name (e.g., -list targets.txt, -domain domains.txt, -wordlist words.txt) containing the list of subdomains, hosts, domains, or words to resolve or bruteforce. dnsx supports direct file inclusion, making it convenient to use files that already contain the necessary targets. Alternatively, these flags can also accept comma-separated values directly in the command, allowing for flexible input methods without the need for a file. (required)
+    **Filename Inclusion/Domain Inclusion**: Use the -list, -domain, or -wordlist flags followed by the file name (e.g., -list targets.txt, -domain domains.txt, -wordlist words.txt) containing the list of subdomains, hosts, domains, or words to resolve or bruteforce. dnsx supports direct file inclusion, making it convenient to use files that already contain the necessary targets. Alternatively, these flags can also accept comma-separated values directly in the command, allowing for flexible input methods without the need for a file. (required)
     - -list string: Specify a file list of subdomains/hosts to resolve.
-    - -domain string: Specify a file or comma-separated list of domains to bruteforce.
-    - -wordlist string: Specify a file or comma-separated list of words to bruteforce.
+    - -domain string: Specify a comma-separated list of domains to bruteforce. If content of files are big use file.
+    - -wordlist string: Specify a comma-separated list of words to bruteforce. If content of files are big use file.
+    IMPORTANT: Generating a command use only following file(s) names because those files user only have provided: ${joinedFileNames}. Don't come up with imagenary names.
   `
     : endent`
     **Direct Domain Inclusion**: When resolving a list of domains or words, directly embed them in the command using the -d or -w flags. These flags can accept comma-separated values directly in the command, providing a quick way to input multiple domains or words without the need for a file.
@@ -780,6 +781,7 @@ export const transformUserQueryToDnsxCommand = (
     \`\`\`
   
     Response:`
+    console.log(answerMessage)
 
   return answerMessage
 }

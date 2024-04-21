@@ -68,6 +68,12 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
 
         <DropdownMenuSeparator />
 
+        <div className="flex justify-center py-2">
+          <div className="opacity-60 cursor-text select-text text-sm"> 
+            contact@hackergpt.chat
+          </div>
+        </div>
+
         <DropdownMenuItem className="flex justify-between">
           <div>Show Help</div>
           <div className="flex opacity-60">
@@ -143,7 +149,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
           </div>
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="flex justify-between">
+        {/* <DropdownMenuItem className="flex justify-between">
           <div>Toggle Retrieval</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border-[1px] p-1 text-center">
@@ -156,7 +162,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
               E
             </div>
           </div>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem className="flex justify-between">
           <div>Open Settings</div>
