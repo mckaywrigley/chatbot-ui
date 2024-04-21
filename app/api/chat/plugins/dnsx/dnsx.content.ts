@@ -46,6 +46,7 @@ const parseCommandLine = (
     soa: false,
     axfr: false,
     caa: false,
+    recon: false,
     any: false,
     resp: false,
     respOnly: false,

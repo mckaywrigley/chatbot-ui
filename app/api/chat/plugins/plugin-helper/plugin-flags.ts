@@ -130,6 +130,7 @@ export interface DnsxParams {
   axfr?: boolean
   caa?: boolean
   any?: boolean
+  recon?: boolean
   resp?: boolean
   respOnly?: boolean
   rcode?: string[]
@@ -162,6 +163,7 @@ export const dnsxBooleanFlagDefinitions: FlagDefinitions<DnsxParams> = {
   "-soa": "soa",
   "-axfr": "axfr",
   "-caa": "caa",
+  "-recon": "recon",
   "-any": "any",
   "-re": "resp",
   "-resp": "resp",
