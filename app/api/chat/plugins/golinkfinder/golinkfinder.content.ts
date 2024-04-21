@@ -188,7 +188,7 @@ export async function handleGolinkfinderRequest(
           timeZoneName: "short"
         })
         const responseString =
-          `# [GoLinkFinder](${pluginUrls.GoLinkFinder}) Results\n` +
+          `# [GoLinkFinder](${pluginUrls.GOLINKFINDER}) Results\n` +
           '**Target**: "' +
           params.domain +
           '"\n\n' +

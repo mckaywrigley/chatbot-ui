@@ -105,15 +105,15 @@ type pluginUrls = {
 }
 
 export const pluginUrls: pluginUrls = {
-  CVEmap: "https://github.com/projectdiscovery/cvemap",
-  Cyberchef: "https://github.com/gchq/CyberChef",
-  Subfinder: "https://github.com/projectdiscovery/subfinder",
-  GoLinkFinder: "https://github.com/0xsha/GoLinkFinder",
-  Nuclei: "https://github.com/projectdiscovery/nuclei",
-  Katana: "https://github.com/projectdiscovery/katana",
-  Httpx: "https://github.com/projectdiscovery/httpx",
-  Naabu: "https://github.com/projectdiscovery/naabu",
-  Gau: "https://github.com/lc/gau",
-  Alterx: "https://github.com/projectdiscovery/alterx",
-  dnsx: "https://github.com/projectdiscovery/dnsx"
+  CVEMAP: "https://github.com/projectdiscovery/cvemap",
+  CYBERCHEF: "https://github.com/gchq/CyberChef",
+  SUBFINDER: "https://github.com/projectdiscovery/subfinder",
+  GOLINKFINDER: "https://github.com/0xsha/GoLinkFinder",
+  NUCLEI: "https://github.com/projectdiscovery/nuclei",
+  KATANA: "https://github.com/projectdiscovery/katana",
+  HTTPX: "https://github.com/projectdiscovery/httpx",
+  NAABU: "https://github.com/projectdiscovery/naabu",
+  GAU: "https://github.com/lc/gau",
+  ALTERX: "https://github.com/projectdiscovery/alterx",
+  DNSX: "https://github.com/projectdiscovery/dnsx"
 }

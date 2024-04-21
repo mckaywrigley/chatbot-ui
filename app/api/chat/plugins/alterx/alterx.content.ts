@@ -115,8 +115,7 @@ export async function handleAlterxRequest(
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean,
-  fileContent?: string,
-  fileName?: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) {
   if (!enableAlterxFeature) {
     return new Response("The Alterx is disabled.")
@@ -124,7 +123,7 @@ export async function handleAlterxRequest(
 
   const headers = createGKEHeaders()
 
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  const fileContentIncluded = !!fileData && fileData.length > 0
   let aiResponse = ""
 
   const stream = new ReadableStream({
@@ -137,7 +136,7 @@ export async function handleAlterxRequest(
       if (invokedByToolId) {
         const options: ProcessAIResponseOptions = {
           fileContentIncluded: fileContentIncluded,
-          fileName: fileName
+          fileNames: fileData?.map(file => file.fileName) || []
         }
 
         try {
@@ -198,12 +197,9 @@ export async function handleAlterxRequest(
         }
       }
 
-      if (
-        fileContentIncluded &&
-        typeof fileContent === "string" &&
-        fileContent.length > 0
-      ) {
-        ;(requestBody as any).fileContent = fileContent
+      if (fileContentIncluded) {
+        ;(requestBody as any).fileContent =
+          fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
       sendMessage(
@@ -254,7 +250,7 @@ export async function handleAlterxRequest(
 
         const formattedResults = formatScanResults({
           pluginName: "AlterX",
-          pluginUrl: pluginUrls.Alterx,
+          pluginUrl: pluginUrls.ALTERX,
           target: params.list,
           results: subdomains
         })

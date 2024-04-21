@@ -3,7 +3,7 @@ import endent from "endent"
 
 export const displayHelpGuideForCvemap = () => {
   return endent`
-    [CVEMap](${pluginUrls.CVEmap}) is an open-source command-line interface (CLI) tool that allows you to explore Common Vulnerabilities and Exposures (CVEs).
+    [CVEMap](${pluginUrls.CVEMAP}) is an open-source command-line interface (CLI) tool that allows you to explore Common Vulnerabilities and Exposures (CVEs).
   
     ## Interaction Methods
   
@@ -53,7 +53,7 @@ export const displayHelpGuideForCvemap = () => {
 
 export const displayHelpGuideForKatana = () => {
   return endent`
-    [Katana](${pluginUrls.Katana}) is a fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.
+    [Katana](${pluginUrls.KATANA}) is a fast crawler focused on execution in automation pipelines offering both headless and non-headless crawling.
     ## Interaction Methods
   
     **Conversational AI Requests:**
@@ -96,7 +96,7 @@ export const displayHelpGuideForKatana = () => {
 
 export const displayHelpGuideForAlterx = () => {
   return endent`
-    [Alterx](${pluginUrls.Alterx}) is a fast and customizable subdomain wordlist generator using DSL.
+    [Alterx](${pluginUrls.ALTERX}) is a fast and customizable subdomain wordlist generator using DSL.
   
     ## Interaction Methods
   
@@ -123,7 +123,7 @@ export const displayHelpGuideForAlterx = () => {
 
 export const displayHelpGuideForHttpx = () => {
   return endent`
-    [HTTPX](${pluginUrls.Httpx}) is a fast and multi-purpose HTTP toolkit built to support running multiple probes using a public library. Probes are specific tests or checks to gather information about web servers, URLs, or other HTTP elements. HTTPX is designed to maintain result reliability with an increased number of threads. 
+    [HTTPX](${pluginUrls.HTTPX}) is a fast and multi-purpose HTTP toolkit built to support running multiple probes using a public library. Probes are specific tests or checks to gather information about web servers, URLs, or other HTTP elements. HTTPX is designed to maintain result reliability with an increased number of threads. 
   
     ## Interaction Methods
   
@@ -209,7 +209,7 @@ export const displayHelpGuideForHttpx = () => {
 
 export const displayHelpGuideForNuclei = () => {
   return endent`
-    [Nuclei](${pluginUrls.Nuclei}) is a fast exploitable vulnerability scanner designed to probe modern applications, infrastructure, cloud platforms, and networks, aiding in the identification and mitigation of vulnerabilities. 
+    [Nuclei](${pluginUrls.NUCLEI}) is a fast exploitable vulnerability scanner designed to probe modern applications, infrastructure, cloud platforms, and networks, aiding in the identification and mitigation of vulnerabilities. 
   
     ## Interaction Methods
   
@@ -288,7 +288,7 @@ export const displayHelpGuideForNuclei = () => {
 
 export const displayHelpGuideForGoLinkFinder = () => {
   return endent`
-    [GoLinkFinder](${pluginUrls.GoLinkFinder}) is a minimalistic JavaScript endpoint extractor that efficiently pulls endpoints from HTML and embedded JavaScript files. 
+    [GoLinkFinder](${pluginUrls.GOLINKFINDER}) is a minimalistic JavaScript endpoint extractor that efficiently pulls endpoints from HTML and embedded JavaScript files. 
   
     ## Interaction Methods
   
@@ -310,7 +310,7 @@ export const displayHelpGuideForGoLinkFinder = () => {
 
 export const displayHelpGuideForGau = () => {
   return endent`
-    [GAU](${pluginUrls.Gau}) is a powerful web scraping tool that fetches known URLs from multiple sources, including AlienVault&apos;s Open Threat Exchange, the Wayback Machine, and Common Crawl. 
+    [GAU](${pluginUrls.GAU}) is a powerful web scraping tool that fetches known URLs from multiple sources, including AlienVault&apos;s Open Threat Exchange, the Wayback Machine, and Common Crawl. 
   
     ## Interaction Methods
   
@@ -343,7 +343,7 @@ export const displayHelpGuideForGau = () => {
 
 export const displayHelpGuideForNaabu = () => {
   return endent`
-    [Naabu](${pluginUrls.Naabu}) is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists all ports that return a reply. 
+    [Naabu](${pluginUrls.NAABU}) is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists all ports that return a reply. 
   
     ## Interaction Methods
   
@@ -391,7 +391,7 @@ export const displayHelpGuideForNaabu = () => {
 
 export const displayHelpGuideForSubfinder = () => {
   return endent`
-   [Subfinder](${pluginUrls.Subfinder}) is a powerful subdomain discovery tool designed to enumerate and uncover valid subdomains of websites efficiently through passive online sources. 
+   [Subfinder](${pluginUrls.SUBFINDER}) is a powerful subdomain discovery tool designed to enumerate and uncover valid subdomains of websites efficiently through passive online sources. 
  
    ## Interaction Methods
  
@@ -430,12 +430,12 @@ export const displayHelpGuideForSubfinder = () => {
 
 export const displayHelpGuideForDnsx = () => {
   return endent`
-   [dnsx](${pluginUrls.dnsx}) is a fast and multi-purpose DNS toolkit allow to run multiple DNS queries of your choice with a list of user-supplied resolvers. 
+   [dnsX](${pluginUrls.DNSX}) is a fast and multi-purpose DNS toolkit allow to run multiple DNS queries of your choice with a list of user-supplied resolvers. 
   
    ## Interaction Methods
 
    **Conversational AI Requests:**
-   Engage with dnsx by describing your DNS query needs in plain language. The AI will interpret your request and automatically execute the appropriate DNS queries using dnsx, providing a user-friendly interface for those who prefer intuitive interactions.
+   Engage with dnsX by describing your DNS query needs in plain language. The AI will interpret your request and automatically execute the appropriate DNS queries using dnsX, providing a user-friendly interface for those who prefer intuitive interactions.
     
    **Direct Commands:**
    Utilize direct commands for detailed control over DNS queries. Begin your command with "/" followed by the necessary flags to specify detailed parameters for the probes.
@@ -447,8 +447,8 @@ export const displayHelpGuideForDnsx = () => {
    Flags:
    INPUT:
       -l, -list string      list of sub(domains)/hosts to resolve (file)
-      -d, -domain string    list of domain to bruteforce (comma separated)
-      -w, -wordlist string  list of words to bruteforce (comma separated)
+      -d, -domain string    list of domain to bruteforce (comma separated, file)
+      -w, -wordlist string  list of words to bruteforce (comma separated, file)
 
    QUERY:
       -a                       query A record (default)
@@ -474,6 +474,9 @@ export const displayHelpGuideForDnsx = () => {
    PROBE:
       -cdn  display cdn name
       -asn  display host asn information
+
+   OUTPUT:
+   -j, -json  write output in JSONL(ines) format
 
    CONFIGURATIONS:
       -r, -resolver string          list of resolvers to use (comma separated)

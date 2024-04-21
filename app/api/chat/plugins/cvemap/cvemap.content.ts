@@ -4,6 +4,7 @@ import {
   createGKEHeaders,
   getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
+  processGKEData,
   truncateData
 } from "../chatpluginhandlers"
 
@@ -221,7 +222,7 @@ export async function handleCvemapRequest(
         })
 
         let cvemapData = await cvemapResponse.text()
-        cvemapData = processCvemapData(cvemapData)
+        cvemapData = processGKEData(cvemapData)
         cvemapData = truncateData(cvemapData, 300000)
 
         if (!cvemapData || cvemapData.length <= 300) {
@@ -284,13 +285,6 @@ function formatCvemapOutput(output: string): string {
     parsedOutput +
     "\n```"
   )
-}
-
-const processCvemapData = (data: string) => {
-  return data
-    .split("\n")
-    .filter(line => line && !line.startsWith("data:") && line.trim() !== "")
-    .join("")
 }
 
 const createResponseString = (cvemapData: string) => {

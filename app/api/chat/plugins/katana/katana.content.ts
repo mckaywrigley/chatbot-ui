@@ -296,14 +296,13 @@ export async function handleKatanaRequest(
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean,
-  fileContent?: string,
-  fileName?: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) {
   if (!enableKatanaFeature) {
     return new Response("The Katana feature is disabled.")
   }
 
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  const fileContentIncluded = !!fileData && fileData.length > 0
   let aiResponse = ""
 
   const headers = createGKEHeaders()
@@ -321,7 +320,7 @@ export async function handleKatanaRequest(
       if (invokedByToolId) {
         const options: ProcessAIResponseOptions = {
           fileContentIncluded: fileContentIncluded,
-          fileName: fileName
+          fileNames: fileData?.map(file => file.fileName) || []
         }
 
         try {
@@ -384,12 +383,9 @@ export async function handleKatanaRequest(
         }
       }
 
-      if (
-        fileContentIncluded &&
-        typeof fileContent === "string" &&
-        fileContent.length > 0
-      ) {
-        ;(requestBody as any).fileContent = fileContent
+      if (fileContentIncluded) {
+        ;(requestBody as any).fileContent =
+          fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -443,7 +439,7 @@ export async function handleKatanaRequest(
 
         const formattedResults = formatScanResults({
           pluginName: "Katana",
-          pluginUrl: pluginUrls.Katana,
+          pluginUrl: pluginUrls.KATANA,
           target: params.urls,
           results: urlsFormatted
         })

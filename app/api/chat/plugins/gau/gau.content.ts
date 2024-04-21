@@ -304,7 +304,7 @@ export async function handleGauRequest(
           timeZoneName: "short"
         })
         const responseString =
-          `# [Gau](${pluginUrls.Gau}) Results\n` +
+          `# [Gau](${pluginUrls.GAU}) Results\n` +
           '**Target**: "' +
           params.targets +
           '"\n\n' +

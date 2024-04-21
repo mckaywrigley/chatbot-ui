@@ -8,6 +8,7 @@ import { handleHttpxRequest } from "./httpx/httpx.content"
 import { handleNaabuRequest } from "./naabu/naabu.content"
 import { handleGauRequest } from "./gau/gau.content"
 import { handleAlterxRequest } from "./alterx/alterx.content"
+import { handleDnsxRequest } from "./dnsx/dnsx.content"
 
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
@@ -27,19 +28,12 @@ type pluginHandlerFunction = (
   messagesToSend: any,
   answerMessage: any,
   invokedByToolId: boolean,
-  fileContent: string,
-  fileName: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) => Promise<any>
 
 type pluginIdToHandlerMapping = {
   [key: string]: pluginHandlerFunction
 }
-
-type TransformQueryFunction = (
-  message: Message,
-  fileContentIncluded?: boolean,
-  fileName?: string
-) => string
 
 export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   cvemap: handleCvemapRequest,
@@ -51,7 +45,8 @@ export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   httpx: handleHttpxRequest,
   naabu: handleNaabuRequest,
   gau: handleGauRequest,
-  alterx: handleAlterxRequest
+  alterx: handleAlterxRequest,
+  dnsx: handleDnsxRequest
 }
 
 const commandHandlers: CommandHandler = {
@@ -63,7 +58,8 @@ const commandHandlers: CommandHandler = {
   handleHttpxRequest,
   handleNaabuRequest,
   handleGauRequest,
-  handleAlterxRequest
+  handleAlterxRequest,
+  handleDnsxRequest
 }
 
 export const isCommand = (commandName: string, message: string) => {
@@ -97,9 +93,15 @@ export const handleCommand = async (
 
 export interface ProcessAIResponseOptions {
   fileContentIncluded?: boolean
-  fileName?: string
+  fileNames?: string[]
   tools?: any
 }
+
+type TransformQueryFunction = (
+  message: Message,
+  fileContentIncluded?: boolean,
+  fileNames?: string
+) => string
 
 export async function* processAIResponseAndUpdateMessage(
   lastMessage: Message,
@@ -117,18 +119,15 @@ export async function* processAIResponseAndUpdateMessage(
   answerMessage: Message,
   options: ProcessAIResponseOptions = {}
 ): AsyncGenerator<string, { aiResponseText: string }, undefined> {
-  const { fileContentIncluded = false, fileName, tools } = options
-
-  const fileNameIncluded =
-    fileContentIncluded && fileName && fileName.length > 0
+  const { fileContentIncluded = false, fileNames, tools } = options
+  const joinedFileNames = fileNames?.join(", ")
 
   const answerPrompt = transformQueryFunction(
     lastMessage,
     fileContentIncluded,
-    fileNameIncluded ? fileName : "hosts.txt"
+    joinedFileNames
   )
   answerMessage.content = answerPrompt
-
   const openAIResponseStream = await OpenAIStream(
     model,
     messagesToSend,
@@ -233,4 +232,11 @@ export function createGKEHeaders(): Headers {
   headers.set("Cache-Control", "no-cache")
   headers.set("Connection", "keep-alive")
   return headers
+}
+
+export const processGKEData = (data: string) => {
+  return data
+    .split("\\n")
+    .filter(line => line && !line.startsWith("data:") && line.trim() !== "")
+    .join("\n")
 }

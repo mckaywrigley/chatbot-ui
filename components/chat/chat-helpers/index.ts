@@ -234,8 +234,7 @@ export const handleHostedPluginsChat = async (
   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
   alertDispatch: React.Dispatch<AlertAction>,
   selectedPlugin: PluginID,
-  fileContent: string,
-  fileName: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) => {
   let formattedMessages = []
 
@@ -248,12 +247,14 @@ export const handleHostedPluginsChat = async (
 
   const apiEndpoint = "/api/chat/plugins"
 
-  const requestBody = {
+  const requestBody: any = {
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
-    selectedPlugin,
-    fileContent,
-    fileName
+    selectedPlugin
+  }
+
+  if (fileData) {
+    requestBody.fileData = fileData
   }
 
   const response = await fetchChatResponse(

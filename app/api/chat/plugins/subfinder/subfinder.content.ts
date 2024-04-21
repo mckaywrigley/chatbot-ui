@@ -429,7 +429,7 @@ const createResponseString = (
   })
 
   return (
-    `# [Subfinder](${pluginUrls.Subfinder}) Results\n` +
+    `# [Subfinder](${pluginUrls.SUBFINDER}) Results\n` +
     '**Target**: "' +
     domain +
     '"\n\n' +

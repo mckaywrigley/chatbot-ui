@@ -42,7 +42,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Navigate the CVE jungle with ease",
     categories: ["Free", "Popular", "New"],
-    githubRepoUrl: pluginUrls.CVEmap,
+    githubRepoUrl: pluginUrls.CVEMAP,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -80,7 +80,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "A tool for for encryption, encoding, compression, and data analysis",
     categories: ["Free", "Popular", "New"],
-    githubRepoUrl: pluginUrls.Cyberchef,
+    githubRepoUrl: pluginUrls.CYBERCHEF,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -117,7 +117,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast passive subdomain enumeration tool",
     categories: ["Free", "Popular"],
-    githubRepoUrl: pluginUrls.Subfinder,
+    githubRepoUrl: pluginUrls.SUBFINDER,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -176,7 +176,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://cdn-icons-png.flaticon.com/512/5972/5972097.png",
     description: "Fast and minimal JS endpoint extractor",
     categories: ["Free", "New", "Popular"],
-    githubRepoUrl: pluginUrls.GoLinkFinder,
+    githubRepoUrl: pluginUrls.GOLINKFINDER,
     isInstalled: false,
     isPremium: false,
     starters: [
@@ -201,7 +201,7 @@ export const availablePlugins: PluginSummary[] = [
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customisable vulnerability scanner",
     categories: ["Popular"],
-    githubRepoUrl: pluginUrls.Nuclei,
+    githubRepoUrl: pluginUrls.NUCLEI,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -237,7 +237,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "Web crawling framework designed to navigate and parse for hidden details",
     categories: ["Popular"],
-    githubRepoUrl: pluginUrls.Katana,
+    githubRepoUrl: pluginUrls.KATANA,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -272,7 +272,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "Fast and multi-purpose HTTP toolkit that allows running multiple probes",
     categories: ["Popular"],
-    githubRepoUrl: pluginUrls.Httpx,
+    githubRepoUrl: pluginUrls.HTTPX,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -307,7 +307,7 @@ export const availablePlugins: PluginSummary[] = [
     description:
       "Fast port scanner written in go with a focus on reliability and simplicity",
     categories: ["Popular"],
-    githubRepoUrl: pluginUrls.Naabu,
+    githubRepoUrl: pluginUrls.NAABU,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -337,16 +337,52 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 10,
+    name: "dnsX",
+    selectorName: "dnsX: DNS toolkit",
+    value: PluginID.DNSX,
+    icon: "https://avatars.githubusercontent.com/u/50994705",
+    description:
+      "Fast and multi-purpose DNS toolkit allow to run multiple DNS queries of your choice with a list of user-supplied resolvers",
+    categories: ["New"],
+    githubRepoUrl: pluginUrls.DNSX,
+    isInstalled: false,
+    isPremium: true,
+    starters: [
+      {
+        title: "Bruteforce Subdomains",
+        description: "for facebook using words blog,api,beta",
+        chatMessage:
+          "Bruteforce subdomains for facebook using words blog, api, beta"
+      },
+      // {
+      //   title: "",
+      //   description: "",
+      //   chatMessage: ""
+      // },
+      // {
+      //   title: "",
+      //   description: "",
+      //   chatMessage: ""
+      // },
+      {
+        title: "dnsX Help",
+        description: "How does the dnsX plugin work?",
+        chatMessage: "/dnsx -help"
+      }
+    ]
+  },
+  {
+    id: 11,
     name: "GAU",
-    selectorName: "GAU: URL Enumeration",
+    selectorName: "GAU: Url Enumeration",
     value: PluginID.GAU,
     icon: "https://avatars.githubusercontent.com/u/19563282",
     description:
       "Fetch known URLs from AlienVault's Open Threat Exchange, the Wayback Machine, and Common Crawl",
-    categories: ["Popular"],
-    githubRepoUrl: pluginUrls.Gau,
+    categories: ["Free"],
+    githubRepoUrl: pluginUrls.GAU,
     isInstalled: false,
-    isPremium: true,
+    isPremium: false,
     starters: [
       {
         title: "Start URL Enumeration",
@@ -371,14 +407,14 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 11,
+    id: 12,
     name: "AlterX",
     selectorName: "AlterX: Subdomain Wordlist Generator",
     value: PluginID.ALTERX,
     icon: "https://avatars.githubusercontent.com/u/50994705",
     description: "Fast and customizable subdomain wordlist generator",
     categories: ["Free"],
-    githubRepoUrl: pluginUrls.Alterx,
+    githubRepoUrl: pluginUrls.ALTERX,
     isInstalled: false,
     isPremium: false,
     starters: [

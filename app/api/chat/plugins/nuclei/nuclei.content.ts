@@ -717,14 +717,13 @@ export async function handleNucleiRequest(
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean,
-  fileContent?: string,
-  fileName?: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) {
   if (!enableNucleiFeature) {
     return new Response("The Nuclei is disabled.")
   }
 
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  const fileContentIncluded = !!fileData && fileData.length > 0
   let aiResponse = ""
 
   const headers = createGKEHeaders()
@@ -742,7 +741,7 @@ export async function handleNucleiRequest(
       if (invokedByToolId) {
         const options: ProcessAIResponseOptions = {
           fileContentIncluded: fileContentIncluded,
-          fileName: fileName
+          fileNames: fileData?.map(file => file.fileName) || []
         }
 
         try {
@@ -884,9 +883,9 @@ export async function handleNucleiRequest(
         requestBody.scan_strategy = params.scanStrategy
       if (params.noHttpx) requestBody.no_httpx = true
 
-      // FILE
       if (fileContentIncluded) {
-        requestBody.fileContent = fileContent
+        ;(requestBody as any).fileContent =
+          fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -937,7 +936,7 @@ export async function handleNucleiRequest(
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
           pluginName: "Nuclei",
-          pluginUrl: pluginUrls.Nuclei,
+          pluginUrl: pluginUrls.NUCLEI,
           target: target,
           results: urlsFormatted
         })

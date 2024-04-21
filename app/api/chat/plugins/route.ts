@@ -8,7 +8,7 @@ import {
   pluginIdToHandlerMapping,
   isCommand,
   handleCommand
-} from "./chatpluginhandlers"
+} from "@/app/api/chat/plugins/chatpluginhandlers"
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 import { PluginID, pluginUrls } from "@/types/plugins"
 import { isPremiumUser } from "@/lib/server/subscription-utils"
@@ -17,15 +17,14 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, selectedPlugin, fileContent, fileName } =
-    json as {
-      chatSettings: ChatSettings
-      messages: any[]
-      selectedPlugin: string
-      isPremium: any
-      fileContent: string
-      fileName: string
-    }
+  const { chatSettings, messages, selectedPlugin, fileData } = json as {
+    chatSettings: ChatSettings
+    messages: any[]
+    selectedPlugin: string
+    isPremium: any
+    fileData?: { fileName: string; fileContent: string }[]
+  }
+
   const premiumPlugins: PluginID[] = [
     PluginID.NUCLEI,
     PluginID.KATANA,
@@ -126,8 +125,7 @@ export async function POST(request: Request) {
         cleanMessages,
         answerMessage,
         invokedByPluginId,
-        fileContent,
-        fileName
+        fileData && fileData.length > 0 ? fileData : undefined
       )
 
       return response

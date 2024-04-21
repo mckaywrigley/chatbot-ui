@@ -621,14 +621,13 @@ export async function handleHttpxRequest(
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean,
-  fileContent?: string,
-  fileName?: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) {
   if (!enableHttpxFeature) {
     return new Response("The Httpx is disabled.")
   }
 
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  const fileContentIncluded = !!fileData && fileData.length > 0
   let aiResponse = ""
 
   const headers = createGKEHeaders()
@@ -646,7 +645,7 @@ export async function handleHttpxRequest(
       if (invokedByToolId) {
         const options: ProcessAIResponseOptions = {
           fileContentIncluded: fileContentIncluded,
-          fileName: fileName
+          fileNames: fileData?.map(file => file.fileName) || []
         }
 
         try {
@@ -920,9 +919,9 @@ export async function handleHttpxRequest(
         requestBody.timeout = params.timeout
       }
 
-      // FILE
       if (fileContentIncluded) {
-        requestBody.fileContent = fileContent
+        ;(requestBody as any).fileContent =
+          fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -973,7 +972,7 @@ export async function handleHttpxRequest(
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
           pluginName: "HTTPX",
-          pluginUrl: pluginUrls.Httpx,
+          pluginUrl: pluginUrls.HTTPX,
           target: target,
           results: urlsFormatted
         })

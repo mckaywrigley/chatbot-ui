@@ -113,8 +113,11 @@ export const validRcodes = [
 
 export interface DnsxParams {
   list?: string
+  listFile?: string
   domain?: string[]
+  domainFile?: string
   wordlist?: string[]
+  wordlistFile?: string
   a?: boolean
   aaaa?: boolean
   cname?: boolean

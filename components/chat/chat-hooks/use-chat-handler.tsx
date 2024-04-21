@@ -22,6 +22,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
+import { isCommand } from "@/app/api/chat/plugins/chatpluginhandlers"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -298,62 +299,64 @@ export const useChatHandler = () => {
       let generatedText = ""
       let finishReasonFromResponse = ""
 
-      // if (!isContinuation && selectedTools.length > 0) {
-      //   setToolInUse(selectedTools.length > 1 ? "Tools" : selectedTools[0].name)
-
-      //   const formattedMessages = await buildFinalMessages(
-      //     payload,
-      //     profile!,
-      //     chatImages,
-      //     selectedPlugin
-      //   )
-
-      //   const response = await fetch("/api/chat/tools", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json"
-      //     },
-      //     body: JSON.stringify({
-      //       chatSettings: payload.chatSettings,
-      //       messages: formattedMessages,
-      //       selectedTools
-      //     })
-      //   })
-
-      //   setToolInUse("none")
-
-      //   const { fullText, finishReason } = await processResponse(
-      //     response,
-      //     isRegeneration
-      //       ? payload.chatMessages[payload.chatMessages.length - 1]
-      //       : tempAssistantChatMessage,
-      //     newAbortController,
-      //     setFirstTokenReceived,
-      //     setChatMessages,
-      //     setToolInUse
-      //   )
-      //   generatedText = fullText
-      //   finishReasonFromResponse = finishReason
       if (
         selectedPlugin.length > 0 &&
         selectedPlugin !== PluginID.NONE &&
         selectedPlugin !== PluginID.WEB_SCRAPER
       ) {
-        let fileContent = ""
-        let fileName = ""
+        let fileData: { fileName: string; fileContent: string }[] = []
 
-        if (newMessageFiles.length > 0 && newMessageFiles[0].type === "text") {
-          const fileId = newMessageFiles[0].id
-          const response = await fetch(`/api/retrieval/file/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ fileId: fileId })
+        const nonExcludedPluginsForFilesCommand = [
+          PluginID.NUCLEI,
+          PluginID.NAABU,
+          PluginID.ALTERX,
+          PluginID.DNSX,
+          PluginID.HTTPX,
+          PluginID.KATANA
+        ]
+
+        const isCommand = (allowedCommands: string[], message: string) => {
+          if (!message.startsWith("/")) return false
+
+          const trimmedMessage = message.trim().toLowerCase()
+
+          // Check if the message matches any of the allowed commands
+          return allowedCommands.some(commandName => {
+            const commandPattern = new RegExp(
+              `^\\/${commandName}(?:\\s+(-[a-z]+|\\S+))*$`
+            )
+            return commandPattern.test(trimmedMessage)
           })
-          const fileData = await response.json()
-          fileContent = fileData.content
-          fileName = newMessageFiles[0].name
+        }
+
+        if (
+          messageContent &&
+          newMessageFiles.length > 0 &&
+          newMessageFiles[0].type === "text" &&
+          (nonExcludedPluginsForFilesCommand.includes(selectedPlugin) ||
+            isCommand(nonExcludedPluginsForFilesCommand, messageContent))
+        ) {
+          const fileIds = newMessageFiles
+            .filter(file => file.type === "text")
+            .map(file => file.id)
+
+          if (fileIds.length > 0) {
+            const response = await fetch(`/api/retrieval/file-2v`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ fileIds: fileIds })
+            })
+
+            if (!response.ok) {
+              const errorData = await response.json()
+              toast.warning(errorData.message)
+            }
+
+            const data = await response.json()
+            fileData.push(...data.files)
+          }
         }
 
         const { fullText, finishReason } = await handleHostedPluginsChat(
@@ -371,8 +374,7 @@ export const useChatHandler = () => {
           setToolInUse,
           alertDispatch,
           selectedPlugin,
-          fileContent,
-          fileName
+          fileData
         )
         generatedText = fullText
         finishReasonFromResponse = finishReason

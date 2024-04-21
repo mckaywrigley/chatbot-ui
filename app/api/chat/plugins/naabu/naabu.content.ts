@@ -249,14 +249,13 @@ export async function handleNaabuRequest(
   messagesToSend: Message[],
   answerMessage: Message,
   invokedByToolId: boolean,
-  fileContent?: string,
-  fileName?: string
+  fileData?: { fileName: string; fileContent: string }[]
 ) {
   if (!enableNaabuFeature) {
     return new Response("The Naabu feature is disabled.")
   }
 
-  const fileContentIncluded = !!fileContent && fileContent.length > 0
+  const fileContentIncluded = !!fileData && fileData.length > 0
   let aiResponse = ""
 
   const headers = createGKEHeaders()
@@ -274,7 +273,7 @@ export async function handleNaabuRequest(
       if (invokedByToolId) {
         const options: ProcessAIResponseOptions = {
           fileContentIncluded: fileContentIncluded,
-          fileName: fileName
+          fileNames: fileData?.map(file => file.fileName) || []
         }
 
         try {
@@ -337,12 +336,9 @@ export async function handleNaabuRequest(
         }
       }
 
-      if (
-        fileContentIncluded &&
-        typeof fileContent === "string" &&
-        fileContent.length > 0
-      ) {
-        ;(requestBody as any).fileContent = fileContent
+      if (fileContentIncluded) {
+        ;(requestBody as any).fileContent =
+          fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
@@ -399,7 +395,7 @@ export async function handleNaabuRequest(
         const target = params.list ? params.list : params.host
         const formattedResults = formatScanResults({
           pluginName: "Naabu",
-          pluginUrl: pluginUrls.Naabu,
+          pluginUrl: pluginUrls.NAABU,
           target: target,
           results: portsFormatted
         })

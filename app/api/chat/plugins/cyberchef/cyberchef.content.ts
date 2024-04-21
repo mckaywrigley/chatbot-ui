@@ -336,7 +336,7 @@ export async function handleCyberchefRequest(
 
 function formatResponseString(outputString: any, params: CyberChefParams) {
   return (
-    `# [CyberChef](${pluginUrls.Cyberchef}) Results\n` +
+    `# [CyberChef](${pluginUrls.CYBERCHEF}) Results\n` +
     "```\n" +
     outputString +
     "\n" +
