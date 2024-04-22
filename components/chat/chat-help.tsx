@@ -69,7 +69,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         <DropdownMenuSeparator />
 
         <div className="flex justify-center py-2">
-          <div className="opacity-60 cursor-text select-text text-sm"> 
+          <div className="cursor-text select-text text-sm opacity-60">
             contact@hackergpt.chat
           </div>
         </div>

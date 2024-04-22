@@ -711,11 +711,13 @@ export const transformUserQueryToDnsxCommand = (
 
   const domainOrFilenameInclusionText = fileContentIncluded
     ? endent`
-    **Filename Inclusion/Domain Inclusion**: Use the -list, -domain, or -wordlist flags followed by the file name (e.g., -list targets.txt, -domain domains.txt, -wordlist words.txt) containing the list of subdomains, hosts, domains, or words to resolve or bruteforce. dnsx supports direct file inclusion, making it convenient to use files that already contain the necessary targets. Alternatively, these flags can also accept comma-separated values directly in the command, allowing for flexible input methods without the need for a file. (required)
-    - -list string: Specify a file list of subdomains/hosts to resolve.
-    - -domain string: Specify a comma-separated list of domains to bruteforce. If content of files are big use file.
-    - -wordlist string: Specify a comma-separated list of words to bruteforce. If content of files are big use file.
-    IMPORTANT: Generating a command use only following file(s) names because those files user only have provided: ${joinedFileNames}. Don't come up with imagenary names.
+    **Filename Inclusion/Domain Inclusion**: 
+    Utilize the following flags as directed by the user. Ensure the exact filenames provided by the user are used. Do not assume or substitute filenames.
+    - -list string: Use this flag with a file name to specify a list of subdomains or hosts for resolution. This flag always requires a file.
+    - -domain string: list of domain to bruteforce. Use this flag in conjunction with the -wordlist flag. This can be used with a file name or as a comma-separated list directly in the command.
+    - -wordlist string: list of words to bruteforce. Use this flag in conjunction with the -domain flag. It can also be used with a file name or as a comma-separated list directly in the command.
+    dnsx supports the flexibility of direct file inclusion or direct value input in the command. Always use the exact file names or values as specified by the user.
+    IMPORTANT: Always use only the this file names: ${joinedFileNames}. Do not create or assume filenames not specified by the user.
   `
     : endent`
     **Direct Domain Inclusion**: When resolving a list of domains or words, directly embed them in the command using the -d or -w flags. These flags can accept comma-separated values directly in the command, providing a quick way to input multiple domains or words without the need for a file.
@@ -727,10 +729,20 @@ export const transformUserQueryToDnsxCommand = (
     ? endent`For resolving a list of subdomains/hosts using a file named 'targets.txt':
         \`\`\`json
         { "command": "dnsx -list targets.txt -recon" }
+        \`\`\`
+
+        For bruteforcing a file of domains with words blog, api, beta:
+        \`\`\`json
+        { "command": "dnsx -domain domains.txt -wordlist blog,api,beta -a -resp" }
+        \`\`\`
+
+        For bruteforcing a file of domains with a wordlist file named 'wordlist.txt':
+        \`\`\`json
+        { "command": "dnsx -list domains.txt -wordlist wordlist.txt -a -resp" }
         \`\`\``
     : endent`For resolving a list of domains directly:
         \`\`\`json
-        { "command": "dnsx -d domain1.com,domain2.com,domain3.com -w api,blog,help -a -resp" }
+        { "command": "dnsx -domain domain1.com,domain2.com,domain3.com -wordlist api,blog,help -a -resp" }
         \`\`\``
 
   const answerMessage = endent`
@@ -781,7 +793,6 @@ export const transformUserQueryToDnsxCommand = (
     \`\`\`
   
     Response:`
-    console.log(answerMessage)
 
   return answerMessage
 }

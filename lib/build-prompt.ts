@@ -176,9 +176,7 @@ export async function buildFinalMessages(
       content
     }
   })
-  console.log(    chatFileItems
-    )
-  console.log(messageFileItems)
+
   if (messageFileItems.length > 0 && selectedPlugin === PluginID.NONE) {
     const retrievalText = buildRetrievalText(messageFileItems)
 
