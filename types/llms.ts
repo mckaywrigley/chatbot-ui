@@ -37,6 +37,7 @@ export type MistralLLMID =
 
 export type GroqLLMID =
   | "llama2-70b-4096" // LLaMA2-70b
+  | "llama3-70b-8192" // LLaMA3-70b
   | "mixtral-8x7b-32768" // Mixtral-8x7b
 
 // Perplexity Models (UPDATED 1/31/24)
