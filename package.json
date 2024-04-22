@@ -75,7 +75,7 @@
     "endent": "^2.1.0",
     "gpt-tokenizer": "^2.1.2",
     "html-to-md": "^0.8.5",
-    "i18next": "^23.7.16",
+    "i18next": "^23.11.2",
     "i18next-resources-to-backend": "^1.2.0",
     "langchain": "^0.1.30",
     "lucide-react": "^0.363.0",
