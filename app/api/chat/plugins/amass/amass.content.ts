@@ -10,50 +10,77 @@ import {
   processGKEData
 } from "../chatpluginhandlers"
 
-import { displayHelpGuideForDnsx } from "../plugin-helper/help-guides"
-import { transformUserQueryToDnsxCommand } from "../plugin-helper/transform-query-to-command"
+import { displayHelpGuideForAmass } from "../plugin-helper/help-guides"
+import { transformUserQueryToAmassCommand } from "../plugin-helper/transform-query-to-command"
 import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 import {
-  DnsxParams,
-  dnsxBooleanFlagDefinitions,
-  dnsxFlagDefinitions,
-  dnsxRepeatableFlags,
-  FlagDefinitions,
-  validRcodes
+  AmassParams,
+  amassBooleanFlagDefinitions,
+  amassFlagDefinitions,
+  amassRepeatableFlags,
+  FlagDefinitions
 } from "../plugin-helper/plugin-flags"
 import { pluginUrls } from "@/types/plugins"
 
 const parseCommandLine = (
   input: string,
-  flagDefinitions: FlagDefinitions<DnsxParams>,
+  flagDefinitions: FlagDefinitions<AmassParams>,
   repeatableFlags: Set<string> = new Set(),
   fileData?: { fileName: string; fileContent: string }[]
-): DnsxParams => {
+): AmassParams => {
   const MAX_INPUT_LENGTH = 5000
+  const MAX_TIMEOUT_MINUTES = 5
 
-  const params: DnsxParams = {
-    list: "",
+  const params: AmassParams = {
+    enum: false,
+    intel: false,
+    active: false,
+    addr: "",
+    alts: false,
+    asn: [],
+    aw: "",
+    awm: "",
+    bl: "",
+    blf: "",
+    blfFile: "",
+    brute: false,
+    cidr: [],
     domain: [],
-    wordlist: [],
-    a: false,
-    aaaa: false,
-    cname: false,
-    ns: false,
-    txt: false,
-    srv: false,
-    ptr: false,
-    mx: false,
-    soa: false,
-    axfr: false,
-    caa: false,
-    recon: false,
-    any: false,
-    resp: false,
-    respOnly: false,
-    rcode: [],
-    cdn: false,
-    asn: false,
-    json: false,
+    demo: false,
+    df: "",
+    dfFile: "",
+    ef: "",
+    efFile: "",
+    exclude: "",
+    if: "",
+    ifFile: "",
+    iface: "",
+    include: "",
+    ip: false,
+    ipv4: false,
+    ipv6: false,
+    list: false,
+    maxDepth: "",
+    minForRecursive: "",
+    nf: "",
+    nfFile: "",
+    norecursive: false,
+    org: "",
+    p: "",
+    passive: false,
+    r: [],
+    rf: "",
+    rfFile: "",
+    rqps: "",
+    timeout: 1,
+    tr: [],
+    trf: "",
+    trfFile: "",
+    trqps: "",
+    w: "",
+    wFile: "",
+    whois: false,
+    wm: "",
     error: null
   }
 
@@ -87,52 +114,27 @@ const parseCommandLine = (
       } else {
         const nextArg = args[i + 1]
         if (nextArg && !nextArg.startsWith("-")) {
-          if (Array.isArray(params[key])) {
-            if (key === "rcode") {
-              const rcodes = nextArg
-                .split(",")
-                .map(rcode => rcode.toLowerCase())
-              const invalidRcodes = rcodes.filter(
-                rcode => !validRcodes.includes(rcode)
-              )
-              if (invalidRcodes.length > 0) {
-                params.error = `🚨 Invalid rcode value(s): ${invalidRcodes.join(", ")}`
-                return params
-              }
-              params[key] = rcodes
+          if (key === "timeout") {
+            const timeoutValue = parseInt(nextArg, 10)
+            if (isNaN(timeoutValue) || timeoutValue > MAX_TIMEOUT_MINUTES) {
+              params.error = `🚨 Timeout value must be a number and cannot exceed 5 minutes (${MAX_TIMEOUT_MINUTES} minutes).`
+              return params
+            }
+          }
+          const fileExtension = nextArg.split(".").pop()?.toLowerCase()
+          if (fileExtension === "txt") {
+            const fileContent = fileData?.find(
+              file => file.fileName === nextArg
+            )?.fileContent
+            if (fileContent) {
+              ;(params as any)[key] = nextArg
+              ;(params as any)[`${key}File`] = fileContent
             } else {
-              const fileExtension = nextArg.split(".").pop()?.toLowerCase()
-              if (fileExtension === "txt") {
-                const fileContent = fileData?.find(
-                  file => file.fileName === nextArg
-                )?.fileContent
-                if (fileContent) {
-                  ;(params as any)[key] = [nextArg]
-                  ;(params as any)[`${key}File`] = fileContent.split("\n")
-                } else {
-                  params.error = `🚨 File not found for flag: ${arg}`
-                  return params
-                }
-              } else {
-                ;(params as any)[key] = [nextArg]
-              }
+              params.error = `🚨 File not found for flag: ${arg}`
+              return params
             }
           } else {
-            const fileExtension = nextArg.split(".").pop()?.toLowerCase()
-            if (fileExtension === "txt") {
-              const fileContent = fileData?.find(
-                file => file.fileName === nextArg
-              )?.fileContent
-              if (fileContent) {
-                ;(params as any)[key] = nextArg
-                ;(params as any)[`${key}File`] = fileContent
-              } else {
-                params.error = `🚨 File not found for flag: ${arg}`
-                return params
-              }
-            } else {
-              ;(params as any)[key] = nextArg
-            }
+            ;(params as any)[key] = nextArg
           }
           i++
         } else {
@@ -140,29 +142,33 @@ const parseCommandLine = (
           return params
         }
       }
+    } else if (arg === "enum") {
+      params.enum = true
+    } else if (arg === "intel") {
+      params.intel = true
     } else {
       params.error = `🚨 Unrecognized flag: ${arg}`
       return params
     }
   }
 
-  if (
-    params.domain &&
-    params.domain.length > 0 &&
-    params.wordlist &&
-    params.wordlist.length === 0
-  ) {
+  if (params.enum && params.intel) {
+    params.error = "🚨 You cannot use both -enum and -intel at the same time."
+    return params
+  }
+
+  if (!params.domain && !params.df && params.enum) {
     params.error =
-      "🚨 Missing wordlist (-w) flag required with domain (-d) input."
+      "🚨 You must provide a domain or a file name when using 'enum' subcommand."
     return params
   }
 
   return params
 }
 
-export async function handleDnsxRequest(
+export async function handleAmassRequest(
   lastMessage: Message,
-  enableDnsxFeature: boolean,
+  enableAmassFeature: boolean,
   OpenAIStream: any,
   model: string,
   messagesToSend: Message[],
@@ -170,7 +176,7 @@ export async function handleDnsxRequest(
   invokedByToolId: boolean,
   fileData?: { fileName: string; fileContent: string }[]
 ) {
-  if (!enableDnsxFeature) {
+  if (!enableAmassFeature) {
     return new Response("The CVEMap is disabled.")
   }
 
@@ -198,7 +204,7 @@ export async function handleDnsxRequest(
         try {
           for await (const chunk of processAIResponseAndUpdateMessage(
             lastMessage,
-            transformUserQueryToDnsxCommand,
+            transformUserQueryToAmassCommand,
             OpenAIStream,
             model,
             messagesToSend,
@@ -225,15 +231,15 @@ export async function handleDnsxRequest(
 
       const parts = lastMessage.content.split(" ")
       if (parts.includes("-h") || parts.includes("-help")) {
-        sendMessage(displayHelpGuideForDnsx(), true)
+        sendMessage(displayHelpGuideForAmass(), true)
         controller.close()
         return
       }
 
       const params = parseCommandLine(
         lastMessage.content,
-        { ...dnsxFlagDefinitions, ...dnsxBooleanFlagDefinitions },
-        dnsxRepeatableFlags,
+        { ...amassFlagDefinitions, ...amassBooleanFlagDefinitions },
+        amassRepeatableFlags,
         fileData
       )
 
@@ -247,9 +253,9 @@ export async function handleDnsxRequest(
         return
       }
 
-      let dnsxUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/dnsx`
+      let amassUrl = `${process.env.SECRET_GKE_PLUGINS_BASE_URL}/api/chat/plugins/amass`
 
-      let requestBody: Partial<DnsxParams> = {}
+      let requestBody: Partial<AmassParams> = {}
 
       for (const [key, value] of Object.entries(params)) {
         if (
@@ -265,14 +271,11 @@ export async function handleDnsxRequest(
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
 
       const intervalId = setInterval(() => {
-        sendMessage(
-          "⏳ Searching in progress. We appreciate your patience.",
-          true
-        )
-      }, 15000)
+        sendMessage("⏳ Still working on it, please hold on...", true)
+      }, 30000)
 
       try {
-        const dnsxResponse = await fetch(dnsxUrl, {
+        const amassResponse = await fetch(amassUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -281,19 +284,24 @@ export async function handleDnsxRequest(
           body: JSON.stringify(requestBody)
         })
 
-        if (dnsxResponse.status !== 200) {
-          const errorMessage = `🚨 An error occurred while running your query. Please try again or check your input.`
-          sendMessage(`${errorMessage}`, true)
+        let amassData = await amassResponse.json()
+
+        if (amassResponse.status !== 200) {
+          amassData = amassData.message
+          sendMessage(
+            `🚨 Amass scan failed with status ${amassResponse.status}`,
+            true
+          )
+          sendMessage(`\`\`\` ${amassData} \`\`\``)
           controller.close()
-          return new Response(errorMessage)
+          return new Response()
         }
 
-        let dnsxData = await dnsxResponse.json()
-        dnsxData = dnsxData.output
-        dnsxData = processGKEData(dnsxData)
-        dnsxData = truncateData(dnsxData, 300000)
+        amassData = amassData.output
+        amassData = processGKEData(amassData)
+        amassData = truncateData(amassData, 300000)
 
-        if (!dnsxData || dnsxData.length === 0) {
+        if (!amassData || amassData.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`
           clearInterval(intervalId)
           sendMessage(noDataMessage, true)
@@ -304,12 +312,12 @@ export async function handleDnsxRequest(
         clearInterval(intervalId)
         sendMessage("✅ Scan done! Now processing the results...", true)
 
-        const target = params.list ? params.list : params.domain
+        const target = params.domain ? params.domain : params.df
         const formattedResults = formatScanResults({
-          pluginName: "dnsx",
-          pluginUrl: pluginUrls.DNSX,
+          pluginName: "Amass",
+          pluginUrl: pluginUrls.AMASS,
           target: target || "",
-          results: dnsxData
+          results: amassData
         })
         sendMessage(formattedResults, true)
 
