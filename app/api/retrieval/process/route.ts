@@ -66,9 +66,11 @@ export async function POST(req: Request) {
           checkApiKey(profile.openai_api_key, "OpenAI")
         }
       } catch (error: any) {
-        error.message = error.message + ", make sure it is configured or else use local embeddings"
-        throw(error)
-      }        
+        error.message =
+          error.message +
+          ", make sure it is configured or else use local embeddings"
+        throw error
+      }
     }
 
     let chunks: FileItemChunk[] = []

@@ -82,6 +82,7 @@ export default async function RootLayout({
       }
     }
   )
+  console.log("Connected to Supabase!")
   const session = (await supabase.auth.getSession()).data.session
 
   const { t, resources } = await initTranslations(locale, i18nNamespaces)
