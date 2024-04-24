@@ -630,75 +630,75 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
   return answerMessage
 }
 
-export const transformUserQueryToCyberChefCommand = (lastMessage: Message) => {
-  const answerMessage = `
-      Query: "${lastMessage.content}"
-    
-      DON'T USE DOUBLE QUOTES ("") for any variable.
-    
-      Based on this query, generate a command for the 'CyberChef' tool using the specified operations ('op') and recipe structures, or use CyberChef Magic if the format is not provided. Ensure that the command follows the required JSON format and only includes the provided operations.
-  
-      IMPORTANT: The AI response must strictly adhere to the JSON format specified below for CyberChef Bake. For CyberChef Magic, no specific format is required. If user asks for help or explanation related to plugin than help them to understand the plugin and its usage in short form.
-    
-      FORMAT FOR AI RESPONSE (CyberChef Bake):
-      \`\`\`json
-      { 
-          "input": "[input data]",
-          "recipe": "[recipe instructions]",
-          "outputType": "[output type]"
-      }
-      \`\`\`
-      Replace '[input data]', '[recipe instructions]', and '[output type]' with the actual data and values. The recipe should be constructed using only the specified operations and their corresponding structures. The 'outputType' should be one of 'string', 'number', or 'byteArray'.
-    
-      FORMAT FOR AI RESPONSE (CyberChef Magic):
-      If no specific format is provided in the query, use CyberChef Magic which automatically determines the best operation to apply:
-      \`\`\`json
-      {
-          "input": "[input data]"
-      }
-      \`\`\`
-    
-      CyberChef Operations for Bake:
-      - To Hex, To Base64, From Hex, From Base64, To Morse Code, From Morse Code, MD5, SHA1, To Upper case, To Lower case, Entropy, AES Encrypt, AES Decrypt, To Hexdump, To Braille, From Braille, URL Decode
-    
-      Recipe Construction Guidelines for Bake:
-      - The recipe should be an object for a single operation or an array of objects for multiple operations.
-      - Each operation object must include 'op' (operation name) and may include 'args' (arguments) if required.
-    
-      Example Commands (CyberChef Bake):
-      For a simple conversion to Base64:
-      \`\`\`json
-      { "input": "sample text", "recipe": {"op": "To Base64"}, "outputType": "string" }
-      \`\`\`
-    
-      For a combination of operations:
-      \`\`\`json
-      { 
-          "input": "sample text", 
-          "recipe": [
-              {"op": "To Hex", "args": {"delimiter": "Space"}},
-              {"op": "MD5"}
-          ],
-          "outputType": "string"
-      }
-      \`\`\`
-    
-      For an AES encryption followed by a conversion to Hex:
-      \`\`\`json
-      { 
-          "input": "example", 
-          "recipe": [
-              {"op": "AES Encrypt", "args": {"key": "mysecretkey", "iv": "initialvector"}},
-              {"op": "To Hex"}
-          ],
-          "outputType": "string"
-      }
-      \`\`\`
-      
-      Response:`
+// export const transformUserQueryToCyberChefCommand = (lastMessage: Message) => {
+//   const answerMessage = `
+//       Query: "${lastMessage.content}"
 
-  return answerMessage
-}
+//       DON'T USE DOUBLE QUOTES ("") for any variable.
+
+//       Based on this query, generate a command for the 'CyberChef' tool using the specified operations ('op') and recipe structures, or use CyberChef Magic if the format is not provided. Ensure that the command follows the required JSON format and only includes the provided operations.
+
+//       IMPORTANT: The AI response must strictly adhere to the JSON format specified below for CyberChef Bake. For CyberChef Magic, no specific format is required. If user asks for help or explanation related to plugin than help them to understand the plugin and its usage in short form.
+
+//       FORMAT FOR AI RESPONSE (CyberChef Bake):
+//       \`\`\`json
+//       {
+//           "input": "[input data]",
+//           "recipe": "[recipe instructions]",
+//           "outputType": "[output type]"
+//       }
+//       \`\`\`
+//       Replace '[input data]', '[recipe instructions]', and '[output type]' with the actual data and values. The recipe should be constructed using only the specified operations and their corresponding structures. The 'outputType' should be one of 'string', 'number', or 'byteArray'.
+
+//       FORMAT FOR AI RESPONSE (CyberChef Magic):
+//       If no specific format is provided in the query, use CyberChef Magic which automatically determines the best operation to apply:
+//       \`\`\`json
+//       {
+//           "input": "[input data]"
+//       }
+//       \`\`\`
+
+//       CyberChef Operations for Bake:
+//       - To Hex, To Base64, From Hex, From Base64, To Morse Code, From Morse Code, MD5, SHA1, To Upper case, To Lower case, Entropy, AES Encrypt, AES Decrypt, To Hexdump, To Braille, From Braille, URL Decode
+
+//       Recipe Construction Guidelines for Bake:
+//       - The recipe should be an object for a single operation or an array of objects for multiple operations.
+//       - Each operation object must include 'op' (operation name) and may include 'args' (arguments) if required.
+
+//       Example Commands (CyberChef Bake):
+//       For a simple conversion to Base64:
+//       \`\`\`json
+//       { "input": "sample text", "recipe": {"op": "To Base64"}, "outputType": "string" }
+//       \`\`\`
+
+//       For a combination of operations:
+//       \`\`\`json
+//       {
+//           "input": "sample text",
+//           "recipe": [
+//               {"op": "To Hex", "args": {"delimiter": "Space"}},
+//               {"op": "MD5"}
+//           ],
+//           "outputType": "string"
+//       }
+//       \`\`\`
+
+//       For an AES encryption followed by a conversion to Hex:
+//       \`\`\`json
+//       {
+//           "input": "example",
+//           "recipe": [
+//               {"op": "AES Encrypt", "args": {"key": "mysecretkey", "iv": "initialvector"}},
+//               {"op": "To Hex"}
+//           ],
+//           "outputType": "string"
+//       }
+//       \`\`\`
+
+//       Response:`
+
+//   return answerMessage
+// }
 
 export const transformUserQueryToDnsxCommand = (
   lastMessage: Message,

@@ -1,5 +1,5 @@
 import { handleCvemapRequest } from "./cvemap/cvemap.content"
-import { handleCyberchefRequest } from "./cyberchef/cyberchef.content"
+// import { handleCyberchefRequest } from "./cyberchef/cyberchef.content"
 import { handleSubfinderRequest } from "./subfinder/subfinder.content"
 import { handleGolinkfinderRequest } from "./golinkfinder/golinkfinder.content"
 import { handleNucleiRequest } from "./nuclei/nuclei.content"
@@ -38,7 +38,7 @@ type pluginIdToHandlerMapping = {
 
 export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   cvemap: handleCvemapRequest,
-  cyberchef: handleCyberchefRequest,
+  // cyberchef: handleCyberchefRequest,
   subfinder: handleSubfinderRequest,
   golinkfinder: handleGolinkfinderRequest,
   nuclei: handleNucleiRequest,
