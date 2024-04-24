@@ -182,7 +182,7 @@ export function formatScanResults({
 }: {
   pluginName: string
   pluginUrl: string
-  target: string | string[]
+  target: string | string[] | null | undefined
   results: any
 }) {
   const formattedDateTime = new Date().toLocaleString("en-US", {
@@ -194,11 +194,18 @@ export function formatScanResults({
     ? results.join("\n")
     : results.split("\n").join("\n")
 
+  let targetInfo = ""
+  if (Array.isArray(target)) {
+    if (target.length > 0) {
+      targetInfo = `**Target**: "${target.join(", ")}"\n\n`
+    }
+  } else if (target && target !== "") {
+    targetInfo = `**Target**: "${target}"\n\n`
+  }
+
   return (
     `# [${pluginName}](${pluginUrl}) Results\n` +
-    '**Target**: "' +
-    target +
-    '"\n\n' +
+    targetInfo +
     "**Scan Date & Time**:" +
     ` ${formattedDateTime} (UTC-5) \n\n` +
     "## Results:\n" +

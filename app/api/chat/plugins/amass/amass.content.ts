@@ -268,7 +268,7 @@ export async function handleAmassRequest(
         }
       }
 
-      sendMessage("🚀 Starting the scan. It might take a minute.", true)
+      sendMessage("🚀 Starting the scan. It might take a minute or two.", true)
 
       const intervalId = setInterval(() => {
         sendMessage("⏳ Still working on it, please hold on...", true)
