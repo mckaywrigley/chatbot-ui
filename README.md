@@ -1,6 +1,6 @@
 # HackerGPT
 
-HackerGPT is your indispensable digital companion in the world of hacking. Crafted with the unique needs of ethical hackers in mind, this AI-powered assistant stands at the forefront of hacking knowledge and assistance. Equipped with an extensive database of hacking techniques, tools, and strategies, HackerGPT is more than just an information resource—it's an active participant in your hacking journey. Whether you're a beginner looking to learn the ropes or a seasoned professional seeking deeper insights, HackerGPT is your ally in navigating the ever-changing landscape of hacking challenges.
+HackerGPT is your indispensable digital companion in the world of hacking, specifically for web and network hacking. Crafted with the unique needs of ethical hackers in mind, this AI-powered assistant stands at the forefront of hacking knowledge and assistance. Equipped with an extensive database of hacking techniques, tools, and strategies, HackerGPT is more than just an information resource—it's an active participant in your hacking journey. Whether you're a beginner looking to learn the ropes or a seasoned professional seeking deeper insights, HackerGPT is your ally in navigating the ever-changing landscape of hacking challenges.
 
 ## How does HackerGPT work?
 
