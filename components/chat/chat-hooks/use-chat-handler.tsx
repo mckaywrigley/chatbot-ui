@@ -313,7 +313,7 @@ export const useChatHandler = () => {
           PluginID.DNSX,
           PluginID.HTTPX,
           PluginID.KATANA,
-          PluginID.AMASS
+          // PluginID.AMASS
         ]
 
         const isCommand = (allowedCommands: string[], message: string) => {

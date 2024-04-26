@@ -797,120 +797,120 @@ export const transformUserQueryToDnsxCommand = (
   return answerMessage
 }
 
-export const transformUserQueryToAmassCommand = (
-  lastMessage: Message,
-  fileContentIncluded?: boolean,
-  joinedFileNames?: string
-) => {
-  const filenameInsturctions = fileContentIncluded
-    ? endent`
-  5. **Filename For Flags** (IMPORTANT): Always use only the this file names: ${joinedFileNames}. Do not create or assume filenames not specified by the user.
-  `
-    : ""
+// export const transformUserQueryToAmassCommand = (
+//   lastMessage: Message,
+//   fileContentIncluded?: boolean,
+//   joinedFileNames?: string
+// ) => {
+//   const filenameInsturctions = fileContentIncluded
+//     ? endent`
+//   5. **Filename For Flags** (IMPORTANT): Always use only the this file names: ${joinedFileNames}. Do not create or assume filenames not specified by the user.
+//   `
+//     : ""
 
-  const answerMessage = endent`
-    Query: "${lastMessage.content}"
+//   const answerMessage = endent`
+//     Query: "${lastMessage.content}"
 
-    Based on the provided query, generate a command for the 'amass' tool, utilizing either the 'intel' or 'enum' subcommand depending on the user's request. The command should incorporate the most relevant flags to fulfill the user's requirements effectively.
+//     Based on the provided query, generate a command for the 'amass' tool, utilizing either the 'intel' or 'enum' subcommand depending on the user's request. The command should incorporate the most relevant flags to fulfill the user's requirements effectively.
 
-    If the user specifically requests the 'intel' subcommand or seeks to discover additional root domain names associated with an organization, use the 'intel' subcommand. Otherwise, default to the 'enum' subcommand for DNS enumeration and network mapping.
+//     If the user specifically requests the 'intel' subcommand or seeks to discover additional root domain names associated with an organization, use the 'intel' subcommand. Otherwise, default to the 'enum' subcommand for DNS enumeration and network mapping.
 
-    ALWAYS USE THIS FORMAT:
-    \`\`\`json
-    { "command": "amass [subcommand] [flags]" }
-    \`\`\`
-    Replace '[subcommand]' with either 'intel' or 'enum', and '[flags]' with the actual flags and values based on the user's request. Include additional flags only if they are specifically relevant to the query. Ensure the command is properly formatted as valid JSON.
+//     ALWAYS USE THIS FORMAT:
+//     \`\`\`json
+//     { "command": "amass [subcommand] [flags]" }
+//     \`\`\`
+//     Replace '[subcommand]' with either 'intel' or 'enum', and '[flags]' with the actual flags and values based on the user's request. Include additional flags only if they are specifically relevant to the query. Ensure the command is properly formatted as valid JSON.
 
-    Command Construction Guidelines:
-    1. Subcommand Selection:
-      - Use the 'intel' subcommand when the user explicitly requests it or seeks to discover additional root domain names associated with an organization.
-      - Use the 'enum' subcommand for DNS enumeration and network mapping by default, unless the 'intel' subcommand is specifically requested.
-    2. Flag Selection for 'intel' subcommand:
-      | Flag | Description | Example |
-      |------|-------------|---------|
-      | -active | Enable active recon methods | amass intel -active -addr 192.168.2.1-64 -p 80,443,8080 |
-      | -addr | IPs and ranges (192.168.1.1-254) separated by commas | amass intel -addr 192.168.2.1-64 |
-      | -asn | ASNs separated by commas (can be used multiple times) | amass intel -asn 13374,14618 |
-      | -cidr | CIDRs separated by commas (can be used multiple times) | amass intel -cidr 104.154.0.0/15 |
-      | -d | Domain names separated by commas (can be used multiple times) | amass intel -whois -d example.com |
-      | -demo | Censor output to make it suitable for demonstrations | amass intel -demo -whois -d example.com |
-      | -df | Path to a file providing root domain names | amass intel -whois -df domains.txt |
-      | -ef | Path to a file providing data sources to exclude | amass intel -whois -ef exclude.txt -d example.com |
-      | -exclude | Data source names separated by commas to be excluded | amass intel -whois -exclude crtsh -d example.com |
-      | -if | Path to a file providing data sources to include | amass intel -whois -if include.txt -d example.com |
-      | -include | Data source names separated by commas to be included | amass intel -whois -include crtsh -d example.com |
-      | -ip | Show the IP addresses for discovered names | amass intel -ip -whois -d example.com |
-      | -ipv4 | Show the IPv4 addresses for discovered names | amass intel -ipv4 -whois -d example.com |
-      | -ipv6 | Show the IPv6 addresses for discovered names | amass intel -ipv6 -whois -d example.com |
-      | -list | Print the names of all available data sources | amass intel -list |
-      | -org | Search string provided against AS description information | amass intel -org Facebook |
-      | -p | Ports separated by commas (default: 80, 443) | amass intel -cidr 104.154.0.0/15 -p 443,8080 |
-      | -r | IP addresses of preferred DNS resolvers (can be used multiple times) | amass intel -r 8.8.8.8,1.1.1.1 -whois -d example.com |
-      | -rf | Path to a file providing preferred DNS resolvers | amass intel -rf data/resolvers.txt -whois -d example.com |
-      | -timeout | Number of minutes to execute the enumeration | amass intel -timeout 30 -d example.com |
-      | -whois | All discovered domains are run through reverse whois | amass intel -whois -d example.com |
-    3. Flag Selection for 'enum' subcommand:
-      | Flag | Description | Example |
-      |------|-------------|---------|
-      | -active | Enable active recon methods | amass enum -active -d example.com -p 80,443,8080 |
-      | -alts | Enable generation of altered names | amass enum -alts -d example.com |
-      | -aw | Path to a different wordlist file for alterations | amass enum -aw PATH -d example.com |
-      | -awm | "hashcat-style" wordlist masks for name alterations | amass enum -awm dev?d -d example.com |
-      | -bl | Blacklist of subdomain names that will not be investigated | amass enum -bl blah.example.com -d example.com |
-      | -blf | Path to a file providing blacklisted subdomains | amass enum -blf data/blacklist.txt -d example.com |
-      | -brute | Perform brute force subdomain enumeration | amass enum -brute -d example.com |
-      | -d | Domain names separated by commas (can be used multiple times) | amass enum -d example.com |
-      | -demo | Censor output to make it suitable for demonstrations | amass enum -demo -d example.com |
-      | -df | Path to a file providing root domain names | amass enum -df domains.txt |
-      | -ef | Path to a file providing data sources to exclude | amass enum -ef exclude.txt -d example.com |
-      | -exclude | Data source names separated by commas to be excluded | amass enum -exclude crtsh -d example.com |
-      | -if | Path to a file providing data sources to include | amass enum -if include.txt -d example.com |
-      | -iface | Provide the network interface to send traffic through | amass enum -iface en0 -d example.com |
-      | -include | Data source names separated by commas to be included | amass enum -include crtsh -d example.com |
-      | -ip | Show the IP addresses for discovered names | amass enum -ip -d example.com |
-      | -ipv4 | Show the IPv4 addresses for discovered names | amass enum -ipv4 -d example.com |
-      | -ipv6 | Show the IPv6 addresses for discovered names | amass enum -ipv6 -d example.com |
-      | -list | Print the names of all available data sources | amass enum -list |
-      | -max-depth | Maximum number of subdomain labels for brute forcing | amass enum -brute -max-depth 3 -d example.com |
-      | -min-for-recursive | Subdomain labels seen before recursive brute forcing (Default: 1) | amass enum -brute -min-for-recursive 3 -d example.com |
-      | -nf | Path to a file providing already known subdomain names (from other tools/sources) | amass enum -nf names.txt -d example.com |
-      | -norecursive | Turn off recursive brute forcing | amass enum -brute -norecursive -d example.com |
-      | -p | Ports separated by commas (default: 443) | amass enum -d example.com -p 443,8080 |
-      | -passive | A purely passive mode of execution | amass enum -passive -d example.com |
-      | -r | IP addresses of untrusted DNS resolvers (can be used multiple times) | amass enum -r 8.8.8.8,1.1.1.1 -d example.com |
-      | -rf | Path to a file providing untrusted DNS resolvers | amass enum -rf data/resolvers.txt -d example.com |
-      | -rqps | Maximum number of DNS queries per second for each untrusted resolver | amass enum -rqps 10 -d example.com |
-      | -timeout | Number of minutes to execute the enumeration | amass enum -timeout 30 -d example.com |
-      | -tr | IP addresses of trusted DNS resolvers (can be used multiple times) | amass enum -tr 8.8.8.8,1.1.1.1 -d example.com |
-      | -trf | Path to a file providing trusted DNS resolvers | amass enum -trf data/trusted.txt -d example.com |
-      | -trqps | Maximum number of DNS queries per second for each trusted resolver | amass enum -trqps 20 -d example.com |
-      | -w | Path to a different wordlist file for brute forcing | amass enum -brute -w wordlist.txt -d example.com |
-      | -wm | "hashcat-style" wordlist masks for DNS brute forcing | amass enum -brute -wm ?l?l -d example.com |
-    4. **Help Flag**: If the user requests help or a list of available flags, include the '-help' flag in the command.
-    ${filenameInsturctions}
+//     Command Construction Guidelines:
+//     1. Subcommand Selection:
+//       - Use the 'intel' subcommand when the user explicitly requests it or seeks to discover additional root domain names associated with an organization.
+//       - Use the 'enum' subcommand for DNS enumeration and network mapping by default, unless the 'intel' subcommand is specifically requested.
+//     2. Flag Selection for 'intel' subcommand:
+//       | Flag | Description | Example |
+//       |------|-------------|---------|
+//       | -active | Enable active recon methods | amass intel -active -addr 192.168.2.1-64 -p 80,443,8080 |
+//       | -addr | IPs and ranges (192.168.1.1-254) separated by commas | amass intel -addr 192.168.2.1-64 |
+//       | -asn | ASNs separated by commas (can be used multiple times) | amass intel -asn 13374,14618 |
+//       | -cidr | CIDRs separated by commas (can be used multiple times) | amass intel -cidr 104.154.0.0/15 |
+//       | -d | Domain names separated by commas (can be used multiple times) | amass intel -whois -d example.com |
+//       | -demo | Censor output to make it suitable for demonstrations | amass intel -demo -whois -d example.com |
+//       | -df | Path to a file providing root domain names | amass intel -whois -df domains.txt |
+//       | -ef | Path to a file providing data sources to exclude | amass intel -whois -ef exclude.txt -d example.com |
+//       | -exclude | Data source names separated by commas to be excluded | amass intel -whois -exclude crtsh -d example.com |
+//       | -if | Path to a file providing data sources to include | amass intel -whois -if include.txt -d example.com |
+//       | -include | Data source names separated by commas to be included | amass intel -whois -include crtsh -d example.com |
+//       | -ip | Show the IP addresses for discovered names | amass intel -ip -whois -d example.com |
+//       | -ipv4 | Show the IPv4 addresses for discovered names | amass intel -ipv4 -whois -d example.com |
+//       | -ipv6 | Show the IPv6 addresses for discovered names | amass intel -ipv6 -whois -d example.com |
+//       | -list | Print the names of all available data sources | amass intel -list |
+//       | -org | Search string provided against AS description information | amass intel -org Facebook |
+//       | -p | Ports separated by commas (default: 80, 443) | amass intel -cidr 104.154.0.0/15 -p 443,8080 |
+//       | -r | IP addresses of preferred DNS resolvers (can be used multiple times) | amass intel -r 8.8.8.8,1.1.1.1 -whois -d example.com |
+//       | -rf | Path to a file providing preferred DNS resolvers | amass intel -rf data/resolvers.txt -whois -d example.com |
+//       | -timeout | Number of minutes to execute the enumeration | amass intel -timeout 30 -d example.com |
+//       | -whois | All discovered domains are run through reverse whois | amass intel -whois -d example.com |
+//     3. Flag Selection for 'enum' subcommand:
+//       | Flag | Description | Example |
+//       |------|-------------|---------|
+//       | -active | Enable active recon methods | amass enum -active -d example.com -p 80,443,8080 |
+//       | -alts | Enable generation of altered names | amass enum -alts -d example.com |
+//       | -aw | Path to a different wordlist file for alterations | amass enum -aw PATH -d example.com |
+//       | -awm | "hashcat-style" wordlist masks for name alterations | amass enum -awm dev?d -d example.com |
+//       | -bl | Blacklist of subdomain names that will not be investigated | amass enum -bl blah.example.com -d example.com |
+//       | -blf | Path to a file providing blacklisted subdomains | amass enum -blf data/blacklist.txt -d example.com |
+//       | -brute | Perform brute force subdomain enumeration | amass enum -brute -d example.com |
+//       | -d | Domain names separated by commas (can be used multiple times) | amass enum -d example.com |
+//       | -demo | Censor output to make it suitable for demonstrations | amass enum -demo -d example.com |
+//       | -df | Path to a file providing root domain names | amass enum -df domains.txt |
+//       | -ef | Path to a file providing data sources to exclude | amass enum -ef exclude.txt -d example.com |
+//       | -exclude | Data source names separated by commas to be excluded | amass enum -exclude crtsh -d example.com |
+//       | -if | Path to a file providing data sources to include | amass enum -if include.txt -d example.com |
+//       | -iface | Provide the network interface to send traffic through | amass enum -iface en0 -d example.com |
+//       | -include | Data source names separated by commas to be included | amass enum -include crtsh -d example.com |
+//       | -ip | Show the IP addresses for discovered names | amass enum -ip -d example.com |
+//       | -ipv4 | Show the IPv4 addresses for discovered names | amass enum -ipv4 -d example.com |
+//       | -ipv6 | Show the IPv6 addresses for discovered names | amass enum -ipv6 -d example.com |
+//       | -list | Print the names of all available data sources | amass enum -list |
+//       | -max-depth | Maximum number of subdomain labels for brute forcing | amass enum -brute -max-depth 3 -d example.com |
+//       | -min-for-recursive | Subdomain labels seen before recursive brute forcing (Default: 1) | amass enum -brute -min-for-recursive 3 -d example.com |
+//       | -nf | Path to a file providing already known subdomain names (from other tools/sources) | amass enum -nf names.txt -d example.com |
+//       | -norecursive | Turn off recursive brute forcing | amass enum -brute -norecursive -d example.com |
+//       | -p | Ports separated by commas (default: 443) | amass enum -d example.com -p 443,8080 |
+//       | -passive | A purely passive mode of execution | amass enum -passive -d example.com |
+//       | -r | IP addresses of untrusted DNS resolvers (can be used multiple times) | amass enum -r 8.8.8.8,1.1.1.1 -d example.com |
+//       | -rf | Path to a file providing untrusted DNS resolvers | amass enum -rf data/resolvers.txt -d example.com |
+//       | -rqps | Maximum number of DNS queries per second for each untrusted resolver | amass enum -rqps 10 -d example.com |
+//       | -timeout | Number of minutes to execute the enumeration | amass enum -timeout 30 -d example.com |
+//       | -tr | IP addresses of trusted DNS resolvers (can be used multiple times) | amass enum -tr 8.8.8.8,1.1.1.1 -d example.com |
+//       | -trf | Path to a file providing trusted DNS resolvers | amass enum -trf data/trusted.txt -d example.com |
+//       | -trqps | Maximum number of DNS queries per second for each trusted resolver | amass enum -trqps 20 -d example.com |
+//       | -w | Path to a different wordlist file for brute forcing | amass enum -brute -w wordlist.txt -d example.com |
+//       | -wm | "hashcat-style" wordlist masks for DNS brute forcing | amass enum -brute -wm ?l?l -d example.com |
+//     4. **Help Flag**: If the user requests help or a list of available flags, include the '-help' flag in the command.
+//     ${filenameInsturctions}
 
-    Example Commands:
-    Intel Subcommand:
-    \`\`\`json
-    { "command": "amass intel -whois -d example.com" }
-    \`\`\`
+//     Example Commands:
+//     Intel Subcommand:
+//     \`\`\`json
+//     { "command": "amass intel -whois -d example.com" }
+//     \`\`\`
 
-    Enum Subcommand:
-    \`\`\`json
-    { "command": "amass enum -active -d example.com -p 80,443,8080" }
-    \`\`\`
+//     Enum Subcommand:
+//     \`\`\`json
+//     { "command": "amass enum -active -d example.com -p 80,443,8080" }
+//     \`\`\`
 
-    Passive Enum Subcommand:
-    \`\`\`json
-    { "command": "amass enum -passive -d example.com" }
-    \`\`\`
+//     Passive Enum Subcommand:
+//     \`\`\`json
+//     { "command": "amass enum -passive -d example.com" }
+//     \`\`\`
 
-    For a request for help or to see all flags:
-    \`\`\`json
-    { "command": "amass -help" }
-    \`\`\`
+//     For a request for help or to see all flags:
+//     \`\`\`json
+//     { "command": "amass -help" }
+//     \`\`\`
 
-    Response:`
+//     Response:`
 
-  return answerMessage
-}
+//   return answerMessage
+// }

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     PluginID.HTTPX,
     PluginID.NAABU,
     PluginID.GAU,
-    PluginID.AMASS
+    // PluginID.AMASS
   ]
 
   try {

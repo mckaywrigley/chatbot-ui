@@ -184,104 +184,104 @@ export const dnsxRepeatableFlags: Set<string> = new Set([
   "-rcode"
 ])
 
-export interface AmassParams {
-  enum?: boolean
-  intel?: boolean
-  active?: boolean
-  addr?: string
-  alts?: boolean
-  asn?: string[]
-  aw?: string
-  awm?: string
-  bl?: string
-  blf?: string
-  blfFile?: string
-  brute?: boolean
-  cidr?: string[]
-  domain?: string[]
-  demo?: boolean
-  df?: string
-  dfFile?: string
-  ef?: string
-  efFile?: string
-  exclude?: string
-  if?: string
-  ifFile?: string
-  iface?: string
-  include?: string
-  ip?: boolean
-  ipv4?: boolean
-  ipv6?: boolean
-  list?: boolean
-  maxDepth?: string
-  minForRecursive?: string
-  nf?: string
-  nfFile?: string
-  norecursive?: boolean
-  org?: string
-  p?: string
-  passive?: boolean
-  r?: string[]
-  rf?: string
-  rfFile?: string
-  rqps?: string
-  timeout?: number
-  tr?: string[]
-  trf?: string
-  trfFile?: string
-  trqps?: string
-  w?: string
-  wFile?: string
-  whois?: boolean
-  wm?: string
-  error?: string | null
-}
+// export interface AmassParams {
+//   enum?: boolean
+//   intel?: boolean
+//   active?: boolean
+//   addr?: string
+//   alts?: boolean
+//   asn?: string[]
+//   aw?: string
+//   awm?: string
+//   bl?: string
+//   blf?: string
+//   blfFile?: string
+//   brute?: boolean
+//   cidr?: string[]
+//   domain?: string[]
+//   demo?: boolean
+//   df?: string
+//   dfFile?: string
+//   ef?: string
+//   efFile?: string
+//   exclude?: string
+//   if?: string
+//   ifFile?: string
+//   iface?: string
+//   include?: string
+//   ip?: boolean
+//   ipv4?: boolean
+//   ipv6?: boolean
+//   list?: boolean
+//   maxDepth?: string
+//   minForRecursive?: string
+//   nf?: string
+//   nfFile?: string
+//   norecursive?: boolean
+//   org?: string
+//   p?: string
+//   passive?: boolean
+//   r?: string[]
+//   rf?: string
+//   rfFile?: string
+//   rqps?: string
+//   timeout?: number
+//   tr?: string[]
+//   trf?: string
+//   trfFile?: string
+//   trqps?: string
+//   w?: string
+//   wFile?: string
+//   whois?: boolean
+//   wm?: string
+//   error?: string | null
+// }
 
-export const amassFlagDefinitions: FlagDefinitions<AmassParams> = {
-  "-addr": "addr",
-  "-asn": "asn",
-  "-aw": "aw",
-  "-awm": "awm",
-  "-bl": "bl",
-  "-blf": "blf",
-  "-cidr": "cidr",
-  "-d": "domain",
-  "-df": "df",
-  "-ef": "ef",
-  "-exclude": "exclude",
-  "-if": "if",
-  "-iface": "iface",
-  "-include": "include",
-  "-max-depth": "maxDepth",
-  "-min-for-recursive": "minForRecursive",
-  "-nf": "nf",
-  "-org": "org",
-  "-p": "p",
-  "-r": "r",
-  "-rf": "rf",
-  "-rqps": "rqps",
-  "-timeout": "timeout",
-  "-tr": "tr",
-  "-trf": "trf",
-  "-trqps": "trqps",
-  "-w": "w",
-  "-wm": "wm"
-}
+// export const amassFlagDefinitions: FlagDefinitions<AmassParams> = {
+//   "-addr": "addr",
+//   "-asn": "asn",
+//   "-aw": "aw",
+//   "-awm": "awm",
+//   "-bl": "bl",
+//   "-blf": "blf",
+//   "-cidr": "cidr",
+//   "-d": "domain",
+//   "-df": "df",
+//   "-ef": "ef",
+//   "-exclude": "exclude",
+//   "-if": "if",
+//   "-iface": "iface",
+//   "-include": "include",
+//   "-max-depth": "maxDepth",
+//   "-min-for-recursive": "minForRecursive",
+//   "-nf": "nf",
+//   "-org": "org",
+//   "-p": "p",
+//   "-r": "r",
+//   "-rf": "rf",
+//   "-rqps": "rqps",
+//   "-timeout": "timeout",
+//   "-tr": "tr",
+//   "-trf": "trf",
+//   "-trqps": "trqps",
+//   "-w": "w",
+//   "-wm": "wm"
+// }
 
-export const amassBooleanFlagDefinitions: FlagDefinitions<AmassParams> = {
-  "-enum": "enum",
-  "-intel": "intel",
-  "-active": "active",
-  "-alts": "alts",
-  "-brute": "brute",
-  "-demo": "demo",
-  "-ip": "ip",
-  "-ipv4": "ipv4",
-  "-ipv6": "ipv6",
-  "-list": "list",
-  "-norecursive": "norecursive",
-  "-passive": "passive",
-  "-whois": "whois"
-}
+// export const amassBooleanFlagDefinitions: FlagDefinitions<AmassParams> = {
+//   "-enum": "enum",
+//   "-intel": "intel",
+//   "-active": "active",
+//   "-alts": "alts",
+//   "-brute": "brute",
+//   "-demo": "demo",
+//   "-ip": "ip",
+//   "-ipv4": "ipv4",
+//   "-ipv6": "ipv6",
+//   "-list": "list",
+//   "-norecursive": "norecursive",
+//   "-passive": "passive",
+//   "-whois": "whois"
+// }
 
-export const amassRepeatableFlags: Set<string> = new Set([])
+// export const amassRepeatableFlags: Set<string> = new Set([])

@@ -37,7 +37,7 @@ export enum PluginID {
   WEB_SEARCH = "websearch",
   ENHANCED_SEARCH = "enhancedsearch",
   DNSX = "dnsx",
-  AMASS = "amass",
+  // AMASS = "amass",
   WEB_SCRAPER = "webscraper",
   PLUGINS_STORE = "pluginselector"
 }
@@ -91,9 +91,9 @@ export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.DNSX]: {
     id: PluginID.DNSX
   },
-  [PluginID.AMASS]: {
-    id: PluginID.AMASS
-  },
+  // [PluginID.AMASS]: {
+  //   id: PluginID.AMASS
+  // },
   [PluginID.WEB_SCRAPER]: {
     id: PluginID.WEB_SCRAPER
   },
@@ -120,5 +120,5 @@ export const pluginUrls: pluginUrls = {
   GAU: "https://github.com/lc/gau",
   ALTERX: "https://github.com/projectdiscovery/alterx",
   DNSX: "https://github.com/projectdiscovery/dnsx",
-  AMASS: "https://github.com/owasp-amass/amass"
+  // AMASS: "https://github.com/owasp-amass/amass"
 }

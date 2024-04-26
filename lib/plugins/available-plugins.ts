@@ -228,42 +228,42 @@ export const availablePlugins: PluginSummary[] = [
       }
     ]
   },
+  // {
+  //   id: 6,
+  //   name: "Amass",
+  //   selectorName: "Amass: Network mapping",
+  //   value: PluginID.AMASS,
+  //   icon: "https://www.kali.org/tools/amass/images/amass-logo.svg",
+  //   description: "In-depth attack surface mapping and asset discovery",
+  //   categories: ["Popular", "New"],
+  //   githubRepoUrl: pluginUrls.AMASS,
+  //   isInstalled: false,
+  //   isPremium: true,
+  //   starters: [
+  //     {
+  //       title: "Enumerate",
+  //       description: "hackerone.com",
+  //       chatMessage: "/amass enum -d hackerone.com"
+  //     },
+  //     {
+  //       title: "Find ASNs",
+  //       description: "for Tesla",
+  //       chatMessage: "/amass intel -org 'Tesla'"
+  //     },
+  //     {
+  //       title: "Perform Passive Enumeration",
+  //       description: "for tesla.com",
+  //       chatMessage: "/amass enum -passive -d tesla.com"
+  //     },
+  //     {
+  //       title: "Amass Help",
+  //       description: "How does the Amass plugin work?",
+  //       chatMessage: "/amass -help"
+  //     }
+  //   ]
+  // },
   {
     id: 6,
-    name: "Amass",
-    selectorName: "Amass: Network mapping",
-    value: PluginID.AMASS,
-    icon: "https://www.kali.org/tools/amass/images/amass-logo.svg",
-    description: "In-depth attack surface mapping and asset discovery",
-    categories: ["Popular", "New"],
-    githubRepoUrl: pluginUrls.AMASS,
-    isInstalled: false,
-    isPremium: true,
-    starters: [
-      {
-        title: "Enumerate",
-        description: "hackerone.com",
-        chatMessage: "/amass enum -d hackerone.com"
-      },
-      {
-        title: "Find ASNs",
-        description: "for Tesla",
-        chatMessage: "/amass intel -org 'Tesla'"
-      },
-      {
-        title: "Perform Passive Enumeration",
-        description: "for tesla.com",
-        chatMessage: "/amass enum -passive -d tesla.com"
-      },
-      {
-        title: "Amass Help",
-        description: "How does the Amass plugin work?",
-        chatMessage: "/amass -help"
-      }
-    ]
-  },
-  {
-    id: 7,
     name: "Katana",
     selectorName: "Katana: Web Crawling",
     value: PluginID.KATANA,
@@ -298,7 +298,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 8,
+    id: 7,
     name: "HTTPX",
     selectorName: "HTTPX: Web Analysis",
     value: PluginID.HTTPX,
@@ -333,7 +333,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 9,
+    id: 8,
     name: "Naabu",
     selectorName: "Naabu: Port Scanner",
     value: PluginID.NAABU,
@@ -370,7 +370,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 10,
+    id: 9,
     name: "GAU",
     selectorName: "GAU: Url Enumeration",
     value: PluginID.GAU,
@@ -405,7 +405,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 11,
+    id: 10,
     name: "dnsX",
     selectorName: "dnsX: DNS toolkit",
     value: PluginID.DNSX,
@@ -423,16 +423,6 @@ export const availablePlugins: PluginSummary[] = [
         chatMessage:
           "Bruteforce subdomains for facebook using words blog, api, beta"
       },
-      // {
-      //   title: "",
-      //   description: "",
-      //   chatMessage: ""
-      // },
-      // {
-      //   title: "",
-      //   description: "",
-      //   chatMessage: ""
-      // },
       {
         title: "dnsX Help",
         description: "How does the dnsX plugin work?",
@@ -441,7 +431,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 12,
+    id: 11,
     name: "AlterX",
     selectorName: "AlterX: Subdomain Wordlist Generator",
     value: PluginID.ALTERX,

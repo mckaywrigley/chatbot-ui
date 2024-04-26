@@ -9,7 +9,7 @@ import { handleNaabuRequest } from "./naabu/naabu.content"
 import { handleGauRequest } from "./gau/gau.content"
 import { handleAlterxRequest } from "./alterx/alterx.content"
 import { handleDnsxRequest } from "./dnsx/dnsx.content"
-import { handleAmassRequest } from "./amass/amass.content"
+// import { handleAmassRequest } from "./amass/amass.content"
 
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 
@@ -48,7 +48,7 @@ export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   gau: handleGauRequest,
   alterx: handleAlterxRequest,
   dnsx: handleDnsxRequest,
-  amass: handleAmassRequest
+  // amass: handleAmassRequest
 }
 
 const commandHandlers: CommandHandler = {
@@ -62,7 +62,7 @@ const commandHandlers: CommandHandler = {
   handleGauRequest,
   handleAlterxRequest,
   handleDnsxRequest,
-  handleAmassRequest
+  // handleAmassRequest
 }
 
 export const isCommand = (commandName: string, message: string) => {
