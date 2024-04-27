@@ -18,7 +18,7 @@ export const getMessageById = async (messageId: string) => {
 export const getMessagesByChatId = async (chatId: string) => {
   const { data: messages } = await supabase
     .from("messages")
-    .select("*")
+    .select("*, feedback(*), file_items (*)")
     .eq("chat_id", chatId)
 
   if (!messages) {

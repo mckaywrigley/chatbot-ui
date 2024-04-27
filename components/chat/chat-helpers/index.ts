@@ -4,7 +4,7 @@ import { AlertAction } from "@/context/alert-context"
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
-import { createMessages, updateMessage } from "@/db/messages"
+import { createMessages, deleteMessage, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import {
   buildFinalMessages
@@ -90,9 +90,8 @@ export const createTempMessages = (
   chatMessages: ChatMessage[],
   chatSettings: ChatSettings,
   b64Images: string[],
-  isRegeneration: boolean,
   isContinuation: boolean,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+  selectedPlugin: PluginID | null
 ) => {
   if (!messageContent || isContinuation) messageContent = CONTINUE_PROMPT
 
@@ -104,6 +103,7 @@ export const createTempMessages = (
       id: uuidv4(),
       image_paths: b64Images,
       model: chatSettings.model,
+      plugin: selectedPlugin,
       role: "user",
       sequence_number: chatMessages.length,
       updated_at: "",
@@ -120,6 +120,7 @@ export const createTempMessages = (
       id: uuidv4(),
       image_paths: [],
       model: chatSettings.model,
+      plugin: selectedPlugin,
       role: "assistant",
       sequence_number: chatMessages.length + 1,
       updated_at: "",
@@ -127,24 +128,6 @@ export const createTempMessages = (
     },
     fileItems: []
   }
-
-  let newMessages = []
-
-  if (isRegeneration) {
-    const lastMessageIndex = chatMessages.length - 1
-    chatMessages[lastMessageIndex].message.content = ""
-    newMessages = [...chatMessages]
-  } else if (isContinuation) {
-    newMessages = [...chatMessages]
-  } else {
-    newMessages = [
-      ...chatMessages,
-      tempUserChatMessage,
-      tempAssistantChatMessage
-    ]
-  }
-
-  setChatMessages(newMessages)
 
   return {
     tempUserChatMessage,
@@ -520,16 +503,15 @@ export const handleCreateMessages = async (
   isContinuation: boolean,
   retrievedFileItems: Tables<"file_items">[],
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setChatFileItems: React.Dispatch<
-    React.SetStateAction<Tables<"file_items">[]>
-  >,
-  setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>
+  setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
+  selectedPlugin: PluginID | null
 ) => {
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     user_id: profile.user_id,
     content: messageContent || "",
     model: modelData.modelId,
+    plugin: selectedPlugin,
     role: "user",
     sequence_number: chatMessages.length,
     image_paths: []
@@ -540,6 +522,7 @@ export const handleCreateMessages = async (
     user_id: profile.user_id,
     content: generatedText,
     model: modelData.modelId,
+    plugin: selectedPlugin,
     role: "assistant",
     sequence_number: chatMessages.length + 1,
     image_paths: []
@@ -548,16 +531,18 @@ export const handleCreateMessages = async (
   let finalChatMessages: ChatMessage[] = []
 
   if (isRegeneration) {
-    const lastStartingMessage = chatMessages[chatMessages.length - 1].message
+    const lastMessageId = chatMessages[chatMessages.length - 1].message.id
+    await deleteMessage(lastMessageId)
 
-    const updatedMessage = await updateMessage(lastStartingMessage.id, {
-      ...lastStartingMessage,
-      content: generatedText
-    })
+    const createdMessages = await createMessages([finalAssistantMessage])
 
-    chatMessages[chatMessages.length - 1].message = updatedMessage
-
-    finalChatMessages = [...chatMessages]
+    finalChatMessages = [
+      ...chatMessages.slice(0, -1),
+      {
+        message: createdMessages[0],
+        fileItems: retrievedFileItems
+      }
+    ]
 
     setChatMessages(finalChatMessages)
   } else if (isContinuation) {
@@ -629,17 +614,9 @@ export const handleCreateMessages = async (
       },
       {
         message: createdMessages[1],
-        fileItems: retrievedFileItems.map(fileItem => fileItem.id)
+        fileItems: retrievedFileItems
       }
     ]
-
-    setChatFileItems(prevFileItems => {
-      const newFileItems = retrievedFileItems.filter(
-        fileItem => !prevFileItems.some(prevItem => prevItem.id === fileItem.id)
-      )
-
-      return [...prevFileItems, ...newFileItems]
-    })
 
     setChatMessages(finalChatMessages)
   }

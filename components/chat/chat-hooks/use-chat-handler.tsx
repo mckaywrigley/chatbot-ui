@@ -3,14 +3,14 @@ import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { getFileById } from "@/db/files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { buildFinalMessages } from "@/lib/build-prompt"
-import { Tables } from "@/supabase/types"
+import { Tables, TablesInsert } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { PluginID } from "@/types/plugins"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
 import { toast } from "sonner"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
+
 import {
   createTempMessages,
   handleCreateChat,
@@ -18,10 +18,11 @@ import {
   handleHostedChat,
   handleHostedPluginsChat,
   handleRetrieval,
-  processResponse,
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
+import { create } from "domain"
+import { createMessageFeedback } from "@/db/message-feedback"
 import { isCommand } from "@/app/api/chat/plugins/chatpluginhandlers"
 
 export const useChatHandler = () => {
@@ -57,8 +58,6 @@ export const useChatHandler = () => {
     setNewMessageFiles,
     setShowFilesDisplay,
     newMessageFiles,
-    chatFileItems,
-    setChatFileItems,
     setToolInUse,
     setFiles,
     useRetrieval,
@@ -90,7 +89,6 @@ export const useChatHandler = () => {
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
-    setChatFileItems([])
 
     setIsGenerating(false)
     setFirstTokenReceived(false)
@@ -161,6 +159,41 @@ export const useChatHandler = () => {
     if (abortController) {
       abortController.abort()
     }
+  }
+
+  const handleSendFeedback = async (
+    chatMessage: ChatMessage,
+    feedback: "good" | "bad",
+    reason?: string,
+    detailedFeed?: string,
+    allow_email?: boolean,
+    allow_sharing?: boolean
+  ) => {
+    const feedbackInsert: TablesInsert<"feedback"> = {
+      message_id: chatMessage.message.id,
+      user_id: chatMessage.message.user_id,
+      chat_id: chatMessage.message.chat_id,
+      feedback: feedback,
+      reason: reason ?? chatMessage.feedback?.reason,
+      detailed_feedback:
+        detailedFeed ?? chatMessage.feedback?.detailed_feedback,
+      model: chatMessage.message.model,
+      created_at: chatMessage.feedback?.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sequence_number: chatMessage.message.sequence_number,
+      allow_email: allow_email,
+      allow_sharing: allow_sharing,
+      has_files: chatMessage.fileItems.length > 0,
+      plugin: chatMessage.message.plugin || PluginID.NONE
+    }
+    const newFeedback = await createMessageFeedback(feedbackInsert)
+    setChatMessages((prevMessages: ChatMessage[]) =>
+      prevMessages.map((message: ChatMessage) =>
+        message.message.id === chatMessage.message.id
+          ? { ...message, feedback: newFeedback[0] }
+          : message
+      )
+    )
   }
 
   const handleSendContinuation = async () => {
@@ -248,9 +281,38 @@ export const useChatHandler = () => {
           }
         }
       }
+
       let currentChat = selectedChat ? { ...selectedChat } : null
 
       const b64Images = newMessageImages.map(image => image.base64)
+
+      const { tempUserChatMessage, tempAssistantChatMessage } =
+        createTempMessages(
+          messageContent,
+          chatMessages,
+          chatSettings!,
+          b64Images,
+          isContinuation,
+          selectedPlugin
+        )
+
+      const sentChatMessages = [...chatMessages]
+
+      if (!isRegeneration) {
+        sentChatMessages.push(tempUserChatMessage)
+        if (!isContinuation) sentChatMessages.push(tempAssistantChatMessage)
+      } else {
+        sentChatMessages.pop()
+        sentChatMessages.push(tempAssistantChatMessage)
+      }
+
+      // Update sequence numbers for the chat messages
+      for (let index = 0; index < sentChatMessages.length; index++) {
+        sentChatMessages[index].message.sequence_number = index
+      }
+
+      // Update the UI with the new messages
+      setChatMessages(sentChatMessages)
 
       let retrievedFileItems: Tables<"file_items">[] = []
 
@@ -270,30 +332,12 @@ export const useChatHandler = () => {
         )
       }
 
-      const { tempUserChatMessage, tempAssistantChatMessage } =
-        createTempMessages(
-          messageContent,
-          chatMessages,
-          chatSettings!,
-          b64Images,
-          isRegeneration,
-          isContinuation,
-          setChatMessages
-        )
-
-      const sentChatMessages = [...chatMessages]
-      if (!isRegeneration) {
-        sentChatMessages.push(tempUserChatMessage)
-        if (!isContinuation) sentChatMessages.push(tempAssistantChatMessage)
-      }
-
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
         workspaceInstructions: selectedWorkspace!.instructions || "",
         chatMessages: sentChatMessages,
         assistant: selectedChat?.assistant_id ? selectedAssistant : null,
-        messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        messageFileItems: retrievedFileItems
       }
 
       let generatedText = ""
@@ -445,8 +489,8 @@ export const useChatHandler = () => {
         isContinuation,
         retrievedFileItems,
         setChatMessages,
-        setChatFileItems,
-        setChatImages
+        setChatImages,
+        selectedPlugin
       )
 
       setIsGenerating(false)
@@ -486,6 +530,7 @@ export const useChatHandler = () => {
     handleFocusChatInput,
     handleStopMessage,
     handleSendContinuation,
-    handleSendEdit
+    handleSendEdit,
+    handleSendFeedback
   }
 }

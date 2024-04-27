@@ -46,8 +46,7 @@ export async function buildFinalMessages(
     workspaceInstructions,
     chatMessages,
     assistant,
-    messageFileItems,
-    chatFileItems
+    messageFileItems
   } = payload
 
   const BUILT_PROMPT = buildBasePrompt(
@@ -85,16 +84,8 @@ export async function buildFinalMessages(
       return chatMessage
     }
 
-    const nextChatMessageFileItems = nextChatMessage.fileItems
-
-    if (nextChatMessageFileItems.length > 0) {
-      const findFileItems = nextChatMessageFileItems
-        .map(fileItemId =>
-          chatFileItems.find(chatFileItem => chatFileItem.id === fileItemId)
-        )
-        .filter(item => item !== undefined) as Tables<"file_items">[]
-
-      const retrievalText = buildRetrievalText(findFileItems)
+    if (chatMessage.fileItems.length > 0) {
+      const retrievalText = buildRetrievalText(chatMessage.fileItems)
 
       return {
         message: {
@@ -131,6 +122,7 @@ export async function buildFinalMessages(
     id: processedChatMessages.length + "",
     image_paths: [],
     model: payload.chatSettings.model,
+    plugin: PluginID.NONE,
     role: "system",
     sequence_number: processedChatMessages.length,
     updated_at: "",

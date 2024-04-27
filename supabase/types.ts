@@ -565,6 +565,82 @@ export interface Database {
           }
         ]
       }
+      feedback: {
+        Row: {
+          allow_email: boolean | null
+          allow_sharing: boolean | null
+          chat_id: string | null
+          created_at: string
+          detailed_feedback: string | null
+          feedback: string
+          has_files: boolean | null
+          id: string
+          message_id: string | null
+          model: string | null
+          plugin: string | null
+          reason: string | null
+          sequence_number: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          allow_email?: boolean | null
+          allow_sharing?: boolean | null
+          chat_id?: string | null
+          created_at?: string
+          detailed_feedback?: string | null
+          feedback: string
+          has_files?: boolean | null
+          id?: string
+          message_id?: string | null
+          model?: string | null
+          plugin?: string | null
+          reason?: string | null
+          sequence_number: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          allow_email?: boolean | null
+          allow_sharing?: boolean | null
+          chat_id?: string | null
+          created_at?: string
+          detailed_feedback?: string | null
+          feedback?: string
+          has_files?: boolean | null
+          id?: string
+          message_id?: string | null
+          model?: string | null
+          plugin?: string | null
+          reason?: string | null
+          sequence_number?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_chat"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_message"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       file_items: {
         Row: {
           content: string
@@ -827,6 +903,7 @@ export interface Database {
           id: string
           image_paths: string[]
           model: string
+          plugin: string | null
           role: string
           sequence_number: number
           updated_at: string | null
@@ -839,6 +916,7 @@ export interface Database {
           id?: string
           image_paths: string[]
           model: string
+          plugin?: string | null
           role: string
           sequence_number: number
           updated_at?: string | null
@@ -851,6 +929,7 @@ export interface Database {
           id?: string
           image_paths?: string[]
           model?: string
+          plugin?: string | null
           role?: string
           sequence_number?: number
           updated_at?: string | null

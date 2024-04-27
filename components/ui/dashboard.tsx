@@ -1,5 +1,6 @@
 "use client"
 
+import Modal from "@/components/chat/dialog-portal"
 import { Sidebar } from "@/components/sidebar/sidebar"
 import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,6 @@ import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
-import Modal from "@/components/chat/dialog-portal"
 
 export const SIDEBAR_WIDTH = 350
 

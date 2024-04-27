@@ -1,18 +1,32 @@
 import { ChatbotUIContext } from "@/context/context"
-import { IconCheck, IconCopy, IconEdit, IconRepeat } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCopy,
+  IconEdit,
+  IconFlag,
+  IconRepeat,
+  IconThumbDown,
+  IconThumbDownFilled,
+  IconThumbUp,
+  IconThumbUpFilled
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
 
-export const MESSAGE_ICON_SIZE = 18
+export const MESSAGE_ICON_SIZE = 20
 
 interface MessageActionsProps {
   isAssistant: boolean
   isLast: boolean
   isEditing: boolean
   isHovering: boolean
+  isGoodResponse: boolean
+  isBadResponse: boolean
   onCopy: () => void
   onEdit: () => void
   onRegenerate: () => void
+  onGoodResponse: () => void
+  onBadResponse: () => void
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -20,9 +34,13 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isLast,
   isEditing,
   isHovering,
+  isGoodResponse,
+  isBadResponse,
   onCopy,
   onEdit,
-  onRegenerate
+  onRegenerate,
+  onGoodResponse,
+  onBadResponse
 }) => {
   const { isGenerating } = useContext(ChatbotUIContext)
 
@@ -77,7 +95,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {(isHovering || isLast) && (
+      {isHovering && (
         <WithTooltip
           delayDuration={1000}
           side="bottom"
@@ -96,7 +114,53 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isLast && (
+      {isAssistant && isHovering && (
+        <WithTooltip
+          delayDuration={1000}
+          side="bottom"
+          display={<div>Good Response</div>}
+          trigger={
+            isGoodResponse ? (
+              <IconThumbUpFilled
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onGoodResponse}
+              />
+            ) : (
+              <IconThumbUp
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onGoodResponse}
+              />
+            )
+          }
+        />
+      )}
+
+      {isAssistant && isHovering && (
+        <WithTooltip
+          delayDuration={1000}
+          side="bottom"
+          display={<div>Bad Response</div>}
+          trigger={
+            isBadResponse ? (
+              <IconThumbDownFilled
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onBadResponse}
+              />
+            ) : (
+              <IconThumbDown
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onBadResponse}
+              />
+            )
+          }
+        />
+      )}
+
+      {isHovering && isLast && (
         <WithTooltip
           delayDuration={1000}
           side="bottom"

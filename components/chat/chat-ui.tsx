@@ -37,7 +37,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     assistants,
     isGenerating,
     setSelectedAssistant,
-    setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval
@@ -115,15 +114,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const images: MessageImage[] = await Promise.all(imagePromises.flat())
     setChatImages(images)
 
-    const messageFileItemPromises = fetchedMessages.map(
-      async message => await getMessageFileItemsByMessageId(message.id)
-    )
-
-    const messageFileItems = await Promise.all(messageFileItemPromises)
-
-    const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
-    setChatFileItems(uniqueFileItems)
-
     const chatFiles = await getChatFilesByChatId(params.chatid as string)
 
     setChatFiles(
@@ -135,21 +125,18 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       }))
     )
 
-    setUseRetrieval(true)
-    setShowFilesDisplay(true)
+    setUseRetrieval(chatFiles.files.length > 0)
+    setShowFilesDisplay(chatFiles.files.length > 0)
 
-    const fetchedChatMessages = fetchedMessages.map(message => {
-      return {
-        message,
-        fileItems: messageFileItems
-          .filter(messageFileItem => messageFileItem.id === message.id)
-          .flatMap(messageFileItem =>
-            messageFileItem.file_items.map(fileItem => fileItem.id)
-          )
-      }
-    })
+    const reformatedMessages = fetchedMessages.map(fetchMessage => ({
+      message: fetchMessage,
+      fileItems: fetchMessage.file_items,
+      feedback: fetchMessage.feedback[0] ?? undefined
+    }))
 
-    setChatMessages(fetchedChatMessages)
+    console.log(reformatedMessages)
+
+    setChatMessages(reformatedMessages)
   }
 
   const fetchChat = async () => {

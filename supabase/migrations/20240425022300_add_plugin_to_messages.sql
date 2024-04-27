@@ -1,0 +1,1 @@
+ALTER TABLE messages ADD COLUMN plugin VARCHAR(255);

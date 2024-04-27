@@ -24,28 +24,40 @@ import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
+import MessageDetailedFeedback from "./message-detailed-feedback"
 import { MessageMarkdown } from "./message-markdown"
+import { MessageQuickFeedback } from "./message-quick-feedback"
 
 const ICON_SIZE = 28
 
 interface MessageProps {
   message: Tables<"messages">
   fileItems: Tables<"file_items">[]
+  feedback?: Tables<"feedback">
   isEditing: boolean
   isLast: boolean
   onStartEdit: (message: Tables<"messages">) => void
   onCancelEdit: () => void
   onSubmitEdit: (value: string, sequenceNumber: number) => void
+  onSendFeedback: (
+    feedback: "good" | "bad",
+    reason?: string,
+    detailedFeedback?: string,
+    allowSharing?: boolean,
+    allowEmail?: boolean
+  ) => void
 }
 
 export const Message: FC<MessageProps> = ({
   message,
   fileItems,
+  feedback,
   isEditing,
   isLast,
   onStartEdit,
   onCancelEdit,
-  onSubmitEdit
+  onSubmitEdit,
+  onSendFeedback
 }) => {
   const {
     profile,
@@ -78,6 +90,11 @@ export const Message: FC<MessageProps> = ({
     useState<Tables<"file_items"> | null>(null)
 
   const [viewSources, setViewSources] = useState(false)
+
+  const [quickFeedback, setQuickFeedback] = useState(false)
+  const [sendReportQuery, setSendReportQuery] = useState(false)
+
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
 
   const handleCopy = () => {
     if (navigator.clipboard) {
@@ -112,6 +129,41 @@ export const Message: FC<MessageProps> = ({
       true
     )
   }
+
+  const handleGoodResponse = async () => {
+    if (feedback?.feedback !== "good") {
+      onSendFeedback("good", "", "", false, false)
+    }
+  }
+
+  const handleReportModal = async () => {
+    setSendReportQuery(false)
+    setIsFeedbackDialogOpen(true)
+  }
+
+  const handleBadResponseReason = async (reason: string) => {
+    if (feedback?.feedback !== "bad" || feedback?.reason !== reason) {
+      onSendFeedback("bad", reason, "", false, false)
+    }
+    setQuickFeedback(false)
+    setSendReportQuery(true)
+  }
+
+  const handleBadResponse = async () => {
+    if (feedback?.feedback !== "bad") {
+      onSendFeedback("bad", "", "", false, false)
+    }
+    setQuickFeedback(true)
+  }
+
+  useEffect(() => {
+    if (quickFeedback) {
+      const feedbackElement = document.querySelector(".quick-feedback")
+      if (feedbackElement) {
+        feedbackElement.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
+    }
+  }, [quickFeedback])
 
   const handleStartEdit = () => {
     onStartEdit(message)
@@ -158,17 +210,6 @@ export const Message: FC<MessageProps> = ({
       onKeyDown={handleKeyDown}
     >
       <div className="relative flex w-full flex-col p-8 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
-        <div className="absolute right-5 top-7 sm:right-0">
-          <MessageActions
-            onCopy={handleCopy}
-            onEdit={handleStartEdit}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            isHovering={isHovering}
-            onRegenerate={handleRegenerate}
-          />
-        </div>
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -381,6 +422,48 @@ export const Message: FC<MessageProps> = ({
             </Button>
           </div>
         )}
+        {!quickFeedback && !sendReportQuery && !isEditing && (
+          <div className="absolute bottom-2 left-5 sm:left-0">
+            <MessageActions
+              onCopy={handleCopy}
+              onEdit={handleStartEdit}
+              isAssistant={message.role === "assistant"}
+              isLast={isLast}
+              isEditing={isEditing}
+              isHovering={isHovering}
+              isGoodResponse={feedback?.feedback === "good"}
+              isBadResponse={feedback?.feedback === "bad"}
+              onRegenerate={handleRegenerate}
+              onGoodResponse={handleGoodResponse}
+              onBadResponse={handleBadResponse}
+            />
+          </div>
+        )}
+
+        {quickFeedback && (
+          <MessageQuickFeedback
+            handleBadResponseReason={handleBadResponseReason}
+            feedback={feedback}
+          />
+        )}
+
+        {sendReportQuery && (
+          <div className="rounded-lg border p-4 shadow-lg">
+            <p className="mb-2">Would you like to tell us more details?</p>
+            <div className="flex flex-row flex-wrap items-start gap-2">
+              <Button variant="outline" size="sm" onClick={handleReportModal}>
+                Yes
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSendReportQuery(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {showImagePreview && selectedImage && (
@@ -406,6 +489,13 @@ export const Message: FC<MessageProps> = ({
           }}
         />
       )}
+
+      <MessageDetailedFeedback
+        isOpen={isFeedbackDialogOpen}
+        onClose={() => setIsFeedbackDialogOpen(false)}
+        feedback={feedback as Tables<"feedback">}
+        onSendFeedback={onSendFeedback}
+      />
     </div>
   )
 }
