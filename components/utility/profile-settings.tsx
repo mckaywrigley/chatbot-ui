@@ -17,6 +17,7 @@ import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFileDownload,
+  IconInfoCircle,
   IconLoader2,
   IconLogout,
   IconUser
@@ -42,6 +43,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faVolume } from "@fortawesome/pro-regular-svg-icons"
 
 interface ProfileSettingsProps {}
 
@@ -118,6 +121,46 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [isPlayingVoiceAudio, setIsPlayingVoiceAudio] = useState(false)
+  const [currentPlayingVoiceAudio, setCurrentPlayingVoiceAudio] =
+    useState<string>(profile?.voice || "")
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
+    null
+  )
+
+  const handleAudioButtonClick = (audio: string) => {
+    if (
+      audioElement &&
+      isPlayingVoiceAudio &&
+      currentPlayingVoiceAudio === audio
+    ) {
+      // If the same audio is already playing, pause it
+      audioElement.pause()
+      setIsPlayingVoiceAudio(false)
+    } else {
+      // If a different audio is selected or no audio is playing, play the new audio
+      if (audioElement) {
+        // Pause the currently playing audio if any
+        audioElement.pause()
+      }
+
+      // Set up a new audio element for the selected audio
+      const audioUrl = `https://cdn.openai.com/API/docs/audio/${audio}.wav`
+      const audioEl = new Audio(audioUrl)
+      audioEl.addEventListener("ended", () => handleAudioEnded(audio))
+      setAudioElement(audioEl)
+      audioEl.play()
+      setIsPlayingVoiceAudio(true)
+    }
+    setCurrentPlayingVoiceAudio(audio)
+  }
+
+  const handleAudioEnded = (audio: string) => {
+    // When audio ends, reset states
+    setIsPlayingVoiceAudio(false)
+    setCurrentPlayingVoiceAudio(audio)
+  }
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -127,6 +170,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   const handleSave = async () => {
     if (!profile) return
+
+    if (audioElement && isPlayingVoiceAudio) {
+      audioElement.pause()
+      audioElement.currentTime = 0
+      setIsPlayingVoiceAudio(false)
+    }
+
     let profileImageUrl = profile.image_url
     let profileImagePath = ""
 
@@ -157,7 +207,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey
+      openrouter_api_key: openrouterAPIKey,
+      voice: currentPlayingVoiceAudio
     })
 
     setProfile(updatedProfile)
@@ -321,21 +372,20 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
-          <SheetHeader>
+          <SheetHeader className="flex flex-row justify-between pr-[22px]">
             <SheetTitle className="flex items-center justify-between space-x-2">
-              <div>User Settings</div>
-
-              <Button
-                variant="savePrompt"
-                tabIndex={-1}
-                className="text-xs"
-                size="savePrompt"
-                onClick={handleSignOut}
-              >
-                <IconLogout className="mr-1" size={20} />
-                Logout
-              </Button>
+              <div className="font-helvetica-now">User Settings</div>
             </SheetTitle>
+            <Button
+              variant="ghost2"
+              tabIndex={-1}
+              className="font-helvetica-now text-xs font-normal"
+              size="logout"
+              onClick={handleSignOut}
+            >
+              <IconLogout className="mr-1 font-normal" size={16} />
+              Logout
+            </Button>
           </SheetHeader>
 
           <Tabs defaultValue="profile">
@@ -358,7 +408,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             <TabsContent className="mt-4 space-y-4" value="profile">
               <div style={{ marginTop: 22 }} className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <Label>Username</Label>
+                  <Label className="font-helvetica-now">Username</Label>
 
                   <div className="text-xs">
                     {username !== profile.username ? (
@@ -404,7 +454,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div style={{ marginTop: 22 }} className="space-y-1">
-                <Label>Profile Image</Label>
+                <Label className="font-helvetica-now">Profile Image</Label>
 
                 <ImagePicker
                   src={profileImageSrc}
@@ -417,7 +467,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div style={{ marginTop: 22 }} className="space-y-1">
-                <Label>Chat Display Name</Label>
+                <Label className="font-helvetica-now">Chat Display Name</Label>
 
                 <Input
                   placeholder="Chat display name..."
@@ -428,7 +478,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div style={{ marginTop: 22 }} className="space-y-1">
-                <Label className="text-sm">
+                <Label className="font-helvetica-now text-sm">
                   What would you like the AI to know about you to provide better
                   responses?
                 </Label>
@@ -438,7 +488,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   value={profileInstructions}
                   onValueChange={setProfileInstructions}
                   placeholder="Profile context"
-                  minRows={6}
+                  minRows={3}
                   maxRows={10}
                 />
 
@@ -447,11 +497,155 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   limit={PROFILE_CONTEXT_MAX}
                 />
               </div>
+
+              <div style={{ marginTop: 22 }} className="flex flex-col">
+                <div className="relative flex flex-row gap-2 py-1">
+                  <Label className="font-helvetica-now">Voice</Label>
+                  <WithTooltip
+                    delayDuration={0}
+                    display={
+                      <div className="w-[400px] p-3">
+                        Press the button to hear the voice.
+                      </div>
+                    }
+                    trigger={
+                      <IconInfoCircle
+                        className="cursor-hover:opacity-50"
+                        size={16}
+                      />
+                    }
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "alloy"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("alloy")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "alloy" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Alloy
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "echo"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("echo")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "echo" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Echo
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "fable"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("fable")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "fable" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Fable
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "onyx"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("onyx")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "onyx" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Onyx
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "shimmer"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("shimmer")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "shimmer" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Shimmer
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      size="voice"
+                      variant={
+                        currentPlayingVoiceAudio === "nova"
+                          ? "voiceSelected"
+                          : "voice"
+                      }
+                      onClick={() => handleAudioButtonClick("nova")}
+                    >
+                      {isPlayingVoiceAudio &&
+                        currentPlayingVoiceAudio === "nova" && (
+                          <FontAwesomeIcon
+                            className="text-pixelspace-gray-20 hover:text-pixelspace-gray-3"
+                            icon={faVolume}
+                          />
+                        )}
+                      Nova
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent className="mt-4 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
-                <Label className="flex items-center">
+                <Label className="font-helvetica-now flex items-center">
                   {useAzureOpenai
                     ? envKeyMap["azure"]
                       ? ""
@@ -745,9 +939,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         </div>
 
         <div className="mt-6 flex items-center">
-          <div className="flex items-center space-x-1">
-            {/* <ThemeSwitcher /> */}
-
+          {/* <div className="flex items-center space-x-1">
             <WithTooltip
               display={
                 <div>
@@ -761,13 +953,21 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 ></i>
               }
             />
-          </div>
+          </div> */}
 
           <div className="ml-auto space-x-2">
             <Button
               size="cancelPrompt"
               variant="cancelPrompt"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                if (audioElement && isPlayingVoiceAudio) {
+                  audioElement.pause()
+                  audioElement.currentTime = 0
+                  setIsPlayingVoiceAudio(false)
+                  setCurrentPlayingVoiceAudio(profile?.voice || "")
+                }
+                setIsOpen(false)
+              }}
             >
               Cancel
             </Button>

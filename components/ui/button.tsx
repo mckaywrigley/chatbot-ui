@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: " hover:text-pixelspace-gray-3 border-1",
         ghost2: " hover:text-pixelspace-gray-3 border border-[#8c8484]",
+        logout:
+          " hover:text-pixelspace-gray-3 border border-pixelspace-gray-40",
         download: "  rounded bg-[#e6e4e5] text-[#110e0f] text-center",
         workspaceButton:
           " hover:text-pixelspace-gray-3 border-1 hover:border-pixelspace-gray-40",
@@ -27,9 +29,12 @@ const buttonVariants = cva(
         savePrompt:
           " bg-pixelspace-gray-10 text-sm font-normal text-pixelspace-gray-90 rounded-sm leading-[17.50px] border text-pixelspace-gray-90 border-pixelspace-gray-3 hover:bg-pixelspace-gray-20",
         cancelPrompt:
-          "bg-pixelspace-gray-90 border text-pixelspace-gray-3 rounded-sm border-pixelspace-gray-20 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
-
-        pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40"
+          "bg-pixelspace-gray-90 border text-pixelspace-gray-3 rounded-sm border-pixelspace-gray-40 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-80",
+        pixelspace: "hover:bg-pixelspace-gray-70 hover:text-pixelspace-gray-40",
+        voice:
+          "bg-pixelspace-gray-90 border text-pixelspace-gray-3 rounded-sm border-pixelspace-gray-40 text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  hover:bg-pixelspace-gray-60 hover:border-pixelspace-gray-60 px-[12px] py-[8px] gap-2",
+        voiceSelected:
+          "border text-pixelspace-gray-3 rounded-sm text-pixelspace-gray-3 text-sm font-normal leading-[17.50px]  bg-pixelspace-gray-60 border-pixelspace-gray-60 px-[12px] py-[8px] gap-2"
       },
       size: {
         cancelPrompt: "p-[10px] w-[130px] h-[44px]",
@@ -42,7 +47,9 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "size-10",
         prompt: "h-11 px-4 py-[10px]",
-        delete: "w-[81px] h-[44px] p-[10px]"
+        delete: "w-[81px] h-[44px] p-[10px]",
+        voice: "h-[32px]",
+        logout: "p-[10px] h-[30px]"
       }
     },
     defaultVariants: {
