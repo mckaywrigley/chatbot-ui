@@ -26,9 +26,15 @@ const notify = (filename: string) =>
 
 interface MessageDownloadProps {
   message: any
+  handleSetIsOpen: () => void
+  handleIsClose: () => void
 }
 
-export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
+export const MessageDownload: FC<MessageDownloadProps> = ({
+  message,
+  handleSetIsOpen,
+  handleIsClose
+}) => {
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [showDialog, setShowDialog] = useState(false)
@@ -97,11 +103,27 @@ export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
   }
 
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+    <Dialog
+      open={showDialog}
+      onOpenChange={open => {
+        setShowDialog(open)
+        if (open) {
+          handleSetIsOpen()
+        } else {
+          handleIsClose()
+        }
+      }}
+    >
       <DialogTrigger asChild>
-        <div className="cursor-pointer">
-          <i className="fa-regular fa-arrow-down-to-line text-pixelspace-gray-40"></i>
-        </div>
+        <li>
+          <div
+            role="button"
+            onClick={() => console.log("TODO: Implement")}
+            className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm font-normal dark:hover:text-white"
+          >
+            Download message
+          </div>
+        </li>
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>
@@ -132,7 +154,10 @@ export const MessageDownload: FC<MessageDownloadProps> = ({ message }) => {
           <Button
             size={"cancelPrompt"}
             variant="ghost2"
-            onClick={() => setShowDialog(false)}
+            onClick={() => {
+              setShowDialog(false)
+              handleIsClose()
+            }}
           >
             Cancel
           </Button>

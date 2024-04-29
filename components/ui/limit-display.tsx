@@ -7,7 +7,7 @@ interface LimitDisplayProps {
 
 export const LimitDisplay: FC<LimitDisplayProps> = ({ used, limit }) => {
   return (
-    <div className="text-xs italic">
+    <div className="font-helvetica-now text-xs">
       {used}/{limit}
     </div>
   )

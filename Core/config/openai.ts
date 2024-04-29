@@ -1,2 +1,4 @@
-export const OPENAI_TRANSCRIPTION_API_URL =
-  "https://pixelspace-api-gciyr7ulia-uc.a.run.app/api/transcription"
+export const PIXELSPACE_API_BASE_URL =
+  "https://pixelspace-api-gciyr7ulia-uc.a.run.app/api"
+
+// export const PIXELSPACE_API_BASE_URL = "http://localhost:8080/api"

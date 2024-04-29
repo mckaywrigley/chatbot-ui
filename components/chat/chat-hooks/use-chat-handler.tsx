@@ -23,7 +23,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
-import { OPENAI_TRANSCRIPTION_API_URL } from "@/Core/config/openai"
+import { PIXELSPACE_API_BASE_URL } from "@/Core/config/openai"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -419,7 +419,7 @@ export const useChatHandler = () => {
     const formData = new FormData()
     formData.append("audio", audio)
 
-    const response = await fetch(OPENAI_TRANSCRIPTION_API_URL, {
+    const response = await fetch(`${PIXELSPACE_API_BASE_URL}/transcription`, {
       method: "POST",
       body: formData
     })
@@ -454,6 +454,26 @@ export const useChatHandler = () => {
     )
   }
 
+  const processTextToSpeech = async (
+    text: string,
+    voice: string
+  ): Promise<string> => {
+    const response = await fetch(`${PIXELSPACE_API_BASE_URL}/voice`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text,
+        voice
+      })
+    })
+
+    const responseJson = await response.text()
+
+    return responseJson
+  }
+
   return {
     chatInputRef,
     prompt,
@@ -464,6 +484,7 @@ export const useChatHandler = () => {
     handleSendEdit,
     processTranscription,
     handleImportThread,
-    handleImportAssistant
+    handleImportAssistant,
+    processTextToSpeech
   }
 }

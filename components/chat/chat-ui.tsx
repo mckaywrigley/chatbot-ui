@@ -207,9 +207,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div className="bg-pixelspace-gray-90 text-pixelspace-gray-3 flex max-h-[50px] min-h-[50px] w-full items-center justify-center px-20 text-2xl font-normal leading-[43.20px]">
-        <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
+        <p className="max-w-4xl truncate px-[32px] text-center sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
           {selectedChat?.name || "Chat"}
-        </div>
+        </p>
       </div>
 
       <div
