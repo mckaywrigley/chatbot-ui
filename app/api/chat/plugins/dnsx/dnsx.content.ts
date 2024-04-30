@@ -108,7 +108,7 @@ const parseCommandLine = (
                 )?.fileContent
                 if (fileContent) {
                   ;(params as any)[key] = [nextArg]
-                  ;(params as any)[`${key}File`] = fileContent.split("\n")
+                  ;(params as any)[`${key}File`] = fileContent
                 } else {
                   params.error = `🚨 File not found for flag: ${arg}`
                   return params
@@ -261,7 +261,7 @@ export async function handleDnsxRequest(
           ;(requestBody as any)[key] = value
         }
       }
-
+      console.log(requestBody)
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
 
       const intervalId = setInterval(() => {
