@@ -83,7 +83,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     contextLength: 4000,
     includeProfileContext: true,
     includeWorkspaceInstructions: true,
-    embeddingsProvider: "openai"
+    embeddingsProvider: "openai",
+    voice: "echo"
   })
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
