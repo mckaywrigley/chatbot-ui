@@ -20,6 +20,11 @@ const errorMessages: any = {
   "2": "Check your email to continue the sign-in process.",
   "3": "Check email to reset password.",
   "4": "Invalid credentials provided.",
+  "5": "Signup requires a valid password.",
+  "6": "Your password must be at least 8 characters long.",
+  "7": "Your password must include both uppercase and lowercase letters.",
+  "8": "Your password must include at least one number.",
+  "9": "Your password must include at least one special character (e.g., !@#$%^&*()).",
   default: "An unexpected error occurred."
 }
 
@@ -98,6 +103,30 @@ export default async function Login({
     const origin = headers().get("origin")
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+
+    if (!password) {
+      return redirect(`/login?message=5`)
+    }
+
+    // Check the minimum length
+    if (password.length < 8) {
+      return redirect(`/login?message=6`) // "Your password must be at least 8 characters long."
+    }
+
+    // Check for a mix of uppercase and lowercase letters
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
+      return redirect(`/login?message=7`) // "Password must include both uppercase and lowercase letters."
+    }
+
+    // Check for numbers
+    if (!/[0-9]/.test(password)) {
+      return redirect(`/login?message=8`) // "Password must include at least one number."
+    }
+
+    // Check for special characters
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)) {
+      return redirect(`/login?message=9`) // "Password must include at least one special character (e.g., !@#$%^&*())."
+    }
 
     if (process.env.EMAIL_DOMAIN_WHITELIST || process.env.EDGE_CONFIG) {
       let patternsString = process.env.EMAIL_DOMAIN_WHITELIST
