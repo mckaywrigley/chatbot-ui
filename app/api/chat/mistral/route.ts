@@ -71,7 +71,6 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${openrouterApiKey}`,
           "Content-Type": "application/json"
         }
-        providerRouting = llmConfig.openrouter.providerRouting
       } else {
         providerUrl = llmConfig.together.url
         selectedModel = llmConfig.models.hackerGPT_pro_together
@@ -97,7 +96,9 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${openrouterApiKey}`,
           "Content-Type": "application/json"
         }
-        providerRouting = llmConfig.openrouter.providerRouting
+        if (process.env.OPENROUTER_FIRST_PROVIDER) {
+          providerRouting = llmConfig.openrouter.providerRouting
+        }
       } else {
         providerUrl = llmConfig.together.url
         selectedModel = llmConfig.models.hackerGPT_RAG_together
@@ -107,7 +108,7 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
           "Content-Type": "application/json"
         }
-        stopSequence = ["[/INST]", "</s>"];
+        stopSequence = ["[/INST]", "</s>"]
       }
 
       similarityTopK = 3
@@ -227,7 +228,7 @@ export async function POST(request: Request) {
     if (providerRouting) {
       requestBody.provider = providerRouting
     }
-    
+
     try {
       const res = await fetch(providerUrl, {
         method: "POST",

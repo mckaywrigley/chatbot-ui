@@ -2,11 +2,7 @@ const llmConfig = {
   openrouter: {
     url: `https://openrouter.ai/api/v1/chat/completions`,
     providerRouting: {
-      order: [
-        `${process.env.OPENROUTER_FIRST_PROVIDER}`,
-        "Together",
-        "Mistral"
-      ]
+      order: [`${process.env.OPENROUTER_FIRST_PROVIDER}`]
     }
   },
   together: {
