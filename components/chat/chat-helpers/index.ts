@@ -167,12 +167,12 @@ export const handleHostedChat = async (
   )
 
   const apiEndpoint =
-    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+    provider === "custom" ? "/api/v2/chat/custom" : `/api/v2/chat/${provider}`
 
   const requestBody = {
-    chatSettings: payload.chatSettings,
-    messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : "",
+    payload: payload,
+    chatImages: chatImages,
+    selectedPlugin: selectedPlugin,
     isRetrieval:
       payload.messageFileItems && payload.messageFileItems.length > 0,
     isContinuation
@@ -219,21 +219,12 @@ export const handleHostedPluginsChat = async (
   selectedPlugin: PluginID,
   fileData?: { fileName: string; fileContent: string }[]
 ) => {
-  let formattedMessages = []
-
-  formattedMessages = await buildFinalMessages(
-    payload,
-    profile,
-    chatImages,
-    selectedPlugin
-  )
-
-  const apiEndpoint = "/api/chat/plugins"
+  const apiEndpoint = "/api/v2/chat/plugins"
 
   const requestBody: any = {
-    chatSettings: payload.chatSettings,
-    messages: formattedMessages,
-    selectedPlugin
+    payload: payload,
+    chatImages: chatImages,
+    selectedPlugin: selectedPlugin
   }
 
   if (fileData) {

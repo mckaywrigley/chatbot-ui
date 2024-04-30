@@ -119,6 +119,6 @@ export const pluginUrls: pluginUrls = {
   NAABU: "https://github.com/projectdiscovery/naabu",
   GAU: "https://github.com/lc/gau",
   ALTERX: "https://github.com/projectdiscovery/alterx",
-  DNSX: "https://github.com/projectdiscovery/dnsx",
+  DNSX: "https://github.com/projectdiscovery/dnsx"
   // AMASS: "https://github.com/owasp-amass/amass"
 }

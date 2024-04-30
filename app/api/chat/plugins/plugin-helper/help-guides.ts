@@ -488,28 +488,28 @@ export const displayHelpGuideForDnsx = () => {
 // export const displayHelpGuideForAmass = () => {
 //   return endent`
 //    [Amass](${pluginUrls.AMASS}) provides in-depth attack surface mapping and asset discovery.
- 
+
 //    ## Interaction Methods
- 
+
 //    **Conversational AI Requests:**
 //    Engage with Amass through conversational AI by simply describing your subdomain discovery needs in plain language. The AI will interpret your request and automatically execute the appropriate Amass command, providing an intuitive and user-friendly interface for effective interaction.
- 
+
 //    **Direct Commands:**
 //    For those who prefer granular control, direct commands can be used to specify the exact parameters of your subdomain discovery. Start your command with "/" followed by the necessary flags to tailor your scan.
 
 //    The amass tool has several subcommands shown below for handling your Internet exposure investigation.
-   
+
 //    | Subcommand | Description |
 //    |------------|-------------|
 //    | intel | Collect open source intelligence for investigation of the target organization |
 //    | enum | Perform DNS enumeration and network mapping of systems exposed to the Internet |
-   
+
 //    Each subcommand's own arguments are shown in the following sections.
-   
+
 //    ### The 'intel' Subcommand
-   
+
 //    The intel subcommand can help you discover additional root domain names associated with the organization you are investigating. The data source sections of the configuration file are utilized by this subcommand in order to obtain passive intelligence, such as reverse whois information.
-   
+
 //    | Flag | Description | Example |
 //    |------|-------------|---------|
 //    | -active | Enable active recon methods | amass intel -active -addr 192.168.2.1-64 -p 80,443,8080 |
@@ -551,7 +551,7 @@ export const displayHelpGuideForDnsx = () => {
 //    + **Passive**: It will only obtain information from data sources and blindly accept it.
 
 //    amass enum --passive -d example.com
-   
+
 //    | Flag | Description | Example |
 //    |------|-------------|---------|
 //    | -active | Enable active recon methods | amass enum -active -d example.com -p 80,443,8080 |

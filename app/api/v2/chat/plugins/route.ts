@@ -12,16 +12,16 @@ import {
 import { OpenAIStream } from "@/app/api/chat/plugins/openaistream"
 import { PluginID, pluginUrls } from "@/types/plugins"
 import { isPremiumUser } from "@/lib/server/subscription-utils"
+import { buildFinalMessages } from "@/lib/build-prompt"
 
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages, selectedPlugin, fileData } = json as {
-    chatSettings: ChatSettings
-    messages: any[]
+  const { payload, chatImages, selectedPlugin, fileData } = json as {
+    payload: any
+    chatImages: any[]
     selectedPlugin: string
-    isPremium: any
     fileData?: { fileName: string; fileContent: string }[]
   }
 
@@ -46,6 +46,7 @@ export async function POST(request: Request) {
 
     checkApiKey(profile.openai_api_key, "OpenAI")
 
+    let chatSettings = payload.chatSettings
     let model = chatSettings.model.toString()
 
     let ratelimitmodel
@@ -71,8 +72,15 @@ export async function POST(request: Request) {
       return rateLimitCheckResultForChatSettingsModel.response
     }
 
+    const formattedMessages = (await buildFinalMessages(
+      payload,
+      profile,
+      chatImages,
+      selectedPlugin as PluginID
+    )) as any
+
     let invokedByPluginId = false
-    let cleanMessages = messages.slice(1, -1)
+    let cleanMessages = formattedMessages.slice(1, -1)
     let latestUserMessage = cleanMessages[cleanMessages.length - 1]
     let answerMessage = { role: "user", content: "" }
     model = "gpt-4"

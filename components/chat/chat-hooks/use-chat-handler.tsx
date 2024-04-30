@@ -356,7 +356,7 @@ export const useChatHandler = () => {
           PluginID.ALTERX,
           PluginID.DNSX,
           PluginID.HTTPX,
-          PluginID.KATANA,
+          PluginID.KATANA
           // PluginID.AMASS
         ]
 

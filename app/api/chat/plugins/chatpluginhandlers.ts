@@ -47,7 +47,7 @@ export const pluginIdToHandlerMapping: pluginIdToHandlerMapping = {
   naabu: handleNaabuRequest,
   gau: handleGauRequest,
   alterx: handleAlterxRequest,
-  dnsx: handleDnsxRequest,
+  dnsx: handleDnsxRequest
   // amass: handleAmassRequest
 }
 
@@ -61,7 +61,7 @@ const commandHandlers: CommandHandler = {
   handleNaabuRequest,
   handleGauRequest,
   handleAlterxRequest,
-  handleDnsxRequest,
+  handleDnsxRequest
   // handleAmassRequest
 }
 
