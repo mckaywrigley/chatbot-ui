@@ -5,7 +5,6 @@ import { FC, useContext, useEffect, useRef, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
 import { MessageDownload } from "./message-download"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Button } from "../ui/button"
 import {
   faCircleStop,
   faEllipsisH,
@@ -16,13 +15,25 @@ import AudioSpinner from "../ui/audio-spinner"
 import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
 import generateBlobUriFromBase64String from "@/lib/get-blob-uri-from-base64-string"
 import { PlayAudioButton } from "../ui/play-audio-button"
-import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
+import { DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
 import {
   Position,
   shouldRenderMenuOnTop
 } from "@/Core/Utils/context-menu-helper"
 import { DownloadChat } from "../sidebar/items/chat/download-chat"
 import toast from "react-hot-toast"
+import {
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  DialogHeader,
+  DialogBody,
+  Dialog,
+  DialogFooter
+} from "@material-tailwind/react"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
 
 const notify = () =>
   toast.success(`The audio has been successfully downloaded`, {
@@ -32,6 +43,18 @@ const notify = () =>
       secondary: "#191617"
     }
   })
+
+const notifyDownload = (filename: string) =>
+  toast.success(
+    `The message has been successfully downloaded as ${filename}.txt`,
+    {
+      duration: 2000,
+      iconTheme: {
+        primary: "#14B8A6",
+        secondary: "#191617"
+      }
+    }
+  )
 
 export const MESSAGE_ICON_SIZE = 18
 
@@ -65,87 +88,78 @@ export const MessageActions: FC<MessageActionsProps> = ({
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
     null
   )
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
-  const [renderOnTop, setRenderOnTop] = useState(false)
-  const [isDownloadMessageMenuOpen, setIsDownloadMessageMenuOpen] =
-    useState(false)
+  const [fileName, setFileName] = useState("")
+  const [isFocused, setIsFocused] = useState(false)
+  const [open, setOpen] = useState(false)
 
-  const menuRef = useRef<any>(null)
+  const handleOpen = () => setOpen(!open)
 
-  const handleMenuButtonClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation()
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
-    setIsMenuOpen(!isMenuOpen)
-    const rect = e.currentTarget.getBoundingClientRect()
+  const handleDownload = () => {
+    handleOpen()
+    let fileType = "text/plain" // Default to text type if extension is not defined
 
-    const menuHeight = 150
-    const menuWidth = 200 // Adjust this according to your side menu width
-
-    let offsetX = -1050 // Default offset x when menu is closed
-    let offsetY = -190 // Default offset y when menu is closed
-
-    if (isMenuOpen) {
-      // Adjust offsetX and offsetY when menu is open
-      offsetX = -menuWidth // Adjust this according to your side menu width
-      offsetY = 0 // Adjust this according to your layout
+    // Check if filename has an extension
+    const fileExtension = fileName.split(".").pop()
+    if (fileExtension) {
+      switch (fileExtension.toLowerCase()) {
+        case "json":
+          fileType = "application/json"
+          break
+        case "txt":
+          fileType = "text/plain"
+          break
+        case "csv":
+          fileType = "text/csv"
+          break
+        case "xml":
+          fileType = "application/xml"
+          break
+        case "html":
+          fileType = "text/html"
+          break
+        case "md":
+          fileType = "text/markdown"
+          break
+        case "js":
+          fileType = "application/javascript"
+          break
+        case "css":
+          fileType = "text/css"
+          break
+        // Add more cases for other file types if needed
+        default:
+          fileType = "text/plain" // Default to text type for unknown extensions
+          break
+      }
     }
 
-    let menuPositionY
+    const blob = new Blob([message.content], { type: fileType })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
 
-    if (rect.bottom + menuHeight > window.innerHeight) {
-      menuPositionY = rect.top - menuHeight
-      offsetY = -menuHeight // Adjust this according to your layout
-    } else {
-      menuPositionY = rect.bottom + offsetY
+    if (notifyDownload) {
+      notifyDownload(fileName)
     }
-
-    const menuPosition = {
-      x: rect.left + offsetX,
-      y: menuPositionY
-    }
-
-    setPosition(menuPosition)
   }
-
-  useEffect(() => {
-    setRenderOnTop(shouldRenderMenuOnTop(position))
-  }, [position])
-
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-  //       if (isDownloadMessageMenuOpen) {
-  //         setIsMenuOpen(true)
-  //       } else {
-  //         setIsMenuOpen(false)
-  //       }
-  //     }
-  //   }
-
-  //   document.addEventListener("mousedown", handleClickOutside)
-
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside)
-  //   }
-  // }, [])
-
-  const itemRef = useRef<HTMLDivElement>(null)
 
   const handleCopy = () => {
     onCopy()
     setShowCheckmark(true)
   }
 
-  const handleForkChat = async () => {}
-
   async function downloadAudio() {
     try {
-      setIsMenuOpen(false)
       const messageContent = message.content
-      const voice = profile?.voice
+      const voice = selectedChat?.voice ?? profile?.voice
 
       if (!messageContent || !voice) {
         return
@@ -171,11 +185,17 @@ export const MessageActions: FC<MessageActionsProps> = ({
           // Create a URL for the downloaded audio
           const audioUrl = URL.createObjectURL(audioBlob)
 
+          console.log("audioBlob", audioBlob)
+
           console.log("message", message)
+          console.log("selectedChat?.name", selectedChat?.name)
+          console.log("audioUrl", audioUrl)
+
+          const name = `message - ${message.chat_id}`
 
           const a = document.createElement("a")
           a.href = audioUrl
-          a.download = selectedChat?.name ?? "thread message"
+          a.download = name ?? "thread message"
           document.body.appendChild(a)
           a.click()
           window.URL.revokeObjectURL(audioUrl)
@@ -318,7 +338,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isLast && renderPlayAudioButton}
+      {renderPlayAudioButton}
 
       {isLast && (
         <WithTooltip
@@ -335,16 +355,33 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
       {/* {(isHovering || isLast) && <MessageDownload message={message} />} */}
 
-      {(isHovering || isLast) && (
+      {isHovering && (
         <div className="flex space-x-1">
-          <div
-            className="flex cursor-pointer items-center"
-            onClick={e => {
-              e.stopPropagation()
-              handleMenuButtonClick(e)
-            }}
-          >
-            <i className="fa-regular fa-arrow-down-to-line text-pixelspace-gray-40"></i>
+          <div className="flex cursor-pointer items-center">
+            <Menu>
+              <MenuHandler>
+                <i className="fa-regular fa-arrow-down-to-line text-pixelspace-gray-40"></i>
+              </MenuHandler>
+              <MenuList
+                className="bg-pixelspace-gray-60 border-0 p-0 text-white"
+                placeholder={""}
+              >
+                <MenuItem
+                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 rounded-b text-left text-sm font-normal dark:hover:text-white"
+                  placeholder={""}
+                  onClick={handleOpen}
+                >
+                  Download message
+                </MenuItem>
+                <MenuItem
+                  className="hover:bg-pixelspace-gray-55 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 rounded-b text-left text-sm font-normal dark:hover:text-white"
+                  placeholder={""}
+                  onClick={downloadAudio}
+                >
+                  Download as audio
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </div>
 
           {/* {hasData && (
@@ -352,45 +389,63 @@ export const MessageActions: FC<MessageActionsProps> = ({
             <IconFolderPlus size={20} />
           </Button>
         )} */}
-
-          {isMenuOpen && (
-            <div
-              ref={menuRef}
-              style={{
-                top: `${position.y}px`,
-                left: `${position.x}px`
-              }}
-              className={`bg-pixelspace-gray-60 absolute z-20 w-44 divide-y rounded text-right shadow dark:divide-gray-600 `}
-            >
-              <ul
-                className="text-sm text-gray-200 dark:text-gray-200"
-                aria-labelledby="dropdownMenuIconHorizontalButton"
-              >
-                <MessageDownload
-                  message={message}
-                  handleSetIsOpen={() => {
-                    setIsDownloadMessageMenuOpen(true)
-                  }}
-                  handleIsClose={() => {
-                    setIsDownloadMessageMenuOpen(false)
-                  }}
-                />
-                <li>
-                  <div
-                    role="button"
-                    onClick={() => downloadAudio()}
-                    className="hover:bg-pixelspace-gray-70 dark:hover:bg-pixelspace-gray-70 text-pixelspace-gray-20 block w-full cursor-pointer rounded-t  p-[10px]  text-left text-sm font-normal dark:hover:text-white"
-                  >
-                    Download as audio
-                  </div>
-                </li>
-              </ul>
-            </div>
-          )}
         </div>
       )}
 
       {/* {1 > 0 && isAssistant && <MessageReplies />} */}
+      <Dialog
+        className="bg-background/80 border-pixelspace-gray-40 border"
+        placeholder={""}
+        open={open}
+        handler={handleOpen}
+      >
+        <DialogHeader
+          className="font-helvetica-now text-lg font-semibold leading-none tracking-tight text-white"
+          placeholder={""}
+        >
+          Download message
+        </DialogHeader>
+        <DialogBody className="bg-background/80" placeholder={""}>
+          <div className="label flex h-7 flex-col justify-center text-sm font-normal leading-[180%] text-[#e6e4e5]">
+            Save message as (e.g., filename.txt, filename.json)
+          </div>
+          <div
+            className={`bg-pixelspace-gray-70 focus:border-pixelspace-gray-40 flex h-[42px] w-full items-center rounded-md border px-2 py-3  ${!isFocused || fileName.length > 0 ? "border-pixelspace-gray-50" : "border-pixelspace-gray-40"} mb-2`}
+          >
+            <Input
+              style={{ border: "none", outline: "none" }}
+              placeholder={`Type your filename`}
+              className={`bg-pixelspace-gray-70  text-sm ${fileName.length > 0 ? "text-pixelspace-gray-3" : "text-pixelspace-gray-20 "} h-[40px] w-full border-none font-normal`}
+              value={fileName}
+              onChange={e => setFileName(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+          </div>
+        </DialogBody>
+        <DialogFooter
+          className="flex flex-row items-center justify-end gap-2 text-white"
+          placeholder={""}
+        >
+          <Button
+            size={"cancelPrompt"}
+            variant="ghost2"
+            onClick={() => {
+              handleOpen()
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            ref={buttonRef}
+            size={"cancelPrompt"}
+            variant="download"
+            onClick={handleDownload}
+          >
+            Download
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   )
 }

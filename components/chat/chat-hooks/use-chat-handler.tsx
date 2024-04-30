@@ -115,7 +115,8 @@ export const useChatHandler = () => {
           selectedAssistant.include_workspace_instructions,
         embeddingsProvider: selectedAssistant.embeddings_provider as
           | "openai"
-          | "local"
+          | "local",
+        voice: selectedAssistant.voice
       })
 
       let allFiles = []
@@ -159,7 +160,8 @@ export const useChatHandler = () => {
           selectedPreset.include_workspace_instructions,
         embeddingsProvider: selectedPreset.embeddings_provider as
           | "openai"
-          | "local"
+          | "local",
+        voice: profile?.voice ?? "echo"
       })
     } else if (selectedWorkspace) {
       // setChatSettings({

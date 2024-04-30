@@ -14,6 +14,8 @@ import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
+import Image from "next/image"
+import pixelspaceLogo from "@/public/favicon.ico"
 
 export const SIDEBAR_ICON_SIZE = 12
 
@@ -28,7 +30,17 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 }) => {
   return (
     <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between border-r px-4 pb-6  pt-8">
-      <TabsList className="bg-pixelspace-gray-90 grid h-[460px]   grid-rows-8 space-y-[32px]">
+      <div className="flex flex-col items-center justify-center">
+        <Image
+          src={pixelspaceLogo.src}
+          alt={"pixelspace_logo"}
+          width={32}
+          height={32}
+          className="rounded-full"
+        />
+        <hr className="border-pixelspace-gray-60 mb-6 mt-8 w-4 border" />
+      </div>
+      <TabsList className="bg-pixelspace-gray-90 grid h-[460px] grid-rows-9 space-y-[32px]">
         <SidebarSwitchItem
           icon={
             <i

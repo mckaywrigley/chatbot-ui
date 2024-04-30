@@ -40,6 +40,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@google/generative-ai": "^0.1.3",
     "@hookform/resolvers": "^3.3.2",
+    "@material-tailwind/react": "^2.1.9",
     "@mistralai/mistralai": "^0.0.8",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",

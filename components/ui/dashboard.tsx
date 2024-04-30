@@ -12,6 +12,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faChevronRight } from "@fortawesome/pro-regular-svg-icons"
 
 export const SIDEBAR_WIDTH = 422
 export const SIDEBAR_MI_WIDTH = 420
@@ -84,7 +86,10 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         size="icon"
         onClick={handleToggleSidebar}
       >
-        <IconChevronCompactRight size={24} />
+        <FontAwesomeIcon
+          icon={faChevronRight}
+          className="hover:text-pixelspace-gray-40 text-[20px]"
+        />
       </Button>
 
       <div

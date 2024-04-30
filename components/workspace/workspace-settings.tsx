@@ -63,7 +63,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     includeProfileContext: selectedWorkspace?.include_profile_context,
     includeWorkspaceInstructions:
       selectedWorkspace?.include_workspace_instructions,
-    embeddingsProvider: selectedWorkspace?.embeddings_provider
+    embeddingsProvider: selectedWorkspace?.embeddings_provider,
+    voice: "echo"
   })
 
   useEffect(() => {
@@ -137,7 +138,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           defaultChatSettings.includeWorkspaceInstructions,
         embeddingsProvider: defaultChatSettings.embeddingsProvider as
           | "openai"
-          | "local"
+          | "local",
+        voice: defaultChatSettings?.voice ?? "echo"
       })
     }
 
