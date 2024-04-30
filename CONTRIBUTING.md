@@ -50,4 +50,4 @@ npm run clean
 
 ## Contact
 
-You can get in touch with us through email at [github@hackergpt.chat](mailto:github@hackergpt.chat) or connect with us on [X](https://twitter.com/thehackergpt).
+You can get in touch with us through email at [contact@hackerai.co](mailto:contact@hackerai.co) or connect with us on [X](https://twitter.com/thehackergpt).

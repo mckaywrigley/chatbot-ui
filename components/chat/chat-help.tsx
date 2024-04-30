@@ -70,7 +70,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
 
         <div className="flex justify-center py-2">
           <div className="cursor-text select-text text-sm opacity-60">
-            contact@hackergpt.chat
+            contact@hackerai.co
           </div>
         </div>
 

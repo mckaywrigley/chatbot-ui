@@ -155,9 +155,9 @@ export default function AboutUsPage() {
               feedback at{" "}
               <a
                 className="text-blue-600 hover:text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
-                href="mailto:contact@hackergpt.chat"
+                href="mailto:contact@hackerai.co"
               >
-                contact@hackergpt.chat
+                contact@hackerai.co
               </a>
             </p>
           </div>
