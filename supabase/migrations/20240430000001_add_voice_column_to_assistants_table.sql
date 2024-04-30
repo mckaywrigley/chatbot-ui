@@ -1,0 +1,2 @@
+ALTER TABLE assistants
+ADD COLUMN voice TEXT NULL;

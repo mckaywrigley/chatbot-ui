@@ -236,6 +236,7 @@ export interface Database {
           temperature: number
           updated_at: string | null
           user_id: string
+          voice: string
         }
         Insert: {
           context_length: number
@@ -254,6 +255,7 @@ export interface Database {
           temperature: number
           updated_at?: string | null
           user_id: string
+          voice?: string
         }
         Update: {
           context_length?: number
@@ -272,6 +274,7 @@ export interface Database {
           temperature?: number
           updated_at?: string | null
           user_id?: string
+          voice?: string
         }
         Relationships: [
           {
@@ -354,6 +357,7 @@ export interface Database {
           updated_at: string | null
           user_id: string
           workspace_id: string
+          voice: string
         }
         Insert: {
           assistant_id?: string | null
@@ -372,6 +376,7 @@ export interface Database {
           updated_at?: string | null
           user_id: string
           workspace_id: string
+          voice: string
         }
         Update: {
           assistant_id?: string | null
@@ -390,6 +395,7 @@ export interface Database {
           updated_at?: string | null
           user_id?: string
           workspace_id?: string
+          voice?: string
         }
         Relationships: [
           {

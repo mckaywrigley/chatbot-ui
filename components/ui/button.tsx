@@ -18,7 +18,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: " hover:text-pixelspace-gray-3 border-1",
-        ghost2: " hover:text-pixelspace-gray-3 border border-[#8c8484]",
+        ghost2: " hover:!text-pixelspace-gray-3 !border !border-[#8c8484]",
         logout:
           " hover:text-pixelspace-gray-3 border border-pixelspace-gray-40",
         download: "  rounded bg-[#e6e4e5] text-[#110e0f] text-center",

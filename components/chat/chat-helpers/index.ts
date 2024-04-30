@@ -376,7 +376,8 @@ export const handleCreateChat = async (
     name: messageContent.substring(0, 100),
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
-    embeddings_provider: chatSettings.embeddingsProvider
+    embeddings_provider: chatSettings.embeddingsProvider,
+    voice: selectedAssistant?.voice ?? profile.voice ?? "echo"
   })
 
   setSelectedChat(createdChat)
@@ -544,7 +545,8 @@ export const importThread = async (
     temperature: conversation?.chatSettings.temperature,
     embeddings_provider: conversation?.chatSettings.embeddingsProvider,
     created_at: conversation?.created_at,
-    updated_at: conversation?.updated_at
+    updated_at: conversation?.updated_at,
+    voice: conversation?.chatsettings.voice
   })
 
   let chatMessageCount = 0
