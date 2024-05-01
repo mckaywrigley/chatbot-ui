@@ -19,6 +19,7 @@ import { LLMID } from "@/types"
 import { useParams, useRouter } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
+import SideMenu from "@/components/side-menu/side-menu"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -57,6 +58,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   } = useContext(ChatbotUIContext)
 
   const [loading, setLoading] = useState(true)
+  const [showUserContextMenu, setShowUserContextMenu] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -174,8 +176,24 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   }
 
   if (loading) {
-    return <Loading />
+    return (
+      <div className="h-[calc(100dvh)] w-full">
+        <Loading />
+      </div>
+    )
   }
 
-  return <Dashboard>{children}</Dashboard>
+  // return <Dashboard>{children}</Dashboard>
+  return (
+    <section>
+      <div className="bg-pixelspace-gray-90 flex flex-row">
+        <div className="bg-pixelspace-gray-90 z-20 h-[calc(100dvh)]">
+          <SideMenu />
+        </div>
+        <div className="h-[calc(100dvh)] w-full">
+          <div className="h-[calc(100dvh)] w-full">{children}</div>
+        </div>
+      </div>
+    </section>
+  )
 }

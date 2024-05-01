@@ -174,7 +174,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
           trigger={
             <div
               role="button"
-              className=" border-pixelspace-60 ml-3 flex size-[42px] items-center justify-center rounded-md border"
+              className=" border-pixelspace-60 flex size-[42px] items-center justify-center rounded-md border"
               onClick={() => setIsOpen(true)}
             >
               <i
@@ -187,7 +187,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       </SheetTrigger>
 
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between overflow-auto"
+        className="flex w-full flex-col justify-between overflow-auto xl:min-w-[450px]"
         side="workspaceSetting"
         onKeyDown={handleKeyDown}
       >

@@ -19,10 +19,13 @@ import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
 import { Toaster } from "react-hot-toast"
+import { useSideMenu } from "@/context/side-menu-context"
 
 interface ChatUIProps {}
 
 export const ChatUI: FC<ChatUIProps> = ({}) => {
+  const { isCollapsed } = useSideMenu()
+
   useHotkey("o", () => handleNewChat())
 
   const params = useParams()
@@ -191,8 +194,12 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     return <Loading />
   }
 
+  const collapsedClass = isCollapsed
+    ? "max-w-4xl sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]"
+    : ""
+
   return (
-    <div className="relative flex h-full flex-col items-center">
+    <div className="relative flex h-[calc(100dvh)] flex-col items-center">
       <div className="absolute left-4 top-2.5 flex justify-center gap-2">
         <ChatScrollButtons
           isAtTop={isAtTop}
@@ -207,14 +214,14 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatSecondaryButtons />
       </div>
 
-      <div className="bg-pixelspace-gray-90 text-pixelspace-gray-3 flex max-h-[50px] min-h-[50px] w-full items-center justify-center px-20 text-2xl font-normal leading-[43.20px]">
-        <p className="max-w-4xl truncate px-[32px] text-center sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
+      <div className="bg-pixelspace-gray-90 text-pixelspace-gray-3 flex max-h-[50px] min-h-[50px] w-full items-center justify-center px-20 text-[20px] font-normal leading-[43.20px]">
+        <p className={`${collapsedClass} truncate px-[32px] text-center`}>
           {selectedChat?.name || "Chat"}
         </p>
       </div>
 
       <div
-        className="flex size-full flex-col overflow-auto"
+        className="flex h-[calc(100dvh)] w-full flex-col overflow-auto"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />
@@ -224,7 +231,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="relative w-[300px] px-11 pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
+      <div className="relative w-full px-11 pb-8 pt-5 md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput />
       </div>
 

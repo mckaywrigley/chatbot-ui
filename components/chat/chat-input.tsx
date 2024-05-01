@@ -358,7 +358,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           paddingTop: 10,
           paddingBottom: 10
         }}
-        className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-[714px] justify-center rounded-[50px] border-2"
+        className="border-input bg-pixelspace-gray-60 mt-3 flex min-h-[56px] w-full justify-center rounded-[30px] border-2  xl:w-[714px] xl:rounded-[50px]"
       >
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
@@ -380,7 +380,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             <div
               className={`h-8 border-l ${
                 !voiceRecorder && !isRecording ? "" : null
-              } flex items-center border-gray-600 py-2 pl-3`}
+              } flex items-center border-gray-600 py-1 pl-1 xl:py-2 xl:pl-3`}
             >
               <button
                 disabled={transcriptionLoading}
@@ -449,7 +449,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         >
           <TextareaAutosize
             textareaRef={chatInputRef}
-            className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} placeholder:font-libre-franklin focus-visible:ring-ring mx-3 flex ${isRecording || transcriptionLoading ? "w-[509px]" : "w-[550px]"} resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+            className={`bg-pixelspace-gray-60 ${isRecording || voiceRecorder ? "placeholder:text-pixelspace-gray-60" : "placeholder:text-pixelspace-gray-40"} placeholder:font-libre-franklin focus-visible:ring-ring mx-1 flex xl:mx-3 ${isRecording || transcriptionLoading ? "w-full xl:w-[509px]" : "w-full xl:w-[550px]"} resize-none rounded-md border-none bg-transparent text-sm  focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
             placeholder={t(
               `${isRecording ? "" : "Ask anything. Type “@” for assistants, “/” for prompts, “#” for files & “!” for actions"}`
             )}

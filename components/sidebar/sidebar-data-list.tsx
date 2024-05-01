@@ -233,7 +233,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     <>
       <div
         ref={divRef}
-        className="mt-2 flex flex-col overflow-auto"
+        className="bg-pixelspace-gray-90 mt-2 flex h-[calc(80vh)] flex-col overflow-y-auto overflow-x-hidden"
         onDrop={handleDrop}
       >
         {data.length === 0 && (
@@ -246,8 +246,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
         {(dataWithFolders.length > 0 || dataWithoutFolders.length > 0) && (
           <div
-            className={`h-full ${
-              isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
+            className={`h-[calc(100dvh)] ${
+              isOverflowing
+                ? "w-[250px] xl:w-[calc(100%-8px)]"
+                : "w-[250px] xl:w-full"
             } ${isOverflowing ? "mr-2" : ""}`}
           >
             {folders.map(folder => (

@@ -366,8 +366,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       </SheetTrigger>
 
       <SheetContent
-        className="flex flex-col justify-between"
-        style={{ width: 450 }}
+        className="flex w-full flex-col justify-between xl:w-[450px]"
         side="userSetting"
         onKeyDown={handleKeyDown}
       >

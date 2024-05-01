@@ -29,7 +29,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   contentType
 }) => {
   return (
-    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex flex-col justify-between border-r px-4 pb-6  pt-8">
+    <div className="border-pixelspace-gray-60 bg-pixelspace-gray-90 flex h-[calc(100dvh)] flex-col justify-between border-r px-4 pb-6 pt-8">
       <div className="flex flex-col items-center justify-center">
         <Image
           src={pixelspaceLogo.src}
@@ -38,9 +38,9 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           height={32}
           className="rounded-full"
         />
-        <hr className="border-pixelspace-gray-60 mb-6 mt-8 w-4 border" />
+        <hr className="border-pixelspace-gray-60 mb-6 w-4 border" />
       </div>
-      <TabsList className="bg-pixelspace-gray-90 grid h-[460px] grid-rows-9 space-y-[32px]">
+      <TabsList className="bg-pixelspace-gray-90 grid h-[calc(100dvh)] grid-rows-9 space-y-8">
         <SidebarSwitchItem
           icon={
             <i
