@@ -1,6 +1,4 @@
 .side-menu {
-	width: calc(30dvw);
-	max-width: calc(30dvw);
 	transition: width 0.3s;
 }
 
