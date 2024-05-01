@@ -27,26 +27,30 @@ export default function ChatPage() {
   return (
     <>
       {chatMessages.length === 0 ? (
-        <div className="relative flex h-full flex-col items-center justify-center">
-          <div className="top-50% left-50% -translate-x-50% -translate-y-50% absolute z-40 mb-20">
+        <div className="flex h-screen w-full flex-col">
+          <div className="flex flex-row items-center justify-between">
+            <div className="">
+              <QuickSettings />
+            </div>
+
+            <div className="">
+              <ChatSettings />
+            </div>
+          </div>
+
+          <div className="top-50% left-50% -translate-x-50% -translate-y-50% mb-20">
             <ChatBrand theme={theme === "dark" ? "dark" : "light"} />
-          </div>
-
-          <div className="absolute left-2 top-2">
-            <QuickSettings />
-          </div>
-
-          <div className="absolute right-2 top-2">
-            <ChatSettings />
           </div>
 
           <div className="flex grow flex-col items-center justify-center" />
 
-          <div className="z-50 w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[714px]">
-            <ChatInput />
+          <div className="flex w-full flex-row items-center justify-center">
+            <div className="flex w-[300px] items-center justify-center pb-8 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[714px]">
+              <ChatInput />
+            </div>
           </div>
 
-          <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
+          <div className="absolute bottom-2 right-2 z-0 hidden md:block lg:bottom-4 lg:right-4">
             <ChatHelp />
           </div>
         </div>

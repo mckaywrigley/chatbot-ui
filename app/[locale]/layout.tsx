@@ -62,7 +62,10 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#000000"
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover"
 }
 
 const i18nNamespaces = ["translation"]
@@ -88,8 +91,19 @@ export default async function RootLayout({
   const { t, resources } = await initTranslations(locale, i18nNamespaces)
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-helvetica-now">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      style={{
+        overflowX: "hidden"
+      }}
+    >
+      <body
+        className="font-helvetica-now"
+        style={{
+          overflowX: "hidden"
+        }}
+      >
         <Providers attribute="class" defaultTheme="dark">
           <TranslationsProvider
             namespaces={i18nNamespaces}
@@ -97,7 +111,7 @@ export default async function RootLayout({
             resources={resources}
           >
             <Toaster richColors position="top-center" duration={3000} />
-            <div className="bg-background text-foreground flex h-screen flex-col items-center">
+            <div className="bg-background text-foreground">
               {session ? <GlobalState>{children}</GlobalState> : children}
             </div>
           </TranslationsProvider>

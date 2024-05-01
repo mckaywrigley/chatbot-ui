@@ -191,7 +191,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   return (
     <div className="flex space-x-2">
       <div
-        className="ml-[5px] flex size-[42px] cursor-pointer items-center justify-center rounded border"
+        className="flex size-[42px] cursor-pointer items-center justify-center rounded border"
         onClick={e => {
           e.stopPropagation()
           handleMenuButtonClick(e)

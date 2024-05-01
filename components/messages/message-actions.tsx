@@ -338,7 +338,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {renderPlayAudioButton}
+      {(isHovering || isLast) && renderPlayAudioButton}
 
       {isLast && (
         <WithTooltip
@@ -355,7 +355,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
       {/* {(isHovering || isLast) && <MessageDownload message={message} />} */}
 
-      {isHovering && (
+      {(isHovering || isLast) && (
         <div className="flex space-x-1">
           <div className="flex cursor-pointer items-center">
             <Menu>

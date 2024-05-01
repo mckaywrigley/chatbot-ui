@@ -51,17 +51,11 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
 
   return (
     <TabsContent
-      className="border-pixelspace-gray-60  bg-pixelspace-gray-90 m-0 w-full space-y-2 border-r"
-      style={{
-        // Sidebar - SidebarSwitcher
-        minWidth: showSidebar ? `calc(${SIDEBAR_MI_WIDTH}px - 60px)` : "0px",
-        maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-      }}
+      className="border-pixelspace-gray-60 bg-pixelspace-gray-90 m-0 w-full space-y-2 border-r"
       value={contentType}
     >
-      <div className="flex h-full flex-col py-3 ">
-        <div className="border-pixelspace-gray-60 flex items-center border-b px-3 pb-2">
+      <div className="flex h-[calc(100dvh)] flex-col py-3 ">
+        <div className="border-pixelspace-gray-60 flex flex-row items-center justify-between gap-2.5 border-b px-3 pb-2">
           <WorkspaceSwitcher />
 
           <WorkspaceSettings />
