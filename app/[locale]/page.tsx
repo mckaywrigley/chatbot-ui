@@ -10,7 +10,7 @@ export default function HomePage() {
   const { theme } = useTheme()
 
   return (
-    <div className="bg-pixelspace-gray-90 flex size-full flex-col items-center justify-center space-y-[40px]">
+    <div className="bg-pixelspace-gray-90 flex h-[calc(100dvh)] w-full flex-col items-center justify-center space-y-[40px]">
       <LoginBrand />
 
       <Link

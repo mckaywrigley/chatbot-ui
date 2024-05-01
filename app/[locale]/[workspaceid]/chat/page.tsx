@@ -29,16 +29,16 @@ export default function ChatPage() {
       {chatMessages.length === 0 ? (
         <div className="flex h-screen w-full flex-col">
           <div className="flex flex-row items-center justify-between">
-            <div className="">
+            <div>
               <QuickSettings />
             </div>
 
-            <div className="">
+            <div>
               <ChatSettings />
             </div>
           </div>
 
-          <div className="top-50% left-50% -translate-x-50% -translate-y-50% mb-20">
+          <div className="flex h-[calc(100dvh)] w-full items-center justify-center">
             <ChatBrand theme={theme === "dark" ? "dark" : "light"} />
           </div>
 
