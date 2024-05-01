@@ -58,7 +58,7 @@ export const studyStates: StudyStateObject[] = [
         newStudyState: "recall_first_attempt"
       },
       {
-        quickText: "Show full topic description.",
+        quickText: "Show study sheet.",
         responseText: "{{topicDescription}}",
         newStudyState: "reviewing"
       }
@@ -74,7 +74,7 @@ export const studyStates: StudyStateObject[] = [
         newStudyState: "recall_first_attempt"
       },
       {
-        quickText: "Show full topic description.",
+        quickText: "Show study sheet.",
         responseText: "{{topicDescription}}",
         newStudyState: "reviewing"
       }
@@ -90,7 +90,7 @@ export const studyStates: StudyStateObject[] = [
     name: "recall_finished_hide_input",
     quickResponses: [
       {
-        quickText: "Show topic description.",
+        quickText: "Show study sheet.",
         responseText: "{{topicDescription}}",
         newStudyState: "final_review_hide_input"
       }
@@ -104,7 +104,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Edit topic.",
-        responseText: "What updates should we make to the topic content?",
+        responseText: "What updates should we make to the topic study sheet?",
         newStudyState: "topic_edit"
       }
     ]
@@ -114,8 +114,9 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "Next.",
-        responseText:
-          "Now I'll guide you on how to add a topic description. It's quite exciting to create a new topic together. Let's start with 'The Solar System.' Click on it below.",
+        responseText: `Now I'll guide you on how to add a study sheet. It's quite exciting to create a new topic together!
+A study sheet typically includes 10 to 30 key facts, each with a few important details. The content and depth may vary based on the topic's complexity and your needs.
+Let's start with 'The Solar System.' Click on it below.`,
         newStudyState: "tutorial_2_hide_input"
       }
     ]
@@ -125,7 +126,7 @@ export const studyStates: StudyStateObject[] = [
     quickResponses: [
       {
         quickText: "The Solar System.",
-        responseText: `If at this stage you've only entered a topic name, like now, I'll step in to help craft a suitable topic description for you. Alternatively, you're more than welcome to add a description yourself, whether by uploading a document or typing directly into our chat. For the moment, I'll take care of generating the description for you. Please 'View topic.' now, and afterwards, 'Save topic.'`,
+        responseText: `If at this stage you've only entered a topic name, like now, I'll step in to help craft a suitable study sheet for you. Alternatively, you're more than welcome to add a description yourself, whether by uploading a document or typing directly into our chat. For the moment, I'll take care of generating the description for you. Please 'View topic.' now, and afterwards, 'Save topic.'`,
         newStudyState: "tutorial_3_hide_input"
       }
     ]
@@ -144,7 +145,7 @@ export const studyStates: StudyStateObject[] = [
     name: "tutorial_4_hide_input",
     quickResponses: [
       {
-        quickText: "Save topic description.",
+        quickText: "Save study sheet.",
         responseText: `Now comes the fun part! After taking some time to study the topic, it's time for your first recall attempt. Let's make it a good one, no peeking allowed! 👀😉
 I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about "The Solar System" topic but leave out some facts for the purpose of this tutorial; select the chat area below (Message Mentor...) then type or hit the microphone key on your keyboard.
 After you receive feedback on your attempt, select "Next step..." to move forward.`,
@@ -196,9 +197,10 @@ The final stage of an effective study session is reviewing the topic one last ti
       {
         quickText: "Finish tutorial.",
         responseText: `Amazing work! 
-On the topic list to the left, you will notice the icon next to this topic name has changed to indicat that you've successfully reviewed the topic. As days go by leading up to your next review session, this icon will change, reflecting an estimate of your recall strength. Don't worry, we'll email you on that day with a gentle nudge when it's time for a refresh.
+On the topic list to the left, you will notice the icon next to this topic name has changed to indicat that you've successfully reviewed the topic. Return to this topic in a few hours, and based on how much you remember, Mentor will schedule a revision in a couple of days. 
+As days go by leading up to your next review session, this icon will change, reflecting an estimate of your recall strength. Don't worry, we'll email you on that day with a gentle nudge when it's time for a refresh.
 Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
-And of course, feel free to dive back in to further solidify your mastery of The Solar System!
+And of course, feel free to dive back in to further solidify your mastery of The Solar System! 🪐
 Enjoy your learning journey!`,
         newStudyState: "topic_creation"
       }

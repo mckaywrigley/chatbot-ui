@@ -313,22 +313,32 @@ export const useChatHandler = () => {
     localStorage.setItem("tutorialDone", "true")
 
     const messageContent = `👋 Hello! I'm your AI Study Mentor.
-I'm here to boost your learning by assisting with topic creation and guiding you through optimally spaced free recall study sessions.
+I'm here to boost your learning by assisting with creating a topic study sheet and guiding you through optimally spaced free recall study sessions.
 This tutorial will walk you through how to craft a revision topic.
 You'll find topics listed in the panel on the left side of the chat window. 👈
 Open the panel, and you'll see "The Solar System" as our example topic for this tutorial.
 Please click 'Next' below to proceed with the tutorial.`
 
-    const topic_description = `* The Solar System consists of the Sun and everything that orbits around it, including planets, moons, asteroids, comets, and meteoroids.
-* The Sun is the center of the Solar System, a star that provides light and heat, making life on Earth possible.
-* Mercury is the closest planet to the Sun, known for having extreme temperature fluctuations.
-* Venus, the second planet, is the hottest due to its thick, toxic atmosphere that traps heat.
-* Earth is the third planet and the only known world to support life, with a unique atmosphere that protects and sustains its inhabitants.
-* Mars, the fourth planet, is known as the Red Planet because of its iron oxide-rich soil and dust.
-* Jupiter is the fifth planet and the largest in our Solar System, with a famous giant red spot that is actually a storm.
-* Saturn, the sixth planet, is most well-known for its spectacular ring system, made up of ice and rock particles.
-* Uranus, the seventh planet, rotates on its side, making it unique among the Solar System's planets.
-* Neptune is the eighth and most distant planet in our Solar System, known for its intense blue color and strong winds.`
+    const topic_description = `### Basic overview of the Solar System
+- **Components:** Consists of the Sun, eight planets, their moons, dwarf planets, asteroids, comets, and various other objects.
+- **Formation:** Formed about 4.6 billion years ago from the gravitational collapse of a giant molecular cloud.
+
+### The Sun
+- **Type:** G-type main-sequence star (G2V)
+- **Composition:** About 74% hydrogen, 24% helium, and other elements.
+- **Significance:** The Sun is the source of energy for all life on Earth and drives Earth’s climate and weather.
+
+### The Planets
+- **Inner Planets (Terrestrial planets):** Mercury, Venus, Earth, and Mars. These are rocky and have relatively few moons.
+- **Outer Planets (Gas giants and ice giants):** Jupiter and Saturn are gas giants, made mostly of hydrogen and helium. Uranus and Neptune are ice giants, with more ices such as water, ammonia, and methane.
+
+### Dwarf Planets
+- **Examples:** Pluto, Eris, Haumea, Makemake, and Ceres.
+- **Characteristics:** Orbit the Sun, have enough mass for their gravity to make them nearly round, but have not cleared their orbital paths of other debris.
+
+### Asteroids and Comets
+- **Asteroids:** Primarily found in the asteroid belt between Mars and Jupiter, made of rock and metal.
+- **Comets:** Composed of ice and dust, often with highly elliptical orbits, showing visible atmospheres (comas) and tails when near the Sun.`
 
     try {
       setUserInput("")

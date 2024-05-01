@@ -34,7 +34,7 @@ import {
   endOfDay,
   addDays
 } from "date-fns"
-import { Card, createEmptyCard } from "ts-fsrs"
+import { fsrs } from "ts-fsrs"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -127,14 +127,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           dueDate >= addWeeks(startOfWeek(currentTime), 1) &&
           dueDate <= endOfWeek(addWeeks(currentTime, 1))
 
-        const notTomorrow = isTomorrow(dueDate)
+        const dueTomorrow = isTomorrow(dueDate)
 
         const endOfNextMonth = endOfMonth(addMonths(currentTime, 1))
         switch (dateCategory) {
           case "Today":
             return isToday(dueDate) || isDateBeforeToday(dueDate)
           case "Tomorrow":
-            return notTomorrow
+            return dueTomorrow
           case "Later this week":
             return (
               dueDate > endOfDay(addDays(new Date(), 1)) && isThisWeek(dueDate)
@@ -150,7 +150,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             )
           case "Next month":
             return (
-              notTomorrow &&
+              !dueTomorrow &&
               dueDate > endOfMonth(currentTime) &&
               dueDate <= endOfNextMonth
             )
@@ -216,15 +216,20 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     }
   }, [data])
 
+  const f = fsrs()
+  const now = new Date()
+
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
   const dataWithPredictedRecall = dataWithoutFolders.map(item => {
     let predictedRecall = -1
 
     if ("srs_card" in item && typeof item.srs_card === "string") {
-      const srs_card: Card = JSON.parse(item.srs_card)
-      const { scheduled_days, elapsed_days } = srs_card
-      predictedRecall = (scheduled_days / (scheduled_days + elapsed_days)) | 0
+      const retrievability = f.get_retrievability(
+        JSON.parse(item.srs_card),
+        now
+      )
+      predictedRecall = parseFloat(retrievability || "75")
     }
 
     return {
