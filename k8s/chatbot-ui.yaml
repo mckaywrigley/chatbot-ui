@@ -10,7 +10,7 @@ metadata:
   name: chatbot-ui
 type: Opaque
 data:
-  OPENAI_API_KEY: <base64 encoded key>
+  OPENAI_API_KEY: c2stcHJvai1HdklVR3ZEZTdGTWhXZ3ZMWEdDSlQzQmxia0ZKNG5Ca0V5N256ZDhPdUo4UTA4MGI=
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: chatbot-ui
-          image: <docker user>/chatbot-ui:latest
+          image: shubhamgokhale2111/chatbot-ui:latest
           resources: {}
           ports:
             - containerPort: 3000
