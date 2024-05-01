@@ -358,7 +358,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         ) : (
           <div
             role="button"
-            className="flex size-[34px] cursor-pointer items-center justify-center"
+            className="mt-4 flex size-[34px] cursor-pointer items-center justify-center"
           >
             <i className="fa-regular fa-face-smile relative right-0 top-0"></i>
           </div>

@@ -60,7 +60,9 @@ export default function SideMenu(): JSX.Element {
     //w-56
     <aside
       className={`bg-pixelspace-gray-90 h-[calc(100dvh)] text-white ${
-        isCollapsed ? "side-menu" : "side-menu-collapsed"
+        isCollapsed
+          ? "side-menu w-[250px] max-w-[250px] xl:w-[450px] xl:max-w-[450px]"
+          : "side-menu-collapsed"
       } `}
     >
       <div

@@ -185,8 +185,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
   // return <Dashboard>{children}</Dashboard>
   return (
-    <section>
-      <div className="bg-pixelspace-gray-90 flex flex-row">
+    <section className="w-full">
+      <div className="bg-pixelspace-gray-90 flex w-full max-w-full flex-row">
         <div className="bg-pixelspace-gray-90 z-20 h-[calc(100dvh)]">
           <SideMenu />
         </div>
