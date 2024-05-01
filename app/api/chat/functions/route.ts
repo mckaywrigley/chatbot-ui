@@ -47,11 +47,20 @@ const callLLM = async (
   let newStudyState: StudyState
   let defaultModel = "mistral-medium-latest"
   const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
-  const copyEditResponse = `You are an upbeat, encouraging tutor who helps the student to develop a detailed topic description; the goal of which is to serve as comprehensive learning resources for future study. 
-Only ask one question at a time.
-First, the student will provide a topic name and possibly a topic description with source learning materials or ideas, whether in structured formats (like course webpages, PDFs from books) or unstructured notes or insights.
-Given this source information, copy edit the content. In addition outline the key facts in a list.
-Next, ask the student if they would like to change anything or if they would instead like to save the topic.`
+  const studySheetInstructions = `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention.
+Instructions:
+  Introduction to the Topic:
+    Provide a brief overview of the topic, including its significance and general context.
+  Key Components or Concepts:
+    List 10 to 30 key facts or components related to the topic. Each fact should be succinct and supported by one or two important details to aid understanding.
+  Structure and Organization:
+    Group related facts into categories or themes to maintain logical coherence and enhance navigability.
+  Common Applications or Implications:
+    Explain how the knowledge of this topic can be applied in real-world scenarios or its relevance in related fields of study.
+  
+Formatting Instructions:
+  Ensure the study sheet is clear and easy to read. Use bullet points for lists, bold headings for sections, and provide ample spacing for clarity.`
+
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
   const mentor_shot_hint_response = `You've done a great job recalling some key facts about Venus! You're definitely on the right track. Let’s look at what you’ve got and fine-tune some details:
       
@@ -76,7 +85,8 @@ Next, ask the student if they would like to change anything or if they would ins
         messages: [
           {
             role: "system",
-            content: copyEditResponse
+            content: `${studySheetInstructions} 
+            Finally, ask the student if they would like to change anything or if they would instead like to save the topic.`
           },
           ...messages
         ]
@@ -100,7 +110,7 @@ Next, ask the student if they would like to change anything or if they would ins
           function: {
             name: "updateTopicContent",
             description:
-              "This function updates the detailed topic description based on student inputs and finalized content.",
+              "This function updates the study sheet based on student inputs and finalized content.",
             parameters: {
               type: "object",
               required: ["description"],
@@ -136,9 +146,9 @@ Next, ask the student if they would like to change anything or if they would ins
       let toolMessages = [
         {
           role: "system",
-          content: `${copyEditResponse}
-  If the student wants to change anything, work with the student to change the topic content. Always use the the tool/functional "updateTopicContent" and pass the final generated topic description. 
-  After updating the topic content display the new topic content. Finally, tell the student they should start the recall session immediately.`
+          content: `${studySheetInstructions}
+  If the student wants to change anything, work with the student to change the topic study sheet. Always use the the tool/functional "updateTopicContent" and pass the final generated study sheet. 
+  After updating the topic study sheet display the new topic study sheet. Finally, tell the student they should start the recall session immediately.`
         },
         ...messages
       ]
@@ -215,14 +225,14 @@ Next, ask the student if they would like to change anything or if they would ins
           {
             role: "user",
             content: `Given the Topic source and a Student's recall attempt below, perform the following tasks:
-            1. Calculate a recall score representing how accurately the student's recall matches the Topic source only. Important: Only compare against the Topic source below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
-            2. Identify any significant omissions in the student's recall when compared against the Topic source below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
+            1. Calculate a recall score representing how accurately the student's recall matches the Topic study sheet only. Important: Only compare against the Topic study sheet below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
+            2. Identify any significant omissions in the student's recall when compared against the Topic study sheet below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
             
             Output the results in JSON format with the following structure:
             - "score": A numerical value between 0 and 100 indicating the recall accuracy.
-            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic source.
+            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet.
             
-            Topic source:
+            Topic study sheet:
             """${topicDescription}"""
             
             Student's recall attempt:
@@ -256,7 +266,7 @@ Next, ask the student if they would like to change anything or if they would ins
       const dateFromNow = formatDistanceToNow(due_date)
 
       let systemMessage = mentor_system_message
-      let userMessage = `Topic source:
+      let userMessage = `Topic study sheet:
       """
       Venus
       * Venus is the second planet from the Sun.
@@ -283,7 +293,7 @@ Next, ask the student if they would like to change anything or if they would ins
       ${mentor_shot_hint_response}
       """
       ---
-      Topic source: 
+      Topic study sheet: 
       """
       ${topicDescription}
       """
@@ -304,7 +314,7 @@ Next, ask the student if they would like to change anything or if they would ins
       if (perfectRecall) {
         systemMessage = mentor_system_message
         userMessage = `Generate upbeat feedback based on the students recall performance. 
-          Topic source: 
+          Topic study sheet: 
           """
           ${topicDescription}
           """
@@ -364,7 +374,7 @@ Next, ask the student if they would like to change anything or if they would ins
           {
             role: "system",
             content: `${mentor_system_message}
-            Use this topic source only when responding to the student ${topicDescription}`
+            Use this topic study sheet only when responding to the student ${topicDescription}`
           },
           {
             role: "user",
@@ -397,7 +407,7 @@ Next, ask the student if they would like to change anything or if they would ins
 
             You're doing well with a 50% correct recall before we went through the hints. Keep it up! 📈
 
-            Your next recall session is due in 2 days. 📅 Review the topic material now to help reinforce and expand your memory on Venus. 📚
+            Your next recall session is due in 2 days. 📅 Review the topic study sheet now to help reinforce and expand your memory on Venus. 📚
 
             Take some time to go over the details, especially the parts about Venus's past climate and its atmospheric composition. This will set us up perfectly for enhancing your understanding in our upcoming session.
             """
@@ -442,7 +452,7 @@ Next, ask the student if they would like to change anything or if they would ins
 
     case "recall_finished_hide_input":
     case "reviewing":
-      // SHOW FULL TOPIC DESCRIPTION ///////////////////////////////
+      // SHOW FULL study sheet ///////////////////////////////
 
       chatStreamResponse = await mistral.chatStream({
         model: defaultModel,

@@ -35,7 +35,7 @@ export default function ChatPage() {
               {localStorage.getItem("tutorialDone") === "true" ? (
                 <>
                   <p>
-                    Please create a topic by describing it below and/or upload a
+                    Create a new topic by describing it below and/or upload a
                     file using the ⨁ button.
                   </p>
                   <div className="mt-3 border-t-2 pt-5">

@@ -177,7 +177,7 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
     .map(item => `<BEGIN SOURCE>\n${item.content}\n</END SOURCE>`)
     .join("\n\n")
 
-  return `Use the following sources to create a detailed topic description. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
+  return `Use the following sources to create a detailed study sheet. If the source does not provide enough material to create a comprahensive study topic, ask the user to provide additional information."\n\n${retrievalText}`
 }
 
 export async function buildGoogleGeminiFinalMessages(

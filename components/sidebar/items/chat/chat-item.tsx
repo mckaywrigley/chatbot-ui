@@ -48,7 +48,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       onClick={handleClick}
     >
       <DynamicPieChart
-        value={(chat as ExtendedChat).predictedRecall * 100}
+        value={(chat as ExtendedChat).predictedRecall}
         scale={0.7}
       />
 
