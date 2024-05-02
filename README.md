@@ -46,6 +46,12 @@ npm run db-push
 
 to apply the latest migrations to your live database.
 
+## Running HackerGPT Locally: Important Note
+
+The primary purpose of this GitHub repo is to show what's behind HackerGPT in order to build trust.
+
+You can run HackerGPT locally, but the RAG system, plugins, and more will only work with proper and complex configuration.
+
 ## Local Quickstart
 
 Follow these steps to get your own Chatbot UI instance running locally.
@@ -246,14 +252,11 @@ In environment variables, add the following from the values you got above:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `NEXT_PUBLIC_OLLAMA_URL` (only needed when using local Ollama models; default: `http://localhost:11434`)
 
 You can also add API keys as environment variables.
 
 - `OPENAI_API_KEY`
-- `AZURE_OPENAI_API_KEY`
-- `AZURE_OPENAI_ENDPOINT`
-- `AZURE_GPT_45_VISION_NAME`
+- `OPENROUTER_API_KEY`
 
 For the full list of environment variables, refer to the '.env.local.example' file. If the environment variables are set for API keys, it will disable the input in the user settings.
 
