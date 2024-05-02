@@ -46,7 +46,7 @@ npm run db-push
 
 to apply the latest migrations to your live database.
 
-## Running HackerGPT Locally: Important Note
+## Important Note About Running HackerGPT Locally
 
 The primary purpose of this GitHub repo is to show what's behind HackerGPT in order to build trust.
 
