@@ -214,10 +214,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatSecondaryButtons />
       </div>
 
-      <div className="bg-pixelspace-gray-90 text-pixelspace-gray-3 flex max-h-[50px] min-h-[50px] w-full items-center justify-center px-20 text-[20px] font-normal leading-[43.20px]">
-        <p className={`${collapsedClass} truncate px-[32px] text-center`}>
-          {selectedChat?.name || "Chat"}
-        </p>
+      <div className="bg-pixelspace-gray-90 text-pixelspace-gray-3 flex max-h-[50px] min-h-[50px] w-full px-20 text-[20px] font-normal leading-[43.20px]">
+        <p>{selectedChat?.name || "Chat"}</p>
       </div>
 
       <div
