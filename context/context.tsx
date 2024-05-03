@@ -98,6 +98,10 @@ interface ChatbotUIContext {
   selectedPlugin: PluginID
   setSelectedPlugin: Dispatch<SetStateAction<PluginID>>
 
+  // RAG
+  isRagEnabled: boolean
+  setIsRagEnabled: Dispatch<SetStateAction<boolean>>
+
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
   setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
@@ -227,6 +231,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setSelectedPluginType: () => {},
   selectedPlugin: PluginID.NONE,
   setSelectedPlugin: () => {},
+
+  // RAG
+  isRagEnabled: false,
+  setIsRagEnabled: () => {},
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: false,

@@ -104,6 +104,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedPluginType, setSelectedPluginType] = useState("")
   const [selectedPlugin, setSelectedPlugin] = useState(PluginID.NONE)
 
+  // RAG ENABLED STORE
+  const [isRagEnabled, setIsRagEnabled] = useState<boolean>(true)
+
   // CHAT INPUT COMMAND STORE
   const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
   const [slashCommand, setSlashCommand] = useState("")
@@ -293,6 +296,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setSelectedPluginType,
         selectedPlugin,
         setSelectedPlugin,
+
+        // RAG ENABLED STORE
+        isRagEnabled: isRagEnabled,
+        setIsRagEnabled: setIsRagEnabled,
 
         // CHAT INPUT COMMAND STORE
         isPromptPickerOpen,

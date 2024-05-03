@@ -46,6 +46,8 @@ export async function POST(request: Request) {
     isContinuation: boolean
   }
 
+  const isRagEnabled = json.isRagEnabled ?? true
+
   try {
     const profile = await getServerProfile()
 
@@ -138,7 +140,7 @@ export async function POST(request: Request) {
       ? cleanedMessages[cleanedMessages.length - 3]
       : cleanedMessages[cleanedMessages.length - 2]
 
-    if (!isRetrieval) {
+    if (!isRetrieval && isRagEnabled) {
       if (
         llmConfig.usePinecone &&
         cleanedMessages.length > 0 &&

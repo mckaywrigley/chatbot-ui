@@ -72,7 +72,8 @@ export const useChatHandler = () => {
     isAtPickerOpen,
     isToolPickerOpen,
     selectedPlugin,
-    subscription
+    subscription,
+    isRagEnabled
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -430,6 +431,7 @@ export const useChatHandler = () => {
           modelData!,
           tempAssistantChatMessage,
           isRegeneration,
+          isRagEnabled,
           isContinuation,
           newAbortController,
           newMessageImages,

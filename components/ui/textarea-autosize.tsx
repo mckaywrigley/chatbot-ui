@@ -5,6 +5,7 @@ import ReactTextareaAutosize from "react-textarea-autosize"
 interface TextareaAutosizeProps {
   value: string
   onValueChange: (value: string) => void
+  onClick?: () => void
 
   textareaRef?: React.RefObject<HTMLTextAreaElement>
   className?: string
@@ -23,6 +24,7 @@ interface TextareaAutosizeProps {
 export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
   value,
   onValueChange,
+  onClick,
   disabled,
   textareaRef,
   className,
@@ -42,6 +44,7 @@ export const TextareaAutosize: FC<TextareaAutosizeProps> = ({
         "bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-2 px-3 py-2 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
+      onClick={onClick}
       minRows={minRows}
       maxRows={minRows > maxRows ? minRows : maxRows}
       placeholder={placeholder}

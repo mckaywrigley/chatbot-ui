@@ -141,6 +141,7 @@ export const handleHostedChat = async (
   modelData: LLM,
   tempAssistantChatMessage: ChatMessage,
   isRegeneration: boolean,
+  isRagEnabled: boolean,
   isContinuation: boolean,
   newAbortController: AbortController,
   newMessageImages: MessageImage[],
@@ -175,7 +176,8 @@ export const handleHostedChat = async (
     selectedPlugin: selectedPlugin,
     isRetrieval:
       payload.messageFileItems && payload.messageFileItems.length > 0,
-    isContinuation
+    isContinuation,
+    isRagEnabled
   }
 
   const response = await fetchChatResponse(

@@ -261,7 +261,7 @@ export async function handleDnsxRequest(
           ;(requestBody as any)[key] = value
         }
       }
-      console.log(requestBody)
+
       sendMessage("🚀 Starting the scan. It might take a minute.", true)
 
       const intervalId = setInterval(() => {

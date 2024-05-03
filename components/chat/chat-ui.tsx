@@ -134,8 +134,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       feedback: fetchMessage.feedback[0] ?? undefined
     }))
 
-    console.log(reformatedMessages)
-
     setChatMessages(reformatedMessages)
   }
 

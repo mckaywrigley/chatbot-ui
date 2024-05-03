@@ -6,8 +6,12 @@ import { cn } from "@/lib/utils"
 import { PluginID } from "@/types/plugins"
 import {
   IconBolt,
+  IconBook,
+  IconBookOff,
+  IconHelp,
   IconPaperclip,
   IconPlayerStopFilled,
+  IconCirclePlus,
   IconPuzzle,
   IconPuzzleOff,
   IconSend
@@ -17,17 +21,20 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { WithTooltip } from "../ui/with-tooltip"
 import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { EnhancedMenuPicker } from "./enhance-menu"
+import { Icon } from "@radix-ui/react-select"
 
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
   const { t } = useTranslation()
+  const TOOLTIP_DELAY = 1000
 
   useHotkey("l", () => {
     handleFocusChatInput()
@@ -37,6 +44,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [showConfirmationDialog, setShowConfirmationDialog] =
     useState<boolean>(false)
   const [currentFile, setCurrentFile] = useState<File | null>(null)
+
+  const [optionsCollapsed, setOptionsCollapsed] = useState(false)
+  const [showMobileHelp, setShowMobileHelp] = useState(false)
 
   const useIsMobile = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
@@ -76,7 +86,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setSelectedTools,
     isEnhancedMenuOpen,
     setIsEnhancedMenuOpen,
-    selectedPlugin
+    selectedPlugin,
+    isRagEnabled: isRagEnabled,
+    setIsRagEnabled: setIsRagEnabled
   } = useContext(ChatbotUIContext)
 
   const {
@@ -88,6 +100,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const handleToggleEnhancedMenu = () => {
     setIsEnhancedMenuOpen(!isEnhancedMenuOpen)
+  }
+
+  const handleToggleRAG = (e: React.MouseEvent) => {
+    setIsRagEnabled(!isRagEnabled)
   }
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -118,14 +134,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
-  }, [selectedPreset, selectedAssistant, handleFocusChatInput])
+  }, [selectedPreset, selectedAssistant])
+
+  useEffect(() => {
+    if (isTyping) {
+      setOptionsCollapsed(true)
+    }
+  }, [isTyping])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    setOptionsCollapsed(true)
+
     if (!isTyping && event.key === "Enter" && !event.shiftKey && !isMobile) {
       event.preventDefault()
       if (!isGenerating) {
         setIsPromptPickerOpen(false)
-        handleSendMessage(userInput, chatMessages, false)
+        handleSendMessage(userInput, chatMessages, false, false)
       }
     }
 
@@ -220,6 +244,96 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  const ToolOptions = () => (
+    <>
+      <div
+        className="flex flex-row items-center"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <WithTooltip
+          delayDuration={TOOLTIP_DELAY}
+          side="top"
+          display={
+            <div className="flex flex-col">
+              <p className="font-medium">Upload a File</p>
+            </div>
+          }
+          trigger={
+            <IconPaperclip
+              className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
+              size={32}
+            />
+          }
+        />
+      </div>
+      <div
+        className="flex flex-row items-center"
+        onClick={handleToggleEnhancedMenu}
+      >
+        <WithTooltip
+          delayDuration={TOOLTIP_DELAY}
+          side="top"
+          display={
+            <div className="flex flex-col">
+              <p className="font-medium">Show/Hide Plugins Menu</p>
+            </div>
+          }
+          trigger={
+            isEnhancedMenuOpen ? (
+              <IconPuzzle
+                className="bottom-[12px] left-12 cursor-pointer p-1 hover:opacity-50"
+                size={32}
+              />
+            ) : (
+              <IconPuzzleOff
+                className="bottom-[12px] left-12 cursor-pointer p-1 opacity-50 hover:opacity-100"
+                size={32}
+              />
+            )
+          }
+        />
+      </div>
+      <div className="flex flex-row items-center" onClick={handleToggleRAG}>
+        <WithTooltip
+          delayDuration={TOOLTIP_DELAY}
+          side="top"
+          display={
+            <div className="flex flex-col">
+              <p className="font-medium">Enable/Disable Enhanced Search</p>
+              <p className="text-sm opacity-80">
+                Enhanced Search adds curated
+                <br />
+                HackerGPT knowledge to the Model
+              </p>
+            </div>
+          }
+          trigger={
+            isRagEnabled &&
+            chatSettings?.model &&
+            chatSettings?.model !== "gpt-4-turbo-preview" ? (
+              <IconBook
+                className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
+                size={32}
+              />
+            ) : (
+              <IconBookOff
+                className="bottom-[12px] cursor-pointer p-1 opacity-50 hover:opacity-100"
+                size={32}
+              />
+            )
+          }
+        />
+      </div>
+      {isMobile && (
+        <IconHelp
+          className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
+          size={32}
+          onClick={() => setShowMobileHelp(true)}
+        />
+      )}
+    </>
+  )
+
   return (
     <>
       <Modal isOpen={showConfirmationDialog}>
@@ -247,6 +361,70 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 Convert
               </button>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={showMobileHelp}>
+        <div className="bg-background/20 size-screen fixed inset-0 z-50 backdrop-blur-sm"></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-background w-full max-w-md rounded-md p-6 text-center">
+            <h3 className="mb-4 text-lg font-semibold">Chat Input Options</h3>
+            <div className="flex flex-col text-left">
+              <div
+                className="flex flex-row items-center"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="ml-2 flex flex-col">
+                  <span className="mb-1 flex flex-row items-center">
+                    <IconPaperclip size={32} />
+                    <span className="ml-2">Upload a file</span>
+                  </span>
+                </div>
+              </div>
+              <div
+                className="mt-4 flex flex-row items-center"
+                onClick={handleToggleEnhancedMenu}
+              >
+                <div className="ml-2 flex flex-col">
+                  <span className="mb-1 flex flex-row items-center">
+                    {isEnhancedMenuOpen ? (
+                      <IconPuzzle size={32} />
+                    ) : (
+                      <IconPuzzleOff size={32} />
+                    )}
+                    <span className="ml-2">Show/Hide the plugins menu</span>
+                  </span>
+                </div>
+              </div>
+              <div
+                className="mt-4 flex flex-row items-center"
+                onClick={handleToggleRAG}
+              >
+                <div className="ml-2 flex flex-col">
+                  <span className="mb-1 flex  flex-row items-center">
+                    {isRagEnabled &&
+                    chatSettings?.model &&
+                    chatSettings?.model !== "gpt-4-turbo-preview" ? (
+                      <IconBook size={32} />
+                    ) : (
+                      <IconBookOff size={32} />
+                    )}
+                    <span className="ml-2">Enable/Disable Enhanced Search</span>
+                  </span>
+                  <p className="text-sm opacity-90">
+                    The enhanced search adds curated HackerGPT knowledge to the
+                    Model improving the answers
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button
+              className="mt-4 rounded-md bg-gray-300 px-4 py-2 text-black hover:bg-gray-400"
+              onClick={() => setShowMobileHelp(false)}
+            >
+              Close
+            </button>
           </div>
         </div>
       </Modal>
@@ -289,30 +467,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           <ChatCommandInput />
         </div>
 
-        <>
-          {isEnhancedMenuOpen ? (
-            <IconPuzzle
-              className="absolute bottom-[12px] left-12 cursor-pointer p-1 hover:opacity-50"
-              size={32}
-              onClick={handleToggleEnhancedMenu}
-            />
-          ) : (
-            <IconPuzzleOff
-              className="absolute bottom-[12px] left-12 cursor-pointer p-1 opacity-50 hover:opacity-100"
-              size={32}
-              onClick={handleToggleEnhancedMenu}
-            />
-          )}
-          <IconPaperclip
-            className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
-          />
-
-          {/* Hidden input to select files from device */}
+        <div className="ml-3 flex flex-row">
           <Input
             ref={fileInputRef}
-            className="hidden"
+            className="hidden w-0"
             type="file"
             onChange={e => {
               if (!e.target.files) return
@@ -320,11 +478,23 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             }}
             accept={filesToAccept}
           />
-        </>
+
+          {isMobile && optionsCollapsed && (
+            <div className="flex flex-row items-center">
+              <IconCirclePlus
+                className="cursor-pointer p-1 hover:opacity-50"
+                onClick={() => setOptionsCollapsed(false)}
+                size={34}
+              />
+            </div>
+          )}
+
+          {(!isMobile || !optionsCollapsed) && <ToolOptions />}
+        </div>
 
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-24 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={
             isMobile
               ? t(`Message. Type "#" for files.`)
@@ -338,6 +508,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onPaste={handlePaste}
           onCompositionStart={() => setIsTyping(true)}
           onCompositionEnd={() => setIsTyping(false)}
+          onClick={() => setOptionsCollapsed(true)}
         />
 
         <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
@@ -354,8 +525,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 !userInput && "cursor-not-allowed opacity-50"
               )}
               onClick={() => {
+                if (isTyping) setOptionsCollapsed(true)
                 if (!userInput) return
-
                 handleSendMessage(userInput, chatMessages, false)
               }}
               size={30}
