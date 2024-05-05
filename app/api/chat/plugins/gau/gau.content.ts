@@ -10,7 +10,10 @@ import {
 
 import { displayHelpGuideForGau } from "../plugin-helper/help-guides"
 import { transformUserQueryToGAUCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface GauParams {
   targets: string[]
@@ -280,6 +283,14 @@ export async function handleGauRequest(
             Authorization: `${process.env.SECRET_AUTH_PLUGINS}`
           }
         })
+
+        const errorHandling = handlePluginError(
+          gauResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         let gauData = await gauResponse.text()
 

@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForDnsx } from "../plugin-helper/help-guides"
 import { transformUserQueryToDnsxCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 import {
   DnsxParams,
   dnsxBooleanFlagDefinitions,
@@ -281,12 +284,13 @@ export async function handleDnsxRequest(
           body: JSON.stringify(requestBody)
         })
 
-        if (dnsxResponse.status !== 200) {
-          const errorMessage = `🚨 An error occurred while running your query. Please try again or check your input.`
-          sendMessage(`${errorMessage}`, true)
-          controller.close()
-          return new Response(errorMessage)
-        }
+        const errorHandling = handlePluginError(
+          dnsxResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         let dnsxData = await dnsxResponse.json()
         dnsxData = dnsxData.output
@@ -306,7 +310,7 @@ export async function handleDnsxRequest(
 
         const target = params.list ? params.list : params.domain
         const formattedResults = formatScanResults({
-          pluginName: "dnsx",
+          pluginName: "dnsX",
           pluginUrl: pluginUrls.DNSX,
           target: target || "",
           results: dnsxData

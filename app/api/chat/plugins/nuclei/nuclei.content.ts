@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForNuclei } from "../plugin-helper/help-guides"
 import { transformUserQueryToNucleiCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface NucleiParams {
   // TARGET
@@ -903,6 +906,14 @@ export async function handleNucleiRequest(
           },
           body: JSON.stringify(requestBody)
         })
+
+        const errorHandling = handlePluginError(
+          nucleiResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         const jsonResponse = await nucleiResponse.json()
         const outputString = jsonResponse.output

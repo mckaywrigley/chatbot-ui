@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForAlterx } from "../plugin-helper/help-guides"
 import { transformUserQueryToAlterxCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface AlterxParams {
   list: string[]
@@ -202,11 +205,6 @@ export async function handleAlterxRequest(
           fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
-      sendMessage(
-        "🚀 Initiating the wordlist generation. This may take a moment.",
-        true
-      )
-
       let isFetching = true
 
       const intervalId = setInterval(() => {
@@ -224,6 +222,15 @@ export async function handleAlterxRequest(
           },
           body: JSON.stringify(requestBody)
         })
+
+        const errorHandling = handlePluginError(
+          alterxResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
+
         isFetching = false
 
         const jsonResponse = await alterxResponse.json()

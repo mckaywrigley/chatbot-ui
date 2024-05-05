@@ -9,7 +9,10 @@ import {
 
 import { displayHelpGuideForCvemap } from "../plugin-helper/help-guides"
 import { transformUserQueryToCvemapCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 import {
   CvemapParams,
   cvemapBooleanFlagDefinitions,
@@ -219,6 +222,14 @@ export async function handleCvemapRequest(
           },
           body: JSON.stringify(requestBody)
         })
+
+        const errorHandling = handlePluginError(
+          cvemapResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         let cvemapData = await cvemapResponse.text()
         cvemapData = processCvemapData(cvemapData)

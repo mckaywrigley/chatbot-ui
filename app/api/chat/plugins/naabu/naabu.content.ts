@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForNaabu } from "../plugin-helper/help-guides"
 import { transformUserQueryToNaabuCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface NaabuParams {
   host: string[] | string
@@ -357,11 +360,13 @@ export async function handleNaabuRequest(
           body: JSON.stringify(requestBody)
         })
 
-        if (!naabuResponse.ok) {
-          throw new Error(
-            `HTTP error! status: ${naabuResponse.status}, ${naabuResponse.statusText}`
-          )
-        }
+        const errorHandling = handlePluginError(
+          naabuResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         const jsonResponse = await naabuResponse.json()
         const outputString = jsonResponse.output

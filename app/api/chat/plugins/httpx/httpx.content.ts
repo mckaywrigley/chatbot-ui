@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForHttpx } from "../plugin-helper/help-guides"
 import { transformUserQueryToHttpxCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface HttpxParams {
   target: string[]
@@ -939,6 +942,14 @@ export async function handleHttpxRequest(
           },
           body: JSON.stringify(requestBody)
         })
+
+        const errorHandling = handlePluginError(
+          httpxResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         const jsonResponse = await httpxResponse.json()
         const outputString = jsonResponse.output

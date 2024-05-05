@@ -12,7 +12,10 @@ import {
 
 import { displayHelpGuideForKatana } from "../plugin-helper/help-guides"
 import { transformUserQueryToKatanaCommand } from "../plugin-helper/transform-query-to-command"
-import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
+import {
+  handlePluginError,
+  handlePluginStreamError
+} from "../plugin-helper/plugin-stream"
 
 interface KatanaParams {
   urls: string[]
@@ -265,8 +268,8 @@ const parseKatanaCommandLine = (input: string): KatanaParams => {
       case "-timeout":
         if (args[i + 1] && isInteger(args[i + 1])) {
           let timeoutValue = parseInt(args[++i])
-          if (timeoutValue > 90) {
-            params.error = `🚨 Timeout value exceeds the maximum limit of 90 seconds`
+          if (timeoutValue > 180) {
+            params.error = `🚨 Timeout value exceeds the maximum limit of 180 seconds`
             return params
           }
           params.timeout = timeoutValue
@@ -388,11 +391,11 @@ export async function handleKatanaRequest(
           fileData?.map(file => file.fileContent).join("\n") || ""
       }
 
-      sendMessage("🚀 Starting the scan. It might take a minute.", true)
+      sendMessage("🚀 Starting the scan. It might take a minute or two.", true)
 
       const intervalId = setInterval(() => {
         sendMessage("⏳ Still working on it, please hold on...", true)
-      }, 15000)
+      }, 20000)
 
       try {
         const katanaResponse = await fetch(katanaUrl, {
@@ -404,9 +407,13 @@ export async function handleKatanaRequest(
           body: JSON.stringify(requestBody)
         })
 
-        if (!katanaResponse.ok) {
-          throw new Error(`HTTP error! status: ${katanaResponse.status}`)
-        }
+        const errorHandling = handlePluginError(
+          katanaResponse,
+          intervalId,
+          controller,
+          sendMessage
+        )
+        await errorHandling()
 
         const jsonResponse = await katanaResponse.json()
         const outputString = jsonResponse.output
