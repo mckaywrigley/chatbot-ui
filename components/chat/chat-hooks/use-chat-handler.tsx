@@ -21,9 +21,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
-import { create } from "domain"
 import { createMessageFeedback } from "@/db/message-feedback"
-import { isCommand } from "@/app/api/chat/plugins/chatpluginhandlers"
 
 export const useChatHandler = () => {
   const router = useRouter()
