@@ -65,7 +65,7 @@
     "@vercel/analytics": "^1.2.2",
     "@vercel/edge-config": "^1.1.0",
     "@xenova/transformers": "^2.13.4",
-    "ai": "^3.0.7",
+    "ai": "^3.1.1",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^0.2.0",
