@@ -3,7 +3,6 @@ import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
-import fs from "fs"
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -70,11 +69,7 @@ export async function POST(request: Request) {
 
       chunks = openaiFileItems
     } else if (embeddingsProvider === "local") {
-      console.log("USER INPUT", userInput)
       const localEmbedding = await generateLocalEmbedding(userInput)
-      // const localEmbedding = fs.readFileSync(
-      //     '/Users/raphaelfeigl/Desktop/embeddings_local/embeddings/embeddings.json', 'utf-8')
-      console.log("loacalEmbedding", localEmbedding.length)
 
       const { data: localFileItems, error: localFileItemsError } =
         await supabaseAdmin.rpc("match_file_items_local", {
@@ -88,7 +83,6 @@ export async function POST(request: Request) {
       }
 
       chunks = localFileItems
-      console.log("CHUNKS", chunks)
     }
 
     const mostSimilarChunks = chunks?.sort(
