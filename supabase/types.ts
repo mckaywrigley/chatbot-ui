@@ -562,6 +562,30 @@ export type Database = {
           },
         ]
       }
+      custom_context: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          local_embedding: string | null
+          tokens: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          local_embedding?: string | null
+          tokens: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          local_embedding?: string | null
+          tokens?: number
+        }
+        Relationships: []
+      }
       file_items: {
         Row: {
           content: string
@@ -1504,6 +1528,18 @@ export type Database = {
         }
         Returns: Record<string, unknown>
       }
+      match_custom_context_local: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          content: string
+          tokens: number
+          similarity: number
+        }[]
+      }
       match_file_items_local: {
         Args: {
           query_embedding: string
@@ -1700,7 +1736,7 @@ export type Database = {
         Args: {
           name: string
         }
-        Returns: string[]
+        Returns: unknown
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>

@@ -13,6 +13,7 @@ import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
+  handleContextRetrieval,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
@@ -244,6 +245,11 @@ export const useChatHandler = () => {
           newMessageFiles,
           chatFiles,
           chatSettings!.embeddingsProvider,
+          sourceCount
+        )
+      } else {
+        retrievedFileItems = await handleContextRetrieval(
+          userInput,
           sourceCount
         )
       }

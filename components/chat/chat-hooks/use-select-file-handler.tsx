@@ -4,6 +4,7 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
+// import fs from 'fs'
 
 export const ACCEPTED_FILE_TYPES = [
   "text/csv",
@@ -45,7 +46,16 @@ export const useSelectFileHandler = () => {
     )
   }
 
+  // const handleSelectDeviceFile = async () => {
   const handleSelectDeviceFile = async (file: File) => {
+    // const fileCustom = fs.readFileSync(
+    //     '/Users/raphaelfeigl/Desktop/embeddings_local/embeddings/embeddings.json', 'utf-8')
+
+    console.log("FILE NAME", file.name)
+    console.log("FILE TYPE", file.type)
+    console.log("FILE SIZE", file.size)
+    console.log("FILE BUFFER", file.arrayBuffer())
+
     if (!profile || !selectedWorkspace || !chatSettings) return
 
     setShowFilesDisplay(true)
