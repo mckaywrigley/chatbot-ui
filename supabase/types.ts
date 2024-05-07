@@ -562,30 +562,6 @@ export type Database = {
           },
         ]
       }
-      custom_context: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          local_embedding: string | null
-          tokens: number
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          local_embedding?: string | null
-          tokens: number
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          local_embedding?: string | null
-          tokens?: number
-        }
-        Relationships: []
-      }
       file_items: {
         Row: {
           content: string
@@ -629,6 +605,60 @@ export type Database = {
             columns: ["file_id"]
             isOneToOne: false
             referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_items_custom: {
+        Row: {
+          content: string
+          created_at: string
+          file_id: string
+          id: string
+          local_embedding: string | null
+          openai_embedding: string | null
+          sharing: string
+          tokens: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          file_id: string
+          id?: string
+          local_embedding?: string | null
+          openai_embedding?: string | null
+          sharing?: string
+          tokens: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          file_id?: string
+          id?: string
+          local_embedding?: string | null
+          openai_embedding?: string | null
+          sharing?: string
+          tokens?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_items_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files_custom"
             referencedColumns: ["id"]
           },
           {
@@ -686,7 +716,113 @@ export type Database = {
           },
         ]
       }
+      file_workspaces_custom: {
+        Row: {
+          created_at: string
+          file_id: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_id: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          file_id?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_workspaces_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files_custom"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_workspaces_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_workspaces_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       files: {
+        Row: {
+          created_at: string
+          description: string
+          file_path: string
+          folder_id: string | null
+          id: string
+          name: string
+          sharing: string
+          size: number
+          tokens: number
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          file_path: string
+          folder_id?: string | null
+          id?: string
+          name: string
+          sharing?: string
+          size: number
+          tokens: number
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          file_path?: string
+          folder_id?: string | null
+          id?: string
+          name?: string
+          sharing?: string
+          size?: number
+          tokens?: number
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files_custom: {
         Row: {
           created_at: string
           description: string
@@ -1528,13 +1664,15 @@ export type Database = {
         }
         Returns: Record<string, unknown>
       }
-      match_custom_context_local: {
+      match_file_items_custom_local: {
         Args: {
           query_embedding: string
           match_count?: number
+          file_ids?: string[]
         }
         Returns: {
           id: string
+          file_id: string
           content: string
           tokens: number
           similarity: number
