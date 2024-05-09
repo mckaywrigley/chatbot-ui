@@ -96,7 +96,7 @@ export async function POST(request: Request) {
     } else {
       if (useOpenRouter) {
         providerUrl = llmConfig.openrouter.url
-        selectedModel = llmConfig.models.hackerGPT_default
+        selectedModel = llmConfig.models.hackerGPT_default_openrouter
         selectedStandaloneQuestionModel =
           llmConfig.models.hackerGPT_standalone_question_openrouter
         providerHeaders = {
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
         }
       } else {
         providerUrl = llmConfig.together.url
-        selectedModel = llmConfig.models.hackerGPT_RAG_together
+        selectedModel = llmConfig.models.hackerGPT_default_together
         selectedStandaloneQuestionModel =
           llmConfig.models.hackerGPT_standalone_question_together
         providerHeaders = {
