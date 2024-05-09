@@ -6,8 +6,7 @@ import {
   createGKEHeaders,
   formatScanResults,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForAlterx } from "../plugin-helper/help-guides"
@@ -23,6 +22,7 @@ interface AlterxParams {
   enrich: boolean
   limit: number
   payload: Map<string, string>
+  output: string
   error: string | null
 }
 
@@ -38,6 +38,7 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
     enrich: false,
     limit: 0,
     payload: new Map(),
+    output: "",
     error: null
   }
 
@@ -93,6 +94,15 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
           params.limit = parseInt(args[++i])
         } else {
           params.error = `🚨 Invalid limit value`
+          return params
+        }
+        break
+      case "-o":
+      case "-output":
+        if (i + 1 < args.length) {
+          params.output = args[++i]
+        } else {
+          params.error = `🚨 Output flag provided without value`
           return params
         }
         break
@@ -194,7 +204,7 @@ export async function handleAlterxRequest(
           (Array.isArray(value) && value.length > 0) ||
           (typeof value === "boolean" && value) ||
           (typeof value === "number" && value > 0) ||
-          (typeof value === "string" && value.length > 0)
+          (typeof value === "string" && value.length > 0 && key !== "output")
         ) {
           ;(requestBody as any)[key] = value
         }
@@ -236,8 +246,15 @@ export async function handleAlterxRequest(
         const jsonResponse = await alterxResponse.json()
         const outputString = jsonResponse.output
 
+        // TODO: Subdomains from GKE should be transformed to the file output if the user provided an output flag.
+        // Filename should be the same as the output flag value if it is extension .txt and uses the correct format.
+        // If not, we will use a default filename like subdomains.txt.
+        if (params.output) {
+          console.log(`Output flag provided: ${params.output}`)
+          console.log(outputString)
+        }
+
         let subdomains = processSubdomains(outputString)
-        subdomains = truncateData(subdomains, 300000)
 
         if (!subdomains || subdomains.length === 0) {
           const noDataMessage = `🔍 Unable to generate wordlist for "${params.list.join(

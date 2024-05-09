@@ -3,8 +3,7 @@ import { pluginUrls } from "@/types/plugins"
 import {
   createGKEHeaders,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForSubfinder } from "../plugin-helper/help-guides"

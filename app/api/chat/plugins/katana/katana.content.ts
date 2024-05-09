@@ -6,8 +6,7 @@ import {
   createGKEHeaders,
   formatScanResults,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForKatana } from "../plugin-helper/help-guides"
@@ -419,7 +418,6 @@ export async function handleKatanaRequest(
         const outputString = jsonResponse.output
 
         let urlsFormatted = processurls(outputString)
-        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&

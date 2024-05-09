@@ -4,8 +4,7 @@ import { pluginUrls } from "@/types/plugins"
 import {
   createGKEHeaders,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForGoLinkFinder } from "../plugin-helper/help-guides"
@@ -165,7 +164,6 @@ export async function handleGolinkfinderRequest(
         let golinkfinderData = await golinkfinderResponse.text()
 
         let urlsFormatted = processGoLinkFinderData(golinkfinderData)
-        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 Didn't find any URLs based on the provided command.`

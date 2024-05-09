@@ -6,8 +6,7 @@ import {
   createGKEHeaders,
   formatScanResults,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForHttpx } from "../plugin-helper/help-guides"
@@ -955,7 +954,6 @@ export async function handleHttpxRequest(
         const outputString = jsonResponse.output
 
         let urlsFormatted = processurls(outputString)
-        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&

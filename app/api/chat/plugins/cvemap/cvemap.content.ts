@@ -3,8 +3,7 @@ import { Message } from "@/types/chat"
 import {
   createGKEHeaders,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForCvemap } from "../plugin-helper/help-guides"
@@ -233,7 +232,6 @@ export async function handleCvemapRequest(
 
         let cvemapData = await cvemapResponse.text()
         cvemapData = processCvemapData(cvemapData)
-        cvemapData = truncateData(cvemapData, 300000)
 
         if (!cvemapData || cvemapData.length <= 300) {
           sendMessage(

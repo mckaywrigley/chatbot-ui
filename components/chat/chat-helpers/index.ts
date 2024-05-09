@@ -6,10 +6,6 @@ import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, deleteMessage, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
-import {
-  buildFinalMessages
-  // buildGoogleGeminiFinalMessages
-} from "@/lib/build-prompt"
 import { consumeReadableStream } from "@/lib/consume-stream"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
@@ -20,6 +16,7 @@ import {
   LLM,
   MessageImage
 } from "@/types"
+import { buildFinalMessages } from "@/lib/build-prompt"
 import { PluginID } from "@/types/plugins"
 import React from "react"
 import { toast } from "sonner"
@@ -221,6 +218,15 @@ export const handleHostedPluginsChat = async (
   selectedPlugin: PluginID,
   fileData?: { fileName: string; fileContent: string }[]
 ) => {
+  let formattedMessages = []
+
+  formattedMessages = await buildFinalMessages(
+    payload,
+    profile,
+    chatImages,
+    selectedPlugin
+  )
+
   const apiEndpoint = "/api/v2/chat/plugins"
 
   const requestBody: any = {

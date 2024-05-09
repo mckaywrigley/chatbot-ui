@@ -6,7 +6,6 @@ import {
   formatScanResults,
   getCommandFromAIResponse,
   processAIResponseAndUpdateMessage,
-  truncateData,
   processGKEData
 } from "../chatpluginhandlers"
 
@@ -295,7 +294,6 @@ export async function handleDnsxRequest(
         let dnsxData = await dnsxResponse.json()
         dnsxData = dnsxData.output
         dnsxData = processGKEData(dnsxData)
-        dnsxData = truncateData(dnsxData, 300000)
 
         if (!dnsxData || dnsxData.length === 0) {
           const noDataMessage = `🔍 No results found with the given parameters.`

@@ -216,26 +216,6 @@ export function formatScanResults({
   )
 }
 
-export function truncateData(data: any, maxLength: number): any {
-  if (Array.isArray(data)) {
-    if (data.length > maxLength) {
-      const truncatedArray = data.slice(0, maxLength)
-      truncatedArray.push("... [output truncated]")
-      return truncatedArray
-    } else {
-      return data
-    }
-  } else if (typeof data === "string") {
-    if (data.length > maxLength) {
-      return `${data.slice(0, maxLength)}\n... [output truncated]`
-    } else {
-      return data
-    }
-  } else {
-    return data
-  }
-}
-
 export function createGKEHeaders(): Headers {
   const headers = new Headers()
   headers.set("Content-Type", "text/event-stream")

@@ -6,7 +6,6 @@
 //   formatScanResults,
 //   getCommandFromAIResponse,
 //   processAIResponseAndUpdateMessage,
-//   truncateData,
 //   processGKEData
 // } from "../chatpluginhandlers"
 
@@ -299,7 +298,6 @@
 
 //         amassData = amassData.output
 //         amassData = processGKEData(amassData)
-//         amassData = truncateData(amassData, 300000)
 
 //         if (!amassData || amassData.length === 0) {
 //           const noDataMessage = `🔍 No results found with the given parameters.`

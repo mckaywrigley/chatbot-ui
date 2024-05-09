@@ -4,8 +4,7 @@ import { pluginUrls } from "@/types/plugins"
 import {
   createGKEHeaders,
   getCommandFromAIResponse,
-  processAIResponseAndUpdateMessage,
-  truncateData
+  processAIResponseAndUpdateMessage
 } from "../chatpluginhandlers"
 
 import { displayHelpGuideForGau } from "../plugin-helper/help-guides"
@@ -295,7 +294,6 @@ export async function handleGauRequest(
         let gauData = await gauResponse.text()
 
         let urlsFormatted = processGauData(gauData)
-        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (!urlsFormatted || urlsFormatted.length === 0) {
           const noDataMessage = `🔍 Didn't find any URLs based on the provided command.`

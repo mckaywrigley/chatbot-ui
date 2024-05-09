@@ -6,7 +6,6 @@ import {
   formatScanResults,
   createGKEHeaders,
   ProcessAIResponseOptions,
-  truncateData,
   getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
@@ -919,7 +918,6 @@ export async function handleNucleiRequest(
         const outputString = jsonResponse.output
 
         let urlsFormatted = processurls(outputString)
-        urlsFormatted = truncateData(urlsFormatted, 300000)
 
         if (
           outputString &&

@@ -6,7 +6,6 @@ import {
   formatScanResults,
   createGKEHeaders,
   ProcessAIResponseOptions,
-  truncateData,
   getCommandFromAIResponse
 } from "../chatpluginhandlers"
 
@@ -372,7 +371,6 @@ export async function handleNaabuRequest(
         const outputString = jsonResponse.output
 
         let portsFormatted = processPorts(outputString)
-        portsFormatted = truncateData(portsFormatted, 300000)
 
         if (
           outputString &&

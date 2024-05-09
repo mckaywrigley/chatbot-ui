@@ -27,6 +27,7 @@ import { MessageActions } from "./message-actions"
 import MessageDetailedFeedback from "./message-detailed-feedback"
 import { MessageMarkdown } from "./message-markdown"
 import { MessageQuickFeedback } from "./message-quick-feedback"
+import { MessageTooLong } from "./message-too-long"
 
 const ICON_SIZE = 28
 
@@ -76,6 +77,10 @@ export const Message: FC<MessageProps> = ({
   } = useContext(ChatbotUIContext)
 
   const { handleSendMessage } = useChatHandler()
+
+  const messageSizeLimit = Number(
+    process.env.NEXT_PUBLIC_MESSAGE_SIZE_LIMIT || 30000
+  )
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -312,6 +317,14 @@ export const Message: FC<MessageProps> = ({
               value={editedMessage}
               onValueChange={setEditedMessage}
               maxRows={20}
+            />
+          ) : message.plugin !== null &&
+            message.role === "assistant" &&
+            message.content.length > messageSizeLimit ? (
+            <MessageTooLong
+              content={message.content}
+              plugin={message.plugin || ""}
+              id={message.id}
             />
           ) : (
             <MessageMarkdown content={message.content} />
