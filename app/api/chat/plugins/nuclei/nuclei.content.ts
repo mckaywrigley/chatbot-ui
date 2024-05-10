@@ -54,6 +54,7 @@ interface NucleiParams {
 
   // OUTPUT
   jsonl: boolean
+  output: string
 
   // CONFIGURATIONS
   followRedirects: boolean
@@ -114,7 +115,12 @@ interface NucleiRequestBody {
   type?: string
   exclude_type?: string
   template_condition?: string
+
+  // OUTPUT
   jsonl?: boolean
+  output?: string
+
+  // CONFIGURATIONS
   follow_redirects?: boolean
   follow_host_redirects?: boolean
   max_redirects?: number
@@ -181,6 +187,7 @@ const parseCommandLine = (input: string) => {
 
     // OUTPUT
     jsonl: false,
+    output: "",
 
     // CONFIGURATIONS
     followRedirects: false,
@@ -565,6 +572,10 @@ const parseCommandLine = (input: string) => {
       case "-j":
       case "-jsonl":
         params.jsonl = true
+        break
+      case "-output":
+        params.output = nextArg
+        i++
         break
       case "-fr":
       case "-follow-redirects":

@@ -56,6 +56,7 @@ const parseCommandLine = (
     cdn: false,
     asn: false,
     json: false,
+    output: "",
     error: null
   }
 
@@ -104,7 +105,7 @@ const parseCommandLine = (
               params[key] = rcodes
             } else {
               const fileExtension = nextArg.split(".").pop()?.toLowerCase()
-              if (fileExtension === "txt") {
+              if (fileExtension === "txt" && key !== "output") {
                 const fileContent = fileData?.find(
                   file => file.fileName === nextArg
                 )?.fileContent
@@ -121,7 +122,7 @@ const parseCommandLine = (
             }
           } else {
             const fileExtension = nextArg.split(".").pop()?.toLowerCase()
-            if (fileExtension === "txt") {
+            if (fileExtension === "txt" && key !== "output") {
               const fileContent = fileData?.find(
                 file => file.fileName === nextArg
               )?.fileContent
@@ -258,7 +259,7 @@ export async function handleDnsxRequest(
           (Array.isArray(value) && value.length > 0) ||
           (typeof value === "boolean" && value) ||
           (typeof value === "number" && value > 0) ||
-          (typeof value === "string" && value.length > 0)
+          (typeof value === "string" && value.length > 0 && key !== "output")
         ) {
           ;(requestBody as any)[key] = value
         }

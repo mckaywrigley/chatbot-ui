@@ -28,6 +28,7 @@ interface GauParams {
   includeSubdomains: boolean
   toDate: string
   verbose: boolean
+  output: string
   error: string | null
 }
 
@@ -50,6 +51,7 @@ const parseGauCommandLine = (input: string): GauParams => {
     includeSubdomains: false,
     toDate: "",
     verbose: false,
+    output: "",
     error: null
   }
 
@@ -140,6 +142,14 @@ const parseGauCommandLine = (input: string): GauParams => {
           params.toDate = args[++i]
           if (!isDateFormat(params.toDate)) {
             params.error = `🚨 Invalid date format for '--to' flag`
+            return params
+          }
+          break
+        case "--output":
+          if (args[++i]) {
+            params.output = args[i].trim()
+          } else {
+            params.error = `🚨 Output flag provided without value`
             return params
           }
           break
@@ -319,7 +329,7 @@ export async function handleGauRequest(
           '"\n\n' +
           "**Scan Date & Time**:" +
           ` ${formattedDateTime} (${timezone}) \n\n` +
-          "## Identified Urls:\n" +
+          "## Results:\n" +
           "```\n" +
           urlsFormatted.trim() +
           "\n" +

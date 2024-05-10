@@ -48,6 +48,7 @@ export const displayHelpGuideForCvemap = () => {
           -l, -limit int       limit the number of results to display (default 50)
           -offset int          offset the results to display
           -j, -json            return output in json format
+          -output string       write output to a file
     \`\`\``
 }
 
@@ -91,6 +92,9 @@ export const displayHelpGuideForKatana = () => {
          -ef, -extension-filter string[]   filter output for given extension (eg, -ef png,css)
          -mdc, -match-condition string     match response with dsl based condition
          -fdc, -filter-condition string    filter response with dsl based condition
+      
+      OUTPUT:
+         -output string  write output to a file
     \`\`\``
 }
 
@@ -116,8 +120,11 @@ export const displayHelpGuideForAlterx = () => {
          -p, -pattern string[]   custom permutation patterns input to generate (comma-seperated, file)
   
       CONFIGURATION:
-         -en, -enrich   enrich wordlist by extracting words from input
-         -limit int     limit the number of results to return (default 0)
+         -en, -enrich    enrich wordlist by extracting words from input
+         -limit int      limit the number of results to return (default 0)
+         
+      OUTPUT:
+         -output string  write output to a file
     \`\`\``
 }
 
@@ -197,6 +204,7 @@ export const displayHelpGuideForHttpx = () => {
       
       OUTPUT:
          -j, -json                         write output in JSONL(ines) format
+         -output string                    write output to a file
          -irh, -include-response-header    include http response (headers) in JSON output (-json only)
          -irr, -include-response           include http request/response (headers + body) in JSON output (-json only)
          -irrb, -include-response-base64   include base64 encoded http request/response in JSON output (-json only)
@@ -260,7 +268,8 @@ export const displayHelpGuideForNuclei = () => {
          -tc, -template-condition string[]  templates to run based on expression condition
   
       OUTPUT:
-         -j, -jsonl  write output in JSONL(ines) format
+         -j, -jsonl      write output in JSONL(ines) format
+         -output string  write output to a file
   
       CONFIGURATIONS:
          -fr, -follow-redirects          enable following redirects for http templates
@@ -305,6 +314,9 @@ export const displayHelpGuideForGoLinkFinder = () => {
       Flags:
       CONFIGURATION:
          -d --domain string   Input a URL.
+
+      OUTPUT:  
+         --output string  write output to a file
     \`\`\``
 }
 
@@ -338,6 +350,9 @@ export const displayHelpGuideForGau = () => {
          --mc strings          list of status codes to match
          --mt strings          list of mime-types to match
          --fp                  remove different parameters of the same endpoint
+
+      OUTPUT:  
+         --output string  write output to a file
     \`\`\``
 }
 
@@ -385,7 +400,8 @@ export const displayHelpGuideForNaabu = () => {
       -rev-ptr                        Reverse PTR lookup for input ips
   
    OUTPUT:
-      -j, -json   write output in JSON lines format
+      -j, -json       write output in JSON lines format
+      -output string  write output to a file
     \`\`\``
 }
 
@@ -420,6 +436,7 @@ export const displayHelpGuideForSubfinder = () => {
  
    OUTPUT:
      -oJ, -json              write output in JSONL(ines) format
+     -output string          write output to a file
      -cs, -collect-sources   include all sources in the output
      -oI, -ip                include host IP in output (-active only)
         
@@ -476,7 +493,8 @@ export const displayHelpGuideForDnsx = () => {
       -asn  display host asn information
 
    OUTPUT:
-   -j, -json  write output in JSONL(ines) format
+      -j, -json       write output in JSONL(ines) format
+      -output string  write output to a file
 
    CONFIGURATIONS:
       -r, -resolver string          list of resolvers to use (comma separated)

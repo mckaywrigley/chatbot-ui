@@ -13,6 +13,7 @@ import { handlePluginStreamError } from "../plugin-helper/plugin-stream"
 
 interface GoLinkFinderParams {
   domain: string[]
+  output: string
   error: string | null
 }
 
@@ -22,6 +23,7 @@ const parseGoLinkFinderCommandLine = (input: string): GoLinkFinderParams => {
 
   const params: GoLinkFinderParams = {
     domain: [],
+    output: "",
     error: null
   }
 
@@ -41,6 +43,14 @@ const parseGoLinkFinderCommandLine = (input: string): GoLinkFinderParams => {
           params.domain = args[++i].split(",")
           if (params.domain.length > MAX_ARRAY_SIZE) {
             params.error = `🚨 Too many elements in domain array`
+            return params
+          }
+          break
+        case "--output":
+          if (args[++i]) {
+            params.output = args[i].trim()
+          } else {
+            params.error = `🚨 Output flag provided without value`
             return params
           }
           break
@@ -192,7 +202,7 @@ export async function handleGolinkfinderRequest(
           '"\n\n' +
           "**Extraction Date & Time**:" +
           ` ${formattedDateTime} (${timezone}) \n\n` +
-          "## URLs Identified:\n" +
+          "## Results:\n" +
           "```\n" +
           urlsFormatted.trim() +
           "\n" +

@@ -39,6 +39,9 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
         <Message
           key={chatMessage.message.sequence_number}
           message={chatMessage.message}
+          previousMessage={
+            index > 0 ? chatMessages[index - 1].message : undefined
+          }
           fileItems={chatMessage.fileItems}
           feedback={chatMessage.feedback}
           isEditing={editingMessage?.id === chatMessage.message.id}

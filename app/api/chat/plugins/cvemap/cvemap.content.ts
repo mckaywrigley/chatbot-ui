@@ -53,6 +53,7 @@ const parseCommandLine = (
     limit: 25,
     offset: 0,
     json: false,
+    output: "",
     error: null
   }
 
@@ -199,7 +200,7 @@ export async function handleCvemapRequest(
           (Array.isArray(value) && value.length > 0) ||
           (typeof value === "boolean" && value) ||
           (typeof value === "number" && value > 0) ||
-          (typeof value === "string" && value.length > 0)
+          (typeof value === "string" && value.length > 0 && key !== "output")
         ) {
           ;(requestBody as any)[key] = value
         }
@@ -294,6 +295,7 @@ function formatCvemapOutput(output: string): string {
 
   return (
     `## CVE Details Report\n\n` +
+    `## Results:\n` +
     "```\n" +
     asciiArt +
     "\n" +
@@ -306,6 +308,7 @@ const createResponseString = (cvemapData: string) => {
   const outerData = JSON.parse(cvemapData)
   const data = JSON.parse(outerData.output)
   let markdownOutput = `# CVE Discovery\n\n`
+  markdownOutput += `## Results:\n`
 
   const formatTime = (timeValue: string | Date) => {
     return new Date(timeValue).toLocaleString("en-US", {

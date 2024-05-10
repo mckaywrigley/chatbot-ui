@@ -70,6 +70,7 @@ interface HttpxParams {
   strip: string
   // OUTPUT
   json: boolean
+  output: string
   include_response_header: boolean
   include_response: boolean
   include_response_base64: boolean
@@ -141,6 +142,7 @@ const parseCommandLine = (input: string) => {
     strip: "",
     // OUTPUT
     json: false,
+    output: "",
     include_response_header: false,
     include_response: false,
     include_response_base64: false,
@@ -600,6 +602,15 @@ const parseCommandLine = (input: string) => {
         }
         i++
         break
+      case "-output":
+        if (isValidString(nextArg)) {
+          params.output = nextArg
+        } else {
+          params.error = `🚨 Output flag provided without value`
+          return params
+        }
+        i++
+        break
       default:
         if (!params.error) {
           params.error = `Invalid or unrecognized flag: ${arg}`
@@ -980,7 +991,7 @@ export async function handleHttpxRequest(
 
         const target = params.list ? params.list : params.target
         const formattedResults = formatScanResults({
-          pluginName: "HTTPX",
+          pluginName: "httpX",
           pluginUrl: pluginUrls.HTTPX,
           target: target,
           results: urlsFormatted

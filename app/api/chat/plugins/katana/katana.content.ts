@@ -32,6 +32,7 @@ interface KatanaParams {
   extensionFilter: string[]
   matchCondition: string
   filterCondition: string
+  output: string
   timeout: number
   error: string | null
 }
@@ -57,6 +58,7 @@ const parseKatanaCommandLine = (input: string): KatanaParams => {
     extensionFilter: [],
     matchCondition: "",
     filterCondition: "",
+    output: "",
     timeout: 15,
     error: null
   }
@@ -277,6 +279,14 @@ const parseKatanaCommandLine = (input: string): KatanaParams => {
           return params
         }
         break
+      case "-output":
+        if (args[i + 1]) {
+          params.output = args[++i]
+        } else {
+          params.error = `🚨 Output flag provided without value`
+          return params
+        }
+        break
       default:
         params.error = `🚨 Invalid or unrecognized flag: ${args[i]}`
         return params
@@ -379,7 +389,7 @@ export async function handleKatanaRequest(
             value > 0 &&
             !(key === "depth" && value === 3) &&
             !(key === "timeout" && value === 15)) ||
-          (typeof value === "string" && value.length > 0)
+          (typeof value === "string" && value.length > 0 && key !== "output")
         ) {
           ;(requestBody as any)[key] = value
         }

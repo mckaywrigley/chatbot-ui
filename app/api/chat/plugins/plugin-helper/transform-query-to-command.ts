@@ -23,6 +23,7 @@ export const transformUserQueryToSubfinderCommand = (lastMessage: Message) => {
       - -match string[]: Match specific subdomains in comma-separated format. (optional)
       - -filter string[]: Exclude certain subdomains in comma-separated format. (optional)
       - -json: Output in JSON format. (optional)
+      - -output (string): write output to a file. Don't put name of file in quotes (optional)
       - -collect-sources: Include source information for each subdomain. (optional)
       - -ip: Include host IP in output (always should go with -active flag). (optional)
       - -timeout int: Set timeout limit (default 30 seconds). (optional)
@@ -123,6 +124,7 @@ export const transformUserQueryToNucleiCommand = (
         - -template-condition (string[]): Templates to run based on expression condition.
       - **OUTPUT**:
         - -jsonl: Write output in JSONL(ines) format. 
+        - -output (string): write output to a file. Don't put name of file in quotes (optional)
       - **CONFIGURATIONS**:
         - -follow-redirects: Enable following redirects for HTTP templates.
         - -follow-host-redirects: Follow redirects on the same host.
@@ -215,6 +217,7 @@ export const transformUserQueryToNaabuCommand = (
       - -nd-ping: Use IPv6 Neighbor Discovery ping. (optional)
       - -rev-ptr: Perform a reverse PTR lookup. (optional)
       - -json: Output results in JSON format. (optional)
+      - -output (string): write output to a file. Don't put name of file in quotes (optional)
       - -help: Display help and all available flags. (optional)
       Use these flags to align with the request's specific requirements or when '-help' is requested for help.
     3. **Relevance and Efficiency**: Ensure that the flags chosen for the command are relevant and contribute to an effective and efficient port discovery process.
@@ -293,6 +296,7 @@ export const transformUserQueryToKatanaCommand = (
       - -match-condition: Apply DSL-based conditions for matching responses. (optional)
       - -filter-condition: Apply DSL-based conditions for filtering responses. (optional)
       - -help: Display help and all available flags. (optional)
+      - -output (string): write output to a file. Don't put name of file in quotes (optional)
       Use these flags to align with the request's specific requirements or when '-help' is requested for help.
     3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient URL crawling and filtering process.
   
@@ -354,6 +358,7 @@ export const transformUserQueryToAlterxCommand = (
       - -pattern: Custom permutation patterns input to generate (optional).
       - -enrich: Enrich wordlist by extracting words from input (optional).
       - -limit: Limit the number of results to return, with the default being 0 (optional).
+      - -output (string): write output to a file. Don't put name of file in quotes (optional)
       - -help: Display help and all available flags. (optional)
       Use these flags to align with the request's specific requirements or when '-help' is requested for help.
     3. **Relevance and Efficiency**: Ensure that the selected flags are relevant and contribute to an effective and efficient wordlist generation process.
@@ -462,6 +467,7 @@ export const transformUserQueryToHttpxCommand = (
         - -strip (string): Strips all tags in response (e.g., '-strip html'). supported formats: html,xml (default html)
       - **Output Options**: Customize the output format with these flags:
         - -json (boolean): Write output in JSONL(ines) format.
+        - -output (string): write output to a file. Don't put name of file in quotes (optional)
         - -include-response-header (boolean): Include HTTP response headers in JSON output. (-json only)
         - -include-response (boolean): Include HTTP request/response in JSON output. (-json only)
         - -include-response-base64 (boolean): Include base64 encoded request/response in JSON output. (-json only)
@@ -501,7 +507,7 @@ export const transformUserQueryToGoLinkFinderCommand = (
     **Command Construction Guidelines for GoLinkFinder**:
     1. **Single Domain Focus**: Direct inclusion of the target domain in the command is mandatory. 
         - --domain (string): Specify the target website URL. (required)
-  
+        - -output (string): write output to a file. Don't put name of file in quotes (optional)
     Note: **Selective Flag Application**: Choose flags that directly contribute to the scope of your query. The key flags include:
         - --help: Display a help guide or a full list of available commands and flags.
     Note: **Limitation on Command and Domain Quantity**: 'GoLinkFinder' is designed to process a single command and a single domain at a time. Should there be attempts to include multiple domains or generate multiple commands by user query, respond back with tool's functionality restricts such operations.  
@@ -550,7 +556,9 @@ export const transformUserQueryToGAUCommand = (lastMessage: Message) => {
       - --mc: List of status codes to match. (optional)
       - --mt: List of mime-types to match. (optional)
       - --fp: Remove different parameters of the same endpoint. (optional)
-    4. **Relevance and Efficiency**:
+    4. **Output Flags**:
+      - --output (string): write output to a file. Don't put name of file in quotes (optional)
+    5. **Relevance and Efficiency**:
       Ensure that the selected flags are relevant and contribute to an effective and efficient URL fetching process.
   
     Example Commands:
@@ -610,6 +618,7 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
       - -json: Return output in JSON format (use for structured data needs).
       - -help: Provide all flags avaiable and information about tool. Use this flag if user asked for help or if user asked for all flags or if user asked about plugin.
       - -json: Return output in json format. 
+      - -output (string): write output to a file. Don't put name of file in quotes. By defualt save into .md file format. (optional)
       Do not include any flags not listed here. Use these flags to align with the request's specific requirements. All flags are optional.
     2. **Quotes around flag content**: If flag content has space between like "windows 10," use "'windows 10'" for any flag. Or another example like "> 15" use "'> 15'" for any flag. Their should always be space between sign like ">", "<", "=", ... and the number. 
     3. **Relevance and Efficiency**: Ensure that the flags chosen for the command are relevant and contribute to an effective and efficient CVEs discovery process.
@@ -782,6 +791,7 @@ export const transformUserQueryToDnsxCommand = (
       - -r, -resolver string: Specify the list of resolvers to use (comma-separated).
       - -wt, -wildcard-threshold int: Set the wildcard filter threshold (default 5).
       - -wd, -wildcard-domain string: Specify the domain name for wildcard filtering (other flags will be ignored - only JSON output is supported).
+      - -output (string): write output to a file. Don't put name of file in quotes (optional)
     5. **Help Flag**: If the user requests help or a list of available flags, include the '-help' flag in the command.
   
     Example Commands:

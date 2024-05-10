@@ -97,7 +97,6 @@ const parseAlterxCommandLine = (input: string): AlterxParams => {
           return params
         }
         break
-      case "-o":
       case "-output":
         if (i + 1 < args.length) {
           params.output = args[++i]
@@ -246,14 +245,6 @@ export async function handleAlterxRequest(
         const jsonResponse = await alterxResponse.json()
         const outputString = jsonResponse.output
 
-        // TODO: Subdomains from GKE should be transformed to the file output if the user provided an output flag.
-        // Filename should be the same as the output flag value if it is extension .txt and uses the correct format.
-        // If not, we will use a default filename like subdomains.txt.
-        if (params.output) {
-          console.log(`Output flag provided: ${params.output}`)
-          console.log(outputString)
-        }
-
         let subdomains = processSubdomains(outputString)
 
         if (!subdomains || subdomains.length === 0) {
@@ -268,7 +259,7 @@ export async function handleAlterxRequest(
 
         clearInterval(intervalId)
         sendMessage(
-          "✅ Wordlist generation complete! Now finalizing the results...'",
+          "✅ Wordlist generation complete! Now finalizing the results...",
           true
         )
 

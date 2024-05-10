@@ -28,11 +28,14 @@ import MessageDetailedFeedback from "./message-detailed-feedback"
 import { MessageMarkdown } from "./message-markdown"
 import { MessageQuickFeedback } from "./message-quick-feedback"
 import { MessageTooLong } from "./message-too-long"
+import { MessagePluginFile } from "./message-plugin-file"
+import { MessageTypeResolver } from "./message-type-solver"
 
 const ICON_SIZE = 28
 
 interface MessageProps {
   message: Tables<"messages">
+  previousMessage: Tables<"messages"> | undefined
   fileItems: Tables<"file_items">[]
   feedback?: Tables<"feedback">
   isEditing: boolean
@@ -51,6 +54,7 @@ interface MessageProps {
 
 export const Message: FC<MessageProps> = ({
   message,
+  previousMessage,
   fileItems,
   feedback,
   isEditing,
@@ -318,16 +322,13 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
-          ) : message.plugin !== null &&
-            message.role === "assistant" &&
-            message.content.length > messageSizeLimit ? (
-            <MessageTooLong
-              content={message.content}
-              plugin={message.plugin || ""}
-              id={message.id}
-            />
           ) : (
-            <MessageMarkdown content={message.content} />
+            <MessageTypeResolver
+              previousMessage={previousMessage}
+              message={message}
+              messageSizeLimit={messageSizeLimit}
+              isLastMessage={isLast}
+            />
           )}
         </div>
 

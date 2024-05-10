@@ -28,6 +28,7 @@ export interface CvemapParams {
   limit?: number
   offset?: number
   json?: boolean | undefined
+  output?: string
   error?: string | null
 }
 
@@ -63,7 +64,8 @@ export const cvemapFlagDefinitions: FlagDefinitions<CvemapParams> = {
   "-exclude": "excludeFields",
   "-l": "limit",
   "-limit": "limit",
-  "-offset": "offset"
+  "-offset": "offset",
+  "-output": "output"
 }
 
 export const cvemapBooleanFlagDefinitions: FlagDefinitions<CvemapParams> = {
@@ -137,6 +139,7 @@ export interface DnsxParams {
   cdn?: boolean
   asn?: boolean
   json?: boolean
+  output?: string
   error?: string | null
 }
 
@@ -148,7 +151,8 @@ export const dnsxFlagDefinitions: FlagDefinitions<DnsxParams> = {
   "-w": "wordlist",
   "-wordlist": "wordlist",
   "-rc": "rcode",
-  "-rcode": "rcode"
+  "-rcode": "rcode",
+  "-output": "output"
 }
 
 export const dnsxBooleanFlagDefinitions: FlagDefinitions<DnsxParams> = {

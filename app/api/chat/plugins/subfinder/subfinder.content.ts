@@ -21,6 +21,7 @@ interface SubfinderParams {
   filter: string[]
   // OUTPUT
   outputJson: boolean
+  output: string
   includeSources: boolean
   ip: boolean
   // OPTIMIZATIONS:
@@ -44,6 +45,7 @@ const parseCommandLine = (input: string) => {
     filter: [],
     // OUTPUT
     outputJson: false,
+    output: "",
     includeSources: false,
     ip: false,
     // OPTIMIZATIONS:
@@ -155,6 +157,14 @@ const parseCommandLine = (input: string) => {
       case "-oi":
       case "-ip":
         params.ip = true
+        break
+      case "-output":
+        if (i + 1 < args.length) {
+          params.output = args[++i]
+        } else {
+          params.error = `🚨 Output flag provided without value`
+          return params
+        }
         break
       default:
         params.error = `🚨 Invalid or unrecognized flag: ${args[i]}`
@@ -434,7 +444,7 @@ const createResponseString = (
     '"\n\n' +
     "**Scan Date & Time**: " +
     `${formattedDateTime} (${timezone}) \n\n` +
-    `## Identified Subdomains:\n` +
+    `## Results:\n` +
     "```\n" +
     subfinderData +
     "\n" +

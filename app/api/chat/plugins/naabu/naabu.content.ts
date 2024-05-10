@@ -36,6 +36,7 @@ interface NaabuParams {
   revPtr: boolean
   timeout: number
   outputJson: boolean
+  output: string
   error: string | null
 }
 
@@ -65,6 +66,7 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
     revPtr: false,
     timeout: 10000,
     outputJson: false,
+    output: "",
     error: null
   }
 
@@ -230,6 +232,14 @@ const parseNaabuCommandLine = (input: string): NaabuParams => {
       case "-json":
         params.outputJson = true
         break
+      case "-output":
+        if (args[i + 1]) {
+          params.output = args[++i]
+        } else {
+          params.error = `🚨 Output flag provided without value`
+          return params
+        }
+        break
       default:
         params.error = `🚨 Invalid or unrecognized flag: ${args[i]}`
         return params
@@ -332,7 +342,7 @@ export async function handleNaabuRequest(
           (typeof value === "number" &&
             value > 0 &&
             !(key === "timeout" && value === 10000)) ||
-          (typeof value === "string" && value.length > 0)
+          (typeof value === "string" && value.length > 0 && key !== "output")
         ) {
           ;(requestBody as any)[key] = value
         }
