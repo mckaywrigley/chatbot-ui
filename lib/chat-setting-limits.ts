@@ -81,11 +81,11 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
   },
 
   // GROQ MODELS
-  "llama2-70b-4096": {
+  "llama3-8b-8192": {
     MIN_TEMPERATURE: 0.0,
     MAX_TEMPERATURE: 1.0,
-    MAX_TOKEN_OUTPUT_LENGTH: 4096,
-    MAX_CONTEXT_LENGTH: 4096
+    MAX_TOKEN_OUTPUT_LENGTH: 8192,
+    MAX_CONTEXT_LENGTH: 8192
   },
   "llama3-70b-8192": {
     MIN_TEMPERATURE: 0.0,
