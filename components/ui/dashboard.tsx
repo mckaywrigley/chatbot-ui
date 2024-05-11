@@ -8,10 +8,11 @@ import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
-import { IconChevronCompactRight } from "@tabler/icons-react"
+import { IconChevronCompactRight, IconFileFilled } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
+import { toast } from "sonner"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -72,10 +73,25 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const onFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
 
-    const files = event.dataTransfer.files
-    const file = files[0]
+    const items = event.dataTransfer.items
+    let fileCount = 0
 
-    handleFileUpload(file)
+    if (items) {
+      for (let i = 0; i < items.length && fileCount < 5; i++) {
+        const item = items[i]
+        if (item.kind === "file") {
+          const file = item.getAsFile()
+          if (file) {
+            handleFileUpload(file)
+            fileCount++
+          }
+        }
+      }
+    }
+
+    if (fileCount >= 5) {
+      toast.error("Maximum of 5 files can be dropped at a time.")
+    }
 
     setIsDragging(false)
   }
@@ -193,7 +209,12 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       >
         {isDragging ? (
           <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
-            drop file here
+            <div className="justify-cente flex flex-col items-center rounded-lg p-4">
+              <IconFileFilled size={48} className="mb-2 text-white" />
+              <span className="text-lg font-semibold text-white">
+                Drop your files here to add it to the conversation
+              </span>
+            </div>
           </div>
         ) : (
           children
