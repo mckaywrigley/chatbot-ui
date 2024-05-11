@@ -83,7 +83,7 @@ export const Message: FC<MessageProps> = ({
   const { handleSendMessage } = useChatHandler()
 
   const messageSizeLimit = Number(
-    process.env.NEXT_PUBLIC_MESSAGE_SIZE_LIMIT || 30000
+    process.env.NEXT_PUBLIC_MESSAGE_SIZE_LIMIT || 12000
   )
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)

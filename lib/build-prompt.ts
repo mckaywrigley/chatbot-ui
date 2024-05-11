@@ -103,13 +103,13 @@ export async function buildFinalMessages(
   let finalMessages = []
 
   for (let i = processedChatMessages.length - 1; i >= 0; i--) {
-    const messageSizeLimit = Number(process.env.MESSAGE_SIZE_LIMIT || 24000)
+    const messageSizeLimit = Number(process.env.MESSAGE_SIZE_LIMIT || 12000)
     if (
       processedChatMessages[i].message.role === "assistant" &&
       processedChatMessages[i].message.plugin !== PluginID.NONE &&
       processedChatMessages[i].message.content.length > messageSizeLimit
     ) {
-      const messageSizeKeep = Number(process.env.MESSAGE_SIZE_KEEP || 6000)
+      const messageSizeKeep = Number(process.env.MESSAGE_SIZE_KEEP || 4000)
       const lastSpaceIndex = processedChatMessages[
         i
       ].message.content.lastIndexOf(" ", messageSizeKeep)
