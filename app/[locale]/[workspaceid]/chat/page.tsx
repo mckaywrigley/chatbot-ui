@@ -12,6 +12,7 @@ import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
 import { useContext } from "react"
+import { ProBadge } from "@/components/chat/pro-badge-mobile"
 
 export default function ChatPage() {
   useHotkey("o", () => handleNewChat())
@@ -19,7 +20,10 @@ export default function ChatPage() {
     handleFocusChatInput()
   })
 
-  const { chatMessages, selectedPlugin } = useContext(ChatbotUIContext)
+  const { chatMessages, selectedPlugin, subscription, isMobile } =
+    useContext(ChatbotUIContext)
+
+  const isPremium = subscription !== null
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
@@ -30,22 +34,31 @@ export default function ChatPage() {
       {chatMessages.length === 0 ? (
         <div className="relative flex h-full flex-col items-center justify-center">
           <div className="absolute left-1/2 -translate-x-1/2 -translate-y-3/4">
-            <div className="logo-sm:hidden logo-xs:hidden mb-12">
+            {isMobile ? (
+              <div className="mb-12">
+                <BrandSmall theme={theme === "dark" ? "dark" : "light"} />
+              </div>
+            ) : (
+              <div className="">
+                <Brand theme={theme === "dark" ? "dark" : "light"} />
+              </div>
+            )}
+            {/* <div className="logo-sm:hidden logo-xs:hidden mb-12">
               <BrandSmall theme={theme === "dark" ? "dark" : "light"} />
-            </div>
+            </div> */}
 
-            <div className="logo-sm:block logo-xs:hidden hidden">
+            {/* <div className="logo-sm:block logo-xs:hidden hidden">
               <Brand theme={theme === "dark" ? "dark" : "light"} />
+            </div> */}
+          </div>
+
+          {!isMobile || isPremium ? (
+            <div className="absolute top-2 md:left-2">
+              <ChatSettings />
             </div>
-          </div>
-
-          {/* <div className="absolute left-2 top-2">
-            <QuickSettings />
-          </div> */}
-
-          <div className="absolute top-2 md:left-2">
-            <ChatSettings />
-          </div>
+          ) : (
+            <ProBadge />
+          )}
 
           <div className="flex grow flex-col items-center justify-center" />
 

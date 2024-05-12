@@ -133,6 +133,27 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
   const [toolInUse, setToolInUse] = useState<string>("none")
 
+  // Define the isMobile state
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  // Handle window resize to update isMobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    // Set initial value
+    setIsMobile(window.innerWidth <= 768)
+
+    // Add event listener
+    window.addEventListener("resize", handleResize)
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
   useEffect(() => {
     ;(async () => {
       const profile = await fetchStartingData()
@@ -343,7 +364,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         selectedTools,
         setSelectedTools,
         toolInUse,
-        setToolInUse
+        setToolInUse,
+
+        isMobile
       }}
     >
       {children}
