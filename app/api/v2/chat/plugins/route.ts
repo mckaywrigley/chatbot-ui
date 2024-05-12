@@ -30,7 +30,8 @@ export async function POST(request: Request) {
     PluginID.KATANA,
     PluginID.HTTPX,
     PluginID.NAABU,
-    PluginID.GAU
+    PluginID.GAU,
+    PluginID.DNSX
     // PluginID.AMASS
   ]
 
