@@ -1,9 +1,10 @@
 import { availablePlugins } from "@/lib/plugins/available-plugins"
 import { ChatMessage } from "@/types"
 import { ChatStarter, PluginID } from "@/types/plugins"
-import React, { memo } from "react"
+import React, { memo, useContext } from "react"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { dragHelper } from "@/components/chat/chat-helpers/drag"
+import { ChatbotUIContext } from "@/context/context"
 
 interface InfoCardProps {
   title: string
@@ -35,12 +36,18 @@ const ChatStarters: React.FC<ChatStartersProps> = ({
   selectedPlugin,
   chatMessages
 }) => {
+  const { userInput } = useContext(ChatbotUIContext)
   const chatHandler = useChatHandler()
   const pluginStarters = availablePlugins.find(
     (plugin: { value: PluginID }) => plugin.value === selectedPlugin
   )?.starters
 
   const handleSendMessage = chatHandler.handleSendMessage
+
+  if (userInput) {
+    return null
+  }
+
   return (
     <div className="flex w-full items-center justify-start">
       <div
