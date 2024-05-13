@@ -310,35 +310,45 @@ export const useChatHandler = () => {
   const handleStartTutorial = async () => {
     setIsGenerating(true)
     setChatStudyState("tutorial_hide_input")
-    localStorage.setItem("tutorialDone", "true")
 
     const messageContent = `👋 Hello! I'm your AI Study Mentor.
 I'm here to boost your learning by assisting with creating a topic study sheet and guiding you through optimally spaced free recall study sessions.
 This tutorial will walk you through how to craft a revision topic.
 You'll find topics listed in the panel on the left side of the chat window. 👈
-Open the panel, and you'll see "The Solar System" as our example topic for this tutorial.
+Open the panel, and you'll see "States of matter" as our example topic for this tutorial.
 Please click 'Next' below to proceed with the tutorial.`
 
-    const topic_description = `### Basic overview of the Solar System
-- **Components:** Consists of the Sun, eight planets, their moons, dwarf planets, asteroids, comets, and various other objects.
-- **Formation:** Formed about 4.6 billion years ago from the gravitational collapse of a giant molecular cloud.
+    const topic_description = `### States of Matter
 
-### The Sun
-- **Type:** G-type main-sequence star (G2V)
-- **Composition:** About 74% hydrogen, 24% helium, and other elements.
-- **Significance:** The Sun is the source of energy for all life on Earth and drives Earth’s climate and weather.
-
-### The Planets
-- **Inner Planets (Terrestrial planets):** Mercury, Venus, Earth, and Mars. These are rocky and have relatively few moons.
-- **Outer Planets (Gas giants and ice giants):** Jupiter and Saturn are gas giants, made mostly of hydrogen and helium. Uranus and Neptune are ice giants, with more ices such as water, ammonia, and methane.
-
-### Dwarf Planets
-- **Examples:** Pluto, Eris, Haumea, Makemake, and Ceres.
-- **Characteristics:** Orbit the Sun, have enough mass for their gravity to make them nearly round, but have not cleared their orbital paths of other debris.
-
-### Asteroids and Comets
-- **Asteroids:** Primarily found in the asteroid belt between Mars and Jupiter, made of rock and metal.
-- **Comets:** Composed of ice and dust, often with highly elliptical orbits, showing visible atmospheres (comas) and tails when near the Sun.`
+    ### Overview 
+       - Matter exists in three main states: solid, liquid, and gas.
+       - These states are defined by how particles are arranged and how they move.
+    
+       ### The Three States of Matter
+       - **Solid:**  
+         - Particles are tightly packed and vibrate in place.
+         - Keeps a definite shape and volume.
+         - Example: Ice.
+    
+       - **Liquid:**  
+         - Particles are less tightly packed and can move around each other.
+         - Has a definite volume but changes shape to fit the container.
+         - Example: Water.
+    
+       - **Gas:**  
+         - Particles are spread out and move freely.
+         - Takes both the shape and volume of the container.
+         - Example: Water vapour.
+    
+    ### Transitions Between States
+       - **Melting:** Solid to liquid (Ice to water).
+       - **Freezing:** Liquid to solid (Water to ice).
+       - **Vaporisation:** Liquid to gas (Water to vapour).
+       - **Condensation:** Gas to liquid (Vapour to water).
+    
+    ### Key Insights
+       - Changes in temperature or pressure cause these transitions.
+       - Understanding the transitions helps explain natural phenomena like ice melting, water boiling, and dew forming.`
 
     try {
       setUserInput("")
