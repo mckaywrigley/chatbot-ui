@@ -5,12 +5,11 @@ import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatInput } from "@/components/chat/chat-input"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
 import { ChatbotUIContext } from "@/context/context"
+import { updateProfile } from "@/db/profile"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { IconPlanet } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
-import { useContext } from "react"
+import { useContext, useEffect, useRef } from "react"
 
 export default function ChatPage() {
   useHotkey("o", () => handleNewChat())
@@ -18,12 +17,32 @@ export default function ChatPage() {
     handleFocusChatInput()
   })
 
-  const { chatMessages } = useContext(ChatbotUIContext)
+  const { chatMessages, profile, setProfile } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput, handleStartTutorial } =
     useChatHandler()
 
   const { theme } = useTheme()
+
+  // Ref to track if the tutorial has been started to prevent duplicate executions
+  const tutorialStartedRef = useRef(false)
+
+  useEffect(() => {
+    const startTutorial = async () => {
+      if (profile && !profile.has_onboarded && !tutorialStartedRef.current) {
+        console.log("Starting tutorial for the first time")
+        tutorialStartedRef.current = true // Mark as tutorial started
+        const updatedProfile = await updateProfile(profile.id, {
+          ...profile,
+          has_onboarded: true
+        })
+        setProfile(updatedProfile)
+        handleStartTutorial()
+      }
+    }
+
+    startTutorial()
+  }, [profile])
 
   return (
     <>
@@ -32,56 +51,12 @@ export default function ChatPage() {
           <div className="top-50% left-50% -translate-x-50% -translate-y-50% absolute mb-20">
             <Brand theme={theme === "dark" ? "dark" : "light"} />
             <div className="mx-16 mt-5 border-t-2 pt-5">
-              {localStorage.getItem("tutorialDone") === "true" ? (
-                <>
-                  <p>
-                    Create a new topic by describing it below and/or upload a
-                    file using the ⨁ button.
-                  </p>
-                  <div className="mt-3 border-t-2 pt-5">
-                    <p className="text-grey-600/75 dark:text-grey-400/50">
-                      🪐
-                      <a
-                        href="#"
-                        onClick={handleStartTutorial}
-                        className="pl-1 underline"
-                      >
-                        Restart tutorial
-                      </a>
-                      .
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p>
-                    Welcome! Let&apos;s get started by creating a new tutorial
-                    topic:
-                  </p>
-                  <div className="mt-3 flex items-center justify-center">
-                    <p>
-                      <a
-                        href="#"
-                        onClick={handleStartTutorial}
-                        className="flex"
-                      >
-                        <IconPlanet className="mr-1" />
-                        <span>Start tutorial</span>
-                      </a>
-                    </p>
-                  </div>
-                </>
-              )}
+              <p>
+                Create a new topic by describing it below and/or upload a file
+                using the ⨁ button.
+              </p>
             </div>
           </div>
-
-          {/* <div className="absolute left-2 top-2">
-            <QuickSettings />
-          </div>
-
-          <div className="absolute right-2 top-2">
-            <ChatSettings />
-          </div> */}
 
           <div className="flex grow flex-col items-center justify-center" />
 

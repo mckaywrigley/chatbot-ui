@@ -368,7 +368,7 @@ export const handleCreateChat = async (
     include_profile_context: chatSettings.includeProfileContext,
     include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
     model: chatSettings.model,
-    name: isTutorial ? "The Solar System" : messageContent.substring(0, 100),
+    name: isTutorial ? "States of matter" : messageContent.substring(0, 100),
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
     embeddings_provider: chatSettings.embeddingsProvider,

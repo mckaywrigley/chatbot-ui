@@ -159,6 +159,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
 
+  console.log("chatStudyState:", chatStudyState)
+
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">

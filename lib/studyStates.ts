@@ -106,6 +106,12 @@ export const studyStates: StudyStateObject[] = [
         quickText: "Edit topic.",
         responseText: "What updates should we make to the topic study sheet?",
         newStudyState: "topic_edit"
+      },
+      {
+        quickText: "Start recall now.",
+        responseText:
+          "Let's see what you remember about the topic. Give it your best shot!",
+        newStudyState: "recall_first_attempt"
       }
     ]
   },
@@ -116,7 +122,7 @@ export const studyStates: StudyStateObject[] = [
         quickText: "Next.",
         responseText: `Now I'll guide you on how to add a study sheet. It's quite exciting to create a new topic together!
 A study sheet typically includes 10 to 30 key facts, each with a few important details. The content and depth may vary based on the topic's complexity and your needs.
-Let's start with 'The Solar System.' Click on it below.`,
+Let's start with 'States of matter' Click on it below.`,
         newStudyState: "tutorial_2_hide_input"
       }
     ]
@@ -125,7 +131,7 @@ Let's start with 'The Solar System.' Click on it below.`,
     name: "tutorial_2_hide_input",
     quickResponses: [
       {
-        quickText: "The Solar System.",
+        quickText: "States of matter.",
         responseText: `If at this stage you've only entered a topic name, like now, I'll step in to help craft a suitable study sheet for you. Alternatively, you're more than welcome to add a description yourself, whether by uploading a document or typing directly into our chat. For the moment, I'll take care of generating the description for you. Please 'View topic.' now, and afterwards, 'Save topic.'`,
         newStudyState: "tutorial_3_hide_input"
       }
@@ -147,7 +153,7 @@ Let's start with 'The Solar System.' Click on it below.`,
       {
         quickText: "Save study sheet.",
         responseText: `Now comes the fun part! After taking some time to study the topic, it's time for your first recall attempt. Let's make it a good one, no peeking allowed! 👀😉
-I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about "The Solar System" topic but leave out some facts for the purpose of this tutorial; select the chat area below (Message Mentor...) then type or hit the microphone key on your keyboard.
+I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about "States of matter" topic but leave out some facts for the purpose of this tutorial; select the chat area below (Message Mentor...) then type or hit the microphone key on your keyboard.
 After you receive feedback on your attempt, select "Next step..." to move forward.`,
         newStudyState: "recall_tutorial_first_attempt"
       }
@@ -197,10 +203,10 @@ The final stage of an effective study session is reviewing the topic one last ti
       {
         quickText: "Finish tutorial.",
         responseText: `Amazing work! 
-On the topic list to the left, you will notice the icon next to this topic name has changed to indicat that you've successfully reviewed the topic. Return to this topic in a few hours, and based on how much you remember, Mentor will schedule a revision in a couple of days. 
+On the topic list to the left, you will notice the icon next to this topic name has changed to indicat that you've successfully reviewed the topic. Return to this topic shortly and based on how much you remember, Mentor will schedule a revision in a couple of days. 
 As days go by leading up to your next review session, this icon will change, reflecting an estimate of your recall strength. Don't worry, we'll email you on that day with a gentle nudge when it's time for a refresh.
 Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
-And of course, feel free to dive back in to further solidify your mastery of The Solar System! 🪐
+And of course, feel free to dive back in to further solidify your mastery of States of matter!
 Enjoy your learning journey!`,
         newStudyState: "topic_creation"
       }
