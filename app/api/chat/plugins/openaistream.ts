@@ -45,7 +45,7 @@ export const OpenAIStream = async (
   replaceWordsInLastUserMessage(messages, wordReplacements)
 
   const commonBody = {
-    model: `gpt-4-turbo-preview`,
+    model: `gpt-4o`,
     messages: [
       {
         role: "system",

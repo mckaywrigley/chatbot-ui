@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: openAiHeaders,
       body: JSON.stringify({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4o",
         messages: messages as ChatCompletionCreateParamsBase["messages"],
         // temperature: chatSettings.temperature,
         temperature: 0.4,
