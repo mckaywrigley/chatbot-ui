@@ -13,7 +13,7 @@ const LLaMA3_8B: LLM = {
     currency: "USD",
     unit: "1M tokens",
     inputCost: 0.05,
-    outputCost: 0.10
+    outputCost: 0.1
   }
 }
 
