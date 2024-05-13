@@ -71,8 +71,15 @@ export const useChatHandler = () => {
     isToolPickerOpen,
     selectedPlugin,
     subscription,
-    isRagEnabled
+    isRagEnabled,
+    isGenerating
   } = useContext(ChatbotUIContext)
+
+  const isGeneratingRef = useRef(isGenerating)
+
+  useEffect(() => {
+    isGeneratingRef.current = isGenerating
+  }, [isGenerating])
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -82,8 +89,16 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isAtPickerOpen, isToolPickerOpen])
 
+  const handleSelectChat = async (chat: Tables<"chats">) => {
+    if (!selectedWorkspace) return
+    await handleStopMessage()
+    return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
+  }
+
   const handleNewChat = async () => {
     if (!selectedWorkspace) return
+
+    await handleStopMessage()
 
     setUserInput("")
     setChatMessages([])
@@ -154,9 +169,13 @@ export const useChatHandler = () => {
     chatInputRef.current?.focus()
   }
 
-  const handleStopMessage = () => {
-    if (abortController) {
+  const handleStopMessage = async () => {
+    if (abortController && !abortController.signal.aborted) {
       abortController.abort()
+      while (isGeneratingRef.current) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
   }
 
@@ -531,6 +550,7 @@ export const useChatHandler = () => {
     handleStopMessage,
     handleSendContinuation,
     handleSendEdit,
-    handleSendFeedback
+    handleSendFeedback,
+    handleSelectChat
   }
 }

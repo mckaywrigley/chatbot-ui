@@ -331,7 +331,6 @@ export const processResponse = async (
       case 429:
         throw new Error(`Rate Limited: ${errorMessage}`)
       case 502:
-        Error
         throw new Error(`Service Unavailable: ${errorMessage}`)
       default:
         throw new Error(`HTTP Error: ${errorMessage}`)
