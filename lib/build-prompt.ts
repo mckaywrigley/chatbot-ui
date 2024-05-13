@@ -64,7 +64,8 @@ export async function buildFinalMessages(
   ) {
     CHUNK_SIZE = 16384
   } else if (chatSettings.model === "mistral-medium") {
-    CHUNK_SIZE = 8192
+    // Adjusting the chunk size to comply with the content size limit imposed by Llama 3
+    CHUNK_SIZE = 6144
   }
 
   if (selectedPlugin !== PluginID.NONE) {
