@@ -2,18 +2,18 @@ import { LLM } from "@/types"
 
 const GROQ_PLATORM_LINK = "https://groq.com/"
 
-const LLaMA2_70B: LLM = {
-  modelId: "llama2-70b-4096",
-  modelName: "LLaMA2-70b-chat",
+const LLaMA3_8B: LLM = {
+  modelId: "llama3-8b-8192",
+  modelName: "LLaMA3-8b-chat",
   provider: "groq",
-  hostedId: "llama2-70b-4096",
+  hostedId: "llama3-8b-8192",
   platformLink: GROQ_PLATORM_LINK,
   imageInput: false,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
-    inputCost: 0.7,
-    outputCost: 0.8
+    inputCost: 0.05,
+    outputCost: 0.10
   }
 }
 
@@ -47,4 +47,4 @@ const MIXTRAL_8X7B: LLM = {
   }
 }
 
-export const GROQ_LLM_LIST: LLM[] = [LLaMA2_70B, LLaMA3_70B, MIXTRAL_8X7B]
+export const GROQ_LLM_LIST: LLM[] = [LLaMA3_8B, LLaMA3_70B, MIXTRAL_8X7B]
