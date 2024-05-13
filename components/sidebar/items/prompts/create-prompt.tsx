@@ -16,7 +16,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace, isMobile } = useContext(ChatbotUIContext)
   const [isTyping, setIsTyping] = useState(false)
   const [name, setName] = useState("")
   const [content, setContent] = useState("")
@@ -60,7 +60,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
               value={content}
               onValueChange={setContent}
               minRows={6}
-              maxRows={20}
+              maxRows={isMobile ? 6 : 12}
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />

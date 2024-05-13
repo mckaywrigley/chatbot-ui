@@ -28,7 +28,6 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { EnhancedMenuPicker } from "./enhance-menu"
-import { Icon } from "@radix-ui/react-select"
 
 interface ChatInputProps {}
 
@@ -503,7 +502,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onValueChange={handleInputChange}
           value={userInput}
           minRows={1}
-          maxRows={18}
+          maxRows={isMobile ? 6 : 12}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           onCompositionStart={() => setIsTyping(true)}

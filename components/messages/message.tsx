@@ -77,7 +77,8 @@ export const Message: FC<MessageProps> = ({
     assistantImages,
     toolInUse,
     files,
-    models
+    models,
+    isMobile
   } = useContext(ChatbotUIContext)
 
   const { handleSendMessage } = useChatHandler()
@@ -320,7 +321,7 @@ export const Message: FC<MessageProps> = ({
               className="text-md"
               value={editedMessage}
               onValueChange={setEditedMessage}
-              maxRows={20}
+              maxRows={isMobile ? 6 : 12}
             />
           ) : (
             <MessageTypeResolver
