@@ -1,5 +1,4 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
-import { ChatSettings } from "@/types"
 import { ServerRuntime } from "next"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
@@ -11,6 +10,8 @@ import {
 
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import { buildFinalMessages } from "@/lib/build-prompt"
+
+import llmConfig from "@/lib/models/llm/llm-config"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
 
     replaceWordsInLastUserMessage(messages, wordReplacements)
 
-    const systemMessageContent = `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}`
+    const systemMessageContent = `${llmConfig.systemPrompts.openai}`
 
     updateOrAddSystemMessage(messages, systemMessageContent)
 

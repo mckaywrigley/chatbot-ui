@@ -1,3 +1,6 @@
+const KnowledgeCutOFFOpenAI = "Knowledge cutoff: 2023-10"
+const currentDate = new Date().toISOString().split("T")[0]
+
 const llmConfig = {
   openrouter: {
     url: `https://openrouter.ai/api/v1/chat/completions`,
@@ -29,7 +32,8 @@ const llmConfig = {
     apiKey: process.env.SECRET_COHERE_API_KEY || "defaultApiKey"
   },
   systemPrompts: {
-    hackerGPT: process.env.SECRET_HACKERGPT_SYSTEM_PROMPT,
+    hackerGPT: `${process.env.SECRET_HACKERGPT_SYSTEM_PROMPT}\n Current date: ${currentDate}`,
+    openai: `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}\n ${KnowledgeCutOFFOpenAI}\n Current date: ${currentDate}`,
     pinecone: process.env.PINECONE_SYSTEM_PROMPT
   },
   models: {

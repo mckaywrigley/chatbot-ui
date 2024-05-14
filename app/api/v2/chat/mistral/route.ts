@@ -167,7 +167,8 @@ export async function POST(request: Request) {
           targetStandAloneMessage,
           providerUrl,
           providerHeaders,
-          selectedStandaloneQuestionModel
+          selectedStandaloneQuestionModel,
+          systemMessageContent
         )
 
         const pineconeRetriever = new RetrieverReranker(
@@ -190,7 +191,7 @@ export async function POST(request: Request) {
           }
 
           cleanedMessages[0].content =
-            `${llmConfig.systemPrompts.hackerGPT} ` +
+            `${systemMessageContent} ` +
             `${llmConfig.systemPrompts.pinecone} ` +
             `Context for RAG enrichment:\n` +
             `---------------------\n` +
@@ -312,7 +313,8 @@ async function generateStandaloneQuestion(
   latestUserMessage: any,
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any,
-  selectedStandaloneQuestionModel: string | undefined
+  selectedStandaloneQuestionModel: string | undefined,
+  systemMessageContent: string
 ) {
   // Removed the filter for the standalone question as we already have one before this function is called
   //if (messages.length < 4 || latestUserMessage.length > 256) {
@@ -350,7 +352,7 @@ async function generateStandaloneQuestion(
 
   const firstMessage = messages[0]
     ? messages[0]
-    : { role: "system", content: `${llmConfig.systemPrompts.hackerGPT}` }
+    : { role: "system", content: `${systemMessageContent}` }
 
   try {
     const requestBody = {
