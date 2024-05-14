@@ -264,9 +264,9 @@ export const useChatHandler = () => {
         const urls = messageContent.match(urlRegex) || []
 
         if (selectedPlugin !== PluginID.WEB_SCRAPER && urls.length > 0) {
-          if (selectedPlugin === PluginID.NONE) {
-            toast.warning("Enable the Web Scraper plugin to process websites.")
-          }
+          // if (selectedPlugin === PluginID.NONE) {
+          //   toast.warning("Enable the Web Scraper plugin to process websites.")
+          // }
         } else {
           for (const url of urls) {
             const response = await fetch(`/api/retrieval/process/web`, {

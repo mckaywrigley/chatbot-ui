@@ -100,7 +100,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     useState<AbortController | null>(null)
 
   // ENHANCE MENU STORE
-  const [isEnhancedMenuOpen, setIsEnhancedMenuOpen] = useState(true)
+  const [isEnhancedMenuOpen, setIsEnhancedMenuOpen] = useState(false)
   const [selectedPluginType, setSelectedPluginType] = useState("")
   const [selectedPlugin, setSelectedPlugin] = useState(PluginID.NONE)
 

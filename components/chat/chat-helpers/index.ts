@@ -150,6 +150,45 @@ export const handleHostedChat = async (
   alertDispatch: React.Dispatch<AlertAction>,
   selectedPlugin: PluginID | null
 ) => {
+  if (!isContinuation) {
+    const pluginDetectorResponse = await fetch("/api/v2/chat/plugin-detector", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        payload: payload,
+        chatImages: chatImages,
+        selectedPlugin: selectedPlugin
+      })
+    })
+
+    if (pluginDetectorResponse.ok) {
+      const data = await pluginDetectorResponse.json()
+      const detectedPlugin = data.plugin
+
+      if (detectedPlugin && detectedPlugin !== "None") {
+        selectedPlugin = detectedPlugin
+        return await handleHostedPluginsChat(
+          payload,
+          profile,
+          modelData,
+          tempAssistantChatMessage,
+          isRegeneration,
+          newAbortController,
+          newMessageImages,
+          chatImages,
+          setIsGenerating,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse,
+          alertDispatch,
+          detectedPlugin
+        )
+      }
+    }
+  }
+
   const provider =
     modelData.provider === "openai" && profile.use_azure_openai
       ? "azure"
@@ -177,7 +216,7 @@ export const handleHostedChat = async (
     isRagEnabled
   }
 
-  const response = await fetchChatResponse(
+  const chatResponse = await fetchChatResponse(
     apiEndpoint,
     requestBody,
     true,
@@ -188,7 +227,7 @@ export const handleHostedChat = async (
   )
 
   return await processResponse(
-    response,
+    chatResponse,
     isRegeneration
       ? payload.chatMessages[payload.chatMessages.length - 1]
       : isContinuation

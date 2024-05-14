@@ -60,10 +60,14 @@ export async function getRemaining(
   isPremium: boolean
 ): Promise<[number, number | null]> {
   const storageKey = _makeStorageKey(userId, model)
-  let timeWindowMinutes =
-    model === "plugins"
-      ? Number(process.env.RATELIMITER_TIME_PLUGINS_WINDOW_MINUTES)
-      : Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
+  let timeWindowMinutes
+  if (model === "plugins") {
+    timeWindowMinutes = Number(
+      process.env.RATELIMITER_TIME_PLUGINS_WINDOW_MINUTES
+    )
+  } else {
+    timeWindowMinutes = Number(process.env.RATELIMITER_TIME_WINDOW_MINUTES)
+  }
   const timeWindow = timeWindowMinutes * 60 * 1000
   const now = Date.now()
   const timestamps: number[] = await getRedis().zrange(
@@ -86,8 +90,8 @@ export async function getRemaining(
 
 function _getLimit(model: string, isPremium: boolean): number {
   let limit
-  if (model === "plugins") {
-    const limitKey = `RATELIMITER_LIMIT_PLUGINS_${isPremium ? "PREMIUM" : "FREE"}`
+  if (model === "plugins" || model === "pluginDetector") {
+    const limitKey = `RATELIMITER_LIMIT_${model.toUpperCase()}_${isPremium ? "PREMIUM" : "FREE"}`
     limit = Number(process.env[limitKey])
   } else {
     const fixedModelName = _getFixedModelName(model)
@@ -143,6 +147,19 @@ export function getRateLimitErrorMessage(
   if (model === "plugins") {
     let message = `
   ⚠️ You've reached the rate limit for plugins.
+⏰ Access will be restored in ${remainingText}.`
+
+    if (!premium) {
+      message += `
+🚀 Consider upgrading for higher limits and more features.`
+    }
+
+    return message.trim()
+  }
+
+  if (model === "pluginDetector") {
+    let message = `
+  ⚠️ You've reached the rate limit for the plugin detector.
 ⏰ Access will be restored in ${remainingText}.`
 
     if (!premium) {
