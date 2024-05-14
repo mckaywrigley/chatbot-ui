@@ -62,10 +62,10 @@ export async function buildFinalMessages(
     chatSettings.model === "gpt-4-turbo-preview" ||
     chatSettings.model === "mistral-large"
   ) {
-    CHUNK_SIZE = 16384
+    CHUNK_SIZE = 12288
   } else if (chatSettings.model === "mistral-medium") {
-    // Adjusting the chunk size to comply with the content size limit imposed by Llama 3
-    CHUNK_SIZE = 6144
+    // Adjusting the chunk size to comply with the content size limit imposed by Llama 3 (8192 max)
+    CHUNK_SIZE = 8192
   }
 
   if (selectedPlugin !== PluginID.NONE) {
