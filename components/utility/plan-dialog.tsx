@@ -115,7 +115,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
         {isMobile ? (
           <div className="flex flex-col items-center p-4 text-center">
             <div className="mb-1">
-              <IconLockOpen size={48} />
+              <IconLockOpen size={42} />
             </div>
             <h3 className="text-2xl font-bold">Get HackerGPT Pro</h3>
             <h4 className="text-primary mb-4 text-base">
