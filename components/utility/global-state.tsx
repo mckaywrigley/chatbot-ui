@@ -139,11 +139,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // Handle window resize to update isMobile
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768)
+      setIsMobile(window.innerWidth <= 640)
     }
 
     // Set initial value
-    setIsMobile(window.innerWidth <= 768)
+    setIsMobile(window.innerWidth <= 640)
 
     // Add event listener
     window.addEventListener("resize", handleResize)

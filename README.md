@@ -8,7 +8,7 @@ When you submit a question, it is transmitted to our server. We first check the 
 
 - **HackerGPT**: A Mixtral 8x22B with a semantic search on our hacking data paired with our unique prompt. 
 - **HackerGPT Pro**: A Mistral Large with a semantic search on our hacking data paired with our unique prompt.
-- **GPT-4 Turbo**: The latest and greatest from OpenAI, paired with our unique prompt. 
+- **GPT-4o**: The latest and greatest from OpenAI, paired with our unique prompt. 
 
 ## What Makes HackerGPT Special?
 

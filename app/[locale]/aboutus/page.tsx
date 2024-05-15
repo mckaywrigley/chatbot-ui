@@ -46,8 +46,8 @@ export default function AboutUsPage() {
                 hacking data paired with our unique prompt.
               </li>
               <li>
-                GPT-4 Turbo: The latest and greatest from OpenAI, paired with
-                our unique prompt.
+                GPT-4o: The latest and greatest from OpenAI, paired with our
+                unique prompt.
               </li>
             </ul>
           </div>

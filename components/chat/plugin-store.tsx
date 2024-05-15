@@ -1,5 +1,5 @@
 import { Dialog, Transition, Tab } from "@headlessui/react"
-import React, { useState, useEffect, Fragment } from "react"
+import React, { useState, useEffect, Fragment, useContext } from "react"
 import {
   IconX,
   IconSearch,
@@ -10,6 +10,7 @@ import {
 
 import { PluginSummary } from "@/types/plugins"
 import Image from "next/image"
+import { ChatbotUIContext } from "@/context/context"
 
 function getPluginsPerPage() {
   const width = window.innerWidth
@@ -34,6 +35,7 @@ function PluginStoreModal({
   uninstallPlugin
 }: PluginStoreModalProps) {
   const categories = ["Free", "Popular", "New", "All", "Installed"]
+  const { isMobile } = useContext(ChatbotUIContext)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("Free")
   const [currentPage, setCurrentPage] = useState(1)
@@ -102,8 +104,6 @@ function PluginStoreModal({
     setCurrentPage(currentPage > 1 ? currentPage - 1 : currentPage)
   const handleNextPage = () =>
     setCurrentPage(currentPage < pageCount ? currentPage + 1 : currentPage)
-
-  const isMobile = windowWidth < 768
 
   const closeModal = () => setIsOpen(false)
 
