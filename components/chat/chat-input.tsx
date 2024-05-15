@@ -87,7 +87,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsEnhancedMenuOpen,
     selectedPlugin,
     isRagEnabled: isRagEnabled,
-    setIsRagEnabled: setIsRagEnabled
+    setIsRagEnabled: setIsRagEnabled,
+    subscription
   } = useContext(ChatbotUIContext)
 
   const {
@@ -249,21 +250,23 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         className="flex flex-row items-center"
         onClick={() => fileInputRef.current?.click()}
       >
-        <WithTooltip
-          delayDuration={TOOLTIP_DELAY}
-          side="top"
-          display={
-            <div className="flex flex-col">
-              <p className="font-medium">Upload a File</p>
-            </div>
-          }
-          trigger={
-            <IconPaperclip
-              className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-              size={32}
-            />
-          }
-        />
+        {subscription && (
+          <WithTooltip
+            delayDuration={TOOLTIP_DELAY}
+            side="top"
+            display={
+              <div className="flex flex-col">
+                <p className="font-medium">Upload a File</p>
+              </div>
+            }
+            trigger={
+              <IconPaperclip
+                className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
+                size={32}
+              />
+            }
+          />
+        )}
       </div>
       <div
         className="flex flex-row items-center"
@@ -374,12 +377,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 className="flex flex-row items-center"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <div className="ml-2 flex flex-col">
-                  <span className="mb-1 flex flex-row items-center">
-                    <IconPaperclip size={32} />
-                    <span className="ml-2">Upload a file</span>
-                  </span>
-                </div>
+                {subscription && (
+                  <div className="ml-2 flex flex-col">
+                    <span className="mb-1 flex flex-row items-center">
+                      <IconPaperclip size={32} />
+                      <span className="ml-2">Upload a file</span>
+                    </span>
+                  </div>
+                )}
               </div>
               <div
                 className="mt-4 flex flex-row items-center"
@@ -496,8 +501,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={
             isMobile
-              ? t(`Message. Type "#" for files.`)
-              : t(`Ask anything. Type "#" for files.`)
+              ? t(`Message`) + (!subscription ? "" : t(`. Type "#" for files.`))
+              : t(`Message HackerGPT`) +
+                (!subscription ? "" : t(`. Type "#" for files.`))
           }
           onValueChange={handleInputChange}
           value={userInput}

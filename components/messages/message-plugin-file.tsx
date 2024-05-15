@@ -5,11 +5,12 @@ import {
   IconEye,
   IconUpload
 } from "@tabler/icons-react"
-import { FC, useEffect, useState } from "react"
+import { FC, useContext, useEffect, useState } from "react"
 import Modal from "../chat/dialog-portal"
 import { Button } from "../ui/button"
 import { MessageMarkdown } from "./message-markdown"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
+import { ChatbotUIContext } from "@/context/context"
 
 interface MessagePluginFileProps {
   autoDownloadEnabled: boolean
@@ -42,6 +43,7 @@ export const MessagePluginFile: FC<MessagePluginFileProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false)
   const { handleSelectDeviceFile } = useSelectFileHandler()
+  const { subscription } = useContext(ChatbotUIContext)
 
   const handleViewContent = () => {
     setShowModal(true)
@@ -121,23 +123,27 @@ export const MessagePluginFile: FC<MessagePluginFileProps> = ({
                 </span>
               </div>
             </Button>
-            <Button
-              variant="outline"
-              className="text-primary bg-primary-foreground hover:bg-muted px-2 py-1 text-sm md:px-4 md:py-2 md:text-base"
-              onClick={() => {
-                const file = new Blob([content], { type: "text/markdown" })
-                handleSelectDeviceFile(
-                  new File([file], `${plugin}-${id}.md`, {
-                    type: "text/markdown"
-                  })
-                )
-              }}
-            >
-              <div className="flex items-center">
-                <IconUpload className="mr-1 md:mr-2" size={16} />
-                <span className="text-sm font-medium md:text-base">Upload</span>
-              </div>
-            </Button>
+            {subscription && (
+              <Button
+                variant="outline"
+                className="text-primary bg-primary-foreground hover:bg-muted px-2 py-1 text-sm md:px-4 md:py-2 md:text-base"
+                onClick={() => {
+                  const file = new Blob([content], { type: "text/markdown" })
+                  handleSelectDeviceFile(
+                    new File([file], `${plugin}-${id}.md`, {
+                      type: "text/markdown"
+                    })
+                  )
+                }}
+              >
+                <div className="flex items-center">
+                  <IconUpload className="mr-1 md:mr-2" size={16} />
+                  <span className="text-sm font-medium md:text-base">
+                    Upload
+                  </span>
+                </div>
+              </Button>
+            )}
           </div>
         )}
       </div>

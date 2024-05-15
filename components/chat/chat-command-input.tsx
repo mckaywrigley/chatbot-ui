@@ -17,7 +17,8 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     setIsAtPickerOpen,
     atCommand,
     focusPrompt,
-    focusFile
+    focusFile,
+    subscription
   } = useContext(ChatbotUIContext)
 
   const { handleSelectUserFile, handleSelectUserCollection } =
@@ -29,20 +30,22 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         <PromptPicker />
       </div> */}
 
-      <div>
-        <FilePicker
-          isOpen={isAtPickerOpen}
-          searchQuery={atCommand}
-          onOpenChange={setIsAtPickerOpen}
-          selectedFileIds={[...newMessageFiles, ...chatFiles].map(
-            file => file.id
-          )}
-          selectedCollectionIds={[]}
-          onSelectFile={handleSelectUserFile}
-          onSelectCollection={handleSelectUserCollection}
-          isFocused={focusFile}
-        />
-      </div>
+      {subscription && (
+        <div>
+          <FilePicker
+            isOpen={isAtPickerOpen}
+            searchQuery={atCommand}
+            onOpenChange={setIsAtPickerOpen}
+            selectedFileIds={[...newMessageFiles, ...chatFiles].map(
+              file => file.id
+            )}
+            selectedCollectionIds={[]}
+            onSelectFile={handleSelectUserFile}
+            onSelectCollection={handleSelectUserCollection}
+            isFocused={focusFile}
+          />
+        </div>
+      )}
 
       {/* <ToolPicker /> */}
     </>

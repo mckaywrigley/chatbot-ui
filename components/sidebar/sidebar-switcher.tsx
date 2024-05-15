@@ -72,17 +72,13 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
-          icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
-          contentType="files"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
-          contentType="collections"
-          onContentTypeChange={onContentTypeChange}
-        />
+        {subscription && (
+          <SidebarSwitchItem
+            icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
+            contentType="files"
+            onContentTypeChange={onContentTypeChange}
+          />
+        )}
 
         {/* Imitating SidebarSwitchItem but without contentType */}
         <button
@@ -93,6 +89,13 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         >
           <IconPuzzle size={SIDEBAR_ICON_SIZE} />
         </button>
+        {subscription && (
+          <SidebarSwitchItem
+            icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
+            contentType="collections"
+            onContentTypeChange={onContentTypeChange}
+          />
+        )}
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">

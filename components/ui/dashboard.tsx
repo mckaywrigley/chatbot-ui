@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
 import { IconChevronCompactRight, IconFileFilled } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FC, useState } from "react"
+import { FC, useContext, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
+import { ChatbotUIContext } from "@/context/context"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -22,6 +23,7 @@ interface DashboardProps {
 
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
+  const { subscription } = useContext(ChatbotUIContext)
 
   const pathname = usePathname()
   const router = useRouter()
@@ -76,7 +78,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     const items = event.dataTransfer.items
     let fileCount = 0
 
-    if (items) {
+    if (items && subscription) {
       for (let i = 0; i < items.length && fileCount < 5; i++) {
         const item = items[i]
         if (item.kind === "file") {
@@ -207,7 +209,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
       >
-        {isDragging ? (
+        {isDragging && subscription ? (
           <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
             <div className="justify-cente flex flex-col items-center rounded-lg p-4">
               <IconFileFilled size={48} className="mb-2 text-white" />
