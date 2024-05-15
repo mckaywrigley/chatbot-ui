@@ -259,11 +259,13 @@ export const useChatHandler = () => {
         messageContent
       )
 
-      if (!isContinuation && messageContent) {
+      if (!isContinuation && messageContent && subscription) {
         const urlRegex = /https?:\/\/[^\s]+/g
         const urls = messageContent.match(urlRegex) || []
 
-        if (selectedPlugin !== PluginID.WEB_SCRAPER && urls.length > 0) {
+        if (
+          selectedPlugin !== PluginID.WEB_SCRAPER && urls.length > 0
+        ) {
           // if (selectedPlugin === PluginID.NONE) {
           //   toast.warning("Enable the Web Scraper plugin to process websites.")
           // }

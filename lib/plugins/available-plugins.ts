@@ -176,10 +176,10 @@ export const availablePlugins: PluginSummary[] = [
     value: PluginID.WEB_SCRAPER,
     icon: "https://cdn-icons-png.flaticon.com/512/11892/11892629.png",
     description: "Extract data from websites and chat with the extracted data",
-    categories: ["Free", "Popular", "New"],
+    categories: ["Popular", "New"],
     githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
     isInstalled: false,
-    isPremium: false,
+    isPremium: true,
     starters: [
       {
         title: "Scrape Data",
