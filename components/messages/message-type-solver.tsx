@@ -77,7 +77,7 @@ export const MessageTypeResolver: FC<MessageTypeResolverProps> = ({
     )
   }
 
-  if (isPluginOutput && message.content.length > messageSizeLimit) {
+  if (message.content.length > messageSizeLimit) {
     return (
       <MessagePluginFile
         created_at={message.created_at}

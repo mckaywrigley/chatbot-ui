@@ -146,7 +146,6 @@ export async function POST(request: Request) {
     )
 
     if (rateLimitCheckResult !== null) {
-      console.log(rateLimitCheckResult)
       return new Response(JSON.stringify({ plugin: "None" }), { status: 200 })
     }
 
