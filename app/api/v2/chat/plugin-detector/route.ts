@@ -229,7 +229,7 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = "openai/gpt-4o"
+  const modelStandaloneQuestion = llmConfig.models.hackerGPT_RAG_openrouter
 
   const chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))
