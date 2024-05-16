@@ -194,15 +194,6 @@ export const handleHostedChat = async (
       ? "azure"
       : modelData.provider
 
-  let formattedMessages = []
-
-  formattedMessages = await buildFinalMessages(
-    payload,
-    profile,
-    chatImages,
-    selectedPlugin
-  )
-
   const apiEndpoint =
     provider === "custom" ? "/api/v2/chat/custom" : `/api/v2/chat/${provider}`
 
@@ -257,15 +248,6 @@ export const handleHostedPluginsChat = async (
   selectedPlugin: PluginID,
   fileData?: { fileName: string; fileContent: string }[]
 ) => {
-  let formattedMessages = []
-
-  formattedMessages = await buildFinalMessages(
-    payload,
-    profile,
-    chatImages,
-    selectedPlugin
-  )
-
   const apiEndpoint = "/api/v2/chat/plugins"
 
   const requestBody: any = {
