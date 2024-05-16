@@ -83,7 +83,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
 
       <PopoverContent
         className="bg-background border-input relative flex max-h-[calc(100vh-60px)] w-[300px] flex-col space-y-4 overflow-auto rounded-lg border-2 p-3 dark:border-none"
-        align={isMobile ? "center" : "start"}
+        align={"center"}
       >
         <ChatSettingsForm
           chatSettings={chatSettings}

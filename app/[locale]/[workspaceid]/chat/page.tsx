@@ -53,7 +53,7 @@ export default function ChatPage() {
           </div>
 
           {!isMobile || isPremium ? (
-            <div className="absolute top-2 md:left-2">
+            <div className="absolute top-2">
               <ChatSettings />
             </div>
           ) : (

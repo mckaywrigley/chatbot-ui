@@ -137,7 +137,6 @@ export async function POST(request: Request) {
 
   try {
     const profile = await getServerProfile()
-
     const openrouterApiKey = profile.openrouter_api_key || ""
 
     const rateLimitCheckResult = await checkRatelimitOnApi(
@@ -149,25 +148,16 @@ export async function POST(request: Request) {
       return new Response(JSON.stringify({ plugin: "None" }), { status: 200 })
     }
 
-    let providerUrl, providerHeaders, selectedStandaloneQuestionModel
-
     const useOpenRouter = process.env.USE_OPENROUTER?.toLowerCase() === "true"
-    if (useOpenRouter) {
-      providerUrl = llmConfig.openrouter.url
-      selectedStandaloneQuestionModel =
-        llmConfig.models.hackerGPT_standalone_question_openrouter
-      providerHeaders = {
-        Authorization: `Bearer ${openrouterApiKey}`,
-        "Content-Type": "application/json"
-      }
-    } else {
-      providerUrl = llmConfig.together.url
-      selectedStandaloneQuestionModel =
-        llmConfig.models.hackerGPT_standalone_question_together
-      providerHeaders = {
-        Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
-        "Content-Type": "application/json"
-      }
+    const providerUrl = useOpenRouter
+      ? llmConfig.openrouter.url
+      : llmConfig.together.url
+    const selectedStandaloneQuestionModel = useOpenRouter
+      ? llmConfig.models.hackerGPT_standalone_question_openrouter
+      : llmConfig.models.hackerGPT_standalone_question_together
+    const providerHeaders = {
+      Authorization: `Bearer ${useOpenRouter ? openrouterApiKey : process.env.TOGETHER_API_KEY}`,
+      "Content-Type": "application/json"
     }
 
     const messages = await buildFinalMessages(
