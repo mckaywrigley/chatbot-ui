@@ -41,7 +41,9 @@ export async function POST(request: Request) {
 
     if (premiumPlugins.includes(selectedPlugin as PluginID) && !isPremium) {
       return new Response(
-        "Access Denied: The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
+        "Access Denied to " +
+          selectedPlugin +
+          ": The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
       )
     }
 
@@ -99,7 +101,9 @@ export async function POST(request: Request) {
         !isPremium
       ) {
         return new Response(
-          "Access Denied: The command you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this command."
+          "Access Denied to " +
+            commandPlugin +
+            ": The command you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this command."
         )
       }
 

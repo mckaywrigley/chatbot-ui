@@ -229,7 +229,7 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = llmConfig.models.hackerGPT_RAG_openrouter
+  const modelStandaloneQuestion = selectedStandaloneQuestionModel
 
   const chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))
@@ -241,7 +241,7 @@ async function detectPlugin(
     .map(plugin => `## ${plugin.name}\n${plugin.description}\n`)
     .join("\n")
 
-  const template = `You are HackerGPT, an expert in web application hacking with the ability to run specific plugins for hacking tasks. You are having a conversation with a user and need to determine if the user wants to use a specific plugin inside the chat environment for their task.
+    const template = `You are HackerGPT, an expert in web application hacking with the ability to run specific plugins for hacking tasks. You are having a conversation with a user and need to determine if the user wants to use a specific plugin inside the chat environment for their task.
     
     Objective: Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. The available plugins are:
     
@@ -261,8 +261,9 @@ async function detectPlugin(
     6. If the request clearly involves an action that matches a plugin's capabilities (like performing a scan or discovery), respond with the name of the plugin, wrapped in <Plugin> tags, in lowercase.
     7. Consider whether the user is asking for a recommendation, tool explanation, or performing an action. Recommendations and explanations should result in <Plugin>None</Plugin>.
     8. Always confirm that the request is an actionable task rather than an informational query before deciding on the plugin response.
-    
-    ALWAYS RESPOND WITH <Plugin>{None or plugin name}</Plugin>
+    9. Plugin can only execute and generate commands; for any questions, you should respond <Plugin>None</Plugin>; otherwise user will not get a response.
+
+    ALWAYS RESPOND WITH: Explanation and than <Plugin>{None or plugin name}</Plugin>
   
     Decision Criteria:
     - For action requests like 'scan a site for vulnerabilities' or 'find all subdomains of a domain', use the respective plugin capable of these actions.
@@ -307,7 +308,7 @@ async function detectPlugin(
         { role: "user", content: template }
       ],
       temperature: 0.1,
-      max_tokens: 64
+      max_tokens: 128
     }
 
     const res = await fetch(openRouterUrl, {
