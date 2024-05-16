@@ -169,16 +169,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   return (
     <div className="relative flex h-full flex-col items-center">
-      <div className="absolute left-4 top-2.5 flex justify-center">
-        <ChatScrollButtons
-          isAtTop={isAtTop}
-          isAtBottom={isAtBottom}
-          isOverflowing={isOverflowing}
-          scrollToTop={scrollToTop}
-          scrollToBottom={scrollToBottom}
-        />
-      </div>
-
       <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
         <ChatSecondaryButtons />
       </div>
@@ -200,20 +190,30 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {!isGenerating && selectedChat?.finish_reason === "length" && (
-        <div className="bg-secondary flex w-full justify-center p-2">
-          <Button
-            onClick={handleSendContinuation}
-            variant="outline"
-            className="flex items-center space-x-1 px-4 py-2"
-          >
-            <IconPlayerTrackNext size={16} />
-            <span>Continue generating</span>
-          </Button>
-        </div>
-      )}
-
       <div className="relative w-screen min-w-[300px] items-end px-2 pb-3 pt-2 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[650px] md:min-w-[300px] lg:w-[650px] xl:w-[800px]">
+        <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 justify-center">
+          <ChatScrollButtons
+            isAtTop={isAtTop}
+            isAtBottom={isAtBottom}
+            isOverflowing={isOverflowing}
+            scrollToTop={scrollToTop}
+            scrollToBottom={scrollToBottom}
+          />
+        </div>
+
+        {!isGenerating && selectedChat?.finish_reason === "length" && (
+          <div className="flex w-full justify-center p-2">
+            <Button
+              onClick={handleSendContinuation}
+              variant="outline"
+              className="flex items-center space-x-1 px-4 py-2"
+            >
+              <IconPlayerTrackNext size={16} />
+              <span>Continue generating</span>
+            </Button>
+          </div>
+        )}
+
         <ChatInput />
       </div>
 

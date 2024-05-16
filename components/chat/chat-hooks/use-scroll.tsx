@@ -37,11 +37,13 @@ export const useScroll = () => {
   const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {
     const target = e.target as HTMLDivElement
     const bottom =
-      Math.round(target.scrollHeight) - Math.round(target.scrollTop) ===
-      Math.round(target.clientHeight)
-    setIsAtBottom(bottom)
+      Math.abs(target.scrollHeight - target.scrollTop - target.clientHeight) <
+      250
+    setTimeout(() => {
+      setIsAtBottom(bottom)
+    }, 300)
 
-    const top = target.scrollTop === 0
+    const top = target.scrollTop < 250
     setIsAtTop(top)
 
     if (!bottom && !isAutoScrolling.current) {
@@ -56,7 +58,7 @@ export const useScroll = () => {
 
   const scrollToTop = useCallback(() => {
     if (messagesStartRef.current) {
-      messagesStartRef.current.scrollIntoView({ behavior: "instant" })
+      messagesStartRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [])
 
@@ -65,7 +67,7 @@ export const useScroll = () => {
 
     setTimeout(() => {
       if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "instant" })
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
       }
 
       isAutoScrolling.current = false

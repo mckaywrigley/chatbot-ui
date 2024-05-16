@@ -241,7 +241,7 @@ async function detectPlugin(
     .map(plugin => `## ${plugin.name}\n${plugin.description}\n`)
     .join("\n")
 
-    const template = `You are HackerGPT, an expert in web application hacking with the ability to run specific plugins for hacking tasks. You are having a conversation with a user and need to determine if the user wants to use a specific plugin inside the chat environment for their task.
+  const template = `You are HackerGPT, an expert in web application hacking with the ability to run specific plugins for hacking tasks. You are having a conversation with a user and need to determine if the user wants to use a specific plugin inside the chat environment for their task.
     
     Objective: Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. The available plugins are:
     
