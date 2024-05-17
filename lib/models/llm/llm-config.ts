@@ -39,7 +39,7 @@ const llmConfig = {
   models: {
     hackerGPT_default_openrouter:
       process.env.OPENROUTER_HACKERGPT_DEFUALT_MODEL,
-    hackerGPT_default_together: process.env.TOGETHER_HACKERGPT_DEFUALT_MODEL,
+    hackerGPT_default_together: process.env.TOGETHER_HACKERGPT_DEFAULT_MODEL,
     hackerGPT_RAG_openrouter: process.env.OPENROUTER_HACKERGPT_RAG_MODEL,
     hackerGPT_RAG_together: process.env.TOGETHER_HACKERGPT_RAG_MODEL,
     hackerGPT_standalone_question_openrouter:
