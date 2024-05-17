@@ -8,7 +8,7 @@ export type LLMID =
   | GroqLLMID
   | PerplexityLLMID
 
-// OpenAI Models (UPDATED 1/29/24)
+// OpenAI Models (UPDATED 5/13/24)
 export type OpenAILLMID =
   | "gpt-4o" // GPT-4o
   | "gpt-4-turbo-preview" // GPT-4 Turbo
@@ -32,12 +32,13 @@ export type AnthropicLLMID =
 // Mistral Models
 export type MistralLLMID =
   | "mistral-tiny" // Mistral Tiny
-  | "mistral-small" // Mistral Small
-  | "mistral-medium" // Mistral Medium
-  | "mistral-large-2402" // Mistral Large
+  | "mistral-small-latest" // Mistral Small
+  | "mistral-medium-latest" // Mistral Medium
+  | "mistral-large-latest" // Mistral Large
 
 export type GroqLLMID =
-  | "llama2-70b-4096" // LLaMA2-70b
+  | "llama3-8b-8192" // LLaMA3-8b
+  | "llama3-70b-8192" // LLaMA3-70b
   | "mixtral-8x7b-32768" // Mixtral-8x7b
 
 // Perplexity Models (UPDATED 1/31/24)
@@ -63,6 +64,12 @@ export interface LLM {
   hostedId: string
   platformLink: string
   imageInput: boolean
+  pricing?: {
+    currency: string
+    unit: string
+    inputCost: number
+    outputCost?: number
+  }
 }
 
 export interface OpenRouterLLM extends LLM {

@@ -144,7 +144,9 @@ export async function buildFinalMessages(
 
           return {
             type: "image_url",
-            image_url: formedUrl
+            image_url: {
+              url: formedUrl
+            }
           }
         })
       ]

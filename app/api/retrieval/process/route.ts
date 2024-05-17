@@ -24,19 +24,52 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
 
-    const file = formData.get("file") as File
     const file_id = formData.get("file_id") as string
     const embeddingsProvider = formData.get("embeddingsProvider") as string
 
+    const { data: fileMetadata, error: metadataError } = await supabaseAdmin
+      .from("files")
+      .select("*")
+      .eq("id", file_id)
+      .single()
+
+    if (metadataError) {
+      throw new Error(
+        `Failed to retrieve file metadata: ${metadataError.message}`
+      )
+    }
+
+    if (!fileMetadata) {
+      throw new Error("File not found")
+    }
+
+    if (fileMetadata.user_id !== profile.user_id) {
+      throw new Error("Unauthorized")
+    }
+
+    const { data: file, error: fileError } = await supabaseAdmin.storage
+      .from("files")
+      .download(fileMetadata.file_path)
+
+    if (fileError)
+      throw new Error(`Failed to retrieve file: ${fileError.message}`)
+
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
-    const fileExtension = file.name.split(".").pop()?.toLowerCase()
+    const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
+      try {
+        if (profile.use_azure_openai) {
+          checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+        } else {
+          checkApiKey(profile.openai_api_key, "OpenAI")
+        }
+      } catch (error: any) {
+        error.message =
+          error.message +
+          ", make sure it is configured or else use local embeddings"
+        throw error
       }
     }
 
@@ -132,7 +165,8 @@ export async function POST(req: Request) {
       status: 200
     })
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    console.log(`Error in retrieval/process: ${error.stack}`)
+    const errorMessage = error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
