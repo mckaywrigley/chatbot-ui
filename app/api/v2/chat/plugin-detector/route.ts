@@ -3,6 +3,7 @@ import { buildFinalMessages } from "@/lib/build-prompt"
 import llmConfig from "@/lib/models/llm/llm-config"
 import { updateOrAddSystemMessage } from "@/lib/ai-helper"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
+import { ca } from "date-fns/locale"
 
 class APIError extends Error {
   code: any
@@ -16,111 +17,104 @@ class APIError extends Error {
 const availablePlugins = [
   {
     name: "cvemap",
-    description: `
-      CVEMAP helps explore and filter CVEs based on criteria like vendor, product, and severity.
-
-      **Priority Level:** High
-
-      **Usage Scenarios:**
-      - Identifying vulnerabilities in specific software.
-      - Filtering CVEs by severity for risk assessment.
-    `
+    priority: "High",
+    description:
+      "CVEMAP helps explore and filter CVEs database based on criteria like vendor, product/library, nuclei templates and severity.",
+    usageScenarios: [
+      "Get updated CVE information for a specific vendor, product, or nuclei template.",
+      "Identifying vulnerabilities in specific software or libraries.",
+      "Filtering CVEs by severity for risk assessment.",
+      "List CVEs in specific software or libraries.",
+      "Provide me with the latest CVEs with the severity of critical.",
+      "Provide me with the CVEs for Microsoft that have nuclei templates."
+    ]
   },
   {
     name: "subfinder",
-    description: `
-      Subfinder discovers valid subdomains for websites using passive sources. It's fast and efficient.
-
-      **Priority Level:** High
-
-      **Usage Scenarios:**
-      - Enumerating subdomains for security testing.
-      - Gathering subdomains for attack surface analysis.
-    `
+    priority: "High",
+    description:
+      "Subfinder discovers valid subdomains for websites using passive sources. It's fast and efficient.",
+    usageScenarios: [
+      "Enumerating subdomains for security testing.",
+      "Gathering subdomains for attack surface analysis."
+    ]
   },
   {
     name: "golinkfinder",
-    description: `
-      GoLinkFinder extracts endpoints from HTML and JavaScript files, helping identify URLs within a target domain.
-
-      **Priority Level:** Medium
-
-      **Usage Scenarios:**
-      - Finding hidden API endpoints.
-      - Extracting URLs from web applications.
-    `
+    priority: "Medium",
+    description:
+      "GoLinkFinder extracts endpoints from HTML and JavaScript files, helping identify URLs within a target domain.",
+    usageScenarios: [
+      "Finding hidden API endpoints.",
+      "Extracting URLs from web applications."
+    ]
   },
   {
     name: "nuclei",
-    description: `
-      Nuclei scans for vulnerabilities in apps, infrastructure, and networks to identify and mitigate risks.
-
-      **Priority Level:** High
-
-      **Usage Scenarios:**
-      - Scanning web applications for known vulnerabilities.
-      - Automating vulnerability assessments.
-    `
+    priority: "High",
+    description:
+      "Nuclei scans for vulnerabilities in apps, infrastructure, and networks to identify and mitigate risks.",
+    usageScenarios: [
+      "Scanning web applications for known vulnerabilities.",
+      "Automating vulnerability assessments."
+    ]
   },
   {
     name: "katana",
-    description: `
-      Katana is a fast web crawler designed to efficiently discover endpoints in both headless and non-headless modes.
-
-      **Priority Level:** Medium
-
-      **Usage Scenarios:**
-      - Crawling websites to map all endpoints.
-      - Discovering hidden resources on a website.
-    `
+    priority: "Medium",
+    description:
+      "Katana is a fast web crawler designed to efficiently discover endpoints in both headless and non-headless modes.",
+    usageScenarios: [
+      "Crawling websites to map all endpoints.",
+      "Discovering hidden resources on a website."
+    ]
   },
   {
     name: "httpx",
-    description: `
-      HTTPX probes web servers, gathering information like status codes, headers, and technologies.
-
-      **Priority Level:** High
-
-      **Usage Scenarios:**
-      - Analyzing server responses.
-      - Detecting technologies and services used on a server.
-    `
+    priority: "High",
+    description:
+      "HTTPX probes web servers, gathering information like status codes, headers, and technologies.",
+    usageScenarios: [
+      "Analyzing server responses.",
+      "Detecting technologies and services used on a server."
+    ]
   },
   {
     name: "naabu",
-    description: `
-      Naabu is a port scanning tool that quickly enumerates open ports on target hosts, supporting SYN, CONNECT, and UDP scans.
-
-      **Priority Level:** High
-
-      **Usage Scenarios:**
-      - Scanning for open ports on a network.
-      - Identifying accessible services on a host.
-    `
+    priority: "High",
+    description:
+      "Naabu is a port scanning tool that quickly enumerates open ports on target hosts, supporting SYN, CONNECT, and UDP scans.",
+    usageScenarios: [
+      "Scanning for open ports on a network.",
+      "Identifying accessible services on a host."
+    ]
   },
   {
     name: "dnsx",
-    description: `
-      DNSX runs multiple DNS queries to discover records and perform DNS brute-forcing with user-supplied resolvers.
-
-      **Priority Level:** Low
-
-      **Usage Scenarios:**
-      - Querying DNS records for a domain.
-      - Brute-forcing subdomains.
-    `
+    priority: "Low",
+    description:
+      "DNSX runs multiple DNS queries to discover records and perform DNS brute-forcing with user-supplied resolvers.",
+    usageScenarios: [
+      "Querying DNS records for a domain.",
+      "Brute-forcing subdomains."
+    ]
   },
   {
     name: "alterx",
-    description: `
-      AlterX generates custom subdomain wordlists using DSL patterns, enriching enumeration pipelines.
-
-      **Priority Level:** Low
-
-      **Usage Scenarios:**
-      - Creating wordlists for subdomain enumeration.
-      - Generating custom permutations for subdomains.
-    `
+    priority: "Low",
+    description:
+      "AlterX generates custom subdomain wordlists using DSL patterns, enriching enumeration pipelines.",
+    usageScenarios: [
+      "Creating wordlists for subdomain enumeration.",
+      "Generating custom permutations for subdomains.",
+      "Generate subdomain wordlist for a domain."
+    ]
+  },
+  {
+    name: "none",
+    priority: "Highest",
+    description: "No specific plugin is suitable for the user's request.",
+    usageScenarios: ["If the user requests a plugin that is not available"]
   }
 ]
 
@@ -219,112 +213,153 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = selectedStandaloneQuestionModel
+  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct"
 
+  // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))
-    .slice(1, -1)
-    .slice(-3)
-    .map(msg => `${msg.role}: ${msg.content}`)
+    .slice(0, -1)
+    .slice(-4)
+    .map(msg => {
+      return {
+        role: msg.role,
+        content:
+          msg.content.substring(0, 1000) +
+          (msg.content.length > 1000 ? "..." : "")
+      }
+    })
 
   const pluginsInfo = availablePlugins
-    .map(plugin => `## ${plugin.name}\n${plugin.description}\n`)
+    .map(
+      plugin =>
+        `${plugin.name}|${plugin.priority}|${plugin.description}|${plugin.usageScenarios.join("; ")}`
+    )
     .join("\n")
 
-  const template = `You are HackerGPT, an expert in web application hacking with the ability to run specific plugins for hacking tasks. You are having a conversation with a user and need to determine if the user wants to use a specific plugin inside the chat environment for their task.
-    
-    Objective: Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. The available plugins are:
-    
-    # Plugins
-    ${pluginsInfo}
-  
-    Input:
-    - Query: """${lastUserMessage}"""
-  
-    IMPORTANT INSTRUCTION:
-    Use the following guidelines to analyze the user's request:
-    1. Treat the conversation as a normal interaction where the user might seek information or want to perform an action using a plugin.
-    2. Respond with the name of the plugin only if the user wants to perform a specific action inside the chat environment that any of the plugins can accomplish. If you are not sure, respond with None.
-    3. DO NOT respond with the plugin name if the user is asking for information about the plugin itself or about general topics. Always respond with <Plugin>None</Plugin> for such queries.
-    4. Identify if the request involves an actionable task that can be directly executed by a plugin within the chat environment (e.g., scanning a website, finding subdomains). Only in these cases should you respond with the plugin name.
-    5. If the user's request is for general information, conceptual explanations, or installation instructions, respond with <Plugin>None</Plugin>.
-    6. If the request clearly involves an action that matches a plugin's capabilities (like performing a scan or discovery), respond with the name of the plugin, wrapped in <Plugin> tags, in lowercase.
-    7. Consider whether the user is asking for a recommendation, tool explanation, or performing an action. Recommendations and explanations should result in <Plugin>None</Plugin>.
-    8. Always confirm that the request is an actionable task rather than an informational query before deciding on the plugin response.
-    9. Plugin can only execute and generate commands; for any questions, you should respond <Plugin>None</Plugin>; otherwise user will not get a response.
+  const template = `      
+      Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. 
 
-    ALWAYS RESPOND WITH: Explanation and than <Plugin>{None or plugin name}</Plugin>
-  
-    Decision Criteria:
-    - For action requests like 'scan a site for vulnerabilities' or 'find all subdomains of a domain', use the respective plugin capable of these actions.
-    - For information requests like 'how to install a plugin', 'tell me about subfinder', 'what plugin would you recommend for subdomain discovery', or 'how can I use this wordlist for attack', respond with <Plugin>None</Plugin>, as these do not require direct plugin intervention.
-    - Consider the overall conversation context to determine whether the user is seeking information or asking for an action to be performed. Ensure that only requests explicitly asking for an actionable task are responded to with a plugin name.
-  
-    Examples:
-    - Query: "tell me about subfinder"
-      - Response: <Plugin>None</Plugin>
-    - Query: "find all subdomains of example.com"
-      - Response: <Plugin>subfinder</Plugin>
-    - Query: "how can I use this wordlist for attack"
-      - Response: <Plugin>None</Plugin>
-    - Query: "what can you tell me about those domains"
-      - Response: <Plugin>None</Plugin>
-    - Query: "scan example.com for vulnerabilities"
-      - Response: <Plugin>nuclei</Plugin>
-    - Query: "extract URLs from this domain"
-      - Response: <Plugin>golinkfinder</Plugin>
-    - Query: "probe example.com for HTTP details"
-      - Response: <Plugin>httpx</Plugin>
-    - Query: "what plugin would you recommend for subdomain discovery"
-      - Response: <Plugin>None</Plugin>
-    - Query: "list all subdomains for test.com"
-      - Response: <Plugin>subfinder</Plugin>
-    - Query: "what tools can I use to scan domains?"
-      - Response: <Plugin>None</Plugin>
-    - Query: "explain how to use nuclei"
-      - Response: <Plugin>None</Plugin>`
+      # User Input:
+      - Query: """${lastUserMessage}"""
+
+      # Available Plugins
+      ID|Priority|Description|Usage Scenarios
+      ${pluginsInfo}
+
+      # Very Important Rules:
+      - All plugins run in our cloud platform, so if the user asks to run anywhere else, respond with ID = None.    
+      - Always pick None if you are not sure.
+
+      # Type of Request
+      Rewrite the user query in its simplest form and then analyze it:
+      - Question: The simplest form is a question that starts with What, Which, How, Why, When, Where, Who, Could you, Can you, etc.
+      - Action: The simplest form starts with a verb, and it's a command.
+      - Other: Other
+
+      # Output only the following:
+      \`\`\`
+      <SimplestUserQuery>{The user's query in its simplest form}</SimplestUserQuery>
+      <ScratchPad>{Your concise, step-by-step reasoning}</ScratchPad>
+      <TypeOfRequest>{Type of request}</TypeOfRequest>
+      <IsUserAskingAboutCVEs>{If the user is asking about CVEs specifically (not cvemap plugin question), true or false.}</IsUserAskingAboutCVEs>
+      <Plugin>{The single most relevant plugin ID for the user's needs}</Plugin>
+      \`\`\`
+      `
 
   const firstMessage = messages[0]
     ? messages[0]
     : { role: "system", content: `${llmConfig.systemPrompts.hackerGPT}` }
 
   try {
-    const requestBody = {
-      model: modelStandaloneQuestion,
-      route: "fallback",
-      messages: [
-        { role: firstMessage.role, content: firstMessage.content },
-        ...chatHistory,
-        { role: "user", content: template }
-      ],
-      temperature: 0.1,
-      max_tokens: 128
-    }
+    const messages = [
+      {
+        role: firstMessage.role,
+        content: template
+      },
+      ...chatHistory,
+      {
+        role: "user",
+        content: template
+      }
+    ]
 
-    const res = await fetch(openRouterUrl, {
-      method: "POST",
-      headers: openRouterHeaders,
-      body: JSON.stringify(requestBody)
-    })
+    const data = await callModel(
+      modelStandaloneQuestion || "",
+      messages,
+      openRouterUrl as string,
+      openRouterHeaders
+    )
 
-    if (!res.ok) {
-      const errorBody = await res.text()
-      throw new Error(
-        `HTTP error! status: ${res.status}. Error Body: ${errorBody}`
-      )
-    }
-
-    const data = await res.json()
     const aiResponse = data.choices?.[0]?.message?.content?.trim()
-    const pluginMatch = aiResponse.match(/<plugin>(.*?)<\/plugin>/i)
-    const detectedPlugin = pluginMatch ? pluginMatch[1].toLowerCase() : "None"
+
+    const detectedPlugin = extractXML(aiResponse, "Plugin", "None")
+    const typeOfRequest = extractXML(aiResponse, "TypeOfRequest", "other")
+    const isUserAskingAboutCVEs = extractXML(
+      aiResponse,
+      "IsUserAskingAboutCVEs",
+      "false"
+    )
+
+    // console.log({
+    //   aiResponse,
+    //   detectedPlugin,
+    //   typeOfRequest,
+    //   isUserAskingAboutCVEs
+    // })
 
     if (!availablePlugins.map(plugin => plugin.name).includes(detectedPlugin)) {
       return "None"
     } else {
+      if (isUserAskingAboutCVEs === "true" && detectedPlugin === "cvemap") {
+        return "cvemap"
+      }
+
+      if (detectedPlugin === "none" || typeOfRequest !== "action") {
+        return "None"
+      }
       return detectedPlugin
     }
   } catch (error) {
     return "None"
   }
+}
+
+function extractXML(aiResponse: string, xmlTag: string, defaultValue: string) {
+  const regex = new RegExp(
+    `<${xmlTag.toLowerCase()}>(.*?)</${xmlTag.toLowerCase()}>`,
+    "i"
+  )
+  const match = aiResponse.toLowerCase().match(regex)
+  return match ? match[1].toLowerCase() : defaultValue
+}
+
+async function callModel(
+  modelStandaloneQuestion: string,
+  messages: any,
+  openRouterUrl: string,
+  openRouterHeaders: any
+): Promise<any> {
+  const requestBody = {
+    model: modelStandaloneQuestion,
+    route: "fallback",
+    messages,
+    temperature: 0.1,
+    max_tokens: 256
+  }
+
+  const res = await fetch(openRouterUrl, {
+    method: "POST",
+    headers: openRouterHeaders,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (!res.ok) {
+    const errorBody = await res.text()
+    throw new Error(
+      `HTTP error! status: ${res.status}. Error Body: ${errorBody}`
+    )
+  }
+
+  const data = await res.json()
+  return data
 }

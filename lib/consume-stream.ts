@@ -6,7 +6,9 @@ export async function consumeReadableStream(
   const reader = stream.getReader()
   const decoder = new TextDecoder()
 
-  signal.addEventListener("abort", () => reader.cancel(), { once: true })
+  signal.addEventListener("abort", () => !reader.closed && reader.cancel(), {
+    once: true
+  })
 
   try {
     while (true) {
