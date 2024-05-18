@@ -191,8 +191,7 @@ export async function POST(request: Request) {
           }
 
           cleanedMessages[0].content =
-            `${systemMessageContent} ` +
-            `${llmConfig.systemPrompts.pinecone} ` +
+            `${llmConfig.systemPrompts.pinecone}\n` +
             `Context for RAG enrichment:\n` +
             `---------------------\n` +
             `${pineconeResults}\n` +

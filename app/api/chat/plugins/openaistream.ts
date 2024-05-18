@@ -10,6 +10,7 @@ import {
   ReconnectInterval,
   createParser
 } from "eventsource-parser"
+import llmConfig from "@/lib/models/llm/llm-config"
 
 export class OpenAIError extends Error {
   type: string
@@ -38,8 +39,8 @@ export const OpenAIStream = async (
   answerMessage: Message,
   tools?: any
 ) => {
-  const SYSTEM_PROMPT = process.env.SECRET_OPENAI_SYSTEM_PROMPT
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+  const SYSTEM_PROMPT = llmConfig.systemPrompts.openaiCurrentDateOnly
+  const OPENAI_API_KEY = llmConfig.openai.apiKey
   const openAIUrl = `https://api.openai.com/v1/chat/completions`
 
   replaceWordsInLastUserMessage(messages, wordReplacements)

@@ -1,5 +1,6 @@
 const KnowledgeCutOFFOpenAI = "Knowledge cutoff: 2023-10"
-const currentDate = new Date().toISOString().split("T")[0]
+const KnowledgeCutOFFMeta = "Knowledge cutoff: 2023-12"
+const currentDate = `Current date: ${new Date().toISOString().split("T")[0]}`
 
 const llmConfig = {
   openrouter: {
@@ -32,9 +33,11 @@ const llmConfig = {
     apiKey: process.env.SECRET_COHERE_API_KEY || "defaultApiKey"
   },
   systemPrompts: {
-    hackerGPT: `${process.env.SECRET_HACKERGPT_SYSTEM_PROMPT}\n Current date: ${currentDate}`,
-    openai: `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}\n ${KnowledgeCutOFFOpenAI}\n Current date: ${currentDate}`,
-    pinecone: process.env.PINECONE_SYSTEM_PROMPT
+    hackerGPT: `${process.env.SECRET_HACKERGPT_SYSTEM_PROMPT}\n${KnowledgeCutOFFMeta}\n${currentDate}`,
+    hackerGPTCurrentDateOnly: `${process.env.SECRET_HACKERGPT_SYSTEM_PROMPT}\n${currentDate}`,
+    openai: `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}\n${KnowledgeCutOFFOpenAI}\n${currentDate}`,
+    openaiCurrentDateOnly: `${process.env.SECRET_OPENAI_SYSTEM_PROMPT}\n${currentDate}`,
+    pinecone: `${process.env.SECRET_HACKERGPT_SYSTEM_PROMPT} ${process.env.PINECONE_SYSTEM_PROMPT}\n${currentDate}`
   },
   models: {
     hackerGPT_default_openrouter:

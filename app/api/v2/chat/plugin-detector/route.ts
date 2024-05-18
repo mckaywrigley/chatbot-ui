@@ -1,9 +1,8 @@
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import llmConfig from "@/lib/models/llm/llm-config"
-import { updateOrAddSystemMessage } from "@/lib/ai-helper"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
-import { ca } from "date-fns/locale"
+import endent from "endent"
 
 class APIError extends Error {
   code: any
@@ -162,9 +161,6 @@ export async function POST(request: Request) {
     )
     const cleanedMessages = messages as any[]
 
-    const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
-    updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
-
     const lastUserMessage = cleanedMessages[cleanedMessages.length - 2].content
 
     if (lastUserMessage.length > llmConfig.pinecone.messageLength.max) {
@@ -213,12 +209,12 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct"
+  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct:nitro"
 
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
     .filter(msg => !(msg.role === "assistant" && msg.content === ""))
-    .slice(0, -1)
+    .slice(1, -1)
     .slice(-4)
     .map(msg => {
       return {
@@ -236,7 +232,7 @@ async function detectPlugin(
     )
     .join("\n")
 
-  const template = `      
+  const template = endent`
       Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. 
 
       # User Input:
@@ -266,15 +262,15 @@ async function detectPlugin(
       \`\`\`
       `
 
-  const firstMessage = messages[0]
-    ? messages[0]
-    : { role: "system", content: `${llmConfig.systemPrompts.hackerGPT}` }
+  const systemMessage = {
+    role: "system",
+    content: `${llmConfig.systemPrompts.hackerGPTCurrentDateOnly}`
+  }
 
   try {
     const messages = [
       {
-        role: firstMessage.role,
-        content: template
+        systemMessage
       },
       ...chatHistory,
       {
