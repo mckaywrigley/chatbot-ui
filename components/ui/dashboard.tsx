@@ -79,24 +79,25 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     event.preventDefault()
 
     const items = event.dataTransfer.items
-    let fileCount = 0
+    // let fileCount = 0
 
     if (items && subscription) {
-      for (let i = 0; i < items.length && fileCount < 5; i++) {
+      // for (let i = 0; i < items.length && fileCount < 5; i++) {
+      for (let i = 0; i < items.length; i++) {
         const item = items[i]
         if (item.kind === "file") {
           const file = item.getAsFile()
           if (file) {
             handleFileUpload(file)
-            fileCount++
+            // fileCount++
           }
         }
       }
     }
 
-    if (fileCount >= 5) {
-      toast.error("Maximum of 5 files can be dropped at a time.")
-    }
+    // if (fileCount >= 5) {
+    //   toast.error("Maximum of 5 files can be dropped at a time.")
+    // }
 
     setIsDragging(false)
   }
