@@ -4,7 +4,12 @@ import { AlertAction } from "@/context/alert-context"
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
-import { createMessages, deleteMessage, updateMessage } from "@/db/messages"
+import {
+  createMessages,
+  deleteMessage,
+  deleteMessagesIncludingAndAfter,
+  updateMessage
+} from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import { consumeReadableStream } from "@/lib/consume-stream"
 import { Tables, TablesInsert } from "@/supabase/types"
@@ -16,7 +21,6 @@ import {
   LLM,
   MessageImage
 } from "@/types"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { PluginID } from "@/types/plugins"
 import React from "react"
 import { toast } from "sonner"
@@ -102,7 +106,7 @@ export const createTempMessages = (
       model: chatSettings.model,
       plugin: selectedPlugin,
       role: "user",
-      sequence_number: chatMessages.length,
+      sequence_number: lastSequenceNumber(chatMessages) + 1,
       updated_at: "",
       user_id: ""
     },
@@ -119,7 +123,7 @@ export const createTempMessages = (
       model: chatSettings.model,
       plugin: selectedPlugin,
       role: "assistant",
-      sequence_number: chatMessages.length + 1,
+      sequence_number: lastSequenceNumber(chatMessages) + 2,
       updated_at: "",
       user_id: ""
     },
@@ -510,6 +514,12 @@ export const handleCreateChat = async (
   return createdChat
 }
 
+export const lastSequenceNumber = (chatMessages: ChatMessage[]) =>
+  chatMessages.reduce(
+    (max, msg) => Math.max(max, msg.message.sequence_number),
+    0
+  )
+
 export const handleCreateMessages = async (
   chatMessages: ChatMessage[],
   currentChat: Tables<"chats">,
@@ -523,8 +533,11 @@ export const handleCreateMessages = async (
   retrievedFileItems: Tables<"file_items">[],
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
-  selectedPlugin: PluginID | null
+  selectedPlugin: PluginID | null,
+  editSequenceNumber?: number
 ) => {
+  const isEdit = editSequenceNumber !== undefined
+
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     user_id: profile.user_id,
@@ -532,7 +545,7 @@ export const handleCreateMessages = async (
     model: modelData.modelId,
     plugin: selectedPlugin,
     role: "user",
-    sequence_number: chatMessages.length,
+    sequence_number: lastSequenceNumber(chatMessages) + 1,
     image_paths: []
   }
 
@@ -543,11 +556,20 @@ export const handleCreateMessages = async (
     model: modelData.modelId,
     plugin: selectedPlugin,
     role: "assistant",
-    sequence_number: chatMessages.length + 1,
+    sequence_number: lastSequenceNumber(chatMessages) + 2,
     image_paths: []
   }
 
   let finalChatMessages: ChatMessage[] = []
+
+  // If the user is editing a message, delete all messages after the edited message
+  if (isEdit) {
+    await deleteMessagesIncludingAndAfter(
+      profile.user_id,
+      currentChat.id,
+      editSequenceNumber
+    )
+  }
 
   if (isRegeneration) {
     const lastMessageId = chatMessages[chatMessages.length - 1].message.id
@@ -626,7 +648,12 @@ export const handleCreateMessages = async (
     )
 
     finalChatMessages = [
-      ...chatMessages,
+      ...(isEdit
+        ? chatMessages.filter(
+            chatMessage =>
+              chatMessage.message.sequence_number < editSequenceNumber
+          )
+        : chatMessages),
       {
         message: updatedMessage,
         fileItems: []

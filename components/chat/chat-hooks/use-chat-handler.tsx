@@ -2,7 +2,6 @@ import { useAlertContext } from "@/context/alert-context"
 import { ChatbotUIContext } from "@/context/context"
 import { updateChat } from "@/db/chats"
 import { getFileById } from "@/db/files"
-import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { PluginID } from "@/types/plugins"
@@ -11,6 +10,7 @@ import { useContext, useEffect, useRef } from "react"
 import { toast } from "sonner"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 
+import { createMessageFeedback } from "@/db/message-feedback"
 import {
   createTempMessages,
   handleCreateChat,
@@ -21,7 +21,6 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { usePromptAndCommand } from "./use-prompt-and-command"
-import { createMessageFeedback } from "@/db/message-feedback"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -222,8 +221,11 @@ export const useChatHandler = () => {
     messageContent: string | null,
     chatMessages: ChatMessage[],
     isRegeneration: boolean,
-    isContinuation: boolean = false
+    isContinuation: boolean = false,
+    editSequenceNumber?: number
   ) => {
+    const isEdit = editSequenceNumber !== undefined
+
     try {
       if (!isRegeneration) {
         setUserInput("")
@@ -314,19 +316,22 @@ export const useChatHandler = () => {
           selectedPlugin
         )
 
-      const sentChatMessages = [...chatMessages]
+      let sentChatMessages = [...chatMessages]
 
-      if (!isRegeneration) {
-        sentChatMessages.push(tempUserChatMessage)
-        if (!isContinuation) sentChatMessages.push(tempAssistantChatMessage)
-      } else {
-        sentChatMessages.pop()
-        sentChatMessages.push(tempAssistantChatMessage)
+      // If the message is an edit, remove all following messages
+      if (isEdit) {
+        sentChatMessages = sentChatMessages.filter(
+          chatMessage =>
+            chatMessage.message.sequence_number < editSequenceNumber
+        )
       }
 
-      // Update sequence numbers for the chat messages
-      for (let index = 0; index < sentChatMessages.length; index++) {
-        sentChatMessages[index].message.sequence_number = index
+      if (isRegeneration) {
+        sentChatMessages.pop()
+        sentChatMessages.push(tempAssistantChatMessage)
+      } else {
+        sentChatMessages.push(tempUserChatMessage)
+        if (!isContinuation) sentChatMessages.push(tempAssistantChatMessage)
       }
 
       // Update the UI with the new messages
@@ -509,7 +514,8 @@ export const useChatHandler = () => {
         retrievedFileItems,
         setChatMessages,
         setChatImages,
-        selectedPlugin
+        selectedPlugin,
+        editSequenceNumber
       )
 
       setIsGenerating(false)
@@ -517,6 +523,8 @@ export const useChatHandler = () => {
     } catch (error) {
       setIsGenerating(false)
       setFirstTokenReceived(false)
+      // Restore the chat messages to the previous state
+      setChatMessages(chatMessages)
     }
   }
 
@@ -526,19 +534,7 @@ export const useChatHandler = () => {
   ) => {
     if (!selectedChat) return
 
-    await deleteMessagesIncludingAndAfter(
-      selectedChat.user_id,
-      selectedChat.id,
-      sequenceNumber
-    )
-
-    const filteredMessages = chatMessages.filter(
-      chatMessage => chatMessage.message.sequence_number < sequenceNumber
-    )
-
-    setChatMessages(filteredMessages)
-
-    handleSendMessage(editedContent, filteredMessages, false)
+    handleSendMessage(editedContent, chatMessages, false, false, sequenceNumber)
   }
 
   return {

@@ -1,5 +1,5 @@
 import { Tables } from "@/supabase/types"
-import { ChatPayload, MessageImage } from "@/types"
+import { ChatMessage, ChatPayload, MessageImage } from "@/types"
 import { PluginID, pluginHelp } from "@/types/plugins"
 import { encode } from "gpt-tokenizer"
 
@@ -34,6 +34,12 @@ const buildBasePrompt = (
 
   return fullPrompt
 }
+
+export const lastSequenceNumber = (chatMessages: ChatMessage[]) =>
+  chatMessages.reduce(
+    (max, msg) => Math.max(max, msg.message.sequence_number),
+    0
+  )
 
 export async function buildFinalMessages(
   payload: ChatPayload,
@@ -140,7 +146,7 @@ export async function buildFinalMessages(
     model: payload.chatSettings.model,
     plugin: PluginID.NONE,
     role: "system",
-    sequence_number: processedChatMessages.length,
+    sequence_number: lastSequenceNumber(processedChatMessages) + 1,
     updated_at: "",
     user_id: ""
   }
