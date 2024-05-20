@@ -1,5 +1,8 @@
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { buildFinalMessages } from "@/lib/build-prompt"
+import {
+  buildFinalMessages,
+  filterEmptyAssistantMessages
+} from "@/lib/build-prompt"
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import endent from "endent"
@@ -153,22 +156,22 @@ export async function POST(request: Request) {
       "Content-Type": "application/json"
     }
 
-    const messages = await buildFinalMessages(
+    const cleanedMessages = (await buildFinalMessages(
       payload,
       profile,
       chatImages,
       selectedPlugin
-    )
-    const cleanedMessages = messages as any[]
+    )) as any[]
 
-    const lastUserMessage = cleanedMessages[cleanedMessages.length - 2].content
+    filterEmptyAssistantMessages(cleanedMessages)
+    const lastUserMessage = cleanedMessages[cleanedMessages.length - 1].content
 
     if (lastUserMessage.length > llmConfig.pinecone.messageLength.max) {
       return new Response(JSON.stringify({ plugin: "None" }), { status: 200 })
     }
 
     const detectedPlugin = await detectPlugin(
-      messages,
+      cleanedMessages,
       lastUserMessage,
       providerUrl,
       providerHeaders,
@@ -213,7 +216,6 @@ async function detectPlugin(
 
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
-    .filter(msg => !(msg.role === "assistant" && msg.content === ""))
     .slice(1, -1)
     .slice(-4)
     .map(msg => {

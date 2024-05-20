@@ -9,7 +9,10 @@ import {
 } from "@/lib/ai-helper"
 
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
-import { buildFinalMessages } from "@/lib/build-prompt"
+import {
+  buildFinalMessages,
+  filterEmptyAssistantMessages
+} from "@/lib/build-prompt"
 
 import llmConfig from "@/lib/models/llm/llm-config"
 
@@ -56,25 +59,24 @@ export async function POST(request: Request) {
       return rateLimitCheckResult.response
     }
 
-    const messages = await buildFinalMessages(
+    const cleanedMessages = (await buildFinalMessages(
       payload,
       profile,
       chatImages,
       selectedPlugin
-    )
-
-    replaceWordsInLastUserMessage(messages, wordReplacements)
+    )) as any[]
 
     const systemMessageContent = `${llmConfig.systemPrompts.openai}`
-
-    updateOrAddSystemMessage(messages, systemMessageContent)
+    updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
+    filterEmptyAssistantMessages(cleanedMessages)
+    replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
 
     const res = await fetch(openAiUrl, {
       method: "POST",
       headers: openAiHeaders,
       body: JSON.stringify({
         model: "gpt-4o",
-        messages: messages as ChatCompletionCreateParamsBase["messages"],
+        messages: cleanedMessages as ChatCompletionCreateParamsBase["messages"],
         // temperature: chatSettings.temperature,
         temperature: 0.4,
         // max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null,

@@ -1,5 +1,4 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
-import { ChatSettings } from "@/types"
 import { ServerRuntime } from "next"
 
 import {
@@ -12,7 +11,10 @@ import RetrieverReranker from "@/lib/models/query-pinecone-2v"
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import endent from "endent"
-import { buildFinalMessages } from "@/lib/build-prompt"
+import {
+  buildFinalMessages,
+  filterEmptyAssistantMessages
+} from "@/lib/build-prompt"
 
 class APIError extends Error {
   code: any
@@ -130,27 +132,27 @@ export async function POST(request: Request) {
       return rateLimitCheckResult.response
     }
 
-    const messages = (await buildFinalMessages(
+    const cleanedMessages = (await buildFinalMessages(
       payload,
       profile,
       chatImages,
       selectedPlugin
-    )) as any
+    )) as any[]
 
     let modelTemperature = 0.4
-
-    const cleanedMessages = messages as any[]
 
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
+    filterEmptyAssistantMessages(cleanedMessages)
+
     // On normal chat, the last user message is the target standalone message
     // On continuation, the tartget is the last generated message by the system
     const targetStandAloneMessage =
-      cleanedMessages[cleanedMessages.length - 2].content
+      cleanedMessages[cleanedMessages.length - 1].content
     const filterTargetMessage = isContinuation
-      ? cleanedMessages[cleanedMessages.length - 3]
-      : cleanedMessages[cleanedMessages.length - 2]
+      ? cleanedMessages[cleanedMessages.length - 2]
+      : cleanedMessages[cleanedMessages.length - 1]
 
     if (!isRetrieval && isRagEnabled) {
       if (
@@ -163,7 +165,7 @@ export async function POST(request: Request) {
           llmConfig.pinecone.messageLength.max
       ) {
         const standaloneQuestion = await generateStandaloneQuestion(
-          messages,
+          cleanedMessages,
           targetStandAloneMessage,
           providerUrl,
           providerHeaders,
@@ -210,7 +212,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // If the user is using the mistral-large model, we must always switch to the pro model.
+    // If the user is using the mistral-large model, we must switch to the pro model.
     if (chatSettings.model === "mistral-large") {
       if (useOpenRouter) {
         selectedModel = llmConfig.models.hackerGPT_pro_openrouter
@@ -224,12 +226,10 @@ export async function POST(request: Request) {
     const requestBody: RequestBody = {
       model: selectedModel,
       route: "fallback",
-      messages: cleanedMessages
-        .filter(msg => !(msg.role === "assistant" && msg.content === ""))
-        .map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
+      messages: cleanedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
       temperature: modelTemperature,
       max_tokens: 1024,
       stream: true
@@ -322,9 +322,7 @@ async function generateStandaloneQuestion(
 
   // Faster and smaller model for standalone questions for reduced latency
   const modelStandaloneQuestion = selectedStandaloneQuestionModel
-
   let chatHistory = messages
-    .filter(msg => !(msg.role === "assistant" && msg.content === ""))
     .slice(1, -1) // Remove the first (system prompt) and the last message (user message)
     .slice(-3) // Get the last 3 messages only (assistant, user, assistant)
     .map(msg => `${msg.role}: ${msg.content}`)
