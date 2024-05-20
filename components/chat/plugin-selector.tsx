@@ -162,7 +162,7 @@ const LockedPluginModal = ({
 }) => {
   return (
     <Modal isOpen={isOpen}>
-      <div className="bg-background/20 size-screen fixed inset-0 z-50 backdrop-blur-sm"></div>
+      <div className="size-screen fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm dark:bg-opacity-75"></div>
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
