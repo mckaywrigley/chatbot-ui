@@ -209,7 +209,7 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct:nitro"
+  const modelStandaloneQuestion = selectedStandaloneQuestionModel
 
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
@@ -243,6 +243,7 @@ async function detectPlugin(
       ${pluginsInfo}
 
       # Very Important Rules:
+      - If the user is asking about same-year CVEs, then respond with ID = cvemap because AI doesn't have access to the past year's CVEs, so we need to use the plugin even though the user doesn't ask for it. 
       - All plugins run in our cloud platform, so if the user asks to run anywhere else, respond with ID = None.    
       - Always pick None if you are not sure.
 
@@ -262,15 +263,11 @@ async function detectPlugin(
       \`\`\`
       `
 
-  const systemMessage = {
-    role: "system",
-    content: `${llmConfig.systemPrompts.hackerGPTCurrentDateOnly}`
-  }
-
   try {
     const messages = [
       {
-        systemMessage
+        role: "system",
+        content: `${llmConfig.systemPrompts.hackerGPTCurrentDateOnly}`
       },
       ...chatHistory,
       {
