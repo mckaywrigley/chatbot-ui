@@ -68,7 +68,7 @@
     "ai": "^3.1.1",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
-    "cmdk": "^0.2.0",
+    "cmdk": "^1.0.0",
     "cohere-ai": "^7.9.5",
     "d3-dsv": "^2.0.0",
     "date-fns": "^3.4.0",
