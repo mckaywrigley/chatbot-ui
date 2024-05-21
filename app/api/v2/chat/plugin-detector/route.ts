@@ -166,7 +166,10 @@ export async function POST(request: Request) {
     filterEmptyAssistantMessages(cleanedMessages)
     const lastUserMessage = cleanedMessages[cleanedMessages.length - 1].content
 
-    if (lastUserMessage.length > llmConfig.pinecone.messageLength.max) {
+    if (
+      lastUserMessage.length < llmConfig.pinecone.messageLength.min ||
+      lastUserMessage.length > llmConfig.pinecone.messageLength.max
+    ) {
       return new Response(JSON.stringify({ plugin: "None" }), { status: 200 })
     }
 
@@ -212,7 +215,7 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = selectedStandaloneQuestionModel
+  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct:nitro"
 
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
@@ -235,35 +238,36 @@ async function detectPlugin(
     .join("\n")
 
   const template = endent`
-      Based on the given follow-up question and chat history, determine if the user wants to use a plugin inside the chat environment for their task. 
-
-      # User Input:
-      - Query: """${lastUserMessage}"""
-
-      # Available Plugins
-      ID|Priority|Description|Usage Scenarios
-      ${pluginsInfo}
-
-      # Very Important Rules:
-      - If the user is asking about same-year CVEs, then respond with ID = cvemap because AI doesn't have access to the past year's CVEs, so we need to use the plugin even though the user doesn't ask for it. 
-      - All plugins run in our cloud platform, so if the user asks to run anywhere else, respond with ID = None.    
-      - Always pick None if you are not sure.
-
-      # Type of Request
-      Rewrite the user query in its simplest form and then analyze it:
-      - Question: The simplest form is a question that starts with What, Which, How, Why, When, Where, Who, Could you, Can you, etc.
-      - Action: The simplest form starts with a verb, and it's a command.
-      - Other: Other
-
-      # Output only the following:
-      \`\`\`
-      <SimplestUserQuery>{The user's query in its simplest form}</SimplestUserQuery>
-      <ScratchPad>{Your concise, step-by-step reasoning}</ScratchPad>
-      <TypeOfRequest>{Type of request}</TypeOfRequest>
-      <IsUserAskingAboutCVEs>{If the user is asking about CVEs specifically (not cvemap plugin question), true or false.}</IsUserAskingAboutCVEs>
-      <Plugin>{The single most relevant plugin ID for the user's needs}</Plugin>
-      \`\`\`
-      `
+    Based on the provided follow-up question and chat history, determine if the user intends to utilize a plugin within the chat environment for their task.
+  
+    # User Input:
+    - Query: """${lastUserMessage}"""
+  
+    # Available Plugins
+    ID|Priority|Description|Usage Scenarios
+    ${pluginsInfo}
+  
+    # Important Rules:
+    - If the user inquires about CVEs specifically from the 2024 year respond with ID = cvemap. This ensures that the response leverages the most updated CVE information available via the plugin, as the AI does not have direct access to the latest CVE data.
+    - If the user inquires about CVEs that are not from the 2024 year and doesn't say or ask to use the plugin, respond with ID = None. 
+    - If the user requests the plugin to run outside our cloud platform, respond with ID = None.    
+    - Opt for ID = None if unsure which plugin to choose.
+  
+    # Type of Request
+    Simplify the user query and categorize it:
+    - Question: Starts with interrogatives like What, Which, How, Why, When, Where, Who, or phrases like Could you, Can you, etc.
+    - Action: Begins with a verb, indicating a command.
+    - Other: Anything that doesn't fit the categories above.
+  
+    # ALWAYS USE EXACT OUTPUT STRUCTURE:
+    \`\`\`
+    <SimplestUserQuery>{The user's query in its simplest form}</SimplestUserQuery>
+    <ScratchPad>{Your concise, step-by-step reasoning}</ScratchPad>
+    <TypeOfRequest>{Type of request}</TypeOfRequest>
+    <IsUserAskingAboutCVEs>{True or false, based only on whether the user specifically asks about CVEs, not the cvemap plugin.}</IsUserAskingAboutCVEs>
+    <Plugin>{The single most relevant plugin ID for the user's needs}</Plugin>
+    \`\`\`
+  `
 
   try {
     const messages = [
