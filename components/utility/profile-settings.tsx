@@ -258,7 +258,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       const usernameRegex = /^[a-zA-Z0-9_]+$/
       if (!usernameRegex.test(username)) {
         setUsernameAvailable(false)
-        alert(
+        toast.error(
           "Username must be letters, numbers, or underscores only - no other characters or spacing allowed."
         )
         return

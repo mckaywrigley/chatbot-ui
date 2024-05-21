@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger
 } from "../ui/dropdown-menu"
 import { Input } from "../ui/input"
+import { toast } from "sonner"
 
 interface AssignWorkspaces {
   selectedWorkspaces: Tables<"workspaces">[]
@@ -135,7 +136,7 @@ const WorkspaceItem: FC<WorkspaceItemProps> = ({
 }) => {
   const handleSelect = () => {
     if (selected && selectedWorkspaces.length === 1) {
-      alert("You must select at least one workspace")
+      toast.info("You must select at least one workspace")
       return
     }
 
