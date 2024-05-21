@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       return new Response(
         "Access Denied to " +
           selectedPlugin +
-          ": The plugin you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this plugin."
+          ": The plugin you or HackerGPT are trying to use is exclusive to Pro members. Please upgrade to a Pro account to access this plugin."
       )
     }
 
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         return new Response(
           "Access Denied to " +
             commandPlugin +
-            ": The command you're trying to use is exclusive to Pro members. Please upgrade to a Pro account to use this command."
+            ": The plugin you or HackerGPT are trying to use is exclusive to Pro members. Please upgrade to a Pro account to access this plugin."
         )
       }
 
