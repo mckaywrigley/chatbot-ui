@@ -54,10 +54,10 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     const videoExtensions = ["mp4", "avi", "mov", "wmv", "flv"]
 
     if (imageExtensions.includes(fileExtension)) {
-      alert("HackerGPT does not support image files yet.")
+      toast.error("HackerGPT does not support image files yet.")
       return
     } else if (videoExtensions.includes(fileExtension)) {
-      alert("HackerGPT does not support video files yet.")
+      toast.error("HackerGPT does not support video files yet.")
       return
     }
 

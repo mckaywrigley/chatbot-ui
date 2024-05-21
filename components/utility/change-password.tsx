@@ -12,6 +12,7 @@ import {
   DialogTitle
 } from "../ui/dialog"
 import { Input } from "../ui/input"
+import { toast } from "sonner"
 
 interface ChangePasswordProps {}
 
@@ -22,13 +23,13 @@ export const ChangePassword: FC<ChangePasswordProps> = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
 
   const handleResetPassword = async () => {
-    if (!newPassword) return alert("Please enter your new password.")
+    if (!newPassword) return toast.error("Please enter your new password.")
     if (newPassword !== confirmPassword)
-      return alert("Your password's don't match.")
+      return toast.error("Your password's don't match.")
 
     await supabase.auth.updateUser({ password: newPassword })
 
-    alert("Password changed successfully.")
+    toast.success("Password changed successfully.")
 
     return router.push("/login")
   }
