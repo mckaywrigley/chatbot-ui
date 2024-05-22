@@ -510,8 +510,9 @@ export const transformUserQueryToGoLinkFinderCommand = (
         - -output (string): write output to a file. Don't put name of file in quotes (optional)
     Note: **Selective Flag Application**: Choose flags that directly contribute to the scope of your query. The key flags include:
         - --help: Display a help guide or a full list of available commands and flags.
-    Note: **Limitation on Command and Domain Quantity**: 'GoLinkFinder' is designed to process a single command and a single domain at a time. Should there be attempts to include multiple domains or generate multiple commands by user query, respond back with tool's functionality restricts such operations.  
-  
+    Note: **Limitation on Command and Domain Quantity**: 'GoLinkFinder' is designed to process a single command and domain simultaneously. Should there be attempts to include multiple domains or generate multiple commands by user query, respond with the tool's functionality restricting such operations. 
+    Note: **Use full URL**: Always use the full URL in the command.
+
     **Example Commands**:
     - For extracting URLs from a specific domain:
     \`\`\`json
