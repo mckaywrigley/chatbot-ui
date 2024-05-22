@@ -605,7 +605,6 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
       - -age string: Filter CVEs published within a specified age in days. (e.g., ""> 365"", "360")
       - -assignee string[]: List CVEs for a given publisher assignee. (e.g., "cve@mitre.org")
       - -vstatus value: Filter CVEs by given vulnerability status in CLI output. Supported values: new, confirmed, unconfirmed, modified, rejected, unknown (e.g., "confirmed")
-      - -search string: Search within CVE data for specific terms. (e.g., "xss")
       - -kev: Display CVEs marked as exploitable vulnerabilities by CISA (default true).
       - -template: Display CVEs that have public Nuclei templates (default true).
       - -poc: Display CVEs that have a publicly published PoC (default true).

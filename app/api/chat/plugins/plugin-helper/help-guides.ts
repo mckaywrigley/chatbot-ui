@@ -34,7 +34,6 @@ export const displayHelpGuideForCvemap = () => {
           -vs, -vstatus value             cve to list for given vulnerability status in cli output. supported: new, confirmed, unconfirmed, modified, rejected, unknown
   
       FILTER:
-          -q, -search string  search in cve data
           -k, -kev            display cves marked as exploitable vulnerabilities by cisa (default true)
           -t, -template       display cves that has public nuclei templates (default true)
           -poc                display cves that has public published poc (default true)
