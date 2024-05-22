@@ -221,7 +221,7 @@ export async function POST(request: Request) {
     }
 
     ensureAssistantMessagesNotEmpty(cleanedMessages)
-    replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
+    // replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
 
     const requestBody: RequestBody = {
       model: selectedModel,
