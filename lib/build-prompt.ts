@@ -245,3 +245,11 @@ export function filterEmptyAssistantMessages(messages: any[]) {
     }
   }
 }
+
+export function ensureAssistantMessagesNotEmpty(messages: any[]) {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === "assistant" && messages[i].content.trim() === "") {
+      messages[i].content = "Sure,"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import endent from "endent"
 import {
   buildFinalMessages,
+  ensureAssistantMessagesNotEmpty,
   filterEmptyAssistantMessages
 } from "@/lib/build-prompt"
 
@@ -144,15 +145,13 @@ export async function POST(request: Request) {
     const systemMessageContent = `${llmConfig.systemPrompts.hackerGPT}`
     updateOrAddSystemMessage(cleanedMessages, systemMessageContent)
 
-    filterEmptyAssistantMessages(cleanedMessages)
-
     // On normal chat, the last user message is the target standalone message
     // On continuation, the tartget is the last generated message by the system
     const targetStandAloneMessage =
-      cleanedMessages[cleanedMessages.length - 1].content
+      cleanedMessages[cleanedMessages.length - 2].content
     const filterTargetMessage = isContinuation
-      ? cleanedMessages[cleanedMessages.length - 2]
-      : cleanedMessages[cleanedMessages.length - 1]
+      ? cleanedMessages[cleanedMessages.length - 3]
+      : cleanedMessages[cleanedMessages.length - 2]
 
     if (!isRetrieval && isRagEnabled) {
       if (
@@ -221,6 +220,7 @@ export async function POST(request: Request) {
       }
     }
 
+    ensureAssistantMessagesNotEmpty(cleanedMessages)
     replaceWordsInLastUserMessage(cleanedMessages, wordReplacements)
 
     const requestBody: RequestBody = {
@@ -322,6 +322,9 @@ async function generateStandaloneQuestion(
 
   // Faster and smaller model for standalone questions for reduced latency
   const modelStandaloneQuestion = selectedStandaloneQuestionModel
+
+  filterEmptyAssistantMessages(messages)
+
   let chatHistory = messages
     .slice(1, -1) // Remove the first (system prompt) and the last message (user message)
     .slice(-3) // Get the last 3 messages only (assistant, user, assistant)
