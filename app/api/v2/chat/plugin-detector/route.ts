@@ -215,7 +215,7 @@ async function detectPlugin(
   openRouterHeaders: any,
   selectedStandaloneQuestionModel: string | undefined
 ) {
-  const modelStandaloneQuestion = "meta-llama/llama-3-70b-instruct:nitro"
+  const modelStandaloneQuestion = selectedStandaloneQuestionModel
 
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
   const chatHistory = messages
