@@ -448,6 +448,7 @@ export const Message: FC<MessageProps> = ({
               isHovering={isHovering}
               isGoodResponse={feedback?.feedback === "good"}
               isBadResponse={feedback?.feedback === "bad"}
+              messageHasImage={message.image_paths.length > 0}
               onRegenerate={handleRegenerate}
               onGoodResponse={handleGoodResponse}
               onBadResponse={handleBadResponse}

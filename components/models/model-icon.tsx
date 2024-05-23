@@ -7,6 +7,7 @@ import { OpenAISVG } from "../icons/openai-svg"
 // import Image from "next/image"
 // import mistral from "@/public/providers/mistral.png"
 import { HackerAISVG } from "../icons/hackerai-svg"
+import { GPT4 } from "@/lib/models/llm/openai-llm-list"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider
@@ -25,7 +26,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
   const { theme } = useTheme()
 
   switch (modelId as LLMID) {
-    case "gpt-4-turbo-preview":
+    case GPT4.modelId:
       return (
         <OpenAISVG
           className={cn(

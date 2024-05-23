@@ -1,26 +1,52 @@
 export function replaceWordsInLastUserMessage(
-  messages: string | any[],
+  messages: any[],
   replacements: { [s: string]: unknown } | ArrayLike<unknown>
 ) {
   const lastUserMessageIndex = messages.length - 1
   for (let i = lastUserMessageIndex; i >= 0; i--) {
     if (messages[i].role === "user") {
-      let content = messages[i].content
-      let replacedContent = content.split(/\b/)
+      if (typeof messages[i].content === "string") {
+        // Handle string content
+        let content = messages[i].content
+        let replacedContent = content.split(/\b/)
 
-      for (let j = 0; j < replacedContent.length; j++) {
-        for (const [key, value] of Object.entries(replacements)) {
-          if (
-            replacedContent[j].toLowerCase() === key.toLowerCase() &&
-            !replacedContent[j].startsWith("√")
-          ) {
-            replacedContent[j] = "√" + value
-            break
+        for (let j = 0; j < replacedContent.length; j++) {
+          for (const [key, value] of Object.entries(replacements)) {
+            if (
+              replacedContent[j].toLowerCase() === key.toLowerCase() &&
+              !replacedContent[j].startsWith("√")
+            ) {
+              replacedContent[j] = "√" + value
+              break
+            }
           }
         }
-      }
 
-      messages[i].content = replacedContent.join("").replace(/√/g, "")
+        messages[i].content = replacedContent.join("").replace(/√/g, "")
+      } else if (Array.isArray(messages[i].content)) {
+        // Handle array of objects with type and text/image_url properties
+        messages[i].content = messages[i].content.map((item: any) => {
+          if (item.type === "text" && item.text) {
+            let content = item.text
+            let replacedContent = content.split(/\b/)
+
+            for (let j = 0; j < replacedContent.length; j++) {
+              for (const [key, value] of Object.entries(replacements)) {
+                if (
+                  replacedContent[j].toLowerCase() === key.toLowerCase() &&
+                  !replacedContent[j].startsWith("√")
+                ) {
+                  replacedContent[j] = "√" + value
+                  break
+                }
+              }
+            }
+
+            item.text = replacedContent.join("").replace(/√/g, "")
+          }
+          return item
+        })
+      }
       break
     }
   }
@@ -61,11 +87,4 @@ export function updateOrAddSystemMessage(
       content: systemMessageContent
     })
   }
-}
-
-export type Role = "assistant" | "user" | "system"
-
-export interface Message {
-  role: Role
-  content: string
 }

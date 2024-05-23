@@ -50,7 +50,6 @@ export const useSelectFileHandler = () => {
     if (!profile || !selectedWorkspace || !chatSettings) return
 
     setShowFilesDisplay(true)
-    setUseRetrieval(true)
 
     if (file) {
       let simplifiedFileType =
@@ -214,6 +213,8 @@ export const useSelectFileHandler = () => {
                   : item
               )
             )
+
+            setUseRetrieval(true)
           }
         } catch (error: any) {
           toast.error("Failed to upload. " + error?.message, {

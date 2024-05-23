@@ -27,6 +27,7 @@ interface MessageActionsProps {
   onRegenerate: () => void
   onGoodResponse: () => void
   onBadResponse: () => void
+  messageHasImage: boolean
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -40,10 +41,10 @@ export const MessageActions: FC<MessageActionsProps> = ({
   onEdit,
   onRegenerate,
   onGoodResponse,
-  onBadResponse
+  onBadResponse,
+  messageHasImage
 }) => {
   const { isGenerating } = useContext(ChatbotUIContext)
-
   const [showCheckmark, setShowCheckmark] = useState(false)
 
   const handleCopy = () => {
@@ -80,7 +81,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )} */}
 
-      {!isAssistant && isHovering && (
+      {!isAssistant && isHovering && !messageHasImage && (
         <WithTooltip
           delayDuration={1000}
           side="bottom"

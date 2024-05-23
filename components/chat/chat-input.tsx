@@ -2,16 +2,17 @@ import Modal from "@/components/chat/dialog-portal"
 import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { GPT4 } from "@/lib/models/llm/openai-llm-list"
 import { cn } from "@/lib/utils"
 import { PluginID } from "@/types/plugins"
 import {
   IconBolt,
   IconBook,
   IconBookOff,
+  IconCirclePlus,
   IconHelp,
   IconPaperclip,
   IconPlayerStopFilled,
-  IconCirclePlus,
   IconPuzzle,
   IconPuzzleOff,
   IconSend
@@ -24,6 +25,7 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
+import { handleFileUpload } from "./chat-helpers/file-upload"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
@@ -77,7 +79,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isToolPickerOpen,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
-    showFilesDisplay,
     isAtPickerOpen,
     setFocusFile,
     chatSettings,
@@ -215,35 +216,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setShowConfirmationDialog(false)
   }
 
-  const handleFileUpload = (file: File) => {
-    const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
-
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "svg"]
-
-    const videoExtensions = ["mp4", "avi", "mov", "wmv", "flv"]
-
-    if (imageExtensions.includes(fileExtension)) {
-      toast.error("HackerGPT does not support image files yet.")
-      return
-    } else if (videoExtensions.includes(fileExtension)) {
-      toast.error("HackerGPT does not support video files yet.")
-      return
-    }
-
-    if (
-      fileExtension &&
-      !["csv", "json", "md", "pdf", "txt", "html", "htm"].includes(
-        fileExtension
-      )
-    ) {
-      setShowConfirmationDialog(true)
-      setCurrentFile(file)
-      return
-    } else {
-      handleSelectDeviceFile(file)
-    }
-  }
-
   const ToolOptions = () => (
     <>
       <div
@@ -312,7 +284,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           trigger={
             isRagEnabled &&
             chatSettings?.model &&
-            chatSettings?.model !== "gpt-4-turbo-preview" ? (
+            chatSettings?.model !== GPT4.modelId ? (
               <IconBook
                 className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
                 size={32}
@@ -409,7 +381,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                   <span className="mb-1 flex  flex-row items-center">
                     {isRagEnabled &&
                     chatSettings?.model &&
-                    chatSettings?.model !== "gpt-4-turbo-preview" ? (
+                    chatSettings?.model !== GPT4.modelId ? (
                       <IconBook size={32} />
                     ) : (
                       <IconBookOff size={32} />
@@ -478,7 +450,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             type="file"
             onChange={e => {
               if (!e.target.files) return
-              handleFileUpload(e.target.files[0])
+              handleFileUpload(
+                e.target.files[0],
+                chatSettings,
+                setShowConfirmationDialog,
+                setCurrentFile,
+                handleSelectDeviceFile
+              )
             }}
             accept={filesToAccept}
           />

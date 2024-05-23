@@ -126,7 +126,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [showFilesDisplay, setShowFilesDisplay] = useState<boolean>(false)
 
   // RETIEVAL STORE
-  const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
+  const [useRetrieval, setUseRetrieval] = useState<boolean>(false)
   const [sourceCount, setSourceCount] = useState<number>(4)
 
   // TOOL STORE
@@ -135,6 +135,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // Define the isMobile state
   const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  // Define is ready to chat state
+  const [isReadyToChat, setIsReadyToChat] = useState<boolean>(false)
 
   // Handle window resize to update isMobile
   useEffect(() => {
@@ -366,7 +369,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         toolInUse,
         setToolInUse,
 
-        isMobile
+        isMobile,
+
+        // Is ready to chat state
+        isReadyToChat,
+        setIsReadyToChat
       }}
     >
       {children}

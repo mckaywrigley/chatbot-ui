@@ -162,7 +162,6 @@ export const handleHostedChat = async (
       },
       body: JSON.stringify({
         payload: payload,
-        chatImages: chatImages,
         selectedPlugin: selectedPlugin
       })
     })

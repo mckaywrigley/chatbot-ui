@@ -62,6 +62,8 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     ...chatFiles
   ]
 
+  const onlyImages = messageImages.length > 0 && combinedChatFiles.length == 0
+
   const combinedMessageFiles = [...messageImages, ...combinedChatFiles]
 
   const getLinkAndView = async (file: ChatFile) => {
@@ -73,7 +75,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
     window.open(link, "_blank")
   }
 
-  return showFilesDisplay && combinedMessageFiles.length > 0 ? (
+  return onlyImages || (showFilesDisplay && combinedMessageFiles.length > 0) ? (
     <>
       {showPreview && selectedImage && (
         <FilePreview
@@ -100,20 +102,22 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       )}
 
       <div className="max-w-full space-y-2">
-        <div className="flex w-full items-center justify-center">
-          <Button
-            className="flex h-[32px] w-[140px] space-x-2"
-            onClick={() => setShowFilesDisplay(false)}
-          >
-            <RetrievalToggle />
+        {!onlyImages && (
+          <div className="flex w-full items-center justify-center">
+            <Button
+              className="flex h-[32px] w-[140px] space-x-2"
+              onClick={() => setShowFilesDisplay(false)}
+            >
+              <RetrievalToggle />
 
-            <div>Hide files</div>
+              <div>Hide files</div>
 
-            <div onClick={e => e.stopPropagation()}>
-              <ChatRetrievalSettings />
-            </div>
-          </Button>
-        </div>
+              <div onClick={e => e.stopPropagation()}>
+                <ChatRetrievalSettings />
+              </div>
+            </Button>
+          </div>
+        )}
 
         <div className="overflow-auto">
           <div
@@ -215,6 +219,9 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                     className="bg-muted-foreground border-primary absolute right-[-6px] top-[-6px] flex size-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
                     onClick={e => {
                       e.stopPropagation()
+                      if (combinedChatFiles.length == 1) {
+                        setUseRetrieval(false)
+                      }
                       setNewMessageFiles(
                         newMessageFiles.filter(f => f.id !== file.id)
                       )
@@ -242,7 +249,6 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
             View {combinedMessageFiles.length} file
             {combinedMessageFiles.length > 1 ? "s" : ""}
           </div>
-
           <div onClick={e => e.stopPropagation()}>
             <ChatRetrievalSettings />
           </div>

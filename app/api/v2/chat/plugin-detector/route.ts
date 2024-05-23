@@ -6,6 +6,7 @@ import {
 import llmConfig from "@/lib/models/llm/llm-config"
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import endent from "endent"
+import { BuiltChatMessage } from "@/types"
 
 class APIError extends Error {
   code: any
@@ -122,7 +123,7 @@ const availablePlugins = [
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { payload, chatImages, selectedPlugin } = json
+  const { payload, selectedPlugin } = json
 
   const USE_PLUGIN_DETECTOR =
     process.env.USE_PLUGIN_DETECTOR?.toLowerCase() === "true"
@@ -159,7 +160,7 @@ export async function POST(request: Request) {
     const cleanedMessages = (await buildFinalMessages(
       payload,
       profile,
-      chatImages,
+      [],
       selectedPlugin
     )) as any[]
 
@@ -209,7 +210,7 @@ export async function POST(request: Request) {
 }
 
 async function detectPlugin(
-  messages: any[],
+  messages: BuiltChatMessage[],
   lastUserMessage: string,
   openRouterUrl: string | URL | Request,
   openRouterHeaders: any,
@@ -217,18 +218,32 @@ async function detectPlugin(
 ) {
   const modelStandaloneQuestion = selectedStandaloneQuestionModel
 
+  // Move to string type msg.content, if it's an array, concat the text and replace type image with [IMAGE]
+  const cleanedMessages = messages.map(msg => {
+    if (Array.isArray(msg.content)) {
+      return {
+        ...msg,
+        content: msg.content
+          .map(content => {
+            if (content.type === "image_url") {
+              return "[IMAGE]"
+            }
+            return (
+              content.text.substring(0, 1000) +
+              (content.text.length > 1000 ? "..." : "")
+            )
+          })
+          .join("\n\n")
+      }
+    }
+    return msg
+  })
+
   // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
-  const chatHistory = messages
+  const chatHistory = cleanedMessages
+    .filter(msg => !(msg.role === "assistant" && msg.content === ""))
     .slice(1, -1)
     .slice(-4)
-    .map(msg => {
-      return {
-        role: msg.role,
-        content:
-          msg.content.substring(0, 1000) +
-          (msg.content.length > 1000 ? "..." : "")
-      }
-    })
 
   const pluginsInfo = availablePlugins
     .map(

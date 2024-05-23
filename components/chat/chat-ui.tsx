@@ -3,7 +3,6 @@ import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
-import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -11,7 +10,7 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, MessageImage } from "@/types"
 import { IconPlayerTrackNext } from "@tabler/icons-react"
 import { useParams } from "next/navigation"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
@@ -39,7 +38,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedAssistant,
     setChatFiles,
     setShowFilesDisplay,
-    setUseRetrieval
+    setUseRetrieval,
+    setIsReadyToChat
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput, handleSendContinuation } =
@@ -71,9 +71,11 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)
+        setIsReadyToChat(true)
       })
     } else {
       setLoading(false)
+      setIsReadyToChat(true)
     }
   }, [])
 

@@ -147,6 +147,9 @@ interface ChatbotUIContext {
   setToolInUse: Dispatch<SetStateAction<string>>
 
   isMobile: boolean
+
+  isReadyToChat: boolean
+  setIsReadyToChat: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -282,5 +285,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   toolInUse: "none",
   setToolInUse: () => {},
 
-  isMobile: false
+  isMobile: false,
+
+  isReadyToChat: false,
+  setIsReadyToChat: () => {}
 })

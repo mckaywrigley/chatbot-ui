@@ -1,7 +1,13 @@
 import { Tables } from "@/supabase/types"
-import { ChatMessage, ChatPayload, MessageImage } from "@/types"
+import {
+  BuiltChatMessage,
+  ChatMessage,
+  ChatPayload,
+  MessageImage
+} from "@/types"
 import { PluginID, pluginHelp } from "@/types/plugins"
 import { encode } from "gpt-tokenizer"
+import { GPT4 } from "./models/llm/openai-llm-list"
 
 const buildBasePrompt = (
   prompt: string,
@@ -46,7 +52,7 @@ export async function buildFinalMessages(
   profile: Tables<"profiles">,
   chatImages: MessageImage[],
   selectedPlugin: PluginID | null
-) {
+): Promise<BuiltChatMessage[]> {
   const {
     chatSettings,
     workspaceInstructions,
@@ -65,7 +71,7 @@ export async function buildFinalMessages(
 
   let CHUNK_SIZE = chatSettings.contextLength
   if (
-    chatSettings.model === "gpt-4-turbo-preview" ||
+    chatSettings.model === GPT4.modelId ||
     chatSettings.model === "mistral-large"
   ) {
     CHUNK_SIZE = 12288
@@ -107,7 +113,7 @@ export async function buildFinalMessages(
     return chatMessage
   })
 
-  let finalMessages = []
+  const truncatedMessages: any[] = []
 
   for (let i = processedChatMessages.length - 1; i >= 0; i--) {
     const messageSizeLimit = Number(process.env.MESSAGE_SIZE_LIMIT || 12000)
@@ -131,7 +137,7 @@ export async function buildFinalMessages(
     if (messageTokens <= remainingTokens) {
       remainingTokens -= messageTokens
       usedTokens += messageTokens
-      finalMessages.unshift(message)
+      truncatedMessages.unshift(message)
     } else {
       break
     }
@@ -151,9 +157,9 @@ export async function buildFinalMessages(
     user_id: ""
   }
 
-  finalMessages.unshift(tempSystemMessage)
+  truncatedMessages.unshift(tempSystemMessage)
 
-  finalMessages = finalMessages.map(message => {
+  const finalMessages: BuiltChatMessage[] = truncatedMessages.map(message => {
     let content
 
     if (message.image_paths.length > 0) {
@@ -162,7 +168,7 @@ export async function buildFinalMessages(
           type: "text",
           text: message.content
         },
-        ...message.image_paths.map(path => {
+        ...message.image_paths.map((path: string) => {
           let formedUrl = ""
 
           if (path.startsWith("data")) {

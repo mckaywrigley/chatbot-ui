@@ -1,22 +1,22 @@
 "use client"
 
-import Modal from "@/components/chat/dialog-portal"
+import { handleFileUpload } from "@/components/chat/chat-helpers/file-upload"
+import { UnsupportedFilesDialog } from "@/components/chat/unsupported-files-dialog"
 import { Sidebar } from "@/components/sidebar/sidebar"
 import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
 import { Button } from "@/components/ui/button"
 import { Tabs } from "@/components/ui/tabs"
+import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
 import {
-  IconLayoutSidebarLeftExpand,
-  IconFileFilled
+  IconFileFilled,
+  IconLayoutSidebarLeftExpand
 } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useContext, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
-import { toast } from "sonner"
-import { ChatbotUIContext } from "@/context/context"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -26,7 +26,8 @@ interface DashboardProps {
 
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
-  const { subscription, isMobile } = useContext(ChatbotUIContext)
+  const { subscription, chatSettings, isReadyToChat } =
+    useContext(ChatbotUIContext)
 
   const pathname = usePathname()
   const router = useRouter()
@@ -44,39 +45,16 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [showConfirmationDialog, setShowConfirmationDialog] =
     useState<boolean>(false)
+
   const [currentFile, setCurrentFile] = useState<File | null>(null)
-
-  const handleFileUpload = (file: File) => {
-    const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
-
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "svg"]
-
-    const videoExtensions = ["mp4", "avi", "mov", "wmv", "flv"]
-
-    if (imageExtensions.includes(fileExtension)) {
-      toast.error("HackerGPT does not support image files yet.")
-      return
-    } else if (videoExtensions.includes(fileExtension)) {
-      toast.error("HackerGPT does not support video files yet.")
-      return
-    }
-
-    if (
-      fileExtension &&
-      !["csv", "json", "md", "pdf", "txt", "html", "htm"].includes(
-        fileExtension
-      )
-    ) {
-      setShowConfirmationDialog(true)
-      setCurrentFile(file)
-      return
-    } else {
-      handleSelectDeviceFile(file)
-    }
-  }
 
   const onFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
+
+    if (!isReadyToChat) {
+      setIsDragging(false)
+      return
+    }
 
     const items = event.dataTransfer.items
     // let fileCount = 0
@@ -88,8 +66,15 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         if (item.kind === "file") {
           const file = item.getAsFile()
           if (file) {
-            handleFileUpload(file)
+            handleFileUpload(
+              file,
+              chatSettings,
+              setShowConfirmationDialog,
+              setCurrentFile,
+              handleSelectDeviceFile
+            )
             // fileCount++
+            break
           }
         }
       }
@@ -135,34 +120,14 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   return (
     <div className="flex size-full">
-      <Modal isOpen={showConfirmationDialog}>
-        <div className="size-screen fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm dark:bg-opacity-75"></div>
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
-            <p>
-              The file extension{" "}
-              <b>.{currentFile?.name.split(".").pop()?.toLowerCase()}</b> is
-              currently not supported.
-            </p>
-            <p>Would you like to convert its content into a text format?</p>
-            <div className="mt-5 flex justify-center gap-5">
-              <button
-                onClick={handleCancel}
-                className="ring-offset-background focus-visible:ring-ring bg-input text-primary hover:bg-input/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConversionConfirmation}
-                className="ring-offset-background focus-visible:ring-ring bg-primary text-primary-foreground hover:bg-primary/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-              >
-                Convert
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      {showConfirmationDialog && currentFile && (
+        <UnsupportedFilesDialog
+          isOpen={showConfirmationDialog}
+          currentFile={currentFile}
+          onCancel={handleCancel}
+          onConfirm={handleConversionConfirmation}
+        />
+      )}
 
       <Button
         className={cn(
@@ -206,26 +171,30 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         )}
       </div>
 
-      <div
-        className="bg-muted/50 flex grow flex-col"
-        onDrop={onFileDrop}
-        onDragOver={onDragOver}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-      >
-        {isDragging && subscription ? (
-          <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
-            <div className="justify-cente flex flex-col items-center rounded-lg p-4">
-              <IconFileFilled size={48} className="mb-2 text-white" />
-              <span className="text-lg font-semibold text-white">
-                Drop your files here to add it to the conversation
-              </span>
+      {isReadyToChat ? (
+        <div
+          className="bg-muted/50 flex grow flex-col"
+          onDrop={onFileDrop}
+          onDragOver={onDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+        >
+          {isDragging && subscription ? (
+            <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
+              <div className="justify-cente flex flex-col items-center rounded-lg p-4">
+                <IconFileFilled size={48} className="mb-2 text-white" />
+                <span className="text-lg font-semibold text-white">
+                  Drop your files here to add it to the conversation
+                </span>
+              </div>
             </div>
-          </div>
-        ) : (
-          children
-        )}
-      </div>
+          ) : (
+            children
+          )}
+        </div>
+      ) : (
+        <div className="bg-muted/50 flex grow flex-col">{children}</div>
+      )}
     </div>
   )
 }

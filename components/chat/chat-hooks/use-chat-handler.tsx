@@ -71,7 +71,9 @@ export const useChatHandler = () => {
     selectedPlugin,
     subscription,
     isRagEnabled,
-    isGenerating
+    isGenerating,
+    setUseRetrieval,
+    setIsReadyToChat
   } = useContext(ChatbotUIContext)
 
   const isGeneratingRef = useRef(isGenerating)
@@ -91,6 +93,7 @@ export const useChatHandler = () => {
   const handleSelectChat = async (chat: Tables<"chats">) => {
     if (!selectedWorkspace) return
     await handleStopMessage()
+    setIsReadyToChat(false)
     return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
   }
 
@@ -113,6 +116,7 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsAtPickerOpen(false)
+    setUseRetrieval(false)
 
     setSelectedTools([])
     setToolInUse("none")
@@ -161,6 +165,7 @@ export const useChatHandler = () => {
       // })
     }
 
+    setIsReadyToChat(true)
     return router.push(`/${selectedWorkspace.id}/chat`)
   }
 
