@@ -140,6 +140,7 @@ export const Message: FC<MessageProps> = ({
                 <IconSparkles size={ICON_SIZE} />
               ) : profile?.image_url ? (
                 <Image
+                  unoptimized
                   className={`size-[32px] rounded`}
                   src={profile?.image_url}
                   height={32}
