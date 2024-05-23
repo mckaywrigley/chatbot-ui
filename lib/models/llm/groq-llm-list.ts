@@ -47,4 +47,24 @@ const MIXTRAL_8X7B: LLM = {
   }
 }
 
-export const GROQ_LLM_LIST: LLM[] = [LLaMA3_8B, LLaMA3_70B, MIXTRAL_8X7B]
+const GEMMA_7B_IT: LLM = {
+  modelId: "gemma-7b-it",
+  modelName: "Gemma-7b-It",
+  provider: "groq",
+  hostedId: "gemma-7b-it",
+  platformLink: GROQ_PLATORM_LINK,
+  imageInput: false,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.15,
+    outputCost: 0.15
+  }
+}
+
+export const GROQ_LLM_LIST: LLM[] = [
+  LLaMA3_8B,
+  LLaMA3_70B,
+  MIXTRAL_8X7B,
+  GEMMA_7B_IT
+]
