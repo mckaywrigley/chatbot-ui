@@ -89,21 +89,9 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         >
           <IconPuzzle size={SIDEBAR_ICON_SIZE} />
         </button>
-        {subscription && (
-          <SidebarSwitchItem
-            icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
-            contentType="collections"
-            onContentTypeChange={onContentTypeChange}
-          />
-        )}
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">
-        {/* TODO */}
-        {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
-        {/* TODO */}
-        {/* <Alerts /> */}
-
         {!subscription && <PlanDialog />}
 
         <WithTooltip
