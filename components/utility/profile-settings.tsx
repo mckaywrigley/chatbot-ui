@@ -308,8 +308,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               <div className="flex items-center justify-center overflow-hidden rounded-full">
                 <div className="relative flex">
                   <Image
+                    unoptimized
                     className="size-[34px]"
-                    src={profile.image_url + "?" + new Date().getTime()}
+                    src={profile.image_url}
                     height={34}
                     width={34}
                     alt={"Image"}
