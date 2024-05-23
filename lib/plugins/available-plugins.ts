@@ -36,6 +36,43 @@ export const availablePlugins: PluginSummary[] = [
   },
   {
     id: 1,
+    name: "Auto Plugin Selector",
+    selectorName: "Auto Plugin Selector",
+    value: PluginID.AUTO_PLUGIN_SELECTOR,
+    description: "Selects the optimal plugin for your specific needs",
+    icon: "https://avatars.githubusercontent.com/u/148977464",
+    categories: ["Free", "New", "Popular"],
+    githubRepoUrl: pluginUrls.HACKERGPT,
+    isInstalled: false,
+    isPremium: false,
+    starters: [
+      {
+        title: "Start Subdomain Discovery",
+        description: "for reddit.com",
+        chatMessage: "Start subdomain discovery for reddit.com"
+      },
+      {
+        title: "Provide Me With",
+        description: "the CVEs for Microsoft that have nuclei templates",
+        chatMessage:
+          "Provide me with the CVEs for Microsoft that have nuclei templates."
+      },
+      {
+        title: "Extract URLs",
+        description: "from https://www.hackerone.com/product/...",
+        chatMessage:
+          "Extract URLs from https://www.hackerone.com/product/overview"
+      },
+      {
+        title: "Provide Information About",
+        description: "CVE-2024-23897 (critical LFI in Jenkins)",
+        chatMessage:
+          "Provide information about CVE-2024-23897 (critical LFI in Jenkins)."
+      }
+    ]
+  },
+  {
+    id: 2,
     name: "CVEMap",
     selectorName: "CVEMap: CVE Database",
     value: PluginID.CVEMAP,
@@ -71,46 +108,8 @@ export const availablePlugins: PluginSummary[] = [
       }
     ]
   },
-  // {
-  //   id: 2,
-  //   name: "CyberChef",
-  //   selectorName: "CyberChef: Data Manipulation",
-  //   value: PluginID.CYBERCHEF,
-  //   icon: "https://gchq.github.io/CyberChef/images/cyberchef-128x128.png",
-  //   description:
-  //     "A tool for for encryption, encoding, compression, and data analysis",
-  //   categories: ["Free", "Popular"],
-  //   githubRepoUrl: pluginUrls.CYBERCHEF,
-  //   isInstalled: false,
-  //   isPremium: false,
-  //   starters: [
-  //     {
-  //       title: "Encode The Following",
-  //       description: "to base64: 'This is your last chance. After this...",
-  //       chatMessage:
-  //         "Encode the following to base64: 'This is your last chance. After this, there is no turning back. You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill - you stay in Wonderland and I show you how deep the rabbit hole goes.'"
-  //     },
-  //     {
-  //       title: "Decode The Following",
-  //       description: "sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73...",
-  //       chatMessage:
-  //         "Decode the following sequence: '54 68 65 20 77 6f 72 6c 64 20 69 73 20 61 20 64 61 6e 67 65 72 6f 75 73 20 70 6c 61 63 65 2c 20 6e 6f 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 64 6f 20 65 76 69 6c 2c 20 62 75 74 20 62 65 63 61 75 73 65 20 6f 66 20 74 68 6f 73 65 20 77 68 6f 20 6c 6f 6f 6b 20 6f 6e 20 61 6e 64 20 64 6f 20 6e 6f 74 68 69 6e 67 2e'"
-  //     },
-  //     {
-  //       title: "Help Me Decode",
-  //       description: "this Morse Code-based 64 encoding: 'Li4uLiAu...",
-  //       chatMessage:
-  //         "Help me decode this Morse Code-based 64 encoding: 'Li4uLiAuLSAuLS0uIC4tLS4gLS4tLQouLi4uIC4tIC0uLS4gLS4tIC4uIC0uIC0tLg=='"
-  //     },
-  //     {
-  //       title: "CyberChef Help",
-  //       description: "How does the CyberChef plugin work?",
-  //       chatMessage: "How does the CyberChef plugin work?"
-  //     }
-  //   ]
-  // },
   {
-    id: 2,
+    id: 3,
     name: "Subfinder",
     selectorName: "Subfinder: Subdomain Finder",
     value: PluginID.SUBFINDER,
@@ -145,7 +144,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 3,
+    id: 4,
     name: "GoLinkFinder",
     selectorName: "GoLinkFinder: Endpoint Extractor",
     value: PluginID.GOLINKFINDER,
@@ -170,14 +169,14 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 4,
+    id: 5,
     name: "Web Scraper",
     selectorName: "Web Scraper: Website Data Extractor",
     value: PluginID.WEB_SCRAPER,
     icon: "https://cdn-icons-png.flaticon.com/512/11892/11892629.png",
     description: "Extract data from websites and chat with the extracted data",
     categories: ["Popular", "New"],
-    githubRepoUrl: "https://github.com/Hacker-GPT/HackerGPT-2.0",
+    githubRepoUrl: pluginUrls.HACKERGPT,
     isInstalled: false,
     isPremium: true,
     starters: [
@@ -194,7 +193,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 5,
+    id: 6,
     name: "Nuclei",
     selectorName: "Nuclei: Website Vulnerability Scanner",
     value: PluginID.NUCLEI,
@@ -263,7 +262,7 @@ export const availablePlugins: PluginSummary[] = [
   //   ]
   // },
   {
-    id: 6,
+    id: 7,
     name: "Katana",
     selectorName: "Katana: Web Crawling",
     value: PluginID.KATANA,
@@ -298,7 +297,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 7,
+    id: 8,
     name: "HTTPX",
     selectorName: "HTTPX: Web Analysis",
     value: PluginID.HTTPX,
@@ -333,7 +332,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 8,
+    id: 9,
     name: "Naabu",
     selectorName: "Naabu: Port Scanner",
     value: PluginID.NAABU,
@@ -370,7 +369,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 9,
+    id: 10,
     name: "GAU",
     selectorName: "GAU: Url Enumeration",
     value: PluginID.GAU,
@@ -405,7 +404,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 10,
+    id: 11,
     name: "dnsX",
     selectorName: "dnsX: DNS toolkit",
     value: PluginID.DNSX,
@@ -431,7 +430,7 @@ export const availablePlugins: PluginSummary[] = [
     ]
   },
   {
-    id: 11,
+    id: 12,
     name: "AlterX",
     selectorName: "AlterX: Subdomain Wordlist Generator",
     value: PluginID.ALTERX,

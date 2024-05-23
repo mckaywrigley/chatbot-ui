@@ -24,6 +24,7 @@ export interface Plugin {
 
 export enum PluginID {
   NONE = "none",
+  AUTO_PLUGIN_SELECTOR = "autopluginselector",
   CVEMAP = "cvemap",
   GOLINKFINDER = "golinkfinder",
   CYBERCHEF = "cyberchef",
@@ -37,7 +38,6 @@ export enum PluginID {
   WEB_SEARCH = "websearch",
   ENHANCED_SEARCH = "enhancedsearch",
   DNSX = "dnsx",
-  // AMASS = "amass",
   WEB_SCRAPER = "webscraper",
   PLUGINS_STORE = "pluginselector"
 }
@@ -51,6 +51,9 @@ export const pluginHelp = (plugin: PluginID) => {
 export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.NONE]: {
     id: PluginID.NONE
+  },
+  [PluginID.AUTO_PLUGIN_SELECTOR]: {
+    id: PluginID.AUTO_PLUGIN_SELECTOR
   },
   [PluginID.CVEMAP]: {
     id: PluginID.CVEMAP
@@ -91,9 +94,6 @@ export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.DNSX]: {
     id: PluginID.DNSX
   },
-  // [PluginID.AMASS]: {
-  //   id: PluginID.AMASS
-  // },
   [PluginID.WEB_SCRAPER]: {
     id: PluginID.WEB_SCRAPER
   },
@@ -109,6 +109,7 @@ type pluginUrls = {
 }
 
 export const pluginUrls: pluginUrls = {
+  HACKERGPT: "https://github.com/Hacker-GPT/HackerGPT-2.0",
   CVEMAP: "https://github.com/projectdiscovery/cvemap",
   CYBERCHEF: "https://github.com/gchq/CyberChef",
   SUBFINDER: "https://github.com/projectdiscovery/subfinder",
@@ -120,5 +121,4 @@ export const pluginUrls: pluginUrls = {
   GAU: "https://github.com/lc/gau",
   ALTERX: "https://github.com/projectdiscovery/alterx",
   DNSX: "https://github.com/projectdiscovery/dnsx"
-  // AMASS: "https://github.com/owasp-amass/amass"
 }

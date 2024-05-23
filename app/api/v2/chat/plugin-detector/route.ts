@@ -260,9 +260,9 @@ async function detectPlugin(
     ${pluginsInfo}
   
     # Important Rules:
-    - If the user inquires about CVEs specifically from the 2024 year respond with ID = cvemap. This ensures that the response leverages the most updated CVE information available via the plugin, as the AI does not have direct access to the latest CVE data.
-    - If the user inquires about CVEs that are not from the 2024 year and doesn't say or ask to use the plugin, respond with ID = None. 
-    - If the user requests the plugin to run outside our cloud platform, respond with ID = None.    
+    - For inquiries specifically requesting detailed, actionable information on CVEs from the current year (2024), use cvemap to ensure access to the most updated CVE data, and respond with ID = cvemap.
+    - For inquiries about CVEs from years other than 2024 or for theoretical or broad discussions on CVEs that do not trigger the cvemap plugin, respond with ID = None.
+    - If the user requests the plugin to run outside our cloud platform, respond with ID = None. 
     - Opt for ID = None if unsure which plugin to choose.
   
     # Type of Request
@@ -321,7 +321,11 @@ async function detectPlugin(
     if (!availablePlugins.map(plugin => plugin.name).includes(detectedPlugin)) {
       return "None"
     } else {
-      if (isUserAskingAboutCVEs === "true" && detectedPlugin === "cvemap") {
+      if (
+        isUserAskingAboutCVEs === "true" &&
+        detectedPlugin === "cvemap" &&
+        typeOfRequest === "action"
+      ) {
         return "cvemap"
       }
 

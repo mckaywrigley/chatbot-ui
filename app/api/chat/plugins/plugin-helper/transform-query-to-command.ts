@@ -586,7 +586,7 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
     
     ALWAYS USE THIS FORMAT:
     \`\`\`json
-    { "command": "cvemap [flags]" }
+    { "command": "cvemap [flags] -json" }
     \`\`\`
     Include any of the additional flags only if they align with the specifics of the request. Ensure the command is properly escaped to be valid JSON.
   
@@ -615,9 +615,8 @@ export const transformUserQueryToCvemapCommand = (lastMessage: Message) => {
       - -list-id: List only the CVE IDs in the output (no additional parameters required).
       - -limit int: Limit the number of results to display (default 50, specify a different number as needed).
       - -offset int: Offset the results to display (use in pagination, starts from 0).
-      - -json: Return output in JSON format (use for structured data needs).
+      - -json: Return output in JSON format (use for structured data needs) (optional).
       - -help: Provide all flags avaiable and information about tool. Use this flag if user asked for help or if user asked for all flags or if user asked about plugin.
-      - -json: Return output in json format. 
       - -output (string): write output to a file. Don't put name of file in quotes. By defualt save into .md file format. (optional)
       Do not include any flags not listed here. Use these flags to align with the request's specific requirements. All flags are optional.
     2. **Quotes around flag content**: If flag content has space between like "windows 10," use "'windows 10'" for any flag. Or another example like "> 15" use "'> 15'" for any flag. Their should always be space between sign like ">", "<", "=", ... and the number. 

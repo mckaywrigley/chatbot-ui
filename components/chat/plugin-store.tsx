@@ -276,21 +276,22 @@ function PluginStoreModal({
                             <p className="text-primary/70 line-clamp-3 h-[60px] text-sm">
                               {plugin.description}
                             </p>
-
-                            <div className="text-primary/60 h-[14px] text-xs">
-                              <a
-                                href={plugin.githubRepoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1.5"
-                              >
-                                View on GitHub
-                                <IconCode
-                                  className="size-4"
-                                  aria-hidden="true"
-                                />
-                              </a>
-                            </div>
+                            {plugin.githubRepoUrl && (
+                              <div className="text-primary/60 h-[14px] text-xs">
+                                <a
+                                  href={plugin.githubRepoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1.5"
+                                >
+                                  View on GitHub
+                                  <IconCode
+                                    className="size-4"
+                                    aria-hidden="true"
+                                  />
+                                </a>
+                              </div>
+                            )}
                           </div>
                         ))
                       ) : (

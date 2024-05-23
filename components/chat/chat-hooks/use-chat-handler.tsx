@@ -68,13 +68,14 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isAtPickerOpen,
     isToolPickerOpen,
-    selectedPlugin,
     subscription,
     isRagEnabled,
     isGenerating,
     setUseRetrieval,
     setIsReadyToChat
   } = useContext(ChatbotUIContext)
+
+  let { selectedPlugin } = useContext(ChatbotUIContext)
 
   const isGeneratingRef = useRef(isGenerating)
 
@@ -371,10 +372,36 @@ export const useChatHandler = () => {
       let generatedText = ""
       let finishReasonFromResponse = ""
 
+      if (!isContinuation && selectedPlugin === PluginID.AUTO_PLUGIN_SELECTOR) {
+        const pluginDetectorResponse = await fetch(
+          "/api/v2/chat/plugin-detector",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              payload: payload,
+              selectedPlugin: selectedPlugin
+            })
+          }
+        )
+
+        if (pluginDetectorResponse.ok) {
+          const data = await pluginDetectorResponse.json()
+          const detectedPlugin = data.plugin
+
+          if (detectedPlugin && detectedPlugin !== "None") {
+            selectedPlugin = detectedPlugin
+          }
+        }
+      }
+
       if (
         selectedPlugin.length > 0 &&
         selectedPlugin !== PluginID.NONE &&
-        selectedPlugin !== PluginID.WEB_SCRAPER
+        selectedPlugin !== PluginID.WEB_SCRAPER &&
+        selectedPlugin !== PluginID.AUTO_PLUGIN_SELECTOR
       ) {
         let fileData: { fileName: string; fileContent: string }[] = []
 
@@ -385,7 +412,6 @@ export const useChatHandler = () => {
           PluginID.DNSX,
           PluginID.HTTPX,
           PluginID.KATANA
-          // PluginID.AMASS
         ]
 
         const isCommand = (allowedCommands: string[], message: string) => {

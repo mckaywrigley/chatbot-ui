@@ -8,6 +8,7 @@ import {
 import { PluginID, pluginHelp } from "@/types/plugins"
 import { encode } from "gpt-tokenizer"
 import { GPT4 } from "./models/llm/openai-llm-list"
+import endent from "endent"
 
 const buildBasePrompt = (
   prompt: string,
@@ -122,7 +123,7 @@ export async function buildFinalMessages(
       // processedChatMessages[i].message.plugin !== PluginID.NONE &&
       processedChatMessages[i].message.content.length > messageSizeLimit
     ) {
-      const messageSizeKeep = Number(process.env.MESSAGE_SIZE_KEEP || 4000)
+      const messageSizeKeep = Number(process.env.MESSAGE_SIZE_KEEP || 2000)
       processedChatMessages[i].message = {
         ...processedChatMessages[i].message,
         content:
@@ -204,7 +205,7 @@ export async function buildFinalMessages(
 
     finalMessages[finalMessages.length - 2] = {
       ...finalMessages[finalMessages.length - 2],
-      content: `Assist with the user's query: '${finalMessages[finalMessages.length - 2].content}' using uploaded files. 
+      content: endent`Assist with the user's query: '${finalMessages[finalMessages.length - 2].content}' using uploaded files. 
       Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. 
       Assess each section for information pertinent to the query.
       
@@ -215,12 +216,16 @@ export async function buildFinalMessages(
       Highlight or address any ambiguities found in the content. 
       State clearly if information related to the query is not available.`
     }
-  } else if (messageFileItems.length > 0 && selectedPlugin !== PluginID.NONE) {
+  } else if (
+    messageFileItems.length > 0 &&
+    selectedPlugin !== PluginID.NONE &&
+    selectedPlugin !== PluginID.AUTO_PLUGIN_SELECTOR
+  ) {
     const retrievalText = buildRetrievalText(messageFileItems)
 
     finalMessages[finalMessages.length - 2] = {
       ...finalMessages[finalMessages.length - 2],
-      content: `Assist with the user's query: '${finalMessages[finalMessages.length - 2].content}' using uploaded files. 
+      content: endent`Assist with the user's query: '${finalMessages[finalMessages.length - 2].content}' using uploaded files. 
       Each <BEGIN SOURCE>...<END SOURCE> section represents part of the overall file. 
       Assess each section for information pertinent to the query.
       
