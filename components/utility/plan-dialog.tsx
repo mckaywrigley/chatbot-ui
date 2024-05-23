@@ -152,7 +152,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                 <span className="ml-1 text-white">Upgrade to Pro</span>
               </Button>
               <p className="text-primary mt-2 text-xs">
-                Auto-renews for $20/month until canceled
+                Auto-renews for $29/month until canceled
               </p>
             </div>
           </div>
@@ -178,7 +178,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                 <div className="flex items-center justify-between">
                   <h3 className="mb-2 text-lg font-bold">Pro</h3>
                   <div className="mb-2 text-lg text-[#8e8ea0]">
-                    USD $20/month
+                    USD $29/month
                   </div>
                 </div>
                 <div className="mb-4 grid grid-cols-1 gap-1">

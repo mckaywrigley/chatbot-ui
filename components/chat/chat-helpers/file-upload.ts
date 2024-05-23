@@ -27,7 +27,6 @@ export const handleFileUpload = (
     imageExtensions.includes(fileExtension) &&
     chatSettings?.model !== GPT4.modelId
   ) {
-    console.log(chatSettings)
     toast.error("Image files are only supported by GPT-4o for now.")
     return
   } else if (videoExtensions.includes(fileExtension)) {

@@ -239,11 +239,8 @@ async function detectPlugin(
     return msg
   })
 
-  // Filter out empty assistant messages, exclude the first and last message, and pick the last 3 messages
-  const chatHistory = cleanedMessages
-    .filter(msg => !(msg.role === "assistant" && msg.content === ""))
-    .slice(1, -1)
-    .slice(-4)
+  // Exclude the first and last message, and pick the last 3 messages
+  const chatHistory = cleanedMessages.slice(1, -1).slice(-4)
 
   const pluginsInfo = availablePlugins
     .map(
