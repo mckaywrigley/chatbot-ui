@@ -23,7 +23,8 @@ module.exports = withBundleAnalyzer(
           protocol: "https",
           hostname: "**"
         }
-      ]
+      ],
+      unoptimized: true
     },
     experimental: {
       serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
