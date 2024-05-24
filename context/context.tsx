@@ -150,6 +150,9 @@ interface ChatbotUIContext {
 
   isReadyToChat: boolean
   setIsReadyToChat: Dispatch<SetStateAction<boolean>>
+
+  currentPlayingMessageId: string | null
+  setCurrentPlayingMessageId: Dispatch<SetStateAction<string | null>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -288,5 +291,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   isMobile: false,
 
   isReadyToChat: false,
-  setIsReadyToChat: () => {}
+  setIsReadyToChat: () => {},
+
+  currentPlayingMessageId: null,
+  setCurrentPlayingMessageId: () => {}
 })

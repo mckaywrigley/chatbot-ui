@@ -452,6 +452,8 @@ export const Message: FC<MessageProps> = ({
               onRegenerate={handleRegenerate}
               onGoodResponse={handleGoodResponse}
               onBadResponse={handleBadResponse}
+              messageContent={message.content}
+              messageSequenceNumber={message.sequence_number}
             />
           </div>
         )}

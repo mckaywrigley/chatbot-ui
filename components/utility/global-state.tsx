@@ -139,6 +139,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // Define is ready to chat state
   const [isReadyToChat, setIsReadyToChat] = useState<boolean>(false)
 
+  // Audio
+  const [currentPlayingMessageId, setCurrentPlayingMessageId] = useState<
+    string | null
+  >(null)
+
   // Handle window resize to update isMobile
   useEffect(() => {
     const handleResize = () => {
@@ -373,7 +378,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // Is ready to chat state
         isReadyToChat,
-        setIsReadyToChat
+        setIsReadyToChat,
+
+        // Audio
+        currentPlayingMessageId,
+        setCurrentPlayingMessageId
       }}
     >
       {children}

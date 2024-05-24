@@ -3,15 +3,18 @@ import {
   IconCheck,
   IconCopy,
   IconEdit,
-  IconFlag,
+  IconVolume,
   IconRepeat,
   IconThumbDown,
   IconThumbDownFilled,
   IconThumbUp,
-  IconThumbUpFilled
+  IconThumbUpFilled,
+  IconPlayerStop,
+  IconLoader
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
+import { useAudioPlayer } from "@/components/chat/chat-hooks/use-audio-player"
 
 export const MESSAGE_ICON_SIZE = 20
 
@@ -28,6 +31,8 @@ interface MessageActionsProps {
   onGoodResponse: () => void
   onBadResponse: () => void
   messageHasImage: boolean
+  messageContent: string
+  messageSequenceNumber: number
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -42,17 +47,22 @@ export const MessageActions: FC<MessageActionsProps> = ({
   onRegenerate,
   onGoodResponse,
   onBadResponse,
-  messageHasImage
+  messageHasImage,
+  messageContent,
+  messageSequenceNumber
 }) => {
-  const { isGenerating } = useContext(ChatbotUIContext)
+  const {
+    isGenerating,
+    currentPlayingMessageId,
+    setCurrentPlayingMessageId,
+    subscription,
+    selectedChat,
+    isMobile
+  } = useContext(ChatbotUIContext)
   const [showCheckmark, setShowCheckmark] = useState(false)
+  const { playAudio, stopAudio, isLoading, isPlaying } = useAudioPlayer()
 
-  const handleCopy = () => {
-    onCopy()
-    setShowCheckmark(true)
-  }
-
-  const handleForkChat = async () => {}
+  const BELOW_MAX_LENGTH = messageContent.length < 4096
 
   useEffect(() => {
     if (showCheckmark) {
@@ -64,26 +74,42 @@ export const MessageActions: FC<MessageActionsProps> = ({
     }
   }, [showCheckmark])
 
-  return (isLast && isGenerating) || isEditing ? null : (
-    <div className="text-muted-foreground flex items-center space-x-2">
-      {/* {((isAssistant && isHovering) || isLast) && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Fork Chat</div>}
-          trigger={
-            <IconGitFork
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={handleForkChat}
-            />
-          }
-        />
-      )} */}
+  const handleCopy = () => {
+    onCopy()
+    setShowCheckmark(true)
+  }
 
+  const handlePlayClick = () => {
+    if (currentPlayingMessageId === messageSequenceNumber.toString()) {
+      stopAudio()
+      setCurrentPlayingMessageId(null)
+    } else {
+      playAudio(messageContent)
+      setCurrentPlayingMessageId(messageSequenceNumber.toString())
+    }
+  }
+
+  useEffect(() => {
+    if (currentPlayingMessageId && selectedChat) {
+      stopAudio()
+      setCurrentPlayingMessageId(null)
+    }
+  }, [selectedChat])
+
+  useEffect(() => {
+    return () => {
+      stopAudio()
+      setCurrentPlayingMessageId(null)
+    }
+  }, [])
+
+  return (isLast && isGenerating) || isEditing ? null : (
+    <div
+      className={`text-muted-foreground flex items-center space-x-3 ${isMobile ? "ml-3" : ""}`}
+    >
       {!isAssistant && isHovering && !messageHasImage && (
         <WithTooltip
-          delayDuration={1000}
+          delayDuration={0}
           side="bottom"
           display={<div>Edit</div>}
           trigger={
@@ -96,9 +122,44 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
+      {isAssistant && isHovering && BELOW_MAX_LENGTH && subscription && (
+        <WithTooltip
+          delayDuration={0}
+          side="bottom"
+          display={
+            <div>
+              {isLoading
+                ? "Loading..."
+                : isPlaying &&
+                    currentPlayingMessageId === messageSequenceNumber.toString()
+                  ? "Stop"
+                  : "Read Aloud"}
+            </div>
+          }
+          trigger={
+            isLoading ? (
+              <IconLoader className="animate-spin" size={MESSAGE_ICON_SIZE} />
+            ) : isPlaying &&
+              currentPlayingMessageId === messageSequenceNumber.toString() ? (
+              <IconPlayerStop
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={handlePlayClick}
+              />
+            ) : (
+              <IconVolume
+                className="cursor-pointer hover:opacity-50"
+                size={MESSAGE_ICON_SIZE}
+                onClick={handlePlayClick}
+              />
+            )
+          }
+        />
+      )}
+
       {isHovering && (
         <WithTooltip
-          delayDuration={1000}
+          delayDuration={0}
           side="bottom"
           display={<div>Copy</div>}
           trigger={
@@ -117,7 +178,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
       {isAssistant && isHovering && (
         <WithTooltip
-          delayDuration={1000}
+          delayDuration={0}
           side="bottom"
           display={<div>Good Response</div>}
           trigger={
@@ -140,7 +201,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
       {isAssistant && isHovering && (
         <WithTooltip
-          delayDuration={1000}
+          delayDuration={0}
           side="bottom"
           display={<div>Bad Response</div>}
           trigger={
@@ -163,7 +224,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
       {isHovering && isLast && (
         <WithTooltip
-          delayDuration={1000}
+          delayDuration={0}
           side="bottom"
           display={<div>Regenerate</div>}
           trigger={
