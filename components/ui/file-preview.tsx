@@ -32,9 +32,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
           if (type === "image") {
             const imageItem = item as MessageImage
 
-            return imageItem.file ? (
-              <DrawingCanvas imageItem={imageItem} />
-            ) : (
+            return (
               <Image
                 className="rounded"
                 src={imageItem.base64 || imageItem.url}
