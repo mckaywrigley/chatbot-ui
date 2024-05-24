@@ -181,9 +181,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         >
           {isDragging && subscription ? (
             <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
-              <div className="justify-cente flex flex-col items-center rounded-lg p-4">
+              <div className="flex flex-col items-center rounded-lg p-4">
                 <IconFileFilled size={48} className="mb-2 text-white" />
-                <span className="text-lg font-semibold text-white">
+                <span className="text-center text-lg font-semibold text-white">
                   Drop your files here to add it to the conversation
                 </span>
               </div>
