@@ -94,8 +94,8 @@ function _getLimit(model: string, isPremium: boolean): number {
     const limitKey = `RATELIMITER_LIMIT_${model.toUpperCase()}_${isPremium ? "PREMIUM" : "FREE"}`
     limit = Number(process.env[limitKey])
   } else if (model === "tts-1") {
-    const limitKey = "RATELIMITER_LIMIT_TTS_1"
-    limit = Number(process.env[limitKey]) || 40
+    const limitKey = `RATELIMITER_LIMIT_TTS_1_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey]) || 15
   } else {
     const fixedModelName = _getFixedModelName(model)
     const limitKey = `RATELIMITER_LIMIT_${fixedModelName}_${isPremium ? "PREMIUM" : "FREE"}`
@@ -158,9 +158,7 @@ export function getRateLimitErrorMessage(
     }
 
     return message.trim()
-  }
-
-  if (model === "pluginDetector") {
+  } else if (model === "pluginDetector") {
     let message = `
   ⚠️ You've reached the rate limit for the plugin detector.
 ⏰ Access will be restored in ${remainingText}.`
@@ -171,12 +169,15 @@ export function getRateLimitErrorMessage(
     }
 
     return message.trim()
-  }
-
-  if (model === "tts-1") {
+  } else if (model === "tts-1") {
     let message = `
   ⚠️ You've reached the rate limit for text-to-speech.
 ⏰ Access will be restored in ${remainingText}.`
+
+    if (!premium) {
+      message += `
+🚀 Consider upgrading for higher limits and more features.`
+    }
 
     return message.trim()
   }

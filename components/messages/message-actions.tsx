@@ -55,7 +55,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
     isGenerating,
     currentPlayingMessageId,
     setCurrentPlayingMessageId,
-    subscription,
     selectedChat,
     isMobile
   } = useContext(ChatbotUIContext)
@@ -122,7 +121,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isAssistant && isHovering && BELOW_MAX_LENGTH && subscription && (
+      {isAssistant && isHovering && BELOW_MAX_LENGTH && (
         <WithTooltip
           delayDuration={0}
           side="bottom"

@@ -1,19 +1,19 @@
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { isPremiumUser } from "@/lib/server/subscription-utils"
+// import { isPremiumUser } from "@/lib/server/subscription-utils"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
   const { text } = await req.json()
 
   const profile = await getServerProfile()
-  const isPremium = await isPremiumUser(profile.user_id)
+  // const isPremium = await isPremiumUser(profile.user_id)
 
-  if (!isPremium) {
-    return new NextResponse("Only Pro users can use text-to-speech", {
-      status: 403
-    })
-  }
+  // if (!isPremium) {
+  //   return new NextResponse("Only Pro users can use text-to-speech", {
+  //     status: 403
+  //   })
+  // }
 
   const rateLimitCheckResult = await checkRatelimitOnApi(
     profile.user_id,
