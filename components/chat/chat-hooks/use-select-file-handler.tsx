@@ -51,6 +51,8 @@ export const useSelectFileHandler = () => {
 
     setShowFilesDisplay(true)
 
+    const loadingId = "loading-" + crypto.randomUUID()
+
     if (file) {
       let simplifiedFileType =
         file.type.split("/")[0] === "text" ? "text" : file.type.split("/")[1]
@@ -77,7 +79,7 @@ export const useSelectFileHandler = () => {
         setNewMessageFiles(prev => [
           ...prev,
           {
-            id: "loading",
+            id: loadingId,
             name: file.name,
             type: simplifiedFileType,
             file: file
@@ -116,12 +118,7 @@ export const useSelectFileHandler = () => {
             toast.error(
               "You reached the maximum amount of files! Please delete some in the files tab."
             )
-            setNewMessageImages(prev =>
-              prev.filter(img => img.messageId !== "temp")
-            )
-            setNewMessageFiles(prev =>
-              prev.filter(file => file.id !== "loading")
-            )
+            setNewMessageFiles(prev => prev.filter(f => f.id !== loadingId))
             return
           }
 
@@ -129,7 +126,7 @@ export const useSelectFileHandler = () => {
 
           setNewMessageFiles(prev =>
             prev.map(item =>
-              item.id === "loading"
+              item.id === loadingId
                 ? {
                     id: createdFile.id,
                     name: createdFile.name,
@@ -163,7 +160,7 @@ export const useSelectFileHandler = () => {
             setNewMessageImages(prev => [
               ...prev,
               {
-                messageId: "temp",
+                messageId: crypto.randomUUID(),
                 path: "",
                 base64: reader.result, // base64 image
                 url: imageUrl,
@@ -190,11 +187,9 @@ export const useSelectFileHandler = () => {
               toast.error(
                 "You reached the maximum amount of files! Please delete some in the files tab."
               )
-              setNewMessageImages(prev =>
-                prev.filter(img => img.messageId !== "temp")
-              )
+
               setNewMessageFiles(prev =>
-                prev.filter(file => file.id !== "loading")
+                prev.filter(file => file.id !== loadingId)
               )
               return
             }
@@ -203,7 +198,7 @@ export const useSelectFileHandler = () => {
 
             setNewMessageFiles(prev =>
               prev.map(item =>
-                item.id === "loading"
+                item.id === loadingId
                   ? {
                       id: createdFile.id,
                       name: createdFile.name,
@@ -223,7 +218,7 @@ export const useSelectFileHandler = () => {
           setNewMessageImages(prev =>
             prev.filter(img => img.messageId !== "temp")
           )
-          setNewMessageFiles(prev => prev.filter(file => file.id !== "loading"))
+          setNewMessageFiles(prev => prev.filter(file => file.id !== loadingId))
         }
       }
     }

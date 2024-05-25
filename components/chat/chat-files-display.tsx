@@ -166,7 +166,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
             ))}
 
             {combinedChatFiles.map((file, index) =>
-              file.id === "loading" ? (
+              file.id.startsWith("loading") ? (
                 <div
                   key={index}
                   className="relative flex h-[64px] items-center space-x-4 rounded-xl border-2 px-4 py-3"
