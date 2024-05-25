@@ -106,7 +106,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
     <div
       className={`text-muted-foreground flex items-center space-x-3 ${isMobile ? "ml-3" : ""}`}
     >
-      {!isAssistant && isHovering && !messageHasImage && (
+      {!isAssistant && !messageHasImage && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
@@ -121,7 +121,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isAssistant && isHovering && BELOW_MAX_LENGTH && (
+      {isAssistant && BELOW_MAX_LENGTH && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
@@ -156,7 +156,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isHovering && (
+      {!messageHasImage && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
@@ -175,7 +175,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isAssistant && isHovering && (
+      {isAssistant && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
@@ -198,7 +198,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isAssistant && isHovering && (
+      {isAssistant && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
@@ -221,7 +221,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {isHovering && isLast && (
+      {isLast && (
         <WithTooltip
           delayDuration={0}
           side="bottom"
