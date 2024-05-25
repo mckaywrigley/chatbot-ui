@@ -63,7 +63,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const fetchData = async () => {
       await Promise.all([fetchMessages(), fetchChat()])
 
-      scrollToBottom()
+      scrollToBottom(true)
       setIsAtBottom(true)
     }
 

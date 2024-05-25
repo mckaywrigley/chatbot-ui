@@ -21,9 +21,7 @@ export const useScroll = () => {
   const [isOverflowing, setIsOverflowing] = useState(false)
 
   useEffect(() => {
-    setUserScrolled(false)
-
-    if (!isGenerating && userScrolled) {
+    if (isGenerating) {
       setUserScrolled(false)
     }
   }, [isGenerating])
@@ -32,24 +30,22 @@ export const useScroll = () => {
     if (isGenerating && !userScrolled) {
       scrollToBottom()
     }
-  }, [chatMessages])
+  }, [chatMessages, isGenerating, userScrolled])
 
   const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {
     const target = e.target as HTMLDivElement
     const bottom =
       Math.abs(target.scrollHeight - target.scrollTop - target.clientHeight) <
-      250
-    setTimeout(() => {
-      setIsAtBottom(bottom)
-    }, 300)
-
+      50
     const top = target.scrollTop < 250
+
+    setIsAtBottom(bottom)
     setIsAtTop(top)
 
-    if (!bottom && !isAutoScrolling.current) {
-      setUserScrolled(true)
-    } else {
-      setUserScrolled(false)
+    if (bottom) {
+      setUserScrolled(false) // Reset userScrolled when at the bottom
+    } else if (!isAutoScrolling.current && target.scrollTop > 50) {
+      setUserScrolled(true) // Set userScrolled to true when scrolled up significantly and not autoscrolling
     }
 
     const isOverflow = target.scrollHeight > target.clientHeight
@@ -62,17 +58,31 @@ export const useScroll = () => {
     }
   }, [])
 
-  const scrollToBottom = useCallback(() => {
-    isAutoScrolling.current = true
-
-    setTimeout(() => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+  const scrollToBottom = useCallback(
+    (forced: boolean = false) => {
+      if (forced) {
+        setUserScrolled(false)
       }
+      if (!userScrolled || forced) {
+        isAutoScrolling.current = true
 
-      isAutoScrolling.current = false
-    }, 100)
-  }, [])
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "auto" })
+        }
+
+        setTimeout(() => {
+          isAutoScrolling.current = false
+        }, 100)
+      }
+    },
+    [userScrolled]
+  )
+
+  useEffect(() => {
+    if (!userScrolled) {
+      scrollToBottom()
+    }
+  }, [chatMessages, scrollToBottom])
 
   return {
     messagesStartRef,

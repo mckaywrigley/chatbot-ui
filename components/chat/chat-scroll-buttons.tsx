@@ -6,7 +6,7 @@ interface ChatScrollButtonsProps {
   isAtBottom: boolean
   isOverflowing: boolean
   scrollToTop: () => void
-  scrollToBottom: () => void
+  scrollToBottom: (forced?: boolean) => void
 }
 
 export const ChatScrollButtons: FC<ChatScrollButtonsProps> = ({
@@ -29,7 +29,7 @@ export const ChatScrollButtons: FC<ChatScrollButtonsProps> = ({
       {!isAtBottom && isOverflowing && (
         <div
           className="border-secondary-foreground bg-secondary cursor-pointer rounded-full border-2 p-1 opacity-75 hover:opacity-100"
-          onClick={scrollToBottom}
+          onClick={() => scrollToBottom(true)}
         >
           <IconArrowDown size={18} />
         </div>
