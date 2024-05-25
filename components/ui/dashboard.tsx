@@ -17,6 +17,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useContext, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
+import { toast } from "sonner"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -46,7 +47,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const [showConfirmationDialog, setShowConfirmationDialog] =
     useState<boolean>(false)
 
-  const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
 
   const onFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -57,34 +58,43 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     }
 
     const items = event.dataTransfer.items
-    // let fileCount = 0
+    const files: File[] = []
 
     if (items && subscription) {
-      // for (let i = 0; i < items.length && fileCount < 5; i++) {
-      for (let i = 0; i < items.length; i++) {
+      for (let i = 0; i < Math.min(items.length, 5); i++) {
         const item = items[i]
         if (item.kind === "file") {
           const file = item.getAsFile()
           if (file) {
-            handleFileUpload(
-              file,
-              chatSettings,
-              setShowConfirmationDialog,
-              setCurrentFile,
-              handleSelectDeviceFile
-            )
-            // fileCount++
-            break
+            files.push(file)
           }
         }
       }
+      handleFileUpload(
+        files,
+        chatSettings,
+        setShowConfirmationDialog,
+        setPendingFiles,
+        handleSelectDeviceFile
+      )
     }
 
-    // if (fileCount >= 5) {
-    //   toast.error("Maximum of 5 files can be dropped at a time.")
-    // }
+    if (items.length > 5) {
+      toast.error("Maximum of 5 files can be dropped at a time.")
+    }
 
     setIsDragging(false)
+  }
+
+  const handleConversionConfirmation = () => {
+    pendingFiles.forEach(file => handleSelectDeviceFile(file))
+    setShowConfirmationDialog(false)
+    setPendingFiles([])
+  }
+
+  const handleCancel = () => {
+    setPendingFiles([])
+    setShowConfirmationDialog(false)
   }
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -106,24 +116,12 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     localStorage.setItem("showSidebar", String(!showSidebar))
   }
 
-  const handleConversionConfirmation = () => {
-    if (currentFile) {
-      handleSelectDeviceFile(currentFile)
-      setShowConfirmationDialog(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setCurrentFile(null)
-    setShowConfirmationDialog(false)
-  }
-
   return (
     <div className="flex size-full">
-      {showConfirmationDialog && currentFile && (
+      {showConfirmationDialog && pendingFiles.length > 0 && (
         <UnsupportedFilesDialog
           isOpen={showConfirmationDialog}
-          currentFile={currentFile}
+          pendingFiles={pendingFiles}
           onCancel={handleCancel}
           onConfirm={handleConversionConfirmation}
         />

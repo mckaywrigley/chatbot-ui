@@ -3,14 +3,14 @@ import Modal from "@/components/chat/dialog-portal"
 
 interface UnsupportedFilesDialogProps {
   isOpen: boolean
-  currentFile: File
+  pendingFiles: File[]
   onCancel: () => void
   onConfirm: () => void
 }
 
 export const UnsupportedFilesDialog: React.FC<UnsupportedFilesDialogProps> = ({
   isOpen,
-  currentFile,
+  pendingFiles,
   onCancel,
   onConfirm
 }) => {
@@ -20,11 +20,15 @@ export const UnsupportedFilesDialog: React.FC<UnsupportedFilesDialogProps> = ({
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
-          <p>
-            The file extension{" "}
-            <b>.{currentFile?.name.split(".").pop()?.toLowerCase()}</b> is
-            currently not supported.
-          </p>
+          <p>The following file extensions are currently not supported:</p>
+          <ul className="mt-4">
+            {pendingFiles.map(file => (
+              <li key={file.name}>
+                <b>.{file.name.split(".").pop()?.toLowerCase()}</b> -{" "}
+                {file.name}
+              </li>
+            ))}
+          </ul>
           <p className="mt-4">
             Would you like to convert their content into a text format?
           </p>

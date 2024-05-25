@@ -137,7 +137,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState<boolean>(false)
 
   // Define is ready to chat state
-  const [isReadyToChat, setIsReadyToChat] = useState<boolean>(false)
+  const [isReadyToChat, setIsReadyToChat] = useState<boolean>(true)
 
   // Audio
   const [currentPlayingMessageId, setCurrentPlayingMessageId] = useState<

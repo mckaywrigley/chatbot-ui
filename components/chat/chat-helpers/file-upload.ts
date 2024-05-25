@@ -2,14 +2,12 @@ import { GPT4 } from "@/lib/models/llm/openai-llm-list"
 import { toast } from "sonner"
 
 export const handleFileUpload = (
-  file: File,
+  files: File[],
   chatSettings: any,
   setShowConfirmationDialog: (show: boolean) => void,
-  setCurrentFile: (file: File | null) => void,
+  setPendingFiles: (files: File[]) => void,
   handleSelectDeviceFile: (file: File) => void
 ) => {
-  const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
-
   const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "svg"]
   const videoExtensions = ["mp4", "avi", "mov", "wmv", "flv"]
   const supportedExtensions = [
@@ -23,22 +21,29 @@ export const handleFileUpload = (
     ...imageExtensions
   ]
 
-  if (
-    imageExtensions.includes(fileExtension) &&
-    chatSettings?.model !== GPT4.modelId
-  ) {
-    toast.error("Image files are only supported by GPT-4o for now.")
-    return
-  } else if (videoExtensions.includes(fileExtension)) {
-    toast.error("Video files are not supported yet.")
-    return
-  }
+  const unsupportedFiles: File[] = []
 
-  if (fileExtension && !supportedExtensions.includes(fileExtension)) {
+  files.forEach(file => {
+    const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
+
+    if (
+      imageExtensions.includes(fileExtension) &&
+      chatSettings?.model !== GPT4.modelId
+    ) {
+      toast.error(
+        `${file.name}: Image files are only supported by GPT-4 for now.`
+      )
+    } else if (videoExtensions.includes(fileExtension)) {
+      toast.error(`${file.name}: Video files are not supported yet.`)
+    } else if (fileExtension && !supportedExtensions.includes(fileExtension)) {
+      unsupportedFiles.push(file)
+    } else {
+      handleSelectDeviceFile(file)
+    }
+  })
+
+  if (unsupportedFiles.length > 0) {
+    setPendingFiles(unsupportedFiles)
     setShowConfirmationDialog(true)
-    setCurrentFile(file)
-    return
-  } else {
-    handleSelectDeviceFile(file)
   }
 }

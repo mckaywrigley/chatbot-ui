@@ -147,7 +147,8 @@ export const useSelectFileHandler = () => {
             : reader.readAsText(file)
         }
       } else {
-        toast.error("Unsupported file type")
+        // Read unsupported file as text
+        reader.readAsText(file)
       }
 
       reader.onloadend = async function () {
@@ -168,6 +169,27 @@ export const useSelectFileHandler = () => {
               }
             ])
           } else {
+            let fileContent = reader.result as string
+
+            // If the file was unsupported, transform it into a .txt file
+            if (!ACCEPTED_FILE_TYPES.split(",").includes(file.type)) {
+              simplifiedFileType = "txt"
+              file = new File([fileContent], `${file.name}.txt`, {
+                type: "text/plain"
+              })
+
+              // Add the transformed file to the preview
+              setNewMessageFiles(prev => [
+                ...prev,
+                {
+                  id: loadingId,
+                  name: file.name,
+                  type: simplifiedFileType,
+                  file: file
+                }
+              ])
+            }
+
             const createdFile = await createFile(
               file,
               {
@@ -212,7 +234,7 @@ export const useSelectFileHandler = () => {
             setUseRetrieval(true)
           }
         } catch (error: any) {
-          toast.error("Failed to upload. " + error?.message, {
+          toast.error(`Failed to upload ${file.name}: ${error?.message}`, {
             duration: 10000
           })
           setNewMessageImages(prev =>

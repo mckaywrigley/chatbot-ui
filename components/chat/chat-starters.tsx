@@ -36,7 +36,7 @@ const ChatStarters: React.FC<ChatStartersProps> = ({
   selectedPlugin,
   chatMessages
 }) => {
-  const { userInput } = useContext(ChatbotUIContext)
+  const { userInput, showFilesDisplay } = useContext(ChatbotUIContext)
   const chatHandler = useChatHandler()
   const pluginStarters = availablePlugins.find(
     (plugin: { value: PluginID }) => plugin.value === selectedPlugin
@@ -44,7 +44,7 @@ const ChatStarters: React.FC<ChatStartersProps> = ({
 
   const handleSendMessage = chatHandler.handleSendMessage
 
-  if (userInput) {
+  if (userInput || showFilesDisplay) {
     return null
   }
 

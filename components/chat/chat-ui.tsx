@@ -68,6 +68,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     }
 
     if ((chatMessages?.length === 0 && !params.chatid) || params.chatid) {
+      setIsReadyToChat(false)
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)

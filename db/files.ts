@@ -160,10 +160,10 @@ export const createFile = async (
     console.error(
       `Error processing file:${createdFile.id}, status:${response.status}, response:${json.message}`
     )
-    toast.error("Failed to process file. Reason:" + json.message, {
-      duration: 10000
-    })
     await deleteFile(createdFile.id)
+    throw new Error(
+      `Failed to process file (${fileRecord.name}): ${json.message}`
+    )
   }
 
   const fetchedFile = await getFileById(createdFile.id)

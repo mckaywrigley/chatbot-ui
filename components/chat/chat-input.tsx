@@ -30,6 +30,7 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { EnhancedMenuPicker } from "./enhance-menu"
+import { UnsupportedFilesDialog } from "./unsupported-files-dialog"
 
 interface ChatInputProps {}
 
@@ -44,7 +45,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
   const [showConfirmationDialog, setShowConfirmationDialog] =
     useState<boolean>(false)
-  const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
 
   const [optionsCollapsed, setOptionsCollapsed] = useState(false)
   const [showMobileHelp, setShowMobileHelp] = useState(false)
@@ -205,14 +206,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
 
   const handleConversionConfirmation = () => {
-    if (currentFile) {
-      handleSelectDeviceFile(currentFile)
-      setShowConfirmationDialog(false)
-    }
+    pendingFiles.forEach(file => handleSelectDeviceFile(file))
+    setShowConfirmationDialog(false)
+    setPendingFiles([])
   }
 
   const handleCancel = () => {
-    setCurrentFile(null)
+    setPendingFiles([])
     setShowConfirmationDialog(false)
   }
 
@@ -310,34 +310,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   return (
     <>
-      <Modal isOpen={showConfirmationDialog}>
-        <div className="size-screen fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm dark:bg-opacity-75"></div>
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
-            <p>
-              The file extension{" "}
-              <b>.{currentFile?.name.split(".").pop()?.toLowerCase()}</b> is
-              currently not supported.
-            </p>
-            <p>Would you like to convert its content into a text format?</p>
-            <div className="mt-5 flex justify-center gap-5">
-              <button
-                onClick={handleCancel}
-                className="ring-offset-background focus-visible:ring-ring bg-input text-primary hover:bg-input/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConversionConfirmation}
-                className="ring-offset-background focus-visible:ring-ring bg-primary text-primary-foreground hover:bg-primary/90 flex h-[36px] items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-              >
-                Convert
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      {showConfirmationDialog && pendingFiles.length > 0 && (
+        <UnsupportedFilesDialog
+          isOpen={showConfirmationDialog}
+          pendingFiles={pendingFiles}
+          onCancel={handleCancel}
+          onConfirm={handleConversionConfirmation}
+        />
+      )}
 
       <Modal isOpen={showMobileHelp}>
         <div className="size-screen fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm dark:bg-opacity-75"></div>
@@ -451,10 +431,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             onChange={e => {
               if (!e.target.files) return
               handleFileUpload(
-                e.target.files[0],
+                Array.from(e.target.files),
                 chatSettings,
                 setShowConfirmationDialog,
-                setCurrentFile,
+                setPendingFiles,
                 handleSelectDeviceFile
               )
             }}

@@ -99,6 +99,12 @@ export async function POST(req: Request) {
         break
     }
 
+    chunks = chunks.filter(chunk => chunk.content.trim() !== "")
+
+    if (chunks.length === 0) {
+      throw new Error("Empty file. Please check the file format and content.")
+    }
+
     let embeddings: any = []
 
     let openai
