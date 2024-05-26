@@ -4,12 +4,13 @@ import { forwardRef, ImgHTMLAttributes, useState } from "react"
 const ImageWithPreview = forwardRef<
   HTMLImageElement,
   ImgHTMLAttributes<HTMLImageElement>
->(({ src, ...props }) => {
+>(({ src, ...props }, ref) => {
   const [showImagePreview, setShowImagePreview] = useState(false)
 
   return (
     <>
       <img
+        ref={ref}
         onClick={() => setShowImagePreview(true)}
         className="w-1/2 rounded-md"
         src={src}
