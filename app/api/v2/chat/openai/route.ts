@@ -77,9 +77,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model: "gpt-4o",
         messages: cleanedMessages as ChatCompletionCreateParamsBase["messages"],
-        // temperature: chatSettings.temperature,
         temperature: 0.4,
-        // max_tokens: chatSettings.model === "gpt-4-vision-preview" ? 4096 : null,
         max_tokens: 1024,
         stream: true
       })

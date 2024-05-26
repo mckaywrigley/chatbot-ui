@@ -71,18 +71,17 @@ export async function buildFinalMessages(
   )
 
   let CHUNK_SIZE = chatSettings.contextLength
-  if (
-    chatSettings.model === GPT4.modelId ||
-    chatSettings.model === "mistral-large"
-  ) {
-    CHUNK_SIZE = 12288
+  if (chatSettings.model === GPT4.modelId) {
+    CHUNK_SIZE = 16000
+  } else if (chatSettings.model === "mistral-large") {
+    CHUNK_SIZE = 12000
   } else if (chatSettings.model === "mistral-medium") {
     // Adjusting the chunk size to comply with the content size limit imposed by Llama 3 (8192 max)
-    CHUNK_SIZE = 8192
+    CHUNK_SIZE = 8000
   }
 
   if (selectedPlugin !== PluginID.NONE) {
-    CHUNK_SIZE = 8192
+    CHUNK_SIZE = 8000
   }
 
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
@@ -90,6 +89,20 @@ export async function buildFinalMessages(
 
   let usedTokens = 0
   usedTokens += PROMPT_TOKENS
+
+  const lastUserMessage = chatMessages[chatMessages.length - 2].message.content
+  const lastUserMessageContent = Array.isArray(lastUserMessage)
+    ? lastUserMessage
+        .map(item => (item.type === "text" ? item.text : ""))
+        .join(" ")
+    : lastUserMessage
+  const lastUserMessageTokens = encode(lastUserMessageContent).length
+
+  if (lastUserMessageTokens > CHUNK_SIZE) {
+    throw new Error(
+      "The message you submitted was too long, please submit something shorter."
+    )
+  }
 
   const processedChatMessages = chatMessages.map((chatMessage, index) => {
     const nextChatMessage = chatMessages[index + 1]

@@ -263,10 +263,9 @@ export const fetchChatResponse = async (
   })
 
   if (!response.ok) {
-    if (response.status === 404 && !isHosted) {
-      toast.error(
-        "Model not found. Make sure you have it downloaded via Ollama."
-      )
+    if (response.status === 500) {
+      const errorData = await response.json()
+      toast.error(errorData.message)
     }
 
     const errorData = await response.json()
@@ -305,22 +304,31 @@ export const processResponse = async (
 
     switch (response.status) {
       case 400:
-        throw new Error(`Bad Request: ${errorMessage}`)
+        errorMessage = `Bad Request: ${errorMessage}`
+        break
       case 401:
-        throw new Error(`Invalid Credentials: ${errorMessage}`)
+        errorMessage = `Invalid Credentials: ${errorMessage}`
+        break
       case 402:
-        throw new Error(`Out of Credits: ${errorMessage}`)
+        errorMessage = `Out of Credits: ${errorMessage}`
+        break
       case 403:
-        throw new Error(`Moderation Required: ${errorMessage}`)
+        errorMessage = `Moderation Required: ${errorMessage}`
+        break
       case 408:
-        throw new Error(`Request Timeout: ${errorMessage}`)
+        errorMessage = `Request Timeout: ${errorMessage}`
+        break
       case 429:
-        throw new Error(`Rate Limited: ${errorMessage}`)
+        errorMessage = `Rate Limited: ${errorMessage}`
+        break
       case 502:
-        throw new Error(`Service Unavailable: ${errorMessage}`)
+        errorMessage = `Service Unavailable: ${errorMessage}`
+        break
       default:
-        throw new Error(`HTTP Error: ${errorMessage}`)
+        errorMessage = `HTTP Error: ${errorMessage}`
     }
+
+    throw new Error(errorMessage)
   }
 
   if (response.body) {
