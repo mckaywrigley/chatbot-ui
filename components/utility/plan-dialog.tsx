@@ -135,7 +135,7 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                   <b>Full access to the GPT-4o model</b>
                 </ProsStatement>
                 <ProsStatement>
-                  <b>File Uploads</b>
+                  <b>Full access to file uploads and vision</b>
                 </ProsStatement>
               </div>
             </div>
@@ -167,11 +167,11 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                 >
                   Your current plan
                 </button>
-                <FreePlanStatement>
-                  Access to our HackerGPT model
-                </FreePlanStatement>
                 <FreePlanStatement>Regular model updates</FreePlanStatement>
-                <FreePlanStatement>Standard response speed</FreePlanStatement>
+                <FreePlanStatement>
+                  Limited access to HackerGPT model
+                </FreePlanStatement>
+                <FreePlanStatement>Limited access to plugins</FreePlanStatement>
               </div>
 
               <div>
@@ -193,19 +193,18 @@ export const PlanDialog: FC<PlanDialogProps> = ({
                     <span className="ml-1 text-white">Upgrade to Pro</span>
                   </Button>
                 </div>
+                <ProsStatement>Early access to new features</ProsStatement>
                 <ProsStatement>
-                  Unlimited access to our HackerGPT model
+                  Full access to HackerGPT and HackerGPT Pro
                 </ProsStatement>
-                <ProsStatement>
-                  Full access to our HackerGPT Pro model
-                </ProsStatement>
-                <ProsStatement>Full access to the GPT-4o model</ProsStatement>
+                <ProsStatement>Full access to GPT-4o</ProsStatement>
                 <ProsStatement>
                   Full access to advanced plugins like Nuclei, Katana, Naabu,
                   and more
                 </ProsStatement>
-                <ProsStatement>Faster response speed</ProsStatement>
-                <ProsStatement>File uploads</ProsStatement>
+                <ProsStatement>
+                  Full access to file uploads and vision
+                </ProsStatement>
               </div>
             </div>
           </div>
