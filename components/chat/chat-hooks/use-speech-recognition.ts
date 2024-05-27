@@ -41,8 +41,13 @@ const useSpeechRecognition = (
       return
     }
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    const mimeType = isMobile
+      ? "audio/mp4"
+      : mediaRecorder?.mimeType || "audio/webm"
+
     const audioBlob = new Blob(audioChunksRef.current, {
-      type: mediaRecorder?.mimeType || "audio/webm"
+      type: mimeType
     })
     const fileSizeInMB = audioBlob.size / (1024 * 1024)
 
@@ -53,7 +58,11 @@ const useSpeechRecognition = (
     }
 
     const formData = new FormData()
-    formData.append("audioFile", audioBlob, "speech.webm")
+    formData.append(
+      "audioFile",
+      audioBlob,
+      `speech.${audioBlob.type.split("/")[1]}`
+    )
 
     try {
       setIsSpeechToTextLoading(true)
@@ -91,13 +100,24 @@ const useSpeechRecognition = (
 
   const getSupportedMimeType = useCallback((): string | null => {
     const mimeTypes = [
-      "audio/webm",
-      "audio/ogg",
-      "audio/wav",
-      "audio/mp4",
-      "audio/aac",
-      "audio/ogg; codecs=opus"
+      "audio/flac", // FLAC format
+      "audio/m4a", // M4A format
+      "audio/mp3", // MP3 format
+      "audio/mp4", // MP4 format
+      "audio/mpeg", // MPEG format
+      "audio/mpga", // MPGA format
+      "audio/oga", // OGA format
+      "audio/ogg", // OGG format
+      "audio/wav", // WAV format
+      "audio/webm" // WebM format
     ]
+
+    // Always use audio/mp4 for mobile devices
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (isMobile) {
+      return "audio/mp4"
+    }
+
     return mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || null
   }, [])
 
@@ -105,10 +125,11 @@ const useSpeechRecognition = (
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(stream => {
-        const mimeType = getSupportedMimeType()
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        const mimeType = isMobile ? "audio/mp4" : getSupportedMimeType()
 
         if (!mimeType) {
-          toast.error("No supported audio mimeType found.")
+          toast.error("No supported audio MIME type found.")
           setIsListening(false)
           return
         }
@@ -117,7 +138,7 @@ const useSpeechRecognition = (
         const recorder = new MediaRecorder(stream, options)
         recorder.ondataavailable = handleDataAvailable
         recorder.onstop = handleStop
-        recorder.start()
+        recorder.start(1000)
         setMediaRecorder(recorder)
         setIsListening(true)
       })

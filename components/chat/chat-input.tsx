@@ -511,19 +511,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           />
 
           <div className="absolute bottom-[14px] right-3 flex cursor-pointer items-center space-x-2">
-          {isMicSupported && hasMicAccess && hasSupportedMimeType && !userInput && !isGenerating && (
-              <IconMicrophone
-                className="cursor-pointer p-1 hover:opacity-50"
-                onClick={startListening}
-                size={30}
-              />
-            )}
-            {isMicSupported && hasMicAccess && hasSupportedMimeType && !userInput && isGenerating && (
-              <IconMicrophone
-                className="cursor-not-allowed p-1 opacity-50"
-                size={30}
-              />
-            )}
+            {isMicSupported &&
+              hasMicAccess &&
+              hasSupportedMimeType &&
+              !userInput &&
+              !isGenerating && (
+                <IconMicrophone
+                  className="cursor-pointer p-1 hover:opacity-50"
+                  onClick={startListening}
+                  size={30}
+                />
+              )}
             {isGenerating ? (
               <IconPlayerStopFilled
                 className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"

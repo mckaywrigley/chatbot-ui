@@ -15,6 +15,24 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  if (
+    ![
+      "audio/flac",
+      "audio/m4a",
+      "audio/mp3",
+      "audio/mp4",
+      "audio/mpeg",
+      "audio/mpga",
+      "audio/oga",
+      "audio/ogg",
+      "audio/wav",
+      "audio/webm"
+    ].includes(audioFile.type)
+  ) {
+    console.error("Unsupported file type:", audioFile.type)
+    return new NextResponse("Unsupported file type", { status: 400 })
+  }
+
   const profile = await getServerProfile()
   const rateLimitCheckResult = await checkRatelimitOnApi(
     profile.user_id,
@@ -35,7 +53,7 @@ export async function POST(req: NextRequest) {
     openaiFormData.append(
       "file",
       new Blob([buffer], { type: audioFile.type }),
-      "audio.webm"
+      `audio.${audioFile.type.split("/")[1]}`
     )
     openaiFormData.append("model", WHISPER_MODEL)
     openaiFormData.append("response_format", "text")
@@ -50,10 +68,13 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(
-        `Failed to transcribe audio: ${response.statusText}`,
-        errorText
-      )
+
+      console.error(`Failed to transcribe audio: ${response.statusText}`, {
+        errorText: errorText,
+        type: audioFile.type,
+        size: buffer.length,
+        name: `audio.${audioFile.type.split("/")[1]}`
+      })
       throw new Error(`Failed to transcribe audio: ${response.statusText}`)
     }
 
