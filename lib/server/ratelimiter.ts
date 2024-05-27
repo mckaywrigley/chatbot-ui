@@ -96,6 +96,9 @@ function _getLimit(model: string, isPremium: boolean): number {
   } else if (model === "tts-1") {
     const limitKey = `RATELIMITER_LIMIT_TTS_1_${isPremium ? "PREMIUM" : "FREE"}`
     limit = Number(process.env[limitKey]) || 15
+  } else if (model === "stt-1") {
+    const limitKey = `RATELIMITER_LIMIT_STT_1_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey]) || 15
   } else {
     const fixedModelName = _getFixedModelName(model)
     const limitKey = `RATELIMITER_LIMIT_${fixedModelName}_${isPremium ? "PREMIUM" : "FREE"}`
@@ -172,6 +175,17 @@ export function getRateLimitErrorMessage(
   } else if (model === "tts-1") {
     let message = `
   ⚠️ You've reached the rate limit for text-to-speech.
+⏰ Access will be restored in ${remainingText}.`
+
+    if (!premium) {
+      message += `
+🚀 Consider upgrading for higher limits and more features.`
+    }
+
+    return message.trim()
+  } else if (model === "stt-1") {
+    let message = `
+  ⚠️ You've reached the rate limit for speech-to-text.
 ⏰ Access will be restored in ${remainingText}.`
 
     if (!premium) {

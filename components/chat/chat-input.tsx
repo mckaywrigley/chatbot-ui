@@ -31,6 +31,10 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { EnhancedMenuPicker } from "./enhance-menu"
 import { UnsupportedFilesDialog } from "./unsupported-files-dialog"
+import useSpeechRecognition from "./chat-hooks/use-speech-recognition"
+import { IconMicrophone } from "@tabler/icons-react"
+import VoiceRecordingBar from "@/components/ui/voice-recording-bar"
+import VoiceLoadingBar from "../ui/voice-loading-bar"
 
 interface ChatInputProps {}
 
@@ -64,6 +68,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
     return isMobile
   }
+
   const isMobile = useIsMobile()
 
   const {
@@ -143,6 +148,24 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       setOptionsCollapsed(true)
     }
   }, [isTyping])
+
+  const handleTranscriptChange = (transcript: string) => {
+    if (transcript !== userInput) {
+      handleInputChange(transcript)
+    }
+  }
+
+  const {
+    isListening,
+    transcript,
+    setIsListening,
+    isMicSupported,
+    hasMicAccess,
+    startListening,
+    cancelListening,
+    isSpeechToTextLoading,
+    hasSupportedMimeType
+  } = useSpeechRecognition(handleTranscriptChange)
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     setOptionsCollapsed(true)
@@ -412,91 +435,118 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           ))}
       </div>
 
-      <div
-        className={`border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2 ${selectedPlugin && selectedPlugin !== PluginID.NONE ? "border-primary" : ""}`}
-        ref={divRef}
-      >
+      {isListening ? (
+        <VoiceRecordingBar
+          isListening={isListening}
+          stopListening={() => setIsListening(false)}
+          cancelListening={() => {
+            setIsListening(false)
+            cancelListening()
+          }}
+        />
+      ) : isSpeechToTextLoading ? (
+        <VoiceLoadingBar isLoading={isSpeechToTextLoading} />
+      ) : (
         <div
-          className={`absolute left-0 w-full overflow-auto rounded-xl dark:border-none`}
-          style={{ bottom: `${bottomSpacingPx}px` }}
+          className={`border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2 ${selectedPlugin && selectedPlugin !== PluginID.NONE ? "border-primary" : ""}`}
+          ref={divRef}
         >
-          <ChatCommandInput />
-        </div>
+          <div
+            className={`absolute left-0 w-full overflow-auto rounded-xl dark:border-none`}
+            style={{ bottom: `${bottomSpacingPx}px` }}
+          >
+            <ChatCommandInput />
+          </div>
 
-        <div className="ml-3 flex flex-row">
-          <Input
-            ref={fileInputRef}
-            className="hidden w-0"
-            type="file"
-            onChange={e => {
-              if (!e.target.files) return
-              handleFileUpload(
-                Array.from(e.target.files),
-                chatSettings,
-                setShowConfirmationDialog,
-                setPendingFiles,
-                handleSelectDeviceFile
-              )
-            }}
-            accept={filesToAccept}
+          <div className="ml-3 flex flex-row">
+            <Input
+              ref={fileInputRef}
+              className="hidden w-0"
+              type="file"
+              onChange={e => {
+                if (!e.target.files) return
+                handleFileUpload(
+                  Array.from(e.target.files),
+                  chatSettings,
+                  setShowConfirmationDialog,
+                  setPendingFiles,
+                  handleSelectDeviceFile
+                )
+              }}
+              accept={filesToAccept}
+            />
+
+            {isMobile && optionsCollapsed && (
+              <div className="flex flex-row items-center">
+                <IconCirclePlus
+                  className="cursor-pointer p-1 hover:opacity-50"
+                  onClick={() => setOptionsCollapsed(false)}
+                  size={34}
+                />
+              </div>
+            )}
+
+            {(!isMobile || !optionsCollapsed) && <ToolOptions />}
+          </div>
+
+          <TextareaAutosize
+            textareaRef={chatInputRef}
+            className={`ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 ${isMicSupported && hasMicAccess && hasSupportedMimeType && !userInput ? "pr-20" : "pr-14"} focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50`}
+            placeholder={
+              isMobile
+                ? t(`Message`) +
+                  (!subscription ? "" : t(`. Type "#" for files.`))
+                : t(`Message HackerGPT`) +
+                  (!subscription ? "" : t(`. Type "#" for files.`))
+            }
+            onValueChange={handleInputChange} // This function updates the userInput state
+            value={userInput} // This state should display the transcribed text
+            minRows={1}
+            maxRows={isMobile ? 6 : 12}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => setIsTyping(true)}
+            onCompositionEnd={() => setIsTyping(false)}
+            onClick={() => setOptionsCollapsed(true)}
           />
 
-          {isMobile && optionsCollapsed && (
-            <div className="flex flex-row items-center">
-              <IconCirclePlus
+          <div className="absolute bottom-[14px] right-3 flex cursor-pointer items-center space-x-2">
+          {isMicSupported && hasMicAccess && hasSupportedMimeType && !userInput && !isGenerating && (
+              <IconMicrophone
                 className="cursor-pointer p-1 hover:opacity-50"
-                onClick={() => setOptionsCollapsed(false)}
-                size={34}
+                onClick={startListening}
+                size={30}
               />
-            </div>
-          )}
-
-          {(!isMobile || !optionsCollapsed) && <ToolOptions />}
+            )}
+            {isMicSupported && hasMicAccess && hasSupportedMimeType && !userInput && isGenerating && (
+              <IconMicrophone
+                className="cursor-not-allowed p-1 opacity-50"
+                size={30}
+              />
+            )}
+            {isGenerating ? (
+              <IconPlayerStopFilled
+                className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
+                onClick={handleStopMessage}
+                size={30}
+              />
+            ) : (
+              <IconSend
+                className={cn(
+                  "bg-primary text-secondary rounded p-1 hover:opacity-50",
+                  !userInput && "cursor-not-allowed opacity-50"
+                )}
+                onClick={() => {
+                  if (isTyping) setOptionsCollapsed(true)
+                  if (!userInput) return
+                  handleSendMessage(userInput, chatMessages, false)
+                }}
+                size={30}
+              />
+            )}
+          </div>
         </div>
-
-        <TextareaAutosize
-          textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={
-            isMobile
-              ? t(`Message`) + (!subscription ? "" : t(`. Type "#" for files.`))
-              : t(`Message HackerGPT`) +
-                (!subscription ? "" : t(`. Type "#" for files.`))
-          }
-          onValueChange={handleInputChange}
-          value={userInput}
-          minRows={1}
-          maxRows={isMobile ? 6 : 12}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-          onClick={() => setOptionsCollapsed(true)}
-        />
-
-        <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
-          {isGenerating ? (
-            <IconPlayerStopFilled
-              className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-              onClick={handleStopMessage}
-              size={30}
-            />
-          ) : (
-            <IconSend
-              className={cn(
-                "bg-primary text-secondary rounded p-1",
-                !userInput && "cursor-not-allowed opacity-50"
-              )}
-              onClick={() => {
-                if (isTyping) setOptionsCollapsed(true)
-                if (!userInput) return
-                handleSendMessage(userInput, chatMessages, false)
-              }}
-              size={30}
-            />
-          )}
-        </div>
-      </div>
+      )}
     </>
   )
 }
