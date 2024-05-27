@@ -1,10 +1,11 @@
 export type ModelProvider =
-  | "openai"
+  | "ollama"
   | "google"
   | "anthropic"
   | "mistral"
   | "groq"
   | "perplexity"
-  | "ollama"
+  | "openai"
   | "openrouter"
   | "custom"
+  | "ollamacpp"

@@ -17,7 +17,8 @@ import {
   ChatPayload,
   ChatSettings,
   LLM,
-  MessageImage
+  MessageImage,
+  ModelProvider
 } from "@/types"
 import React from "react"
 import { toast } from "sonner"
@@ -201,13 +202,9 @@ export const handleHostedChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const provider =
-    modelData.provider === "openai" && profile.use_azure_openai
-      ? "azure"
-      : modelData.provider
+  const provider = "ollamacpp" as ModelProvider
 
   let formattedMessages = []
-
   if (provider === "google") {
     formattedMessages = await buildGoogleGeminiFinalMessages(
       payload,
@@ -218,13 +215,33 @@ export const handleHostedChat = async (
     formattedMessages = await buildFinalMessages(payload, profile, chatImages)
   }
 
-  const apiEndpoint =
+  let apiEndpoint =
     provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+  let requestBody: {} = {}
+  if (provider === "ollamacpp") {
+    if (newMessageImages.length > 0) {
+      newMessageImages.forEach(obj => {
+        obj.id = uuidv4()
+      })
+    }
 
-  const requestBody = {
-    chatSettings: payload.chatSettings,
-    messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : ""
+    requestBody = {
+      prompt:
+        newMessageImages.length > 0
+          ? payload.chatMessages[payload.chatMessages.length - 1].message
+              .content +
+            [...newMessageImages.map(image => ` [img-${image.id}]`)].toString()
+          : payload.chatMessages[payload.chatMessages.length - 1].message
+              .content,
+      image_data: newMessageImages
+    }
+    apiEndpoint = process.env.NEXT_PUBLIC_OLLAMA_CPP_URL + ""
+  } else {
+    requestBody = {
+      chatSettings: payload.chatSettings,
+      messages: formattedMessages,
+      customModelId: provider === "custom" ? modelData.hostedId : ""
+    }
   }
 
   const response = await fetchChatResponse(
@@ -301,20 +318,25 @@ export const processResponse = async (
         setToolInUse("none")
 
         try {
-          contentToAdd = isHosted
+          contentToAdd = !isHosted
             ? chunk
-            : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
+            : chunk
                 .trimEnd()
                 .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
-          fullText += contentToAdd
+                .reduce((acc, line) => {
+                  const jsonObject = JSON.parse(line)
+                  if (
+                    jsonObject &&
+                    jsonObject.message &&
+                    jsonObject.message.content
+                  ) {
+                    acc += jsonObject.message.content.trim()
+                  }
+                  return acc
+                }, "")
+          const jsonData = JSON.parse(chunk)
+          const content = jsonData.content
+          fullText += content
         } catch (error) {
           console.error("Error parsing JSON:", error)
         }
@@ -325,7 +347,7 @@ export const processResponse = async (
               const updatedChatMessage: ChatMessage = {
                 message: {
                   ...chatMessage.message,
-                  content: fullText
+                  content: chatMessage.message.content + contentToAdd
                 },
                 fileItems: chatMessage.fileItems
               }

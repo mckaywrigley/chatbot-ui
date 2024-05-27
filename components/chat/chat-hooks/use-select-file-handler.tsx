@@ -4,6 +4,7 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
+import axios from "axios"
 
 export const ACCEPTED_FILE_TYPES = [
   "text/csv",
@@ -13,7 +14,10 @@ export const ACCEPTED_FILE_TYPES = [
   "application/pdf",
   "text/plain"
 ].join(",")
-
+export const ACCEPTED_DOCUMENT_FILE_TYPES = [
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/pdf"
+].join(",")
 export const useSelectFileHandler = () => {
   const {
     selectedWorkspace,
@@ -47,6 +51,7 @@ export const useSelectFileHandler = () => {
 
   const handleSelectDeviceFile = async (file: File) => {
     if (!profile || !selectedWorkspace || !chatSettings) return
+    // Todo send file to server
 
     setShowFilesDisplay(true)
     setUseRetrieval(true)
@@ -184,10 +189,9 @@ export const useSelectFileHandler = () => {
               )
             )
           }
-        } catch (error: any) {
-          toast.error("Failed to upload. " + error?.message, {
-            duration: 10000
-          })
+        } catch (error) {
+          toast.error("Failed to upload.")
+
           setNewMessageImages(prev =>
             prev.filter(img => img.messageId !== "temp")
           )

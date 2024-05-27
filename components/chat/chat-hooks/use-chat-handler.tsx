@@ -10,7 +10,6 @@ import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
-import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
   handleCreateChat,
@@ -21,6 +20,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -204,7 +204,6 @@ export const useChatHandler = () => {
 
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
-
       const modelData = [
         ...models.map(model => ({
           modelId: model.model_id as LLMID,
@@ -218,7 +217,7 @@ export const useChatHandler = () => {
         ...availableLocalModels,
         ...availableOpenRouterModels
       ].find(llm => llm.modelId === chatSettings?.model)
-
+      console.log(chatSettings)
       validateChatSettings(
         chatSettings,
         modelData,

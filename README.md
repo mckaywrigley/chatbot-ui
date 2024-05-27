@@ -1,8 +1,8 @@
-# Chatbot UI
+# Prozorro assistance
 
 The open-source AI chat app for everyone.
 
-<img src="./public/readme/screenshot.png" alt="Chatbot UI" width="600">
+<img src="./public/readme/screenshot.png" alt="Prozorro assistance" width="600">
 
 ## Demo
 
@@ -233,7 +233,7 @@ In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you wil
 - `project_url` (line 53): Use the `Project URL` value from above
 - `service_role_key` (line 54): Use the `Service role key` value from above
 
-Now, open a terminal in the root directory of your local Chatbot UI repository. We will execute a few commands here.
+Now, open a terminal in the root directory of your local Prozorro assistance repository. We will execute a few commands here.
 
 Login to Supabase by running:
 
@@ -261,7 +261,7 @@ Your hosted database should now be set up!
 
 Go to [Vercel](https://vercel.com/) and create a new project.
 
-In the setup page, import your GitHub repository for your hosted instance of Chatbot UI. Within the project Settings, in the "Build & Development Settings" section, switch Framework Preset to "Next.js".
+In the setup page, import your GitHub repository for your hosted instance of Prozorro assistance. Within the project Settings, in the "Build & Development Settings" section, switch Framework Preset to "Next.js".
 
 In environment variables, add the following from the values you got above:
 
@@ -281,7 +281,7 @@ For the full list of environment variables, refer to the '.env.local.example' fi
 
 Click "Deploy" and wait for your frontend to deploy.
 
-Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
+Once deployed, you should be able to use your hosted instance of Prozorro assistance via the URL Vercel gives you.
 
 ## Contributing
 
