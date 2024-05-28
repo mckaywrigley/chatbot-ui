@@ -59,7 +59,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.99.0",
     "@supabase/ssr": "^0.0.10",
-    "@supabase/supabase-js": "^2.38.4",
+    "@supabase/supabase-js": "^2.43.4",
     "@tabler/icons-react": "^3.1.0",
     "@upstash/redis": "^1.28.3",
     "@vercel/analytics": "^1.2.2",
