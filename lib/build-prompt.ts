@@ -72,9 +72,9 @@ export async function buildFinalMessages(
 
   let CHUNK_SIZE = chatSettings.contextLength
   if (chatSettings.model === GPT4.modelId) {
-    CHUNK_SIZE = 16000
-  } else if (chatSettings.model === "mistral-large") {
     CHUNK_SIZE = 12000
+  } else if (chatSettings.model === "mistral-large") {
+    CHUNK_SIZE = 10000
   } else if (chatSettings.model === "mistral-medium") {
     // Adjusting the chunk size to comply with the content size limit imposed by Llama 3 (8192 max)
     CHUNK_SIZE = 8000
