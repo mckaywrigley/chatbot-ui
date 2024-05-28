@@ -58,7 +58,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^7.99.0",
-    "@supabase/ssr": "^0.0.10",
+    "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
     "@tabler/icons-react": "^3.1.0",
     "@upstash/redis": "^1.28.3",
