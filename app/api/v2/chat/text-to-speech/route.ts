@@ -1,39 +1,38 @@
 import { checkRatelimitOnApi } from "@/lib/server/ratelimiter"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-// import { isPremiumUser } from "@/lib/server/subscription-utils"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
-  const { text } = await req.json()
-
-  const profile = await getServerProfile()
-  // const isPremium = await isPremiumUser(profile.user_id)
-
-  // if (!isPremium) {
-  //   return new NextResponse("Only Pro users can use text-to-speech", {
-  //     status: 403
-  //   })
-  // }
-
-  const rateLimitCheckResult = await checkRatelimitOnApi(
-    profile.user_id,
-    "tts-1"
-  )
-
-  if (rateLimitCheckResult !== null) {
-    return rateLimitCheckResult.response
-  }
-
-  const MAX_LENGTH = 4096
-  const truncationNotice =
-    " Please note, this message was shortened to fit the length limit."
-  const maxTextLength = MAX_LENGTH - truncationNotice.length
-  const needsTruncation = text.length > MAX_LENGTH
-  const truncatedText = needsTruncation
-    ? text.slice(0, maxTextLength) + truncationNotice
-    : text
-
   try {
+    const { text, format = "mp3" }: { text: string; format?: string } =
+      await req.json()
+    const profile = await getServerProfile()
+    // const isPremium = await isPremiumUser(profile.user_id);
+
+    // if (!isPremium) {
+    //   return new NextResponse("Only Pro users can use text-to-speech", {
+    //     status: 403
+    //   });
+    // }
+
+    const rateLimitCheckResult = await checkRatelimitOnApi(
+      profile.user_id,
+      "tts-1"
+    )
+
+    if (rateLimitCheckResult !== null) {
+      return rateLimitCheckResult.response
+    }
+
+    const MAX_LENGTH = 4096
+    const truncationNotice =
+      " Please note, this message was shortened to fit the length limit."
+    const maxTextLength = MAX_LENGTH - truncationNotice.length
+    const needsTruncation = text.length > MAX_LENGTH
+    const truncatedText = needsTruncation
+      ? text.slice(0, maxTextLength) + truncationNotice
+      : text
+
     const openaiResponse = await fetch(
       "https://api.openai.com/v1/audio/speech",
       {
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
           model: "tts-1",
           voice: "onyx",
           input: truncatedText,
-          response_format: "wav",
+          response_format: format,
           speed: 1,
           stream: true
         })
@@ -75,19 +74,19 @@ export async function POST(req: NextRequest) {
             return
           }
           controller.enqueue(value)
-          push()
+          await push()
         }
 
-        push()
+        await push()
       }
     })
 
     const headers = new Headers()
-    headers.append("Content-Type", "audio/wav")
+    headers.append("Content-Type", `audio/${format}`)
     headers.append("Transfer-Encoding", "chunked")
 
     return new NextResponse(stream, { headers })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating speech:", error)
     return new NextResponse("Error generating speech", { status: 500 })
   }

@@ -1,11 +1,13 @@
 import { toast } from "sonner"
 
+type Subscriber = (isLoading: boolean, isPlaying: boolean) => void
+
 class SingletonAudioPlayer {
   private static instance: SingletonAudioPlayer
   private audio: HTMLAudioElement | null = null
-  private isLoading: boolean = false
-  private isPlaying: boolean = false
-  private subscribers: ((isLoading: boolean, isPlaying: boolean) => void)[] = []
+  private isLoading = false
+  private isPlaying = false
+  private subscribers: Subscriber[] = []
   private abortController: AbortController | null = null
 
   private constructor() {}
@@ -23,30 +25,33 @@ class SingletonAudioPlayer {
     )
   }
 
-  public subscribe(
-    subscriber: (isLoading: boolean, isPlaying: boolean) => void
-  ) {
+  private getPreferredAudioFormat(messageContent: string): string {
+    const userAgent = navigator.userAgent.toLowerCase()
+    if (messageContent.length > 2000) {
+      return "wav"
+    } else if (/iphone|ipad|ipod|android/.test(userAgent)) {
+      return "aac"
+    } else if (/chrome|firefox|safari/.test(userAgent)) {
+      return "wav"
+    } else {
+      return "mp3"
+    }
+  }
+
+  public subscribe(subscriber: Subscriber) {
     this.subscribers.push(subscriber)
-    // Immediately notify new subscriber of current state
     subscriber(this.isLoading, this.isPlaying)
   }
 
-  public unsubscribe(
-    subscriber: (isLoading: boolean, isPlaying: boolean) => void
-  ) {
+  public unsubscribe(subscriber: Subscriber) {
     this.subscribers = this.subscribers.filter(sub => sub !== subscriber)
   }
 
   public async playAudio(messageContent: string) {
-    if (this.audio) {
-      this.audio.pause()
-      this.audio.currentTime = 0
-      this.audio = null
-    }
+    const format = this.getPreferredAudioFormat(messageContent)
 
-    if (this.abortController) {
-      this.abortController.abort()
-    }
+    this.stopAudio()
+
     this.abortController = new AbortController()
 
     this.isLoading = true
@@ -59,7 +64,7 @@ class SingletonAudioPlayer {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text: messageContent }),
+        body: JSON.stringify({ text: messageContent, format }),
         signal: this.abortController.signal
       })
 
@@ -77,19 +82,10 @@ class SingletonAudioPlayer {
         this.notifySubscribers()
       }
 
-      this.audio
-        .play()
-        .then(() => {
-          this.isLoading = false
-          this.isPlaying = true
-          this.notifySubscribers()
-        })
-        .catch(error => {
-          console.error("Error playing audio:", error)
-          this.isLoading = false
-          this.isPlaying = false
-          this.notifySubscribers()
-        })
+      await this.audio.play()
+      this.isLoading = false
+      this.isPlaying = true
+      this.notifySubscribers()
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error("Error generating speech:", error)

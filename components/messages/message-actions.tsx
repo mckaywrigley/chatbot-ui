@@ -176,6 +176,21 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
+      {isLast && (
+        <WithTooltip
+          delayDuration={0}
+          side="bottom"
+          display={<div>Regenerate</div>}
+          trigger={
+            <IconRepeat
+              className="cursor-pointer hover:opacity-50"
+              size={MESSAGE_ICON_SIZE}
+              onClick={onRegenerate}
+            />
+          }
+        />
+      )}
+
       {isAssistant && (
         <WithTooltip
           delayDuration={0}
@@ -218,21 +233,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
                 onClick={onBadResponse}
               />
             )
-          }
-        />
-      )}
-
-      {isLast && (
-        <WithTooltip
-          delayDuration={0}
-          side="bottom"
-          display={<div>Regenerate</div>}
-          trigger={
-            <IconRepeat
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onRegenerate}
-            />
           }
         />
       )}
