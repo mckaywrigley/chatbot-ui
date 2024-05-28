@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       "audio/mpeg",
       "audio/mpga",
       "audio/oga",
+
       "audio/ogg",
       "audio/wav",
       "audio/webm"
@@ -57,7 +58,10 @@ export async function POST(req: NextRequest) {
     )
     openaiFormData.append("model", WHISPER_MODEL)
     openaiFormData.append("response_format", "text")
-
+    openaiFormData.append(
+      "prompt",
+      "HackerGPT, Hackerone, Bugcrowd, Synack, Intigriti, HackTheBox, Burp Suite, TryHackMe, OWASP, CVE, XSS, CSRF, RCE, BeEF, 0day, Pwn, PrivEsc, PoC, IDS, IPS, WAF, OSINT, Subfinder, GoLinkFinder, Nuclei, httpX, Naabu, GAU, dnsX, CVEMap, AlterX"
+    )
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
