@@ -305,9 +305,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             </div>
           }
           trigger={
-            isRagEnabled &&
             chatSettings?.model &&
-            chatSettings?.model !== GPT4.modelId ? (
+            chatSettings?.model !== GPT4.modelId &&
+            (isRagEnabled ? (
               <IconBook
                 className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
                 size={32}
@@ -317,17 +317,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 className="bottom-[12px] cursor-pointer p-1 opacity-50 hover:opacity-100"
                 size={32}
               />
-            )
+            ))
           }
         />
       </div>
-      {isMobile && (
-        <IconHelp
-          className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
-          size={32}
-          onClick={() => setShowMobileHelp(true)}
-        />
-      )}
+      {isMobile &&
+        chatSettings?.model &&
+        chatSettings?.model !== GPT4.modelId && (
+          <IconHelp
+            className="bottom-[12px] cursor-pointer p-1 hover:opacity-50"
+            size={32}
+            onClick={() => setShowMobileHelp(true)}
+          />
+        )}
     </>
   )
 
