@@ -16,6 +16,10 @@ const useSpeechRecognition = (
   const isCanceledRef = useRef(false)
   const prevIsListeningRef = useRef(false)
 
+  const isAppleDevice =
+    /iPhone|iPad|iPod|Macintosh|MacIntel|MacPPC|Mac68K/i.test(
+      navigator.userAgent
+    )
   const { dispatch: alertDispatch } = useAlertContext()
 
   useEffect(() => {
@@ -41,8 +45,7 @@ const useSpeechRecognition = (
       return
     }
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    const mimeType = isMobile
+    const mimeType = isAppleDevice
       ? "audio/mp4"
       : mediaRecorder?.mimeType || "audio/webm"
 
@@ -112,9 +115,8 @@ const useSpeechRecognition = (
       "audio/webm" // WebM format
     ]
 
-    // Always use audio/mp4 for mobile devices
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    if (isMobile) {
+    // Always use audio/mp4 for Apple devices
+    if (isAppleDevice) {
       return "audio/mp4"
     }
 

@@ -61,6 +61,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
   const [showCheckmark, setShowCheckmark] = useState(false)
   const { playAudio, stopAudio, isLoading, isPlaying } = useAudioPlayer()
 
+  const MESSAGE_ICON_SIZE = isMobile ? 22 : 20
   const BELOW_MAX_LENGTH = messageContent.length < 4096
 
   useEffect(() => {
@@ -104,7 +105,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
   return (isLast && isGenerating) || isEditing ? null : (
     <div
-      className={`text-muted-foreground flex items-center space-x-3 ${isMobile ? "ml-3" : ""}`}
+      className={`text-muted-foreground flex items-center ${isMobile ? "ml-3 space-x-4" : "space-x-3"}`}
     >
       {!isAssistant && !messageHasImage && (
         <WithTooltip
