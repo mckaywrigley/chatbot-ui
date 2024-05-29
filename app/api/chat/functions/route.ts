@@ -41,7 +41,8 @@ const callLLM = async (
   messages: any[],
   studyState: StudyState,
   studentMessage: { content: string; role: string },
-  chatRecallMetadata: ChatRecallMetadata
+  chatRecallMetadata: ChatRecallMetadata,
+  randomRecallFact: string
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
@@ -76,6 +77,7 @@ Formatting Instructions:
   Think about how long a day on Venus is compared to its year. It's quite a unique aspect of the planet. Can you remember which one is longer? 🤔
   There's an interesting point about the past state of Venus related to water. What do you think Venus might have looked like a billion years ago? 💧🌐
   Take a moment to think about these hints and see if you can recall more about those specific points. You’re doing wonderfully so far, and digging a bit deeper will help solidify your understanding even more! 🚀💡`
+  const quickQuizSystemMessage = `You are helpful, friendly quiz master who likes to use emojis. You help students remember facts on their own by providing short answer quiz questions based on a provided fact.`
 
   switch (studyState) {
     case "topic_creation":
@@ -469,6 +471,54 @@ Formatting Instructions:
 
       stream = MistralStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
+    case "quick_quiz_hide_input":
+      chatStreamResponse = await mistral.chatStream({
+        model: defaultModel,
+        temperature: 0.4,
+        messages: [
+          {
+            role: "system",
+            content: quickQuizSystemMessage
+          },
+          {
+            role: "user",
+            content: `Generate a short answer quiz question based on the following fact:
+              ${randomRecallFact}`
+          }
+        ]
+      })
+      newStudyState = "quick_quiz"
+      stream = MistralStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
+    case "quick_quiz":
+      const previousQuizQuestion = messages[messages.length - 2].content
+
+      chatStreamResponse = await mistral.chatStream({
+        model: defaultModel,
+        temperature: 0.4,
+        messages: [
+          {
+            role: "system",
+            content: quickQuizSystemMessage
+          },
+          {
+            role: "user",
+            content: `Step 1: Provide feedback to the following quiz question:
+            ${previousQuizQuestion}
+            based on the following student answer:
+            ${studentMessage.content}
+            Step 2: Generate a short answer quiz question based on the following fact:
+              ${randomRecallFact}`
+          }
+        ]
+      })
+
+      stream = MistralStream(chatStreamResponse)
+      return new StreamingTextResponse(stream)
 
     default:
       // Handle other states or error
@@ -486,7 +536,8 @@ export async function POST(request: Request) {
       chatId,
       chatStudyState,
       topicDescription,
-      chatRecallMetadata
+      chatRecallMetadata,
+      randomRecallFact
     } = json
 
     const studentMessage = messages[messages.length - 1]
@@ -521,7 +572,8 @@ export async function POST(request: Request) {
       messages,
       chatStudyState,
       studentMessage,
-      chatRecallMetadata
+      chatRecallMetadata,
+      randomRecallFact
     )
 
     return response

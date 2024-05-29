@@ -18,6 +18,8 @@ export type StudyState =
   | "tutorial_final_review_hide_input"
   | "tutorial_finished_hide_input"
   | "final_review_hide_input"
+  | "quick_quiz_hide_input"
+  | "quick_quiz"
 
 export interface QuickResponse {
   quickText: string
@@ -209,6 +211,16 @@ Now, you're all set to begin creating your own topics! Just click on the "+ New 
 And of course, feel free to dive back in to further solidify your mastery of States of matter!
 Enjoy your learning journey!`,
         newStudyState: "topic_creation"
+      }
+    ]
+  },
+  {
+    name: "quick_quiz_hide_input",
+    quickResponses: [
+      {
+        quickText: "Let's go!",
+        responseText: "LLM",
+        newStudyState: "quick_quiz"
       }
     ]
   }

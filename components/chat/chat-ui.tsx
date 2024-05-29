@@ -46,7 +46,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedTools,
     setTopicDescription,
     chats,
-    setChatStudyState
+    setChatStudyState,
+    setAllChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -75,24 +76,69 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       setIsAtBottom(true)
     }
 
+    const startQuickQuiz = async () => {
+      // create
+      // put all non null values of chats.recall_analysis in an array
+      const recallAnalysisInChats = chats
+        .map(chat => chat.recall_analysis)
+        .filter(analysis => analysis != null)
+        .map(analysis => {
+          try {
+            return JSON.parse(analysis as string)
+          } catch (e) {
+            console.error("Failed to parse recall_analysis:", analysis)
+            return []
+          }
+        })
+        .flat()
+
+      if (recallAnalysisInChats.length > 0) {
+        setAllChatRecallAnalysis(recallAnalysisInChats)
+        setChatMessages([
+          {
+            message: {
+              id: "1",
+              user_id: "1",
+              content: `Are you ready to start a 🔥 Quick quiz?`,
+              created_at: new Date().toISOString(),
+              image_paths: [],
+              model: "",
+              role: "assistant",
+              sequence_number: 0,
+              updated_at: null,
+              assistant_id: selectedAssistant?.id || null,
+              chat_id: "quick-quiz"
+            },
+            fileItems: []
+          }
+        ])
+        setChatStudyState("quick_quiz_hide_input")
+      }
+    }
+
     if (params.chatid) {
-      fetchData().then(() => {
-        handleFocusChatInput()
+      if (params.chatid === "quick-quiz") {
+        startQuickQuiz()
         setLoading(false)
-      })
+      } else {
+        fetchData().then(() => {
+          handleFocusChatInput()
+          setLoading(false)
+        })
+      }
     } else {
       setLoading(false)
     }
 
-    return () => {
-      if (selectedChat) {
-        deleteMessagesIncludingAndAfter(
-          selectedChat.user_id,
-          selectedChat.id,
-          0
-        )
-      }
-    }
+    // return () => {
+    //   if (selectedChat) {
+    //     deleteMessagesIncludingAndAfter(
+    //       selectedChat.user_id,
+    //       selectedChat.id,
+    //       0
+    //     )
+    //   }
+    // }
   }, [])
 
   useEffect(() => {

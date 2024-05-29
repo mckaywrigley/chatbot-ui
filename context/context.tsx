@@ -86,6 +86,8 @@ interface ChatbotUIContext {
   setChatStudyState: Dispatch<SetStateAction<StudyState>>
   chatRecallMetadata: ChatRecallMetadata | null
   setChatRecallMetadata: Dispatch<SetStateAction<ChatRecallMetadata | null>>
+  allChatRecallAnalysis: string[]
+  setAllChatRecallAnalysis: Dispatch<SetStateAction<string[]>>
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
@@ -218,6 +220,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setChatStudyState: () => {},
   chatRecallMetadata: null,
   setChatRecallMetadata: () => {},
+  allChatRecallAnalysis: [],
+  setAllChatRecallAnalysis: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,

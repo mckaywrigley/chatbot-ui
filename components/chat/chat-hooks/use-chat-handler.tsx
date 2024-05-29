@@ -60,7 +60,9 @@ export const useChatHandler = () => {
     topicDescription,
     setTopicDescription,
     setChatRecallMetadata,
-    chatRecallMetadata
+    chatRecallMetadata,
+    allChatRecallAnalysis,
+    setAllChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -180,6 +182,21 @@ export const useChatHandler = () => {
 
       const formattedMessagesWithoutSystem = formattedMessages.slice(1)
 
+      let randomRecallFact: string = ""
+
+      const isQuickQuiz =
+        chatStudyState === "quick_quiz" || "quick_quiz_hide_input"
+
+      if (isQuickQuiz) {
+        // randomly remove and return one item from allChatRecallAnalysis
+        const randomIndex = Math.floor(
+          Math.random() * allChatRecallAnalysis.length
+        )
+        randomRecallFact = allChatRecallAnalysis[randomIndex]
+        const updated = allChatRecallAnalysis.splice(randomIndex, 1)
+        setAllChatRecallAnalysis(updated)
+      }
+
       response = await fetch("/api/chat/functions", {
         method: "POST",
         headers: {
@@ -190,7 +207,8 @@ export const useChatHandler = () => {
           chatId: currentChat?.id,
           chatStudyState,
           topicDescription,
-          chatRecallMetadata
+          chatRecallMetadata,
+          randomRecallFact
         })
       })
 
@@ -267,13 +285,9 @@ export const useChatHandler = () => {
         { modelId: "llama2-uncensored:latest" },
         messageContent,
         generatedText,
-        newMessageImages,
-        isRegeneration,
         retrievedFileItems,
         setChatMessages,
-        setChatFileItems,
-        setChatImages,
-        selectedAssistant
+        setChatFileItems
       )
       setIsGenerating(false)
       setFirstTokenReceived(false)

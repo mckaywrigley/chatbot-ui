@@ -35,6 +35,7 @@ import {
   addDays
 } from "date-fns"
 import { fsrs } from "ts-fsrs"
+import { QuickQuiz } from "./items/chat/quick-quiz"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -273,6 +274,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             ))}
 
             {folders.length > 0 && <Separator />}
+
+            <div className="pb-2">
+              <div className={cn("flex grow flex-col")}>
+                <QuickQuiz />
+              </div>
+            </div>
 
             {contentType === "chats" ? (
               <>
