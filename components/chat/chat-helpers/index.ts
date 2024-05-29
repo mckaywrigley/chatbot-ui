@@ -394,7 +394,7 @@ export const handleCreateChat = async (
 
 export const handleCreateMessages = async (
   chatMessages: ChatMessage[],
-  currentChat: Tables<"chats">,
+  currentChat: Tables<"chats"> | null,
   profile: Tables<"profiles">,
   modelData: any,
   messageContent: string,
@@ -410,7 +410,7 @@ export const handleCreateMessages = async (
     ...chatMessages,
     {
       message: {
-        chat_id: currentChat.id,
+        chat_id: currentChat?.id ?? "",
         assistant_id: null,
         user_id: profile.user_id,
         content: messageContent,
@@ -426,7 +426,7 @@ export const handleCreateMessages = async (
     },
     {
       message: {
-        chat_id: currentChat.id,
+        chat_id: currentChat?.id ?? "",
         assistant_id: null,
         user_id: profile.user_id,
         content: generatedText,

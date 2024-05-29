@@ -77,7 +77,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     }
 
     const startQuickQuiz = async () => {
-      // create
+      setSelectedChat(null)
       // put all non null values of chats.recall_analysis in an array
       const recallAnalysisInChats = chats
         .map(chat => chat.recall_analysis)

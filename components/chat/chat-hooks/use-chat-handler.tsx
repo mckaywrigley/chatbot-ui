@@ -193,8 +193,10 @@ export const useChatHandler = () => {
           Math.random() * allChatRecallAnalysis.length
         )
         randomRecallFact = allChatRecallAnalysis[randomIndex]
-        const updated = allChatRecallAnalysis.splice(randomIndex, 1)
+        const updated = [...allChatRecallAnalysis]
+        updated.splice(randomIndex, 1)
         setAllChatRecallAnalysis(updated)
+        console.log("randomRecallFact", randomRecallFact, updated.length)
       }
 
       response = await fetch("/api/chat/functions", {
@@ -252,7 +254,7 @@ export const useChatHandler = () => {
         setToolInUse
       )
 
-      if (!currentChat) {
+      if (!currentChat && !isQuickQuiz) {
         currentChat = await handleCreateChat(
           chatSettings!,
           profile!,
@@ -264,8 +266,8 @@ export const useChatHandler = () => {
           setChats,
           setChatFiles
         )
-      } else {
-        const updatedChat = await getChatById(currentChat.id)
+      } else if (!isQuickQuiz) {
+        const updatedChat = await getChatById(currentChat!.id)
 
         if (updatedChat) {
           setChats(prevChats => {
