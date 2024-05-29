@@ -133,8 +133,7 @@ const useSpeechRecognition = (
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(stream => {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-        const mimeType = isMobile ? "audio/mp4" : getSupportedMimeType()
+        const mimeType = getSupportedMimeType()
 
         if (!mimeType) {
           toast.error("No supported audio MIME type found.")
