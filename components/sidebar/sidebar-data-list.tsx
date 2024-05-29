@@ -12,14 +12,11 @@ import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Separator } from "../ui/separator"
-import { AssistantItem } from "./items/assistants/assistant-item"
 import { ChatItem } from "./items/chat/chat-item"
-import { CollectionItem } from "./items/collections/collection-item"
 import { FileItem } from "./items/files/file-item"
 import { Folder } from "./items/folders/folder-item"
 import { ModelItem } from "./items/models/model-item"
-import { PresetItem } from "./items/presets/preset-item"
-import { PromptItem } from "./items/prompts/prompt-item"
+
 import { ToolItem } from "./items/tools/tool-item"
 
 interface SidebarDataListProps {
@@ -57,30 +54,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       case "chats":
         return <ChatItem key={item.id} chat={item as Tables<"chats">} />
 
-      case "presets":
-        return <PresetItem key={item.id} preset={item as Tables<"presets">} />
-
-      case "prompts":
-        return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
-
       case "files":
         return <FileItem key={item.id} file={item as Tables<"files">} />
-
-      case "collections":
-        return (
-          <CollectionItem
-            key={item.id}
-            collection={item as Tables<"collections">}
-          />
-        )
-
-      case "assistants":
-        return (
-          <AssistantItem
-            key={item.id}
-            assistant={item as Tables<"assistants">}
-          />
-        )
 
       case "tools":
         return <ToolItem key={item.id} tool={item as Tables<"tools">} />
@@ -95,7 +70,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const getSortedData = (
     data: any,
-    dateCategory: "Today" | "Yesterday" | "Previous Week" | "Older"
+    dateCategory:
+      | "Today"
+      | "Yesterday"
+      | "Previous 7 Days"
+      | "Previous 30 Days"
+      | "Older"
   ) => {
     const now = new Date()
     const todayStart = new Date(now.setHours(0, 0, 0, 0))
@@ -104,6 +84,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     )
     const oneWeekAgoStart = new Date(
       new Date().setDate(todayStart.getDate() - 7)
+    )
+    const thirtyDaysAgoStart = new Date(
+      new Date().setDate(todayStart.getDate() - 30)
     )
 
     return data
@@ -114,10 +97,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             return itemDate >= todayStart
           case "Yesterday":
             return itemDate >= yesterdayStart && itemDate < todayStart
-          case "Previous Week":
+          case "Previous 7 Days":
             return itemDate >= oneWeekAgoStart && itemDate < yesterdayStart
+          case "Previous 30 Days":
+            return itemDate >= thirtyDaysAgoStart && itemDate < oneWeekAgoStart
           case "Older":
-            return itemDate < oneWeekAgoStart
+            return itemDate < thirtyDaysAgoStart
           default:
             return true
         }
@@ -263,49 +248,54 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
             {contentType === "chats" ? (
               <>
-                {["Today", "Yesterday", "Previous Week", "Older"].map(
-                  dateCategory => {
-                    const sortedData = getSortedData(
-                      dataWithoutFolders,
-                      dateCategory as
-                        | "Today"
-                        | "Yesterday"
-                        | "Previous Week"
-                        | "Older"
-                    )
+                {[
+                  "Today",
+                  "Yesterday",
+                  "Previous 7 Days",
+                  "Previous 30 Days",
+                  "Older"
+                ].map(dateCategory => {
+                  const sortedData = getSortedData(
+                    dataWithoutFolders,
+                    dateCategory as
+                      | "Today"
+                      | "Yesterday"
+                      | "Previous 7 Days"
+                      | "Previous 30 Days"
+                      | "Older"
+                  )
 
-                    return (
-                      sortedData.length > 0 && (
-                        <div key={dateCategory} className="pb-2">
-                          <div className="text-muted-foreground mb-1 text-sm font-bold">
-                            {dateCategory}
-                          </div>
-
-                          <div
-                            className={cn(
-                              "flex grow flex-col",
-                              isDragOver && "bg-accent"
-                            )}
-                            onDrop={handleDrop}
-                            onDragEnter={handleDragEnter}
-                            onDragLeave={handleDragLeave}
-                            onDragOver={handleDragOver}
-                          >
-                            {sortedData.map((item: any) => (
-                              <div
-                                key={item.id}
-                                draggable
-                                onDragStart={e => handleDragStart(e, item.id)}
-                              >
-                                {getDataListComponent(contentType, item)}
-                              </div>
-                            ))}
-                          </div>
+                  return (
+                    sortedData.length > 0 && (
+                      <div key={dateCategory} className="pb-2">
+                        <div className="text-muted-foreground mb-1 text-sm font-bold">
+                          {dateCategory}
                         </div>
-                      )
+
+                        <div
+                          className={cn(
+                            "flex grow flex-col",
+                            isDragOver && "bg-accent"
+                          )}
+                          onDrop={handleDrop}
+                          onDragEnter={handleDragEnter}
+                          onDragLeave={handleDragLeave}
+                          onDragOver={handleDragOver}
+                        >
+                          {sortedData.map((item: any) => (
+                            <div
+                              key={item.id}
+                              draggable
+                              onDragStart={e => handleDragStart(e, item.id)}
+                            >
+                              {getDataListComponent(contentType, item)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )
-                  }
-                )}
+                  )
+                })}
               </>
             ) : (
               <div
