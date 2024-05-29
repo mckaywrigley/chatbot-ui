@@ -54,6 +54,12 @@ const useSpeechRecognition = (
     })
     const fileSizeInMB = audioBlob.size / (1024 * 1024)
 
+    if (audioBlob.size === 0) {
+      toast.error("Audio file size is 0. Please try recording again.")
+      audioChunksRef.current = []
+      return
+    }
+
     if (fileSizeInMB > 24) {
       toast.error("Audio file size exceeds the maximum allowed size of 24 MB.")
       audioChunksRef.current = []
@@ -103,16 +109,16 @@ const useSpeechRecognition = (
 
   const getSupportedMimeType = useCallback((): string | null => {
     const mimeTypes = [
-      "audio/flac", // FLAC format
-      "audio/m4a", // M4A format
-      "audio/mp3", // MP3 format
-      "audio/mp4", // MP4 format
-      "audio/mpeg", // MPEG format
-      "audio/mpga", // MPGA format
-      "audio/oga", // OGA format
-      "audio/ogg", // OGG format
-      "audio/wav", // WAV format
-      "audio/webm" // WebM format
+      "audio/flac",
+      "audio/m4a",
+      "audio/mp3",
+      "audio/mp4",
+      "audio/mpeg",
+      "audio/mpga",
+      "audio/oga",
+      "audio/ogg",
+      "audio/wav",
+      "audio/webm"
     ]
 
     // Always use audio/mp4 for Apple devices

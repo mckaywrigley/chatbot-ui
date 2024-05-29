@@ -24,7 +24,6 @@ export async function POST(req: NextRequest) {
       "audio/mpeg",
       "audio/mpga",
       "audio/oga",
-
       "audio/ogg",
       "audio/wav",
       "audio/webm"
