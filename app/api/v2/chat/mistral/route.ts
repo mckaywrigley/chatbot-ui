@@ -1,11 +1,7 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ServerRuntime } from "next"
 
-import {
-  replaceWordsInLastUserMessage,
-  updateOrAddSystemMessage,
-  wordReplacements
-} from "@/lib/ai-helper"
+import { updateOrAddSystemMessage } from "@/lib/ai-helper"
 import RetrieverReranker from "@/lib/models/query-pinecone-2v"
 
 import llmConfig from "@/lib/models/llm/llm-config"
@@ -95,7 +91,10 @@ export async function POST(request: Request) {
 
       similarityTopK = 3
 
-      rateLimitCheckResult = await checkRatelimitOnApi(profile.user_id, "gpt-4")
+      rateLimitCheckResult = await checkRatelimitOnApi(
+        profile.user_id,
+        "hackergpt-pro"
+      )
     } else {
       if (useOpenRouter) {
         providerUrl = llmConfig.openrouter.url
@@ -212,7 +211,7 @@ export async function POST(request: Request) {
     }
 
     // If the user is using the mistral-large model, we must switch to the pro model.
-    if (chatSettings.model === "mistral-large") {
+    if (chatSettings.model === "mistral-large" && !isRagEnabled) {
       if (useOpenRouter) {
         selectedModel = llmConfig.models.hackerGPT_pro_openrouter
       } else {

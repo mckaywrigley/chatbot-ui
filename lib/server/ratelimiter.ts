@@ -99,6 +99,9 @@ function _getLimit(model: string, isPremium: boolean): number {
   } else if (model === "stt-1") {
     const limitKey = `RATELIMITER_LIMIT_STT_1_${isPremium ? "PREMIUM" : "FREE"}`
     limit = Number(process.env[limitKey]) || (isPremium ? 60 : 30)
+  } else if (model === "hackergpt-pro") {
+    const limitKey = `RATELIMITER_LIMIT_HACKERGPT_PRO_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey]) || (isPremium ? 60 : 0)
   } else if (model === "gpt-4") {
     const limitKey = `RATELIMITER_LIMIT_GPT_4_${isPremium ? "PREMIUM" : "FREE"}`
     limit = Number(process.env[limitKey]) || (isPremium ? 40 : 0)
