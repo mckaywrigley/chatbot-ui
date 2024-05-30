@@ -8,10 +8,10 @@ import {
   getServerProfile,
   functionCalledByLLM
 } from "@/lib/server/server-chat-helpers"
-import { OpenAIStream, StreamingTextResponse, MistralStream } from "ai"
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import MistralClient from "@mistralai/mistralai"
 import { formatDistanceToNow } from "date-fns/esm"
+import { openAsBlob } from "fs"
 
 // export const runtime = "edge"
 export const dynamic = "force-dynamic"
@@ -36,7 +36,6 @@ function extractAnalysisInfoWithComments(response: string) {
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
-  mistral: MistralClient,
   topicDescription: string,
   messages: any[],
   studyState: StudyState,
@@ -46,7 +45,7 @@ const callLLM = async (
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
-  let defaultModel = "mistral-medium-latest"
+  let defaultModel = "gpt-4o"
   const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
   const studySheetInstructions = `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention.
 Instructions:
@@ -82,9 +81,10 @@ Formatting Instructions:
 
   switch (studyState) {
     case "topic_creation":
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.4,
+        stream: true,
+        temperature: 0.3,
         messages: [
           {
             role: "system",
@@ -95,7 +95,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       newStudyState = "topic_edit"
       return new StreamingTextResponse(stream, {
         headers: {
@@ -157,7 +157,7 @@ Formatting Instructions:
       ]
 
       chatResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: defaultModel,
         messages: toolMessages,
         tools
       })
@@ -205,7 +205,7 @@ Formatting Instructions:
       }
 
       const secondResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: defaultModel,
         messages: toolMessages,
         stream: true
       })
@@ -220,7 +220,7 @@ Formatting Instructions:
     case "recall_tutorial_first_attempt":
     case "recall_first_attempt":
       // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
-      chatResponse = await mistral.chat({
+      chatResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
         response_format: { type: "json_object" },
@@ -243,11 +243,12 @@ Formatting Instructions:
             `
           }
         ]
-      } as any)
+      })
 
       analysis = await chatResponse.choices[0]?.message?.content
-      const { score, forgotten_facts } =
-        extractAnalysisInfoWithComments(analysis)
+      const { score, forgotten_facts } = extractAnalysisInfoWithComments(
+        analysis || ""
+      )
 
       const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
 
@@ -336,9 +337,10 @@ Formatting Instructions:
             : "recall_finished_hide_input"
       }
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.2,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -351,7 +353,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState,
@@ -370,9 +372,10 @@ Formatting Instructions:
         mentorHintsMessage = messages.slice(-4, -3)[0]
       }
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.4,
+        temperature: 0.3,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -408,7 +411,7 @@ Formatting Instructions:
 
             However, about Venus's past, it was actually thought to have been a habitable ocean world similar to Earth, not a dry desert. Scientists believe it may have had large amounts of surface water which later disappeared due to a runaway greenhouse effect. 🌊➡️🔥
 
-            You're doing well with a 50% correct recall before we went through the hints. Keep it up! 📈
+            You're doing well with a 50% correct recall before we went through the hints. Keep it up!
 
             Your next recall session is due in 2 days. 📅 Review the topic study sheet now to help reinforce and expand your memory on Venus. 📚
 
@@ -442,7 +445,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       newStudyState =
         studyState === "recall_tutorial_hinting"
           ? "tutorial_final_stage_hide_input"
@@ -457,9 +460,10 @@ Formatting Instructions:
     case "reviewing":
       // SHOW FULL study sheet ///////////////////////////////
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.7,
+        temperature: 0.5,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -470,12 +474,13 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
     case "quick_quiz_hide_input":
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.4,
+        temperature: 0.3,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -489,7 +494,7 @@ Formatting Instructions:
         ]
       })
       newStudyState = "quick_quiz"
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
@@ -498,9 +503,10 @@ Formatting Instructions:
     case "quick_quiz":
       const previousQuizQuestion = messages[messages.length - 2].content
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.4,
+        temperature: 0.3,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -518,7 +524,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
 
     default:
@@ -563,12 +569,9 @@ export async function POST(request: Request) {
       organization: profile.openai_organization_id
     })
 
-    const mistral = new MistralClient(process.env.MISTRAL_API_KEY)
-
     const response = await callLLM(
       chatId,
       openai,
-      mistral,
       topicDescription,
       messages,
       chatStudyState,
