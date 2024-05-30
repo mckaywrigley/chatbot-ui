@@ -27,7 +27,7 @@ export async function ratelimit(
 ): Promise<RateLimitResult> {
   const enable = Boolean(
     process.env.RATELIMITER_ENABLED &&
-      process.env.RATELIMITER_ENABLED === "true"
+      process.env.RATELIMITER_ENABLED.toLowerCase() === "true"
   )
   if (!enable) {
     return { allowed: true, remaining: -1, timeRemaining: null }
@@ -95,10 +95,13 @@ function _getLimit(model: string, isPremium: boolean): number {
     limit = Number(process.env[limitKey])
   } else if (model === "tts-1") {
     const limitKey = `RATELIMITER_LIMIT_TTS_1_${isPremium ? "PREMIUM" : "FREE"}`
-    limit = Number(process.env[limitKey]) || 15
+    limit = Number(process.env[limitKey]) || (isPremium ? 30 : 15)
   } else if (model === "stt-1") {
     const limitKey = `RATELIMITER_LIMIT_STT_1_${isPremium ? "PREMIUM" : "FREE"}`
-    limit = Number(process.env[limitKey]) || 15
+    limit = Number(process.env[limitKey]) || (isPremium ? 60 : 30)
+  } else if (model === "gpt-4") {
+    const limitKey = `RATELIMITER_LIMIT_GPT_4_${isPremium ? "PREMIUM" : "FREE"}`
+    limit = Number(process.env[limitKey]) || (isPremium ? 40 : 0)
   } else {
     const fixedModelName = _getFixedModelName(model)
     const limitKey = `RATELIMITER_LIMIT_${fixedModelName}_${isPremium ? "PREMIUM" : "FREE"}`

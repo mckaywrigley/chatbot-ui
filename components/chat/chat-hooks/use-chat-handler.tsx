@@ -228,7 +228,8 @@ export const useChatHandler = () => {
     chatMessages: ChatMessage[],
     isRegeneration: boolean,
     isContinuation: boolean = false,
-    editSequenceNumber?: number
+    editSequenceNumber?: number,
+    model?: LLMID
   ) => {
     const isEdit = editSequenceNumber !== undefined
 
@@ -256,7 +257,7 @@ export const useChatHandler = () => {
         ...LLM_LIST,
         ...availableLocalModels,
         ...availableOpenRouterModels
-      ].find(llm => llm.modelId === chatSettings?.model)
+      ].find(llm => llm.modelId === (model || chatSettings?.model))
 
       validateChatSettings(
         chatSettings,
@@ -319,7 +320,8 @@ export const useChatHandler = () => {
           chatSettings!,
           b64Images,
           isContinuation,
-          selectedPlugin
+          selectedPlugin,
+          model || chatSettings!.model
         )
 
       let sentChatMessages = [...chatMessages]

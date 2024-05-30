@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
+import { ChangeModelIcon } from "../ui/change-model-icon"
 import { useAudioPlayer } from "@/components/chat/chat-hooks/use-audio-player"
 
 export const MESSAGE_ICON_SIZE = 20
@@ -22,16 +23,17 @@ interface MessageActionsProps {
   isAssistant: boolean
   isLast: boolean
   isEditing: boolean
-  isHovering: boolean
   isGoodResponse: boolean
   isBadResponse: boolean
   onCopy: () => void
   onEdit: () => void
   onRegenerate: () => void
+  onRegenerateSpecificModel: (model: string) => void
   onGoodResponse: () => void
   onBadResponse: () => void
   messageHasImage: boolean
   messageContent: string
+  messageModel: string
   messageSequenceNumber: number
 }
 
@@ -39,16 +41,17 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isAssistant,
   isLast,
   isEditing,
-  isHovering,
   isGoodResponse,
   isBadResponse,
   onCopy,
   onEdit,
   onRegenerate,
+  onRegenerateSpecificModel,
   onGoodResponse,
   onBadResponse,
   messageHasImage,
   messageContent,
+  messageModel,
   messageSequenceNumber
 }) => {
   const {
@@ -56,10 +59,12 @@ export const MessageActions: FC<MessageActionsProps> = ({
     currentPlayingMessageId,
     setCurrentPlayingMessageId,
     selectedChat,
-    isMobile
+    isMobile,
+    subscription
   } = useContext(ChatbotUIContext)
   const [showCheckmark, setShowCheckmark] = useState(false)
   const { playAudio, stopAudio, isLoading, isPlaying } = useAudioPlayer()
+  const isPremium = subscription !== null
 
   const MESSAGE_ICON_SIZE = isMobile ? 22 : 20
   const BELOW_MAX_LENGTH = messageContent.length < 4096
@@ -237,7 +242,13 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )}
 
-      {/* {1 > 0 && isAssistant && <MessageReplies />} */}
+      {isLast && isPremium && (
+        <ChangeModelIcon
+          currentModel={messageModel}
+          onChangeModel={onRegenerateSpecificModel}
+          isMobile={isMobile}
+        />
+      )}
     </div>
   )
 }

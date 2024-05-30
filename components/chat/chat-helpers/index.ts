@@ -19,6 +19,7 @@ import {
   ChatPayload,
   ChatSettings,
   LLM,
+  LLMID,
   MessageImage
 } from "@/types"
 import { PluginID } from "@/types/plugins"
@@ -92,7 +93,8 @@ export const createTempMessages = (
   chatSettings: ChatSettings,
   b64Images: string[],
   isContinuation: boolean,
-  selectedPlugin: PluginID | null
+  selectedPlugin: PluginID | null,
+  model: LLMID
 ) => {
   if (!messageContent || isContinuation) messageContent = CONTINUE_PROMPT
 
@@ -103,7 +105,7 @@ export const createTempMessages = (
       created_at: "",
       id: uuidv4(),
       image_paths: b64Images,
-      model: chatSettings.model,
+      model,
       plugin: selectedPlugin,
       role: "user",
       sequence_number: lastSequenceNumber(chatMessages) + 1,
@@ -120,7 +122,7 @@ export const createTempMessages = (
       created_at: "",
       id: uuidv4(),
       image_paths: [],
-      model: chatSettings.model,
+      model,
       plugin: selectedPlugin,
       role: "assistant",
       sequence_number: lastSequenceNumber(chatMessages) + 2,

@@ -89,7 +89,6 @@ export const Message: FC<MessageProps> = ({
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
-  const [isHovering, setIsHovering] = useState(false)
   const [editedMessage, setEditedMessage] = useState(message.content)
 
   const [showImagePreview, setShowImagePreview] = useState(false)
@@ -137,6 +136,19 @@ export const Message: FC<MessageProps> = ({
       editedMessage || chatMessages[chatMessages.length - 2].message.content,
       chatMessages,
       true
+    )
+  }
+
+  const handleRegenerateSpecificModel = async (model: string) => {
+    setIsGenerating(true)
+
+    await handleSendMessage(
+      editedMessage || chatMessages[chatMessages.length - 2].message.content,
+      chatMessages,
+      true,
+      false,
+      undefined,
+      model as LLMID
     )
   }
 
@@ -215,11 +227,9 @@ export const Message: FC<MessageProps> = ({
         "flex w-full justify-center",
         message.role === "user" ? "" : "bg-secondary"
       )}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col p-8 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
+      <div className="relative mb-2 flex w-full flex-col p-8 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -249,16 +259,10 @@ export const Message: FC<MessageProps> = ({
                     />
                   )
                 ) : (
-                  <WithTooltip
-                    display={<div>{MODEL_DATA?.modelName}</div>}
-                    trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        modelId={modelDetails?.modelId || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
-                    }
+                  <ModelIcon
+                    modelId={modelDetails?.modelId || "custom"}
+                    height={ICON_SIZE}
+                    width={ICON_SIZE}
                   />
                 )
               ) : profile?.image_url ? (
@@ -445,14 +449,15 @@ export const Message: FC<MessageProps> = ({
               isAssistant={message.role === "assistant"}
               isLast={isLast}
               isEditing={isEditing}
-              isHovering={isHovering}
               isGoodResponse={feedback?.feedback === "good"}
               isBadResponse={feedback?.feedback === "bad"}
               messageHasImage={message.image_paths.length > 0}
               onRegenerate={handleRegenerate}
+              onRegenerateSpecificModel={handleRegenerateSpecificModel}
               onGoodResponse={handleGoodResponse}
               onBadResponse={handleBadResponse}
               messageContent={message.content}
+              messageModel={message.model}
               messageSequenceNumber={message.sequence_number}
             />
           </div>

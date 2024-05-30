@@ -68,7 +68,6 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
           variant="ghost"
         >
           <ModelIcon
-            provider={fullModel?.provider || "custom"}
             modelId={fullModel?.modelId || "custom"}
             width={26}
             height={26}

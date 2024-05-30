@@ -1,23 +1,19 @@
 import { cn } from "@/lib/utils"
-import { LLMID, ModelProvider } from "@/types"
+import { LLMID } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import { FC, HTMLAttributes } from "react"
 import { OpenAISVG } from "../icons/openai-svg"
-// import Image from "next/image"
-// import mistral from "@/public/providers/mistral.png"
 import { HackerAISVG } from "../icons/hackerai-svg"
 import { GPT4 } from "@/lib/models/llm/openai-llm-list"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
-  provider: ModelProvider
   modelId: LLMID | "custom"
   height: number
   width: number
 }
 
 export const ModelIcon: FC<ModelIconProps> = ({
-  provider,
   modelId,
   height,
   width,

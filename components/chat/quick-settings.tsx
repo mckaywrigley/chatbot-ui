@@ -180,7 +180,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         <Button variant="ghost" className="flex space-x-3 text-lg">
           {selectedPreset && (
             <ModelIcon
-              provider={modelDetails?.provider || "custom"}
               modelId={modelDetails?.modelId || "custom"}
               width={32}
               height={32}

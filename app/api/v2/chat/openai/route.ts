@@ -49,10 +49,9 @@ export async function POST(request: Request) {
       Authorization: `Bearer ${profile.openai_api_key}`
     }
 
-    // rate limit check
     const rateLimitCheckResult = await checkRatelimitOnApi(
       profile.user_id,
-      chatSettings.model
+      "gpt-4o"
     )
 
     if (rateLimitCheckResult !== null) {

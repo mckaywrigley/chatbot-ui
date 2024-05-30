@@ -32,7 +32,6 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
       <div className="w-[32px]">
         {contentType === "presets" ? (
           <ModelIcon
-            provider={modelDetails?.provider || "custom"}
             modelId={modelDetails?.modelId || "custom"}
             width={32}
             height={32}
