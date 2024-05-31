@@ -76,7 +76,7 @@ Formatting Instructions:
   There's an interesting point about the past state of Venus related to water. What do you think Venus might have looked like a billion years ago? 💧🌐
   Take a moment to think about these hints and see if you can recall more about those specific points. You’re doing wonderfully so far, and digging a bit deeper will help solidify your understanding even more! 🚀💡`
   const quickQuizSystemMessage =
-    "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Do not state which step of the instuctions you are on."
+    "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on."
 
   switch (studyState) {
     case "topic_creation":
@@ -84,6 +84,7 @@ Formatting Instructions:
         model: defaultModel,
         stream: true,
         temperature: 0.3,
+        max_tokens: 1024,
         messages: [
           {
             role: "system",
@@ -124,24 +125,6 @@ Formatting Instructions:
               }
             }
           }
-        },
-        {
-          type: "function",
-          function: {
-            name: "testMeNow",
-            description:
-              "This function initiates a topic recall session immediately upon student's request.",
-            parameters: {
-              type: "object",
-              properties: {
-                start_test: {
-                  type: "boolean",
-                  description: "Flag to start the test immediately."
-                }
-              },
-              required: ["start_test"]
-            }
-          }
         }
       ]
 
@@ -149,8 +132,9 @@ Formatting Instructions:
         {
           role: "system",
           content: `${studySheetInstructions}
-  If the student wants to change anything, work with the student to change the topic study sheet. Always use the the tool/functional "updateTopicContent" and pass the final generated study sheet. 
-  After updating the topic study sheet display the new topic study sheet. Finally, tell the student they should start the recall session immediately.`
+  If I want to change anything, work with me to change the topic study sheet. 
+  Always use the the tool/function "updateTopicContent" and pass the final generated study sheet. 
+  After updating the topic study sheet, display the new topic study sheet. Finally, tell me I should start the recall session immediately.`
         },
         ...messages
       ]
@@ -158,6 +142,9 @@ Formatting Instructions:
       chatResponse = await openai.chat.completions.create({
         model: defaultModel,
         messages: toolMessages,
+        temperature: 0.2,
+        tool_choice: "auto",
+        max_tokens: 1024,
         tools
       })
 

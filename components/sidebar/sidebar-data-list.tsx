@@ -56,7 +56,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setCollections,
     setAssistants,
     setTools,
-    setModels
+    setModels,
+    allChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -153,7 +154,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             return (
               !dueTomorrow &&
               dueDate > endOfMonth(currentTime) &&
-              dueDate <= endOfNextMonth
+              dueDate <= endOfNextMonth &&
+              !revisionNextWeek
             )
           case "After next month":
             return dueDate > endOfNextMonth
@@ -275,11 +277,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
             {folders.length > 0 && <Separator />}
 
-            <div className="pb-2">
-              <div className={cn("flex grow flex-col")}>
-                <QuickQuiz />
+            {allChatRecallAnalysis.length > 0 && (
+              <div className="pb-2">
+                <div className={cn("flex grow flex-col")}>
+                  <QuickQuiz />
+                </div>
               </div>
-            </div>
+            )}
 
             {contentType === "chats" ? (
               <>

@@ -25,8 +25,6 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
 
   return (
     <>
-      <PromptPicker />
-
       <FilePicker
         isOpen={isFilePickerOpen}
         searchQuery={hashtagCommand}
@@ -39,10 +37,6 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         onSelectCollection={handleSelectUserCollection}
         isFocused={focusFile}
       />
-
-      <ToolPicker />
-
-      <AssistantPicker />
     </>
   )
 }

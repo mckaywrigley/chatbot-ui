@@ -184,8 +184,9 @@ export const useChatHandler = () => {
 
       let randomRecallFact: string = ""
 
-      const isQuickQuiz =
-        chatStudyState === "quick_quiz" || "quick_quiz_hide_input"
+      const isQuickQuiz: boolean =
+        chatStudyState === "quick_quiz" ||
+        chatStudyState === "quick_quiz_hide_input"
 
       if (isQuickQuiz) {
         // randomly remove and return one item from allChatRecallAnalysis
