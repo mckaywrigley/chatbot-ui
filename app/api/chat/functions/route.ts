@@ -11,7 +11,6 @@ import {
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { formatDistanceToNow } from "date-fns/esm"
-import { openAsBlob } from "fs"
 
 // export const runtime = "edge"
 export const dynamic = "force-dynamic"
@@ -45,7 +44,7 @@ const callLLM = async (
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
-  let defaultModel = "gpt-4o"
+  let defaultModel = "meta-llama/Meta-Llama-3-70B-Instruct"
   const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
   const studySheetInstructions = `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention.
 Instructions:
@@ -536,7 +535,7 @@ Formatting Instructions:
 export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
-    checkApiKey(profile.openai_api_key, "OpenAI")
+    checkApiKey(profile.deepinfra_api_key, "Deep infra")
     const json = await request.json()
     const {
       messages,
@@ -565,8 +564,8 @@ export async function POST(request: Request) {
     }
 
     const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      apiKey: profile.deepinfra_api_key || "",
+      baseURL: "https://api.deepinfra.com/v1/openai"
     })
 
     const response = await callLLM(
