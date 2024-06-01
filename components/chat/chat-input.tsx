@@ -15,7 +15,8 @@ import {
   IconPlayerStopFilled,
   IconPuzzle,
   IconPuzzleOff,
-  IconSend
+  IconSend,
+  IconLoader2
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -164,7 +165,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     startListening,
     cancelListening,
     isSpeechToTextLoading,
-    hasSupportedMimeType
+    hasSupportedMimeType,
+    isRequestingMicAccess,
+    requestMicAccess
   } = useSpeechRecognition(handleTranscriptChange)
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -514,15 +517,23 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
           <div className="absolute bottom-[14px] right-3 flex cursor-pointer items-center space-x-2">
             {isMicSupported &&
-              hasMicAccess &&
               hasSupportedMimeType &&
               !userInput &&
               !isGenerating && (
-                <IconMicrophone
-                  className="cursor-pointer p-1 hover:opacity-50"
-                  onClick={startListening}
-                  size={30}
-                />
+                <>
+                  {isRequestingMicAccess ? (
+                    <IconLoader2
+                      className="animate-spin cursor-pointer p-1 hover:opacity-50"
+                      size={30}
+                    />
+                  ) : (
+                    <IconMicrophone
+                      className="cursor-pointer p-1 hover:opacity-50"
+                      onClick={hasMicAccess ? startListening : requestMicAccess}
+                      size={30}
+                    />
+                  )}
+                </>
               )}
             {isGenerating ? (
               <IconPlayerStopFilled

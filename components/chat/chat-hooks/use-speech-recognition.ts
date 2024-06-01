@@ -8,19 +8,22 @@ const useSpeechRecognition = (
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [isMicSupported, setIsMicSupported] = useState(true)
-  const [hasMicAccess, setHasMicAccess] = useState(true)
+  const [hasMicAccess, setHasMicAccess] = useState(false)
+  const [isRequestingMicAccess, setIsRequestingMicAccess] = useState(false)
   const [isSpeechToTextLoading, setIsSpeechToTextLoading] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const [hasSupportedMimeType, setHasSupportedMimeType] = useState(false)
+
   const audioChunksRef = useRef<Blob[]>([])
   const isCanceledRef = useRef(false)
   const prevIsListeningRef = useRef(false)
+
+  const { dispatch: alertDispatch } = useAlertContext()
 
   const isAppleDevice =
     /iPhone|iPad|iPod|Macintosh|MacIntel|MacPPC|Mac68K/i.test(
       navigator.userAgent
     )
-  const { dispatch: alertDispatch } = useAlertContext()
 
   useEffect(() => {
     if (!navigator.mediaDevices || !window.MediaRecorder) {
@@ -30,6 +33,23 @@ const useSpeechRecognition = (
 
     const mimeType = getSupportedMimeType()
     setHasSupportedMimeType(!!mimeType)
+  }, [])
+
+  const requestMicAccess = useCallback(() => {
+    setIsRequestingMicAccess(true)
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(() => {
+        setHasMicAccess(true)
+        setIsListening(true)
+      })
+      .catch(() => {
+        setHasMicAccess(false)
+        setIsMicSupported(false)
+      })
+      .finally(() => {
+        setIsRequestingMicAccess(false)
+      })
   }, [])
 
   const handleDataAvailable = useCallback((event: BlobEvent) => {
@@ -48,10 +68,7 @@ const useSpeechRecognition = (
     const mimeType = isAppleDevice
       ? "audio/mp4"
       : mediaRecorder?.mimeType || "audio/webm"
-
-    const audioBlob = new Blob(audioChunksRef.current, {
-      type: mimeType
-    })
+    const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
     const fileSizeInMB = audioBlob.size / (1024 * 1024)
 
     if (audioBlob.size === 0) {
@@ -87,6 +104,10 @@ const useSpeechRecognition = (
             type: "SHOW",
             payload: { message: data.message, title: "Usage Cap Error" }
           })
+        } else if (data.error && data.error.code === "audio_too_short") {
+          toast.error(
+            "Audio file is too short. Minimum audio length is 0.1 seconds."
+          )
         } else {
           throw new Error("Failed to transcribe audio")
         }
@@ -96,11 +117,9 @@ const useSpeechRecognition = (
       setTranscript(data.text)
       onTranscriptChange(data.text)
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(`Error: ${error.message}`)
-      } else {
-        toast.error("An unknown error occurred")
-      }
+      toast.error(
+        `Error: ${error instanceof Error ? error.message : "An unknown error occurred"}`
+      )
     } finally {
       setIsSpeechToTextLoading(false)
       audioChunksRef.current = []
@@ -121,7 +140,6 @@ const useSpeechRecognition = (
       "audio/webm"
     ]
 
-    // Always use audio/mp4 for Apple devices
     if (isAppleDevice) {
       return "audio/mp4"
     }
@@ -130,6 +148,13 @@ const useSpeechRecognition = (
   }, [])
 
   const startRecording = useCallback(() => {
+    if (!hasMicAccess) {
+      toast.error("Microphone access is required to start recording.")
+      return
+    }
+
+    setTranscript("")
+
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(stream => {
@@ -141,8 +166,7 @@ const useSpeechRecognition = (
           return
         }
 
-        const options = { mimeType }
-        const recorder = new MediaRecorder(stream, options)
+        const recorder = new MediaRecorder(stream, { mimeType })
         recorder.ondataavailable = handleDataAvailable
         recorder.onstop = handleStop
         recorder.start(1000)
@@ -150,11 +174,11 @@ const useSpeechRecognition = (
         setIsListening(true)
       })
       .catch(err => {
-        toast.error("Microphone access denied: " + err)
+        toast.error(`Microphone access denied: ${err}`)
         setHasMicAccess(false)
         setIsListening(false)
       })
-  }, [handleDataAvailable, handleStop, getSupportedMimeType])
+  }, [handleDataAvailable, handleStop, getSupportedMimeType, hasMicAccess])
 
   useEffect(() => {
     if (isListening && !prevIsListeningRef.current) {
@@ -188,6 +212,8 @@ const useSpeechRecognition = (
     isMicSupported,
     hasSupportedMimeType,
     hasMicAccess,
+    isRequestingMicAccess,
+    requestMicAccess,
     startListening,
     cancelListening,
     isSpeechToTextLoading

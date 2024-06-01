@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, memo } from "react"
 import { IconLoader } from "@tabler/icons-react"
 
 interface VoiceLoadingBarProps {
@@ -16,4 +16,8 @@ const VoiceLoadingBar: FC<VoiceLoadingBarProps> = ({ isLoading }) => {
   )
 }
 
-export default VoiceLoadingBar
+VoiceLoadingBar.defaultProps = {
+  isLoading: false
+}
+
+export default memo(VoiceLoadingBar)
