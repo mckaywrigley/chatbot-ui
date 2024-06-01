@@ -342,7 +342,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="bg-background w-full max-w-lg rounded-md p-10 text-center">
             <p>
-              <b>All chats and folders in all workspaces</b> will be deleted!
+              <b>All chats and folders</b> will be deleted!
             </p>
             <p>Are you sure you want to do this?</p>
             <div className="mt-5 flex justify-center gap-5">

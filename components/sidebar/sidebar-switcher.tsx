@@ -29,7 +29,6 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   const { subscription } = useContext(ChatbotUIContext)
   const [isPluginStoreModalOpen, setIsPluginStoreModalOpen] = useState(false)
   const { state: pluginState, dispatch: pluginDispatch } = usePluginContext()
-  const defaultPluginIds = [0, 99]
 
   const installPlugin = (plugin: PluginSummary) => {
     pluginDispatch({
@@ -51,10 +50,6 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
     )
     return { ...plugin, isInstalled }
   })
-
-  const selectorPlugins = updatedAvailablePlugins.filter(
-    plugin => plugin.isInstalled || defaultPluginIds.includes(plugin.id)
-  )
 
   return (
     <div className="flex flex-col justify-between border-r-2 pb-5">

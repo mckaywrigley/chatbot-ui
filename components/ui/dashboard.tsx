@@ -27,7 +27,7 @@ interface DashboardProps {
 
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
-  const { subscription, chatSettings, isReadyToChat } =
+  const { subscription, chatSettings, isReadyToChat, isMobile } =
     useContext(ChatbotUIContext)
 
   const pathname = usePathname()
@@ -129,7 +129,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
       <Button
         className={cn(
-          `absolute left-[4px] ${showSidebar ? "top-[50%]" : "top-3"} z-20 size-[32px] cursor-pointer`
+          `absolute left-[8px] ${showSidebar && isMobile ? "top-[50%]" : "top-3"} z-20 size-[32px] cursor-pointer`
         )}
         style={{
           marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",

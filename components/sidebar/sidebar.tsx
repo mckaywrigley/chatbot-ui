@@ -41,12 +41,6 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       value={contentType}
     >
       <div className="flex h-full flex-col p-3">
-        <div className="flex items-center border-b-2 pb-2">
-          <WorkspaceSwitcher />
-
-          <WorkspaceSettings />
-        </div>
-
         {(() => {
           switch (contentType) {
             case "chats":
