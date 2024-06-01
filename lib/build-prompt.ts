@@ -1,6 +1,7 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
+import { getBase64FromDataURL, getMediaTypeFromDataURL } from "@/lib/utils"
 
 const buildBasePrompt = (
   prompt: string,
@@ -182,125 +183,78 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
   return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
 }
 
-export async function buildGoogleGeminiFinalMessages(
-  payload: ChatPayload,
-  profile: Tables<"profiles">,
-  messageImageFiles: MessageImage[]
-) {
-  const { chatSettings, workspaceInstructions, chatMessages, assistant } =
-    payload
+function adaptSingleMessageForGoogleGemini(message: any) {
 
-  const BUILT_PROMPT = buildBasePrompt(
-    chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
-  )
+  let adaptedParts = []
 
-  let finalMessages = []
-
-  let usedTokens = 0
-  const CHUNK_SIZE = chatSettings.contextLength
-  const PROMPT_TOKENS = encode(chatSettings.prompt).length
-  let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
-
-  usedTokens += PROMPT_TOKENS
-
-  for (let i = chatMessages.length - 1; i >= 0; i--) {
-    const message = chatMessages[i].message
-    const messageTokens = encode(message.content).length
-
-    if (messageTokens <= REMAINING_TOKENS) {
-      REMAINING_TOKENS -= messageTokens
-      usedTokens += messageTokens
-      finalMessages.unshift(message)
-    } else {
-      break
-    }
+  let rawParts = []
+  if(!Array.isArray(message.content)) {
+    rawParts.push({type: 'text', text: message.content})
+  } else {
+    rawParts = message.content
   }
 
-  let tempSystemMessage: Tables<"messages"> = {
-    chat_id: "",
-    assistant_id: null,
-    content: BUILT_PROMPT,
-    created_at: "",
-    id: chatMessages.length + "",
-    image_paths: [],
-    model: payload.chatSettings.model,
-    role: "system",
-    sequence_number: chatMessages.length,
-    updated_at: "",
-    user_id: ""
-  }
+  for(let i = 0; i < rawParts.length; i++) {
+    let rawPart = rawParts[i]
 
-  finalMessages.unshift(tempSystemMessage)
-
-  let GOOGLE_FORMATTED_MESSAGES = []
-
-  if (chatSettings.model === "gemini-pro") {
-    GOOGLE_FORMATTED_MESSAGES = [
-      {
-        role: "user",
-        parts: finalMessages[0].content
-      },
-      {
-        role: "model",
-        parts: "I will follow your instructions."
-      }
-    ]
-
-    for (let i = 1; i < finalMessages.length; i++) {
-      GOOGLE_FORMATTED_MESSAGES.push({
-        role: finalMessages[i].role === "user" ? "user" : "model",
-        parts: finalMessages[i].content as string
-      })
-    }
-
-    return GOOGLE_FORMATTED_MESSAGES
-  } else if ((chatSettings.model = "gemini-pro-vision")) {
-    // Gemini Pro Vision doesn't currently support messages
-    async function fileToGenerativePart(file: File) {
-      const base64EncodedDataPromise = new Promise(resolve => {
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result.split(",")[1])
-          }
-        }
-
-        reader.readAsDataURL(file)
-      })
-
-      return {
+    if(rawPart.type == 'text') {
+      adaptedParts.push({text: rawPart.text})
+    } else if(rawPart.type === 'image_url') {
+      adaptedParts.push({
         inlineData: {
-          data: await base64EncodedDataPromise,
-          mimeType: file.type
+          data: getBase64FromDataURL(rawPart.image_url.url),
+          mimeType: getMediaTypeFromDataURL(rawPart.image_url.url),
         }
-      }
+      })
     }
-
-    let prompt = ""
-
-    for (let i = 0; i < finalMessages.length; i++) {
-      prompt += `${finalMessages[i].role}:\n${finalMessages[i].content}\n\n`
-    }
-
-    const files = messageImageFiles.map(file => file.file)
-    const imageParts = await Promise.all(
-      files.map(file =>
-        file ? fileToGenerativePart(file) : Promise.resolve(null)
-      )
-    )
-
-    // FIX: Hacky until chat messages are supported
-    return [
-      {
-        prompt,
-        imageParts
-      }
-    ]
   }
 
-  return finalMessages
+  let role = 'user'
+  if(["user", "system"].includes(message.role)) {
+    role = 'user'
+  } else if(message.role === 'assistant') {
+    role = 'model'
+  }
+
+  return {
+    role: role,
+    parts: adaptedParts
+  }
 }
+
+function adaptMessagesForGeminiVision(
+  messages: any[]
+) {
+  // Gemini Pro Vision cannot process multiple messages
+  // Reformat, using all texts and last visual only
+
+  const basePrompt = messages[0].parts[0].text
+  const baseRole = messages[0].role
+  const lastMessage = messages[messages.length-1]
+  const visualMessageParts = lastMessage.parts;
+  let visualQueryMessages = [{
+    role: "user",
+    parts: [
+      `${baseRole}:\n${basePrompt}\n\nuser:\n${visualMessageParts[0].text}\n\n`,
+      visualMessageParts.slice(1)
+    ]
+  }]
+  return visualQueryMessages
+}
+
+export async function adaptMessagesForGoogleGemini(
+  payload: ChatPayload,
+  messages:  any[]
+) {
+  let geminiMessages = []
+  for (let i = 0; i < messages.length; i++) {
+    let adaptedMessage = adaptSingleMessageForGoogleGemini(messages[i])
+    geminiMessages.push(adaptedMessage)
+  }
+
+  if(payload.chatSettings.model === "gemini-pro-vision") {
+    geminiMessages = adaptMessagesForGeminiVision(geminiMessages)
+  }
+  return geminiMessages
+}
+
