@@ -25,7 +25,7 @@ const GPT4Turbo: LLM = {
   provider: "openai",
   hostedId: "gpt-4-turbo-preview",
   platformLink: OPENAI_PLATORM_LINK,
-  imageInput: true,
+  imageInput: false,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
