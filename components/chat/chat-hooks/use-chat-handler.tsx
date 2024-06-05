@@ -62,7 +62,8 @@ export const useChatHandler = () => {
     setChatRecallMetadata,
     chatRecallMetadata,
     allChatRecallAnalysis,
-    setAllChatRecallAnalysis
+    setAllChatRecallAnalysis,
+    chats
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -185,15 +186,24 @@ export const useChatHandler = () => {
       let randomRecallFact: string = ""
 
       const isQuickQuiz: boolean =
-        chatStudyState === "quick_quiz" ||
-        chatStudyState === "quick_quiz_hide_input"
+        chatStudyState === "quick_quiz_ready_hide_input" ||
+        chatStudyState === "quick_quiz_answer"
 
-      if (isQuickQuiz) {
+      let studySheet = topicDescription
+
+      if (chatStudyState === "quick_quiz_ready_hide_input") {
         // randomly remove and return one item from allChatRecallAnalysis
         const randomIndex = Math.floor(
           Math.random() * allChatRecallAnalysis.length
         )
-        randomRecallFact = allChatRecallAnalysis[randomIndex]
+        const { recallAnalysis, chatId } = allChatRecallAnalysis[randomIndex]
+        randomRecallFact = recallAnalysis
+        // set topicDescription based on topicDescription allChatRecallAnalysis[randomIndex].id
+        studySheet =
+          chats.find(chat => chat.id === chatId)?.topic_description || ""
+
+        setTopicDescription(studySheet)
+
         const updated = [...allChatRecallAnalysis]
         updated.splice(randomIndex, 1)
         setAllChatRecallAnalysis(updated)
@@ -209,7 +219,7 @@ export const useChatHandler = () => {
           messages: formattedMessagesWithoutSystem,
           chatId: currentChat?.id,
           chatStudyState,
-          topicDescription,
+          studySheet,
           chatRecallMetadata,
           randomRecallFact
         })

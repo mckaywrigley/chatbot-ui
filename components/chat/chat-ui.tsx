@@ -94,7 +94,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
             fileItems: []
           }
         ])
-        setChatStudyState("quick_quiz_hide_input")
+        setChatStudyState("quick_quiz_ready_hide_input")
       }
     }
 

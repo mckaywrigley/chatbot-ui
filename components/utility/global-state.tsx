@@ -94,9 +94,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     useState<StudyState>("topic_creation")
   const [chatRecallMetadata, setChatRecallMetadata] =
     useState<ChatRecallMetadata | null>(null)
-  const [allChatRecallAnalysis, setAllChatRecallAnalysis] = useState<string[]>(
-    []
-  )
+  const [allChatRecallAnalysis, setAllChatRecallAnalysis] = useState<
+    { chatId: string; recallAnalysis: any }[]
+  >([])
 
   // ACTIVE CHAT STORE
   const [isGenerating, setIsGenerating] = useState<boolean>(false)

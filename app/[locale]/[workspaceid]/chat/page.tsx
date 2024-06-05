@@ -47,17 +47,29 @@ export default function ChatPage() {
 
   useEffect(() => {
     const recallAnalysisInChats = chats
-      .map(chat => chat.recall_analysis)
-      .filter(analysis => analysis != null)
+      .map(chat => ({
+        chatId: chat.id,
+        recallAnalysis: chat.recall_analysis
+      }))
+      .filter(analysis => analysis.recallAnalysis != null)
       .map(analysis => {
         try {
-          return JSON.parse(analysis as string)
+          return {
+            chatId: analysis.chatId,
+            recallAnalysis: JSON.parse(analysis.recallAnalysis as string)
+          }
         } catch (e) {
-          console.error("Failed to parse recall_analysis:", analysis)
-          return []
+          console.error(
+            "Failed to parse recall_analysis:",
+            analysis.recallAnalysis
+          )
+          return null
         }
       })
-      .flat()
+      .filter(analysis => analysis != null) as {
+      chatId: string
+      recallAnalysis: any
+    }[]
 
     if (recallAnalysisInChats.length > 0) {
       setAllChatRecallAnalysis(recallAnalysisInChats)

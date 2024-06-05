@@ -35,7 +35,7 @@ function extractAnalysisInfoWithComments(response: string) {
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
-  topicDescription: string,
+  studySheet: string,
   messages: any[],
   studyState: StudyState,
   studentMessage: { content: string; role: string },
@@ -222,7 +222,7 @@ Formatting Instructions:
             - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet.
             
             Topic study sheet:
-            """${topicDescription}"""
+            """${studySheet}"""
             
             Student's recall attempt:
             """${studentMessage.content}"""
@@ -285,7 +285,7 @@ Formatting Instructions:
       ---
       Topic study sheet: 
       """
-      ${topicDescription}
+      ${studySheet}
       """
 
       Student recall: 
@@ -306,7 +306,7 @@ Formatting Instructions:
         userMessage = `Generate upbeat feedback based on the students recall performance. 
           Topic study sheet: 
           """
-          ${topicDescription}
+          ${studySheet}
           """
 
           Student recall: 
@@ -366,7 +366,7 @@ Formatting Instructions:
           {
             role: "system",
             content: `${mentor_system_message}
-            Use this topic study sheet only when responding to the student ${topicDescription}`
+            Use this topic study sheet only when responding to the student ${studySheet}`
           },
           {
             role: "user",
@@ -462,7 +462,7 @@ Formatting Instructions:
 
       stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
-    case "quick_quiz_hide_input":
+    case "quick_quiz_ready_hide_input":
       chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
@@ -474,19 +474,22 @@ Formatting Instructions:
           },
           {
             role: "user",
-            content: `Generate a short answer quiz question based on the following fact:
-              """${randomRecallFact}"""`
+            content: `Given this topic study sheet as context:
+            """${studySheet}"""
+            Generate a short answer quiz question based on the following fact:
+              """${randomRecallFact}"""
+              Important: Do not provide the answer when generating the question or mention the fact used to generate quiz question.`
           }
         ]
       })
-      newStudyState = "quick_quiz"
+      newStudyState = "quick_quiz_answer"
       stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
         }
       })
-    case "quick_quiz":
+    case "quick_quiz_answer":
       const previousQuizQuestion = messages[messages.length - 2].content
 
       chatStreamResponse = await openai.chat.completions.create({
@@ -500,18 +503,22 @@ Formatting Instructions:
           },
           {
             role: "user",
-            content: `Step 1: Provide feedback and answer to the following quiz question:
+            content: `Provide feedback and answer to the following quiz question:
             """${previousQuizQuestion}"""
             Based on the following student response:
             """${studentMessage.content}"""
-            Step 2: Generate a short answer quiz question based on the following fact. Important: Do not provide the answer when generating the question:
-              """${randomRecallFact}"""`
+            Given this topic study sheet as context:
+            """${studySheet}"""`
           }
         ]
       })
-
+      newStudyState = "quick_quiz_ready_hide_input"
       stream = OpenAIStream(chatStreamResponse)
-      return new StreamingTextResponse(stream)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
 
     default:
       // Handle other states or error
@@ -528,7 +535,7 @@ export async function POST(request: Request) {
       messages,
       chatId,
       chatStudyState,
-      topicDescription,
+      studySheet,
       chatRecallMetadata,
       randomRecallFact
     } = json
@@ -539,7 +546,7 @@ export async function POST(request: Request) {
     if (quickResponse && quickResponse.responseText !== "LLM") {
       const responseText =
         quickResponse.responseText === "{{topicDescription}}"
-          ? topicDescription
+          ? studySheet
           : quickResponse.responseText
 
       return new Response(responseText, {
@@ -558,7 +565,7 @@ export async function POST(request: Request) {
     const response = await callLLM(
       chatId,
       openai,
-      topicDescription,
+      studySheet,
       messages,
       chatStudyState,
       studentMessage,

@@ -18,8 +18,8 @@ export type StudyState =
   | "tutorial_final_review_hide_input"
   | "tutorial_finished_hide_input"
   | "final_review_hide_input"
-  | "quick_quiz_hide_input"
-  | "quick_quiz"
+  | "quick_quiz_ready_hide_input"
+  | "quick_quiz_answer"
 
 export interface QuickResponse {
   quickText: string
@@ -215,12 +215,12 @@ Enjoy your learning journey!`,
     ]
   },
   {
-    name: "quick_quiz_hide_input",
+    name: "quick_quiz_ready_hide_input",
     quickResponses: [
       {
-        quickText: "Let's go!",
+        quickText: "Next question.",
         responseText: "LLM",
-        newStudyState: "quick_quiz"
+        newStudyState: "quick_quiz_answer"
       }
     ]
   }

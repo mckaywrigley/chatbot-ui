@@ -86,8 +86,10 @@ interface ChatbotUIContext {
   setChatStudyState: Dispatch<SetStateAction<StudyState>>
   chatRecallMetadata: ChatRecallMetadata | null
   setChatRecallMetadata: Dispatch<SetStateAction<ChatRecallMetadata | null>>
-  allChatRecallAnalysis: string[]
-  setAllChatRecallAnalysis: Dispatch<SetStateAction<string[]>>
+  allChatRecallAnalysis: { chatId: string; recallAnalysis: any }[]
+  setAllChatRecallAnalysis: Dispatch<
+    SetStateAction<{ chatId: string; recallAnalysis: any }[]>
+  >
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
