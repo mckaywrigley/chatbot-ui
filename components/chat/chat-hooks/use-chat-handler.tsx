@@ -190,8 +190,10 @@ export const useChatHandler = () => {
         chatStudyState === "quick_quiz_answer"
 
       let studySheet = topicDescription
+      let quizFinished = allChatRecallAnalysis.length === 0
+      let studyState = chatStudyState
 
-      if (chatStudyState === "quick_quiz_ready_hide_input") {
+      if (chatStudyState === "quick_quiz_ready_hide_input" && !quizFinished) {
         // randomly remove and return one item from allChatRecallAnalysis
         const randomIndex = Math.floor(
           Math.random() * allChatRecallAnalysis.length
@@ -208,6 +210,9 @@ export const useChatHandler = () => {
         updated.splice(randomIndex, 1)
         setAllChatRecallAnalysis(updated)
         console.log("randomRecallFact", randomRecallFact, updated.length)
+      } else if (isQuickQuiz && quizFinished) {
+        studyState = "quick_quiz_finished_hide_input"
+        setChatStudyState(studyState)
       }
 
       response = await fetch("/api/chat/functions", {
@@ -218,7 +223,7 @@ export const useChatHandler = () => {
         body: JSON.stringify({
           messages: formattedMessagesWithoutSystem,
           chatId: currentChat?.id,
-          chatStudyState,
+          studyState,
           studySheet,
           chatRecallMetadata,
           randomRecallFact

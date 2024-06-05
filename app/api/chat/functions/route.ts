@@ -40,7 +40,8 @@ const callLLM = async (
   studyState: StudyState,
   studentMessage: { content: string; role: string },
   chatRecallMetadata: ChatRecallMetadata,
-  randomRecallFact: string
+  randomRecallFact: string,
+  noMoreQuizQuestions: boolean
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
@@ -476,7 +477,7 @@ Formatting Instructions:
             role: "user",
             content: `Given this topic study sheet as context:
             """${studySheet}"""
-            Generate a short answer quiz question based on the following fact:
+            Generate a short answer quiz question based on the following fact the student previously got incorrect:
               """${randomRecallFact}"""
               Important: Do not provide the answer when generating the question or mention the fact used to generate quiz question.`
           }
@@ -490,7 +491,11 @@ Formatting Instructions:
         }
       })
     case "quick_quiz_answer":
+    case "quick_quiz_finished_hide_input":
       const previousQuizQuestion = messages[messages.length - 2].content
+      const finalFeeback = noMoreQuizQuestions
+        ? "Finally advise the student there are no more quiz questions available. Come back again another time."
+        : ""
 
       chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
@@ -499,7 +504,7 @@ Formatting Instructions:
         messages: [
           {
             role: "system",
-            content: `${quickQuizSystemMessage}.  Always provide the answer when giving feedback to the student.`
+            content: `${quickQuizSystemMessage}.  Always provide the answer when giving feedback to the student. If the students answers "I don't know.", just give the answer.`
           },
           {
             role: "user",
@@ -508,11 +513,16 @@ Formatting Instructions:
             Based on the following student response:
             """${studentMessage.content}"""
             Given this topic study sheet as context:
-            """${studySheet}"""`
+            """${studySheet}"""
+            ${finalFeeback}
+            `
           }
         ]
       })
-      newStudyState = "quick_quiz_ready_hide_input"
+      newStudyState =
+        studyState === "quick_quiz_finished_hide_input"
+          ? "quick_quiz_finished_hide_input"
+          : "quick_quiz_ready_hide_input"
       stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
@@ -534,7 +544,7 @@ export async function POST(request: Request) {
     const {
       messages,
       chatId,
-      chatStudyState,
+      studyState,
       studySheet,
       chatRecallMetadata,
       randomRecallFact
@@ -562,15 +572,18 @@ export async function POST(request: Request) {
       baseURL: "https://api.deepinfra.com/v1/openai"
     })
 
+    const noMoreQuizQuestions = studyState === "quick_quiz_finished_hide_input"
+
     const response = await callLLM(
       chatId,
       openai,
       studySheet,
       messages,
-      chatStudyState,
+      studyState,
       studentMessage,
       chatRecallMetadata,
-      randomRecallFact
+      randomRecallFact,
+      noMoreQuizQuestions
     )
 
     return response
