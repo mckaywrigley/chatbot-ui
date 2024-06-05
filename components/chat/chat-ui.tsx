@@ -5,10 +5,7 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
-import {
-  getMessagesByChatId,
-  deleteMessagesIncludingAndAfter
-} from "@/db/messages"
+import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -47,7 +44,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setTopicDescription,
     chats,
     setChatStudyState,
-    setAllChatRecallAnalysis
+    allChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -78,22 +75,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
     const startQuickQuiz = async () => {
       setSelectedChat(null)
-      // put all non null values of chats.recall_analysis in an array
-      const recallAnalysisInChats = chats
-        .map(chat => chat.recall_analysis)
-        .filter(analysis => analysis != null)
-        .map(analysis => {
-          try {
-            return JSON.parse(analysis as string)
-          } catch (e) {
-            console.error("Failed to parse recall_analysis:", analysis)
-            return []
-          }
-        })
-        .flat()
-
-      if (recallAnalysisInChats.length > 0) {
-        setAllChatRecallAnalysis(recallAnalysisInChats)
+      if (allChatRecallAnalysis.length > 0) {
         setChatMessages([
           {
             message: {
@@ -129,16 +111,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     } else {
       setLoading(false)
     }
-
-    // return () => {
-    //   if (selectedChat) {
-    //     deleteMessagesIncludingAndAfter(
-    //       selectedChat.user_id,
-    //       selectedChat.id,
-    //       0
-    //     )
-    //   }
-    // }
   }, [])
 
   useEffect(() => {

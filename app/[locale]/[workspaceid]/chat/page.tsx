@@ -17,7 +17,8 @@ export default function ChatPage() {
     handleFocusChatInput()
   })
 
-  const { chatMessages, profile, setProfile } = useContext(ChatbotUIContext)
+  const { chatMessages, profile, setProfile, chats, setAllChatRecallAnalysis } =
+    useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput, handleStartTutorial } =
     useChatHandler()
@@ -43,6 +44,25 @@ export default function ChatPage() {
 
     startTutorial()
   }, [profile])
+
+  useEffect(() => {
+    const recallAnalysisInChats = chats
+      .map(chat => chat.recall_analysis)
+      .filter(analysis => analysis != null)
+      .map(analysis => {
+        try {
+          return JSON.parse(analysis as string)
+        } catch (e) {
+          console.error("Failed to parse recall_analysis:", analysis)
+          return []
+        }
+      })
+      .flat()
+
+    if (recallAnalysisInChats.length > 0) {
+      setAllChatRecallAnalysis(recallAnalysisInChats)
+    }
+  }, [chats])
 
   return (
     <>
