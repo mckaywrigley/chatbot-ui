@@ -44,7 +44,6 @@ export async function POST(request: Request) {
     return new Response(readableStream, {
       headers: { "Content-Type": "text/plain" }
     })
-
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
