@@ -60,7 +60,10 @@ export const useChatHandler = () => {
     topicDescription,
     setTopicDescription,
     setChatRecallMetadata,
-    chatRecallMetadata
+    chatRecallMetadata,
+    allChatRecallAnalysis,
+    setAllChatRecallAnalysis,
+    chats
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -71,11 +74,37 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
+  const handleGoHome = async () => {
+    if (!selectedWorkspace) return
+
+    setUserInput("")
+    setSelectedChat(null)
+    setChatFileItems([])
+
+    setIsGenerating(false)
+    setFirstTokenReceived(false)
+
+    setChatFiles([])
+    setChatImages([])
+    setNewMessageFiles([])
+    setNewMessageImages([])
+    setShowFilesDisplay(false)
+    setIsPromptPickerOpen(false)
+    setIsFilePickerOpen(false)
+    setChatMessages([])
+
+    setSelectedTools([])
+    setToolInUse("none")
+
+    setChatStudyState("home")
+
+    return router.push(`/${selectedWorkspace.id}/chat`)
+  }
+
   const handleNewChat = async () => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
     setSelectedChat(null)
     setChatFileItems([])
 
@@ -93,7 +122,26 @@ export const useChatHandler = () => {
     setSelectedTools([])
     setToolInUse("none")
 
-    setChatStudyState("topic_creation")
+    setChatMessages([
+      {
+        message: {
+          id: "1",
+          user_id: "1",
+          content: `Enter your topic name below to start.`,
+          created_at: new Date().toISOString(),
+          image_paths: [],
+          model: "",
+          role: "assistant",
+          sequence_number: 0,
+          updated_at: null,
+          assistant_id: selectedAssistant?.id || null,
+          chat_id: "quick-quiz"
+        },
+        fileItems: []
+      }
+    ])
+
+    setChatStudyState("topic_new")
 
     return router.push(`/${selectedWorkspace.id}/chat`)
   }
@@ -114,6 +162,11 @@ export const useChatHandler = () => {
     isRegeneration: boolean
   ) => {
     const startingInput = messageContent
+
+    if (chatStudyState === "topic_new") {
+      handleCreateTopic(messageContent, chatMessages)
+      return
+    }
 
     try {
       setUserInput("")
@@ -180,6 +233,38 @@ export const useChatHandler = () => {
 
       const formattedMessagesWithoutSystem = formattedMessages.slice(1)
 
+      let randomRecallFact: string = ""
+
+      const isQuickQuiz: boolean =
+        chatStudyState === "quick_quiz_ready_hide_input" ||
+        chatStudyState === "quick_quiz_answer"
+
+      let studySheet = topicDescription
+      let quizFinished = allChatRecallAnalysis.length === 0
+      let studyState = chatStudyState
+
+      if (chatStudyState === "quick_quiz_ready_hide_input" && !quizFinished) {
+        // randomly remove and return one item from allChatRecallAnalysis
+        const randomIndex = Math.floor(
+          Math.random() * allChatRecallAnalysis.length
+        )
+        const { recallAnalysis, chatId } = allChatRecallAnalysis[randomIndex]
+        randomRecallFact = recallAnalysis
+        // set topicDescription based on topicDescription allChatRecallAnalysis[randomIndex].id
+        studySheet =
+          chats.find(chat => chat.id === chatId)?.topic_description || ""
+
+        setTopicDescription(studySheet)
+
+        const updated = [...allChatRecallAnalysis]
+        updated.splice(randomIndex, 1)
+        setAllChatRecallAnalysis(updated)
+        console.log("randomRecallFact", randomRecallFact, updated.length)
+      } else if (isQuickQuiz && quizFinished) {
+        studyState = "quick_quiz_finished_hide_input"
+        setChatStudyState(studyState)
+      }
+
       response = await fetch("/api/chat/functions", {
         method: "POST",
         headers: {
@@ -188,9 +273,10 @@ export const useChatHandler = () => {
         body: JSON.stringify({
           messages: formattedMessagesWithoutSystem,
           chatId: currentChat?.id,
-          chatStudyState,
-          topicDescription,
-          chatRecallMetadata
+          studyState,
+          studySheet,
+          chatRecallMetadata,
+          randomRecallFact
         })
       })
 
@@ -204,7 +290,7 @@ export const useChatHandler = () => {
           const newTopicContent = await getChatById(currentChat!.id)
           const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
           setTopicDescription(topicDescription)
-          // remove files from chat
+          // remove files from chat ///////////////////////////////
           setChatFiles([])
           setNewMessageFiles([])
           setShowFilesDisplay(false)
@@ -234,7 +320,7 @@ export const useChatHandler = () => {
         setToolInUse
       )
 
-      if (!currentChat) {
+      if (!currentChat && !isQuickQuiz) {
         currentChat = await handleCreateChat(
           chatSettings!,
           profile!,
@@ -246,8 +332,8 @@ export const useChatHandler = () => {
           setChats,
           setChatFiles
         )
-      } else {
-        const updatedChat = await getChatById(currentChat.id)
+      } else if (!isQuickQuiz) {
+        const updatedChat = await getChatById(currentChat!.id)
 
         if (updatedChat) {
           setChats(prevChats => {
@@ -267,13 +353,9 @@ export const useChatHandler = () => {
         { modelId: "llama2-uncensored:latest" },
         messageContent,
         generatedText,
-        newMessageImages,
-        isRegeneration,
         retrievedFileItems,
         setChatMessages,
-        setChatFileItems,
-        setChatImages,
-        selectedAssistant
+        setChatFileItems
       )
       setIsGenerating(false)
       setFirstTokenReceived(false)
@@ -283,6 +365,55 @@ export const useChatHandler = () => {
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput(startingInput)
+    }
+  }
+
+  const handleCreateTopic = async (
+    messageContent: string,
+    chatMessages: ChatMessage[]
+  ) => {
+    try {
+      setUserInput("")
+      setIsPromptPickerOpen(false)
+      setIsFilePickerOpen(false)
+      setNewMessageImages([])
+
+      const currentChat = await handleCreateChat(
+        chatSettings!,
+        profile!,
+        selectedWorkspace!,
+        messageContent,
+        selectedAssistant!,
+        newMessageFiles,
+        setSelectedChat,
+        setChats,
+        setChatFiles
+      )
+
+      const generatedText = `Topic successfully created. Please describe your topic below.
+You can also upload files ⨁ as source material for me to generate your study notes.`
+
+      const retrievedFileItems: Tables<"file_items">[] = []
+
+      await handleCreateMessages(
+        chatMessages,
+        currentChat,
+        profile!,
+        { modelId: "llama2-uncensored:latest" },
+        messageContent,
+        generatedText,
+        retrievedFileItems,
+        setChatMessages,
+        setChatFileItems
+      )
+
+      const newStudyState: StudyState = "topic_edit"
+      setChatStudyState(newStudyState)
+
+      setUserInput("")
+    } catch (error) {
+      console.log({ error })
+      setUserInput(messageContent)
     }
   }
 
@@ -393,6 +524,7 @@ Please click 'Next' below to proceed with the tutorial.`
     chatInputRef,
     prompt,
     handleNewChat,
+    handleGoHome,
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,

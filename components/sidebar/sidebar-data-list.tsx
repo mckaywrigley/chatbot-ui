@@ -35,6 +35,7 @@ import {
   addDays
 } from "date-fns"
 import { fsrs } from "ts-fsrs"
+import { QuickQuiz } from "./items/chat/quick-quiz"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -55,7 +56,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setCollections,
     setAssistants,
     setTools,
-    setModels
+    setModels,
+    allChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -152,7 +154,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             return (
               !dueTomorrow &&
               dueDate > endOfMonth(currentTime) &&
-              dueDate <= endOfNextMonth
+              dueDate <= endOfNextMonth &&
+              !revisionNextWeek
             )
           case "After next month":
             return dueDate > endOfNextMonth
@@ -273,6 +276,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             ))}
 
             {folders.length > 0 && <Separator />}
+
+            {allChatRecallAnalysis.length > 0 && (
+              <div className="pb-2">
+                <div className={cn("flex grow flex-col")}>
+                  <QuickQuiz />
+                </div>
+              </div>
+            )}
 
             {contentType === "chats" ? (
               <>

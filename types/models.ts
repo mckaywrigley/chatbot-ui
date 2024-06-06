@@ -8,3 +8,4 @@ export type ModelProvider =
   | "ollama"
   | "openrouter"
   | "custom"
+  | "deepinfra"

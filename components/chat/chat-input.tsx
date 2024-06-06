@@ -61,7 +61,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     handleFocusChatInput
   } = useChatHandler()
 
-  const { handleInputChange, handleSelectAssistant } = usePromptAndCommand()
+  const { handleInputChange } = usePromptAndCommand()
 
   const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
 

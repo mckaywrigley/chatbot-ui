@@ -1128,6 +1128,7 @@ export interface Database {
           azure_openai_endpoint: string | null
           bio: string
           created_at: string
+          deepinfra_api_key: string | null
           display_name: string
           google_gemini_api_key: string | null
           groq_api_key: string | null
@@ -1157,6 +1158,7 @@ export interface Database {
           azure_openai_endpoint?: string | null
           bio: string
           created_at?: string
+          deepinfra_api_key?: string | null
           display_name: string
           google_gemini_api_key?: string | null
           groq_api_key?: string | null
@@ -1186,6 +1188,7 @@ export interface Database {
           azure_openai_endpoint?: string | null
           bio?: string
           created_at?: string
+          deepinfra_api_key?: string | null
           display_name?: string
           google_gemini_api_key?: string | null
           groq_api_key?: string | null

@@ -1,5 +1,6 @@
 export type StudyState =
-  | "topic_creation"
+  | "home"
+  | "topic_new"
   | "topic_edit"
   | "topic_updated"
   | "topic_default_hide_input"
@@ -18,6 +19,9 @@ export type StudyState =
   | "tutorial_final_review_hide_input"
   | "tutorial_finished_hide_input"
   | "final_review_hide_input"
+  | "quick_quiz_ready_hide_input"
+  | "quick_quiz_answer"
+  | "quick_quiz_finished_hide_input"
 
 export interface QuickResponse {
   quickText: string
@@ -37,30 +41,12 @@ export interface ChatRecallMetadata {
 
 export const studyStates: StudyStateObject[] = [
   {
-    name: "topic_creation"
-  },
-  {
-    name: "topic_edit",
-    quickResponses: [
-      {
-        quickText: "Save topic.",
-        responseText: "LLM",
-        newStudyState: "topic_updated"
-      }
-    ]
-  },
-  {
     name: "topic_updated",
     quickResponses: [
       {
         quickText: "Start recall now.",
         responseText: "Try to recall as much as you can. Good luck!",
         newStudyState: "recall_first_attempt"
-      },
-      {
-        quickText: "Show study sheet.",
-        responseText: "{{topicDescription}}",
-        newStudyState: "reviewing"
       }
     ]
   },
@@ -208,7 +194,27 @@ As days go by leading up to your next review session, this icon will change, ref
 Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
 And of course, feel free to dive back in to further solidify your mastery of States of matter!
 Enjoy your learning journey!`,
-        newStudyState: "topic_creation"
+        newStudyState: "topic_edit"
+      }
+    ]
+  },
+  {
+    name: "quick_quiz_ready_hide_input",
+    quickResponses: [
+      {
+        quickText: "Next question.",
+        responseText: "LLM",
+        newStudyState: "quick_quiz_answer"
+      }
+    ]
+  },
+  {
+    name: "quick_quiz_answer",
+    quickResponses: [
+      {
+        quickText: "I don't know.",
+        responseText: "LLM",
+        newStudyState: "quick_quiz_answer"
       }
     ]
   }

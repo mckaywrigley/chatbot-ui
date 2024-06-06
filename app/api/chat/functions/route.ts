@@ -8,9 +8,8 @@ import {
   getServerProfile,
   functionCalledByLLM
 } from "@/lib/server/server-chat-helpers"
-import { OpenAIStream, StreamingTextResponse, MistralStream } from "ai"
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import MistralClient from "@mistralai/mistralai"
 import { formatDistanceToNow } from "date-fns/esm"
 
 // export const runtime = "edge"
@@ -36,16 +35,17 @@ function extractAnalysisInfoWithComments(response: string) {
 const callLLM = async (
   chatId: string,
   openai: OpenAI,
-  mistral: MistralClient,
-  topicDescription: string,
+  studySheet: string,
   messages: any[],
   studyState: StudyState,
   studentMessage: { content: string; role: string },
-  chatRecallMetadata: ChatRecallMetadata
+  chatRecallMetadata: ChatRecallMetadata,
+  randomRecallFact: string,
+  noMoreQuizQuestions: boolean
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
-  let defaultModel = "mistral-medium-latest"
+  let defaultModel = "meta-llama/Meta-Llama-3-70B-Instruct"
   const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
   const studySheetInstructions = `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention.
 Instructions:
@@ -76,34 +76,12 @@ Formatting Instructions:
   Think about how long a day on Venus is compared to its year. It's quite a unique aspect of the planet. Can you remember which one is longer? 🤔
   There's an interesting point about the past state of Venus related to water. What do you think Venus might have looked like a billion years ago? 💧🌐
   Take a moment to think about these hints and see if you can recall more about those specific points. You’re doing wonderfully so far, and digging a bit deeper will help solidify your understanding even more! 🚀💡`
+  const quickQuizSystemMessage =
+    "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on."
 
   switch (studyState) {
-    case "topic_creation":
-      chatStreamResponse = await mistral.chatStream({
-        model: defaultModel,
-        temperature: 0.4,
-        messages: [
-          {
-            role: "system",
-            content: `${studySheetInstructions} 
-            Finally, ask the student if they would like to change anything or if they would instead like to save the topic.`
-          },
-          ...messages
-        ]
-      })
-
-      stream = MistralStream(chatStreamResponse)
-      newStudyState = "topic_edit"
-      return new StreamingTextResponse(stream, {
-        headers: {
-          "NEW-STUDY-STATE": newStudyState
-        }
-      })
-
-    case "topic_updated":
     case "topic_edit":
-      // TOPIC MANAGEMENT ///////////////////////////////
-
+    case "topic_updated":
       const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
         {
           type: "function",
@@ -122,24 +100,6 @@ Formatting Instructions:
               }
             }
           }
-        },
-        {
-          type: "function",
-          function: {
-            name: "testMeNow",
-            description:
-              "This function initiates a topic recall session immediately upon student's request.",
-            parameters: {
-              type: "object",
-              properties: {
-                start_test: {
-                  type: "boolean",
-                  description: "Flag to start the test immediately."
-                }
-              },
-              required: ["start_test"]
-            }
-          }
         }
       ]
 
@@ -147,15 +107,19 @@ Formatting Instructions:
         {
           role: "system",
           content: `${studySheetInstructions}
-  If the student wants to change anything, work with the student to change the topic study sheet. Always use the the tool/functional "updateTopicContent" and pass the final generated study sheet. 
-  After updating the topic study sheet display the new topic study sheet. Finally, tell the student they should start the recall session immediately.`
+  If I want to change anything, work with me to change the topic study sheet. 
+  Always use the the tool/function "updateTopicContent" and pass the final generated study sheet. 
+  After updating the topic study sheet, display the new topic study sheet. 
+  Finally, ask the student if they would like to change anything or if they would instead like to start a recall session.`
         },
         ...messages
       ]
 
       chatResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: defaultModel,
         messages: toolMessages,
+        temperature: 0.2,
+        max_tokens: 1024,
         tools
       })
 
@@ -187,10 +151,6 @@ Formatting Instructions:
             bodyContent,
             chatId
           )
-        } else {
-          // has to be testMeNow
-          functionResponse = { success: true }
-          newStudyState = "recall_first_attempt"
         }
 
         toolMessages.push({
@@ -202,13 +162,14 @@ Formatting Instructions:
       }
 
       const secondResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: defaultModel,
         messages: toolMessages,
         stream: true
       })
 
       stream = OpenAIStream(secondResponse)
 
+      newStudyState = "topic_updated"
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
@@ -217,7 +178,7 @@ Formatting Instructions:
     case "recall_tutorial_first_attempt":
     case "recall_first_attempt":
       // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
-      chatResponse = await mistral.chat({
+      chatResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
         response_format: { type: "json_object" },
@@ -233,18 +194,19 @@ Formatting Instructions:
             - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet.
             
             Topic study sheet:
-            """${topicDescription}"""
+            """${studySheet}"""
             
             Student's recall attempt:
             """${studentMessage.content}"""
             `
           }
         ]
-      } as any)
+      })
 
       analysis = await chatResponse.choices[0]?.message?.content
-      const { score, forgotten_facts } =
-        extractAnalysisInfoWithComments(analysis)
+      const { score, forgotten_facts } = extractAnalysisInfoWithComments(
+        analysis || ""
+      )
 
       const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
 
@@ -295,7 +257,7 @@ Formatting Instructions:
       ---
       Topic study sheet: 
       """
-      ${topicDescription}
+      ${studySheet}
       """
 
       Student recall: 
@@ -316,7 +278,7 @@ Formatting Instructions:
         userMessage = `Generate upbeat feedback based on the students recall performance. 
           Topic study sheet: 
           """
-          ${topicDescription}
+          ${studySheet}
           """
 
           Student recall: 
@@ -333,9 +295,10 @@ Formatting Instructions:
             : "recall_finished_hide_input"
       }
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.2,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -348,7 +311,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState,
@@ -367,14 +330,15 @@ Formatting Instructions:
         mentorHintsMessage = messages.slice(-4, -3)[0]
       }
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.4,
+        temperature: 0.3,
+        stream: true,
         messages: [
           {
             role: "system",
             content: `${mentor_system_message}
-            Use this topic study sheet only when responding to the student ${topicDescription}`
+            Use this topic study sheet only when responding to the student ${studySheet}`
           },
           {
             role: "user",
@@ -405,7 +369,7 @@ Formatting Instructions:
 
             However, about Venus's past, it was actually thought to have been a habitable ocean world similar to Earth, not a dry desert. Scientists believe it may have had large amounts of surface water which later disappeared due to a runaway greenhouse effect. 🌊➡️🔥
 
-            You're doing well with a 50% correct recall before we went through the hints. Keep it up! 📈
+            You're doing well with a 50% correct recall before we went through the hints. Keep it up!
 
             Your next recall session is due in 2 days. 📅 Review the topic study sheet now to help reinforce and expand your memory on Venus. 📚
 
@@ -439,7 +403,7 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       newStudyState =
         studyState === "recall_tutorial_hinting"
           ? "tutorial_final_stage_hide_input"
@@ -454,9 +418,10 @@ Formatting Instructions:
     case "reviewing":
       // SHOW FULL study sheet ///////////////////////////////
 
-      chatStreamResponse = await mistral.chatStream({
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        temperature: 0.7,
+        temperature: 0.5,
+        stream: true,
         messages: [
           {
             role: "system",
@@ -467,8 +432,74 @@ Formatting Instructions:
         ]
       })
 
-      stream = MistralStream(chatStreamResponse)
+      stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
+    case "quick_quiz_ready_hide_input":
+      chatStreamResponse = await openai.chat.completions.create({
+        model: defaultModel,
+        temperature: 0.3,
+        stream: true,
+        messages: [
+          {
+            role: "system",
+            content: quickQuizSystemMessage
+          },
+          {
+            role: "user",
+            content: `Given this topic study sheet as context:
+            """${studySheet}"""
+            Generate a short answer quiz question based on the following fact the student previously got incorrect:
+              """${randomRecallFact}"""
+              Important: Do not provide the answer when generating the question or mention the fact used to generate quiz question.`
+          }
+        ]
+      })
+      newStudyState = "quick_quiz_answer"
+      stream = OpenAIStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
+    case "quick_quiz_answer":
+    case "quick_quiz_finished_hide_input":
+      const previousQuizQuestion = messages[messages.length - 2].content
+      const finalFeeback = noMoreQuizQuestions
+        ? "Finally advise the student there are no more quiz questions available. Come back again another time."
+        : ""
+
+      chatStreamResponse = await openai.chat.completions.create({
+        model: defaultModel,
+        temperature: 0.3,
+        stream: true,
+        messages: [
+          {
+            role: "system",
+            content: `${quickQuizSystemMessage}.  Always provide the answer when giving feedback to the student. If the students answers "I don't know.", just give the answer.`
+          },
+          {
+            role: "user",
+            content: `Provide feedback and answer to the following quiz question:
+            """${previousQuizQuestion}"""
+            Based on the following student response:
+            """${studentMessage.content}"""
+            Given this topic study sheet as context:
+            """${studySheet}"""
+            ${finalFeeback}
+            `
+          }
+        ]
+      })
+      newStudyState =
+        studyState === "quick_quiz_finished_hide_input"
+          ? "quick_quiz_finished_hide_input"
+          : "quick_quiz_ready_hide_input"
+      stream = OpenAIStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState
+        }
+      })
 
     default:
       // Handle other states or error
@@ -479,14 +510,15 @@ Formatting Instructions:
 export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
-    checkApiKey(profile.openai_api_key, "OpenAI")
+    checkApiKey(profile.deepinfra_api_key, "Deep infra")
     const json = await request.json()
     const {
       messages,
       chatId,
-      chatStudyState,
-      topicDescription,
-      chatRecallMetadata
+      studyState,
+      studySheet,
+      chatRecallMetadata,
+      randomRecallFact
     } = json
 
     const studentMessage = messages[messages.length - 1]
@@ -495,7 +527,7 @@ export async function POST(request: Request) {
     if (quickResponse && quickResponse.responseText !== "LLM") {
       const responseText =
         quickResponse.responseText === "{{topicDescription}}"
-          ? topicDescription
+          ? studySheet
           : quickResponse.responseText
 
       return new Response(responseText, {
@@ -507,27 +539,28 @@ export async function POST(request: Request) {
     }
 
     const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      apiKey: profile.deepinfra_api_key || "",
+      baseURL: "https://api.deepinfra.com/v1/openai"
     })
 
-    const mistral = new MistralClient(process.env.MISTRAL_API_KEY)
+    const noMoreQuizQuestions = studyState === "quick_quiz_finished_hide_input"
 
     const response = await callLLM(
       chatId,
       openai,
-      mistral,
-      topicDescription,
+      studySheet,
       messages,
-      chatStudyState,
+      studyState,
       studentMessage,
-      chatRecallMetadata
+      chatRecallMetadata,
+      randomRecallFact,
+      noMoreQuizQuestions
     )
 
     return response
   } catch (error: any) {
     console.error(error)
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    const errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

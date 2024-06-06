@@ -5,10 +5,7 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
-import {
-  getMessagesByChatId,
-  deleteMessagesIncludingAndAfter
-} from "@/db/messages"
+import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -46,7 +43,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedTools,
     setTopicDescription,
     chats,
-    setChatStudyState
+    setChatStudyState,
+    allChatRecallAnalysis
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -75,23 +73,43 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       setIsAtBottom(true)
     }
 
-    if (params.chatid) {
-      fetchData().then(() => {
-        handleFocusChatInput()
-        setLoading(false)
-      })
-    } else {
-      setLoading(false)
+    const startQuickQuiz = async () => {
+      setSelectedChat(null)
+      if (allChatRecallAnalysis.length > 0) {
+        setChatMessages([
+          {
+            message: {
+              id: "1",
+              user_id: "1",
+              content: `Are you ready to start a 🔥 Quick quiz?`,
+              created_at: new Date().toISOString(),
+              image_paths: [],
+              model: "",
+              role: "assistant",
+              sequence_number: 0,
+              updated_at: null,
+              assistant_id: selectedAssistant?.id || null,
+              chat_id: "quick-quiz"
+            },
+            fileItems: []
+          }
+        ])
+        setChatStudyState("quick_quiz_ready_hide_input")
+      }
     }
 
-    return () => {
-      if (selectedChat) {
-        deleteMessagesIncludingAndAfter(
-          selectedChat.user_id,
-          selectedChat.id,
-          0
-        )
+    if (params.chatid) {
+      if (params.chatid === "quick-quiz") {
+        startQuickQuiz()
+        setLoading(false)
+      } else {
+        fetchData().then(() => {
+          handleFocusChatInput()
+          setLoading(false)
+        })
       }
+    } else {
+      setLoading(false)
     }
   }, [])
 
@@ -237,7 +255,7 @@ Please select from the options below.`,
           fileItems: []
         }
       ])
-      setChatStudyState("topic_creation")
+      setChatStudyState("topic_edit")
     }
 
     setSelectedChat(chat)

@@ -86,6 +86,10 @@ interface ChatbotUIContext {
   setChatStudyState: Dispatch<SetStateAction<StudyState>>
   chatRecallMetadata: ChatRecallMetadata | null
   setChatRecallMetadata: Dispatch<SetStateAction<ChatRecallMetadata | null>>
+  allChatRecallAnalysis: { chatId: string; recallAnalysis: any }[]
+  setAllChatRecallAnalysis: Dispatch<
+    SetStateAction<{ chatId: string; recallAnalysis: any }[]>
+  >
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
@@ -214,10 +218,12 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setChatFileItems: () => {},
   topicDescription: "",
   setTopicDescription: () => {},
-  chatStudyState: "topic_creation",
+  chatStudyState: "home",
   setChatStudyState: () => {},
   chatRecallMetadata: null,
   setChatRecallMetadata: () => {},
+  allChatRecallAnalysis: [],
+  setAllChatRecallAnalysis: () => {},
 
   // ACTIVE CHAT STORE
   isGenerating: false,
