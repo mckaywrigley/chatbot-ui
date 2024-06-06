@@ -80,34 +80,8 @@ Formatting Instructions:
     "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on."
 
   switch (studyState) {
-    case "topic_creation":
-      chatStreamResponse = await openai.chat.completions.create({
-        model: defaultModel,
-        stream: true,
-        temperature: 0.3,
-        max_tokens: 1024,
-        messages: [
-          {
-            role: "system",
-            content: `${studySheetInstructions} 
-            Finally, ask the student if they would like to change anything or if they would instead like to save the topic.`
-          },
-          ...messages
-        ]
-      })
-
-      stream = OpenAIStream(chatStreamResponse)
-      newStudyState = "topic_edit"
-      return new StreamingTextResponse(stream, {
-        headers: {
-          "NEW-STUDY-STATE": newStudyState
-        }
-      })
-
-    case "topic_updated":
     case "topic_edit":
-      // TOPIC MANAGEMENT ///////////////////////////////
-
+    case "topic_updated":
       const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
         {
           type: "function",
@@ -135,7 +109,8 @@ Formatting Instructions:
           content: `${studySheetInstructions}
   If I want to change anything, work with me to change the topic study sheet. 
   Always use the the tool/function "updateTopicContent" and pass the final generated study sheet. 
-  After updating the topic study sheet, display the new topic study sheet. Finally, tell me I should start the recall session immediately.`
+  After updating the topic study sheet, display the new topic study sheet. 
+  Finally, ask the student if they would like to change anything or if they would instead like to start a recall session.`
         },
         ...messages
       ]
@@ -144,7 +119,6 @@ Formatting Instructions:
         model: defaultModel,
         messages: toolMessages,
         temperature: 0.2,
-        tool_choice: "auto",
         max_tokens: 1024,
         tools
       })
@@ -177,10 +151,6 @@ Formatting Instructions:
             bodyContent,
             chatId
           )
-        } else {
-          // has to be testMeNow
-          functionResponse = { success: true }
-          newStudyState = "recall_first_attempt"
         }
 
         toolMessages.push({
@@ -199,6 +169,7 @@ Formatting Instructions:
 
       stream = OpenAIStream(secondResponse)
 
+      newStudyState = "topic_updated"
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
@@ -589,7 +560,7 @@ export async function POST(request: Request) {
     return response
   } catch (error: any) {
     console.error(error)
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    const errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

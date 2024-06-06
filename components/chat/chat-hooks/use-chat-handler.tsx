@@ -74,11 +74,37 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
+  const handleGoHome = async () => {
+    if (!selectedWorkspace) return
+
+    setUserInput("")
+    setSelectedChat(null)
+    setChatFileItems([])
+
+    setIsGenerating(false)
+    setFirstTokenReceived(false)
+
+    setChatFiles([])
+    setChatImages([])
+    setNewMessageFiles([])
+    setNewMessageImages([])
+    setShowFilesDisplay(false)
+    setIsPromptPickerOpen(false)
+    setIsFilePickerOpen(false)
+    setChatMessages([])
+
+    setSelectedTools([])
+    setToolInUse("none")
+
+    setChatStudyState("home")
+
+    return router.push(`/${selectedWorkspace.id}/chat`)
+  }
+
   const handleNewChat = async () => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
     setSelectedChat(null)
     setChatFileItems([])
 
@@ -96,7 +122,26 @@ export const useChatHandler = () => {
     setSelectedTools([])
     setToolInUse("none")
 
-    setChatStudyState("topic_creation")
+    setChatMessages([
+      {
+        message: {
+          id: "1",
+          user_id: "1",
+          content: `Enter your topic name below to start.`,
+          created_at: new Date().toISOString(),
+          image_paths: [],
+          model: "",
+          role: "assistant",
+          sequence_number: 0,
+          updated_at: null,
+          assistant_id: selectedAssistant?.id || null,
+          chat_id: "quick-quiz"
+        },
+        fileItems: []
+      }
+    ])
+
+    setChatStudyState("topic_new")
 
     return router.push(`/${selectedWorkspace.id}/chat`)
   }
@@ -117,6 +162,11 @@ export const useChatHandler = () => {
     isRegeneration: boolean
   ) => {
     const startingInput = messageContent
+
+    if (chatStudyState === "topic_new") {
+      handleCreateTopic(messageContent, chatMessages)
+      return
+    }
 
     try {
       setUserInput("")
@@ -240,7 +290,7 @@ export const useChatHandler = () => {
           const newTopicContent = await getChatById(currentChat!.id)
           const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
           setTopicDescription(topicDescription)
-          // remove files from chat
+          // remove files from chat ///////////////////////////////
           setChatFiles([])
           setNewMessageFiles([])
           setShowFilesDisplay(false)
@@ -315,6 +365,55 @@ export const useChatHandler = () => {
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput(startingInput)
+    }
+  }
+
+  const handleCreateTopic = async (
+    messageContent: string,
+    chatMessages: ChatMessage[]
+  ) => {
+    try {
+      setUserInput("")
+      setIsPromptPickerOpen(false)
+      setIsFilePickerOpen(false)
+      setNewMessageImages([])
+
+      const currentChat = await handleCreateChat(
+        chatSettings!,
+        profile!,
+        selectedWorkspace!,
+        messageContent,
+        selectedAssistant!,
+        newMessageFiles,
+        setSelectedChat,
+        setChats,
+        setChatFiles
+      )
+
+      const generatedText = `Topic successfully created. Please describe your topic below.
+You can also upload files ⨁ as source material for me to generate your study notes.`
+
+      const retrievedFileItems: Tables<"file_items">[] = []
+
+      await handleCreateMessages(
+        chatMessages,
+        currentChat,
+        profile!,
+        { modelId: "llama2-uncensored:latest" },
+        messageContent,
+        generatedText,
+        retrievedFileItems,
+        setChatMessages,
+        setChatFileItems
+      )
+
+      const newStudyState: StudyState = "topic_edit"
+      setChatStudyState(newStudyState)
+
+      setUserInput("")
+    } catch (error) {
+      console.log({ error })
+      setUserInput(messageContent)
     }
   }
 
@@ -425,6 +524,7 @@ Please click 'Next' below to proceed with the tutorial.`
     chatInputRef,
     prompt,
     handleNewChat,
+    handleGoHome,
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,

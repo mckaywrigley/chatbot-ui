@@ -1,9 +1,7 @@
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { ChatbotUIContext } from "@/context/context"
-import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
-import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
-import { FC, useContext, useState } from "react"
+import { IconPlus } from "@tabler/icons-react"
+import { FC, useState } from "react"
 import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
@@ -19,11 +17,8 @@ interface SidebarCreateButtonsProps {
 }
 
 export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
-  contentType,
-  hasData
+  contentType
 }) => {
-  const { profile, selectedWorkspace, folders, setFolders } =
-    useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
 
   const [isCreatingPrompt, setIsCreatingPrompt] = useState(false)
@@ -33,20 +28,6 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
   const [isCreatingTool, setIsCreatingTool] = useState(false)
   const [isCreatingModel, setIsCreatingModel] = useState(false)
-
-  const handleCreateFolder = async () => {
-    if (!profile) return
-    if (!selectedWorkspace) return
-
-    const createdFolder = await createFolder({
-      user_id: profile.user_id,
-      workspace_id: selectedWorkspace.id,
-      name: "New Folder",
-      description: "",
-      type: contentType
-    })
-    setFolders([...folders, createdFolder])
-  }
 
   const getCreateFunction = () => {
     switch (contentType) {
@@ -97,7 +78,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
 
   const tempText = `New ${contentType.charAt(0).toUpperCase() + contentType.slice(1, contentType.length - 1)}`
   // if content type is "chats", then buttonText will be "New Topic"
-  const buttonText = contentType === "chats" ? "New Topic" : tempText
+  const buttonText = contentType === "chats" ? "New topic" : tempText
 
   return (
     <div className="flex w-full space-x-2">

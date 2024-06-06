@@ -30,8 +30,6 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     setWorkspaces
   } = useContext(ChatbotUIContext)
 
-  const { handleNewChat } = useChatHandler()
-
   const router = useRouter()
 
   const [open, setOpen] = useState(false)

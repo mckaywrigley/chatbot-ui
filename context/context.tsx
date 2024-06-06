@@ -218,7 +218,7 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setChatFileItems: () => {},
   topicDescription: "",
   setTopicDescription: () => {},
-  chatStudyState: "topic_creation",
+  chatStudyState: "home",
   setChatStudyState: () => {},
   chatRecallMetadata: null,
   setChatRecallMetadata: () => {},

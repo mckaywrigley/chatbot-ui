@@ -24,7 +24,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
 
   const { setChats } = useContext(ChatbotUIContext)
-  const { handleNewChat } = useChatHandler()
+  const { handleGoHome } = useChatHandler()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -37,7 +37,7 @@ export const DeleteChat: FC<DeleteChatProps> = ({ chat }) => {
 
     setShowChatDialog(false)
 
-    handleNewChat()
+    handleGoHome()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
