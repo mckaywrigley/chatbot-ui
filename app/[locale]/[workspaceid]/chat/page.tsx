@@ -2,7 +2,6 @@
 
 import { ChatHelp } from "@/components/chat/chat-help"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { ChatInput } from "@/components/chat/chat-input"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Brand } from "@/components/ui/brand"
 import { ChatbotUIContext } from "@/context/context"
