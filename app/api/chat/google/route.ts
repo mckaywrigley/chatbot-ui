@@ -1,6 +1,11 @@
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import {
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+  SafetySetting
+} from "@google/generative-ai"
 
 export const runtime = "edge"
 
@@ -17,7 +22,30 @@ export async function POST(request: Request) {
     checkApiKey(profile.google_gemini_api_key, "Google")
 
     const genAI = new GoogleGenerativeAI(profile.google_gemini_api_key || "")
-    const googleModel = genAI.getGenerativeModel({ model: chatSettings.model })
+
+    const safety: SafetySetting[] = [
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      }
+    ]
+
+    const googleModel = genAI.getGenerativeModel({
+      model: chatSettings.model,
+      safetySettings: safety
+    })
 
     const lastMessage = messages.pop()
 
