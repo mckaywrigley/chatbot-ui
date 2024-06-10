@@ -123,19 +123,26 @@ export async function getUserEmailById(userId: string) {
   return data.user.email
 }
 
-// Function that returns all chats where revise_date is before the current time
-export async function getChatsByDueDate(cutoffDate: Date, request: any) {
-  const cutoffDateString = cutoffDate.toISOString()
+// Function that returns all chats where revise_date is today
+export async function getChatsByDueDate(request: any) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const todayString = today.toISOString()
+
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+  const tomorrowString = tomorrow.toISOString()
 
   const supabaseAdmin = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  // Perform the query to get chats where revise_date is less than the current time
+  // Perform the query to get chats where revise_date is today
   const { data: chats, error } = await supabaseAdmin
     .from("chats")
     .select("*")
-    .lt("due_date", cutoffDateString)
+    .gte("due_date", todayString)
+    .lt("due_date", tomorrowString)
 
   // Error handling
   if (error) {
