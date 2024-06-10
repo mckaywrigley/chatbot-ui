@@ -12,17 +12,9 @@ export async function GET(request: NextRequest) {
     return new Response("Unauthorized", { status: 401 })
   }
 
-  // Set cutoff date to end of today
-  const cutoffDate = new Date()
-  cutoffDate.setHours(23, 59, 59, 999)
-
-  // Search all chats in DB and return array where revise_date is before now
-
-  const chats = await getChatsByDueDate(cutoffDate, request)
-  console.log(
-    "Valid topics due for revision in this time period: ",
-    chats.length
-  )
+  // Search all chats in DB and return array where revise_date is today
+  const chats = await getChatsByDueDate(request)
+  console.log("Valid topics due for revision today: ", chats.length)
 
   // Group chats by user_id
   let emailsToSend = []
@@ -67,18 +59,6 @@ export async function GET(request: NextRequest) {
   console.log("Client", { client: postmarkClient })
 
   console.log("Emails to send: ", JSON.stringify(emailsToSend.map(e => e.To)))
-
-  // postmarkClient
-  //   .getMessageStreams({
-  //     includeArchivedStreams: true,
-  //     messageStreamType: "Transactional"
-  //   })
-  //   .then(result => {
-  //     const stream = result.MessageStreams[0]
-  //     console.log(result.TotalCount)
-  //     console.log(stream.Name)
-  //     console.log(stream.Description)
-  //   })
 
   // Send emails in batch
   if (emailsToSend.length > 0) {
