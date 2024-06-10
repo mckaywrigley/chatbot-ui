@@ -47,19 +47,6 @@ const callLLM = async (
   let newStudyState: StudyState
   let defaultModel = "meta-llama/Meta-Llama-3-70B-Instruct"
   const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
-  const studySheetInstructions = `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention.
-Instructions:
-  Introduction to the Topic:
-    Provide a brief overview of the topic, including its significance and general context.
-  Key Components or Concepts:
-    List 10 to 30 key facts or components related to the topic. Each fact should be succinct and supported by one or two important details to aid understanding.
-  Structure and Organization:
-    Group related facts into categories or themes to maintain logical coherence and enhance navigability.
-  Common Applications or Implications:
-    Explain how the knowledge of this topic can be applied in real-world scenarios or its relevance in related fields of study.
-  
-Formatting Instructions:
-  Ensure the study sheet is clear and easy to read. Use bullet points for lists, bold headings for sections, and provide ample spacing for clarity.`
 
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
   const mentor_shot_hint_response = `You've done a great job recalling some key facts about Venus! You're definitely on the right track. Let’s look at what you’ve got and fine-tune some details:
@@ -80,96 +67,37 @@ Formatting Instructions:
     "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on."
 
   switch (studyState) {
-    case "topic_edit":
-    case "topic_updated":
-      const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
-        {
-          type: "function",
-          function: {
-            name: "updateTopicContent",
-            description:
-              "This function updates the study sheet based on student inputs and finalized content.",
-            parameters: {
-              type: "object",
-              required: ["description"],
-              properties: {
-                content: {
-                  type: "string",
-                  description: "The full topic content to be saved."
-                }
-              }
-            }
-          }
-        }
-      ]
-
-      let toolMessages = [
-        {
-          role: "system",
-          content: `${studySheetInstructions}
-  If I want to change anything, work with me to change the topic study sheet. 
-  Always use the the tool/function "updateTopicContent" and pass the final generated study sheet. 
-  After updating the topic study sheet, display the new topic study sheet. 
-  Finally, ask the student if they would like to change anything or if they would instead like to start a recall session.`
-        },
-        ...messages
-      ]
-
-      chatResponse = await openai.chat.completions.create({
+    case "topic_describe_upload":
+    case "topic_generated":
+      chatStreamResponse = await openai.chat.completions.create({
         model: defaultModel,
-        messages: toolMessages,
         temperature: 0.2,
+        stream: true,
         max_tokens: 1024,
-        tools
+        messages: [
+          {
+            role: "system",
+            content: `Objective: Create a detailed study sheet for a specified topic. The study sheet should be concise, informative, and well-organized to facilitate quick learning and retention. Important: generate the study sheet text only. Do not generate additional text like summary, notes or additional text not in study sheet text.
+            Instructions:
+              Introduction to the Topic:
+                Provide a brief overview of the topic, including its significance and general context.
+              Key Components or Concepts:
+                List 10 to 30 key facts or components related to the topic. Each fact should be succinct and supported by one or two important details to aid understanding.
+              Structure and Organization:
+                Group related facts into categories or themes to maintain logical coherence and enhance navigability.
+              Common Applications or Implications:
+                Explain how the knowledge of this topic can be applied in real-world scenarios or its relevance in related fields of study.
+              
+            Formatting Instructions:
+              Ensure the study sheet is clear and easy to read. Use bullet points for lists, bold headings for sections, and provide ample spacing for clarity.
+              Do not generate additional text like summary, notes or additional text not in study sheet text.`
+          },
+          ...messages
+        ]
       })
+      stream = OpenAIStream(chatStreamResponse)
 
-      const message = chatResponse.choices[0].message
-      toolMessages.push(message)
-      const toolCalls = message.tool_calls || []
-
-      if (toolCalls.length === 0) {
-        return new Response(message.content, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-      }
-
-      newStudyState = "topic_updated"
-      for (const toolCall of toolCalls) {
-        let functionName = toolCall.function.name
-        const argumentsString = toolCall.function.arguments.trim()
-        const parsedArgs = JSON.parse(argumentsString)
-
-        let functionResponse = {}
-        let bodyContent = parsedArgs.requestBody || parsedArgs
-        let toolId = toolCall.id
-
-        if (functionName === "updateTopicContent") {
-          functionResponse = await functionCalledByLLM(
-            "updateTopicContent",
-            bodyContent,
-            chatId
-          )
-        }
-
-        toolMessages.push({
-          tool_call_id: toolId,
-          role: "tool",
-          name: functionName,
-          content: JSON.stringify(functionResponse)
-        })
-      }
-
-      const secondResponse = await openai.chat.completions.create({
-        model: defaultModel,
-        messages: toolMessages,
-        stream: true
-      })
-
-      stream = OpenAIStream(secondResponse)
-
-      newStudyState = "topic_updated"
+      newStudyState = "topic_generated"
       return new StreamingTextResponse(stream, {
         headers: {
           "NEW-STUDY-STATE": newStudyState
@@ -524,16 +452,38 @@ export async function POST(request: Request) {
     const studentMessage = messages[messages.length - 1]
 
     const quickResponse = getQuickResponseByUserText(studentMessage.content)
-    if (quickResponse && quickResponse.responseText !== "LLM") {
-      const responseText =
-        quickResponse.responseText === "{{topicDescription}}"
-          ? studySheet
-          : quickResponse.responseText
+    if (quickResponse && quickResponse.responseText !== "{{LLM}}") {
+      let responseText
+      let newStudyState: StudyState = quickResponse.newStudyState
+
+      switch (quickResponse.responseText) {
+        case "{{DB}}":
+          // for now assume its a topic update
+          const topicContent = messages[messages.length - 2].content
+          const functionResponse = await functionCalledByLLM(
+            "updateTopicContent",
+            { content: topicContent },
+            chatId
+          )
+          if (functionResponse.success === false) {
+            responseText = "Server error saving topic content."
+            newStudyState = "topic_describe_upload"
+          } else {
+            responseText = "Save successful."
+          }
+          break
+        case "{{topicDescription}}":
+          responseText = studySheet
+          break
+        default:
+          responseText = quickResponse.responseText
+          break
+      }
 
       return new Response(responseText, {
         status: 200,
         headers: {
-          "NEW-STUDY-STATE": quickResponse.newStudyState
+          "NEW-STUDY-STATE": newStudyState
         }
       })
     }

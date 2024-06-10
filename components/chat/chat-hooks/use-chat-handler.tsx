@@ -286,7 +286,7 @@ export const useChatHandler = () => {
 
       if (newStudyState) {
         setChatStudyState(newStudyState)
-        if (newStudyState === "topic_updated") {
+        if (newStudyState === "topic_saved_hide_input") {
           const newTopicContent = await getChatById(currentChat!.id)
           const topicDescription = newTopicContent!.topic_description || "" // Provide a default value if topicDescription is null
           setTopicDescription(topicDescription)
@@ -407,7 +407,7 @@ You can also upload files ⨁ as source material for me to generate your study n
         setChatFileItems
       )
 
-      const newStudyState: StudyState = "topic_edit"
+      const newStudyState: StudyState = "topic_describe_upload"
       setChatStudyState(newStudyState)
 
       setUserInput("")
