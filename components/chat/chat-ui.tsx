@@ -255,7 +255,7 @@ Please select from the options below.`,
           fileItems: []
         }
       ])
-      setChatStudyState("topic_edit")
+      setChatStudyState("topic_describe_upload")
     }
 
     setSelectedChat(chat)

@@ -1,8 +1,9 @@
 export type StudyState =
   | "home"
   | "topic_new"
-  | "topic_edit"
-  | "topic_updated"
+  | "topic_describe_upload"
+  | "topic_generated"
+  | "topic_saved_hide_input"
   | "topic_default_hide_input"
   | "recall_first_attempt"
   | "recall_hinting"
@@ -41,12 +42,27 @@ export interface ChatRecallMetadata {
 
 export const studyStates: StudyStateObject[] = [
   {
-    name: "topic_updated",
+    name: "topic_generated",
+    quickResponses: [
+      {
+        quickText: "Save study sheet.",
+        responseText: "{{DB}}",
+        newStudyState: "topic_saved_hide_input"
+      }
+    ]
+  },
+  {
+    name: "topic_saved_hide_input",
     quickResponses: [
       {
         quickText: "Start recall now.",
         responseText: "Try to recall as much as you can. Good luck!",
         newStudyState: "recall_first_attempt"
+      },
+      {
+        quickText: "Edit topic.",
+        responseText: "What updates should we make to the topic study sheet?",
+        newStudyState: "topic_describe_upload"
       }
     ]
   },
@@ -91,7 +107,7 @@ export const studyStates: StudyStateObject[] = [
       {
         quickText: "Edit topic.",
         responseText: "What updates should we make to the topic study sheet?",
-        newStudyState: "topic_edit"
+        newStudyState: "topic_describe_upload"
       },
       {
         quickText: "Start recall now.",
@@ -137,7 +153,7 @@ Let's start with 'States of matter' Click on it below.`,
     name: "tutorial_4_hide_input",
     quickResponses: [
       {
-        quickText: "Save study sheet.",
+        quickText: "Save tutorial study sheet.",
         responseText: `Now comes the fun part! After taking some time to study the topic, it's time for your first recall attempt. Let's make it a good one, no peeking allowed! 👀😉
 I'll be here to assess your attempt and set up a recall session based on how you do. Give it your best shot to recall as much as you can about "States of matter" topic but leave out some facts for the purpose of this tutorial; select the chat area below (Message Mentor...) then type or hit the microphone key on your keyboard.
 After you receive feedback on your attempt, select "Next step..." to move forward.`,
@@ -194,7 +210,7 @@ As days go by leading up to your next review session, this icon will change, ref
 Now, you're all set to begin creating your own topics! Just click on the "+ New topic" button located at the top left corner.
 And of course, feel free to dive back in to further solidify your mastery of States of matter!
 Enjoy your learning journey!`,
-        newStudyState: "topic_edit"
+        newStudyState: "home"
       }
     ]
   },
@@ -203,7 +219,7 @@ Enjoy your learning journey!`,
     quickResponses: [
       {
         quickText: "Next question.",
-        responseText: "LLM",
+        responseText: "{{LLM}}",
         newStudyState: "quick_quiz_answer"
       }
     ]
@@ -213,7 +229,7 @@ Enjoy your learning journey!`,
     quickResponses: [
       {
         quickText: "I don't know.",
-        responseText: "LLM",
+        responseText: "{{LLM}}",
         newStudyState: "quick_quiz_answer"
       }
     ]
