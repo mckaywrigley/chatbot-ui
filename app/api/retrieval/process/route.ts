@@ -59,10 +59,17 @@ export async function POST(req: Request) {
     const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
+      try {
+        if (profile.use_azure_openai) {
+          checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+        } else {
+          checkApiKey(profile.openai_api_key, "OpenAI")
+        }
+      } catch (error: any) {
+        error.message =
+          error.message +
+          ", make sure it is configured or else use local embeddings"
+        throw error
       }
     }
 
@@ -158,7 +165,8 @@ export async function POST(req: Request) {
       status: 200
     })
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    console.log(`Error in retrieval/process: ${error.stack}`)
+    const errorMessage = error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

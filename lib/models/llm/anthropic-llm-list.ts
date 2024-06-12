@@ -12,7 +12,13 @@ const CLAUDE_2: LLM = {
   provider: "anthropic",
   hostedId: "claude-2.1",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false
+  imageInput: false,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 8,
+    outputCost: 24
+  }
 }
 
 // Claude Instant (UPDATED 12/21/23)
@@ -22,7 +28,13 @@ const CLAUDE_INSTANT: LLM = {
   provider: "anthropic",
   hostedId: "claude-instant-1.2",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false
+  imageInput: false,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.8,
+    outputCost: 2.4
+  }
 }
 
 // Claude 3 Haiku (UPDATED 03/13/24)
@@ -32,7 +44,13 @@ const CLAUDE_3_HAIKU: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-haiku-20240307",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: true
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.25,
+    outputCost: 1.25
+  }
 }
 
 // Claude 3 Sonnet (UPDATED 03/04/24)
@@ -42,7 +60,13 @@ const CLAUDE_3_SONNET: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-sonnet-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: true
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 3,
+    outputCost: 15
+  }
 }
 
 // Claude 3 Opus (UPDATED 03/04/24)
@@ -52,7 +76,13 @@ const CLAUDE_3_OPUS: LLM = {
   provider: "anthropic",
   hostedId: "claude-3-opus-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: true
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 15,
+    outputCost: 75
+  }
 }
 
 export const ANTHROPIC_LLM_LIST: LLM[] = [

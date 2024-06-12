@@ -37,14 +37,14 @@ export async function POST(request: NextRequest) {
               return { type: "text", text: content }
             } else if (
               content?.type === "image_url" &&
-              content?.image_url?.length
+              content?.image_url?.url?.length
             ) {
               return {
                 type: "image",
                 source: {
                   type: "base64",
-                  media_type: getMediaTypeFromDataURL(content.image_url),
-                  data: getBase64FromDataURL(content.image_url)
+                  media_type: getMediaTypeFromDataURL(content.image_url.url),
+                  data: getBase64FromDataURL(content.image_url.url)
                 }
               }
             } else {
