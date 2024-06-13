@@ -1,14 +1,14 @@
 import { test, expect } from "@playwright/test"
 
 test("start learning is displayed", async ({ page }) => {
-  await page.goto("http://localhost:3000/")
+  await page.goto("/")
 
   //expect the start learning link to be visible
   await expect(page.getByRole("link", { name: "Start Learning" })).toBeVisible()
 })
 
 test("No password error message", async ({ page }) => {
-  await page.goto("http://localhost:3000/login")
+  await page.goto("/login")
   //fill in dummy email
   await page.getByPlaceholder("you@example.com").fill("dummyemail@gmail.com")
   await page.getByRole("button", { name: "Login" }).click()
@@ -18,7 +18,7 @@ test("No password error message", async ({ page }) => {
   await expect(page.getByText("Invalid login credentials")).toBeVisible()
 })
 test("No password for signup", async ({ page }) => {
-  await page.goto("http://localhost:3000/login")
+  await page.goto("/login")
 
   await page
     .getByPlaceholder("you@example.com")
@@ -28,7 +28,7 @@ test("No password for signup", async ({ page }) => {
   await expect(page.getByText("Signup requires a valid")).toBeVisible()
 })
 // test("invalid username for signup", async ({ page }) => {
-//   await page.goto("http://localhost:3000/login")
+//   await page.goto("/login")
 
 //   await page.getByPlaceholder("you@example.com").fill("dummyEmail")
 //   await page.getByPlaceholder("••••••••").fill("dummypassword")
@@ -37,7 +37,7 @@ test("No password for signup", async ({ page }) => {
 //   await expect(page.getByText("Unable to validate email")).toBeVisible()
 // })
 test("password reset message", async ({ page }) => {
-  await page.goto("http://localhost:3000/login")
+  await page.goto("/login")
   await page.getByPlaceholder("you@example.com").fill("demo@gmail.com")
   await page.getByRole("button", { name: "Reset" }).click()
   //validate appropriate message is shown
