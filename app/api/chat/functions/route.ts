@@ -467,7 +467,14 @@ export async function POST(request: Request) {
           )
           if (functionResponse.success === false) {
             responseText = "Server error saving topic content."
+
             newStudyState = "topic_describe_upload"
+            return new Response(responseText, {
+              status: 500,
+              headers: {
+                "NEW-STUDY-STATE": newStudyState
+              }
+            })
           } else {
             responseText = "Save successful."
           }
