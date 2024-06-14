@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test"
 
+// Reset storage state for this file to avoid being authenticated
+test.use({ storageState: { cookies: [], origins: [] } })
+
 test("start learning is displayed", async ({ page }) => {
   await page.goto("/")
 
