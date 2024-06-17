@@ -1,7 +1,7 @@
 {
-  "name": "chatbot-ui",
-  "version": "2.0.0",
-  "private": true,
+  "name": "learntime",
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "chat": "supabase start && npm run db-types && npm run dev",
     "restart": "supabase stop && npm run chat",
@@ -23,7 +23,7 @@
     "db-types": "supabase gen types typescript --local > supabase/types.ts",
     "db-pull": "supabase db remote commit",
     "db-push": "supabase db push",
-    "test": "jest"
+    "test": "npm --prefix __tests__/playwright-test run test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.18.0",
@@ -70,6 +70,7 @@
     "cmdk": "^0.2.0",
     "d3-dsv": "^2.0.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.4.5",
     "endent": "^2.1.0",
     "gpt-tokenizer": "^2.1.2",
     "i18next": "^23.7.16",
@@ -101,6 +102,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^14.0.2",
+    "@playwright/test": "^1.44.1",
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",

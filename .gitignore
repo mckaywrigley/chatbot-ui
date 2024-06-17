@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+auth.json
 
 # next.js
 /.next/
@@ -45,3 +46,9 @@ sw.js
 sw.js.map
 workbox-*.js
 workbox-*.js.map
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+playwright/.auth
