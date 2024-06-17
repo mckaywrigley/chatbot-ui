@@ -28,6 +28,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
+  useHotkey("0", () => {
+    handleStopMessage()
+  })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
 

@@ -1,25 +1,27 @@
 import { test, expect } from "@playwright/test"
 import path from "path"
 
+import submitWaitStopLLM from "./submitWaitStopLLM"
+
 test("topic recall demo session", async ({ page }) => {
   await page.goto("/")
   await page.getByRole("link", { name: "Start Learning" }).click()
 
   await page.getByPlaceholder("Search topic names...").click()
-  await page.getByPlaceholder("Search topic names...").fill("solar system")
-  await expect(page.locator("body")).toContainText("The Solar System")
+  await page.getByPlaceholder("Search topic names...").fill("matter")
+  await expect(page.locator("body")).toContainText("States of matter")
 
   await page
     .locator("div")
-    .filter({ hasText: /^The Solar System$/ })
+    .filter({ hasText: /^States of matter$/ })
     .nth(2)
     .click()
 
   await expect(page.locator(".bg-secondary").first()).toContainText(
-    "The Solar System"
+    "States of matter"
   )
   await expect(page.getByRole("paragraph")).toContainText(
-    'Welcome back to the topic "The Solar System". Please select from the options below.'
+    'Welcome back to the topic "States of matter". Please select from the options below.'
   )
   await expect(
     page.getByRole("button", { name: "Start recall now." })
@@ -31,7 +33,7 @@ test("topic recall demo session", async ({ page }) => {
   await page.getByRole("button", { name: "Show study sheet." }).click()
   await expect(page.locator("div:nth-child(4) > .relative")).toBeVisible()
   await expect(page.locator("body")).toContainText(
-    "Basic overview of the Solar System"
+    "Matter exists in three main states"
   )
   await page.getByRole("button", { name: "Start recall now." }).click()
   await expect(
@@ -88,6 +90,7 @@ test("new topic creation and edit with error handling", async ({ page }) => {
   // Enter the topic name
   await page.getByPlaceholder("Message Mentor...").click()
   await page.getByPlaceholder("Message Mentor...").fill("electron")
+
   await page.locator(".absolute > .bg-primary").first().click()
   // Check if topic creation is successful
   await expect(
@@ -100,14 +103,15 @@ test("new topic creation and edit with error handling", async ({ page }) => {
   // Enter the topic description
   await page.getByPlaceholder("Message Mentor...").click()
   await page.getByPlaceholder("Message Mentor...").fill("electron introduction")
-  await page.locator(".absolute > .bg-primary").first().click()
+  await submitWaitStopLLM(page)
 
   // Check if the description is visible and save study sheet button is available
-  await expect(page.locator("div:nth-child(6)").first()).toBeVisible()
+  await expect(
+    page.locator("div:nth-child(4) > div:nth-child(6)").first()
+  ).toBeVisible()
   await expect(
     page.getByRole("button", { name: "Save study sheet." })
   ).toBeVisible()
-  await page.locator(".hover\\:bg-background > path").click()
 
   // Save the study sheet
   await page.getByRole("button", { name: "Save study sheet." }).click()
@@ -138,10 +142,12 @@ test("new topic creation and edit with error handling", async ({ page }) => {
     .getByPlaceholder("Message Mentor...")
     .fill("remove introduction at the begining")
 
-  await page.locator(".absolute > .bg-primary").first().click()
+  await submitWaitStopLLM(page)
 
   // Check if the update is processed
-  await expect(page.locator("div:nth-child(12)")).toBeVisible()
+  await expect(
+    page.locator("div:nth-child(4) > div:nth-child(12)")
+  ).toBeVisible()
 
   await page.locator(".ml-2 > svg:nth-child(2)").first().click()
   await expect(
@@ -175,10 +181,11 @@ test("new topic creation with file upload RAG", async ({ page }) => {
   await page
     .getByPlaceholder("Message Mentor...")
     .fill("Use this file to generate study notes")
-  await page.locator(".absolute > .bg-primary").first().click()
+  await submitWaitStopLLM(page)
 
-  await page.locator(".hover\\:bg-background > path").click()
-  await expect(page.locator("div:nth-child(6)").first()).toBeVisible()
+  await expect(
+    page.locator("div:nth-child(4) > div:nth-child(6)").first()
+  ).toBeVisible()
   await expect(
     page.getByRole("button", { name: "Save study sheet." })
   ).toBeVisible()
