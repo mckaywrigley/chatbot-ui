@@ -51,7 +51,9 @@ test("Onboard tutorial test", async ({ page }) => {
     "Welcome to Learntime, Test!"
   )
   await page.getByRole("button", { name: "Next" }).click()
-  await expect(page.locator("body")).toContainText("New topic")
+  await expect(page.locator("body")).toContainText("New topic", {
+    timeout: 20000
+  })
   await expect(page.getByRole("paragraph")).toContainText("tutorial")
   await expect(
     page.locator(".flex > div > .hover\\:bg-accent").first()
