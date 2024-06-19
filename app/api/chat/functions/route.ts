@@ -41,12 +41,15 @@ const callLLM = async (
   studentMessage: { content: string; role: string },
   chatRecallMetadata: ChatRecallMetadata,
   randomRecallFact: string,
-  noMoreQuizQuestions: boolean
+  noMoreQuizQuestions: boolean,
+  profile_context: string
 ) => {
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
   let defaultModel = "meta-llama/Meta-Llama-3-70B-Instruct"
-  const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.`
+  const studentContext = `Here is how the student would like you to respond: 
+    """${profile_context}"""`
+  const mentor_system_message = `You are helpful, friendly study mentor who likes to use emojis. You help students remember facts on their own by providing hints and clues without giving away answers.${studentContext}`
 
   const finalFeedback = `Finally, ask the student if they wish to revisit the topic's source material to enhance understanding or clarify any uncertainties.`
   const mentor_shot_hint_response = `You've done a great job recalling some key facts about Venus! You're definitely on the right track. Let’s look at what you’ve got and fine-tune some details:
@@ -63,8 +66,7 @@ const callLLM = async (
   Think about how long a day on Venus is compared to its year. It's quite a unique aspect of the planet. Can you remember which one is longer? 🤔
   There's an interesting point about the past state of Venus related to water. What do you think Venus might have looked like a billion years ago? 💧🌐
   Take a moment to think about these hints and see if you can recall more about those specific points. You’re doing wonderfully so far, and digging a bit deeper will help solidify your understanding even more! 🚀💡`
-  const quickQuizSystemMessage =
-    "You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on."
+  const quickQuizSystemMessage = `You are helpful, friendly quiz master. Generate short answer quiz questions based on a provided fact. Never give the answer to the question when generating the question text. Do not state which step of the instuctions you are on.${studentContext}`
 
   switch (studyState) {
     case "topic_describe_upload":
@@ -90,7 +92,7 @@ const callLLM = async (
               
             Formatting Instructions:
               Ensure the study sheet is clear and easy to read. Use bullet points for lists, bold headings for sections, and provide ample spacing for clarity.
-              Do not generate additional text like summary, notes or additional text not in study sheet text.`
+              Do not generate additional text like summary, notes or additional text not in study sheet text.${studentContext}`
           },
           ...messages
         ]
@@ -126,6 +128,7 @@ const callLLM = async (
             
             Student's recall attempt:
             """${studentMessage.content}"""
+            ${studentContext}
             `
           }
         ]
@@ -353,8 +356,7 @@ const callLLM = async (
         messages: [
           {
             role: "system",
-            content:
-              "Act as a study mentor, guiding student through active recall sessions."
+            content: `Act as a study mentor, guiding student through active recall sessions. ${studentContext}`
           },
           ...messages
         ]
@@ -446,7 +448,8 @@ export async function POST(request: Request) {
       studyState,
       studySheet,
       chatRecallMetadata,
-      randomRecallFact
+      randomRecallFact,
+      profile_context
     } = json
 
     const studentMessage = messages[messages.length - 1]
@@ -511,7 +514,8 @@ export async function POST(request: Request) {
       studentMessage,
       chatRecallMetadata,
       randomRecallFact,
-      noMoreQuizQuestions
+      noMoreQuizQuestions,
+      profile_context
     )
 
     return response
