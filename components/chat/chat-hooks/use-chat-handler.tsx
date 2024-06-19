@@ -276,7 +276,8 @@ export const useChatHandler = () => {
           studyState,
           studySheet,
           chatRecallMetadata,
-          randomRecallFact
+          randomRecallFact,
+          profile_context: profile?.profile_context || ""
         })
       })
 

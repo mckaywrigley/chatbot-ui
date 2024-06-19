@@ -41,24 +41,9 @@ export default function SetupPage() {
   // Profile Step
   const [displayName, setDisplayName] = useState("")
   const [username, setUsername] = useState(profile?.username || "")
-  const [usernameAvailable, setUsernameAvailable] = useState(true)
-
-  // API Step
-  const [useAzureOpenai, setUseAzureOpenai] = useState(false)
-  const [openaiAPIKey, setOpenaiAPIKey] = useState("")
-  const [openaiOrgID, setOpenaiOrgID] = useState("")
-  const [azureOpenaiAPIKey, setAzureOpenaiAPIKey] = useState("")
-  const [azureOpenaiEndpoint, setAzureOpenaiEndpoint] = useState("")
-  const [azureOpenai35TurboID, setAzureOpenai35TurboID] = useState("")
-  const [azureOpenai45TurboID, setAzureOpenai45TurboID] = useState("")
-  const [azureOpenai45VisionID, setAzureOpenai45VisionID] = useState("")
-  const [azureOpenaiEmbeddingsID, setAzureOpenaiEmbeddingsID] = useState("")
-  const [anthropicAPIKey, setAnthropicAPIKey] = useState("")
-  const [googleGeminiAPIKey, setGoogleGeminiAPIKey] = useState("")
-  const [mistralAPIKey, setMistralAPIKey] = useState("")
-  const [groqAPIKey, setGroqAPIKey] = useState("")
-  const [perplexityAPIKey, setPerplexityAPIKey] = useState("")
-  const [openrouterAPIKey, setOpenrouterAPIKey] = useState("")
+  const [profileInstructions, setProfileInstructions] = useState(
+    profile?.profile_context || ""
+  )
 
   useEffect(() => {
     ;(async () => {
@@ -123,21 +108,7 @@ export default function SetupPage() {
       ...profile,
       display_name: displayName,
       username,
-      openai_api_key: openaiAPIKey,
-      openai_organization_id: openaiOrgID,
-      anthropic_api_key: anthropicAPIKey,
-      google_gemini_api_key: googleGeminiAPIKey,
-      mistral_api_key: mistralAPIKey,
-      groq_api_key: groqAPIKey,
-      perplexity_api_key: perplexityAPIKey,
-      openrouter_api_key: openrouterAPIKey,
-      use_azure_openai: useAzureOpenai,
-      azure_openai_api_key: azureOpenaiAPIKey,
-      azure_openai_endpoint: azureOpenaiEndpoint,
-      azure_openai_35_turbo_id: azureOpenai35TurboID,
-      azure_openai_45_turbo_id: azureOpenai45TurboID,
-      azure_openai_45_vision_id: azureOpenai45VisionID,
-      azure_openai_embeddings_id: azureOpenaiEmbeddingsID
+      profile_context: profileInstructions
     }
 
     const updatedProfile = await updateProfile(profile.id, updateProfilePayload)
@@ -163,15 +134,13 @@ export default function SetupPage() {
             stepNum={currentStep}
             stepTitle="Welcome to Learntime"
             onShouldProceed={handleShouldProceed}
-            showNextButton={!!(username && usernameAvailable)}
+            showNextButton={!!username}
             showBackButton={false}
           >
             <ProfileStep
-              username={username}
-              usernameAvailable={usernameAvailable}
               displayName={displayName}
-              onUsernameAvailableChange={setUsernameAvailable}
-              onUsernameChange={setUsername}
+              profileInstructions={profileInstructions}
+              onProfileInstructionsChange={setProfileInstructions}
               onDisplayNameChange={setDisplayName}
             />
           </StepContainer>

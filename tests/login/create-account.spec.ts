@@ -58,17 +58,30 @@ test("create account", async ({ page }) => {
   // await teardownNewAccount() // cant delete user for some reason. chore to fix.
 
   const tempEmail = `test_${uuidv4()}@learntime.ai`
+  const contextText = "Please use UK english."
 
   await page.goto("/login")
   await page.getByPlaceholder("you@example.com").click()
   await page.getByPlaceholder("you@example.com").fill(tempEmail)
   await page.getByPlaceholder("you@example.com").press("Tab")
   await page.getByPlaceholder("••••••••").fill("1qasw23ed")
+
   await page.getByRole("button", { name: "Sign Up" }).click()
   await expect(page.getByText("Welcome to Learntime")).toBeVisible()
   await page.getByPlaceholder("Your Name").click()
   await page.getByPlaceholder("Your Name").fill("Test SignUp")
+  await page.getByPlaceholder("Profile context... (optional)").click()
+  await page.getByPlaceholder("Profile context... (optional)").fill(contextText)
+
   await page.getByRole("button", { name: "Next" }).click()
   await expect(page.getByText("Setup Complete")).toBeVisible()
   await page.getByRole("button", { name: "Next" }).click()
+  await page.getByRole("button", { name: "Next" }).click()
+  await page.getByRole("button", { name: "Test" }).nth(1).click()
+  await expect(page.getByPlaceholder("Chat display name...")).toHaveValue(
+    "Test SignUp"
+  )
+  await expect(
+    page.getByPlaceholder("Profile context... (optional)")
+  ).toHaveValue(contextText)
 })
