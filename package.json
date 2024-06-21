@@ -26,6 +26,7 @@
     "test": "npm --prefix __tests__/playwright-test run test"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^0.0.32",
     "@anthropic-ai/sdk": "^0.18.0",
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
     "@azure/openai": "^1.0.0-beta.8",
@@ -65,7 +66,7 @@
     "@vercel/analytics": "^1.1.1",
     "@vercel/edge-config": "^0.4.1",
     "@xenova/transformers": "^2.13.4",
-    "ai": "^3.2.1",
+    "ai": "^3.2.2",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^0.2.0",
     "d3-dsv": "^2.0.0",

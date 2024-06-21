@@ -21,7 +21,7 @@ export default function HomePage() {
       </div>
 
       <Link
-        className="mt-4 flex w-[230px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold"
+        className="mt-4 flex w-[230px] items-center justify-center rounded-md bg-blue-500 p-2 font-semibold text-white dark:text-black"
         href="/login"
       >
         Start Learning
