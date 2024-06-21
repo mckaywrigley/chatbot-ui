@@ -1525,6 +1525,12 @@ export interface Database {
         }
         Returns: Record<string, unknown>
       }
+      getenv: {
+        Args: {
+          key: string
+        }
+        Returns: string
+      }
       match_file_items_local: {
         Args: {
           query_embedding: string

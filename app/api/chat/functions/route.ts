@@ -11,6 +11,7 @@ import {
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { formatDistanceToNow } from "date-fns/esm"
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs"
 
 // export const runtime = "edge"
 export const dynamic = "force-dynamic"
@@ -34,7 +35,7 @@ function extractAnalysisInfoWithComments(response: string) {
 
 const callLLM = async (
   chatId: string,
-  openai: OpenAI,
+  LLMs: { openai: OpenAI; deepinfra: OpenAI },
   studySheet: string,
   messages: any[],
   studyState: StudyState,
@@ -44,6 +45,7 @@ const callLLM = async (
   noMoreQuizQuestions: boolean,
   profile_context: string
 ) => {
+  const { openai, deepinfra } = LLMs
   let stream, chatResponse, chatStreamResponse, analysis, serverResult
   let newStudyState: StudyState
   let defaultModel = "meta-llama/Meta-Llama-3-70B-Instruct"
@@ -71,7 +73,7 @@ const callLLM = async (
   switch (studyState) {
     case "topic_describe_upload":
     case "topic_generated":
-      chatStreamResponse = await openai.chat.completions.create({
+      chatStreamResponse = await deepinfra.chat.completions.create({
         model: defaultModel,
         temperature: 0.2,
         stream: true,
@@ -108,6 +110,207 @@ const callLLM = async (
     case "recall_tutorial_first_attempt":
     case "recall_first_attempt":
       // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
+      // Step 1: send the conversation and function to the model
+
+      const multiShotMessages: ChatCompletionMessageParam[] = [
+        {
+          role: "system",
+          content: `${mentor_system_message} Answer in a consistent style.`
+        },
+        {
+          role: "user",
+          content: `Topic study sheet:
+      """
+      Venus
+      * Venus is the second planet from the Sun.
+      * It is named after the Roman goddess of love and beauty.
+      * Venus is the hottest planet in our solar system, with surface temperatures reaching up to 480 degrees celsuis.
+      * Venus has a longer day than its year. 
+      * Scientists believe that Venus may have once been a habitable ocean world like Earth, but that was at least a billion years ago. A runaway greenhouse effect turned all surface water into vapor, which then leaked slowly into space.
+      * Venus has the densest atmosphere of the terrestrial planets, composed mostly of carbon dioxide with a thick, global sulfuric acid cloud cover.
+      * The rotation of Venus has been slowed and turned against its orbital direction (retrograde) by the strong currents and drag of its atmosphere.
+      """
+      
+      Student recall:
+      """
+      Venus is the second planet from the Sun and named after the Roman goddess of love. It's known for being extremely hot, with temperatures reaching around 400 degrees Celsius. Venus actually spins backwards compared to its orbital direction because of the thick atmosphere which consists mainly of sulfuric acid clouds.
+      
+      It's said that Venus might have been similar to Earth with oceans a long time ago, maybe even a billion years or so. But I think it was the intense heat that eventually made the water disappear, turning it all into steam. As far as I remember, Venus has a day that is longer than its year, but I'm not too sure why that is.
+      
+      I believe it's mostly carbon dioxide in the atmosphere, but there might be some oxygen too. I don't recall much about why it rotates the way it does, maybe something to do with solar winds?
+      """`
+        },
+        {
+          role: "assistant",
+          content: mentor_shot_hint_response
+        },
+        {
+          role: "user",
+          content: `Topic study sheet:
+      """
+      Saturn, the sixth planet from the Sun and the second-largest planet in our solar system, is renowned for its stunning and unique ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn primarily consists of hydrogen and helium. Its dense atmosphere features swirling clouds and powerful winds. The planet boasts numerous moons, with Titan being the largest, even surpassing Mercury in size.
+
+Key facts:
+
+Saturn is the sixth planet from the Sun and the second-largest in the solar system.
+The planet is known for its beautiful and distinctive ring system, made up of ice particles, dust, and rocks.
+Saturn is a gas giant, primarily composed of hydrogen and helium.
+The atmosphere of Saturn is thick, with swirling clouds and strong winds.
+The planet has a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and finally, a gaseous outer layer.
+Saturn has at least 146 known moons, 63 of which are officially named, not including the hundreds of moonlets in its rings.
+Titan, Saturn's largest moon and the second-largest in the solar system, is larger than Mercury and has a substantial atmosphere.
+      """
+      
+      Student recall:
+      """
+      Saturn, the sixth planet from the Sun and the second-largest in our solar system, is famed for its unique and spectacular ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn is mainly composed of hydrogen and helium. Its dense atmosphere is characterised by swirling clouds and powerful winds. The planet’s structure includes a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and an outer gaseous layer. Saturn is orbited by at least 146 known moons, 63 of which have been officially named, and also has numerous moonlets in its rings. Titan, the largest of Saturn’s moons, is larger than Mercury and possesses a significant atmosphere.
+      """`
+        },
+        {
+          role: "assistant",
+          content: `
+        🎉👏 Wow, amazing job on your recall performance! 🤩 You scored an impressive 100% on the Saturn topic study sheet! 🌟
+Your recall is incredibly accurate, and you've demonstrated a solid understanding of the key facts. I'm particularly impressed with how you've retained the details about Saturn's composition, atmosphere, and moon system. Your hard work and dedication to studying are truly paying off! 💪
+
+Now, let's look ahead to your next recall session, which will be in 2 months from now. 📆 This will help you maintain a consistent pace and ensure that the information stays fresh in your mind.
+
+Before we wrap up, I want to ask: Would you like to revisit the topic's source material to further enhance your understanding or clarify any uncertainties? 🤔 This is a great opportunity to reinforce your knowledge and fill in any gaps. Let me know, and we can discuss the best approach! 😊
+
+Keep up the fantastic work, and I look forward to seeing your continued progress! 🚀`
+        }
+      ]
+
+      const functionName = "save_score_and_forgotten_facts"
+
+      chatResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0.3,
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: functionName,
+              description:
+                "Saves recall score and forgotten facts to the database.",
+              parameters: {
+                type: "object",
+                properties: {
+                  score: {
+                    type: "number",
+                    description: "The student's recall score."
+                  },
+                  forgotten_facts: {
+                    type: "array",
+                    description:
+                      "The student's forgotten facts as an array of strings."
+                  }
+                },
+                required: ["score", "forgotten_facts"]
+              }
+            }
+          }
+        ],
+        tool_choice: "required",
+        messages: [
+          ...multiShotMessages,
+          {
+            role: "user",
+            content: `
+            You are a study mentor. You assess student recall performance and what they recalled incorrectly.
+
+            Student's instructions and context:
+            ${studentContext}
+
+            Instructions:
+            Given the Topic source and a Student's recall attempt below, perform the following tasks:
+            1. Calculate a recall score representing how accurately the student's recall matches the Topic study sheet only. Important: Only compare against the Topic study sheet below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
+            2. Identify any significant omissions in the student's recall when compared against the Topic study sheet below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
+            
+            Call the save_score_and_forgotten_facts tool / function with the following parameters:
+            - "score": A numerical value between 0 and 100 indicating the recall accuracy.
+            - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet. If the students recalled all facts correctly, provide an empty array.
+            
+            Topic study sheet:
+            """${studySheet}"""
+            
+            Student's recall attempt:
+            """${studentMessage.content}"""
+            `
+          }
+        ]
+      })
+
+      // Step 2: check if the model wanted to call a function
+      const responseMessage = chatResponse.choices[0].message
+
+      const toolCalls = responseMessage.tool_calls
+
+      if (
+        !toolCalls ||
+        toolCalls?.length < 1 ||
+        toolCalls[0].function.name !== functionName
+      ) {
+        throw new Error(`${functionName} Function not called`)
+      }
+      // Step 3: call the function
+      // Note: the JSON response may not always be valid; be sure to handle errors
+
+      messages.push(responseMessage) // extend conversation with assistant's reply
+
+      const functionArgs = JSON.parse(toolCalls[0].function.arguments)
+      let { score, forgotten_facts } = functionArgs
+      if (typeof score !== "number" || score < 0 || score > 100) {
+        throw new Error(
+          "Invalid score value. Score must be a number between 0 and 100."
+        )
+      }
+      if (!Array.isArray(forgotten_facts)) {
+        throw new Error("forgotten_facts must be an array")
+      }
+      if (!forgotten_facts.every(fact => typeof fact === "string")) {
+        throw new Error("forgotten_facts must contain only strings")
+      }
+
+      const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
+
+      const functionResponse = await functionCalledByLLM(
+        "updateTopicOnRecall",
+        {
+          test_result: perfectRecall ? 100 : score,
+          recall_analysis: JSON.stringify(forgotten_facts)
+        },
+        chatId
+      )
+
+      const due_date: Date = functionResponse.due_date
+      // const date = parseISO(revise_date)
+      const dateFromNow = formatDistanceToNow(due_date)
+
+      messages.push({
+        tool_call_id: toolCalls[0].id,
+        role: "tool",
+        name: functionName,
+        content: functionResponse
+      }) // extend conversation with function response
+
+      const secondResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: messages,
+        stream: true,
+        temperature: 0.3
+      }) // get a new response from the model where it can see the function response
+
+      stream = OpenAIStream(chatStreamResponse)
+      return new StreamingTextResponse(stream, {
+        headers: {
+          "NEW-STUDY-STATE": newStudyState,
+          SCORE: score.toString(),
+          "DUE-DATE-FROM-NOW": dateFromNow
+        }
+      })
+
+      /////////////////
+
       chatResponse = await openai.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
@@ -122,6 +325,7 @@ const callLLM = async (
             Output the results in JSON format with the following structure:
             - "score": A numerical value between 0 and 100 indicating the recall accuracy.
             - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet.
+            - "feedback": Provide any additional feedback or guidance for the student based on their recall performance.${studentContext},
             
             Topic study sheet:
             """${studySheet}"""
@@ -134,29 +338,29 @@ const callLLM = async (
         ]
       })
 
-      analysis = await chatResponse.choices[0]?.message?.content
-      const { score, forgotten_facts } = extractAnalysisInfoWithComments(
-        analysis || ""
-      )
+      // analysis = await chatResponse.choices[0]?.message?.content
+      // const { score, forgotten_facts } = extractAnalysisInfoWithComments(
+      //   analysis || ""
+      // )
 
-      const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
+      // const perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
 
-      serverResult = await functionCalledByLLM(
-        "updateTopicOnRecall",
-        {
-          test_result: perfectRecall ? 100 : score,
-          recall_analysis: JSON.stringify(forgotten_facts)
-        },
-        chatId
-      )
-      if (serverResult.success === false) {
-        throw new Error("Server error saving score.")
-      }
+      // serverResult = await functionCalledByLLM(
+      //   "updateTopicOnRecall",
+      //   {
+      //     test_result: perfectRecall ? 100 : score,
+      //     recall_analysis: JSON.stringify(forgotten_facts)
+      //   },
+      //   chatId
+      // )
+      // if (serverResult.success === false) {
+      //   throw new Error("Server error saving score.")
+      // }
 
-      const result = serverResult
-      const due_date: Date = result.due_date
-      // const date = parseISO(revise_date)
-      const dateFromNow = formatDistanceToNow(due_date)
+      // const result = serverResult
+      // const due_date: Date = result.due_date
+      // // const date = parseISO(revise_date)
+      // const dateFromNow = formatDistanceToNow(due_date)
 
       let systemMessage = mentor_system_message
       let userMessage = `Topic study sheet:
@@ -261,7 +465,7 @@ const callLLM = async (
         mentorHintsMessage = messages.slice(-4, -3)[0]
       }
 
-      chatStreamResponse = await openai.chat.completions.create({
+      chatStreamResponse = await deepinfra.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
         stream: true,
@@ -349,7 +553,7 @@ const callLLM = async (
     case "reviewing":
       // SHOW FULL study sheet ///////////////////////////////
 
-      chatStreamResponse = await openai.chat.completions.create({
+      chatStreamResponse = await deepinfra.chat.completions.create({
         model: defaultModel,
         temperature: 0.5,
         stream: true,
@@ -365,7 +569,7 @@ const callLLM = async (
       stream = OpenAIStream(chatStreamResponse)
       return new StreamingTextResponse(stream)
     case "quick_quiz_ready_hide_input":
-      chatStreamResponse = await openai.chat.completions.create({
+      chatStreamResponse = await deepinfra.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
         stream: true,
@@ -398,7 +602,7 @@ const callLLM = async (
         ? "Finally advise the student there are no more quiz questions available. Come back again another time."
         : ""
 
-      chatStreamResponse = await openai.chat.completions.create({
+      chatStreamResponse = await deepinfra.chat.completions.create({
         model: defaultModel,
         temperature: 0.3,
         stream: true,
@@ -441,6 +645,8 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
     checkApiKey(profile.deepinfra_api_key, "Deep infra")
+    checkApiKey(profile.openai_api_key, "OpenAI")
+
     const json = await request.json()
     const {
       messages,
@@ -499,15 +705,21 @@ export async function POST(request: Request) {
     }
 
     const openai = new OpenAI({
+      apiKey: profile.openai_api_key || "",
+      organization: profile.openai_organization_id
+    })
+
+    const deepinfra = new OpenAI({
       apiKey: profile.deepinfra_api_key || "",
       baseURL: "https://api.deepinfra.com/v1/openai"
     })
+    const LLMs = { openai, deepinfra }
 
     const noMoreQuizQuestions = studyState === "quick_quiz_finished_hide_input"
 
     const response = await callLLM(
       chatId,
-      openai,
+      LLMs,
       studySheet,
       messages,
       studyState,
