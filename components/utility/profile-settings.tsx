@@ -91,6 +91,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [azureOpenai35TurboID, setAzureOpenai35TurboID] = useState(
     profile?.azure_openai_35_turbo_id || ""
   )
+  const [azureOpenai45OID, setAzureOpenai45OID] = useState(
+    profile?.azure_openai_45_o_id || ""
+  )
   const [azureOpenai45TurboID, setAzureOpenai45TurboID] = useState(
     profile?.azure_openai_45_turbo_id || ""
   )
@@ -154,6 +157,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
       azure_openai_35_turbo_id: azureOpenai35TurboID,
+      azure_openai_45_o_id: azureOpenai45OID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
@@ -528,6 +532,28 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                               value={azureOpenai35TurboID}
                               onChange={e =>
                                 setAzureOpenai35TurboID(e.target.value)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
+
+                    {
+                      <div className="space-y-1">
+                        {envKeyMap["azure_gpt_45_o_name"] ? (
+                          <Label className="text-xs">
+                            Azure GPT-4.5 O deployment name set by admin.
+                          </Label>
+                        ) : (
+                          <>
+                            <Label>Azure GPT-4.5 O Deployment Name</Label>
+
+                            <Input
+                              placeholder="Azure GPT-4.5 O Deployment Name"
+                              value={azureOpenai45OID}
+                              onChange={e =>
+                                setAzureOpenai45OID(e.target.value)
                               }
                             />
                           </>
