@@ -1,0 +1,28 @@
+{
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+  "flake8.args": [
+    "--max-line-length=240",
+    "--ignore=E501",
+    "--exclude = .git,__pycache__,__init__.py,.mypy_cache,.pytest_cache,alembic/*,temp_*"
+  ],
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.analysis.extraPaths": [
+    ".."
+  ],
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "python.testing.pytestArgs": [
+    "."
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}
