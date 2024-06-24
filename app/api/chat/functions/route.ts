@@ -104,18 +104,159 @@ const callLLM = async (
       case "recall_tutorial_first_attempt":
       case "recall_first_attempt":
         // GET FORGOTTEN FACTS AND SCORE AND SAVE TO DB ///////////////////////////////
-        // Step 1: send the conversation and function to the model
 
-        const multiShotMessages: Array<
+        let perfectRecall = false
+        let date_from_now = ""
+        let recallScore = 0
+        let forgottenFacts: string[] = []
+
+        const save_score_and_forgotten_facts = tool({
+          description:
+            "Saves recall score and forgotten facts to the database.",
+          parameters: z.object({
+            score: z
+              .number()
+              .describe(
+                "The student's recall score as a number between 0 and 100."
+              ),
+            forgotten_facts: z
+              .array(z.string())
+              .describe("The student's forgotten facts as an array of strings.")
+          }),
+          execute: async ({ score, forgotten_facts }) => {
+            perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
+            console.log({ perfectRecall, score, forgotten_facts })
+            forgottenFacts = forgotten_facts
+            // Save the score and forgotten facts to the database
+            const functionResponse = await functionCalledByLLM(
+              "updateTopicOnRecall",
+              {
+                test_result: perfectRecall ? 100 : score,
+                recall_analysis: JSON.stringify(forgotten_facts)
+              },
+              chatId
+            )
+            if (functionResponse.success === false) {
+              return { success: false }
+            }
+            const { due_date } = functionResponse
+            date_from_now = formatDistanceToNow(due_date)
+            recallScore = score
+
+            return "Saved in database"
+          }
+        })
+
+        const result = await generateText({
+          model: frontierModel,
+          // temperature: 0.3,
+          tools: {
+            save_score_and_forgotten_facts
+          },
+          toolChoice: "required",
+          messages: [
+            {
+              role: "user",
+              content: `
+              You are a study mentor. You assess student recall performance and what they recalled incorrectly.
+  
+              Instructions:
+              Given the Topic source and a Student's recall attempt below, perform the following tasks:
+              1. Calculate a recall score representing how accurately the student's recall matches the Topic study sheet only. Important: Only compare against the Topic study sheet below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
+              2. Identify any significant omissions in the student's recall when compared against the Topic study sheet below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
+  
+              Call the save_score_and_forgotten_facts tool / function with the following parameters:
+              - "score": A numerical value between 0 and 100 indicating the recall accuracy.
+              - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet. If the students recalled all facts correctly, provide an empty array.
+  
+  
+              Topic study sheet:
+              """${studySheet}"""
+  
+              Student's recall attempt:
+              """${studentMessage.content}"""
+              `
+            }
+          ]
+        })
+
+        if (result.toolCalls.length === 0) {
+          throw new Error("Tool call not found")
+        }
+
+        let finalMessages: Array<
           CoreSystemMessage | CoreUserMessage | CoreAssistantMessage
         > = [
           {
             role: "system",
             content: `${mentor_system_message} Answer in a consistent style.`
-          },
-          {
-            role: "user",
-            content: `Topic study sheet:
+          }
+        ]
+
+        if (perfectRecall) {
+          finalMessages.push(
+            {
+              role: "user",
+              content: `Topic study sheet:
+          """
+          Saturn, the sixth planet from the Sun and the second-largest planet in our solar system, is renowned for its stunning and unique ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn primarily consists of hydrogen and helium. Its dense atmosphere features swirling clouds and powerful winds. The planet boasts numerous moons, with Titan being the largest, even surpassing Mercury in size.
+    
+    Key facts:
+    
+    Saturn is the sixth planet from the Sun and the second-largest in the solar system.
+    The planet is known for its beautiful and distinctive ring system, made up of ice particles, dust, and rocks.
+    Saturn is a gas giant, primarily composed of hydrogen and helium.
+    The atmosphere of Saturn is thick, with swirling clouds and strong winds.
+    The planet has a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and finally, a gaseous outer layer.
+    Saturn has at least 146 known moons, 63 of which are officially named, not including the hundreds of moonlets in its rings.
+    Titan, Saturn's largest moon and the second-largest in the solar system, is larger than Mercury and has a substantial atmosphere.
+          """
+    
+          Student recall:
+          """
+          Saturn, the sixth planet from the Sun and the second-largest in our solar system, is famed for its unique and spectacular ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn is mainly composed of hydrogen and helium. Its dense atmosphere is characterised by swirling clouds and powerful winds. The planet’s structure includes a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and an outer gaseous layer. Saturn is orbited by at least 146 known moons, 63 of which have been officially named, and also has numerous moonlets in its rings. Titan, the largest of Saturn’s moons, is larger than Mercury and possesses a significant atmosphere.
+          """`
+            },
+            {
+              role: "assistant",
+              content: `
+            🎉👏 Wow, amazing job on your recall performance! 🤩 You scored an impressive 100% on the Saturn topic study sheet! 🌟
+    Your recall is incredibly accurate, and you've demonstrated a solid understanding of the key facts. I'm particularly impressed with how you've retained the details about Saturn's composition, atmosphere, and moon system. Your hard work and dedication to studying are truly paying off! 💪
+    
+    Now, let's look ahead to your next recall session, which will be in 2 months from now. 📆 This will help you maintain a consistent pace and ensure that the information stays fresh in your mind.
+    
+    Before we wrap up, I want to ask: Would you like to revisit the topic's source material to further enhance your understanding or clarify any uncertainties? 🤔 This is a great opportunity to reinforce your knowledge and fill in any gaps. Let me know, and we can discuss the best approach! 😊
+    
+    Keep up the fantastic work, and I look forward to seeing your continued progress! 🚀`
+            },
+            {
+              role: "user",
+              content: `Generate upbeat feedback based on the students recall performance. 
+            Topic study sheet: 
+            """
+            ${studySheet}
+            """
+  
+            Student recall: 
+            """
+            ${studentMessage.content}
+            """
+  
+            Inform the student of their recall score: ${recallScore}% and the next recall session date; ${date_from_now} from now, to ensure consistent study progress.
+            ${finalFeedback}`
+            }
+          )
+
+          newStudyState =
+            studyState === "recall_tutorial_first_attempt"
+              ? "tutorial_hinting_hide_input"
+              : "recall_finished_hide_input"
+        } else {
+          // score < 90
+          finalMessages.push(
+            {
+              role: "user",
+              content: `Topic study sheet:
         """
         Venus
         * Venus is the second planet from the Sun.
@@ -135,138 +276,36 @@ const callLLM = async (
   
         I believe it's mostly carbon dioxide in the atmosphere, but there might be some oxygen too. I don't recall much about why it rotates the way it does, maybe something to do with solar winds?
         """`
-          },
-          {
-            role: "assistant",
-            content: mentor_shot_hint_response
-          },
-          {
-            role: "user",
-            content: `Topic study sheet:
-        """
-        Saturn, the sixth planet from the Sun and the second-largest planet in our solar system, is renowned for its stunning and unique ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn primarily consists of hydrogen and helium. Its dense atmosphere features swirling clouds and powerful winds. The planet boasts numerous moons, with Titan being the largest, even surpassing Mercury in size.
-  
-  Key facts:
-  
-  Saturn is the sixth planet from the Sun and the second-largest in the solar system.
-  The planet is known for its beautiful and distinctive ring system, made up of ice particles, dust, and rocks.
-  Saturn is a gas giant, primarily composed of hydrogen and helium.
-  The atmosphere of Saturn is thick, with swirling clouds and strong winds.
-  The planet has a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and finally, a gaseous outer layer.
-  Saturn has at least 146 known moons, 63 of which are officially named, not including the hundreds of moonlets in its rings.
-  Titan, Saturn's largest moon and the second-largest in the solar system, is larger than Mercury and has a substantial atmosphere.
-        """
-  
-        Student recall:
-        """
-        Saturn, the sixth planet from the Sun and the second-largest in our solar system, is famed for its unique and spectacular ring system, composed of ice particles, dust, and rocks. As a gas giant, Saturn is mainly composed of hydrogen and helium. Its dense atmosphere is characterised by swirling clouds and powerful winds. The planet’s structure includes a rocky core, surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium, and an outer gaseous layer. Saturn is orbited by at least 146 known moons, 63 of which have been officially named, and also has numerous moonlets in its rings. Titan, the largest of Saturn’s moons, is larger than Mercury and possesses a significant atmosphere.
-        """`
-          },
-          {
-            role: "assistant",
-            content: `
-          🎉👏 Wow, amazing job on your recall performance! 🤩 You scored an impressive 100% on the Saturn topic study sheet! 🌟
-  Your recall is incredibly accurate, and you've demonstrated a solid understanding of the key facts. I'm particularly impressed with how you've retained the details about Saturn's composition, atmosphere, and moon system. Your hard work and dedication to studying are truly paying off! 💪
-  
-  Now, let's look ahead to your next recall session, which will be in 2 months from now. 📆 This will help you maintain a consistent pace and ensure that the information stays fresh in your mind.
-  
-  Before we wrap up, I want to ask: Would you like to revisit the topic's source material to further enhance your understanding or clarify any uncertainties? 🤔 This is a great opportunity to reinforce your knowledge and fill in any gaps. Let me know, and we can discuss the best approach! 😊
-  
-  Keep up the fantastic work, and I look forward to seeing your continued progress! 🚀`
-          }
-        ]
+            },
+            {
+              role: "assistant",
+              content: mentor_shot_hint_response
+            },
+            {
+              role: "user",
+              content: `Topic study sheet: 
+      """
+      ${studySheet}
+      """
 
-        // const functionName = "save_score_and_forgotten_facts"
-        let perfectRecall = false
-        let date_from_now = ""
-        let recallScore = 0
+      Student recall: 
+      """
+      ${studentMessage.content}
+      """
+`
+            }
+          )
+
+          newStudyState =
+            studyState === "recall_tutorial_first_attempt"
+              ? "tutorial_hinting_hide_input"
+              : "recall_hinting"
+        }
 
         chatStreamResponse = await streamText({
           model: frontierModel,
-          temperature: 0.3,
-          tools: {
-            save_score_and_forgotten_facts: tool({
-              description:
-                "Saves recall score and forgotten facts to the database.",
-              parameters: z.object({
-                score: z
-                  .number()
-                  .describe(
-                    "The student's recall score as a number between 0 and 100."
-                  ),
-                forgotten_facts: z
-                  .array(z.string())
-                  .describe(
-                    "The student's forgotten facts as an array of strings."
-                  )
-              }),
-              execute: async ({ score, forgotten_facts }) => {
-                perfectRecall = score >= 90 // LLM model is not perfect, so we need to set a threshold
-
-                // Save the score and forgotten facts to the database
-                const functionResponse = await functionCalledByLLM(
-                  "updateTopicOnRecall",
-                  {
-                    test_result: perfectRecall ? 100 : score,
-                    recall_analysis: JSON.stringify(forgotten_facts)
-                  },
-                  chatId
-                )
-                if (functionResponse.success === false) {
-                  return { success: false }
-                }
-                const { due_date } = functionResponse
-                date_from_now = formatDistanceToNow(due_date)
-                recallScore = score
-
-                return {
-                  ...functionResponse,
-                  date_from_now
-                }
-              }
-            })
-          },
-          toolChoice: "required",
-          messages: [
-            ...multiShotMessages,
-            {
-              role: "user",
-              content: `
-              You are a study mentor. You assess student recall performance and what they recalled incorrectly.
-  
-              Student's instructions and context:
-              ${studentContext}
-  
-              Instructions:
-              Given the Topic source and a Student's recall attempt below, perform the following tasks:
-              1. Calculate a recall score representing how accurately the student's recall matches the Topic study sheet only. Important: Only compare against the Topic study sheet below. The score should reflect the percentage of the material correctly recalled, ranging from 0 (no recall) to 100 (perfect recall).
-              2. Identify any significant omissions in the student's recall when compared against the Topic study sheet below. List these omissions as succinctly as possible, providing clear and educational summaries for review.
-  
-              Call the save_score_and_forgotten_facts tool / function with the following parameters:
-              - "score": A numerical value between 0 and 100 indicating the recall accuracy.
-              - "forgotten_facts": An array of strings, each summarizing a key fact or concept omitted from the student's recall when compared to the original topic study sheet. If the students recalled all facts correctly, provide an empty array.
-  
-              3. Finally after saving the score and forgotten facts, generate a positive feedback message consistant with the messages in this thread, depending on the student's recall score:
-              If the student has a score below 90%, provide constructive feedback and hints to the facts they forgot or recalled incorrectly. Remember: You help students remember facts on their own by providing hints and clues without giving away answers.
-              If the student has a perfect recall score, provide a congratulatory message and inform them of the next recall session date. ${finalFeedback}
-  
-              Topic study sheet:
-              """${studySheet}"""
-  
-              Student's recall attempt:
-              """${studentMessage.content}"""
-              `
-            }
-          ]
+          messages: finalMessages
         })
-
-        if (studyState === "recall_tutorial_first_attempt") {
-          newStudyState = "tutorial_hinting_hide_input"
-        } else {
-          newStudyState = perfectRecall
-            ? "recall_finished_hide_input"
-            : "recall_hinting"
-        }
 
         return new StreamingTextResponse(chatStreamResponse.textStream, {
           headers: {
