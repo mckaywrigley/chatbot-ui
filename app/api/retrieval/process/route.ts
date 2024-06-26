@@ -13,6 +13,8 @@ import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
+import { qDrant } from "@/lib/qdrant"
+
 export async function POST(req: Request) {
   try {
     const supabaseAdmin = createClient<Database>(
@@ -76,6 +78,7 @@ export async function POST(req: Request) {
     let chunks: FileItemChunk[] = []
 
     switch (fileExtension) {
+      case "application/csv":
       case "csv":
         chunks = await processCSV(blob)
         break
@@ -135,26 +138,55 @@ export async function POST(req: Request) {
       })
 
       embeddings = await Promise.all(embeddingPromises)
+    } else if (
+      embeddingsProvider === "multilingual-e5-large" ||
+      embeddingsProvider === "multilingual-e5-small"
+    ) {
+      const customOpenai = new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: "DUMMY"
+      })
+      const response = await customOpenai.embeddings.create({
+        model: embeddingsProvider,
+        input: chunks.map(chunk => chunk.content)
+      })
+
+      embeddings = response.data.map((item: any) => {
+        return item.embedding
+      })
     }
+    let totalTokens: number
+    if (process.env.EMBEDDING_STORAGE == "qdrant") {
+      const qclient = new qDrant()
+      const file_items = await qclient.addEmbeddings(
+        profile.user_id,
+        embeddings,
+        file_id,
+        chunks
+      )
+      totalTokens = file_items.reduce(
+        (acc, item) => acc + item.payload.tokens,
+        0
+      )
+    } else {
+      const file_items = chunks.map((chunk, index) => ({
+        file_id,
+        user_id: profile.user_id,
+        content: chunk.content,
+        tokens: chunk.tokens,
+        openai_embedding:
+          embeddingsProvider === "openai"
+            ? ((embeddings[index] || null) as any)
+            : null,
+        local_embedding:
+          embeddingsProvider === "local"
+            ? ((embeddings[index] || null) as any)
+            : null
+      }))
 
-    const file_items = chunks.map((chunk, index) => ({
-      file_id,
-      user_id: profile.user_id,
-      content: chunk.content,
-      tokens: chunk.tokens,
-      openai_embedding:
-        embeddingsProvider === "openai"
-          ? ((embeddings[index] || null) as any)
-          : null,
-      local_embedding:
-        embeddingsProvider === "local"
-          ? ((embeddings[index] || null) as any)
-          : null
-    }))
-
-    await supabaseAdmin.from("file_items").upsert(file_items)
-
-    const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
+      await supabaseAdmin.from("file_items").upsert(file_items)
+      totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)
+    }
 
     await supabaseAdmin
       .from("files")

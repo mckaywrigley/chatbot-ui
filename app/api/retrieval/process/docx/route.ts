@@ -12,7 +12,11 @@ export async function POST(req: Request) {
   const { text, fileId, embeddingsProvider, fileExtension } = json as {
     text: string
     fileId: string
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider:
+      | "openai"
+      | "local"
+      | "multilingual-e5-large"
+      | "multilingual-e5-small"
     fileExtension: string
   }
 
@@ -81,6 +85,22 @@ export async function POST(req: Request) {
       })
 
       embeddings = await Promise.all(embeddingPromises)
+    } else if (
+      embeddingsProvider === "multilingual-e5-large" ||
+      embeddingsProvider === "multilingual-e5-small"
+    ) {
+      const customOpenai = new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: "DUMMY"
+      })
+      const response = await customOpenai.embeddings.create({
+        model: embeddingsProvider,
+        input: chunks.map(chunk => chunk.content)
+      })
+
+      embeddings = response.data.map((item: any) => {
+        return item.embedding
+      })
     }
 
     const file_items = chunks.map((chunk, index) => ({
@@ -89,7 +109,9 @@ export async function POST(req: Request) {
       content: chunk.content,
       tokens: chunk.tokens,
       openai_embedding:
-        embeddingsProvider === "openai"
+        embeddingsProvider === "openai" ||
+        embeddingsProvider === "multilingual-e5-small" ||
+        embeddingsProvider === "multilingual-e5-large"
           ? ((embeddings[index] || null) as any)
           : null,
       local_embedding:
@@ -114,6 +136,7 @@ export async function POST(req: Request) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    console.log(errorMessage + " - " + JSON.stringify(error))
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

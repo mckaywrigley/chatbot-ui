@@ -9,6 +9,7 @@ import { get } from "@vercel/edge-config"
 import { Metadata } from "next"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { QdrantClient } from "@qdrant/js-client-rest"
 
 export const metadata: Metadata = {
   title: "Login"

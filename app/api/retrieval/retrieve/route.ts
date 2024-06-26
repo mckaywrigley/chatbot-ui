@@ -4,18 +4,25 @@ import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
+import { qDrant } from "@/lib/qdrant"
+
 export async function POST(request: Request) {
   const json = await request.json()
   const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
     userInput: string
     fileIds: string[]
-    embeddingsProvider: "openai" | "local"
+    embeddingsProvider:
+      | "openai"
+      | "local"
+      | "multilingual-e5-large"
+      | "multilingual-e5-small"
     sourceCount: number
   }
 
   const uniqueFileIds = [...new Set(fileIds)]
 
   try {
+    const qclient = new qDrant()
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -71,30 +78,71 @@ export async function POST(request: Request) {
     } else if (embeddingsProvider === "local") {
       const localEmbedding = await generateLocalEmbedding(userInput)
 
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
+      if (process.env.EMBEDDING_STORAGE == "qdrant") {
+        const qclient = new qDrant()
+        chunks = await qclient.searchEmbeddings(
+          uniqueFileIds,
+          profile.user_id,
+          localEmbedding
+        )
+      } else {
+        const { data: localFileItems, error: localFileItemsError } =
+          await supabaseAdmin.rpc("match_file_items_local", {
+            query_embedding: localEmbedding as any,
+            match_count: sourceCount,
+            file_ids: uniqueFileIds
+          })
 
-      if (localFileItemsError) {
-        throw localFileItemsError
+        if (localFileItemsError) {
+          throw localFileItemsError
+        }
+        chunks = localFileItems
       }
+    } else if (
+      embeddingsProvider === "multilingual-e5-large" ||
+      embeddingsProvider === "multilingual-e5-small"
+    ) {
+      const customOpenai = new OpenAI({
+        baseURL: process.env.OPENAI_BASE_URL,
+        apiKey: "DUMMY"
+      })
+      const response = await customOpenai.embeddings.create({
+        model: embeddingsProvider,
+        input: userInput
+      })
 
-      chunks = localFileItems
+      const openaiEmbedding = response.data.map(item => item.embedding)[0]
+      if (process.env.EMBEDDING_STORAGE == "qdrant") {
+        const qclient = new qDrant()
+        chunks = await qclient.searchEmbeddings(
+          uniqueFileIds,
+          profile.user_id,
+          openaiEmbedding
+        )
+      } else {
+        const { data: openaiFileItems, error: openaiError } =
+          await supabaseAdmin.rpc("match_file_items_openai", {
+            query_embedding: openaiEmbedding as any,
+            match_count: sourceCount,
+            file_ids: uniqueFileIds
+          })
+        if (openaiError) {
+          throw openaiError
+        }
+        chunks = openaiFileItems
+      }
     }
 
     const mostSimilarChunks = chunks?.sort(
       (a, b) => b.similarity - a.similarity
     )
-
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
     })
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
+    console.log(errorMessage + " - " + JSON.stringify(error))
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

@@ -8,7 +8,11 @@ export interface ChatSettings {
   contextLength: number
   includeProfileContext: boolean
   includeWorkspaceInstructions: boolean
-  embeddingsProvider: "openai" | "local"
+  embeddingsProvider:
+    | "openai"
+    | "local"
+    | "multilingual-e5-large"
+    | "multilingual-e5-small"
 }
 
 export interface ChatPayload {
