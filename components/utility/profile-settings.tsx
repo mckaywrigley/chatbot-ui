@@ -118,6 +118,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [togetherAPIKey, setTogetherAPIKey] = useState(
+    profile?.together_api_key || ""
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -150,6 +154,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       mistral_api_key: mistralAPIKey,
       groq_api_key: groqAPIKey,
       perplexity_api_key: perplexityAPIKey,
+      together_api_key: togetherAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
@@ -172,7 +177,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       "mistral",
       "groq",
       "perplexity",
-      "openrouter"
+      "openrouter",
+      "together"
     ]
 
     providers.forEach(async provider => {
@@ -719,6 +725,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={openrouterAPIKey}
                       onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["together"] ? (
+                  <Label>Together API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Together API Key</Label>
+                    <Input
+                      placeholder="Together API Key"
+                      type="password"
+                      value={togetherAPIKey}
+                      onChange={e => setTogetherAPIKey(e.target.value)}
                     />
                   </>
                 )}
