@@ -2,6 +2,48 @@ import { LLM } from "@/types"
 
 const OPENAI_PLATORM_LINK = "https://platform.openai.com/docs/overview"
 
+const GPT5_2: LLM = {
+  modelId: "gpt-5.2",
+  modelName: "GPT-5.2",
+  provider: "openai",
+  hostedId: "gpt-5.2",
+  platformLink: OPENAI_PLATORM_LINK,
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 1.75,
+    outputCost: 14
+  }
+}
+const GPT5_MINI: LLM = {
+  modelId: "gpt-5-mini",
+  modelName: "GPT-5 Mini",
+  provider: "openai",
+  hostedId: "gpt-5-mini",
+  platformLink: OPENAI_PLATORM_LINK,
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.25,
+    outputCost: 2
+  }
+}
+const GPT5_NANO: LLM = {
+  modelId: "gpt-5-nano",
+  modelName: "GPT-5 Nano",
+  provider: "openai",
+  hostedId: "gpt-5-nano",
+  platformLink: OPENAI_PLATORM_LINK,
+  imageInput: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.05,
+    outputCost: 0.4
+  }
+}
 // OpenAI Models (UPDATED 1/25/24) -----------------------------
 const GPT4o: LLM = {
   modelId: "gpt-4o",
@@ -82,6 +124,9 @@ const GPT3_5Turbo: LLM = {
 }
 
 export const OPENAI_LLM_LIST: LLM[] = [
+  GPT5_2,
+  GPT5_MINI,
+  GPT5_NANO,
   GPT4o,
   GPT4Turbo,
   GPT4Vision,

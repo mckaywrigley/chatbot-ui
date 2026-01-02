@@ -28,16 +28,17 @@ export async function POST(request: Request) {
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens:
+      max_completion_tokens: 12000,
+      /*max_tokens:
         chatSettings.model === "gpt-4-vision-preview" ||
         chatSettings.model === "gpt-4o"
-          ? 4096
+          ? 4086
           : null, // TODO: Fix
+          */
       stream: true
     })
 
     const stream = OpenAIStream(response)
-
     return new StreamingTextResponse(stream)
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
