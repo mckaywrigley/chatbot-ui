@@ -18,11 +18,14 @@ export async function GET() {
     const myAssistants = await openai.beta.assistants.list({
       limit: 100
     })
-
-    return new Response(JSON.stringify({ assistants: myAssistants.data }), {
-      status: 200
-    })
-  } catch (error: any) {
+      return new Response(
+      JSON.stringify({ assistants: myAssistants.data }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      }
+    )
+  }catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
