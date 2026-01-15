@@ -13,6 +13,7 @@ import { FC } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
+import { ThemeSwitcher } from "../utility/theme-switcher"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 
 export const SIDEBAR_ICON_SIZE = 28
@@ -82,6 +83,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
+
+        <WithTooltip display={<div>Theme</div>} trigger={<ThemeSwitcher />} />
 
         <WithTooltip
           display={<div>Profile Settings</div>}

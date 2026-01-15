@@ -11,6 +11,7 @@ import { ChatbotUIContext } from "@/context/context"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
 import { useContext } from "react"
+import { ThemeSwitcher } from "@/components/utility/theme-switcher"
 
 export default function ChatPage() {
   useHotkey("o", () => handleNewChat())
@@ -36,7 +37,8 @@ export default function ChatPage() {
             <QuickSettings />
           </div>
 
-          <div className="absolute right-2 top-2">
+          <div className="absolute right-2 top-2 flex items-center gap-2">
+            <ThemeSwitcher />
             <ChatSettings />
           </div>
 

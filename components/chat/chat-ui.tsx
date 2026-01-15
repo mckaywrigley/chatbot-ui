@@ -18,6 +18,7 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { ThemeSwitcher } from "../utility/theme-switcher"
 
 interface ChatUIProps {}
 
@@ -198,6 +199,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
+        <ThemeSwitcher />
         <ChatSecondaryButtons />
       </div>
 
