@@ -61,13 +61,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
   useEffect(() => {
     ;(async () => {
-      const session = (await supabase.auth.getSession()).data.session
-
-      if (!session) {
-        return router.push("/login")
-      } else {
-        await fetchWorkspaceData(workspaceId)
-      }
+      // Skip authentication check - allow access without login
+      await fetchWorkspaceData(workspaceId)
     })()
   }, [])
 
@@ -91,86 +86,166 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)
 
-    const workspace = await getWorkspaceById(workspaceId)
-    setSelectedWorkspace(workspace)
+    try {
+      // Try to fetch workspace data - if Supabase is not configured, this will fail
+      // and we'll use default values in the catch block
+      const hasSupabase =
+        process.env.NEXT_PUBLIC_SUPABASE_URL &&
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
-    setAssistants(assistantData.assistants)
+      if (!hasSupabase) {
+        // Use default workspace when Supabase is not configured
+        const defaultWorkspace = {
+          id: workspaceId,
+          name: "Default Workspace",
+          default_model: "gpt-4-1106-preview",
+          default_prompt: "You are a friendly, helpful AI assistant.",
+          default_temperature: 0.5,
+          default_context_length: 4096,
+          include_profile_context: true,
+          include_workspace_instructions: true,
+          embeddings_provider: "openai" as const
+        }
+        setSelectedWorkspace(defaultWorkspace as any)
+        setAssistants([])
+        setChats([])
+        setCollections({ collections: [] })
+        setFolders([])
+        setFiles({ files: [] })
+        setPresets({ presets: [] })
+        setPrompts({ prompts: [] })
+        setTools({ tools: [] })
+        setModels({ models: [] })
 
-    for (const assistant of assistantData.assistants) {
-      let url = ""
+        setChatSettings({
+          model: (searchParams.get("model") || "gpt-4-1106-preview") as LLMID,
+          prompt: "You are a friendly, helpful AI assistant.",
+          temperature: 0.5,
+          contextLength: 4096,
+          includeProfileContext: true,
+          includeWorkspaceInstructions: true,
+          embeddingsProvider: "openai"
+        })
 
-      if (assistant.image_path) {
-        url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
+        setLoading(false)
+        return
       }
 
-      if (url) {
-        const response = await fetch(url)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
+      const workspace = await getWorkspaceById(workspaceId)
+      setSelectedWorkspace(workspace)
 
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64,
-            url
-          }
-        ])
-      } else {
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64: "",
-            url
-          }
-        ])
+      const assistantData =
+        await getAssistantWorkspacesByWorkspaceId(workspaceId)
+      setAssistants(assistantData.assistants)
+
+      for (const assistant of assistantData.assistants) {
+        let url = ""
+
+        if (assistant.image_path) {
+          url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
+        }
+
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
+
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64,
+              url
+            }
+          ])
+        } else {
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
+        }
       }
+
+      const chats = await getChatsByWorkspaceId(workspaceId)
+      setChats(chats)
+
+      const collectionData =
+        await getCollectionWorkspacesByWorkspaceId(workspaceId)
+      setCollections(collectionData.collections)
+
+      const folders = await getFoldersByWorkspaceId(workspaceId)
+      setFolders(folders)
+
+      const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
+      setFiles(fileData.files)
+
+      const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
+      setPresets(presetData.presets)
+
+      const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
+      setPrompts(promptData.prompts)
+
+      const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
+      setTools(toolData.tools)
+
+      const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
+      setModels(modelData.models)
+
+      setChatSettings({
+        model: (searchParams.get("model") ||
+          workspace?.default_model ||
+          "gpt-4-1106-preview") as LLMID,
+        prompt:
+          workspace?.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature: workspace?.default_temperature || 0.5,
+        contextLength: workspace?.default_context_length || 4096,
+        includeProfileContext: workspace?.include_profile_context || true,
+        includeWorkspaceInstructions:
+          workspace?.include_workspace_instructions || true,
+        embeddingsProvider:
+          (workspace?.embeddings_provider as "openai" | "local") || "openai"
+      })
+    } catch (error) {
+      // If Supabase is not configured or there's an error, use defaults
+      const defaultWorkspace = {
+        id: workspaceId,
+        name: "Default Workspace",
+        default_model: "gpt-4-1106-preview",
+        default_prompt: "You are a friendly, helpful AI assistant.",
+        default_temperature: 0.5,
+        default_context_length: 4096,
+        include_profile_context: true,
+        include_workspace_instructions: true,
+        embeddings_provider: "openai" as const
+      }
+      setSelectedWorkspace(defaultWorkspace as any)
+      setAssistants([])
+      setChats([])
+      setCollections({ collections: [] })
+      setFolders([])
+      setFiles({ files: [] })
+      setPresets({ presets: [] })
+      setPrompts({ prompts: [] })
+      setTools({ tools: [] })
+      setModels({ models: [] })
+
+      setChatSettings({
+        model: (searchParams.get("model") || "gpt-4-1106-preview") as LLMID,
+        prompt: "You are a friendly, helpful AI assistant.",
+        temperature: 0.5,
+        contextLength: 4096,
+        includeProfileContext: true,
+        includeWorkspaceInstructions: true,
+        embeddingsProvider: "openai"
+      })
     }
-
-    const chats = await getChatsByWorkspaceId(workspaceId)
-    setChats(chats)
-
-    const collectionData =
-      await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    setCollections(collectionData.collections)
-
-    const folders = await getFoldersByWorkspaceId(workspaceId)
-    setFolders(folders)
-
-    const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    setFiles(fileData.files)
-
-    const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
-    setPresets(presetData.presets)
-
-    const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
-    setPrompts(promptData.prompts)
-
-    const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
-    setTools(toolData.tools)
-
-    const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
-    setModels(modelData.models)
-
-    setChatSettings({
-      model: (searchParams.get("model") ||
-        workspace?.default_model ||
-        "gpt-4-1106-preview") as LLMID,
-      prompt:
-        workspace?.default_prompt ||
-        "You are a friendly, helpful AI assistant.",
-      temperature: workspace?.default_temperature || 0.5,
-      contextLength: workspace?.default_context_length || 4096,
-      includeProfileContext: workspace?.include_profile_context || true,
-      includeWorkspaceInstructions:
-        workspace?.include_workspace_instructions || true,
-      embeddingsProvider:
-        (workspace?.embeddings_provider as "openai" | "local") || "openai"
-    })
 
     setLoading(false)
   }
