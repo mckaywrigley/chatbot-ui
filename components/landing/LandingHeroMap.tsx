@@ -6,9 +6,10 @@ import {
   IconSearch,
   IconCurrentLocation,
   IconLoader2,
-  IconMessageCircle,
-  IconHome,
-  IconMapPin
+  IconChevronDown,
+  IconStar,
+  IconLock,
+  IconHome
 } from "@tabler/icons-react"
 
 interface LandingHeroMapProps {
@@ -25,6 +26,7 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
 }) => {
   const [scriptLoaded, setScriptLoaded] = useState(false)
   const [mapInitialized, setMapInitialized] = useState(false)
+  const [scriptFailed, setScriptFailed] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState("")
 
@@ -43,14 +45,29 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
     }
   }, [])
 
+  // Check if Google Maps is already loaded (e.g. from a cached script)
+  // Also set a timeout fallback if the script never loads
+  useEffect(() => {
+    if (window.google?.maps) {
+      setScriptLoaded(true)
+      return
+    }
+    const timeout = setTimeout(() => {
+      if (!window.google?.maps) {
+        setScriptFailed(true)
+      }
+    }, 12000)
+    return () => clearTimeout(timeout)
+  }, [])
+
   // Initialize map
   useEffect(() => {
     if (!scriptLoaded || !mapContainerRef.current || mapInitialized) return
     if (!window.google?.maps) return
 
     const map = new window.google.maps.Map(mapContainerRef.current, {
-      center: { lat: 39.8283, lng: -98.5795 },
-      zoom: 5,
+      center: { lat: 32.83657, lng: -96.79327 },
+      zoom: 19,
       mapTypeId: "hybrid",
       fullscreenControl: false,
       mapTypeControl: false,
@@ -59,15 +76,20 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
       scaleControl: false,
       zoomControl: true,
       zoomControlOptions: {
-        position: window.google.maps.ControlPosition.RIGHT_CENTER
+        position: window.google.maps.ControlPosition.RIGHT_BOTTOM
       },
       tilt: 0,
       heading: 0,
       styles: [
         {
-          featureType: "all",
+          featureType: "poi",
           elementType: "labels",
-          stylers: [{ visibility: "on" }]
+          stylers: [{ visibility: "off" }]
+        },
+        {
+          featureType: "transit",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }]
         }
       ]
     })
@@ -105,44 +127,8 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
       })
     }
 
-    // Click listener for map
-    map.addListener("click", (e: google.maps.MapMouseEvent) => {
-      if (!e.latLng) return
-
-      const lat = e.latLng.lat()
-      const lng = e.latLng.lng()
-
-      placeMarker(map, { lat, lng })
-
-      // Reverse geocode
-      if (geocoderRef.current) {
-        geocoderRef.current.geocode(
-          { location: { lat, lng } },
-          (results, status) => {
-            if (
-              status === window.google.maps.GeocoderStatus.OK &&
-              results?.[0]
-            ) {
-              const address = results[0].formatted_address
-              setSelectedAddress(address)
-
-              // Snap to geocoded building center
-              if (results[0].geometry?.location) {
-                const gLat = results[0].geometry.location.lat()
-                const gLng = results[0].geometry.location.lng()
-                if (markerRef.current) {
-                  markerRef.current.setPosition({ lat: gLat, lng: gLng })
-                }
-                if (autocompleteInputRef.current) {
-                  autocompleteInputRef.current.value = address
-                }
-                onPropertySelect({ lat: gLat, lng: gLng }, address)
-              }
-            }
-          }
-        )
-      }
-    })
+    // No click listener on landing page — only address search triggers preview
+    // This prevents accidental taps from burning the free preview
 
     setMapInitialized(true)
   }, [scriptLoaded, mapInitialized, onPropertySelect])
@@ -194,7 +180,8 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
           placeMarker(mapRef.current, { lat, lng })
         }
 
-        // Reverse geocode
+        // Reverse geocode to populate search bar — but do NOT auto-select
+        // The user still needs to search or pick an address to trigger the preview
         if (geocoderRef.current) {
           geocoderRef.current.geocode(
             { location: { lat, lng } },
@@ -208,7 +195,6 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
                 if (autocompleteInputRef.current) {
                   autocompleteInputRef.current.value = address
                 }
-                onPropertySelect({ lat, lng }, address)
               }
               setIsLocating(false)
             }
@@ -230,67 +216,68 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
         src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry`}
         onLoad={handleScriptLoad}
         onReady={handleScriptLoad}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
 
       {/* Map Container */}
       <div ref={mapContainerRef} className="absolute inset-0 bg-gray-800" />
 
-      {/* Loading overlay before map loads */}
+      {/* Loading / fallback overlay before map loads */}
       {!mapInitialized && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-          <div className="flex flex-col items-center gap-3">
-            <IconLoader2 className="size-8 animate-spin text-cyan-400" />
-            <span className="text-sm font-medium text-white/70">
-              Loading map...
-            </span>
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          {scriptFailed ? (
+            <div className="flex flex-col items-center gap-4 px-6 text-center">
+              <div className="flex size-16 items-center justify-center rounded-2xl bg-white/10">
+                <IconHome className="size-8 text-cyan-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white">
+                Instant Roof Reports
+              </h2>
+              <p className="max-w-sm text-sm text-white/60">
+                Search any address to get satellite roof measurements, pitch
+                analysis, and cost estimates in seconds.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              <IconLoader2 className="size-8 animate-spin text-cyan-400" />
+              <span className="text-sm font-medium text-white/70">
+                Loading map...
+              </span>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Floating Control Panel at Bottom */}
+      {/* Floating Control Panel — centered vertically */}
       <div
-        className={`absolute inset-x-0 bottom-0 z-20 p-3 transition-all duration-300 sm:p-4 ${
+        className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-all duration-300 ${
           isDrawerOpen ? "sm:right-[420px]" : ""
         }`}
       >
-        <div className="mx-auto max-w-3xl">
-          {/* Feature Tabs */}
-          <div className="relative z-10 -mb-[1px] flex items-end gap-0 pl-2 sm:pl-4">
-            {/* Report Tab (active) */}
-            <div className="z-20 rounded-t-xl bg-[#4FEBBC] p-[1px] pb-0">
-              <button className="flex size-full items-center gap-1.5 whitespace-nowrap rounded-t-[11px] border-b border-white bg-white px-3 py-2 text-sm font-medium text-gray-900 sm:gap-2 sm:px-4 sm:py-2.5">
-                <IconHome className="size-4" />
-                <span>Instant Roof Report</span>
-              </button>
-            </div>
-
-            {/* Chat Tab (redirects to login) */}
-            <div className="ml-[-1px] mb-[1px] rounded-t-xl py-[1px]">
-              <a
-                href="/login"
-                className="flex size-full items-center gap-1.5 whitespace-nowrap rounded-t-[11px] border border-transparent bg-gray-200/80 px-3 py-2 text-sm font-medium text-gray-600 backdrop-blur-sm transition-colors hover:bg-gray-300 hover:text-gray-900 sm:gap-2 sm:px-4 sm:py-2.5"
-              >
-                <IconMessageCircle className="size-4" />
-                <span>Rooftops Chat</span>
-              </a>
-            </div>
+        <div className="pointer-events-auto mx-auto w-full max-w-sm px-4 sm:max-w-lg sm:px-6">
+          {/* Scarcity hint */}
+          <div className="mb-2.5 flex items-center justify-center gap-1.5 sm:mb-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm sm:text-sm">
+              <IconLock size={14} className="text-emerald-400" />1 free report —
+              no signup needed
+            </span>
           </div>
 
           {/* Input Container */}
           <div className="gradient-border relative z-0 rounded-2xl p-[1px] shadow-2xl">
-            <div className="rounded-[15px] bg-white p-3 sm:p-4">
+            <div className="rounded-[15px] bg-white p-4">
               {/* Search Input Row */}
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2.5">
                 <div className="relative grow">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <IconSearch className="size-4 text-gray-400 sm:size-5" />
+                    <IconSearch className="size-[18px] text-gray-400" />
                   </div>
                   <input
                     ref={autocompleteInputRef}
                     type="text"
-                    placeholder="Search any address to see instant roof data..."
-                    className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:h-12 sm:text-base"
+                    placeholder="Try it — enter any address"
+                    className="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 pl-10 pr-3 text-[15px] text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:h-12 sm:text-base"
                   />
                 </div>
 
@@ -298,29 +285,63 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
                 <button
                   onClick={handleCurrentLocation}
                   disabled={isLocating}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:border-cyan-400 hover:bg-cyan-50 hover:text-cyan-600 sm:size-12"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:border-cyan-400 hover:bg-cyan-50 hover:text-cyan-600 sm:size-12"
                   title="Use current location"
                 >
                   {isLocating ? (
-                    <IconLoader2 size={20} className="animate-spin" />
+                    <IconLoader2 size={18} className="animate-spin" />
                   ) : (
-                    <IconCurrentLocation size={20} />
+                    <IconCurrentLocation size={18} />
                   )}
                 </button>
               </div>
 
-              {/* CTA Button */}
-              <a
-                href="/login"
-                className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-sm font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl sm:h-12 sm:text-base"
+              {/* CTA Button — focuses input on click */}
+              <button
+                onClick={() => autocompleteInputRef.current?.focus()}
+                className="mt-2.5 flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 text-[13px] font-semibold text-white shadow-lg transition-all hover:from-emerald-600 hover:to-cyan-600 hover:shadow-xl sm:mt-3 sm:h-12 sm:text-base"
               >
-                <IconMapPin size={18} />
-                Try It Free — No Credit Card Required
-              </a>
+                Get Free Roof Report
+              </button>
+
+              {/* Social proof — inline below CTA */}
+              <div className="mt-2.5 flex items-center justify-center gap-3 text-xs text-gray-400 sm:mt-3 sm:text-sm">
+                <div className="flex items-center gap-1">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <IconStar
+                        key={i}
+                        size={12}
+                        className="fill-amber-400 text-amber-400"
+                      />
+                    ))}
+                  </div>
+                  <span className="font-medium text-gray-500">4.9</span>
+                </div>
+                <span className="text-gray-300">·</span>
+                <span className="font-medium text-gray-500">
+                  2,000+ roofers
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Scroll down indicator arrow */}
+      <button
+        onClick={() => {
+          const belowFold = document.getElementById("below-fold")
+          if (belowFold) belowFold.scrollIntoView({ behavior: "smooth" })
+        }}
+        className="absolute inset-x-0 bottom-6 z-20 mx-auto flex w-fit animate-bounce flex-col items-center gap-1.5 rounded-full bg-black/40 px-6 py-3 text-white/90 backdrop-blur-sm transition-colors hover:bg-black/60 sm:bottom-4"
+        aria-label="Scroll down to learn more"
+      >
+        <span className="text-xs font-medium tracking-wide sm:text-[11px]">
+          Learn More
+        </span>
+        <IconChevronDown size={20} />
+      </button>
     </div>
   )
 }

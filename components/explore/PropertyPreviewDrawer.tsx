@@ -14,11 +14,11 @@ import {
   IconChevronRight,
   IconSparkles,
   IconLoader2,
-  IconMapPin,
   IconCompass,
   IconClock,
   IconShieldCheck
 } from "@tabler/icons-react"
+import { RooftopsSVG } from "@/components/icons/rooftops-svg"
 import {
   extractSolarRoofMetrics,
   type SolarRoofMetrics
@@ -31,6 +31,8 @@ interface PropertyPreviewDrawerProps {
   location: { lat: number; lng: number } | null
   onGenerateFullReport: () => void
   isAnalyzing: boolean
+  /** When true, shows landing-page-specific CTA with feature list and sign-up messaging */
+  landingMode?: boolean
 }
 
 // Compass direction from azimuth degrees
@@ -43,7 +45,11 @@ function azimuthToDirection(deg: number): string {
 function qualityColor(q: string): { bg: string; text: string; dot: string } {
   switch (q) {
     case "HIGH":
-      return { bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" }
+      return {
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        dot: "bg-emerald-500"
+      }
     case "MEDIUM":
       return { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" }
     default:
@@ -57,7 +63,8 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
   address,
   location,
   onGenerateFullReport,
-  isAnalyzing
+  isAnalyzing,
+  landingMode = false
 }) => {
   const [activeImageTab, setActiveImageTab] = useState<"satellite" | "street">(
     "satellite"
@@ -68,7 +75,10 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
   const [isLoadingSolar, setIsLoadingSolar] = useState(false)
   const [solarError, setSolarError] = useState(false)
   const [segmentsExpanded, setSegmentsExpanded] = useState(false)
-  const [imageLoaded, setImageLoaded] = useState({ satellite: false, street: false })
+  const [imageLoaded, setImageLoaded] = useState({
+    satellite: false,
+    street: false
+  })
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLEMAPS_API_KEY || ""
 
@@ -135,7 +145,7 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
     <>
       {/* Drawer panel — no overlay, map remains interactive */}
       <div
-        className={`fixed inset-y-0 right-0 z-30 flex w-full flex-col border-l border-gray-200/80 bg-white shadow-2xl transition-transform duration-300 ease-out sm:z-30 sm:w-[420px] ${
+        className={`fixed inset-y-0 right-0 z-[60] flex w-full flex-col border-l border-gray-200/80 bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-[420px]${
           isOpen ? "translate-x-0" : "pointer-events-none translate-x-full"
         }`}
         style={{
@@ -146,8 +156,8 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
       >
         {/* ━━━ HEADER ━━━ */}
         <div className="flex items-start gap-3 border-b border-gray-100 px-5 pb-4 pt-5">
-          <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-50 to-emerald-50">
-            <IconMapPin size={18} className="text-cyan-600" />
+          <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-gray-900 to-gray-800 p-1.5">
+            <RooftopsSVG className="size-6" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400">
@@ -260,8 +270,8 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
                   Solar data unavailable
                 </p>
                 <p className="mt-0.5 text-xs text-amber-600">
-                  Google Solar API data isn't available for this location. You
-                  can still generate a full AI report.
+                  Google Solar API data isn&apos;t available for this location.
+                  You can still generate a full AI report.
                 </p>
               </div>
             ) : solarMetrics ? (
@@ -291,7 +301,16 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
                     value={solarMetrics.predominantPitch}
                     unit="rise/run"
                     icon={
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M3 20h18" />
                         <path d="M3 20L12 6l9 14" />
                       </svg>
@@ -329,15 +348,9 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
                         {solarMetrics.segments.length} Roof Segments
                       </span>
                       {segmentsExpanded ? (
-                        <IconChevronDown
-                          size={14}
-                          className="text-gray-400"
-                        />
+                        <IconChevronDown size={14} className="text-gray-400" />
                       ) : (
-                        <IconChevronRight
-                          size={14}
-                          className="text-gray-400"
-                        />
+                        <IconChevronRight size={14} className="text-gray-400" />
                       )}
                     </button>
 
@@ -376,25 +389,50 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
 
           {/* ━━━ CTA SECTION ━━━ */}
           <div className="px-5 pb-6 pt-5">
+            {landingMode && (
+              <div className="mb-4 space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-gray-400">
+                  Unlock with free account
+                </p>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {[
+                    { icon: "📊", label: "Full AI Roof Report" },
+                    { icon: "💰", label: "Instant Cost Estimates" },
+                    { icon: "☀️", label: "Solar Panel Analysis" },
+                    { icon: "🤖", label: "Custom AI Chat Assistant" },
+                    { icon: "📋", label: "Proposal & Invoice Generator" }
+                  ].map(feat => (
+                    <div
+                      key={feat.label}
+                      className="flex items-center gap-2.5 rounded-lg bg-gray-50 px-3 py-2"
+                    >
+                      <span className="text-sm">{feat.icon}</span>
+                      <span className="text-xs font-medium text-gray-700">
+                        {feat.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               onClick={onGenerateFullReport}
               disabled={isAnalyzing}
               className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 via-emerald-600 to-green-600 px-5 py-4 text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {/* Subtle animated shimmer */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
                 style={{
-                  animation: "shimmer 2s ease-in-out infinite",
+                  animation: "shimmerSlide 2s ease-in-out infinite"
                 }}
               />
 
               <div className="relative flex items-center justify-center gap-2.5">
                 {isAnalyzing ? (
                   <>
-                    <IconLoader2
-                      size={20}
-                      className="animate-spin"
-                    />
+                    <IconLoader2 size={20} className="animate-spin" />
                     <span className="text-[15px] font-bold tracking-tight">
                       Generating Report...
                     </span>
@@ -403,7 +441,9 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
                   <>
                     <IconSparkles size={20} />
                     <span className="text-[15px] font-bold tracking-tight">
-                      Generate Full AI Report
+                      {landingMode
+                        ? "See the Full Report — Free"
+                        : "Generate Full AI Report"}
                     </span>
                   </>
                 )}
@@ -412,9 +452,15 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
               {!isAnalyzing && (
                 <div className="relative mt-1.5 flex items-center justify-center gap-1.5 text-[11px] font-medium text-white/75">
                   <IconClock size={11} />
-                  <span>~2 min</span>
+                  <span>
+                    {landingMode ? "Sign up in 30 seconds" : "~2 min"}
+                  </span>
                   <span className="text-white/40">·</span>
-                  <span>Multi-agent AI for enhanced accuracy</span>
+                  <span>
+                    {landingMode
+                      ? "No credit card required"
+                      : "Multi-agent AI for enhanced accuracy"}
+                  </span>
                 </div>
               )}
             </button>
@@ -438,9 +484,13 @@ const PropertyPreviewDrawer: React.FC<PropertyPreviewDrawerProps> = ({
 
       {/* Shimmer animation keyframe */}
       <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+        @keyframes shimmerSlide {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
       `}</style>
     </>

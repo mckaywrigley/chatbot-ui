@@ -7,7 +7,7 @@ const GMAIL_APP_PASS = "hykthkubqorybvnb"
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    
+
     const {
       companyName,
       website,
@@ -157,7 +157,7 @@ Submitted: ${new Date().toISOString()}`
 
   try {
     const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
-    
+
     const emailContent = [
       `From: Rooftops AI Consulting <${GMAIL_USER}>`,
       `To: bsbillings@gmail.com`,
@@ -177,7 +177,7 @@ Submitted: ${new Date().toISOString()}`
       htmlContent,
       ``,
       `--${boundary}--`
-    ].join('\n')
+    ].join("\n")
 
     const curlCommand = `echo '${emailContent.replace(/'/g, "'\"'\"'")}' | curl -s --url "smtps://smtp.gmail.com:465" \
       --ssl-reqd \
@@ -186,9 +186,9 @@ Submitted: ${new Date().toISOString()}`
       --mail-rcpt "${GMAIL_USER}" \
       --user "${GMAIL_USER}:${GMAIL_APP_PASS}" \
       --upload-file -`
-    
-    execSync(curlCommand, { stdio: 'pipe' })
-    
+
+    execSync(curlCommand, { stdio: "pipe" })
+
     console.log(`✅ Intake notification sent for ${data.companyName}`)
     return true
   } catch (error) {

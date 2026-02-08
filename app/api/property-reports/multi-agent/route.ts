@@ -37,7 +37,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No images provided" }, { status: 400 })
     }
 
-
     // Separate overhead images from angled views
     // Images have 'viewName' property, not 'name' (e.g., "Overhead (Context)", "Overhead (Detail)")
     const overheadImages = capturedImages.filter(
@@ -49,7 +48,6 @@ export async function POST(req: NextRequest) {
     )
 
     const allImages = capturedImages
-
 
     // Track agent execution
     const agentResults: any = {

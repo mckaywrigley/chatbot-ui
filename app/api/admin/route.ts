@@ -5,23 +5,25 @@ export const dynamic = "force-dynamic"
 
 // Helper to check if user is admin
 async function isAdmin(supabase: any) {
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user }
+  } = await supabase.auth.getUser()
   if (!user) return false
-  
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("is_admin")
     .eq("user_id", user.id)
     .single()
-  
+
   return profile?.is_admin === true
 }
 
 // GET /api/admin/metrics - Get current metrics snapshot
 export async function GET(request: Request) {
   const supabase = await createClient()
-  
-  if (!await isAdmin(supabase)) {
+
+  if (!(await isAdmin(supabase))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
@@ -32,12 +34,14 @@ export async function GET(request: Request) {
       .select("subscription_status, plan_type", { count: "exact" })
 
     const totalRegistered = userCounts?.length || 0
-    const payingUsers = userCounts?.filter(u => 
-      u.subscription_status === "active" || u.subscription_status === "trialing"
-    ).length || 0
-    const trialingUsers = userCounts?.filter(u => 
-      u.subscription_status === "trialing"
-    ).length || 0
+    const payingUsers =
+      userCounts?.filter(
+        u =>
+          u.subscription_status === "active" ||
+          u.subscription_status === "trialing"
+      ).length || 0
+    const trialingUsers =
+      userCounts?.filter(u => u.subscription_status === "trialing").length || 0
 
     // Get MRR from Stripe subscriptions
     const { data: subscriptions } = await supabase
@@ -46,14 +50,15 @@ export async function GET(request: Request) {
       .eq("status", "active")
 
     const planPrices: Record<string, number> = {
-      "premium": 2500, // $25/month in cents
-      "business": 8400, // $84/month in cents
-      "ai_employee": 16900 // $169/month in cents
+      premium: 2500, // $25/month in cents
+      business: 8400, // $84/month in cents
+      ai_employee: 16900 // $169/month in cents
     }
 
-    const mrrCents = subscriptions?.reduce((total, sub) => {
-      return total + (planPrices[sub.plan_type] || 0)
-    }, 0) || 0
+    const mrrCents =
+      subscriptions?.reduce((total, sub) => {
+        return total + (planPrices[sub.plan_type] || 0)
+      }, 0) || 0
 
     const arrCents = mrrCents * 12
 
@@ -68,7 +73,7 @@ export async function GET(request: Request) {
     // Get 30-day trends
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    
+
     const { data: trendData } = await supabase
       .from("admin_daily_metrics")
       .select("*")
@@ -97,7 +102,6 @@ export async function GET(request: Request) {
       today: todayUsage || null,
       trends: trendData || []
     })
-
   } catch (error) {
     console.error("Error fetching admin metrics:", error)
     return NextResponse.json(

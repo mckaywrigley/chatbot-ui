@@ -423,110 +423,110 @@ export const ChatInput: FC<ChatInputProps> = ({ onVoiceModeClick }) => {
         {/* Main input container with gradient border effect */}
         <div className="gradient-border relative z-0 rounded-2xl p-[1px] shadow-lg">
           <div className="bg-background flex w-full flex-col rounded-[15px]">
-          {/* Web Search Pill Indicator */}
-          {profile?.web_search_enabled && (
-            <div className="px-4 pt-3">
-              <div
-                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-gray-700"
-                style={{ backgroundColor: "rgb(184 191 206)" }}
-              >
-                <IconWorld size={16} />
-                <span className="text-sm font-medium">Web Search On</span>
-                <button
-                  onClick={handleToggleWebSearch}
-                  className="ml-1 rounded-full p-0.5 hover:bg-gray-400/50"
-                  aria-label="Disable web search"
+            {/* Web Search Pill Indicator */}
+            {profile?.web_search_enabled && (
+              <div className="px-4 pt-3">
+                <div
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-gray-700"
+                  style={{ backgroundColor: "rgb(184 191 206)" }}
                 >
-                  <IconX size={14} className="text-gray-700" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Text input row */}
-          <div className="relative flex items-center">
-            <TextareaAutosize
-              textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none border-none bg-transparent px-4 py-3 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder={t(`Ask me anything...`)}
-              onValueChange={handleInputChange}
-              value={userInput}
-              minRows={1}
-              maxRows={18}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-
-            {/* Voice/Submit buttons (aligned with textarea) */}
-            <div className="absolute right-3 top-3 cursor-pointer hover:opacity-50">
-              {isGenerating ? (
-                <div className="flex items-center gap-2">
-                  <IconLoader2
-                    className="animate-spin text-[#60A5FA]"
-                    size={30}
-                    strokeWidth={2.5}
-                  />
+                  <IconWorld size={16} />
+                  <span className="text-sm font-medium">Web Search On</span>
+                  <button
+                    onClick={handleToggleWebSearch}
+                    className="ml-1 rounded-full p-0.5 hover:bg-gray-400/50"
+                    aria-label="Disable web search"
+                  >
+                    <IconX size={14} className="text-gray-700" />
+                  </button>
                 </div>
-              ) : !userInput && onVoiceModeClick ? (
-                <button
-                  onClick={onVoiceModeClick}
-                  className="flex items-center gap-2 rounded-full bg-black px-3 py-1.5 text-white transition-colors hover:bg-gray-800"
-                >
-                  <IconWaveSine size={20} />
-                  <span className="text-sm font-medium">Voice</span>
-                </button>
-              ) : (
-                <IconArrowUp
-                  className={cn(
-                    "rounded-full bg-black p-1 text-white",
-                    !userInput && "cursor-not-allowed opacity-50"
-                  )}
-                  onClick={() => {
-                    if (!userInput) return
-                    handleSendMessage(userInput, chatMessages, false)
-                  }}
-                  size={30}
-                />
-              )}
-            </div>
-          </div>
+              </div>
+            )}
 
-          {/* Bottom toolbar row */}
-          <div className="px-3 py-2">
-            <div className="flex items-center gap-2">
-              {/* File Picker */}
-              <FilePickerDropdown
-                onLocalFileClick={() => fileInputRef.current?.click()}
-                filesToAccept={filesToAccept}
+            {/* Text input row */}
+            <div className="relative flex items-center">
+              <TextareaAutosize
+                textareaRef={chatInputRef}
+                className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none border-none bg-transparent px-4 py-3 pr-14 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder={t(`Ask me anything...`)}
+                onValueChange={handleInputChange}
+                value={userInput}
+                minRows={1}
+                maxRows={18}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                onCompositionStart={() => setIsTyping(true)}
+                onCompositionEnd={() => setIsTyping(false)}
               />
 
-              {/* Web Search Toggle */}
-              <WebSearchToggle />
-
-              {/* Pipedream Data Sources - hidden for launch */}
-              {SHOW_CONNECTORS && (
-                <PipedreamDataSources chatId={selectedChat?.id} />
-              )}
-
-              {/* Model Selector */}
-              <ModelSelector />
-
-              {/* Trial CTA for free users */}
-              {(!userSubscription ||
-                userSubscription.plan_type === "free" ||
-                (!userSubscription.plan_type && !userSubscription.tier)) && (
-                <Link
-                  href="/pricing"
-                  className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-cyan-500/10 to-green-500/10 px-3 py-1 text-xs font-semibold text-cyan-700 transition-colors hover:from-cyan-500/20 hover:to-green-500/20 sm:flex"
-                >
-                  <IconSparkles size={14} />
-                  Try Pro Free
-                </Link>
-              )}
+              {/* Voice/Submit buttons (aligned with textarea) */}
+              <div className="absolute right-3 top-3 cursor-pointer hover:opacity-50">
+                {isGenerating ? (
+                  <div className="flex items-center gap-2">
+                    <IconLoader2
+                      className="animate-spin text-[#60A5FA]"
+                      size={30}
+                      strokeWidth={2.5}
+                    />
+                  </div>
+                ) : !userInput && onVoiceModeClick ? (
+                  <button
+                    onClick={onVoiceModeClick}
+                    className="flex items-center gap-2 rounded-full bg-black px-3 py-1.5 text-white transition-colors hover:bg-gray-800"
+                  >
+                    <IconWaveSine size={20} />
+                    <span className="text-sm font-medium">Voice</span>
+                  </button>
+                ) : (
+                  <IconArrowUp
+                    className={cn(
+                      "rounded-full bg-black p-1 text-white",
+                      !userInput && "cursor-not-allowed opacity-50"
+                    )}
+                    onClick={() => {
+                      if (!userInput) return
+                      handleSendMessage(userInput, chatMessages, false)
+                    }}
+                    size={30}
+                  />
+                )}
+              </div>
             </div>
-          </div>
+
+            {/* Bottom toolbar row */}
+            <div className="px-3 py-2">
+              <div className="flex items-center gap-2">
+                {/* File Picker */}
+                <FilePickerDropdown
+                  onLocalFileClick={() => fileInputRef.current?.click()}
+                  filesToAccept={filesToAccept}
+                />
+
+                {/* Web Search Toggle */}
+                <WebSearchToggle />
+
+                {/* Pipedream Data Sources - hidden for launch */}
+                {SHOW_CONNECTORS && (
+                  <PipedreamDataSources chatId={selectedChat?.id} />
+                )}
+
+                {/* Model Selector */}
+                <ModelSelector />
+
+                {/* Trial CTA for free users */}
+                {(!userSubscription ||
+                  userSubscription.plan_type === "free" ||
+                  (!userSubscription.plan_type && !userSubscription.tier)) && (
+                  <Link
+                    href="/pricing"
+                    className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-cyan-500/10 to-green-500/10 px-3 py-1 text-xs font-semibold text-cyan-700 transition-colors hover:from-cyan-500/20 hover:to-green-500/20 sm:flex"
+                  >
+                    <IconSparkles size={14} />
+                    Try Pro Free
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

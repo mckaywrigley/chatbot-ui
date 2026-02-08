@@ -30,7 +30,10 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
           })
         }
       } catch (error) {
-        console.error("[MessageMarkdown] Error parsing message metadata:", error)
+        console.error(
+          "[MessageMarkdown] Error parsing message metadata:",
+          error
+        )
       }
     }
     return map

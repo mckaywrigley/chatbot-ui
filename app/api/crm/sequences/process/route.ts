@@ -11,8 +11,7 @@ export async function GET(request: Request) {
 
   // Allow cron requests from Vercel or requests with valid secret
   const isVercelCron = request.headers.get("x-vercel-cron") === "true"
-  const hasValidSecret =
-    cronSecret && authHeader === `Bearer ${cronSecret}`
+  const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`
 
   if (!isVercelCron && !hasValidSecret) {
     // In development, allow without auth

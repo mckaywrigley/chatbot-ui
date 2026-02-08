@@ -33,7 +33,7 @@ Founder, Rooftops AI
 
 P.S. — The new platform will eventually replace the old one, but you're getting early access with free months as our thank you for being an early supporter.`
   },
-  
+
   week2: {
     subject: "Have you tried the new Rooftops AI yet? (3 free months waiting)",
     body: (firstName: string) => `Hi ${firstName},
@@ -51,7 +51,7 @@ If you have any concerns about switching, just reply and let me know.
 
 — Steele`
   },
-  
+
   week3: {
     subject: "[Last call] 72% of beta users switched to the new platform",
     body: (firstName: string) => `Hi ${firstName},
@@ -70,7 +70,7 @@ If the new platform doesn't blow you away, keep using the old one. No pressure.
 
 — Steele`
   },
-  
+
   week4: {
     subject: "Which Rooftops AI should we keep? (Quick survey)",
     body: (firstName: string) => `Hi ${firstName},
@@ -98,7 +98,10 @@ export async function POST(request: Request) {
 
     if (!email || !template || !TEMPLATES[template as keyof typeof TEMPLATES]) {
       return NextResponse.json(
-        { error: "Invalid request. Need email, firstName, and valid template (week1|week2|week3|week4)" },
+        {
+          error:
+            "Invalid request. Need email, firstName, and valid template (week1|week2|week3|week4)"
+        },
         { status: 400 }
       )
     }
@@ -106,19 +109,19 @@ export async function POST(request: Request) {
     const templateData = TEMPLATES[template as keyof typeof TEMPLATES]
     const subject = templateData.subject
     const plainBody = templateData.body(firstName, email)
-    
+
     // Simple HTML version
     const htmlBody = plainBody
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>')
-      .replace(/^/, '<p>')
-      .replace(/$/, '</p>')
+      .replace(/\n\n/g, "</p><p>")
+      .replace(/\n/g, "<br>")
+      .replace(/^/, "<p>")
+      .replace(/$/, "</p>")
       .replace(/👉/g, '<span style="font-size: 18px;">👉</span>')
       .replace(/🔥/g, '<span style="font-size: 18px;">🔥</span>')
       .replace(/🎁/g, '<span style="font-size: 18px;">🎁</span>')
       .replace(/📊/g, '<span style="font-size: 18px;">📊</span>')
       .replace(/💬/g, '<span style="font-size: 18px;">💬</span>')
-      .replace(/✓/g, '✓')
+      .replace(/✓/g, "✓")
 
     const fullHtml = `<!DOCTYPE html>
 <html>
@@ -134,7 +137,7 @@ export async function POST(request: Request) {
 
     // Send via Gmail
     const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
-    
+
     const emailContent = [
       `From: Steele Billings <${GMAIL_USER}>`,
       `To: ${email}`,
@@ -153,7 +156,7 @@ export async function POST(request: Request) {
       fullHtml,
       ``,
       `--${boundary}--`
-    ].join('\n')
+    ].join("\n")
 
     const curlCommand = `echo '${emailContent.replace(/'/g, "'\"'\"'")}' | curl -s --url "smtps://smtp.gmail.com:465" \
       --ssl-reqd \
@@ -161,14 +164,13 @@ export async function POST(request: Request) {
       --mail-rcpt "${email}" \
       --user "${GMAIL_USER}:${GMAIL_APP_PASS}" \
       --upload-file -`
-    
-    execSync(curlCommand, { stdio: 'pipe' })
 
-    return NextResponse.json({ 
-      success: true, 
-      message: `Migration email (${template}) sent to ${email}` 
+    execSync(curlCommand, { stdio: "pipe" })
+
+    return NextResponse.json({
+      success: true,
+      message: `Migration email (${template}) sent to ${email}`
     })
-
   } catch (error) {
     console.error("Failed to send migration email:", error)
     return NextResponse.json(

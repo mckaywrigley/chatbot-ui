@@ -173,8 +173,14 @@ function generateProfessionalStandardPDF(data: ProposalData): jsPDF {
 
   const validUntil = new Date(
     Date.now() + data.validDays * 24 * 60 * 60 * 1000
-  ).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-  pdf.text(`Valid until ${validUntil}`, pageWidth - margin, 40, { align: "right" })
+  ).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  })
+  pdf.text(`Valid until ${validUntil}`, pageWidth - margin, 40, {
+    align: "right"
+  })
 
   y = 75
 
@@ -242,7 +248,7 @@ function generateProfessionalStandardPDF(data: ProposalData): jsPDF {
   pdf.setFont("helvetica", "bold")
   pdf.text("DESCRIPTION", margin + 5, y + 7)
   pdf.text("QTY", margin + contentWidth * 0.55, y + 7)
-  pdf.text("RATE", margin + contentWidth * 0.70, y + 7)
+  pdf.text("RATE", margin + contentWidth * 0.7, y + 7)
   pdf.text("AMOUNT", margin + contentWidth * 0.85, y + 7)
 
   y += 14
@@ -269,7 +275,7 @@ function generateProfessionalStandardPDF(data: ProposalData): jsPDF {
 
     pdf.setTextColor(...COLORS.gray600)
     pdf.text(`${item.qty} ${item.unit}`, margin + contentWidth * 0.55, y + 2)
-    pdf.text(`$${item.price.toFixed(2)}`, margin + contentWidth * 0.70, y + 2)
+    pdf.text(`$${item.price.toFixed(2)}`, margin + contentWidth * 0.7, y + 2)
 
     const itemTotal = item.qty * item.price
     pdf.setTextColor(...COLORS.gray900)
@@ -284,14 +290,26 @@ function generateProfessionalStandardPDF(data: ProposalData): jsPDF {
   // Total Row
   y += 5
   pdf.setFillColor(...COLORS.primary)
-  pdf.roundedRect(margin + contentWidth * 0.5, y - 3, contentWidth * 0.5, 14, 2, 2, "F")
+  pdf.roundedRect(
+    margin + contentWidth * 0.5,
+    y - 3,
+    contentWidth * 0.5,
+    14,
+    2,
+    2,
+    "F"
+  )
 
   pdf.setTextColor(...COLORS.white)
   pdf.setFontSize(12)
   pdf.setFont("helvetica", "bold")
   pdf.text("TOTAL INVESTMENT", margin + contentWidth * 0.55, y + 6)
   pdf.setFontSize(14)
-  pdf.text(formatCurrency(data.estimateTotal), margin + contentWidth * 0.85, y + 6)
+  pdf.text(
+    formatCurrency(data.estimateTotal),
+    margin + contentWidth * 0.85,
+    y + 6
+  )
 
   y += 25
 
@@ -308,8 +326,16 @@ function generateProfessionalStandardPDF(data: ProposalData): jsPDF {
     pdf.setTextColor(...COLORS.gray700)
     pdf.setFontSize(9)
     pdf.setFont("helvetica", "normal")
-    pdf.text("• 10-Year Workmanship Warranty on all labor and installation", margin + 8, y + 18)
-    pdf.text("• 30-Year Manufacturer Warranty on roofing materials", margin + 8, y + 25)
+    pdf.text(
+      "• 10-Year Workmanship Warranty on all labor and installation",
+      margin + 8,
+      y + 18
+    )
+    pdf.text(
+      "• 30-Year Manufacturer Warranty on roofing materials",
+      margin + 8,
+      y + 25
+    )
 
     y += 35
   }
@@ -415,7 +441,9 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   pdf.setFontSize(9)
   pdf.setFont("helvetica", "normal")
   pdf.text(proposalNum, pageWidth - margin, 32, { align: "right" })
-  pdf.text(new Date().toLocaleDateString(), pageWidth - margin, 40, { align: "right" })
+  pdf.text(new Date().toLocaleDateString(), pageWidth - margin, 40, {
+    align: "right"
+  })
 
   y = 65
 
@@ -475,7 +503,12 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   const specs = [
     ["Job Site:", data.propertyAddress.split(",")[0]],
     ["Roof Size:", `${data.roofSize} squares (${data.roofSize * 100} sq ft)`],
-    ["Valid Until:", new Date(Date.now() + data.validDays * 24 * 60 * 60 * 1000).toLocaleDateString()],
+    [
+      "Valid Until:",
+      new Date(
+        Date.now() + data.validDays * 24 * 60 * 60 * 1000
+      ).toLocaleDateString()
+    ],
     ["Payment Terms:", "50% deposit, balance on completion"]
   ]
 
@@ -506,8 +539,20 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   pdf.setFontSize(8)
   pdf.setFont("helvetica", "bold")
 
-  const colWidths = [contentWidth * 0.40, contentWidth * 0.15, contentWidth * 0.15, contentWidth * 0.15, contentWidth * 0.15]
-  const colX = [margin + 3, margin + colWidths[0], margin + colWidths[0] + colWidths[1], margin + colWidths[0] + colWidths[1] + colWidths[2], margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3]]
+  const colWidths = [
+    contentWidth * 0.4,
+    contentWidth * 0.15,
+    contentWidth * 0.15,
+    contentWidth * 0.15,
+    contentWidth * 0.15
+  ]
+  const colX = [
+    margin + 3,
+    margin + colWidths[0],
+    margin + colWidths[0] + colWidths[1],
+    margin + colWidths[0] + colWidths[1] + colWidths[2],
+    margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3]
+  ]
 
   pdf.text("DESCRIPTION", colX[0], y + 7)
   pdf.text("QUANTITY", colX[1], y + 7)
@@ -566,7 +611,9 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   pdf.setFontSize(10)
   pdf.setFont("helvetica", "normal")
   pdf.text("Subtotal:", summaryX + 5, y + 10)
-  pdf.text(formatCurrency(subtotal), summaryX + summaryWidth - 5, y + 10, { align: "right" })
+  pdf.text(formatCurrency(subtotal), summaryX + summaryWidth - 5, y + 10, {
+    align: "right"
+  })
 
   // Tax line (0%)
   pdf.text("Tax (0%):", summaryX + 5, y + 18)
@@ -580,7 +627,12 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   pdf.setFont("helvetica", "bold")
   pdf.text("TOTAL DUE:", summaryX + 5, y + 31)
   pdf.setFontSize(13)
-  pdf.text(formatCurrency(data.estimateTotal), summaryX + summaryWidth - 5, y + 31, { align: "right" })
+  pdf.text(
+    formatCurrency(data.estimateTotal),
+    summaryX + summaryWidth - 5,
+    y + 31,
+    { align: "right" }
+  )
 
   y += 45
 
@@ -597,7 +649,9 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
     pdf.setFont("helvetica", "normal")
 
     const terms = [
-      "• This estimate is valid for " + data.validDays + " days from the date above",
+      "• This estimate is valid for " +
+        data.validDays +
+        " days from the date above",
       "• 50% deposit required to schedule work; balance due upon completion",
       "• All work performed by licensed and insured professionals",
       data.includeWarranty ? "• 10-year workmanship warranty included" : "",
@@ -635,8 +689,17 @@ function generateDetailedBreakdownPDF(data: ProposalData): jsPDF {
   pdf.rect(0, pageHeight - 18, pageWidth, 18, "F")
   pdf.setTextColor(...COLORS.gray500)
   pdf.setFontSize(7)
-  pdf.text(`${companyName} | Thank you for your business`, margin, pageHeight - 8)
-  pdf.text("Questions? Contact us anytime", pageWidth - margin, pageHeight - 8, { align: "right" })
+  pdf.text(
+    `${companyName} | Thank you for your business`,
+    margin,
+    pageHeight - 8
+  )
+  pdf.text(
+    "Questions? Contact us anytime",
+    pageWidth - margin,
+    pageHeight - 8,
+    { align: "right" }
+  )
 
   return pdf
 }
@@ -756,7 +819,9 @@ function generateQuickQuotePDF(data: ProposalData): jsPDF {
     pdf.setFontSize(10)
     pdf.setFont("helvetica", "normal")
     pdf.text(`${item.name} (${item.qty} ${item.unit})`, margin + 5, y)
-    pdf.text(formatCurrency(itemTotal), pageWidth - margin - 5, y, { align: "right" })
+    pdf.text(formatCurrency(itemTotal), pageWidth - margin - 5, y, {
+      align: "right"
+    })
 
     pdf.setDrawColor(...COLORS.gray200)
     pdf.line(margin, y + 4, pageWidth - margin, y + 4)
@@ -776,7 +841,12 @@ function generateQuickQuotePDF(data: ProposalData): jsPDF {
 
   pdf.setFontSize(22)
   pdf.setFont("helvetica", "bold")
-  pdf.text(formatCurrency(data.estimateTotal), pageWidth - margin - 10, y + 17, { align: "right" })
+  pdf.text(
+    formatCurrency(data.estimateTotal),
+    pageWidth - margin - 10,
+    y + 17,
+    { align: "right" }
+  )
 
   y += 40
 
@@ -785,7 +855,9 @@ function generateQuickQuotePDF(data: ProposalData): jsPDF {
   pdf.setFontSize(9)
   pdf.setFont("helvetica", "normal")
 
-  const validDate = new Date(Date.now() + data.validDays * 24 * 60 * 60 * 1000).toLocaleDateString()
+  const validDate = new Date(
+    Date.now() + data.validDays * 24 * 60 * 60 * 1000
+  ).toLocaleDateString()
   pdf.text(`✓ Quote valid until ${validDate}`, margin, y)
   y += 6
   pdf.text("✓ Free on-site consultation available", margin, y)
@@ -802,7 +874,10 @@ function generateQuickQuotePDF(data: ProposalData): jsPDF {
     pdf.setTextColor(...COLORS.gray700)
     pdf.setFontSize(9)
     pdf.setFont("helvetica", "italic")
-    const noteLines = pdf.splitTextToSize(`Note: ${data.customerNotes}`, contentWidth)
+    const noteLines = pdf.splitTextToSize(
+      `Note: ${data.customerNotes}`,
+      contentWidth
+    )
     for (const line of noteLines.slice(0, 3)) {
       pdf.text(line, margin, y)
       y += 5
@@ -815,7 +890,12 @@ function generateQuickQuotePDF(data: ProposalData): jsPDF {
   pdf.setTextColor(...COLORS.white)
   pdf.setFontSize(9)
   pdf.setFont("helvetica", "normal")
-  pdf.text("Ready to get started? Contact us today!", pageWidth / 2, pageHeight - 5, { align: "center" })
+  pdf.text(
+    "Ready to get started? Contact us today!",
+    pageWidth / 2,
+    pageHeight - 5,
+    { align: "center" }
+  )
 
   return pdf
 }
@@ -869,7 +949,11 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
   pdf.setFontSize(7)
   pdf.setFont("helvetica", "normal")
   pdf.text("FOR INSURANCE PURPOSES", pageWidth - margin - 50, 23)
-  pdf.text(`DOC #${Date.now().toString().slice(-8)}`, pageWidth - margin - 50, 29)
+  pdf.text(
+    `DOC #${Date.now().toString().slice(-8)}`,
+    pageWidth - margin - 50,
+    29
+  )
 
   y = 50
 
@@ -884,7 +968,11 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
   pdf.setFont("helvetica", "bold")
   pdf.text(`Date: ${new Date().toLocaleDateString()}`, margin + 5, y + 8)
   pdf.text(`Valid: ${data.validDays} Days`, margin + 50, y + 8)
-  pdf.text(`Property: ${data.propertyAddress.split(",")[0]}`, margin + 90, y + 8)
+  pdf.text(
+    `Property: ${data.propertyAddress.split(",")[0]}`,
+    margin + 90,
+    y + 8
+  )
 
   y += 20
 
@@ -971,7 +1059,7 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
   pdf.text("QTY", margin + contentWidth * 0.55, y + 5.5)
   pdf.text("UNIT", margin + contentWidth * 0.65, y + 5.5)
   pdf.text("UNIT COST", margin + contentWidth * 0.75, y + 5.5)
-  pdf.text("TOTAL", margin + contentWidth * 0.90, y + 5.5)
+  pdf.text("TOTAL", margin + contentWidth * 0.9, y + 5.5)
 
   y += 8
 
@@ -999,7 +1087,7 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
     pdf.text(item.unit, margin + contentWidth * 0.65, y + 5.5)
     pdf.text(`$${item.price.toFixed(2)}`, margin + contentWidth * 0.75, y + 5.5)
     pdf.setFont("helvetica", "bold")
-    pdf.text(formatCurrency(itemTotal), margin + contentWidth * 0.90, y + 5.5)
+    pdf.text(formatCurrency(itemTotal), margin + contentWidth * 0.9, y + 5.5)
     pdf.setFont("helvetica", "normal")
 
     y += 8
@@ -1017,7 +1105,9 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
 
   pdf.setFontSize(9)
   pdf.text("Subtotal:", totalsX + 5, y + 8)
-  pdf.text(formatCurrency(runningTotal), totalsX + totalsWidth - 5, y + 8, { align: "right" })
+  pdf.text(formatCurrency(runningTotal), totalsX + totalsWidth - 5, y + 8, {
+    align: "right"
+  })
 
   pdf.text("Tax:", totalsX + 5, y + 15)
   pdf.text("$0.00", totalsX + totalsWidth - 5, y + 15, { align: "right" })
@@ -1028,7 +1118,12 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
   pdf.setFont("helvetica", "bold")
   pdf.text("TOTAL ESTIMATE:", totalsX + 5, y + 25)
   pdf.setFontSize(11)
-  pdf.text(formatCurrency(data.estimateTotal), totalsX + totalsWidth - 5, y + 25, { align: "right" })
+  pdf.text(
+    formatCurrency(data.estimateTotal),
+    totalsX + totalsWidth - 5,
+    y + 25,
+    { align: "right" }
+  )
 
   y += 35
 
@@ -1055,8 +1150,16 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
       certY += 4
     }
 
-    pdf.text("Contractor Signature: _____________________________", margin + 5, y + 22)
-    pdf.text(`Date: ${new Date().toLocaleDateString()}`, margin + contentWidth - 50, y + 22)
+    pdf.text(
+      "Contractor Signature: _____________________________",
+      margin + 5,
+      y + 22
+    )
+    pdf.text(
+      `Date: ${new Date().toLocaleDateString()}`,
+      margin + contentWidth - 50,
+      y + 22
+    )
 
     y += 38
   }
@@ -1083,8 +1186,14 @@ function generateInsuranceReadyPDF(data: ProposalData): jsPDF {
   pdf.rect(0, pageHeight - 15, pageWidth, 15, "F")
   pdf.setTextColor(...COLORS.gray600)
   pdf.setFontSize(7)
-  pdf.text("This document is intended for insurance claim purposes. Retain for your records.", margin, pageHeight - 8)
-  pdf.text(`${companyName} | Page 1 of 1`, pageWidth - margin, pageHeight - 8, { align: "right" })
+  pdf.text(
+    "This document is intended for insurance claim purposes. Retain for your records.",
+    margin,
+    pageHeight - 8
+  )
+  pdf.text(`${companyName} | Page 1 of 1`, pageWidth - margin, pageHeight - 8, {
+    align: "right"
+  })
 
   return pdf
 }
@@ -1294,7 +1403,10 @@ export async function POST(request: Request) {
     } else if (type === "property-report") {
       pdf = generatePropertyReportPDF(data as PropertyReportData)
     } else {
-      return NextResponse.json({ error: "Invalid report type" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Invalid report type" },
+        { status: 400 }
+      )
     }
 
     // Generate PDF buffer

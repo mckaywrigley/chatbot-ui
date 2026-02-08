@@ -62,7 +62,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
   {
     id: "professional-standard",
     name: "Professional Standard",
-    description: "Clean, modern teal design perfect for residential customers. Includes warranty section and professional formatting.",
+    description:
+      "Clean, modern teal design perfect for residential customers. Includes warranty section and professional formatting.",
     category: "professional",
     preview: "professional",
     popular: true,
@@ -72,7 +73,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
   {
     id: "detailed-breakdown",
     name: "Detailed Breakdown",
-    description: "Navy blue corporate style with 5-column itemized table, payment terms, and comprehensive specifications.",
+    description:
+      "Navy blue corporate style with 5-column itemized table, payment terms, and comprehensive specifications.",
     category: "detailed",
     preview: "detailed",
     headerColor: "bg-blue-900",
@@ -81,7 +83,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
   {
     id: "quick-quote",
     name: "Quick Quote",
-    description: "Minimal one-page design for fast quotes. Simple line items with a bold total section.",
+    description:
+      "Minimal one-page design for fast quotes. Simple line items with a bold total section.",
     category: "simple",
     preview: "simple",
     headerColor: "bg-teal-500",
@@ -90,7 +93,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
   {
     id: "insurance-ready",
     name: "Insurance Ready",
-    description: "Official form-style document for insurance claims. Includes contractor certification and line-numbered items.",
+    description:
+      "Official form-style document for insurance claims. Includes contractor certification and line-numbered items.",
     category: "insurance",
     preview: "insurance",
     headerColor: "bg-gray-800",
@@ -949,7 +953,8 @@ export function ProposalTemplates({
                           </div>
                           <div className="flex items-center justify-between pt-1">
                             <span className="text-sm font-medium text-teal-700">
-                              Line Total: {formatCurrency(item.qty * item.price)}
+                              Line Total:{" "}
+                              {formatCurrency(item.qty * item.price)}
                             </span>
                             <button
                               onClick={() => setEditingItemId(null)}
@@ -975,7 +980,8 @@ export function ProposalTemplates({
                                 </div>
                               )}
                               <div className="mt-1 text-xs text-gray-400">
-                                {item.qty} {item.unit} × ${item.price.toFixed(2)}
+                                {item.qty} {item.unit} × $
+                                {item.price.toFixed(2)}
                               </div>
                             </div>
                             <div className="text-right">
@@ -1079,11 +1085,15 @@ export function ProposalTemplates({
                       )}
                       <div>
                         <div className="text-2xl font-bold">
-                          {businessName || companyInfo?.name || "Your Roofing Company"}
+                          {businessName ||
+                            companyInfo?.name ||
+                            "Your Roofing Company"}
                         </div>
                         <div className="mt-1 text-sm opacity-90">
                           Licensed & Insured •{" "}
-                          {businessLicense || companyInfo?.license || "License #12345"}
+                          {businessLicense ||
+                            companyInfo?.license ||
+                            "License #12345"}
                         </div>
                       </div>
                     </div>

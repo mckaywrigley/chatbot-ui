@@ -150,7 +150,10 @@ export async function POST(request: Request) {
     // Build tool descriptions for better AI understanding
     const toolDescriptions = openaiTools
       .slice(0, 15) // Limit to prevent token overflow
-      .map(t => `- ${t.function.name}: ${t.function.description?.slice(0, 100) || "Execute this action"}`)
+      .map(
+        t =>
+          `- ${t.function.name}: ${t.function.description?.slice(0, 100) || "Execute this action"}`
+      )
       .join("\n")
 
     // Add comprehensive system context about available tools

@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { 
-  IconSearch, 
-  IconMail, 
-  IconMessageCircle, 
+import {
+  IconSearch,
+  IconMail,
+  IconMessageCircle,
   IconPhone,
   IconChevronDown,
   IconChevronUp,
@@ -133,21 +133,24 @@ export default function HelpPage() {
     }
   ]
 
-  const filteredFaqs = searchQuery 
-    ? faqs.map(cat => ({
-        ...cat,
-        questions: cat.questions.filter(q => 
-          q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          q.a.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(cat => cat.questions.length > 0)
+  const filteredFaqs = searchQuery
+    ? faqs
+        .map(cat => ({
+          ...cat,
+          questions: cat.questions.filter(
+            q =>
+              q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              q.a.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        }))
+        .filter(cat => cat.questions.length > 0)
     : faqs
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
           <a href="/">
             <Image
               src="/rooftops-logo-gr-black.png"
@@ -157,8 +160,8 @@ export default function HelpPage() {
               className="h-7 w-auto"
             />
           </a>
-          <a 
-            href="/login" 
+          <a
+            href="/login"
             className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-white"
           >
             Sign In
@@ -181,8 +184,8 @@ export default function HelpPage() {
               type="text"
               placeholder="Search for answers..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border-0 bg-white/10 py-4 pl-12 pr-4 text-white placeholder-gray-400 outline-none ring-1 ring-white/20 backdrop-blur-sm focus:ring-2 focus:ring-cyan-500"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border-0 bg-white/10 py-4 pl-12 pr-4 text-white outline-none ring-1 ring-white/20 backdrop-blur-sm placeholder:text-gray-400 focus:ring-2 focus:ring-cyan-500"
             />
           </div>
         </div>
@@ -199,8 +202,8 @@ export default function HelpPage() {
             <p className="mb-3 text-sm text-gray-600">
               Get a response within 24 hours
             </p>
-            <a 
-              href="mailto:sb@rooftops.ai" 
+            <a
+              href="mailto:sb@rooftops.ai"
               className="text-sm font-semibold text-cyan-600 hover:text-cyan-700"
             >
               sb@rooftops.ai
@@ -215,8 +218,8 @@ export default function HelpPage() {
             <p className="mb-3 text-sm text-gray-600">
               Instant answers from our AI assistant
             </p>
-            <a 
-              href="/login" 
+            <a
+              href="/login"
               className="inline-flex items-center gap-1 text-sm font-semibold text-green-600 hover:text-green-700"
             >
               Start Chat <IconArrowRight className="size-4" />
@@ -231,8 +234,8 @@ export default function HelpPage() {
             <p className="mb-3 text-sm text-gray-600">
               1-on-1 help implementing AI in your business
             </p>
-            <a 
-              href="/consulting" 
+            <a
+              href="/consulting"
               className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 hover:text-purple-700"
             >
               Learn More <IconArrowRight className="size-4" />
@@ -249,8 +252,10 @@ export default function HelpPage() {
 
         {filteredFaqs.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-            <p className="text-gray-600">No results found for "{searchQuery}"</p>
-            <button 
+            <p className="text-gray-600">
+              No results found for &ldquo;{searchQuery}&rdquo;
+            </p>
+            <button
               onClick={() => setSearchQuery("")}
               className="mt-4 text-sm font-semibold text-cyan-600"
             >
@@ -262,35 +267,44 @@ export default function HelpPage() {
             {filteredFaqs.map((category, catIdx) => {
               const Icon = category.icon
               return (
-                <div key={catIdx} className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div
+                  key={catIdx}
+                  className="rounded-xl border border-gray-200 bg-white shadow-sm"
+                >
                   <div className="flex items-center gap-3 border-b border-gray-100 p-4">
                     <div className="flex size-10 items-center justify-center rounded-lg bg-gray-100">
                       <Icon className="size-5 text-gray-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900">{category.category}</h3>
+                    <h3 className="font-bold text-gray-900">
+                      {category.category}
+                    </h3>
                   </div>
-                  
+
                   <div className="divide-y divide-gray-100">
                     {category.questions.map((faq, faqIdx) => {
                       const globalIdx = catIdx * 100 + faqIdx
                       const isOpen = openFaq === globalIdx
-                      
+
                       return (
                         <div key={faqIdx} className="p-4">
                           <button
-                            onClick={() => setOpenFaq(isOpen ? null : globalIdx)}
+                            onClick={() =>
+                              setOpenFaq(isOpen ? null : globalIdx)
+                            }
                             className="flex w-full items-center justify-between text-left"
                           >
-                            <span className="font-medium text-gray-900">{faq.q}</span>
+                            <span className="font-medium text-gray-900">
+                              {faq.q}
+                            </span>
                             {isOpen ? (
                               <IconChevronUp className="size-5 text-gray-400" />
                             ) : (
                               <IconChevronDown className="size-5 text-gray-400" />
                             )}
                           </button>
-                          
+
                           {isOpen && (
-                            <p className="mt-3 text-gray-600 leading-relaxed">
+                            <p className="mt-3 leading-relaxed text-gray-600">
                               {faq.a}
                             </p>
                           )}
@@ -313,13 +327,13 @@ export default function HelpPage() {
             Our team is here to help you get the most out of Rooftops AI
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a 
+            <a
               href="mailto:sb@rooftops.ai"
               className="rounded-lg bg-white px-6 py-3 font-semibold text-gray-900"
             >
               Email Support
             </a>
-            <a 
+            <a
               href="/consulting"
               className="rounded-lg border-2 border-white bg-transparent px-6 py-3 font-semibold text-white"
             >

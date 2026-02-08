@@ -120,10 +120,7 @@ export async function DELETE(request: Request) {
         .single()
 
       if (wsError || !workspace) {
-        return NextResponse.json(
-          { error: "Not authorized" },
-          { status: 403 }
-        )
+        return NextResponse.json({ error: "Not authorized" }, { status: 403 })
       }
     }
 

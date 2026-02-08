@@ -1,11 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useChatbotUI } from "@/context/context"
 import { RooftopsSVG } from "@/components/icons/rooftops-svg"
 import Link from "next/link"
@@ -106,10 +102,13 @@ export function FeatureDiscoveryModal({
   const step = steps[currentStep]
 
   return (
-    <Dialog open={open} onOpenChange={val => { if (!val) handleClose() }}>
-      <DialogContent
-        className="!m-0 !max-h-none !max-w-none !translate-x-0 !translate-y-0 !gap-0 !rounded-none !border-0 !bg-white !from-transparent !to-transparent !p-0 !shadow-none sm:!left-[50%] sm:!top-[50%] sm:!max-w-[460px] sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:!rounded-2xl sm:!border sm:!border-gray-200 sm:!shadow-2xl !inset-0 sm:!inset-auto sm:!max-h-[calc(100%-40px)]"
-      >
+    <Dialog
+      open={open}
+      onOpenChange={val => {
+        if (!val) handleClose()
+      }}
+    >
+      <DialogContent className="!inset-0 !m-0 !max-h-none !max-w-none !translate-x-0 !translate-y-0 !gap-0 !rounded-none !border-0 !bg-white !from-transparent !to-transparent !p-0 !shadow-none sm:!inset-auto sm:!left-[50%] sm:!top-[50%] sm:!max-h-[calc(100%-40px)] sm:!max-w-[460px] sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:!rounded-2xl sm:!border sm:!border-gray-200 sm:!shadow-2xl">
         <DialogTitle className="sr-only">{title}</DialogTitle>
 
         <div
@@ -121,7 +120,7 @@ export function FeatureDiscoveryModal({
           <div className="relative shrink-0 overflow-hidden px-6 pb-5 pt-8 sm:px-8 sm:pt-10">
             {/* Subtle gradient accent line at very top */}
             <div
-              className="absolute inset-x-0 top-0 h-1"
+              className="absolute inset-x-0 top-0 h-1 sm:rounded-t-2xl"
               style={{
                 background: "linear-gradient(90deg, #03A7FF, #50EBBC)"
               }}
@@ -130,7 +129,9 @@ export function FeatureDiscoveryModal({
             {/* Background glow */}
             <div
               className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full opacity-[0.07] blur-3xl"
-              style={{ background: "linear-gradient(135deg, #03A7FF, #50EBBC)" }}
+              style={{
+                background: "linear-gradient(135deg, #03A7FF, #50EBBC)"
+              }}
             />
 
             {/* Logo + brand */}
@@ -166,7 +167,8 @@ export function FeatureDiscoveryModal({
                   <button
                     key={i}
                     onClick={() => goToStep(i)}
-                    className="group relative h-7 flex-1 cursor-pointer"
+                    tabIndex={-1}
+                    className="group relative h-7 flex-1 cursor-pointer outline-none focus:outline-none"
                     aria-label={`Step ${i + 1} of ${steps.length}`}
                   >
                     <div
@@ -208,7 +210,7 @@ export function FeatureDiscoveryModal({
                   : "translate-x-0 opacity-100"
               }`}
             >
-              <div className="rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50/80 to-white px-5 py-5 shadow-sm sm:px-6">
+              <div className="rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50/80 to-white p-5 shadow-sm sm:px-6">
                 {/* Icon + premium badge row */}
                 <div className="mb-3 flex items-start justify-between">
                   <div className="flex size-12 items-center justify-center rounded-xl bg-white text-3xl shadow-sm ring-1 ring-gray-100">
@@ -218,8 +220,7 @@ export function FeatureDiscoveryModal({
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
                       style={{
-                        background:
-                          "linear-gradient(135deg, #03A7FF, #50EBBC)"
+                        background: "linear-gradient(135deg, #03A7FF, #50EBBC)"
                       }}
                     >
                       <svg
@@ -283,8 +284,7 @@ export function FeatureDiscoveryModal({
                       onClick={handleClose}
                       className="w-full rounded-xl px-5 py-3 text-[14px] font-bold text-white shadow-lg transition-all hover:shadow-xl active:scale-[0.98]"
                       style={{
-                        background:
-                          "linear-gradient(135deg, #03A7FF, #0ED4A3)",
+                        background: "linear-gradient(135deg, #03A7FF, #0ED4A3)",
                         boxShadow: "0 4px 14px rgba(3, 167, 255, 0.25)"
                       }}
                     >
@@ -316,8 +316,7 @@ export function FeatureDiscoveryModal({
                     onClick={handleClose}
                     className="w-full rounded-xl px-5 py-3.5 text-[15px] font-bold text-white shadow-lg transition-all hover:shadow-xl active:scale-[0.98]"
                     style={{
-                      background:
-                        "linear-gradient(135deg, #03A7FF, #0ED4A3)",
+                      background: "linear-gradient(135deg, #03A7FF, #0ED4A3)",
                       boxShadow: "0 4px 14px rgba(3, 167, 255, 0.25)"
                     }}
                   >

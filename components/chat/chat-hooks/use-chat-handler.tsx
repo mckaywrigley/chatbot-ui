@@ -296,7 +296,6 @@ export const useChatHandler = () => {
       // Clear the session storage
       sessionStorage.removeItem("pendingFileContext")
       sessionStorage.removeItem("pendingFileName")
-
     }
 
     // Check if this is a weather-related query

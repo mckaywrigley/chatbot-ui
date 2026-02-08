@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { 
-  IconUsers, 
-  IconMail, 
-  IconLogin, 
+import {
+  IconUsers,
+  IconMail,
+  IconLogin,
   IconCheck,
   IconTrendingUp,
   IconAlertCircle
@@ -96,22 +96,29 @@ export default function MigrationDashboard() {
 
         {/* Progress Bar */}
         <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">Migration Progress</h2>
+          <h2 className="mb-4 text-lg font-bold text-gray-900">
+            Migration Progress
+          </h2>
           <div className="h-4 w-full rounded-full bg-gray-200">
-            <div 
+            <div
               className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-green-500 transition-all"
-              style={{ width: `${((stats?.migrated || 0) / (stats?.total || 1)) * 100}%` }}
+              style={{
+                width: `${((stats?.migrated || 0) / (stats?.total || 1)) * 100}%`
+              }}
             ></div>
           </div>
           <p className="mt-2 text-sm text-gray-600">
-            {stats?.migrated} of {stats?.total} users migrated ({Math.round(((stats?.migrated || 0) / (stats?.total || 1)) * 100)}%)
+            {stats?.migrated} of {stats?.total} users migrated (
+            {Math.round(((stats?.migrated || 0) / (stats?.total || 1)) * 100)}%)
           </p>
         </div>
 
         {/* Email Campaign Actions */}
         <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">Email Campaigns</h2>
-          
+          <h2 className="mb-4 text-lg font-bold text-gray-900">
+            Email Campaigns
+          </h2>
+
           <div className="space-y-3">
             <CampaignRow
               week="Week 1"
@@ -119,7 +126,7 @@ export default function MigrationDashboard() {
               description="Announcement + free months offer"
               sent={15}
               total={25}
-              onSend={() => sendBatchEmails('week1')}
+              onSend={() => sendBatchEmails("week1")}
               sending={sending}
             />
             <CampaignRow
@@ -128,7 +135,7 @@ export default function MigrationDashboard() {
               description="Reminder + social proof"
               sent={0}
               total={10}
-              onSend={() => sendBatchEmails('week2')}
+              onSend={() => sendBatchEmails("week2")}
               sending={sending}
             />
             <CampaignRow
@@ -137,7 +144,7 @@ export default function MigrationDashboard() {
               description="Urgency + stats"
               sent={0}
               total={10}
-              onSend={() => sendBatchEmails('week3')}
+              onSend={() => sendBatchEmails("week3")}
               sending={sending}
             />
             <CampaignRow
@@ -146,7 +153,7 @@ export default function MigrationDashboard() {
               description="Final decision request"
               sent={0}
               total={10}
-              onSend={() => sendBatchEmails('week4')}
+              onSend={() => sendBatchEmails("week4")}
               sending={sending}
             />
           </div>
@@ -159,9 +166,12 @@ export default function MigrationDashboard() {
             <div>
               <h3 className="font-bold text-amber-900">Next Steps</h3>
               <p className="text-sm text-amber-800">
-                1. Export user emails from legacy database<br/>
-                2. Import to this dashboard<br/>
-                3. Send Week 1 campaign<br/>
+                1. Export user emails from legacy database
+                <br />
+                2. Import to this dashboard
+                <br />
+                3. Send Week 1 campaign
+                <br />
                 4. Monitor logins daily
               </p>
             </div>
@@ -172,17 +182,22 @@ export default function MigrationDashboard() {
   )
 }
 
-function StatCard({ icon: Icon, label, value, color }: { 
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  color
+}: {
   icon: React.ElementType
   label: string
   value: number
-  color: 'blue' | 'yellow' | 'purple' | 'green'
+  color: "blue" | "yellow" | "purple" | "green"
 }) {
   const colors = {
-    blue: 'bg-blue-100 text-blue-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    purple: 'bg-purple-100 text-purple-600',
-    green: 'bg-green-100 text-green-600'
+    blue: "bg-blue-100 text-blue-600",
+    yellow: "bg-yellow-100 text-yellow-600",
+    purple: "bg-purple-100 text-purple-600",
+    green: "bg-green-100 text-green-600"
   }
 
   return (
@@ -196,14 +211,14 @@ function StatCard({ icon: Icon, label, value, color }: {
   )
 }
 
-function CampaignRow({ 
-  week, 
-  title, 
-  description, 
-  sent, 
-  total, 
+function CampaignRow({
+  week,
+  title,
+  description,
+  sent,
+  total,
   onSend,
-  sending 
+  sending
 }: {
   week: string
   title: string
@@ -223,14 +238,16 @@ function CampaignRow({
           <h3 className="font-semibold text-gray-900">{title}</h3>
         </div>
         <p className="mt-1 text-sm text-gray-500">{description}</p>
-        <p className="mt-1 text-xs text-gray-400">{sent} of {total} sent</p>
+        <p className="mt-1 text-xs text-gray-400">
+          {sent} of {total} sent
+        </p>
       </div>
       <button
         onClick={onSend}
         disabled={sending || sent === total}
         className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
       >
-        {sending ? 'Sending...' : sent === total ? 'Sent' : 'Send'}
+        {sending ? "Sending..." : sent === total ? "Sent" : "Send"}
       </button>
     </div>
   )

@@ -107,7 +107,11 @@ export async function processSequenceSteps(): Promise<ProcessResult> {
       try {
         // Skip if sequence is no longer active
         if (!enrollment.sequence?.active) {
-          await updateEnrollmentStatus(enrollment.id, "paused", "Sequence deactivated")
+          await updateEnrollmentStatus(
+            enrollment.id,
+            "paused",
+            "Sequence deactivated"
+          )
           result.details.push({
             enrollment_id: enrollment.id,
             status: "skipped",
@@ -150,13 +154,21 @@ export async function processSequenceSteps(): Promise<ProcessResult> {
         if (currentStep.channel === "sms" && customer.phone) {
           sendResult = await sendSMS(
             customer.phone,
-            personalizeTemplate(currentStep.template, customer, enrollment.job_id)
+            personalizeTemplate(
+              currentStep.template,
+              customer,
+              enrollment.job_id
+            )
           )
         } else if (currentStep.channel === "email" && customer.email) {
           sendResult = await sendEmail(
             customer.email,
             currentStep.subject || enrollment.sequence?.name || "Follow-up",
-            personalizeTemplate(currentStep.template, customer, enrollment.job_id)
+            personalizeTemplate(
+              currentStep.template,
+              customer,
+              enrollment.job_id
+            )
           )
         } else {
           sendResult = {
@@ -173,7 +185,9 @@ export async function processSequenceSteps(): Promise<ProcessResult> {
           if (nextStep) {
             // Calculate next step time
             const nextStepAt = new Date()
-            nextStepAt.setDate(nextStepAt.getDate() + (nextStep.day - currentStep.day))
+            nextStepAt.setDate(
+              nextStepAt.getDate() + (nextStep.day - currentStep.day)
+            )
 
             await supabase
               .from("sequence_enrollments")

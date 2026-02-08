@@ -191,7 +191,9 @@ function generateProposalEmailHTML(data: ProposalEmailData): string {
   `
 }
 
-function generatePropertyReportEmailHTML(data: PropertyReportEmailData): string {
+function generatePropertyReportEmailHTML(
+  data: PropertyReportEmailData
+): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -291,15 +293,26 @@ function generatePropertyReportEmailHTML(data: PropertyReportEmailData): string 
 export async function POST(request: Request) {
   try {
     console.log("[Email Send] Starting email send process...")
-    console.log("[Email Send] RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY)
-    console.log("[Email Send] RESEND_FROM_EMAIL:", process.env.RESEND_FROM_EMAIL)
+    console.log(
+      "[Email Send] RESEND_API_KEY exists:",
+      !!process.env.RESEND_API_KEY
+    )
+    console.log(
+      "[Email Send] RESEND_FROM_EMAIL:",
+      process.env.RESEND_FROM_EMAIL
+    )
 
     const resend = getResendClient()
 
     if (!resend) {
-      console.error("[Email Send] Resend client not initialized - missing API key")
+      console.error(
+        "[Email Send] Resend client not initialized - missing API key"
+      )
       return NextResponse.json(
-        { error: "Email service not configured. Please add RESEND_API_KEY to environment." },
+        {
+          error:
+            "Email service not configured. Please add RESEND_API_KEY to environment."
+        },
         { status: 500 }
       )
     }
@@ -307,7 +320,11 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { type, recipientEmail, recipientName, data } = body
 
-    console.log("[Email Send] Request:", { type, recipientEmail, recipientName })
+    console.log("[Email Send] Request:", {
+      type,
+      recipientEmail,
+      recipientName
+    })
 
     if (!recipientEmail) {
       return NextResponse.json(
@@ -331,8 +348,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email type" }, { status: 400 })
     }
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "Rooftops AI <onboarding@resend.dev>"
-    console.log("[Email Send] Sending email from:", fromEmail, "to:", recipientEmail)
+    const fromEmail =
+      process.env.RESEND_FROM_EMAIL || "Rooftops AI <onboarding@resend.dev>"
+    console.log(
+      "[Email Send] Sending email from:",
+      fromEmail,
+      "to:",
+      recipientEmail
+    )
 
     // Send email using Resend
     const { data: emailData, error } = await resend.emails.send({
@@ -344,7 +367,10 @@ export async function POST(request: Request) {
     })
 
     if (error) {
-      console.error("[Email Send] Resend API Error:", JSON.stringify(error, null, 2))
+      console.error(
+        "[Email Send] Resend API Error:",
+        JSON.stringify(error, null, 2)
+      )
       return NextResponse.json(
         { error: `Failed to send email: ${error.message}`, details: error },
         { status: 500 }

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
+const RESEND_FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL || "Rooftops AI <onboarding@resend.dev>"
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +12,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Valid email required" },
         { status: 400 }
+      )
+    }
+
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY is not configured")
+      return NextResponse.json(
+        { error: "Email service not configured" },
+        { status: 500 }
+      )
+    }
+
+    // Warn if still using Resend sandbox domain (only delivers to account owner)
+    if (RESEND_FROM_EMAIL?.includes("@resend.dev")) {
+      console.warn(
+        "⚠️  Using Resend sandbox domain (@resend.dev). Emails will ONLY deliver to your Resend account email. Set RESEND_FROM_EMAIL to a verified domain (e.g. noreply@rooftops.ai) to send to real users."
       )
     }
 
@@ -39,7 +56,7 @@ export async function POST(request: Request) {
 async function sendCouponEmail(toEmail: string): Promise<boolean> {
   const couponCode = "FREEMONTHFORME"
   const discount = "$29"
-  
+
   const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
@@ -245,11 +262,11 @@ Questions? Contact us at team@rooftops.ai
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Rooftops AI <notifications@agent.rooftops.ai>",
+        from: RESEND_FROM_EMAIL,
         to: toEmail,
         subject: "🎁 Your Free Month of Rooftops AI - Coupon Inside",
         html: htmlContent,
@@ -260,11 +277,16 @@ Questions? Contact us at team@rooftops.ai
     const data = await response.json()
 
     if (!response.ok) {
-      console.error("Resend API error:", data)
+      console.error(
+        "Resend API error:",
+        JSON.stringify(data),
+        "Status:",
+        response.status
+      )
       return false
     }
 
-    console.log(`✅ Coupon email sent to ${toEmail}`, data)
+    console.log(`Coupon email sent to ${toEmail}`, data.id)
     return true
   } catch (error) {
     console.error("Failed to send coupon email:", error)

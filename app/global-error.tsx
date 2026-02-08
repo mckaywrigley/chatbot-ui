@@ -29,11 +29,20 @@ export default function GlobalError({
             textAlign: "center"
           }}
         >
-          <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem" }}>
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              marginBottom: "1rem"
+            }}
+          >
             Something went wrong
           </h2>
-          <p style={{ color: "#666", marginBottom: "1.5rem", maxWidth: "400px" }}>
-            An unexpected error occurred. Our team has been notified and is looking into it.
+          <p
+            style={{ color: "#666", marginBottom: "1.5rem", maxWidth: "400px" }}
+          >
+            An unexpected error occurred. Our team has been notified and is
+            looking into it.
           </p>
           <button
             onClick={reset}

@@ -12,7 +12,8 @@ import { LoginForm } from "@/components/ui/login-form"
 
 export const metadata: Metadata = {
   title: "Sign Up - Rooftops AI | AI Tools for Roofing Contractors",
-  description: "Create your free Rooftops AI account. Get instant roof reports, AI chatbots, and automation tools for your roofing business. 3-day free trial."
+  description:
+    "Create your free Rooftops AI account. Get instant roof reports, AI chatbots, and automation tools for your roofing business. 3-day free trial."
 }
 
 export default async function Login({
@@ -296,7 +297,7 @@ export default async function Login({
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex min-h-screen w-full flex-col items-center bg-white px-4 py-6 sm:p-8 lg:w-1/2 lg:justify-center lg:py-12 dark:bg-slate-950">
+      <div className="flex min-h-screen w-full flex-col items-center bg-white px-4 pb-16 pt-6 sm:p-8 lg:w-1/2 lg:justify-center lg:py-12 dark:bg-slate-950">
         {/* Mobile logo */}
         <div className="mb-6 flex w-full justify-center lg:hidden">
           <Image

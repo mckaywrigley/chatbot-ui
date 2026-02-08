@@ -1659,7 +1659,9 @@ const MapView: React.FC<MapViewProps> = ({
         </div>
 
         {/* Floating Control Panel at Bottom - Like chat input */}
-        <div className={`absolute inset-x-0 bottom-0 z-20 p-4 transition-all duration-300 ${isPreviewDrawerOpen ? "sm:right-[420px]" : ""}`}>
+        <div
+          className={`absolute inset-x-0 bottom-0 z-20 p-4 transition-all duration-300${isPreviewDrawerOpen ? "sm:right-[420px]" : ""}`}
+        >
           <div className="mx-auto max-w-4xl">
             {/* Navigation Tabs */}
             <FeatureTabs activeTab="report" className="pl-2 sm:pl-4" />
@@ -1667,98 +1669,98 @@ const MapView: React.FC<MapViewProps> = ({
             {/* Floating Container with gradient border */}
             <div className="gradient-border relative z-0 rounded-2xl p-[1px] shadow-2xl">
               <div className="rounded-[15px] bg-white p-4 dark:bg-gray-800">
-              {/* Search Input Row */}
-              <div className="mb-3 flex items-center gap-3">
-                {/* Address Search Input */}
-                <div className="relative grow">
-                  <Input
-                    ref={autocompleteInputRefMobile}
-                    type="text"
-                    placeholder="Search Address"
-                    className="h-12 w-full rounded-xl border-gray-300 bg-gray-50 pr-12 text-base focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-                    defaultValue={searchInputValue}
-                  />
+                {/* Search Input Row */}
+                <div className="mb-3 flex items-center gap-3">
+                  {/* Address Search Input */}
+                  <div className="relative grow">
+                    <Input
+                      ref={autocompleteInputRefMobile}
+                      type="text"
+                      placeholder="Search Address"
+                      className="h-12 w-full rounded-xl border-gray-300 bg-gray-50 pr-12 text-base focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                      defaultValue={searchInputValue}
+                    />
+                  </div>
+
+                  {/* Current Location Button */}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCurrentLocation}
+                    disabled={isSearching}
+                    className="size-12 shrink-0 rounded-xl border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-blue-900/20"
+                    title="Use current location"
+                  >
+                    {isSearching ? (
+                      <IconLoader2 size={20} className="animate-spin" />
+                    ) : (
+                      <IconCurrentLocation size={20} />
+                    )}
+                  </Button>
+
+                  {/* Measure Button - Icon Only, Desktop Only */}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={toggleDrawingTools}
+                    className={`hidden size-12 shrink-0 rounded-xl border-gray-300 hover:border-blue-500 hover:bg-blue-50 md:flex dark:border-gray-600 dark:hover:bg-blue-900/20 ${showDrawingTools ? "ring-2 ring-blue-500" : ""}`}
+                    title="Measure tools"
+                  >
+                    <IconRuler size={20} />
+                  </Button>
                 </div>
 
-                {/* Current Location Button */}
+                {/* Generate Report Button - Full Width */}
                 <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCurrentLocation}
-                  disabled={isSearching}
-                  className="size-12 shrink-0 rounded-xl border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-blue-900/20"
-                  title="Use current location"
+                  onClick={onAnalyzePropertyClick}
+                  disabled={!selectedLocation || isAnalyzing}
+                  className="mb-3 h-12 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-base font-semibold text-white hover:from-emerald-600 hover:to-cyan-600"
                 >
-                  {isSearching ? (
-                    <IconLoader2 size={20} className="animate-spin" />
+                  {isAnalyzing ? (
+                    <span className="flex items-center justify-center">
+                      <IconLoader2 size={20} className="mr-2 animate-spin" />
+                      Generating Report...
+                    </span>
                   ) : (
-                    <IconCurrentLocation size={20} />
+                    <span className="flex items-center justify-center">
+                      <IconBuildingSkyscraper size={20} className="mr-2" />
+                      Generate Full Report
+                    </span>
                   )}
                 </Button>
 
-                {/* Measure Button - Icon Only, Desktop Only */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleDrawingTools}
-                  className={`hidden size-12 shrink-0 rounded-xl border-gray-300 hover:border-blue-500 hover:bg-blue-50 md:flex dark:border-gray-600 dark:hover:bg-blue-900/20 ${showDrawingTools ? "ring-2 ring-blue-500" : ""}`}
-                  title="Measure tools"
-                >
-                  <IconRuler size={20} />
-                </Button>
-              </div>
+                {/* Bottom Row - AI Model Badge, Debug, and Tools (Smaller) - Desktop Only */}
+                <div className="hidden items-center gap-2 overflow-x-auto md:flex">
+                  {/* Rooftops Agent Badge (Read-only) */}
+                  <div className="flex h-8 items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 text-xs font-medium text-blue-700 dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
+                    <IconSparkles size={14} />
+                    <span>Rooftops Agent: On</span>
+                  </div>
 
-              {/* Generate Report Button - Full Width */}
-              <Button
-                onClick={onAnalyzePropertyClick}
-                disabled={!selectedLocation || isAnalyzing}
-                className="mb-3 h-12 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-base font-semibold text-white hover:from-emerald-600 hover:to-cyan-600"
-              >
-                {isAnalyzing ? (
-                  <span className="flex items-center justify-center">
-                    <IconLoader2 size={20} className="mr-2 animate-spin" />
-                    Generating Report...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center">
-                    <IconBuildingSkyscraper size={20} className="mr-2" />
-                    Generate Full Report
-                  </span>
-                )}
-              </Button>
+                  {/* Debug Button as Pill */}
+                  {onToggleDebugMode && (
+                    <Button
+                      variant="outline"
+                      onClick={onToggleDebugMode}
+                      className={`h-8 rounded-full border border-gray-300 bg-gray-50 px-3 text-xs dark:border-gray-600 dark:bg-gray-700 ${isDebugMode ? "ring-2 ring-blue-500" : ""}`}
+                    >
+                      <IconInfoCircle size={14} className="mr-1" />
+                      Debug
+                    </Button>
+                  )}
 
-              {/* Bottom Row - AI Model Badge, Debug, and Tools (Smaller) - Desktop Only */}
-              <div className="hidden items-center gap-2 overflow-x-auto md:flex">
-                {/* Rooftops Agent Badge (Read-only) */}
-                <div className="flex h-8 items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 text-xs font-medium text-blue-700 dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
-                  <IconSparkles size={14} />
-                  <span>Rooftops Agent: On</span>
+                  {measuredArea && (
+                    <span className="whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
+                      {measuredArea}
+                    </span>
+                  )}
+
+                  {measuredDistance && (
+                    <span className="whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
+                      {measuredDistance}
+                    </span>
+                  )}
                 </div>
-
-                {/* Debug Button as Pill */}
-                {onToggleDebugMode && (
-                  <Button
-                    variant="outline"
-                    onClick={onToggleDebugMode}
-                    className={`h-8 rounded-full border border-gray-300 bg-gray-50 px-3 text-xs dark:border-gray-600 dark:bg-gray-700 ${isDebugMode ? "ring-2 ring-blue-500" : ""}`}
-                  >
-                    <IconInfoCircle size={14} className="mr-1" />
-                    Debug
-                  </Button>
-                )}
-
-                {measuredArea && (
-                  <span className="whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
-                    {measuredArea}
-                  </span>
-                )}
-
-                {measuredDistance && (
-                  <span className="whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
-                    {measuredDistance}
-                  </span>
-                )}
-              </div>
               </div>
             </div>
           </div>

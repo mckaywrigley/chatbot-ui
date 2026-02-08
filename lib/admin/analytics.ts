@@ -15,11 +15,7 @@ const PLAN_PRICES: Record<string, number> = {
 }
 
 // Annual plan types
-const ANNUAL_PLANS = [
-  "premium_annual",
-  "business_annual",
-  "ai_employee_annual"
-]
+const ANNUAL_PLANS = ["premium_annual", "business_annual", "ai_employee_annual"]
 
 export interface DailyMetrics {
   date: string
@@ -77,7 +73,7 @@ export async function calculateMRR(): Promise<number> {
 
   for (const sub of subscriptions || []) {
     const planPrice = PLAN_PRICES[sub.plan_type] || 0
-    
+
     // For annual plans, divide by 12 to get monthly equivalent
     if (ANNUAL_PLANS.includes(sub.plan_type)) {
       mrrCents += Math.round(planPrice / 12)
@@ -118,7 +114,7 @@ export async function getDailyNewUsers(
 
   // Group by date
   const counts: Record<string, number> = {}
-  
+
   for (const profile of profiles || []) {
     const date = profile.created_at.split("T")[0]
     counts[date] = (counts[date] || 0) + 1
@@ -128,7 +124,7 @@ export async function getDailyNewUsers(
   const result: { date: string; count: number }[] = []
   const start = new Date(startDate)
   const end = new Date(endDate)
-  
+
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split("T")[0]
     result.push({
@@ -161,7 +157,7 @@ export async function getDailyReports(
 
   // Group by date
   const counts: Record<string, number> = {}
-  
+
   for (const report of reports || []) {
     if (report.created_at) {
       const date = report.created_at.split("T")[0]
@@ -173,7 +169,7 @@ export async function getDailyReports(
   const result: { date: string; count: number }[] = []
   const start = new Date(startDate)
   const end = new Date(endDate)
-  
+
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split("T")[0]
     result.push({
@@ -206,7 +202,7 @@ export async function getDailyMessages(
 
   // Group by date
   const counts: Record<string, number> = {}
-  
+
   for (const message of messages || []) {
     const date = message.created_at.split("T")[0]
     counts[date] = (counts[date] || 0) + 1
@@ -216,7 +212,7 @@ export async function getDailyMessages(
   const result: { date: string; count: number }[] = []
   const start = new Date(startDate)
   const end = new Date(endDate)
-  
+
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split("T")[0]
     result.push({
@@ -250,17 +246,17 @@ export async function getDailyRevenue(
 
   // Group by date
   const amounts: Record<string, number> = {}
-  
+
   for (const sub of subscriptions || []) {
     if (sub.created_at) {
       const date = sub.created_at.split("T")[0]
       const planPrice = PLAN_PRICES[sub.plan_type] || 0
-      
+
       // For annual plans, divide by 12 to get monthly equivalent
       const monthlyPrice = ANNUAL_PLANS.includes(sub.plan_type)
         ? Math.round(planPrice / 12)
         : planPrice
-      
+
       amounts[date] = (amounts[date] || 0) + monthlyPrice
     }
   }
@@ -269,7 +265,7 @@ export async function getDailyRevenue(
   const result: { date: string; amount: number }[] = []
   const start = new Date(startDate)
   const end = new Date(endDate)
-  
+
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split("T")[0]
     result.push({
@@ -305,7 +301,8 @@ export async function getUserMetrics(): Promise<UserMetrics> {
   }
 
   const totalPaying = payingData?.length || 0
-  const totalTrialing = payingData?.filter(u => u.status === "trialing").length || 0
+  const totalTrialing =
+    payingData?.filter(u => u.status === "trialing").length || 0
 
   // Get yesterday's counts for daily change (approximation)
   const yesterday = new Date()
@@ -450,7 +447,10 @@ export function exportToCSV(
         .map(header => {
           const value = row[header]
           // Escape values containing commas or quotes
-          if (typeof value === "string" && (value.includes(",") || value.includes('"'))) {
+          if (
+            typeof value === "string" &&
+            (value.includes(",") || value.includes('"'))
+          ) {
             return `"${value.replace(/"/g, '""')}"`
           }
           return value ?? ""

@@ -622,7 +622,10 @@ export function UnifiedSidebar({ isCollapsed, onToggle }: UnifiedSidebarProps) {
             </Link>
           )}
           {profile?.is_admin && isCollapsed && (
-            <Link href="/admin/dashboard" className="flex w-full justify-center">
+            <Link
+              href="/admin/dashboard"
+              className="flex w-full justify-center"
+            >
               <button className="flex w-full flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-gray-500 transition-all hover:bg-gray-50 hover:text-gray-700">
                 <IconShieldCog size={SIDEBAR_ICON_SIZE} stroke={1.5} />
                 <span className="text-[10px] leading-tight">Admin</span>

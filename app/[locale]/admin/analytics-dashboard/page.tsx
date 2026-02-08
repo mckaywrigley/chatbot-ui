@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { 
-  IconUsers, 
-  IconCreditCard, 
-  IconTrendingUp, 
+import {
+  IconUsers,
+  IconCreditCard,
+  IconTrendingUp,
   IconReport,
   IconMessageCircle,
   IconArrowUp,
@@ -65,8 +65,10 @@ export default function AdminDashboard() {
 
   const checkAuthAndFetch = async () => {
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user }
+    } = await supabase.auth.getUser()
+
     if (!user) {
       router.push("/login")
       return
@@ -123,17 +125,23 @@ export default function AdminDashboard() {
   const sevenDaysAgo = trends[trends.length - 8]
   const latest = trends[trends.length - 1]
 
-  const userChange = sevenDaysAgo 
-    ? ((current?.totalRegisteredUsers || 0) - (sevenDaysAgo.total_registered_users || 0))
+  const userChange = sevenDaysAgo
+    ? (current?.totalRegisteredUsers || 0) -
+      (sevenDaysAgo.total_registered_users || 0)
     : 0
 
   const mrrChange = sevenDaysAgo
-    ? ((current?.mrrDollars || 0) - (sevenDaysAgo.mrr_cents / 100 || 0))
+    ? (current?.mrrDollars || 0) - (sevenDaysAgo.mrr_cents / 100 || 0)
     : 0
 
   // Chart data
   const userTrendData = {
-    labels: trends.map(t => new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })),
+    labels: trends.map(t =>
+      new Date(t.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      })
+    ),
     datasets: [
       {
         label: "Total Users",
@@ -155,7 +163,12 @@ export default function AdminDashboard() {
   }
 
   const revenueTrendData = {
-    labels: trends.map(t => new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })),
+    labels: trends.map(t =>
+      new Date(t.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      })
+    ),
     datasets: [
       {
         label: "MRR ($)",
@@ -169,7 +182,11 @@ export default function AdminDashboard() {
   }
 
   const usageData = {
-    labels: trends.slice(-7).map(t => new Date(t.date).toLocaleDateString("en-US", { weekday: "short" })),
+    labels: trends
+      .slice(-7)
+      .map(t =>
+        new Date(t.date).toLocaleDateString("en-US", { weekday: "short" })
+      ),
     datasets: [
       {
         label: "Reports Generated",
@@ -190,7 +207,9 @@ export default function AdminDashboard() {
       <header className="border-b border-gray-200 bg-white px-6 py-4">
         <div className="mx-auto max-w-7xl">
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500">Rooftops AI Analytics & Metrics</p>
+          <p className="text-sm text-gray-500">
+            Rooftops AI Analytics & Metrics
+          </p>
         </div>
       </header>
 
@@ -231,7 +250,9 @@ export default function AdminDashboard() {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <IconReport className="size-5 text-purple-600" />
-                <span className="text-sm font-medium text-gray-600">Total Usage</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Total Usage
+                </span>
               </div>
             </div>
             <div className="space-y-3">
@@ -255,9 +276,11 @@ export default function AdminDashboard() {
         <div className="mb-8 grid gap-6 lg:grid-cols-2">
           {/* User Growth Chart */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">User Growth (30 Days)</h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+              User Growth (30 Days)
+            </h3>
             <div className="h-64">
-              <Line 
+              <Line
                 data={userTrendData}
                 options={{
                   responsive: true,
@@ -271,19 +294,21 @@ export default function AdminDashboard() {
 
           {/* Revenue Chart */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">Revenue Growth (30 Days)</h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+              Revenue Growth (30 Days)
+            </h3>
             <div className="h-64">
-              <Line 
+              <Line
                 data={revenueTrendData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: { legend: { position: "bottom" } },
-                  scales: { 
-                    y: { 
+                  scales: {
+                    y: {
                       beginAtZero: true,
-                      ticks: { callback: (value) => `$${value}` }
-                    } 
+                      ticks: { callback: value => `$${value}` }
+                    }
                   }
                 }}
               />
@@ -293,9 +318,11 @@ export default function AdminDashboard() {
 
         {/* Charts Row 2 */}
         <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Usage (Last 7 Days)</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">
+            Usage (Last 7 Days)
+          </h3>
           <div className="h-64">
-            <Bar 
+            <Bar
               data={usageData}
               options={{
                 responsive: true,
@@ -310,37 +337,58 @@ export default function AdminDashboard() {
         {/* Daily Metrics Table */}
         <div className="rounded-xl border border-gray-200 bg-white">
           <div className="border-b border-gray-200 px-6 py-4">
-            <h3 className="text-lg font-semibold text-gray-900">Daily Metrics (Last 30 Days)</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Daily Metrics (Last 30 Days)
+            </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 font-medium text-gray-500">Date</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">New Signups</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Paying</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">
+                    New Signups
+                  </th>
+                  <th className="px-6 py-3 font-medium text-gray-500">
+                    Paying
+                  </th>
                   <th className="px-6 py-3 font-medium text-gray-500">MRR</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Reports</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">
+                    Reports
+                  </th>
                   <th className="px-6 py-3 font-medium text-gray-500">Chats</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {[...trends].reverse().slice(0, 10).map((day) => (
-                  <tr key={day.date}>
-                    <td className="px-6 py-3 text-gray-900">
-                      {new Date(day.date).toLocaleDateString("en-US", { 
-                        month: "short", 
-                        day: "numeric",
-                        year: "numeric"
-                      })}
-                    </td>
-                    <td className="px-6 py-3 text-gray-600">+{day.new_signups}</td>
-                    <td className="px-6 py-3 text-gray-600">{day.total_paying_users}</td>
-                    <td className="px-6 py-3 text-gray-600">${(day.mrr_cents / 100).toLocaleString()}</td>
-                    <td className="px-6 py-3 text-gray-600">{day.total_reports_generated.toLocaleString()}</td>
-                    <td className="px-6 py-3 text-gray-600">{day.total_chat_messages.toLocaleString()}</td>
-                  </tr>
-                ))}
+                {[...trends]
+                  .reverse()
+                  .slice(0, 10)
+                  .map(day => (
+                    <tr key={day.date}>
+                      <td className="px-6 py-3 text-gray-900">
+                        {new Date(day.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </td>
+                      <td className="px-6 py-3 text-gray-600">
+                        +{day.new_signups}
+                      </td>
+                      <td className="px-6 py-3 text-gray-600">
+                        {day.total_paying_users}
+                      </td>
+                      <td className="px-6 py-3 text-gray-600">
+                        ${(day.mrr_cents / 100).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3 text-gray-600">
+                        {day.total_reports_generated.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3 text-gray-600">
+                        {day.total_chat_messages.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -351,14 +399,14 @@ export default function AdminDashboard() {
 }
 
 // Metric Card Component
-function MetricCard({ 
-  title, 
-  value, 
-  change, 
+function MetricCard({
+  title,
+  value,
+  change,
   changePrefix = "",
   subtitle,
   icon: Icon,
-  color 
+  color
 }: any) {
   const colorClasses: Record<string, string> = {
     blue: "bg-blue-50 text-blue-600",
@@ -373,13 +421,18 @@ function MetricCard({
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
-        <div className={`flex size-10 items-center justify-center rounded-lg ${colorClasses[color]}`}>
+        <div
+          className={`flex size-10 items-center justify-center rounded-lg ${colorClasses[color]}`}
+        >
           <Icon className="size-5" />
         </div>
         {change !== undefined && (
-          <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? "text-green-600" : "text-red-600"}`}>
+          <div
+            className={`flex items-center gap-1 text-sm font-medium ${isPositive ? "text-green-600" : "text-red-600"}`}
+          >
             <ArrowIcon className="size-4" />
-            {changePrefix}{Math.abs(change).toLocaleString()}
+            {changePrefix}
+            {Math.abs(change).toLocaleString()}
           </div>
         )}
       </div>

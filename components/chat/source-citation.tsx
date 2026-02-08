@@ -106,11 +106,7 @@ export function SourceCitation({
             {isClickable && <ExternalLink className="size-2.5 opacity-60" />}
           </span>
         </TooltipTrigger>
-        <TooltipContent
-          side="top"
-          className="max-w-xs"
-          sideOffset={5}
-        >
+        <TooltipContent side="top" className="max-w-xs" sideOffset={5}>
           <div className="space-y-1">
             <p className="line-clamp-2 font-medium">{title}</p>
             {domain && (

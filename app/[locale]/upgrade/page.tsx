@@ -11,7 +11,9 @@ import { useChatbotUI } from "@/context/context"
 export default function UpgradePage() {
   const router = useRouter()
   const { profile } = useChatbotUI()
-  const [activeTab, setActiveTab] = useState<"pro" | "business" | "ai_employee">("pro")
+  const [activeTab, setActiveTab] = useState<
+    "pro" | "business" | "ai_employee"
+  >("pro")
   const [loading, setLoading] = useState(false)
 
   const handleCheckout = async (priceId: string, planType: string) => {
@@ -117,9 +119,7 @@ export default function UpgradePage() {
             <>
               {/* Pro Plan */}
               <div className="mb-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                  Pro
-                </h2>
+                <h2 className="mb-2 text-2xl font-bold text-gray-900">Pro</h2>
                 <p className="text-sm text-gray-600">
                   For solo roofers & small crews
                 </p>

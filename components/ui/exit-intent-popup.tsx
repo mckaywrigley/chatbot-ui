@@ -16,7 +16,7 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
 
   useEffect(() => {
     let shown = false
-    
+
     const handleMouseLeave = (e: MouseEvent) => {
       // Only trigger when mouse leaves from the top of the page
       if (e.clientY <= 0 && !shown && !submitted) {
@@ -29,7 +29,12 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
     let lastScrollY = window.scrollY
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      if (currentScrollY < lastScrollY && currentScrollY < 100 && !shown && !submitted) {
+      if (
+        currentScrollY < lastScrollY &&
+        currentScrollY < 100 &&
+        !shown &&
+        !submitted
+      ) {
         shown = true
         setIsVisible(true)
       }
@@ -73,11 +78,20 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
           onSignup()
         }, 3000)
       } else {
-        toast.error(data.error || "Failed to send coupon. Please try again.")
+        console.warn("Email send failed:", data.error)
+        toast.error("Couldn't send the email — but you can still sign up free!")
+        setTimeout(() => {
+          setIsVisible(false)
+          onSignup()
+        }, 2500)
       }
     } catch (error) {
       console.error("Error sending coupon:", error)
-      toast.error("Something went wrong. Please try again.")
+      toast.error("Something went wrong — but you can still sign up free!")
+      setTimeout(() => {
+        setIsVisible(false)
+        onSignup()
+      }, 2500)
     } finally {
       setIsLoading(false)
     }
@@ -86,12 +100,18 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
   if (!isVisible) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-md animate-in fade-in zoom-in duration-300">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      onClick={() => setIsVisible(false)}
+    >
+      <div
+        className="animate-in fade-in zoom-in relative w-full max-w-md duration-300"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Close button */}
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute -right-2 -top-2 z-10 rounded-full bg-white p-1 shadow-lg ring-1 ring-gray-100 transition-transform hover:scale-110"
+          className="absolute -right-2 -top-2 z-10 rounded-full bg-white p-2 shadow-lg ring-1 ring-gray-100 transition-transform hover:scale-110"
         >
           <IconX className="size-5 text-gray-500" />
         </button>
@@ -115,24 +135,57 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
                 <div className="mb-4 space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded-full bg-green-100">
-                      <svg className="size-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <svg
+                        className="size-3 text-green-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
-                    <span><strong>1 Month FREE</strong> of Rooftops Premium ($29 value)</span>
+                    <span>
+                      <strong>1 Month FREE</strong> of Rooftops Premium ($29
+                      value)
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded-full bg-green-100">
-                      <svg className="size-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <svg
+                        className="size-3 text-green-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                     <span>1 free AI roof report (no credit card required)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded-full bg-green-100">
-                      <svg className="size-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <svg
+                        className="size-3 text-green-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                     <span>The 7-Day Roofing AI Quick-Start Guide</span>
@@ -145,7 +198,7 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       className="w-full rounded-lg border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-[#24BDEB] focus:ring-2 focus:ring-[#24BDEB]/20"
                       required
@@ -154,13 +207,28 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full rounded-lg bg-gradient-to-r from-[#24BDEB] to-[#4FEBBC] py-3 font-semibold text-white shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg bg-gradient-to-r from-[#24BDEB] to-[#4FEBBC] py-3 font-semibold text-white shadow-md transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin size-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <svg
+                          className="size-4 animate-spin"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
                         </svg>
                         Sending...
                       </span>
@@ -177,16 +245,29 @@ export function ExitIntentPopup({ onSignup }: ExitIntentPopupProps) {
             ) : (
               <div className="py-6 text-center">
                 <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100">
-                  <svg className="size-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="size-8 text-green-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900">Check Your Email!</h4>
+                <h4 className="text-lg font-bold text-gray-900">
+                  Check Your Email!
+                </h4>
                 <p className="mt-2 text-sm text-gray-600">
-                  We just sent your <strong>$29 coupon code</strong> and free toolkit to your inbox.
+                  We just sent your <strong>$29 coupon code</strong> and free
+                  toolkit to your inbox.
                 </p>
                 <p className="mt-1 text-xs text-gray-500">
-                  (Don't forget to check your spam folder)
+                  (Don&apos;t forget to check your spam folder)
                 </p>
               </div>
             )}

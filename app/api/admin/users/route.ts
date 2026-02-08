@@ -23,8 +23,13 @@ const getServiceClient = () => {
 }
 
 // Verify admin access - checks is_admin flag in profiles table
-async function verifyAdmin(serverClient: any): Promise<{ authorized: boolean; userId?: string; email?: string }> {
-  const { data: { user }, error } = await serverClient.auth.getUser()
+async function verifyAdmin(
+  serverClient: any
+): Promise<{ authorized: boolean; userId?: string; email?: string }> {
+  const {
+    data: { user },
+    error
+  } = await serverClient.auth.getUser()
   if (error || !user) {
     return { authorized: false }
   }
@@ -117,7 +122,9 @@ export async function GET(request: NextRequest) {
     } catch (authError) {
       console.error("Failed to fetch auth users:", authError)
       return NextResponse.json(
-        { error: "Failed to fetch auth users. Check SUPABASE_SERVICE_ROLE_KEY." },
+        {
+          error: "Failed to fetch auth users. Check SUPABASE_SERVICE_ROLE_KEY."
+        },
         { status: 500 }
       )
     }
@@ -140,7 +147,9 @@ export async function GET(request: NextRequest) {
       supabase.from("chats").select("user_id, created_at"),
       supabase.from("messages").select("*", { count: "exact", head: true }),
       supabase.from("chats").select("*", { count: "exact", head: true }),
-      supabase.from("property_reports").select("*", { count: "exact", head: true })
+      supabase
+        .from("property_reports")
+        .select("*", { count: "exact", head: true })
     ])
 
     const profiles = profilesResult.data || []
@@ -153,7 +162,9 @@ export async function GET(request: NextRequest) {
     const totalReports = reportsCountResult.count || 0
 
     // Log data counts for debugging
-    console.log(`[Admin API] Auth users: ${authUsers.length}, Profiles: ${profiles.length}, Subscriptions: ${subscriptions.length}`)
+    console.log(
+      `[Admin API] Auth users: ${authUsers.length}, Profiles: ${profiles.length}, Subscriptions: ${subscriptions.length}`
+    )
 
     // Build lookup maps for O(1) access
     const profileMap = new Map(profiles.map(p => [p.user_id, p]))
@@ -192,20 +203,28 @@ export async function GET(request: NextRequest) {
       const userChats = chatsByUser.get(authUser.id) || []
 
       // Calculate total usage across all months
-      const totalChatMessages = usage.reduce((sum: number, u: any) =>
-        sum + (u.chat_messages_free || 0) + (u.chat_messages_premium || 0), 0
+      const totalChatMessages = usage.reduce(
+        (sum: number, u: any) =>
+          sum + (u.chat_messages_free || 0) + (u.chat_messages_premium || 0),
+        0
       )
-      const totalUserReports = usage.reduce((sum: number, u: any) =>
-        sum + (u.reports_generated || 0), 0
+      const totalUserReports = usage.reduce(
+        (sum: number, u: any) => sum + (u.reports_generated || 0),
+        0
       )
-      const totalWebSearches = usage.reduce((sum: number, u: any) =>
-        sum + (u.web_searches || 0), 0
+      const totalWebSearches = usage.reduce(
+        (sum: number, u: any) => sum + (u.web_searches || 0),
+        0
       )
 
       return {
         id: authUser.id,
         email: authUser.email || "Unknown",
-        display_name: profile?.display_name || authUser.user_metadata?.display_name || authUser.user_metadata?.name || "No name",
+        display_name:
+          profile?.display_name ||
+          authUser.user_metadata?.display_name ||
+          authUser.user_metadata?.name ||
+          "No name",
         created_at: authUser.created_at,
         last_sign_in: authUser.last_sign_in_at,
         email_confirmed: !!authUser.email_confirmed_at,
@@ -231,8 +250,9 @@ export async function GET(request: NextRequest) {
     })
 
     // Sort by created_at descending (newest first)
-    users.sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    users.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )
 
     // Calculate stats
@@ -242,28 +262,37 @@ export async function GET(request: NextRequest) {
     const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
 
-    const activeSubscriptions = subscriptions.filter(s =>
-      s.status === "active" || s.status === "trialing"
+    const activeSubscriptions = subscriptions.filter(
+      s => s.status === "active" || s.status === "trialing"
     )
-    const trialingSubscriptions = subscriptions.filter(s =>
-      s.status === "trialing"
+    const trialingSubscriptions = subscriptions.filter(
+      s => s.status === "trialing"
     )
-    const canceledSubscriptions = subscriptions.filter(s =>
-      s.status === "canceled" || s.status === "cancelled"
+    const canceledSubscriptions = subscriptions.filter(
+      s => s.status === "canceled" || s.status === "cancelled"
     )
-    const pastDueSubscriptions = subscriptions.filter(s =>
-      s.status === "past_due"
+    const pastDueSubscriptions = subscriptions.filter(
+      s => s.status === "past_due"
     )
 
     // Count by plan type
-    const premiumSubs = activeSubscriptions.filter(s =>
-      s.plan_type === "premium" || s.plan_type === "premium_monthly" || s.plan_type === "premium_annual"
+    const premiumSubs = activeSubscriptions.filter(
+      s =>
+        s.plan_type === "premium" ||
+        s.plan_type === "premium_monthly" ||
+        s.plan_type === "premium_annual"
     )
-    const businessSubs = activeSubscriptions.filter(s =>
-      s.plan_type === "business" || s.plan_type === "business_monthly" || s.plan_type === "business_annual"
+    const businessSubs = activeSubscriptions.filter(
+      s =>
+        s.plan_type === "business" ||
+        s.plan_type === "business_monthly" ||
+        s.plan_type === "business_annual"
     )
-    const aiEmployeeSubs = activeSubscriptions.filter(s =>
-      s.plan_type === "ai_employee" || s.plan_type === "ai_employee_monthly" || s.plan_type === "ai_employee_annual"
+    const aiEmployeeSubs = activeSubscriptions.filter(
+      s =>
+        s.plan_type === "ai_employee" ||
+        s.plan_type === "ai_employee_monthly" ||
+        s.plan_type === "ai_employee_annual"
     )
 
     // Calculate MRR properly
@@ -281,13 +310,13 @@ export async function GET(request: NextRequest) {
     const thisMonthUsage = userUsage.filter(u => u.month === thisMonth)
 
     // Users who signed in during last 7 days
-    const activeUsers7d = users.filter(u =>
-      u.last_sign_in && new Date(u.last_sign_in) > weekAgo
+    const activeUsers7d = users.filter(
+      u => u.last_sign_in && new Date(u.last_sign_in) > weekAgo
     ).length
 
     // Users who signed in during last 30 days
-    const activeUsers30d = users.filter(u =>
-      u.last_sign_in && new Date(u.last_sign_in) > monthAgo
+    const activeUsers30d = users.filter(
+      u => u.last_sign_in && new Date(u.last_sign_in) > monthAgo
     ).length
 
     const stats = {
@@ -295,9 +324,14 @@ export async function GET(request: NextRequest) {
       activeUsersLast7Days: activeUsers7d,
       activeUsersLast30Days: activeUsers30d,
       newUsersToday: users.filter(u => u.created_at.startsWith(today)).length,
-      newUsersThisWeek: users.filter(u => new Date(u.created_at) > weekAgo).length,
-      newUsersThisMonth: users.filter(u => new Date(u.created_at) > monthAgo).length,
-      freeUsers: users.length - activeSubscriptions.length - canceledSubscriptions.length,
+      newUsersThisWeek: users.filter(u => new Date(u.created_at) > weekAgo)
+        .length,
+      newUsersThisMonth: users.filter(u => new Date(u.created_at) > monthAgo)
+        .length,
+      freeUsers:
+        users.length -
+        activeSubscriptions.length -
+        canceledSubscriptions.length,
       premiumUsers: premiumSubs.length,
       businessUsers: businessSubs.length,
       aiEmployeeUsers: aiEmployeeSubs.length,
@@ -309,31 +343,52 @@ export async function GET(request: NextRequest) {
       totalChats,
       totalMessages,
       totalReports,
-      totalWebSearches: userUsage.reduce((sum, u) => sum + (u.web_searches || 0), 0),
-      chatsThisMonth: thisMonthUsage.reduce((sum, u) =>
-        sum + (u.chat_messages_free || 0) + (u.chat_messages_premium || 0), 0
+      totalWebSearches: userUsage.reduce(
+        (sum, u) => sum + (u.web_searches || 0),
+        0
       ),
-      reportsThisMonth: thisMonthUsage.reduce((sum, u) =>
-        sum + (u.reports_generated || 0), 0
+      chatsThisMonth: thisMonthUsage.reduce(
+        (sum, u) =>
+          sum + (u.chat_messages_free || 0) + (u.chat_messages_premium || 0),
+        0
       ),
-      webSearchesThisMonth: thisMonthUsage.reduce((sum, u) =>
-        sum + (u.web_searches || 0), 0
+      reportsThisMonth: thisMonthUsage.reduce(
+        (sum, u) => sum + (u.reports_generated || 0),
+        0
+      ),
+      webSearchesThisMonth: thisMonthUsage.reduce(
+        (sum, u) => sum + (u.web_searches || 0),
+        0
       ),
       // Conversion metrics
-      trialToPayConversion: trialingSubscriptions.length > 0
-        ? Math.round(((premiumSubs.length + businessSubs.length + aiEmployeeSubs.length) /
-          (premiumSubs.length + businessSubs.length + aiEmployeeSubs.length + trialingSubscriptions.length)) * 100)
-        : 0,
-      onboardingCompletion: users.length > 0
-        ? Math.round((users.filter(u => u.has_onboarded).length / users.length) * 100)
-        : 0
+      trialToPayConversion:
+        trialingSubscriptions.length > 0
+          ? Math.round(
+              ((premiumSubs.length +
+                businessSubs.length +
+                aiEmployeeSubs.length) /
+                (premiumSubs.length +
+                  businessSubs.length +
+                  aiEmployeeSubs.length +
+                  trialingSubscriptions.length)) *
+                100
+            )
+          : 0,
+      onboardingCompletion:
+        users.length > 0
+          ? Math.round(
+              (users.filter(u => u.has_onboarded).length / users.length) * 100
+            )
+          : 0
     }
 
     return NextResponse.json({ users, stats })
   } catch (error) {
     console.error("Admin users API error:", error)
     return NextResponse.json(
-      { error: `Internal server error: ${error instanceof Error ? error.message : "Unknown error"}` },
+      {
+        error: `Internal server error: ${error instanceof Error ? error.message : "Unknown error"}`
+      },
       { status: 500 }
     )
   }

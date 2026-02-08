@@ -308,23 +308,25 @@ export async function POST(request: NextRequest) {
 
             // Only include if we have valid tool calls
             if (toolCallsArray.length > 0) {
-              const formattedToolCalls = toolCallsArray.map((tc: any) => {
-                const tcId = tc.id || tc.tool_call_id
-                if (tcId) seenToolCallIds.add(tcId)
-                return {
-                  id: tcId,
-                  type: "function" as const,
-                  function: {
-                    name: tc.name || tc.function?.name,
-                    arguments:
-                      typeof tc.arguments === "string"
-                        ? tc.arguments
-                        : JSON.stringify(
-                            tc.arguments || tc.function?.arguments || {}
-                          )
+              const formattedToolCalls = toolCallsArray
+                .map((tc: any) => {
+                  const tcId = tc.id || tc.tool_call_id
+                  if (tcId) seenToolCallIds.add(tcId)
+                  return {
+                    id: tcId,
+                    type: "function" as const,
+                    function: {
+                      name: tc.name || tc.function?.name,
+                      arguments:
+                        typeof tc.arguments === "string"
+                          ? tc.arguments
+                          : JSON.stringify(
+                              tc.arguments || tc.function?.arguments || {}
+                            )
+                    }
                   }
-                }
-              }).filter((tc: any) => tc.id && tc.function.name)
+                })
+                .filter((tc: any) => tc.id && tc.function.name)
 
               if (formattedToolCalls.length > 0) {
                 conversationHistory.push({
@@ -343,7 +345,9 @@ export async function POST(request: NextRequest) {
                 tool_call_id: msg.tool_call_id
               })
             } else {
-              console.log(`[Agent Stream] Skipping orphan tool message with tool_call_id: ${msg.tool_call_id}`)
+              console.log(
+                `[Agent Stream] Skipping orphan tool message with tool_call_id: ${msg.tool_call_id}`
+              )
             }
           } else if (msg.role === "user") {
             conversationHistory.push({

@@ -288,9 +288,7 @@ export default function AIEmployeesPage() {
                     </button>
                   </form>
                 )}
-                {error && (
-                  <p className="mt-2 text-sm text-red-400">{error}</p>
-                )}
+                {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
                 <p className="mt-3 text-xs text-white/50">
                   No spam. You&apos;ll get a private invite when AI Employees
                   launches.
@@ -446,7 +444,9 @@ export default function AIEmployeesPage() {
               {isSubmitted ? (
                 <div className="flex items-center gap-2 rounded-full bg-teal-500/20 px-5 py-3 text-teal-300">
                   <IconCircleCheck className="size-5" />
-                  <span className="font-medium">You&apos;re on the waitlist!</span>
+                  <span className="font-medium">
+                    You&apos;re on the waitlist!
+                  </span>
                 </div>
               ) : (
                 <form

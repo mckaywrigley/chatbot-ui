@@ -25,7 +25,9 @@ export function FeatureTabs({ activeTab, className }: FeatureTabsProps) {
   }
 
   return (
-    <div className={cn("relative z-10 -mb-[1px] flex items-end gap-0", className)}>
+    <div
+      className={cn("relative z-10 -mb-[1px] flex items-end gap-0", className)}
+    >
       {/* Chat Tab */}
       <div
         className={`rounded-t-xl transition-all duration-200 ${

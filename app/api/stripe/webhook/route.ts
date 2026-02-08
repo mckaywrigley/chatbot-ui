@@ -203,9 +203,15 @@ export async function POST(req: Request) {
           }
         }
 
-        await updateSubscription(subscription.id, updates)
+        const updated = await updateSubscription(subscription.id, updates)
 
-        console.log("✅ Subscription updated in database")
+        if (updated) {
+          console.log("✅ Subscription updated in database")
+        } else {
+          console.warn(
+            `⚠️ Subscription ${subscription.id} not found in DB — checkout.session.completed may not have been processed yet`
+          )
+        }
         break
       }
 
@@ -213,11 +219,17 @@ export async function POST(req: Request) {
         const subscription = event.data.object
         console.log("❌ Subscription canceled:", subscription.id)
 
-        await updateSubscription(subscription.id, {
+        const deleted = await updateSubscription(subscription.id, {
           status: "canceled"
         })
 
-        console.log("✅ Subscription canceled in database")
+        if (deleted) {
+          console.log("✅ Subscription canceled in database")
+        } else {
+          console.warn(
+            `⚠️ Subscription ${subscription.id} not found in DB for cancellation`
+          )
+        }
         break
       }
 

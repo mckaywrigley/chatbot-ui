@@ -1238,6 +1238,7 @@ export type Database = {
           id: string
           image_path: string
           image_url: string
+          is_admin: boolean | null
           mistral_api_key: string | null
           onedrive_connected: boolean | null
           openai_api_key: string | null
@@ -1271,6 +1272,7 @@ export type Database = {
           id?: string
           image_path: string
           image_url: string
+          is_admin?: boolean | null
           mistral_api_key?: string | null
           onedrive_connected?: boolean | null
           openai_api_key?: string | null
@@ -1304,6 +1306,7 @@ export type Database = {
           id?: string
           image_path?: string
           image_url?: string
+          is_admin?: boolean | null
           mistral_api_key?: string | null
           onedrive_connected?: boolean | null
           openai_api_key?: string | null

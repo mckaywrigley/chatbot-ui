@@ -3,13 +3,20 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { IconCheck, IconCalendar, IconBuildingStore, IconUsers, IconTarget, IconLoader2 } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCalendar,
+  IconBuildingStore,
+  IconUsers,
+  IconTarget,
+  IconLoader2
+} from "@tabler/icons-react"
 import { toast } from "sonner"
 
 export default function ConsultingSuccessPage() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -54,7 +61,11 @@ export default function ConsultingSuccessPage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
@@ -69,16 +80,22 @@ export default function ConsultingSuccessPage() {
             <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-green-100">
               <IconCheck className="size-10 text-green-600" />
             </div>
-            <h1 className="mb-4 text-3xl font-bold text-gray-900">You're All Set!</h1>
+            <h1 className="mb-4 text-3xl font-bold text-gray-900">
+              You&apos;re All Set!
+            </h1>
             <p className="mb-6 text-gray-600">
-              Thank you for your payment and for sharing details about your business. 
-              I'll review everything and reach out within 24 hours to schedule our first session.
+              Thank you for your payment and for sharing details about your
+              business. I&apos;ll review everything and reach out within 24
+              hours to schedule our first session.
             </p>
             <div className="rounded-lg bg-cyan-50 p-4">
               <p className="text-sm text-cyan-800">
-                <strong>Next Steps:</strong><br />
-                1. Check your email for confirmation<br />
-                2. I'll send scheduling link within 24 hours<br />
+                <strong>Next Steps:</strong>
+                <br />
+                1. Check your email for confirmation
+                <br />
+                2. I&apos;ll send scheduling link within 24 hours
+                <br />
                 3. Our first session will be Week 1: AI Audit & Strategy
               </p>
             </div>
@@ -111,9 +128,12 @@ export default function ConsultingSuccessPage() {
           <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100">
             <IconCheck className="size-8 text-green-600" />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">Payment Confirmed!</h1>
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+            Payment Confirmed!
+          </h1>
           <p className="text-gray-600">
-            Welcome to the AI Consulting Program. Let's get to know your business.
+            Welcome to the AI Consulting Program. Let&apos;s get to know your
+            business.
           </p>
         </div>
 
@@ -124,7 +144,7 @@ export default function ConsultingSuccessPage() {
               <IconBuildingStore className="size-5 text-cyan-600" />
               About Your Business
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -219,7 +239,7 @@ export default function ConsultingSuccessPage() {
               <IconTarget className="size-5 text-cyan-600" />
               Challenges & Goals
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -259,20 +279,36 @@ export default function ConsultingSuccessPage() {
               <IconUsers className="size-5 text-cyan-600" />
               AI Experience
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                  What's your current experience with AI tools? *
+                  What&apos;s your current experience with AI tools? *
                 </label>
                 <div className="space-y-2">
                   {[
-                    { value: "none", label: "No experience - this is all new to me" },
-                    { value: "basic", label: "Basic - I've played with ChatGPT a few times" },
-                    { value: "moderate", label: "Moderate - I use AI tools occasionally for work" },
-                    { value: "advanced", label: "Advanced - I already use AI regularly in my business" }
-                  ].map((option) => (
-                    <label key={option.value} className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50">
+                    {
+                      value: "none",
+                      label: "No experience - this is all new to me"
+                    },
+                    {
+                      value: "basic",
+                      label: "Basic - I've played with ChatGPT a few times"
+                    },
+                    {
+                      value: "moderate",
+                      label: "Moderate - I use AI tools occasionally for work"
+                    },
+                    {
+                      value: "advanced",
+                      label:
+                        "Advanced - I already use AI regularly in my business"
+                    }
+                  ].map(option => (
+                    <label
+                      key={option.value}
+                      className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50"
+                    >
                       <input
                         type="radio"
                         name="aiExperience"
@@ -281,7 +317,9 @@ export default function ConsultingSuccessPage() {
                         onChange={handleChange}
                         className="mt-1 size-4 text-cyan-600"
                       />
-                      <span className="text-sm text-gray-700">{option.label}</span>
+                      <span className="text-sm text-gray-700">
+                        {option.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -295,7 +333,7 @@ export default function ConsultingSuccessPage() {
               <IconCalendar className="size-5 text-cyan-600" />
               Scheduling Preferences
             </h2>
-            
+
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 What time of day works best for our weekly sessions? *
@@ -311,10 +349,11 @@ export default function ConsultingSuccessPage() {
                 <option value="morning">Morning (8am-12pm ET)</option>
                 <option value="afternoon">Afternoon (12pm-5pm ET)</option>
                 <option value="evening">Evening (5pm-8pm ET)</option>
-                <option value="flexible">I'm flexible</option>
+                <option value="flexible">I&apos;m flexible</option>
               </select>
               <p className="mt-2 text-xs text-gray-500">
-                All sessions are conducted via Zoom. I'll send you a scheduling link within 24 hours.
+                All sessions are conducted via Zoom. I&apos;ll send you a
+                scheduling link within 24 hours.
               </p>
             </div>
           </div>
@@ -322,13 +361,14 @@ export default function ConsultingSuccessPage() {
           {/* Submit */}
           <div className="rounded-xl bg-gradient-to-r from-cyan-50 to-green-50 p-6">
             <p className="mb-4 text-sm text-gray-600">
-              This information helps me prepare for our first session and customize 
-              the program to your specific needs. Everything is confidential.
+              This information helps me prepare for our first session and
+              customize the program to your specific needs. Everything is
+              confidential.
             </p>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-green-500 py-4 font-semibold text-white shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-green-500 py-4 font-semibold text-white shadow-md transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">

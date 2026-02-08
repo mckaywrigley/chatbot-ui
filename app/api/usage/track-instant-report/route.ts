@@ -25,7 +25,10 @@ export async function POST(request: Request) {
 
     if (error) {
       // Don't fail the request if tracking fails — just log it
-      console.warn("[track-instant-report] Failed to track usage:", error.message)
+      console.warn(
+        "[track-instant-report] Failed to track usage:",
+        error.message
+      )
     }
 
     return NextResponse.json({ tracked: true })

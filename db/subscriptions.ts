@@ -57,7 +57,7 @@ export async function createSubscription(
 export async function updateSubscription(
   stripeSubscriptionId: string,
   updates: SubscriptionUpdate
-): Promise<Subscription> {
+): Promise<Subscription | null> {
   const { data, error } = await supabase
     .from("subscriptions")
     .update(updates)
@@ -66,6 +66,14 @@ export async function updateSubscription(
     .single()
 
   if (error) {
+    // PGRST116 = no rows found — subscription may not exist yet
+    // (Stripe can fire "updated" before "checkout.session.completed")
+    if (error.code === "PGRST116") {
+      console.warn(
+        `[updateSubscription] No subscription found for stripe_subscription_id: ${stripeSubscriptionId} — likely a race condition with checkout.session.completed`
+      )
+      return null
+    }
     throw new Error(`Error updating subscription: ${error.message}`)
   }
 

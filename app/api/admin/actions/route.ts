@@ -20,8 +20,13 @@ const getServiceClient = () => {
 }
 
 // Verify admin access via is_admin flag
-async function verifyAdmin(serverClient: any): Promise<{ authorized: boolean; userId?: string; email?: string }> {
-  const { data: { user }, error } = await serverClient.auth.getUser()
+async function verifyAdmin(
+  serverClient: any
+): Promise<{ authorized: boolean; userId?: string; email?: string }> {
+  const {
+    data: { user },
+    error
+  } = await serverClient.auth.getUser()
   if (error || !user) {
     return { authorized: false }
   }
@@ -40,10 +45,13 @@ async function verifyAdmin(serverClient: any): Promise<{ authorized: boolean; us
 }
 
 // Email templates
-const EMAIL_TEMPLATES: Record<string, { subject: string; html: (vars: Record<string, string>) => string }> = {
+const EMAIL_TEMPLATES: Record<
+  string,
+  { subject: string; html: (vars: Record<string, string>) => string }
+> = {
   welcome: {
     subject: "Welcome to Rooftops AI!",
-    html: (vars) => `
+    html: vars => `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
         <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Rooftops AI</h1>
@@ -64,7 +72,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (vars: Record<str
   },
   trial_expiring: {
     subject: "Your trial is ending soon - Don't lose access!",
-    html: (vars) => `
+    html: vars => `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
         <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Your Trial is Ending Soon</h1>
@@ -85,7 +93,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (vars: Record<str
   },
   check_in: {
     subject: "How's everything going with Rooftops AI?",
-    html: (vars) => `
+    html: vars => `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
         <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 24px;">Just Checking In</h1>
@@ -103,7 +111,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (vars: Record<str
   },
   feature_announcement: {
     subject: "New Feature: Check out what's new in Rooftops AI!",
-    html: (vars) => `
+    html: vars => `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
         <div style="background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 28px;">What&apos;s New</h1>
@@ -123,7 +131,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (vars: Record<str
   },
   custom: {
     subject: "",
-    html: (vars) => `
+    html: vars => `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
         <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 24px;">Rooftops AI</h1>
@@ -164,14 +172,19 @@ export async function POST(request: NextRequest) {
         const allAuthUsers: any[] = []
         let page = 1
         while (true) {
-          const { data: authData } = await supabase.auth.admin.listUsers({ page, perPage: 500 })
+          const { data: authData } = await supabase.auth.admin.listUsers({
+            page,
+            perPage: 500
+          })
           if (!authData?.users || authData.users.length === 0) break
           allAuthUsers.push(...authData.users)
           if (authData.users.length < 500) break
           page++
         }
 
-        const targetUsers = allAuthUsers.filter(u => targetUserIds.includes(u.id))
+        const targetUsers = allAuthUsers.filter(u =>
+          targetUserIds.includes(u.id)
+        )
 
         if (targetUsers.length === 0) {
           return NextResponse.json({ error: "No users found" }, { status: 404 })
@@ -179,8 +192,14 @@ export async function POST(request: NextRequest) {
 
         const RESEND_API_KEY = process.env.RESEND_API_KEY
         if (!RESEND_API_KEY) {
-          return NextResponse.json({ error: "Email service not configured" }, { status: 500 })
+          return NextResponse.json(
+            { error: "Email service not configured - RESEND_API_KEY missing" },
+            { status: 500 }
+          )
         }
+
+        const fromEmail =
+          process.env.RESEND_FROM_EMAIL || "Rooftops AI <onboarding@resend.dev>"
 
         const results = []
         for (const targetUser of targetUsers) {
@@ -194,7 +213,10 @@ export async function POST(request: NextRequest) {
               const tmpl = EMAIL_TEMPLATES[template]
               emailSubject = emailSubject || tmpl.subject
               emailHtml = tmpl.html({
-                name: targetUser.user_metadata?.display_name || targetUser.user_metadata?.name || "",
+                name:
+                  targetUser.user_metadata?.display_name ||
+                  targetUser.user_metadata?.name ||
+                  "",
                 message: message || "",
                 ...(templateVars || {})
               })
@@ -212,21 +234,36 @@ export async function POST(request: NextRequest) {
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
-                from: "Rooftops AI <notifications@agent.rooftops.ai>",
+                from: fromEmail,
                 to: targetUser.email,
                 subject: emailSubject || "Message from Rooftops AI",
                 html: emailHtml
               })
             })
 
+            const resData = await response.json()
             if (response.ok) {
-              results.push({ email: targetUser.email, success: true })
+              results.push({
+                email: targetUser.email,
+                success: true,
+                id: resData.id
+              })
             } else {
-              const error = await response.json()
-              results.push({ email: targetUser.email, success: false, error: error.message })
+              console.error(`Resend error for ${targetUser.email}:`, resData)
+              results.push({
+                email: targetUser.email,
+                success: false,
+                error:
+                  resData.message || resData.error || JSON.stringify(resData)
+              })
             }
           } catch (err: any) {
-            results.push({ email: targetUser.email, success: false, error: err.message })
+            console.error(`Email send exception for ${targetUser.email}:`, err)
+            results.push({
+              email: targetUser.email,
+              success: false,
+              error: err.message
+            })
           }
         }
 
@@ -249,14 +286,19 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (!subscription) {
-          return NextResponse.json({ error: "No subscription found" }, { status: 404 })
+          return NextResponse.json(
+            { error: "No subscription found" },
+            { status: 404 }
+          )
         }
 
         const currentEnd = subscription.current_period_end
           ? new Date(subscription.current_period_end)
           : new Date()
 
-        const newEnd = new Date(currentEnd.getTime() + daysToExtend * 24 * 60 * 60 * 1000)
+        const newEnd = new Date(
+          currentEnd.getTime() + daysToExtend * 24 * 60 * 60 * 1000
+        )
 
         const { error } = await supabase
           .from("subscriptions")
@@ -268,7 +310,10 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId)
 
         if (error) {
-          return NextResponse.json({ error: "Failed to extend trial" }, { status: 500 })
+          return NextResponse.json(
+            { error: "Failed to extend trial" },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({
@@ -298,22 +343,26 @@ export async function POST(request: NextRequest) {
             .eq("user_id", userId)
 
           if (error) {
-            return NextResponse.json({ error: "Failed to update subscription" }, { status: 500 })
+            return NextResponse.json(
+              { error: "Failed to update subscription" },
+              { status: 500 }
+            )
           }
         } else {
-          const { error } = await supabase
-            .from("subscriptions")
-            .insert({
-              user_id: userId,
-              plan_type: plan_type || "premium",
-              tier: plan_type || "premium",
-              status: status || "active",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
+          const { error } = await supabase.from("subscriptions").insert({
+            user_id: userId,
+            plan_type: plan_type || "premium",
+            tier: plan_type || "premium",
+            status: status || "active",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
 
           if (error) {
-            return NextResponse.json({ error: "Failed to create subscription" }, { status: 500 })
+            return NextResponse.json(
+              { error: "Failed to create subscription" },
+              { status: 500 }
+            )
           }
         }
 
@@ -334,7 +383,10 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId)
 
         if (error) {
-          return NextResponse.json({ error: "Failed to cancel subscription" }, { status: 500 })
+          return NextResponse.json(
+            { error: "Failed to cancel subscription" },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({
@@ -348,7 +400,10 @@ export async function POST(request: NextRequest) {
         const allAuthUsers: any[] = []
         let pg = 1
         while (true) {
-          const { data: authData } = await supabase.auth.admin.listUsers({ page: pg, perPage: 500 })
+          const { data: authData } = await supabase.auth.admin.listUsers({
+            page: pg,
+            perPage: 500
+          })
           if (!authData?.users || authData.users.length === 0) break
           allAuthUsers.push(...authData.users)
           if (authData.users.length < 500) break
@@ -356,11 +411,19 @@ export async function POST(request: NextRequest) {
         }
 
         const { data: profiles } = await supabase.from("profiles").select("*")
-        const { data: subscriptions } = await supabase.from("subscriptions").select("*")
-        const { data: userUsage } = await supabase.from("user_usage").select("*")
+        const { data: subscriptions } = await supabase
+          .from("subscriptions")
+          .select("*")
+        const { data: userUsage } = await supabase
+          .from("user_usage")
+          .select("*")
 
-        const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]))
-        const subMap = new Map((subscriptions || []).map((s: any) => [s.user_id, s]))
+        const profileMap = new Map(
+          (profiles || []).map((p: any) => [p.user_id, p])
+        )
+        const subMap = new Map(
+          (subscriptions || []).map((s: any) => [s.user_id, s])
+        )
 
         const csvRows = [
           "Email,Name,Plan,Status,Trial End,Stripe Customer ID,Created,Last Sign In,Onboarded,Chat Messages,Reports,Web Searches"
@@ -369,28 +432,45 @@ export async function POST(request: NextRequest) {
         allAuthUsers.forEach(u => {
           const profile = profileMap.get(u.id)
           const sub = subMap.get(u.id)
-          const usage = (userUsage || []).filter((uu: any) => uu.user_id === u.id)
-          const totalChats = usage.reduce((s: number, uu: any) =>
-            s + (uu.chat_messages_free || 0) + (uu.chat_messages_premium || 0), 0)
-          const totalReports = usage.reduce((s: number, uu: any) =>
-            s + (uu.reports_generated || 0), 0)
-          const totalSearches = usage.reduce((s: number, uu: any) =>
-            s + (uu.web_searches || 0), 0)
+          const usage = (userUsage || []).filter(
+            (uu: any) => uu.user_id === u.id
+          )
+          const totalChats = usage.reduce(
+            (s: number, uu: any) =>
+              s +
+              (uu.chat_messages_free || 0) +
+              (uu.chat_messages_premium || 0),
+            0
+          )
+          const totalReports = usage.reduce(
+            (s: number, uu: any) => s + (uu.reports_generated || 0),
+            0
+          )
+          const totalSearches = usage.reduce(
+            (s: number, uu: any) => s + (uu.web_searches || 0),
+            0
+          )
 
-          csvRows.push([
-            `"${(u.email || "").replace(/"/g, '""')}"`,
-            `"${((profile as any)?.display_name || "").replace(/"/g, '""')}"`,
-            sub?.plan_type || "free",
-            sub?.status || "none",
-            sub?.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : "",
-            sub?.stripe_customer_id || "",
-            u.created_at ? new Date(u.created_at).toLocaleDateString() : "",
-            u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString() : "",
-            (profile as any)?.has_onboarded ? "Yes" : "No",
-            totalChats,
-            totalReports,
-            totalSearches
-          ].join(","))
+          csvRows.push(
+            [
+              `"${(u.email || "").replace(/"/g, '""')}"`,
+              `"${((profile as any)?.display_name || "").replace(/"/g, '""')}"`,
+              sub?.plan_type || "free",
+              sub?.status || "none",
+              sub?.current_period_end
+                ? new Date(sub.current_period_end).toLocaleDateString()
+                : "",
+              sub?.stripe_customer_id || "",
+              u.created_at ? new Date(u.created_at).toLocaleDateString() : "",
+              u.last_sign_in_at
+                ? new Date(u.last_sign_in_at).toLocaleDateString()
+                : "",
+              (profile as any)?.has_onboarded ? "Yes" : "No",
+              totalChats,
+              totalReports,
+              totalSearches
+            ].join(",")
+          )
         })
 
         return NextResponse.json({
@@ -409,13 +489,82 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ templates })
       }
 
+      case "get_usage_metrics": {
+        const { startDate, endDate } = data || {}
+
+        // Build date-filtered count queries in parallel
+        const queries: Promise<any>[] = []
+
+        // Chats count
+        let chatsQuery = supabase
+          .from("chats")
+          .select("*", { count: "exact", head: true })
+        if (startDate) chatsQuery = chatsQuery.gte("created_at", startDate)
+        if (endDate) chatsQuery = chatsQuery.lte("created_at", endDate)
+        queries.push(chatsQuery)
+
+        // Messages count
+        let messagesQuery = supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+        if (startDate)
+          messagesQuery = messagesQuery.gte("created_at", startDate)
+        if (endDate) messagesQuery = messagesQuery.lte("created_at", endDate)
+        queries.push(messagesQuery)
+
+        // Reports count
+        let reportsQuery = supabase
+          .from("property_reports")
+          .select("*", { count: "exact", head: true })
+        if (startDate) reportsQuery = reportsQuery.gte("created_at", startDate)
+        if (endDate) reportsQuery = reportsQuery.lte("created_at", endDate)
+        queries.push(reportsQuery)
+
+        // Web searches - aggregated in user_usage by month, so filter by month strings
+        let usageQuery = supabase
+          .from("user_usage")
+          .select(
+            "web_searches, chat_messages_free, chat_messages_premium, reports_generated, month"
+          )
+        if (startDate) {
+          const startMonth = startDate.substring(0, 7) // "YYYY-MM"
+          usageQuery = usageQuery.gte("month", startMonth)
+        }
+        if (endDate) {
+          const endMonth = endDate.substring(0, 7)
+          usageQuery = usageQuery.lte("month", endMonth)
+        }
+        queries.push(usageQuery)
+
+        const [chatsResult, messagesResult, reportsResult, usageResult] =
+          await Promise.all(queries)
+
+        const usageRows = usageResult.data || []
+        const totalWebSearches = usageRows.reduce(
+          (sum: number, u: any) => sum + (u.web_searches || 0),
+          0
+        )
+
+        return NextResponse.json({
+          success: true,
+          metrics: {
+            chats: chatsResult.count || 0,
+            messages: messagesResult.count || 0,
+            reports: reportsResult.count || 0,
+            webSearches: totalWebSearches
+          }
+        })
+      }
+
       default:
         return NextResponse.json({ error: "Unknown action" }, { status: 400 })
     }
   } catch (error) {
     console.error("Admin action error:", error)
     return NextResponse.json(
-      { error: `Internal server error: ${error instanceof Error ? error.message : "Unknown error"}` },
+      {
+        error: `Internal server error: ${error instanceof Error ? error.message : "Unknown error"}`
+      },
       { status: 500 }
     )
   }

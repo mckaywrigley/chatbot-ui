@@ -164,7 +164,9 @@ export async function POST(request: Request) {
                   }
                 }
               } catch (error: any) {
-                console.error(`OpenAI RAG - Query reformulation failed: ${error.message}`)
+                console.error(
+                  `OpenAI RAG - Query reformulation failed: ${error.message}`
+                )
               }
             }
 
@@ -212,11 +214,15 @@ export async function POST(request: Request) {
                 })
               }
             } else {
-              console.error(`OpenAI RAG - Brave API error: ${braveResponse.status}`)
+              console.error(
+                `OpenAI RAG - Brave API error: ${braveResponse.status}`
+              )
             }
           }
         } catch (braveError: any) {
-          console.error(`OpenAI RAG - Brave search error: ${braveError.message}`)
+          console.error(
+            `OpenAI RAG - Brave search error: ${braveError.message}`
+          )
           // Continue without Brave results - don't let this block the response
         }
 
@@ -334,7 +340,9 @@ export async function POST(request: Request) {
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {
-    console.error(`[OpenAI Route] Error: ${error.message || "Unknown error"}, status: ${error.status || 500}`)
+    console.error(
+      `[OpenAI Route] Error: ${error.message || "Unknown error"}, status: ${error.status || 500}`
+    )
 
     let errorMessage = error.message || "An unexpected error occurred"
     let errorCode = error.status || 500
@@ -380,7 +388,9 @@ export async function POST(request: Request) {
       errorCodeName = "CONNECTION_ERROR"
     }
 
-    console.error(`[OpenAI Route] Error response: ${errorCodeName} ${errorCode}`)
+    console.error(
+      `[OpenAI Route] Error response: ${errorCodeName} ${errorCode}`
+    )
 
     return new Response(
       JSON.stringify({

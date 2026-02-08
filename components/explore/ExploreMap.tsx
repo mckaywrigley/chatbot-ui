@@ -995,7 +995,7 @@ const ExploreMap: React.FC<ExploreMapProps> = ({
             await new Promise(resolve => setTimeout(resolve, 1000))
             // Trigger map re-render
             if (mapRef.current) {
-              google.maps.event.trigger(mapRef.current, 'resize')
+              google.maps.event.trigger(mapRef.current, "resize")
               await new Promise(resolve => setTimeout(resolve, 500))
             }
           } else {
@@ -1261,7 +1261,7 @@ const ExploreMap: React.FC<ExploreMapProps> = ({
       // Vercel serverless functions have a ~4.5MB body limit
       logDebug("Compressing images for API transfer...")
       const compressedViews = await Promise.all(
-        validViews.map(async (view) => {
+        validViews.map(async view => {
           if (!view.imageData) return view
           const originalSize = Math.round(view.imageData.length / 1024)
           const compressedData = await compressImageForApi(view.imageData)
@@ -2342,7 +2342,8 @@ ${referenceSection}
     // Show toast warning about keeping the screen on
     toast.info("Keep this tab active while generating the report", {
       duration: 5000,
-      description: "Switching tabs or letting your screen turn off may interrupt the process."
+      description:
+        "Switching tabs or letting your screen turn off may interrupt the process."
     })
 
     try {
@@ -2355,7 +2356,8 @@ ${referenceSection}
         // Check if page was hidden during analysis
         if (pageHiddenDuringAnalysis.current) {
           toast.error("Report generation was interrupted", {
-            description: "Your screen turned off or you switched tabs. Please try again and keep this tab active."
+            description:
+              "Your screen turned off or you switched tabs. Please try again and keep this tab active."
           })
         }
         // Error was already shown in captureSatelliteViews, just return
@@ -2480,7 +2482,6 @@ ${referenceSection}
                   : null
             }
           }
-
         } else {
           // Solar API returned error
         }
@@ -2539,7 +2540,6 @@ ${referenceSection}
             important: true
           }
         )
-
       }
     } finally {
       setIsLoading(false)
@@ -2636,7 +2636,9 @@ ${referenceSection}
           livePreviewImages={livePreviewImages}
           currentCaptureStage={currentCaptureStage}
           hasActiveReport={!!(roofAnalysis || reportData)}
-          isPreviewDrawerOpen={showPreviewDrawer && !roofAnalysis && !reportData}
+          isPreviewDrawerOpen={
+            showPreviewDrawer && !roofAnalysis && !reportData
+          }
         />
       </div>
 

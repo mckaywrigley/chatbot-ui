@@ -193,13 +193,22 @@ export function LoginForm({
           {/* Social proof */}
           <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
             <IconUsers className="size-4 text-gray-400" />
-            <span>Join <strong className="text-gray-700 dark:text-gray-300">2,000+</strong> roofing pros</span>
+            <span>
+              Join{" "}
+              <strong className="text-gray-700 dark:text-gray-300">
+                2,000+
+              </strong>{" "}
+              roofing pros
+            </span>
           </div>
 
           {/* Rating */}
           <div className="flex items-center justify-center gap-1">
             {[...Array(5)].map((_, i) => (
-              <IconStar key={i} className="size-4 fill-yellow-400 text-yellow-400" />
+              <IconStar
+                key={i}
+                className="size-4 fill-yellow-400 text-yellow-400"
+              />
             ))}
             <span className="ml-1 text-xs text-gray-500">4.9/5 rating</span>
           </div>

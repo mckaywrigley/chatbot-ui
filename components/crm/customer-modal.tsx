@@ -1,7 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { IconX, IconLoader2, IconMicrophone, IconPlayerStop } from "@tabler/icons-react"
+import {
+  IconX,
+  IconLoader2,
+  IconMicrophone,
+  IconPlayerStop
+} from "@tabler/icons-react"
 import { VoiceInput } from "./voice-input"
 
 interface Customer {
@@ -173,17 +178,20 @@ export function CustomerModal({
                   </h3>
                 </div>
                 <p className="mb-3 text-sm text-purple-700 dark:text-purple-300">
-                  Speak the customer details and AI will fill the form automatically.
+                  Speak the customer details and AI will fill the form
+                  automatically.
                 </p>
                 <VoiceInput
-                  onTranscript={(text) => console.log("Transcript:", text)}
-                  onParsedData={(data) => {
+                  onTranscript={text => console.log("Transcript:", text)}
+                  onParsedData={data => {
                     setFormData(prev => ({
                       ...prev,
                       ...data,
                       // Preserve existing values for fields not in voice input
                       status: data.status || prev.status,
-                      preferredContactMethod: data.preferredContactMethod || prev.preferredContactMethod
+                      preferredContactMethod:
+                        data.preferredContactMethod ||
+                        prev.preferredContactMethod
                     }))
                   }}
                   placeholder="Speak customer details"

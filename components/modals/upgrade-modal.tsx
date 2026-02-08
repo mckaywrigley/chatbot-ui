@@ -170,9 +170,7 @@ export function UpgradeModal({
                   className="mt-0.5 text-green-600 dark:text-green-400"
                   aria-hidden="true"
                 />
-                <span className="text-sm">
-                  1,000 GPT-5 messages/month
-                </span>
+                <span className="text-sm">1,000 GPT-5 messages/month</span>
               </div>
               <div className="flex items-start gap-2">
                 <IconCheck
@@ -232,9 +230,7 @@ export function UpgradeModal({
                   className="mt-0.5 text-green-600 dark:text-green-400"
                   aria-hidden="true"
                 />
-                <span className="text-sm">
-                  5,000 GPT-5 messages/month
-                </span>
+                <span className="text-sm">5,000 GPT-5 messages/month</span>
               </div>
               <div className="flex items-start gap-2">
                 <IconCheck

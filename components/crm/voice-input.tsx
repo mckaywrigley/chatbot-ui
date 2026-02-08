@@ -1,7 +1,11 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { IconMicrophone, IconPlayerStop, IconLoader2 } from "@tabler/icons-react"
+import {
+  IconMicrophone,
+  IconPlayerStop,
+  IconLoader2
+} from "@tabler/icons-react"
 
 interface VoiceInputProps {
   onTranscript: (transcript: string) => void
@@ -164,7 +168,7 @@ export function VoiceInput({
 
       {transcript && !isListening && !isParsing && (
         <p className="max-w-xs truncate text-sm italic text-gray-500">
-          "{transcript.slice(0, 50)}..."
+          &ldquo;{transcript.slice(0, 50)}...&rdquo;
         </p>
       )}
 
