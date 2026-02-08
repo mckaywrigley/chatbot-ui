@@ -1,20 +1,12 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Image from "next/image"
 import {
-  IconPlus,
-  IconWorld,
-  IconArrowUp,
-  IconMap,
-  IconMaximize,
   IconCalculator,
   IconFileText,
   IconMessageCircle,
-  IconHome,
-  IconClock,
-  IconCash,
   IconTargetArrow,
   IconTrendingUp,
   IconStar,
@@ -28,14 +20,13 @@ import {
   IconSparkles,
   IconBrandInstagram,
   IconMail,
-  IconCheck,
-  IconRocket,
-  IconShield,
-  IconLock,
-  IconUsers
+  IconRocket
 } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/client"
 import { ExitIntentPopup } from "@/components/ui/exit-intent-popup"
+import LandingHeroMap from "@/components/landing/LandingHeroMap"
+import PropertyPreviewDrawer from "@/components/explore/PropertyPreviewDrawer"
+import { SignupGateModal } from "@/components/landing/SignupGateModal"
 
 // Testimonials data for social proof
 const testimonials = [
@@ -68,9 +59,16 @@ const testimonials = [
 export default function LandingPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [activeTab, setActiveTab] = useState<"chat" | "report">("chat")
-  const [inputValue, setInputValue] = useState("")
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+
+  // Interactive map hero state
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number
+    lng: number
+  } | null>(null)
+  const [selectedAddress, setSelectedAddress] = useState("")
+  const [showPreviewDrawer, setShowPreviewDrawer] = useState(false)
+  const [showSignupGate, setShowSignupGate] = useState(false)
 
   // Check auth in background without blocking render
   useEffect(() => {
@@ -120,41 +118,31 @@ export default function LandingPage() {
     router.push("/login")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    router.push("/login")
-  }
+  // Handle property selection from interactive map
+  const handlePropertySelect = useCallback(
+    (location: { lat: number; lng: number }, address: string) => {
+      const used =
+        typeof window !== "undefined" &&
+        localStorage.getItem("rooftops_free_preview_used") === "true"
+      if (used) {
+        setShowSignupGate(true)
+        return
+      }
+      // Allow first free preview
+      if (typeof window !== "undefined") {
+        localStorage.setItem("rooftops_free_preview_used", "true")
+      }
+      setSelectedLocation(location)
+      setSelectedAddress(address)
+      setShowPreviewDrawer(true)
+    },
+    []
+  )
 
   return (
     <div className="relative flex min-h-full w-full flex-col bg-[#FAFAFA]">
-      {/* Legacy User Banner */}
-      <div className="w-full bg-amber-50 border-b border-amber-200 px-4 py-2 text-center">
-        <p className="text-sm text-amber-800">
-          <span className="font-semibold">Legacy user?</span> Access the classic version at{" "}
-          <a 
-            href="https://legacy.rooftops.ai" 
-            className="font-semibold underline text-amber-700 hover:text-amber-900"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            legacy.rooftops.ai
-          </a>
-          {" "}·{" "}
-          <a 
-            href="#" 
-            className="text-amber-600 hover:text-amber-800"
-            onClick={(e) => {
-              e.preventDefault()
-              // Could add dismiss logic here
-            }}
-          >
-            Dismiss
-          </a>
-        </p>
-      </div>
-
-      {/* Header - Full width edge-to-edge */}
-      <header className="sticky top-0 z-50 flex w-full items-center justify-between bg-[#FAFAFA] px-4 py-3 md:px-6">
+      {/* Header - Transparent overlay on map hero */}
+      <header className="absolute inset-x-0 top-0 z-50 flex w-full items-center justify-between px-4 py-3 md:px-6">
         <div
           className="flex shrink-0 cursor-pointer items-center"
           onClick={handleRedirectToLogin}
@@ -164,7 +152,7 @@ export default function LandingPage() {
             alt="Rooftops AI"
             width={160}
             height={40}
-            className="h-7 w-auto object-contain sm:h-8 md:h-9"
+            className="h-7 w-auto rounded-md bg-white/90 object-contain px-2 py-1 shadow-sm backdrop-blur-sm sm:h-8 md:h-9"
             priority
           />
         </div>
@@ -172,81 +160,67 @@ export default function LandingPage() {
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <button
             onClick={handleRedirectToLogin}
-            className="px-2 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 sm:px-3"
+            className="px-2 py-1.5 text-sm font-medium text-white/90 transition-colors hover:text-white sm:px-3"
           >
             Sign In
           </button>
           <button
             onClick={handleRedirectToLogin}
-            className="rounded-lg bg-[#1A1A1A] px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-black sm:px-4 sm:py-2"
+            className="rounded-lg bg-white/95 px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm backdrop-blur-sm transition-all hover:bg-white sm:px-4 sm:py-2"
           >
             Sign Up
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex flex-1 flex-col items-center px-4 pb-12 pt-6 sm:pt-10 md:px-6 md:pt-16 lg:pt-20">
+      {/* Interactive Map Hero — Full-screen "try before signup" experience */}
+      <div className="relative h-[70vh] w-full sm:h-[80vh]">
+        {/* Overlay gradient for hero text legibility */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-black/50 to-transparent" />
+
+        {/* Hero text overlay */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 text-center sm:pt-8">
+          <h1 className="text-2xl font-bold leading-tight tracking-tight text-white drop-shadow-lg sm:text-4xl md:text-5xl">
+            Win more roofing jobs. Work less.
+          </h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm font-medium text-white/80 drop-shadow sm:mt-3 sm:text-base">
+            Search any address below to see instant roof data — free, no signup required.
+          </p>
+        </div>
+
+        {/* The interactive map */}
+        <LandingHeroMap
+          onPropertySelect={handlePropertySelect}
+          isDrawerOpen={showPreviewDrawer}
+        />
+
+        {/* Instant Property Preview Drawer — gated to 1 free preview */}
+        {selectedLocation && selectedAddress && (
+          <PropertyPreviewDrawer
+            isOpen={showPreviewDrawer}
+            onClose={() => setShowPreviewDrawer(false)}
+            address={selectedAddress}
+            location={selectedLocation}
+            onGenerateFullReport={() => {
+              setShowPreviewDrawer(false)
+              setShowSignupGate(true)
+            }}
+            isAnalyzing={false}
+          />
+        )}
+
+        {/* Signup gate modal after 1 free preview */}
+        <SignupGateModal
+          open={showSignupGate}
+          onOpenChange={setShowSignupGate}
+        />
+      </div>
+
+      {/* Scrollable content below the fold */}
+      <main className="flex flex-1 flex-col items-center px-4 pb-12 pt-10 md:px-6">
         <div className="relative z-10 w-full max-w-5xl">
-          {/* Trust Badge - Above the fold */}
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 sm:text-sm">
-            <div className="flex items-center gap-1.5">
-              <IconUsers className="size-4 text-[#24BDEB]" />
-              <span>Join <strong className="text-gray-700">2,000+</strong> roofing pros</span>
-            </div>
-            <div className="hidden h-4 w-px bg-gray-300 sm:block" />
-            <div className="flex items-center gap-1.5">
-              <IconStar className="size-4 fill-yellow-400 text-yellow-400" />
-              <span><strong className="text-gray-700">4.9/5</strong> rating</span>
-            </div>
-            <div className="hidden h-4 w-px bg-gray-300 sm:block" />
-            <div className="flex items-center gap-1.5">
-              <IconShield className="size-4 text-green-500" />
-              <span>No credit card required</span>
-            </div>
-          </div>
-
-          {/* Hero Heading with Shimmer Effect */}
-          <div className="mb-6 text-center sm:mb-10 md:mb-14">
-            <h1 className="animate-shimmer-text text-4xl leading-tight tracking-tight sm:text-5xl md:text-5xl lg:text-6xl">
-              Win more roofing jobs. Work less.
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl font-[Inter] text-sm font-normal text-gray-600 sm:text-base md:text-lg">
-              AI-powered roof reports, instant estimates, and automated
-              proposals. Close deals faster while your competition is still
-              measuring.
-            </p>
-            
-            {/* Urgency Banner */}
-            <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 ring-1 ring-amber-200">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex size-2 rounded-full bg-amber-500"></span>
-              </span>
-              <span className="text-sm font-medium text-amber-800">
-                🔥 <strong>47 spots</strong> left at current pricing
-              </span>
-            </div>
-
-            <div className="mt-6 flex flex-col items-center justify-center gap-3">
-              <button
-                onClick={handleRedirectToLogin}
-                className="w-full rounded-lg bg-[#1A1A1A] px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl sm:w-auto"
-              >
-                Try It Free — No Credit Card Required
-              </button>
-              <p className="text-sm text-gray-500">
-                Get 1 free report instantly. See the AI in action on your own properties.
-              </p>
-            </div>
-            
-            <p className="mt-3 text-xs text-gray-400">
-              Trusted by roofing contractors nationwide · Cancel anytime
-            </p>
-          </div>
-
-          {/* Quantified Value Stats - Like Handoff */}
-          <div className="mx-auto mb-8 grid max-w-3xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:gap-4">
+          {/* Quantified Value Stats */}
+          <div className="mx-auto mb-10 grid max-w-3xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:gap-4">
             <div className="rounded-xl bg-white p-3 text-center shadow-sm ring-1 ring-gray-100">
               <div className="text-xl font-bold text-[#24BDEB] sm:text-2xl">
                 +12 hrs
@@ -271,205 +245,6 @@ export default function LandingPage() {
               </div>
               <div className="text-xs text-gray-500">avg revenue boost</div>
             </div>
-          </div>
-
-          {/* Chat Input */}
-          <div className="mx-auto flex w-full max-w-3xl flex-col px-0 sm:px-4">
-            {/* Tabs Container */}
-            <div className="relative z-10 -mb-[1px] flex items-end gap-0 pl-2 sm:pl-4">
-              {/* Chat Tab */}
-              <div
-                className={`rounded-t-xl transition-all duration-200 ${
-                  activeTab === "chat"
-                    ? "z-20 bg-[#24BDEB] p-[1px] pb-0"
-                    : "mb-[1px] py-[1px]"
-                }`}
-              >
-                <button
-                  onClick={() => setActiveTab("chat")}
-                  className={`flex size-full items-center gap-1.5 whitespace-nowrap rounded-t-[11px] px-3 py-2 text-sm font-medium sm:gap-2 sm:px-4 sm:py-2.5${
-                    activeTab === "chat"
-                      ? "border-b border-white bg-white pb-2.5 pt-2 text-gray-900 sm:pb-3 sm:pt-2.5"
-                      : "border border-transparent bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-900"
-                  }`}
-                >
-                  <IconMessageCircle className="size-4" />
-                  <span>Rooftops Chat</span>
-                </button>
-              </div>
-
-              {/* Report Tab */}
-              <div
-                className={`ml-[-1px] rounded-t-xl transition-all duration-200 ${
-                  activeTab === "report"
-                    ? "z-20 bg-[#4FEBBC] p-[1px] pb-0"
-                    : "mb-[1px] py-[1px]"
-                }`}
-              >
-                <button
-                  onClick={() => setActiveTab("report")}
-                  className={`flex size-full items-center gap-1.5 whitespace-nowrap rounded-t-[11px] px-3 py-2 text-sm font-medium sm:gap-2 sm:px-4 sm:py-2.5${
-                    activeTab === "report"
-                      ? "border-b border-white bg-white pb-2.5 pt-2 text-gray-900 sm:pb-3 sm:pt-2.5"
-                      : "border border-transparent bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-900"
-                  }`}
-                >
-                  <IconHome className="size-4" />
-                  <span>Instant Roof Report</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Input Area with Gradient Border */}
-            <div className="gradient-border relative z-0 rounded-2xl p-[1px] shadow-lg">
-              <form
-                onSubmit={handleSubmit}
-                className="relative rounded-[15px] bg-white p-3 transition-all duration-300 sm:p-4"
-              >
-                <textarea
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  placeholder={
-                    activeTab === "chat"
-                      ? "Ask me anything..."
-                      : "Enter address for instant report..."
-                  }
-                  className="min-h-[60px] w-full resize-none bg-transparent text-base text-gray-900 outline-none placeholder:text-gray-400 sm:min-h-[80px]"
-                  onKeyDown={e => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSubmit(e)
-                    }
-                  }}
-                />
-
-                <div className="mt-2 flex items-center justify-between">
-                  {/* Left Actions */}
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <button
-                      type="button"
-                      onClick={handleRedirectToLogin}
-                      className="rounded-full p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:p-2"
-                      title="Add attachment"
-                    >
-                      <IconPlus className="size-4 sm:size-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleRedirectToLogin}
-                      className="rounded-full p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:p-2"
-                      title="Browse internet"
-                    >
-                      <IconWorld className="size-4 sm:size-5" />
-                    </button>
-                    <div className="mx-1 h-4 w-[1px] bg-gray-200" />
-                    <button
-                      type="button"
-                      onClick={handleRedirectToLogin}
-                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:gap-2 sm:py-1.5"
-                    >
-                      <svg
-                        className="size-3.5 sm:size-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                      </svg>
-                      <span>GPT-5.2</span>
-                    </button>
-                  </div>
-
-                  {/* Send Button */}
-                  <button
-                    type="submit"
-                    className={`flex items-center justify-center rounded-full p-1.5 transition-all duration-200 sm:p-2 ${
-                      inputValue.trim()
-                        ? "scale-100 bg-gray-900 text-white shadow-md"
-                        : "cursor-not-allowed bg-gray-200 text-gray-500"
-                    }`}
-                  >
-                    <IconArrowUp className="size-4 sm:size-5" />
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          {/* Feature Cards */}
-          <div className="mx-auto mt-5 grid w-full max-w-3xl grid-cols-2 gap-2.5 sm:mt-6 sm:gap-3 sm:px-4 md:grid-cols-4">
-            {/* Card 1 - with gradient border */}
-            <button
-              onClick={handleRedirectToLogin}
-              className="group relative h-full rounded-xl bg-gradient-to-r from-[#24BDEB] to-[#4FEBBC]/50 p-[1px] text-left shadow-sm transition-all duration-300 hover:shadow-md"
-            >
-              <div className="flex h-full flex-col justify-between rounded-[11px] bg-white p-3 transition-colors hover:bg-gray-50">
-                <div className="mb-2">
-                  <IconMap className="mb-2 size-5 text-[#24BDEB]" />
-                  <h3 className="text-sm font-bold leading-tight text-[#1A1A1A]">
-                    Instant Roof Measurements
-                  </h3>
-                </div>
-                <p className="text-xs leading-tight text-gray-500">
-                  2 min reports
-                </p>
-              </div>
-            </button>
-
-            {/* Card 2 */}
-            <button
-              onClick={handleRedirectToLogin}
-              className="group relative h-full rounded-xl border border-gray-200 bg-white text-left shadow-sm transition-all duration-200 hover:shadow-md"
-            >
-              <div className="flex h-full flex-col justify-between rounded-xl p-3 transition-colors hover:bg-gray-50">
-                <div className="mb-2">
-                  <IconMaximize className="mb-2 size-5 text-[#24BDEB]" />
-                  <h3 className="text-sm font-bold leading-tight text-[#1A1A1A]">
-                    Satellite Roof Analysis
-                  </h3>
-                </div>
-                <p className="text-xs leading-tight text-gray-500">
-                  No ladder needed
-                </p>
-              </div>
-            </button>
-
-            {/* Card 3 */}
-            <button
-              onClick={handleRedirectToLogin}
-              className="group relative h-full rounded-xl border border-gray-200 bg-white text-left shadow-sm transition-all duration-200 hover:shadow-md"
-            >
-              <div className="flex h-full flex-col justify-between rounded-xl p-3 transition-colors hover:bg-gray-50">
-                <div className="mb-2">
-                  <IconCalculator className="mb-2 size-5 text-[#24BDEB]" />
-                  <h3 className="text-sm font-bold leading-tight text-[#1A1A1A]">
-                    AI Cost Estimates
-                  </h3>
-                </div>
-                <p className="text-xs leading-tight text-gray-500">
-                  Bid with confidence
-                </p>
-              </div>
-            </button>
-
-            {/* Card 4 */}
-            <button
-              onClick={handleRedirectToLogin}
-              className="group relative h-full rounded-xl border border-gray-200 bg-white text-left shadow-sm transition-all duration-200 hover:shadow-md"
-            >
-              <div className="flex h-full flex-col justify-between rounded-xl p-3 transition-colors hover:bg-gray-50">
-                <div className="mb-2">
-                  <IconFileText className="mb-2 size-5 text-[#24BDEB]" />
-                  <h3 className="text-sm font-bold leading-tight text-[#1A1A1A]">
-                    AI Proposals & Follow-ups
-                  </h3>
-                </div>
-                <p className="text-xs leading-tight text-gray-500">
-                  Close Deals
-                </p>
-              </div>
-            </button>
           </div>
 
           {/* How It Works Section */}
@@ -833,7 +608,7 @@ export default function LandingPage() {
       </main>
 
       {/* Floating CTA - Sticky on scroll */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm sm:hidden">
         <button
           onClick={handleRedirectToLogin}
           className="w-full rounded-lg bg-gradient-to-r from-[#24BDEB] to-[#4FEBBC] py-3 text-sm font-semibold text-white shadow-md"
