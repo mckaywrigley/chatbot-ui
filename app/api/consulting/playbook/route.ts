@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { supabase } from "@/lib/supabase/service-role"
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const RESEND_FROM_EMAIL =
@@ -27,6 +28,16 @@ export async function POST(request: Request) {
       console.warn(
         "⚠️  Using Resend sandbox domain (@resend.dev). Emails will ONLY deliver to your Resend account email."
       )
+    }
+
+    // Save lead capture to database
+    try {
+      await supabase.from("lead_captures").insert({
+        email,
+        source: "consulting_playbook"
+      })
+    } catch (dbError) {
+      console.warn("Failed to save lead capture:", dbError)
     }
 
     const sent = await sendPlaybookEmail(email)

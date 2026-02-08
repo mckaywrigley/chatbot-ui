@@ -123,7 +123,15 @@ type SortField =
   | "reports_count"
   | "web_searches"
 type SortOrder = "asc" | "desc"
-type TabType = "overview" | "users" | "revenue" | "engagement"
+type TabType = "overview" | "users" | "revenue" | "engagement" | "leads"
+
+interface LeadCapture {
+  id: string
+  email: string
+  source: string
+  coupon_code: string | null
+  created_at: string
+}
 
 // Saved filter presets
 const SAVED_FILTERS: {
@@ -203,6 +211,8 @@ export default function AdminDashboard() {
   const [refreshing, setRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState<TabType>("overview")
   const [error, setError] = useState<string | null>(null)
+  const [leads, setLeads] = useState<LeadCapture[]>([])
+  const [leadsLoading, setLeadsLoading] = useState(false)
 
   // User list state
   const [searchTerm, setSearchTerm] = useState("")
@@ -289,6 +299,19 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error("Auth check failed:", err)
       router.push("/")
+    }
+  }
+
+  const fetchLeads = async () => {
+    setLeadsLoading(true)
+    try {
+      const response = await fetch("/api/admin/leads")
+      const data = await response.json()
+      setLeads(data.leads || [])
+    } catch (err) {
+      console.error("Failed to fetch leads:", err)
+    } finally {
+      setLeadsLoading(false)
     }
   }
 
@@ -823,11 +846,14 @@ export default function AdminDashboard() {
 
           {/* Tab Navigation */}
           <div className="-mb-px mt-3 flex gap-6">
-            {(["overview", "users", "revenue", "engagement"] as TabType[]).map(
+            {(["overview", "users", "revenue", "engagement", "leads"] as TabType[]).map(
               tab => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab)
+                    if (tab === "leads" && leads.length === 0) fetchLeads()
+                  }}
                   className={`border-b-2 pb-2 text-xs font-medium capitalize transition ${
                     activeTab === tab
                       ? "border-cyan-500 text-cyan-600 dark:text-cyan-400"
@@ -1828,6 +1854,77 @@ export default function AdminDashboard() {
                   </p>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* === LEADS TAB === */}
+        {activeTab === "leads" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-white">
+                Lead Captures ({leads.length})
+              </h2>
+              <button
+                onClick={fetchLeads}
+                disabled={leadsLoading}
+                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700/50"
+              >
+                <IconRefresh className={`size-3.5 ${leadsLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+              {leadsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <IconRefresh className="size-5 animate-spin text-gray-400" />
+                </div>
+              ) : leads.length === 0 ? (
+                <div className="py-12 text-center">
+                  <IconMail className="mx-auto mb-3 size-8 text-gray-300 dark:text-gray-600" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No leads captured yet. Leads from the exit-intent popup and consulting playbook form will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-800/50">
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">#</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Email</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Source</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Coupon</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                      {leads.map((lead, idx) => (
+                        <tr key={lead.id || idx} className="transition hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                          <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
+                          <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{lead.email}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                              lead.source === "exit_intent_coupon"
+                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                : lead.source === "consulting_playbook"
+                                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                                  : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                            }`}>
+                              {lead.source === "exit_intent_coupon" ? "Exit Intent" : lead.source === "consulting_playbook" ? "Playbook" : lead.source}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{lead.coupon_code || "—"}</td>
+                          <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                            {new Date(lead.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}

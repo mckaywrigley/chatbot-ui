@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { supabase } from "@/lib/supabase/service-role"
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const RESEND_FROM_EMAIL =
@@ -28,6 +29,17 @@ export async function POST(request: Request) {
       console.warn(
         "⚠️  Using Resend sandbox domain (@resend.dev). Emails will ONLY deliver to your Resend account email. Set RESEND_FROM_EMAIL to a verified domain (e.g. noreply@rooftops.ai) to send to real users."
       )
+    }
+
+    // Save lead capture to database
+    try {
+      await supabase.from("lead_captures").insert({
+        email,
+        source: "exit_intent_coupon",
+        coupon_code: "FREEMONTHFORME"
+      })
+    } catch (dbError) {
+      console.warn("Failed to save lead capture (table may not exist):", dbError)
     }
 
     // Send coupon email via Resend

@@ -12,7 +12,6 @@ import {
   IconPlayerStopFilled,
   IconSend,
   IconSparkles,
-  IconWaveSine,
   IconWorld,
   IconX
 } from "@tabler/icons-react"
@@ -469,14 +468,6 @@ export const ChatInput: FC<ChatInputProps> = ({ onVoiceModeClick }) => {
                       strokeWidth={2.5}
                     />
                   </div>
-                ) : !userInput && onVoiceModeClick ? (
-                  <button
-                    onClick={onVoiceModeClick}
-                    className="flex items-center gap-2 rounded-full bg-black px-3 py-1.5 text-white transition-colors hover:bg-gray-800"
-                  >
-                    <IconWaveSine size={20} />
-                    <span className="text-sm font-medium">Voice</span>
-                  </button>
                 ) : (
                   <IconArrowUp
                     className={cn(

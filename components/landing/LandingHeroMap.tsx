@@ -9,8 +9,11 @@ import {
   IconChevronDown,
   IconStar,
   IconLock,
-  IconHome
+  IconHome,
+  IconMessageCircle,
+  IconFileAnalytics
 } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 
 interface LandingHeroMapProps {
   onPropertySelect: (
@@ -24,6 +27,7 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
   onPropertySelect,
   isDrawerOpen
 }) => {
+  const router = useRouter()
   const [scriptLoaded, setScriptLoaded] = useState(false)
   const [mapInitialized, setMapInitialized] = useState(false)
   const [scriptFailed, setScriptFailed] = useState(false)
@@ -264,9 +268,26 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
             </span>
           </div>
 
+          {/* Tabs */}
+          <div className="flex">
+            <button
+              onClick={() => router.push("/login")}
+              className="flex flex-1 items-center justify-center gap-2 rounded-t-xl bg-white/80 px-4 py-2.5 text-sm font-medium text-gray-500 backdrop-blur-sm transition-colors hover:bg-white/90 hover:text-gray-700 sm:flex-none sm:px-6"
+            >
+              <IconMessageCircle size={16} />
+              <span>Rooftops Chat</span>
+            </button>
+            <button
+              className="flex flex-1 items-center justify-center gap-2 rounded-t-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 sm:flex-none sm:px-6"
+            >
+              <IconFileAnalytics size={16} />
+              <span>Instant Report</span>
+            </button>
+          </div>
+
           {/* Input Container */}
-          <div className="gradient-border relative z-0 rounded-2xl p-[1px] shadow-2xl">
-            <div className="rounded-[15px] bg-white p-4">
+          <div className="gradient-border relative z-0 rounded-2xl rounded-tl-none p-[1px] shadow-2xl">
+            <div className="rounded-[15px] rounded-tl-none bg-white p-4">
               {/* Search Input Row */}
               <div className="flex items-center gap-2.5">
                 <div className="relative grow">

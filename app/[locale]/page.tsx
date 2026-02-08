@@ -22,7 +22,8 @@ import {
   IconStar,
   IconMapPin,
   IconUsers,
-  IconReportAnalytics
+  IconReportAnalytics,
+  IconX
 } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/client"
 import { ExitIntentPopup } from "@/components/ui/exit-intent-popup"
@@ -43,6 +44,10 @@ export default function LandingPage() {
   const [selectedAddress, setSelectedAddress] = useState("")
   const [showPreviewDrawer, setShowPreviewDrawer] = useState(false)
   const [showSignupGate, setShowSignupGate] = useState(false)
+  const [showLegacyBanner, setShowLegacyBanner] = useState(() => {
+    if (typeof window === "undefined") return true
+    return localStorage.getItem("rooftops_legacy_banner_dismissed") !== "true"
+  })
 
   // Check auth in background without blocking render
   useEffect(() => {
@@ -117,6 +122,31 @@ export default function LandingPage() {
 
   return (
     <div className="relative flex min-h-full w-full flex-col bg-[#FAFAFA]">
+      {/* Legacy User Banner */}
+      {showLegacyBanner && (
+        <div className="relative z-[60] flex items-center justify-center gap-3 bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-2.5 text-center text-sm text-white">
+          <span>
+            Looking for the original Rooftops AI?{" "}
+            <a
+              href="https://legacy.rooftops.ai"
+              className="font-semibold text-cyan-400 underline underline-offset-2 transition-colors hover:text-cyan-300"
+            >
+              Go to legacy.rooftops.ai
+            </a>
+          </span>
+          <button
+            onClick={() => {
+              setShowLegacyBanner(false)
+              localStorage.setItem("rooftops_legacy_banner_dismissed", "true")
+            }}
+            className="ml-2 rounded p-0.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Dismiss"
+          >
+            <IconX size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Header - Transparent overlay on map hero */}
       <header className="absolute inset-x-0 top-0 z-50 flex w-full items-center justify-between px-4 py-3 md:px-6">
         <div
