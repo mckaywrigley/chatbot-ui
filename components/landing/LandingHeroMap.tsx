@@ -277,9 +277,7 @@ const LandingHeroMap: React.FC<LandingHeroMapProps> = ({
               <IconMessageCircle size={16} />
               <span>Rooftops Chat</span>
             </button>
-            <button
-              className="flex flex-1 items-center justify-center gap-2 rounded-t-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 sm:flex-none sm:px-6"
-            >
+            <button className="flex flex-1 items-center justify-center gap-2 rounded-t-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 sm:flex-none sm:px-6">
               <IconFileAnalytics size={16} />
               <span>Instant Report</span>
             </button>

@@ -846,24 +846,30 @@ export default function AdminDashboard() {
 
           {/* Tab Navigation */}
           <div className="-mb-px mt-3 flex gap-6">
-            {(["overview", "users", "revenue", "engagement", "leads"] as TabType[]).map(
-              tab => (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab)
-                    if (tab === "leads" && leads.length === 0) fetchLeads()
-                  }}
-                  className={`border-b-2 pb-2 text-xs font-medium capitalize transition ${
-                    activeTab === tab
-                      ? "border-cyan-500 text-cyan-600 dark:text-cyan-400"
-                      : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                  }`}
-                >
-                  {tab}
-                </button>
-              )
-            )}
+            {(
+              [
+                "overview",
+                "users",
+                "revenue",
+                "engagement",
+                "leads"
+              ] as TabType[]
+            ).map(tab => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab)
+                  if (tab === "leads" && leads.length === 0) fetchLeads()
+                }}
+                className={`border-b-2 pb-2 text-xs font-medium capitalize transition ${
+                  activeTab === tab
+                    ? "border-cyan-500 text-cyan-600 dark:text-cyan-400"
+                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -1870,7 +1876,9 @@ export default function AdminDashboard() {
                 disabled={leadsLoading}
                 className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700/50"
               >
-                <IconRefresh className={`size-3.5 ${leadsLoading ? "animate-spin" : ""}`} />
+                <IconRefresh
+                  className={`size-3.5 ${leadsLoading ? "animate-spin" : ""}`}
+                />
                 Refresh
               </button>
             </div>
@@ -1884,7 +1892,8 @@ export default function AdminDashboard() {
                 <div className="py-12 text-center">
                   <IconMail className="mx-auto mb-3 size-8 text-gray-300 dark:text-gray-600" />
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    No leads captured yet. Leads from the exit-intent popup and consulting playbook form will appear here.
+                    No leads captured yet. Leads from the exit-intent popup and
+                    consulting playbook form will appear here.
                   </p>
                 </div>
               ) : (
@@ -1892,32 +1901,64 @@ export default function AdminDashboard() {
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-800/50">
-                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">#</th>
-                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Email</th>
-                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Source</th>
-                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Coupon</th>
-                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Date</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                          #
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                          Email
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                          Source
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                          Coupon
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                          Date
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                       {leads.map((lead, idx) => (
-                        <tr key={lead.id || idx} className="transition hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                        <tr
+                          key={lead.id || idx}
+                          className="transition hover:bg-gray-50 dark:hover:bg-gray-700/30"
+                        >
                           <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
-                          <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{lead.email}</td>
+                          <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                            {lead.email}
+                          </td>
                           <td className="px-4 py-3">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                              lead.source === "exit_intent_coupon"
-                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                lead.source === "exit_intent_coupon"
+                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                  : lead.source === "consulting_playbook"
+                                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                                    : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                              }`}
+                            >
+                              {lead.source === "exit_intent_coupon"
+                                ? "Exit Intent"
                                 : lead.source === "consulting_playbook"
-                                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-                                  : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                            }`}>
-                              {lead.source === "exit_intent_coupon" ? "Exit Intent" : lead.source === "consulting_playbook" ? "Playbook" : lead.source}
+                                  ? "Playbook"
+                                  : lead.source}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{lead.coupon_code || "—"}</td>
                           <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                            {new Date(lead.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}
+                            {lead.coupon_code || "—"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                            {new Date(lead.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit"
+                              }
+                            )}
                           </td>
                         </tr>
                       ))}

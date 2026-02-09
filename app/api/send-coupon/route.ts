@@ -39,7 +39,10 @@ export async function POST(request: Request) {
         coupon_code: "FREEMONTHFORME"
       })
     } catch (dbError) {
-      console.warn("Failed to save lead capture (table may not exist):", dbError)
+      console.warn(
+        "Failed to save lead capture (table may not exist):",
+        dbError
+      )
     }
 
     // Send coupon email via Resend

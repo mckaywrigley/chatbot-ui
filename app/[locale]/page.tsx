@@ -147,8 +147,10 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Header - Transparent overlay on map hero */}
-      <header className="absolute inset-x-0 top-0 z-50 flex w-full items-center justify-between px-4 py-3 md:px-6">
+      {/* Header - Transparent overlay on map hero, pushed down when banner is visible */}
+      <header
+        className={`absolute inset-x-0 z-50 flex w-full items-center justify-between px-4 py-3 md:px-6 ${showLegacyBanner ? "top-[40px]" : "top-0"}`}
+      >
         <div
           className="flex shrink-0 cursor-pointer items-center"
           onClick={handleRedirectToLogin}
@@ -191,7 +193,7 @@ export default function LandingPage() {
           className="pointer-events-none absolute inset-x-0 z-20 px-6 text-center"
           style={{ top: "18%" }}
         >
-          <h1 className="animate-shimmer-hero text-[26px] font-extrabold leading-[1.25] tracking-tight sm:text-4xl md:text-5xl">
+          <h1 className="animate-shimmer-hero text-[40px] font-extrabold leading-[1.15] tracking-tight sm:text-5xl md:text-6xl">
             AI Roof Reports
             <br />
             in 30 Seconds.
