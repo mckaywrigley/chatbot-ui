@@ -1,3 +1,4 @@
+import { checkProfanity } from "@/lib/enrichr"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 
@@ -10,6 +11,16 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Check for profanity before querying the database.
+    // Requires ENRICHR_API_KEY in .env.local — skipped silently if not set.
+    const profanity = await checkProfanity(username)
+    if (profanity?.contains_profanity) {
+      return new Response(
+        JSON.stringify({ message: "Username contains inappropriate content." }),
+        { status: 422 }
+      )
+    }
+
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
