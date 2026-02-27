@@ -45,6 +45,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_ENV_KEYS.MISTRAL_API_KEY]: "mistral_api_key",
     [VALID_ENV_KEYS.GROQ_API_KEY]: "groq_api_key",
     [VALID_ENV_KEYS.PERPLEXITY_API_KEY]: "perplexity_api_key",
+    [VALID_ENV_KEYS.AVIAN_API_KEY]: "avian_api_key",
     [VALID_ENV_KEYS.AZURE_OPENAI_API_KEY]: "azure_openai_api_key",
     [VALID_ENV_KEYS.OPENROUTER_API_KEY]: "openrouter_api_key",
 

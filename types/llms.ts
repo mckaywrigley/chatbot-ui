@@ -7,6 +7,7 @@ export type LLMID =
   | MistralLLMID
   | GroqLLMID
   | PerplexityLLMID
+  | AvianLLMID
 
 // OpenAI Models (UPDATED 5/13/24)
 export type OpenAILLMID =
@@ -60,6 +61,13 @@ export type PerplexityLLMID =
   | "sonar-small-online" // Sonar Small Online
   | "sonar-medium-chat" // Sonar Medium Chat
   | "sonar-medium-online" // Sonar Medium Online
+
+// Avian Models
+export type AvianLLMID =
+  | "deepseek/deepseek-v3.2" // DeepSeek V3.2
+  | "moonshotai/kimi-k2.5" // Kimi K2.5
+  | "z-ai/glm-5" // GLM-5
+  | "minimax/minimax-m2.5" // MiniMax M2.5
 
 export interface LLM {
   modelId: LLMID

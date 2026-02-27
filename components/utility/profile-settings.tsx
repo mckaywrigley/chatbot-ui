@@ -113,6 +113,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [perplexityAPIKey, setPerplexityAPIKey] = useState(
     profile?.perplexity_api_key || ""
   )
+  const [avianAPIKey, setAvianAPIKey] = useState(
+    profile?.avian_api_key || ""
+  )
 
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState(
     profile?.openrouter_api_key || ""
@@ -150,6 +153,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       mistral_api_key: mistralAPIKey,
       groq_api_key: groqAPIKey,
       perplexity_api_key: perplexityAPIKey,
+      avian_api_key: avianAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
@@ -172,6 +176,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       "mistral",
       "groq",
       "perplexity",
+      "avian",
       "openrouter"
     ]
 
@@ -703,6 +708,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={perplexityAPIKey}
                       onChange={e => setPerplexityAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["avian"] ? (
+                  <Label>Avian API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Avian API Key</Label>
+                    <Input
+                      placeholder="Avian API Key"
+                      type="password"
+                      value={avianAPIKey}
+                      onChange={e => setAvianAPIKey(e.target.value)}
                     />
                   </>
                 )}
