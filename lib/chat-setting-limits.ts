@@ -125,6 +125,32 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_CONTEXT_LENGTH: 8192
   },
 
+  // AVIAN MODELS
+  "deepseek/deepseek-v3.2": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 2.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 65536,
+    MAX_CONTEXT_LENGTH: 163840
+  },
+  "moonshotai/kimi-k2.5": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 2.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 8192,
+    MAX_CONTEXT_LENGTH: 131072
+  },
+  "z-ai/glm-5": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 2.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 16384,
+    MAX_CONTEXT_LENGTH: 131072
+  },
+  "minimax/minimax-m2.5": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 2.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 1048576,
+    MAX_CONTEXT_LENGTH: 1048576
+  },
+
   // OPENAI MODELS
   "gpt-3.5-turbo": {
     MIN_TEMPERATURE: 0.0,

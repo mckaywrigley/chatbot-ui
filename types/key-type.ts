@@ -5,4 +5,5 @@ export type EnvKey =
   | "MISTRAL_API_KEY"
   | "GROQ_API_KEY"
   | "PERPLEXITY_API_KEY"
+  | "AVIAN_API_KEY"
   | "AZURE_OPENAI_API_KEY"
