@@ -145,7 +145,12 @@ Get the required values by running:
 supabase status
 ```
 
-Note: Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`
+Notes:
+- Use `API URL` from `supabase status` for `NEXT_PUBLIC_SUPABASE_URL`
+- Use `anon key` for `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Use `service_role key` for `SUPABASE_SERVICE_ROLE_KEY`
+
+Depending on your Supabase CLI version, field names/casing in output may vary slightly, but the values above are the ones you need.
 
 Now go to your `.env.local` file and fill in the values.
 
