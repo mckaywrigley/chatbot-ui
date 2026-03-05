@@ -21,7 +21,8 @@ export async function POST(request: Request) {
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      organization: profile.openai_organization_id,
+      baseURL: process.env.OPENAI_BASE_URL || undefined
     })
 
     const response = await openai.chat.completions.create({
