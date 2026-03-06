@@ -1111,6 +1111,7 @@ export type Database = {
           azure_openai_embeddings_id: string | null
           azure_openai_endpoint: string | null
           bio: string
+          cometapi_api_key: string | null
           created_at: string
           display_name: string
           google_gemini_api_key: string | null
@@ -1139,6 +1140,7 @@ export type Database = {
           azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
           bio: string
+          cometapi_api_key?: string | null
           created_at?: string
           display_name: string
           google_gemini_api_key?: string | null
@@ -1167,6 +1169,7 @@ export type Database = {
           azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
           bio?: string
+          cometapi_api_key?: string | null
           created_at?: string
           display_name?: string
           google_gemini_api_key?: string | null
