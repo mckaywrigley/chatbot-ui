@@ -1,5 +1,6 @@
 export type ModelProvider =
   | "openai"
+  | "cometapi"
   | "google"
   | "anthropic"
   | "mistral"
