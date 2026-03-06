@@ -8,9 +8,12 @@ export type LLMID =
   | GroqLLMID
   | PerplexityLLMID
 
-// OpenAI Models (UPDATED 5/13/24)
+// OpenAI Models (UPDATED 9/24/24)
 export type OpenAILLMID =
+  | "o1-preview" // o1 Preview
+  | "o1-mini" // o1 mini
   | "gpt-4o" // GPT-4o
+  | "gpt-4o-mini" // GPT-4o mini
   | "gpt-4-turbo-preview" // GPT-4 Turbo
   | "gpt-4-vision-preview" // GPT-4 Vision
   | "gpt-4" // GPT-4
