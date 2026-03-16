@@ -45,21 +45,13 @@ export type GroqLLMID =
   | "mixtral-8x7b-32768" // Mixtral-8x7b
   | "gemma-7b-it" // Gemma-7b IT
 
-// Perplexity Models (UPDATED 1/31/24)
+// Perplexity Models (UPDATED 3/16/26)
 export type PerplexityLLMID =
-  | "pplx-7b-online" // Perplexity Online 7B
-  | "pplx-70b-online" // Perplexity Online 70B
-  | "pplx-7b-chat" // Perplexity Chat 7B
-  | "pplx-70b-chat" // Perplexity Chat 70B
-  | "mixtral-8x7b-instruct" // Mixtral 8x7B Instruct
-  | "mistral-7b-instruct" // Mistral 7B Instruct
-  | "llama-2-70b-chat" // Llama2 70B Chat
-  | "codellama-34b-instruct" // CodeLlama 34B Instruct
-  | "codellama-70b-instruct" // CodeLlama 70B Instruct
-  | "sonar-small-chat" // Sonar Small Chat
-  | "sonar-small-online" // Sonar Small Online
-  | "sonar-medium-chat" // Sonar Medium Chat
-  | "sonar-medium-online" // Sonar Medium Online
+  | "sonar-reasoning-pro" // Sonar Reasoning Pro
+  | "sonar-reasoning" // Sonar Reasoning
+  | "sonar-pro" // Sonar Pro
+  | "sonar" // Sonar
+  | "sonar-deep-research" // Sonar Deep Research
 
 export interface LLM {
   modelId: LLMID
