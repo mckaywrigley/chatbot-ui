@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     // Perplexity is compatible the OpenAI SDK
     const perplexity = new OpenAI({
       apiKey: profile.perplexity_api_key || "",
-      baseURL: "https://api.perplexity.ai/"
+      baseURL: "https://api.perplexity.ai/",
+      timeout: 60_000
     })
 
     const response = await perplexity.chat.completions.create({
