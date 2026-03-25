@@ -21,7 +21,8 @@ export async function POST(request: Request) {
     const groq = new OpenAI({
       apiKey: profile.groq_api_key || "",
       baseURL: "https://api.groq.com/openai/v1",
-      timeout: 60_000
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     const response = await groq.chat.completions.create({

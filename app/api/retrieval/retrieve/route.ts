@@ -40,13 +40,15 @@ export async function POST(request: Request) {
         baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
         defaultQuery: { "api-version": "2023-12-01-preview" },
         defaultHeaders: { "api-key": profile.azure_openai_api_key },
-        timeout: 60_000
+        timeout: 60_000,
+      maxRetries: 3
       })
     } else {
       openai = new OpenAI({
         apiKey: profile.openai_api_key || "",
         organization: profile.openai_organization_id,
-        timeout: 60_000
+        timeout: 60_000,
+      maxRetries: 3
       })
     }
 

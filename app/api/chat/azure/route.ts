@@ -49,7 +49,8 @@ export async function POST(request: Request) {
       baseURL: `${ENDPOINT}/openai/deployments/${DEPLOYMENT_ID}`,
       defaultQuery: { "api-version": "2023-12-01-preview" },
       defaultHeaders: { "api-key": KEY },
-      timeout: 60_000
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     const response = await azureOpenai.chat.completions.create({

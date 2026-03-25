@@ -21,7 +21,8 @@ export async function POST(request: Request) {
     const perplexity = new OpenAI({
       apiKey: profile.perplexity_api_key || "",
       baseURL: "https://api.perplexity.ai/",
-      timeout: 60_000
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     const response = await perplexity.chat.completions.create({

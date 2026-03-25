@@ -56,7 +56,9 @@ export async function POST(request: NextRequest) {
     )
 
     const anthropic = new Anthropic({
-      apiKey: profile.anthropic_api_key || ""
+      apiKey: profile.anthropic_api_key || "",
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     try {

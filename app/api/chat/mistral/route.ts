@@ -22,7 +22,8 @@ export async function POST(request: Request) {
     const mistral = new OpenAI({
       apiKey: profile.mistral_api_key || "",
       baseURL: "https://api.mistral.ai/v1",
-      timeout: 60_000
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     const response = await mistral.chat.completions.create({

@@ -22,7 +22,8 @@ export async function POST(request: Request) {
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
       organization: profile.openai_organization_id,
-      timeout: 60_000
+      timeout: 60_000,
+      maxRetries: 3
     })
 
     const response = await openai.chat.completions.create({
