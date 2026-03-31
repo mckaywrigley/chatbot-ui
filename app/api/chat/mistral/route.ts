@@ -21,7 +21,9 @@ export async function POST(request: Request) {
     // Mistral is compatible the OpenAI SDK
     const mistral = new OpenAI({
       apiKey: profile.mistral_api_key || "",
-      baseURL: "https://api.mistral.ai/v1"
+      baseURL: "https://api.mistral.ai/v1",
+      timeout: 60000,
+      maxRetries: 3,
     })
 
     const response = await mistral.chat.completions.create({

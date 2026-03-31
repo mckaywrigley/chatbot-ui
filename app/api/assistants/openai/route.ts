@@ -12,7 +12,9 @@ export async function GET() {
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      organization: profile.openai_organization_id,
+      timeout: 60000,
+      maxRetries: 3,
     })
 
     const myAssistants = await openai.beta.assistants.list({
