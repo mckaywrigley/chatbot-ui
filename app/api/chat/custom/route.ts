@@ -34,7 +34,9 @@ export async function POST(request: Request) {
 
     const custom = new OpenAI({
       apiKey: customModel.api_key || "",
-      baseURL: customModel.base_url
+      baseURL: customModel.base_url,
+      timeout: 60000,
+      maxRetries: 3,
     })
 
     const response = await custom.chat.completions.create({

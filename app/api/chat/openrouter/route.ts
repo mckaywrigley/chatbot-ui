@@ -21,7 +21,9 @@ export async function POST(request: Request) {
 
     const openai = new OpenAI({
       apiKey: profile.openrouter_api_key || "",
-      baseURL: "https://openrouter.ai/api/v1"
+      baseURL: "https://openrouter.ai/api/v1",
+      timeout: 60000,
+      maxRetries: 3,
     })
 
     const response = await openai.chat.completions.create({
