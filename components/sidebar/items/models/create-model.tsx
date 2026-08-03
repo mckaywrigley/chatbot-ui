@@ -49,7 +49,8 @@ export const CreateModel: FC<CreateModelProps> = ({ isOpen, onOpenChange }) => {
 
             <div>
               Your API <span className="font-bold">*must*</span> be compatible
-              with the OpenAI SDK.
+              with the OpenAI SDK (including multi-model gateways such as DaoXE
+              at https://api.daoxe.com/v1).
             </div>
           </div>
 
@@ -78,7 +79,7 @@ export const CreateModel: FC<CreateModelProps> = ({ isOpen, onOpenChange }) => {
             <Label>Base URL</Label>
 
             <Input
-              placeholder="Base URL..."
+              placeholder="https://api.example.com/v1"
               value={baseUrl}
               onChange={e => setBaseUrl(e.target.value)}
             />

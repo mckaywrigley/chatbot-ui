@@ -283,7 +283,23 @@ Click "Deploy" and wait for your frontend to deploy.
 
 Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
 
+## Custom OpenAI-compatible models
+
+Chatbot UI already supports **custom models** (sidebar → Models → Create). Your endpoint **must** be compatible with the OpenAI SDK.
+
+Set **Base URL** to the provider's OpenAI-compatible root (usually ending in `/v1`), for example:
+
+| Provider | Example Base URL |
+| --- | --- |
+| Ollama (local) | `http://localhost:11434/v1` |
+| Multi-model gateway (e.g. [DaoXE](https://daoxe.com)) | `https://api.daoxe.com/v1` |
+
+Also set **Model ID** to a model the endpoint serves, and provide the API key when required.
+
+This is the same mechanism used for other OpenAI-compatible backends; DaoXE is one concrete hosted multi-model example.
+
 ## Contributing
+
 
 We are working on a guide for contributing.
 
