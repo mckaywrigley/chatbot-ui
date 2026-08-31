@@ -25,6 +25,28 @@ export const getChatsByWorkspaceId = async (workspaceId: string) => {
   return chats
 }
 
+/**
+ * Returns the single pinned thread for a (scope, scope_id) pair - used by the
+ * right-rail chat. Picks the most recently updated match so legacy rows with
+ * duplicate scopes resolve deterministically.
+ */
+export const getChatByScope = async (
+  scope: "project" | "design" | "report",
+  scopeId: string
+) => {
+  const { data, error } = await supabase
+    .from("chats")
+    .select("*")
+    .eq("scope", scope)
+    .eq("scope_id", scopeId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  return data
+}
+
 export const createChat = async (chat: TablesInsert<"chats">) => {
   const { data: createdChat, error } = await supabase
     .from("chats")

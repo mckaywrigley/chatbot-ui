@@ -20,6 +20,9 @@ export default function ChangePasswordPage() {
         setLoading(false)
       }
     })()
+    // Mount-once auth gate - `router` is stable; the effect must NOT re-run
+    // on route changes (would unguard the page on every navigation).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {

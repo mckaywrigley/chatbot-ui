@@ -1,13 +1,23 @@
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
+import { checkRateLimit, getClientIp } from "@/lib/server/rate-limit"
 
-export const runtime = "edge"
+// Needs Node runtime so the rate limiter can read headers() and the Upstash
+// client can operate on its standard fetch flow.
 
 export async function POST(request: Request) {
   const json = await request.json()
   const { username } = json as {
     username: string
   }
+
+  const limited = await checkRateLimit({
+    name: "username-available",
+    identifier: getClientIp(),
+    requests: 10,
+    window: "1 m"
+  })
+  if (limited) return limited
 
   try {
     const supabaseAdmin = createClient<Database>(

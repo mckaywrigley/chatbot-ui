@@ -1,12 +1,8 @@
 import { ChatbotUIContext } from "@/context/context"
-import { updateAssistant } from "@/db/assistants"
 import { updateChat } from "@/db/chats"
+import { updateAssistant } from "@/db/assistants"
 import { updateCollection } from "@/db/collections"
 import { updateFile } from "@/db/files"
-import { updateModel } from "@/db/models"
-import { updatePreset } from "@/db/presets"
-import { updatePrompt } from "@/db/prompts"
-import { updateTool } from "@/db/tools"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
@@ -17,13 +13,27 @@ import { ChatItem } from "./items/chat/chat-item"
 import { CollectionItem } from "./items/collections/collection-item"
 import { FileItem } from "./items/files/file-item"
 import { Folder } from "./items/folders/folder-item"
-import { ModelItem } from "./items/models/model-item"
-import { PresetItem } from "./items/presets/preset-item"
-import { PromptItem } from "./items/prompts/prompt-item"
-import { ToolItem } from "./items/tools/tool-item"
+import { updateReport } from "@/db/reports-firestore"
+import { ReportItem } from "./items/reports/report-item"
+import { updateDesign } from "@/db/designs-firestore"
+import { DesignItem } from "./items/designs/design-item"
+import { updateDataCollection } from "@/db/data-collections-firestore"
+import { DataCollectionItem } from "./items/data-collections/data-collection-item"
+import { DataCollectionItem as DataCollectionItemType } from "@/types/sidebar-data"
+
+// Add this type definition at the top of the file
+type ValidContentType =
+  | "chats"
+  | "files"
+  | "assistants"
+  | "collections"
+  | "reports"
+  | "designs"
+  | "projects"
+  | "data-collections"
 
 interface SidebarDataListProps {
-  contentType: ContentType
+  contentType: ValidContentType
   data: DataListType
   folders: Tables<"folders">[]
 }
@@ -35,13 +45,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 }) => {
   const {
     setChats,
-    setPresets,
-    setPrompts,
     setFiles,
     setCollections,
     setAssistants,
-    setTools,
-    setModels
+    setReports,
+    setDesigns,
+    setDataCollections
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -56,12 +65,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     switch (contentType) {
       case "chats":
         return <ChatItem key={item.id} chat={item as Tables<"chats">} />
-
-      case "presets":
-        return <PresetItem key={item.id} preset={item as Tables<"presets">} />
-
-      case "prompts":
-        return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
 
       case "files":
         return <FileItem key={item.id} file={item as Tables<"files">} />
@@ -81,12 +84,19 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             assistant={item as Tables<"assistants">}
           />
         )
+      case "reports":
+        return <ReportItem key={item.id} report={item as Tables<"reports">} />
 
-      case "tools":
-        return <ToolItem key={item.id} tool={item as Tables<"tools">} />
+      case "designs":
+        return <DesignItem key={item.id} design={item as Tables<"designs">} />
 
-      case "models":
-        return <ModelItem key={item.id} model={item as Tables<"models">} />
+      case "data-collections":
+        return (
+          <DataCollectionItem
+            key={item.id}
+            dataCollection={item as DataCollectionItemType}
+          />
+        )
 
       default:
         return null
@@ -134,37 +144,39 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const updateFunctions = {
     chats: updateChat,
-    presets: updatePreset,
-    prompts: updatePrompt,
     files: updateFile,
-    collections: updateCollection,
     assistants: updateAssistant,
-    tools: updateTool,
-    models: updateModel
-  }
+    reports: updateReport,
+    collections: updateCollection,
+    designs: updateDesign,
+    "data-collections": updateDataCollection,
+    projects: null
+  } as Record<string, any>
 
   const stateUpdateFunctions = {
     chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
     files: setFiles,
-    collections: setCollections,
     assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
+    reports: setReports,
+    collections: setCollections,
+    designs: setDesigns,
+    "data-collections": setDataCollections,
+    projects: null
+  } as Record<string, any>
 
   const updateFolder = async (itemId: string, folderId: string | null) => {
     const item: any = data.find(item => item.id === itemId)
 
     if (!item) return null
 
-    const updateFunction = updateFunctions[contentType]
-    const setStateFunction = stateUpdateFunctions[contentType]
+    const updateFunction = updateFunctions[contentType as ValidContentType]
+    const setStateFunction =
+      stateUpdateFunctions[contentType as ValidContentType]
 
     if (!updateFunction || !setStateFunction) return
 
     const updatedItem = await updateFunction(item.id, {
+      ...item,
       folder_id: folderId
     })
 

@@ -1,14 +1,15 @@
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { ThinkingIndicator } from "@/components/chat/thinking-indicator"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
+import { getAzureDeploymentNameClient } from "@/lib/azure-deployment-client"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
   IconBolt,
   IconCaretDownFilled,
   IconCaretRightFilled,
-  IconCircleFilled,
   IconFileText,
   IconMoodSmile,
   IconPencil
@@ -59,7 +60,8 @@ export const Message: FC<MessageProps> = ({
     assistantImages,
     toolInUse,
     files,
-    models
+    models,
+    selectedChat
   } = useContext(ChatbotUIContext)
 
   const { handleSendMessage } = useChatHandler()
@@ -68,6 +70,10 @@ export const Message: FC<MessageProps> = ({
 
   const [isHovering, setIsHovering] = useState(false)
   const [editedMessage, setEditedMessage] = useState(message.content)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [azureDeploymentName, setAzureDeploymentName] = useState<
+    string | null | undefined
+  >(undefined)
 
   const [showImagePreview, setShowImagePreview] = useState(false)
   const [selectedImage, setSelectedImage] = useState<MessageImage | null>(null)
@@ -116,6 +122,14 @@ export const Message: FC<MessageProps> = ({
     onStartEdit(message)
   }
 
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked)
+    // TODO: Implement actual bookmark persistence to database
+    console.log(
+      `${isBookmarked ? "Removed" : "Added"} bookmark for message ${message.id}`
+    )
+  }
+
   useEffect(() => {
     setEditedMessage(message.content)
 
@@ -124,6 +138,10 @@ export const Message: FC<MessageProps> = ({
       input.focus()
       input.setSelectionRange(input.value.length, input.value.length)
     }
+    // Snapshots `message.content` on each toggle of `isEditing`. Including
+    // `message.content` in deps would overwrite the user's in-progress edit
+    // whenever the server-side message text streams in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing])
 
   const MODEL_DATA = [
@@ -150,266 +168,343 @@ export const Message: FC<MessageProps> = ({
 
   const modelDetails = LLM_LIST.find(model => model.modelId === message.model)
 
-  const fileAccumulator: Record<
-    string,
-    {
-      id: string
-      name: string
-      count: number
-      type: string
-      description: string
-    }
-  > = {}
+  // Legacy `fileSummary` (parent-file aggregation) was removed when the
+  // Sources panel switched to rendering RAG citations directly. Each
+  // `fileItem` now carries its own source_title / source_url / preview
+  // (set by the chat-ui adapter that fetches rag_item snapshots).
 
-  const fileSummary = fileItems.reduce((acc, fileItem) => {
-    const parentFile = files.find(file => file.id === fileItem.file_id)
-    if (parentFile) {
-      if (!acc[parentFile.id]) {
-        acc[parentFile.id] = {
-          id: parentFile.id,
-          name: parentFile.name,
-          count: 1,
-          type: parentFile.type,
-          description: parentFile.description
-        }
-      } else {
-        acc[parentFile.id].count += 1
-      }
-    }
-    return acc
-  }, fileAccumulator)
+  const isLoadingThisMessage =
+    !firstTokenReceived &&
+    isGenerating &&
+    isLast &&
+    message.role === "assistant"
+
+  useEffect(() => {
+    if (!isLoadingThisMessage) return
+    if (azureDeploymentName !== undefined) return
+    ;(async () => {
+      const deployment = await getAzureDeploymentNameClient()
+      setAzureDeploymentName(deployment)
+    })()
+  }, [isLoadingThisMessage, azureDeploymentName])
+
+  // Model name intentionally not surfaced anywhere user-visible -
+  // Shadow AI is the product, the underlying LLM (or Azure deployment)
+  // is implementation detail. `displayedModelName` retained as an
+  // unused local so future debug overlays can still toggle it on
+  // without rewiring.
+  const displayedModelName =
+    isLoadingThisMessage && azureDeploymentName
+      ? azureDeploymentName
+      : MODEL_DATA?.modelName
+  void displayedModelName
+
+  const isUser = message.role === "user"
+  const isAssistant = message.role === "assistant"
+  const isSystem = message.role === "system"
+
+  // Default assistant label across all chat scopes (was design-only).
+  // Only an explicitly-attached assistant or selectedAssistant overrides
+  // this - never the raw model name.
+  const senderName = isAssistant
+    ? message.assistant_id
+      ? assistants.find(a => a.id === message.assistant_id)?.name
+      : (selectedAssistant?.name ?? "Shadow AI")
+    : (profile?.display_name ?? profile?.username)
 
   return (
     <div
       className={cn(
-        "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
+        "group flex w-full px-4 py-2",
+        isUser ? "justify-end" : "justify-start"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col p-6 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
-        <div className="absolute right-5 top-7 sm:right-0">
-          <MessageActions
-            onCopy={handleCopy}
-            onEdit={handleStartEdit}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            isHovering={isHovering}
-            onRegenerate={handleRegenerate}
-          />
-        </div>
-        <div className="space-y-3">
-          {message.role === "system" ? (
-            <div className="flex items-center space-x-4">
-              <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
-                size={ICON_SIZE}
-              />
-
-              <div className="text-lg font-semibold">Prompt</div>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-3">
-              {message.role === "assistant" ? (
-                messageAssistantImage ? (
-                  <Image
-                    style={{
-                      width: `${ICON_SIZE}px`,
-                      height: `${ICON_SIZE}px`
-                    }}
-                    className="rounded"
-                    src={messageAssistantImage}
-                    alt="assistant image"
-                    height={ICON_SIZE}
-                    width={ICON_SIZE}
-                  />
-                ) : (
-                  <WithTooltip
-                    display={<div>{MODEL_DATA?.modelName}</div>}
-                    trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
-                    }
-                  />
-                )
-              ) : profile?.image_url ? (
+      <div
+        className={cn(
+          "relative flex max-w-[85%] flex-col",
+          isUser ? "items-end" : "items-start"
+        )}
+      >
+        {/* Sender name + avatar row */}
+        {!isSystem && (
+          <div
+            className={cn(
+              "mb-1.5 flex items-center gap-2 px-1",
+              isUser ? "flex-row-reverse" : "flex-row"
+            )}
+          >
+            {isAssistant ? (
+              messageAssistantImage ? (
                 <Image
-                  className={`size-[32px] rounded`}
-                  src={profile?.image_url}
-                  height={32}
-                  width={32}
-                  alt="user image"
+                  className="size-5 rounded"
+                  src={messageAssistantImage}
+                  alt="assistant"
+                  height={20}
+                  width={20}
                 />
               ) : (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
-                  size={ICON_SIZE}
+                <ModelIcon
+                  provider={modelDetails?.provider || "custom"}
+                  height={20}
+                  width={20}
                 />
-              )}
-
-              <div className="font-semibold">
-                {message.role === "assistant"
-                  ? message.assistant_id
-                    ? assistants.find(
-                        assistant => assistant.id === message.assistant_id
-                      )?.name
-                    : selectedAssistant
-                      ? selectedAssistant?.name
-                      : MODEL_DATA?.modelName
-                  : profile?.display_name ?? profile?.username}
-              </div>
-            </div>
-          )}
-          {!firstTokenReceived &&
-          isGenerating &&
-          isLast &&
-          message.role === "assistant" ? (
-            <>
-              {(() => {
-                switch (toolInUse) {
-                  case "none":
-                    return (
-                      <IconCircleFilled className="animate-pulse" size={20} />
-                    )
-                  case "retrieval":
-                    return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconFileText size={20} />
-
-                        <div>Searching files...</div>
-                      </div>
-                    )
-                  default:
-                    return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconBolt size={20} />
-
-                        <div>Using {toolInUse}...</div>
-                      </div>
-                    )
-                }
-              })()}
-            </>
-          ) : isEditing ? (
-            <TextareaAutosize
-              textareaRef={editInputRef}
-              className="text-md"
-              value={editedMessage}
-              onValueChange={setEditedMessage}
-              maxRows={20}
-            />
-          ) : (
-            <MessageMarkdown content={message.content} />
-          )}
-        </div>
-
-        {fileItems.length > 0 && (
-          <div className="border-primary mt-6 border-t pt-4 font-bold">
-            {!viewSources ? (
-              <div
-                className="flex cursor-pointer items-center text-lg hover:opacity-50"
-                onClick={() => setViewSources(true)}
-              >
-                {fileItems.length}
-                {fileItems.length > 1 ? " Sources " : " Source "}
-                from {Object.keys(fileSummary).length}{" "}
-                {Object.keys(fileSummary).length > 1 ? "Files" : "File"}{" "}
-                <IconCaretRightFilled className="ml-1" />
-              </div>
+              )
+            ) : profile?.image_url ? (
+              <Image
+                className="size-5 rounded-full"
+                src={profile?.image_url}
+                height={20}
+                width={20}
+                alt="user"
+              />
             ) : (
+              <div className="bg-rust flex size-5 items-center justify-center rounded-full">
+                <IconMoodSmile size={12} className="text-paper" />
+              </div>
+            )}
+            <span className="text-ink-3 text-xs font-medium">{senderName}</span>
+          </div>
+        )}
+
+        {/* System message */}
+        {isSystem && (
+          <div className="bg-paper-2 flex w-full items-center gap-3 rounded-xl px-4 py-3">
+            <IconPencil
+              className="bg-ink text-paper shrink-0 rounded p-1"
+              size={24}
+            />
+            <div className="text-ink text-sm font-semibold">Prompt</div>
+          </div>
+        )}
+
+        {/* Message bubble */}
+        {!isSystem && (
+          <div
+            className={cn(
+              "relative rounded-2xl px-4 py-2.5 text-sm shadow-sm",
+              isUser
+                ? "bg-ink text-paper rounded-tr-sm"
+                : "border-line bg-surface text-ink rounded-tl-sm border"
+            )}
+          >
+            {/* Hover actions - anchored just BELOW the bubble and inside its
+                horizontal bounds. The old `-left-8/-right-8` pushed them 32px
+                outside the bubble, which overflowed and overlapped in the
+                narrow design chat rail. */}
+            <div
+              className={cn(
+                "absolute -bottom-6 z-10 flex opacity-0 transition-opacity group-hover:opacity-100",
+                isUser ? "right-1 justify-end" : "left-1 justify-start"
+              )}
+            >
+              <MessageActions
+                onCopy={handleCopy}
+                onEdit={handleStartEdit}
+                isAssistant={isAssistant}
+                isLast={isLast}
+                isEditing={isEditing}
+                isHovering={isHovering}
+                onRegenerate={handleRegenerate}
+                onBookmark={handleBookmark}
+                isBookmarked={isBookmarked}
+              />
+            </div>
+
+            {/* Content */}
+            {isLoadingThisMessage ? (
               <>
-                <div
-                  className="flex cursor-pointer items-center text-lg hover:opacity-50"
-                  onClick={() => setViewSources(false)}
-                >
-                  {fileItems.length}
-                  {fileItems.length > 1 ? " Sources " : " Source "}
-                  from {Object.keys(fileSummary).length}{" "}
-                  {Object.keys(fileSummary).length > 1 ? "Files" : "File"}{" "}
-                  <IconCaretDownFilled className="ml-1" />
-                </div>
-
-                <div className="mt-3 space-y-4">
-                  {Object.values(fileSummary).map((file, index) => (
-                    <div key={index}>
-                      <div className="flex items-center space-x-2">
-                        <div>
-                          <FileIcon type={file.type} />
+                {(() => {
+                  switch (toolInUse) {
+                    case "none":
+                      return <ThinkingIndicator />
+                    case "retrieval":
+                      return (
+                        <div className="flex animate-pulse items-center space-x-2 text-slate-500">
+                          <IconFileText size={18} />
+                          <div>Searching files...</div>
                         </div>
-
-                        <div className="truncate">{file.name}</div>
-                      </div>
-
-                      {fileItems
-                        .filter(fileItem => {
-                          const parentFile = files.find(
-                            parentFile => parentFile.id === fileItem.file_id
-                          )
-                          return parentFile?.id === file.id
-                        })
-                        .map((fileItem, index) => (
-                          <div
-                            key={index}
-                            className="ml-8 mt-1.5 flex cursor-pointer items-center space-x-2 hover:opacity-50"
-                            onClick={() => {
-                              setSelectedFileItem(fileItem)
-                              setShowFileItemPreview(true)
-                            }}
-                          >
-                            <div className="text-sm font-normal">
-                              <span className="mr-1 text-lg font-bold">-</span>{" "}
-                              {fileItem.content.substring(0, 200)}...
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  ))}
-                </div>
+                      )
+                    default:
+                      return (
+                        <div className="flex animate-pulse items-center space-x-2 text-slate-500">
+                          <IconBolt size={18} />
+                          <div>Using {toolInUse}...</div>
+                        </div>
+                      )
+                  }
+                })()}
               </>
+            ) : isEditing ? (
+              <TextareaAutosize
+                textareaRef={editInputRef}
+                className="text-md w-full bg-transparent"
+                value={editedMessage}
+                onValueChange={setEditedMessage}
+                maxRows={20}
+              />
+            ) : (
+              <MessageMarkdown
+                content={message.content}
+                isUser={isUser}
+                // Post-PR-6 each fileItem may carry RagItem citation
+                // metadata (source_title / source_url / source_section)
+                // so the chip renderer can resolve [N] markers to
+                // clickable links. Legacy file_items rows just produce
+                // styled pills via the renderer's fallback path.
+                sources={fileItems.map(fi => ({
+                  source_title: (fi as any).source_title ?? null,
+                  source_url: (fi as any).source_url ?? null,
+                  source_section: (fi as any).source_section ?? null
+                }))}
+              />
             )}
           </div>
         )}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {message.image_paths.map((path, index) => {
-            const item = chatImages.find(image => image.path === path)
+        {/* Sources */}
+        {fileItems.length > 0 && (
+          <div className="mt-2 w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm">
+            {(() => {
+              // Post-PR-6 each fileItem may carry RAG citation metadata
+              // (source_title, source_url, source_section). The legacy
+              // `fileSummary` path joins to `files` table and only finds
+              // anything for chats that attached actual file_items rows
+              // - RAG citations have file_id=null so file count came out
+              // as zero ("4 Sources from 0 File"). Render the panel
+              // directly off `fileItems` instead.
+              const items = fileItems as Array<any>
+              return (
+                <>
+                  {!viewSources ? (
+                    <div
+                      className="flex cursor-pointer items-center font-medium text-slate-600 hover:text-slate-800"
+                      onClick={() => setViewSources(true)}
+                    >
+                      {items.length}
+                      {items.length > 1 ? " Sources" : " Source"}
+                      <IconCaretRightFilled className="ml-1" size={14} />
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className="flex cursor-pointer items-center font-medium text-slate-600 hover:text-slate-800"
+                        onClick={() => setViewSources(false)}
+                      >
+                        {items.length}
+                        {items.length > 1 ? " Sources" : " Source"}
+                        <IconCaretDownFilled className="ml-1" size={14} />
+                      </div>
 
-            return (
-              <Image
-                key={index}
-                className="cursor-pointer rounded hover:opacity-50"
-                src={path.startsWith("data") ? path : item?.base64}
-                alt="message image"
-                width={300}
-                height={300}
-                onClick={() => {
-                  setSelectedImage({
-                    messageId: message.id,
-                    path,
-                    base64: path.startsWith("data") ? path : item?.base64 || "",
-                    url: path.startsWith("data") ? "" : item?.url || "",
-                    file: null
-                  })
+                      <div className="mt-2 space-y-2.5">
+                        {items.map((fileItem, idx) => {
+                          const title =
+                            fileItem.source_title ??
+                            files.find(f => f.id === fileItem.file_id)?.name ??
+                            "Untitled source"
+                          const url = fileItem.source_url ?? null
+                          const section = fileItem.source_section ?? null
+                          const preview = (fileItem.content ?? "")
+                            .toString()
+                            .slice(0, 200)
+                          const inner = (
+                            <div className="flex items-start gap-2">
+                              <span className="bg-rust-soft text-rust mt-0.5 inline-flex h-[18px] min-w-[20px] shrink-0 items-center justify-center rounded-md px-1 font-mono text-[10.5px] font-semibold">
+                                {idx + 1}
+                              </span>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate font-medium text-slate-700">
+                                  {title}
+                                  {section && (
+                                    <span className="text-slate-400">
+                                      {" - "}
+                                      {section}
+                                    </span>
+                                  )}
+                                </div>
+                                {preview && (
+                                  <div className="mt-0.5 line-clamp-2 break-words text-xs font-normal text-slate-500">
+                                    {preview}
+                                    {fileItem.content?.length > 200 && "…"}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                          return url ? (
+                            <a
+                              key={idx}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block rounded-md p-1.5 hover:bg-slate-100"
+                              title={`Open: ${title}`}
+                            >
+                              {inner}
+                            </a>
+                          ) : (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                setSelectedFileItem(fileItem)
+                                setShowFileItemPreview(true)
+                              }}
+                              className="block w-full rounded-md p-1.5 text-left hover:bg-slate-100"
+                            >
+                              {inner}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+                </>
+              )
+            })()}
+          </div>
+        )}
 
-                  setShowImagePreview(true)
-                }}
-                loading="lazy"
-              />
-            )
-          })}
-        </div>
+        {/* Images */}
+        {message.image_paths.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {message.image_paths.map((path, index) => {
+              const item = chatImages.find(image => image.path === path)
+              return (
+                <Image
+                  key={index}
+                  className="cursor-pointer rounded-lg hover:opacity-80"
+                  src={path.startsWith("data") ? path : item?.base64}
+                  alt="message image"
+                  width={200}
+                  height={200}
+                  onClick={() => {
+                    setSelectedImage({
+                      messageId: message.id,
+                      path,
+                      base64: path.startsWith("data")
+                        ? path
+                        : item?.base64 || "",
+                      url: path.startsWith("data") ? "" : item?.url || "",
+                      file: null
+                    })
+                    setShowImagePreview(true)
+                  }}
+                  loading="lazy"
+                />
+              )
+            })}
+          </div>
+        )}
+
+        {/* Edit buttons */}
         {isEditing && (
-          <div className="mt-4 flex justify-center space-x-2">
+          <div className="mt-3 flex gap-2">
             <Button size="sm" onClick={handleSendEdit}>
               Save & Send
             </Button>
-
             <Button size="sm" variant="outline" onClick={onCancelEdit}>
               Cancel
             </Button>

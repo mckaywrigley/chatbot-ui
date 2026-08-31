@@ -1,0 +1,39 @@
+User-agent: *
+Allow: /
+Allow: /welcome
+Allow: /blog
+Allow: /blog/
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /signup
+Allow: /login
+
+# Block authenticated app routes - nothing useful for crawlers here
+Disallow: /*/designs/
+Disallow: /*/reports/
+Disallow: /*/chats/
+Disallow: /*/projects/
+Disallow: /*/data-collections/
+Disallow: /*/onboarding
+Disallow: /api/
+Disallow: /auth/
+
+# Internal ops dashboard - never crawl
+Disallow: /admin
+Disallow: /admin/
+Disallow: /*/admin/
+
+# AI training opt-out for scraper bots
+User-agent: GPTBot
+Allow: /blog/
+Allow: /
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Disallow: /
+
+Sitemap: https://www.shadowai.work/sitemap.xml

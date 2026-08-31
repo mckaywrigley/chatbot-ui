@@ -73,6 +73,11 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       )?.base64 || ""
 
     setImageLink(workspaceImage)
+    // `selectedWorkspace?.image_path` is read to LOOK UP the matching cached
+    // image; it doesn't drive the effect. The effect should fire when the
+    // image cache itself changes (after upload), not on every workspace
+    // metadata edit (which would flicker the avatar mid-typing).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaceImages])
 
   const handleSave = async () => {

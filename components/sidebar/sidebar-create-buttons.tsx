@@ -1,17 +1,16 @@
+import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
-import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
 import { CreateFile } from "./items/files/create-file"
-import { CreateModel } from "./items/models/create-model"
-import { CreatePreset } from "./items/presets/create-preset"
-import { CreatePrompt } from "./items/prompts/create-prompt"
-import { CreateTool } from "./items/tools/create-tool"
+import { CreateReport } from "../reports/create-report"
+import { CreateDesign } from "../designs/create-design"
+import { CreateDataCollection } from "../data-collections/create-data-collection"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -26,13 +25,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
 
-  const [isCreatingPrompt, setIsCreatingPrompt] = useState(false)
-  const [isCreatingPreset, setIsCreatingPreset] = useState(false)
   const [isCreatingFile, setIsCreatingFile] = useState(false)
   const [isCreatingCollection, setIsCreatingCollection] = useState(false)
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
-  const [isCreatingTool, setIsCreatingTool] = useState(false)
-  const [isCreatingModel, setIsCreatingModel] = useState(false)
+  const [isCreatingReport, setIsCreatingReport] = useState(false)
+  const [isCreatingDesign, setIsCreatingDesign] = useState(false)
+  const [isCreatingDataCollection, setIsCreatingDataCollection] =
+    useState(false)
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -55,16 +54,6 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           handleNewChat()
         }
 
-      case "presets":
-        return async () => {
-          setIsCreatingPreset(true)
-        }
-
-      case "prompts":
-        return async () => {
-          setIsCreatingPrompt(true)
-        }
-
       case "files":
         return async () => {
           setIsCreatingFile(true)
@@ -79,15 +68,17 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
         return async () => {
           setIsCreatingAssistant(true)
         }
-
-      case "tools":
+      case "reports":
         return async () => {
-          setIsCreatingTool(true)
+          setIsCreatingReport(true)
         }
-
-      case "models":
+      case "designs":
         return async () => {
-          setIsCreatingModel(true)
+          setIsCreatingDesign(true)
+        }
+      case "data-collections":
+        return async () => {
+          setIsCreatingDataCollection(true)
         }
 
       default:
@@ -100,28 +91,16 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
         <IconPlus className="mr-1" size={20} />
         New{" "}
-        {contentType.charAt(0).toUpperCase() +
-          contentType.slice(1, contentType.length - 1)}
+        {contentType === "data-collections"
+          ? "Data Collection"
+          : contentType.charAt(0).toUpperCase() +
+            contentType.slice(1, contentType.length - 1)}
       </Button>
 
       {hasData && (
         <Button className="size-[36px] p-1" onClick={handleCreateFolder}>
           <IconFolderPlus size={20} />
         </Button>
-      )}
-
-      {isCreatingPrompt && (
-        <CreatePrompt
-          isOpen={isCreatingPrompt}
-          onOpenChange={setIsCreatingPrompt}
-        />
-      )}
-
-      {isCreatingPreset && (
-        <CreatePreset
-          isOpen={isCreatingPreset}
-          onOpenChange={setIsCreatingPreset}
-        />
       )}
 
       {isCreatingFile && (
@@ -142,14 +121,24 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
         />
       )}
 
-      {isCreatingTool && (
-        <CreateTool isOpen={isCreatingTool} onOpenChange={setIsCreatingTool} />
+      {isCreatingReport && (
+        <CreateReport
+          isOpen={isCreatingReport}
+          onOpenChange={setIsCreatingReport}
+        />
       )}
 
-      {isCreatingModel && (
-        <CreateModel
-          isOpen={isCreatingModel}
-          onOpenChange={setIsCreatingModel}
+      {isCreatingDesign && (
+        <CreateDesign
+          isOpen={isCreatingDesign}
+          onOpenChange={setIsCreatingDesign}
+        />
+      )}
+
+      {isCreatingDataCollection && (
+        <CreateDataCollection
+          isOpen={isCreatingDataCollection}
+          onOpenChange={setIsCreatingDataCollection}
         />
       )}
     </div>

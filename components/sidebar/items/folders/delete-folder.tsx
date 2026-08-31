@@ -35,7 +35,10 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
     setCollections,
     setAssistants,
     setTools,
-    setModels
+    setModels,
+    setReports,
+    setDesigns,
+    setDataCollections
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -50,8 +53,12 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
-  }
+    models: setModels,
+    reports: setReports,
+    designs: setDesigns,
+    projects: null,
+    "data-collections": setDataCollections
+  } as Record<string, any>
 
   const handleDeleteFolderOnly = async () => {
     await deleteFolder(folder.id)
@@ -83,13 +90,17 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
 
     if (!setStateFunction) return
 
-    const { error } = await supabase
-      .from(contentType)
-      .delete()
-      .eq("folder_id", folder.id)
+    // Data collections are stored in Firestore, not Supabase; chat-history is
+    // a view-only content type with no table of its own.
+    if (contentType !== "data-collections" && contentType !== "chat-history") {
+      const { error } = await supabase
+        .from(contentType)
+        .delete()
+        .eq("folder_id", folder.id)
 
-    if (error) {
-      toast.error(error.message)
+      if (error) {
+        toast.error(error.message)
+      }
     }
 
     setStateFunction((prevItems: any) =>

@@ -5,25 +5,28 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "ring-offset-background focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "focus-visible:ring-rust/40 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default:
+          "bg-surface border-line text-ink hover:border-line-strong hover:bg-paper-2 border",
+        primary:
+          "bg-rust text-paper border-rust border hover:border-[color:var(--rust-hover)] hover:bg-[color:var(--rust-hover)]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-transparent",
         outline:
-          "border-input bg-background hover:bg-accent hover:text-accent-foreground border",
+          "border-line hover:bg-paper-2 hover:border-line-strong border bg-transparent",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline"
+          "bg-paper-2 text-ink hover:bg-paper-3 border border-transparent",
+        ghost: "text-ink-2 hover:bg-paper-2 border border-transparent",
+        link: "text-rust underline-offset-4 hover:underline"
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "size-10"
+        default: "h-9 px-[14px]",
+        sm: "h-8 rounded-lg px-3 text-[13px]",
+        lg: "h-11 rounded-md px-5 text-[15px]",
+        icon: "size-9 p-0"
       }
     },
     defaultVariants: {

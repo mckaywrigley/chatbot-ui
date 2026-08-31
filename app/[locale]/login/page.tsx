@@ -1,23 +1,30 @@
-import { Brand } from "@/components/ui/brand"
+import Link from "next/link"
+import { Metadata } from "next"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { createServerClient } from "@supabase/ssr"
+
+import { AuthShell } from "@/components/auth/auth-shell"
+import { GoogleButton } from "@/components/auth/google-button"
+import { PasswordInput } from "@/components/auth/password-input"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubmitButton } from "@/components/ui/submit-button"
 import { createClient } from "@/lib/supabase/server"
+import { friendlyAuthError } from "@/lib/auth/friendly-errors"
 import { Database } from "@/supabase/types"
-import { createServerClient } from "@supabase/ssr"
-import { get } from "@vercel/edge-config"
-import { Metadata } from "next"
-import { cookies, headers } from "next/headers"
-import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
-  title: "Login"
+  title: "Sign In",
+  description: "Sign in to Shadow AI and continue designing your experiments.",
+  alternates: { canonical: "/login" },
+  robots: { index: false, follow: false }
 }
 
 export default async function Login({
   searchParams
 }: {
-  searchParams: { message: string }
+  searchParams: { message?: string; error?: string }
 }) {
   const cookieStore = cookies()
   const supabase = createServerClient<Database>(
@@ -31,191 +38,130 @@ export default async function Login({
       }
     }
   )
-  const session = (await supabase.auth.getSession()).data.session
+  let supabaseConnectionError: string | null = null
+  let session: Awaited<
+    ReturnType<typeof supabase.auth.getSession>
+  >["data"]["session"] = null
+  try {
+    session = (await supabase.auth.getSession()).data.session
+  } catch (e: any) {
+    session = null
+    supabaseConnectionError =
+      e?.cause?.code === "ECONNREFUSED"
+        ? `Supabase is unreachable at ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Run "supabase start" locally and copy API URL + anon key from "supabase status" into .env.local.`
+        : "Supabase is unreachable. Check NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY and that Supabase is running."
+  }
 
   if (session) {
-    const { data: homeWorkspace, error } = await supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("is_home", true)
-      .single()
-
-    if (!homeWorkspace) {
-      throw new Error(error.message)
-    }
-
-    return redirect(`/${homeWorkspace.id}/chat`)
+    // Middleware decides where an authenticated user belongs. Bouncing through "/"
+    // keeps that decision in one place.
+    return redirect("/")
   }
 
   const signIn = async (formData: FormData) => {
     "use server"
 
-    const email = formData.get("email") as string
+    const email = (formData.get("email") as string)?.trim()
     const password = formData.get("password") as string
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     })
 
     if (error) {
-      return redirect(`/login?message=${error.message}`)
-    }
-
-    const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", data.user.id)
-      .eq("is_home", true)
-      .single()
-
-    if (!homeWorkspace) {
-      throw new Error(
-        homeWorkspaceError?.message || "An unexpected error occurred"
+      return redirect(
+        `/login?error=${encodeURIComponent(friendlyAuthError(error.message))}`
       )
     }
 
-    return redirect(`/${homeWorkspace.id}/chat`)
+    return redirect("/")
   }
 
-  const getEnvVarOrEdgeConfigValue = async (name: string) => {
-    "use server"
-    if (process.env.EDGE_CONFIG) {
-      return await get<string>(name)
-    }
-
-    return process.env[name]
-  }
-
-  const signUp = async (formData: FormData) => {
-    "use server"
-
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-
-    const emailDomainWhitelistPatternsString = await getEnvVarOrEdgeConfigValue(
-      "EMAIL_DOMAIN_WHITELIST"
-    )
-    const emailDomainWhitelist = emailDomainWhitelistPatternsString?.trim()
-      ? emailDomainWhitelistPatternsString?.split(",")
-      : []
-    const emailWhitelistPatternsString =
-      await getEnvVarOrEdgeConfigValue("EMAIL_WHITELIST")
-    const emailWhitelist = emailWhitelistPatternsString?.trim()
-      ? emailWhitelistPatternsString?.split(",")
-      : []
-
-    // If there are whitelist patterns, check if the email is allowed to sign up
-    if (emailDomainWhitelist.length > 0 || emailWhitelist.length > 0) {
-      const domainMatch = emailDomainWhitelist?.includes(email.split("@")[1])
-      const emailMatch = emailWhitelist?.includes(email)
-      if (!domainMatch && !emailMatch) {
-        return redirect(
-          `/login?message=Email ${email} is not allowed to sign up.`
-        )
-      }
-    }
-
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-        // emailRedirectTo: `${origin}/auth/callback`
-      }
-    })
-
-    if (error) {
-      console.error(error)
-      return redirect(`/login?message=${error.message}`)
-    }
-
-    return redirect("/setup")
-
-    // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-    // return redirect("/login?message=Check email to continue sign in process")
-  }
-
-  const handleResetPassword = async (formData: FormData) => {
-    "use server"
-
-    const origin = headers().get("origin")
-    const email = formData.get("email") as string
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${origin}/auth/callback?next=/login/password`
-    })
-
-    if (error) {
-      return redirect(`/login?message=${error.message}`)
-    }
-
-    return redirect("/login?message=Check email to reset password")
-  }
+  const message = searchParams?.message
+  const errorMessage = searchParams?.error
 
   return (
-    <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
-      <form
-        className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2"
-        action={signIn}
-      >
-        <Brand />
-
-        <Label className="text-md mt-4" htmlFor="email">
-          Email
-        </Label>
-        <Input
-          className="mb-3 rounded-md border bg-inherit px-4 py-2"
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
-
-        <Label className="text-md" htmlFor="password">
-          Password
-        </Label>
-        <Input
-          className="mb-6 rounded-md border bg-inherit px-4 py-2"
-          type="password"
-          name="password"
-          placeholder="••••••••"
-        />
-
-        <SubmitButton className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white">
-          Login
-        </SubmitButton>
-
-        <SubmitButton
-          formAction={signUp}
-          className="border-foreground/20 mb-2 rounded-md border px-4 py-2"
-        >
-          Sign Up
-        </SubmitButton>
-
-        <div className="text-muted-foreground mt-1 flex justify-center text-sm">
-          <span className="mr-1">Forgot your password?</span>
-          <button
-            formAction={handleResetPassword}
-            className="text-primary ml-1 underline hover:opacity-80"
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to keep planning experiments."
+      footer={
+        <span>
+          New to Shadow AI?{" "}
+          <Link
+            href="/signup"
+            className="text-rust font-medium underline-offset-2 hover:underline"
           >
-            Reset
-          </button>
+            Create an account
+          </Link>
+        </span>
+      }
+    >
+      <div className="mb-4 flex flex-col gap-4">
+        <GoogleButton next="/" />
+        <div className="flex items-center gap-3">
+          <span className="bg-line h-px flex-1" />
+          <span className="text-ink-3 text-[11.5px] uppercase tracking-wide">
+            or sign in with email
+          </span>
+          <span className="bg-line h-px flex-1" />
+        </div>
+      </div>
+      <form className="flex w-full flex-col gap-4" action={signIn}>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="email" className="text-ink text-[12.5px] font-medium">
+            Email
+          </Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            required
+          />
         </div>
 
-        {searchParams?.message && (
-          <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
-            {searchParams.message}
+        <PasswordInput
+          name="password"
+          autoComplete="current-password"
+          required
+          placeholder="Your password"
+        />
+
+        <div className="-mt-1 flex justify-end">
+          <Link
+            href="/forgot-password"
+            className="text-ink-3 hover:text-ink text-[12px] underline-offset-2 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
+        <SubmitButton className="bg-rust text-paper border-rust mt-2 inline-flex h-10 items-center justify-center rounded-md border px-4 text-[14px] font-medium transition-colors hover:bg-[color:var(--rust-hover)]">
+          Sign in
+        </SubmitButton>
+
+        {(errorMessage || message) && (
+          <p
+            className={`mt-1 rounded-md border p-3 text-center text-[12.5px] ${
+              errorMessage
+                ? "bg-rust-soft text-rust-ink border-rust-soft"
+                : "bg-paper-2 text-ink-2 border-line"
+            }`}
+          >
+            {errorMessage || message}
+          </p>
+        )}
+
+        {supabaseConnectionError && (
+          <p className="bg-rust-soft text-rust-ink border-rust-soft mt-1 rounded-md border p-3 text-center text-[12.5px]">
+            {supabaseConnectionError}
           </p>
         )}
       </form>
-    </div>
+    </AuthShell>
   )
 }

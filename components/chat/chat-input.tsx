@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { WithTooltip } from "../ui/with-tooltip"
 import { ChatCommandInput } from "./chat-command-input"
 import { ChatFilesDisplay } from "./chat-files-display"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
@@ -79,6 +80,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
+    // Re-focuses the input when preset/assistant changes. `handleFocusChatInput`
+    // is a stable callback from useChatHistoryHandler; including it would
+    // cause an extra refocus on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPreset, selectedAssistant])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -211,26 +216,37 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         )}
       </div>
 
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
+      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border">
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
 
         <>
-          <IconCirclePlus
-            className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
-          />
+          <div className="absolute bottom-[12px] left-3">
+            <WithTooltip
+              display={<div>Attach files</div>}
+              trigger={
+                <IconCirclePlus
+                  className="text-muted-foreground hover:text-primary cursor-pointer p-1 transition-all hover:scale-110 hover:opacity-50"
+                  size={32}
+                  onClick={() => fileInputRef.current?.click()}
+                />
+              }
+            />
+          </div>
 
           {/* Hidden input to select files from device */}
           <Input
             ref={fileInputRef}
             className="hidden"
             type="file"
+            multiple
             onChange={e => {
               if (!e.target.files) return
-              handleSelectDeviceFile(e.target.files[0])
+              // Handle multiple files
+              for (let i = 0; i < e.target.files.length; i++) {
+                handleSelectDeviceFile(e.target.files[i])
+              }
             }}
             accept={filesToAccept}
           />

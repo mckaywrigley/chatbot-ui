@@ -7,6 +7,10 @@ import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
 import { WorkspaceSettings } from "../workspace/workspace-settings"
 import { SidebarContent } from "./sidebar-content"
+import { ProjectsSidebarContent } from "./projects-sidebar-content"
+
+// Define a constant for the sidebar switcher width
+export const SIDEBAR_SWITCHER_WIDTH = 180
 
 interface SidebarProps {
   contentType: ContentType
@@ -17,27 +21,27 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   const {
     folders,
     chats,
-    presets,
-    prompts,
     files,
     collections,
     assistants,
-    tools,
-    models
+    reports,
+    designs,
+    dataCollections
   } = useContext(ChatbotUIContext)
 
-  const chatFolders = folders.filter(folder => folder.type === "chats")
-  const presetFolders = folders.filter(folder => folder.type === "presets")
-  const promptFolders = folders.filter(folder => folder.type === "prompts")
   const filesFolders = folders.filter(folder => folder.type === "files")
-  const collectionFolders = folders.filter(
+  const chatsFolders = folders.filter(folder => folder.type === "chats")
+  const collectionsFolders = folders.filter(
     folder => folder.type === "collections"
   )
-  const assistantFolders = folders.filter(
+  const assistantsFolders = folders.filter(
     folder => folder.type === "assistants"
   )
-  const toolFolders = folders.filter(folder => folder.type === "tools")
-  const modelFolders = folders.filter(folder => folder.type === "models")
+  const reportsFolders = folders.filter(folder => folder.type === "reports")
+  const designsFolders = folders.filter(folder => folder.type === "designs")
+  const dataCollectionsFolders = folders.filter(
+    folder => folder.type === "data-collections"
+  )
 
   const renderSidebarContent = (
     contentType: ContentType,
@@ -54,9 +58,15 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       className="m-0 w-full space-y-2"
       style={{
         // Sidebar - SidebarSwitcher
-        minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
+        minWidth: showSidebar
+          ? `calc(${SIDEBAR_WIDTH}px - ${SIDEBAR_SWITCHER_WIDTH}px)`
+          : "0px",
+        maxWidth: showSidebar
+          ? `calc(${SIDEBAR_WIDTH}px - ${SIDEBAR_SWITCHER_WIDTH}px)`
+          : "0px",
+        width: showSidebar
+          ? `calc(${SIDEBAR_WIDTH}px - ${SIDEBAR_SWITCHER_WIDTH}px)`
+          : "0px"
       }}
       value={contentType}
     >
@@ -70,13 +80,11 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
         {(() => {
           switch (contentType) {
             case "chats":
-              return renderSidebarContent("chats", chats, chatFolders)
+            case "chat-history":
+              return renderSidebarContent("chats", chats, chatsFolders)
 
-            case "presets":
-              return renderSidebarContent("presets", presets, presetFolders)
-
-            case "prompts":
-              return renderSidebarContent("prompts", prompts, promptFolders)
+            case "projects":
+              return <ProjectsSidebarContent />
 
             case "files":
               return renderSidebarContent("files", files, filesFolders)
@@ -85,21 +93,27 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
               return renderSidebarContent(
                 "collections",
                 collections,
-                collectionFolders
+                collectionsFolders
               )
 
             case "assistants":
               return renderSidebarContent(
                 "assistants",
                 assistants,
-                assistantFolders
+                assistantsFolders
               )
+            case "reports":
+              return renderSidebarContent("reports", reports, reportsFolders)
 
-            case "tools":
-              return renderSidebarContent("tools", tools, toolFolders)
+            case "designs":
+              return renderSidebarContent("designs", designs, designsFolders)
 
-            case "models":
-              return renderSidebarContent("models", models, modelFolders)
+            case "data-collections":
+              return renderSidebarContent(
+                "data-collections",
+                dataCollections,
+                dataCollectionsFolders
+              )
 
             default:
               return null

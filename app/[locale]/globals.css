@@ -2,95 +2,225 @@
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa;
-}
-
-::-webkit-scrollbar-track:hover {
-  background-color: #f2f2f2;
-}
-
-::-webkit-scrollbar-corner {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* ============================================================
+   Shadow AI - Scientific design tokens
+   Palette: cream-warm neutrals + cyan/magenta brand accents
+            sampled from the helix logo (public/shadowai-logo.png).
+            Logo hues: navy bg #0E0B40, cyan #22D3EE (Shadow text +
+            helix top), magenta #E879F9 (helix bottom), deep blue
+            #3B82F6 (AI text), soft cyan glow #7DD3FC.
+   Type:    Inter Tight (display) · IBM Plex Sans (body) · IBM Plex Mono
+   Token names retained (--rust, --paper, --ink-*) so component code
+   remains unchanged across the rebrand.
+   ============================================================ */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* ----- Surfaces (cream-warm) ----- */
+    --paper: #f7f5f1; /* page background */
+    --paper-2: #efebe3; /* recessed/quiet sections */
+    --paper-3: #e4e0d8; /* deeper recess */
+    --line: #e4e0d8; /* default borders */
+    --line-strong: #d6d1c5; /* hover borders */
+    --ink: #0e0f12; /* primary text */
+    --ink-2: #2a2c31; /* body text */
+    --ink-3: #6b6e76; /* tertiary, captions */
+    --ink-4: #9a9ca3; /* placeholders */
+    --surface: #ffffff; /* raised cards, inputs, modals */
 
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    /* ----- Brand: helix cyan (token still named --rust for callsite stability)
+       sampled from the logo's "Shadow" text + helix top.            ----- */
+    --rust: #22d3ee; /* CTA, accent, focus */
+    --rust-hover: #0891b2; /* darker cyan on hover */
+    --rust-soft: #cffafe; /* subtle tinted backgrounds */
+    --rust-ink: #155e75; /* legible cyan ink */
+    /* Secondary brand accent - magenta from the helix bottom; used by
+       chips / highlights that need a second hue. */
+    --brand-magenta: #e879f9;
+    --brand-magenta-soft: #fae8ff;
+    --brand-magenta-ink: #86198f;
+    --brand-navy: #0e0b40; /* logo background, used for splash + theme-color */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
+    /* Phase tints - re-tuned to the logo's hue sweep:
+       cyan (problem) → deep blue (lit) → magenta (hyp), with the
+       neutral overview/design slabs flanking them. */
+    --p-overview: #5b6b7a;
+    --p-problem: #22d3ee; /* logo cyan */
+    --p-lit: #3b82f6; /* logo "AI" deep blue */
+    --p-hyp: #e879f9; /* logo magenta */
+    --p-design: #6f6a52;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --success: oklch(0.55 0.1 155);
+    --warn: oklch(0.62 0.14 50);
+    --danger: oklch(0.55 0.18 25);
+    --info: oklch(0.58 0.19 240);
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
+    /* Shadows - deepest layer tints with brand blue */
+    --shadow-sm: 0 1px 0 rgba(14, 15, 18, 0.02),
+      0 1px 3px rgba(14, 15, 18, 0.04);
+    --shadow-md: 0 1px 0 rgba(14, 15, 18, 0.02),
+      0 12px 32px -16px rgba(14, 15, 18, 0.1),
+      0 32px 64px -32px rgba(14, 15, 18, 0.12);
+    --shadow-lg: 0 1px 0 rgba(14, 15, 18, 0.02),
+      0 20px 40px -20px rgba(14, 15, 18, 0.15),
+      0 32px 64px -32px color-mix(in oklab, var(--rust) 22%, transparent);
+    --shadow-drawer: -24px 0 56px -8px rgba(14, 15, 18, 0.18);
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    /* Radii - tight, scientific */
+    --r-sm: 2px; /* buttons, inputs, chips */
+    --r-md: 6px; /* dropdowns, faux browser windows */
+    --r-lg: 10px; /* cards */
+    --r-xl: 14px; /* premium / pricing cards */
 
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    /* Density */
+    --density: 1;
+    --space-unit: calc(4px * var(--density));
 
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    /* Typography CSS vars (wired to next/font variables in layout.tsx).
+       Per brand: Inter Tight = display/headings, IBM Plex Sans = body/UI,
+       IBM Plex Mono = code/eyebrow/metadata. */
+    --f-ui: var(--font-ibm-plex-sans), "IBM Plex Sans", -apple-system,
+      BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --f-display: var(--font-inter-tight), "Inter Tight", -apple-system,
+      BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --f-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace,
+      SFMono-Regular, Menlo, Consolas, monospace;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    /* ----- shadcn HSL tokens (remapped to brand palette) ----- */
+    /* Values are "H S% L%" triplets, consumed via hsl(var(--xxx)) */
+    --background: 38 27% 96%; /* paper */
+    --foreground: 225 13% 6%; /* ink */
 
-    --ring: 0 0% 63.9%;
+    --surface-hsl: 0 0% 100%; /* surface */
+    --paper-hsl: 38 27% 96%;
+    --paper-2-hsl: 38 23% 91%;
+    --paper-3-hsl: 39 19% 86%;
+    --line-hsl: 39 19% 86%;
+    --line-strong-hsl: 38 17% 80%;
+    --ink-hsl: 225 13% 6%;
+    --ink-2-hsl: 222 8% 18%;
+    --ink-3-hsl: 222 5% 44%;
+    --ink-4-hsl: 222 5% 62%;
+    --rust-hsl: 188 85% 53%; /* logo cyan #22D3EE */
+    --rust-soft-hsl: 187 80% 90%; /* #CFFAFE */
+    --rust-ink-hsl: 192 91% 27%; /* #155E75 - readable cyan */
 
-    --radius: 0.5rem;
+    --muted: 38 23% 91%; /* paper-2 */
+    --muted-foreground: 222 5% 44%; /* ink-3 */
+
+    --popover: 0 0% 100%; /* surface */
+    --popover-foreground: 225 13% 6%;
+
+    --card: 0 0% 100%; /* surface */
+    --card-foreground: 225 13% 6%;
+
+    --border: 39 19% 86%; /* line */
+    --input: 39 19% 86%;
+
+    /* Primary (neutral ink on paper) - default shadcn buttons */
+    --primary: 225 13% 6%;
+    --primary-foreground: 38 27% 96%;
+
+    /* Secondary (muted paper bg) */
+    --secondary: 38 23% 91%;
+    --secondary-foreground: 225 13% 6%;
+
+    /* shadcn "accent" is a subtle hover surface, NOT the brand blue.
+       Use --rust / bg-rust utilities for brand accent. */
+    --accent: 38 23% 91%;
+    --accent-foreground: 225 13% 6%;
+
+    --destructive: 18 70% 48%;
+    --destructive-foreground: 38 27% 96%;
+
+    --ring: 188 85% 53%; /* logo cyan focus ring */
+
+    --radius: 0.625rem; /* 10px - r-lg (cards) */
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    /* Dark mode: logo-navy paper + bright cyan accent. The deep navy
+       (#0E0B40) is the helix's background in the brand mark, so the
+       app's dark theme reads as a continuation of the logo. */
+    --paper: #0e0b40; /* page background - logo navy */
+    --paper-2: #14114a; /* recessed sections (slightly raised navy) */
+    --paper-3: #1a1755; /* deeper recess */
+    --line: #2a2570; /* default borders */
+    --line-strong: #3b3590; /* hover borders */
+    --ink: #f4f1ea; /* primary text (warm cream) */
+    --ink-2: #d6d1c5; /* body text */
+    --ink-3: #a3a0c2; /* tertiary (cool tint to harmonise with navy) */
+    --ink-4: #7a7799; /* placeholders */
+    --surface: #1a1755; /* raised cards, modals */
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --rust: #67e8f9; /* brightened logo cyan for dark bg */
+    --rust-hover: #22d3ee;
+    --rust-soft: #0e7490; /* deep cyan ink panel */
+    --rust-ink: #cffafe;
+    --brand-magenta: #f0abfc; /* brightened magenta on dark */
+    --brand-magenta-soft: #701a75;
+    --brand-magenta-ink: #fae8ff;
 
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    /* Phase tints - brightened for dark contrast, same hue sweep. */
+    --p-overview: #8c9aa8;
+    --p-problem: #67e8f9;
+    --p-lit: #93c5fd;
+    --p-hyp: #f0abfc;
+    --p-design: #b9b08a;
 
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --success: oklch(0.7 0.13 155);
+    --warn: oklch(0.78 0.13 60);
+    --danger: oklch(0.7 0.16 25);
+    --info: oklch(0.78 0.16 235);
 
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5),
+      0 24px 56px -16px color-mix(in oklab, var(--rust) 28%, transparent);
+    --shadow-drawer: -24px 0 56px rgba(0, 0, 0, 0.5);
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --background: 245 70% 13%; /* logo navy */
+    --foreground: 38 27% 94%;
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --surface-hsl: 246 58% 21%;
+    --paper-hsl: 245 70% 13%;
+    --paper-2-hsl: 246 62% 17%;
+    --paper-3-hsl: 246 58% 21%;
+    --line-hsl: 247 49% 30%;
+    --line-strong-hsl: 247 45% 39%;
+    --ink-hsl: 38 27% 94%;
+    --ink-2-hsl: 38 17% 80%;
+    --ink-3-hsl: 250 16% 70%;
+    --ink-4-hsl: 250 11% 53%;
+    --rust-hsl: 188 92% 69%; /* bright logo cyan on dark */
+    --rust-soft-hsl: 192 91% 31%;
+    --rust-ink-hsl: 187 80% 90%;
 
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --muted: 246 62% 17%;
+    --muted-foreground: 250 16% 70%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
+    --popover: 246 58% 21%;
+    --popover-foreground: 38 27% 94%;
 
-    --ring: 0 0% 14.9%;
+    --card: 246 58% 21%;
+    --card-foreground: 38 27% 94%;
+
+    --border: 247 49% 30%;
+    --input: 247 49% 30%;
+
+    --primary: 38 27% 94%;
+    --primary-foreground: 245 70% 13%;
+
+    --secondary: 246 62% 17%;
+    --secondary-foreground: 38 27% 94%;
+
+    --accent: 246 62% 17%;
+    --accent-foreground: 38 27% 94%;
+
+    --destructive: 18 70% 60%;
+    --destructive-foreground: 38 27% 94%;
+
+    --ring: 188 92% 69%;
   }
 }
 
@@ -98,7 +228,149 @@
   * {
     @apply border-border;
   }
+
+  html,
   body {
-    @apply bg-background text-foreground;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--f-ui);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
+  ::selection {
+    background: var(--rust);
+    color: var(--paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Scrollbars - subtle, warm */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-4);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Density override hook */
+[data-density="compact"] {
+  --density: 0.88;
+}
+
+/* Animations used across the app */
+@keyframes spin-accent {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: -200px 0;
+  }
+  to {
+    background-position: 200px 0;
+  }
+}
+
+.animate-spin-accent {
+  animation: spin-accent 1.4s linear infinite;
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+.animate-fade-up {
+  animation: fade-up 300ms ease-out both;
+}
+.animate-drawer-in {
+  animation: drawer-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Editorial text utilities */
+.t-display {
+  font-family: var(--f-display);
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+}
+.t-eyebrow {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--ink-3-hsl));
+}
+.t-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--ink-3-hsl));
+  letter-spacing: 0.01em;
+}
+.t-body {
+  font-size: 15px;
+  color: hsl(var(--ink-2-hsl));
+  line-height: 1.6;
+}
+.t-mono {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: hsl(var(--ink-2-hsl));
+}
+.t-caption {
+  font-size: 13px;
+  color: hsl(var(--ink-3-hsl));
+}
+
+/* Legacy force-light override - retained as no-op on editorial palette */
+.app-main-content {
+  color-scheme: light;
 }

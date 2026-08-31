@@ -1,0 +1,85 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400" }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400" }
+      ]
+    }
+  ],
+  "functions": {
+    "app/api/report/outline/route.ts": {
+      "maxDuration": 240
+    },
+    "app/api/design/draft/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/draft/status/[planId]/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/inngest/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/draft/hypothesis/[hypothesisId]/design/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/[designid]/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/mock/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/mock-regenerate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/regenerate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/report/regenerate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/[designid]/generate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/[designid]/clarify/route.ts": {
+      "maxDuration": 120
+    },
+    "app/api/design/[designid]/validate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/design/extract-materials/route.ts": {
+      "maxDuration": 240
+    },
+    "app/api/data-collection/structure/route.ts": {
+      "maxDuration": 240
+    },
+    "app/api/retrieval/process/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/retrieval/process/docx/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/data-collection/transcribe/route.ts": {
+      "maxDuration": 120
+    }
+  }
+}

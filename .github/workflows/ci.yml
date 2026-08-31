@@ -1,0 +1,102 @@
+name: CI
+
+# Release gate for the core flows. Runs on every PR and on pushes to the
+# main + active design branches. Blocks merges if type-check, lint, the test
+# suite (incl. the design-pipeline guard in __tests__/design/pipeline.test.ts),
+# or the production build break - so create-design → literature → hypotheses →
+# design → chat-context can't silently regress.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - design/editorial-overhaul
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: type-check · lint · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `next-env.d.ts` is gitignored (Next.js regenerates it on build), and it
+      # is what pulls in `next/image-types/global` - the declarations that make
+      # `import x from "@/public/foo.png"` type-check. Since this job runs
+      # type-check BEFORE build, the file does not exist yet and every image
+      # import fails with TS2307. It passes on a developer machine only because
+      # a previous build left the file behind, which is exactly the kind of
+      # "works locally" divergence that had main red for weeks. Write the file
+      # Next would generate, verbatim, before type-checking.
+      - name: Generate Next.js type references
+        run: |
+          cat > next-env.d.ts <<'TYPES'
+          /// <reference types="next" />
+          /// <reference types="next/image-types/global" />
+
+          // NOTE: This file should not be edited
+          // see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
+          TYPES
+
+      # Deterministic, env-free gates - catch the regressions that have bitten
+      # the design pipeline (types, wiring, dropped fields, bad merges).
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Production build - catches issues tsc can't (e.g. edge-runtime bundling).
+      #
+      # `next build` collects page data for every API route, which imports each
+      # route's module graph and runs its top-level initializers. Several of
+      # those throw outright when their key is absent (the SerpApi client is the
+      # loudest), so the original assumption here - that "the build reads real
+      # secrets only at request time" - does not hold, and the build died in a
+      # clean checkout. These placeholders exist purely to get those
+      # initializers past construction; nothing is called, so the values are
+      # never used for anything. Real credentials still belong in the runtime
+      # environment, not here.
+      - name: Build
+        run: npm run build
+        env:
+          # Server-side keys whose clients construct at module load.
+          SERPAPI_API_KEY: "placeholder-serpapi-key"
+          SUPABASE_SERVICE_ROLE_KEY: "placeholder-service-role-key"
+          AZURE_OPENAI_ENDPOINT: "https://placeholder.openai.azure.com"
+          AZURE_OPENAI_KEY: "placeholder-azure-key"
+          AZURE_OPENAI_API_KEY: "placeholder-azure-key"
+          AZURE_OPENAI_DEPLOYMENT: "placeholder-deployment"
+          AZURE_OPENAI_DESIGN_DEPLOYMENT: "placeholder-deployment"
+          OPENAI_API_KEY: "placeholder-openai-key"
+          ANTHROPIC_API_KEY: "placeholder-anthropic-key"
+          RESEND_API_KEY: "placeholder-resend-key"
+          INNGEST_SIGNING_KEY: "signkey-prod-placeholder"
+          INNGEST_EVENT_KEY: "placeholder-event-key"
+          FIREBASE_PROJECT_ID: "placeholder-project"
+          FIREBASE_CLIENT_EMAIL: "placeholder@placeholder.iam.gserviceaccount.com"
+          FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nplaceholder\n-----END PRIVATE KEY-----\n"
+          NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
+          NEXT_PUBLIC_FIREBASE_API_KEY: "placeholder"
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "placeholder.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "placeholder"
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "placeholder.appspot.com"
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "0000000000"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:0:web:0"

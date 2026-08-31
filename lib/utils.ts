@@ -1,3 +1,4 @@
+import { toast } from "@/components/ui/use-toast"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -22,4 +23,21 @@ export function getMediaTypeFromDataURL(dataURL: string): string | null {
 export function getBase64FromDataURL(dataURL: string): string | null {
   const matches = dataURL.match(/^data:[A-Za-z-+\/]+;base64,(.*)$/)
   return matches ? matches[1] : null
+}
+
+export const copyToClipboard = (textToCopy: string) => {
+  navigator.clipboard
+    .writeText(textToCopy)
+    .then(() => {
+      toast({
+        title: "Copied to clipboard",
+        variant: "default"
+      })
+    })
+    .catch(err => {
+      toast({
+        title: "Could not copy text",
+        variant: "destructive"
+      })
+    })
 }

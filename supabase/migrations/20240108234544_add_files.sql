@@ -87,7 +87,30 @@ EXECUTE PROCEDURE delete_old_file();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('files', 'files', false);
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name)
+  VALUES ('files', 'files')
+  ON CONFLICT (id) DO NOTHING;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'public'
+  ) THEN
+    UPDATE storage.buckets SET public = false WHERE id = 'files';
+  ELSIF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'is_public'
+  ) THEN
+    UPDATE storage.buckets SET is_public = false WHERE id = 'files';
+  END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION public.non_private_file_exists(p_name text)
 RETURNS boolean

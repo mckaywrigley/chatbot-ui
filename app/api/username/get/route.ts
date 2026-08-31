@@ -1,13 +1,20 @@
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
-
-export const runtime = "edge"
+import { checkRateLimit, getClientIp } from "@/lib/server/rate-limit"
 
 export async function POST(request: Request) {
   const json = await request.json()
   const { userId } = json as {
     userId: string
   }
+
+  const limited = await checkRateLimit({
+    name: "username-get",
+    identifier: getClientIp(),
+    requests: 30,
+    window: "1 m"
+  })
+  if (limited) return limited
 
   try {
     const supabaseAdmin = createClient<Database>(

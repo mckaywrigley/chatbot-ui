@@ -1,14 +1,5 @@
 import { ContentType } from "@/types"
-import {
-  IconAdjustmentsHorizontal,
-  IconBolt,
-  IconBooks,
-  IconFile,
-  IconMessage,
-  IconPencil,
-  IconRobotFace,
-  IconSparkles
-} from "@tabler/icons-react"
+import { IconFolder } from "@tabler/icons-react"
 import { FC } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -21,68 +12,26 @@ interface SidebarSwitcherProps {
   onContentTypeChange: (contentType: ContentType) => void
 }
 
+/**
+ * Experiment-design sidebar: Projects only. Chat is no longer a workspace-level
+ * surface - it lives scoped to a design (side chat) or as the "all designs"
+ * thread, so the Chat History nav item has been removed. Project-local items
+ * live inside the Project canvas. Profile stays at the bottom.
+ */
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
   return (
     <div className="flex flex-col justify-between border-r-2 pb-5">
-      <TabsList className="bg-background grid h-[440px] grid-rows-7">
+      <TabsList className="bg-background grid w-[180px] auto-rows-auto">
         <SidebarSwitchItem
-          icon={<IconMessage size={SIDEBAR_ICON_SIZE} />}
-          contentType="chats"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}
-          contentType="presets"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
-          contentType="prompts"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconSparkles size={SIDEBAR_ICON_SIZE} />}
-          contentType="models"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
-          contentType="files"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
-          contentType="collections"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
-          contentType="assistants"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
-          contentType="tools"
+          icon={<IconFolder size={SIDEBAR_ICON_SIZE} />}
+          contentType="projects"
           onContentTypeChange={onContentTypeChange}
         />
       </TabsList>
 
-      <div className="flex flex-col items-center space-y-4">
-        {/* TODO */}
-        {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
-
-        {/* TODO */}
-        {/* <Alerts /> */}
-
+      <div className="flex flex-col items-center space-y-4 px-3 py-2">
         <WithTooltip
           display={<div>Profile Settings</div>}
           trigger={<ProfileSettings />}

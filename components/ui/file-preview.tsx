@@ -50,8 +50,11 @@ export const FilePreview: FC<FilePreviewProps> = ({
           } else if (type === "file_item") {
             const fileItem = item as Tables<"file_items">
             return (
-              <div className="bg-background text-primary h-[50vh] min-w-[700px] overflow-auto whitespace-pre-wrap rounded-xl p-4">
-                <div>{fileItem.content}</div>
+              <div className="bg-foreground text-secondary h-[50vh] min-w-[700px] overflow-auto whitespace-pre-wrap rounded-xl p-2">
+                <h2 className="justify-center text-xl font-bold">
+                  Source information:
+                </h2>
+                <div> {fileItem.content}</div>
               </div>
             )
           } else if (type === "file") {

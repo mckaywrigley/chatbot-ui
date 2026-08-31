@@ -62,7 +62,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         3,
         true
       )}${fileExtension}`
-      const fileName = window.prompt("Enter file name" || "", suggestedFileName)
+      const fileName = window.prompt("Enter file name", suggestedFileName)
 
       if (!fileName) {
         return
@@ -86,42 +86,59 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     }
 
     return (
-      <div className="codeblock relative w-full bg-zinc-950 font-sans">
-        <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
-          <span className="text-xs lowercase">{language}</span>
+      <div className="codeblock relative w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 font-sans shadow-sm">
+        <div className="flex w-full items-center justify-between border-b border-zinc-700 bg-zinc-800 px-4 py-2 text-white">
+          <span className="text-xs font-medium uppercase tracking-wide text-zinc-300">
+            {language || "code"}
+          </span>
           <div className="flex items-center space-x-1">
             <Button
               variant="ghost"
               size="icon"
-              className="hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+              className="size-7 transition-colors hover:bg-zinc-700 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
               onClick={downloadAsFile}
             >
-              <IconDownload size={16} />
+              <IconDownload size={14} />
             </Button>
 
             <Button
               variant="ghost"
               size="icon"
-              className="text-xs hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+              className="size-7 transition-colors hover:bg-zinc-700 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
               onClick={onCopy}
             >
-              {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
+              {isCopied ? (
+                <IconCheck size={14} className="text-green-400" />
+              ) : (
+                <IconCopy size={14} />
+              )}
             </Button>
           </div>
         </div>
         <SyntaxHighlighter
           language={language}
           style={oneDark}
-          // showLineNumbers
+          showLineNumbers={value.split("\n").length > 10}
           customStyle={{
             margin: 0,
             width: "100%",
-            background: "transparent"
+            background: "transparent",
+            padding: "1rem"
+          }}
+          lineNumberStyle={{
+            color: "#6b7280",
+            fontSize: "12px",
+            minWidth: "2.5em",
+            paddingRight: "1em",
+            textAlign: "right",
+            userSelect: "none"
           }}
           codeTagProps={{
             style: {
-              fontSize: "14px",
-              fontFamily: "var(--font-mono)"
+              fontSize: "13px",
+              fontFamily:
+                "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Menlo', monospace",
+              lineHeight: "1.5"
             }
           }}
         >

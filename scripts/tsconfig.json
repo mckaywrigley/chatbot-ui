@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": { "@/*": ["./*"] },
+    "isolatedModules": false,
+    "noEmit": false
+  },
+  "include": ["scripts/**/*.ts"]
+}

@@ -1,0 +1,28 @@
+{
+  "forbidden_categories": [
+    "no_actionable_protocols",
+    "no_pathogen_enhancement",
+    "no_weapons_design"
+  ],
+  "rules": [
+    {
+      "category": "no_actionable_protocols",
+      "description": "Block detailed protocols for creating harmful substances",
+      "keywords": ["synthesis protocol", "step-by-step", "recipe", "how to make"],
+      "severity": "block"
+    },
+    {
+      "category": "no_pathogen_enhancement",
+      "description": "Block research that enhances pathogen virulence or transmissibility",
+      "keywords": ["enhance virulence", "increase transmissibility", "gain of function"],
+      "severity": "block"
+    },
+    {
+      "category": "no_weapons_design",
+      "description": "Block weapons design or development",
+      "keywords": ["bioweapon", "biological weapon", "weapon", "explosive", "lethal"],
+      "severity": "block"
+    }
+  ],
+  "block_threshold": 0.7
+}

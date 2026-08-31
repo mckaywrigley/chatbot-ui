@@ -5,7 +5,30 @@ ADD COLUMN image_path TEXT DEFAULT '' NOT NULL CHECK (char_length(image_path) <=
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('workspace_images', 'workspace_images', false);
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name)
+  VALUES ('workspace_images', 'workspace_images')
+  ON CONFLICT (id) DO NOTHING;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'public'
+  ) THEN
+    UPDATE storage.buckets SET public = false WHERE id = 'workspace_images';
+  ELSIF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'is_public'
+  ) THEN
+    UPDATE storage.buckets SET is_public = false WHERE id = 'workspace_images';
+  END IF;
+END $$;
 
 -- FUNCTIONS --
 

@@ -1,11 +1,16 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { processDocX } from "@/lib/retrieval/processing"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  getAzureOpenAIEmbeddingsClient,
+  getAzureOpenAIEmbeddingsDeployment
+} from "@/lib/azure-openai"
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { recordCompletionUsage } from "@/lib/billing/account"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
-import OpenAI from "openai"
+import { enforceSize } from "@/lib/server/file-validation"
 
 export async function POST(req: Request) {
   const json = await req.json()
@@ -24,13 +29,22 @@ export async function POST(req: Request) {
 
     const profile = await getServerProfile()
 
-    if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
-      }
+    // Verify fileId belongs to the authenticated user before embedding /
+    // writing file_items scoped to it.
+    const { data: ownedFile, error: ownedError } = await supabaseAdmin
+      .from("files")
+      .select("id")
+      .eq("id", fileId)
+      .eq("user_id", profile.user_id)
+      .maybeSingle()
+
+    if (ownedError) throw ownedError
+    if (!ownedFile) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
+
+    const sizeError = enforceSize(Buffer.byteLength(text || "", "utf8"), "text")
+    if (sizeError) return sizeError
 
     let chunks: FileItemChunk[] = []
 
@@ -46,26 +60,30 @@ export async function POST(req: Request) {
 
     let embeddings: any = []
 
-    let openai
-    if (profile.use_azure_openai) {
-      openai = new OpenAI({
-        apiKey: profile.azure_openai_api_key || "",
-        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-12-01-preview" },
-        defaultHeaders: { "api-key": profile.azure_openai_api_key }
-      })
-    } else {
-      openai = new OpenAI({
-        apiKey: profile.openai_api_key || "",
-        organization: profile.openai_organization_id
-      })
-    }
-
     if (embeddingsProvider === "openai") {
+      const embeddingsDeployment =
+        profile.azure_openai_embeddings_id ||
+        getAzureOpenAIEmbeddingsDeployment()
+      if (!embeddingsDeployment) {
+        throw new Error(
+          "Azure embeddings deployment not configured. Set AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT or configure azure_openai_embeddings_id, or use local embeddings."
+        )
+      }
+
+      const openai = getAzureOpenAIEmbeddingsClient()
       const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
+        model: embeddingsDeployment,
         input: chunks.map(chunk => chunk.content)
       })
+
+      await recordCompletionUsage(
+        {
+          userId: profile.user_id,
+          feature: "embeddings",
+          model: embeddingsDeployment
+        },
+        response
+      )
 
       embeddings = response.data.map((item: any) => {
         return item.embedding

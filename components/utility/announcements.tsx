@@ -50,6 +50,10 @@ export const Announcements: FC<AnnouncementsProps> = () => {
     // Update state and local storage
     setAnnouncements(updatedAnnouncements)
     localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
+    // Mount-once reconciler that merges the static `announcements` constant
+    // with localStorage. Adding `announcements` would loop because the
+    // effect itself calls `setAnnouncements`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const unreadCount = announcements.filter(a => !a.read).length

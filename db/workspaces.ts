@@ -7,13 +7,15 @@ export const getHomeWorkspaceByUserId = async (userId: string) => {
     .select("*")
     .eq("user_id", userId)
     .eq("is_home", true)
-    .single()
+    .maybeSingle()
 
-  if (!homeWorkspace) {
+  if (error && error.code !== "PGRST116") {
+    // Only throw for actual database errors, not for "not found"
     throw new Error(error.message)
   }
 
-  return homeWorkspace.id
+  // Return null if home workspace doesn't exist (e.g., after database reset)
+  return homeWorkspace?.id || null
 }
 
 export const getWorkspaceById = async (workspaceId: string) => {

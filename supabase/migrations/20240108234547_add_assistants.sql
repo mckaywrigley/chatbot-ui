@@ -91,7 +91,30 @@ EXECUTE PROCEDURE delete_old_assistant_image();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('assistant_images', 'assistant_images', false);
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name)
+  VALUES ('assistant_images', 'assistant_images')
+  ON CONFLICT (id) DO NOTHING;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'public'
+  ) THEN
+    UPDATE storage.buckets SET public = false WHERE id = 'assistant_images';
+  ELSIF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'is_public'
+  ) THEN
+    UPDATE storage.buckets SET is_public = false WHERE id = 'assistant_images';
+  END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION public.non_private_assistant_exists(p_name text)
 RETURNS boolean

@@ -104,7 +104,30 @@ EXECUTE PROCEDURE delete_old_message_images();
 
 -- MESSAGE IMAGES
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('message_images', 'message_images', false);
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name)
+  VALUES ('message_images', 'message_images')
+  ON CONFLICT (id) DO NOTHING;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'public'
+  ) THEN
+    UPDATE storage.buckets SET public = false WHERE id = 'message_images';
+  ELSIF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'is_public'
+  ) THEN
+    UPDATE storage.buckets SET is_public = false WHERE id = 'message_images';
+  END IF;
+END $$;
 
 CREATE POLICY "Allow read access to own message images"
     ON storage.objects FOR SELECT

@@ -24,15 +24,19 @@ export async function POST(request: Request) {
       baseURL: "https://openrouter.ai/api/v1"
     })
 
-    const response = await openai.chat.completions.create({
+    const params: any = {
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: undefined,
       stream: true
-    })
+    }
 
-    const stream = OpenAIStream(response)
+    // Defensive: never send nullish max_tokens
+    if (params.max_tokens == null) delete params.max_tokens
+
+    const response = await openai.chat.completions.create(params)
+
+    const stream = OpenAIStream(response as any)
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {

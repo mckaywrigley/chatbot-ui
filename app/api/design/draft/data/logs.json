@@ -1,0 +1,1741 @@
+[
+  {
+    "timestamp": "2025-11-13T11:27:26.841Z",
+    "actor": "supervisor",
+    "message": "Starting research plan a9fffa70-2294-4494-b8ce-b1b6f14958ce",
+    "level": "info",
+    "context": {
+      "planId": "a9fffa70-2294-4494-b8ce-b1b6f14958ce"
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:27:26.842Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "a9fffa70-2294-4494-b8ce-b1b6f14958ce",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:27:37.161Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "a9fffa70-2294-4494-b8ce-b1b6f14958ce",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:27:37.177Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "a9fffa70-2294-4494-b8ce-b1b6f14958ce",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:28:41.724Z",
+    "actor": "supervisor",
+    "message": "Research plan a9fffa70-2294-4494-b8ce-b1b6f14958ce completed",
+    "level": "info",
+    "context": {
+      "planId": "a9fffa70-2294-4494-b8ce-b1b6f14958ce",
+      "totalTimeMs": 74918
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:40:43.262Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+    "level": "info",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2"
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:40:43.264Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:40:54.378Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:40:54.379Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:42:13.257Z",
+    "actor": "supervisor",
+    "message": "Research plan 77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2 completed",
+    "level": "info",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "totalTimeMs": 90014
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:47:08.785Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Generating experiment design for hypothesis 8e262391-455a-4a1c-84ac-d5af165c9e7f",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "hypothesisId": "8e262391-455a-4a1c-84ac-d5af165c9e7f"
+    }
+  },
+  {
+    "timestamp": "2025-11-13T11:47:12.690Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design generated for hypothesis 8e262391-455a-4a1c-84ac-d5af165c9e7f",
+    "context": {
+      "planId": "77d8bc0b-a31e-4a23-9f74-1f1a32d14aa2",
+      "hypothesisId": "8e262391-455a-4a1c-84ac-d5af165c9e7f"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:18:58.420Z",
+    "actor": "supervisor",
+    "message": "Starting research plan c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+    "level": "info",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:18:58.421Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:19:19.538Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:19:19.541Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:20:24.802Z",
+    "actor": "supervisor",
+    "message": "Research plan c8d5823b-2067-45ec-ab7e-0c47927a2e54 completed",
+    "level": "info",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "totalTimeMs": 86418
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:20:43.815Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Generating experiment design for hypothesis b6bbf77a-acbe-4b47-a6df-a6f6d953c81f",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "b6bbf77a-acbe-4b47-a6df-a6f6d953c81f"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:20:49.060Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design generated for hypothesis b6bbf77a-acbe-4b47-a6df-a6f6d953c81f",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "b6bbf77a-acbe-4b47-a6df-a6f6d953c81f"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:21:16.778Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Generating experiment design for hypothesis d7269802-ea91-4bfc-a3f8-1411c908692b",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "d7269802-ea91-4bfc-a3f8-1411c908692b"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:21:24.942Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design generated for hypothesis d7269802-ea91-4bfc-a3f8-1411c908692b",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "d7269802-ea91-4bfc-a3f8-1411c908692b"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:27:12.915Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Generating experiment design for hypothesis 816231b0-f5e6-48e5-8165-992adc4f14b5",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "816231b0-f5e6-48e5-8165-992adc4f14b5"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:27:16.018Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design generated for hypothesis 816231b0-f5e6-48e5-8165-992adc4f14b5",
+    "context": {
+      "planId": "c8d5823b-2067-45ec-ab7e-0c47927a2e54",
+      "hypothesisId": "816231b0-f5e6-48e5-8165-992adc4f14b5"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:40:10.271Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 992d314b-95be-4539-97b9-bc6312a8247b",
+    "level": "info",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:40:10.272Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:40:19.333Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:40:19.334Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:41:24.599Z",
+    "actor": "supervisor",
+    "message": "Research plan 992d314b-95be-4539-97b9-bc6312a8247b completed",
+    "level": "info",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "totalTimeMs": 74367
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:41:40.113Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1be285f0-e6d1-413a-b65f-95e24d227c2a",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1be285f0-e6d1-413a-b65f-95e24d227c2a"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T12:47:39.169Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1be285f0-e6d1-413a-b65f-95e24d227c2a",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1be285f0-e6d1-413a-b65f-95e24d227c2a",
+      "totalTimeMs": 359056
+    }
+  },
+  {
+    "timestamp": "2025-11-14T13:15:41.211Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 421d16b4-d764-42a9-ba3b-379184de01a2",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "421d16b4-d764-42a9-ba3b-379184de01a2"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T13:18:29.646Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 421d16b4-d764-42a9-ba3b-379184de01a2",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "421d16b4-d764-42a9-ba3b-379184de01a2",
+      "totalTimeMs": 168433
+    }
+  },
+  {
+    "timestamp": "2025-11-14T13:52:18.560Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T13:57:14.607Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "totalTimeMs": 296047
+    }
+  },
+  {
+    "timestamp": "2025-11-14T13:58:37.646Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:00:37.559Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "totalTimeMs": 119913
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:20:18.374Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:20:23.832Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:21:09.001Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:21:44.797Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:22:08.877Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:22:12.456Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:22:15.253Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:22:17.500Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:25:42.948Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:26:20.305Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:29:14.343Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "totalTimeMs": 211395
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:30:46.403Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "totalTimeMs": 266098
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:49:44.817Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:53:39.723Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "totalTimeMs": 234906
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:54:22.989Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T14:54:22.992Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Applying user instructions for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "planId": "992d314b-95be-4539-97b9-bc6312a8247b",
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "instructions": "add more detailed instructions for m"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T15:11:59.389Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+    "context": {
+      "hypothesisId": "1d524719-7b4b-44bc-a87d-1ee2faf1876e",
+      "error": "Connection error."
+    }
+  },
+  {
+    "timestamp": "2025-11-14T18:58:53.736Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+    "level": "info",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T18:58:53.750Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T18:59:10.129Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T18:59:10.144Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-14T19:00:32.591Z",
+    "actor": "supervisor",
+    "message": "Research plan 000fc65e-6073-4fc8-8c86-7a27f9b744e7 completed",
+    "level": "info",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "totalTimeMs": 98884
+    }
+  },
+  {
+    "timestamp": "2025-11-14T19:02:54.828Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 0d9a81b6-6e09-4192-871b-5939f3fd102b",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "hypothesisId": "0d9a81b6-6e09-4192-871b-5939f3fd102b"
+    }
+  },
+  {
+    "timestamp": "2025-11-14T19:05:14.553Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 0d9a81b6-6e09-4192-871b-5939f3fd102b",
+    "context": {
+      "planId": "000fc65e-6073-4fc8-8c86-7a27f9b744e7",
+      "hypothesisId": "0d9a81b6-6e09-4192-871b-5939f3fd102b",
+      "totalTimeMs": 139725
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:55:04.198Z",
+    "actor": "supervisor",
+    "message": "Starting research plan bdadf945-238b-4775-8811-000b595bf5de",
+    "level": "info",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:55:04.206Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:55:14.096Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:55:14.343Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:56:44.059Z",
+    "actor": "supervisor",
+    "message": "Research plan bdadf945-238b-4775-8811-000b595bf5de completed",
+    "level": "info",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "totalTimeMs": 99904
+    }
+  },
+  {
+    "timestamp": "2025-11-15T07:59:04.328Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 0a30447f-ef74-4264-bd55-39d82c7337b7",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "0a30447f-ef74-4264-bd55-39d82c7337b7"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:01:41.721Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 0a30447f-ef74-4264-bd55-39d82c7337b7",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "0a30447f-ef74-4264-bd55-39d82c7337b7",
+      "totalTimeMs": 157393
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:14:24.416Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 0a30447f-ef74-4264-bd55-39d82c7337b7",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "0a30447f-ef74-4264-bd55-39d82c7337b7"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:14:24.423Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Applying user instructions for hypothesis 0a30447f-ef74-4264-bd55-39d82c7337b7",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "0a30447f-ef74-4264-bd55-39d82c7337b7",
+      "instructions": "give me more detailed instructions"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:18:31.548Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 0a30447f-ef74-4264-bd55-39d82c7337b7",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "0a30447f-ef74-4264-bd55-39d82c7337b7",
+      "totalTimeMs": 247132
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:24:03.694Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis eda37eed-7686-435f-bf4e-a9fe66497e75",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "eda37eed-7686-435f-bf4e-a9fe66497e75"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:26:59.241Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis eda37eed-7686-435f-bf4e-a9fe66497e75",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "eda37eed-7686-435f-bf4e-a9fe66497e75",
+      "totalTimeMs": 175546
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:56:13.001Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis eda37eed-7686-435f-bf4e-a9fe66497e75",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "eda37eed-7686-435f-bf4e-a9fe66497e75"
+    }
+  },
+  {
+    "timestamp": "2025-11-15T08:59:31.194Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis eda37eed-7686-435f-bf4e-a9fe66497e75",
+    "context": {
+      "planId": "bdadf945-238b-4775-8811-000b595bf5de",
+      "hypothesisId": "eda37eed-7686-435f-bf4e-a9fe66497e75",
+      "totalTimeMs": 198193
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:06:29.599Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+    "level": "info",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:06:29.605Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:06:42.679Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:06:42.955Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:08:02.625Z",
+    "actor": "supervisor",
+    "message": "Research plan 5cdb84d9-5be2-496c-818a-f9a4f167e00f completed",
+    "level": "info",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "totalTimeMs": 93069
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:08:21.787Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:08:22.829Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (405): Method Not Allowed"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:11:49.034Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:11:59.118Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (500): A content Agent has failed to respond; BroadSearchAgent failed to respond; No documents retrieved from dense and s2 search"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:18:06.201Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:20:53.772Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "totalTimeMs": 167566
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:57:53.939Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:57:55.395Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:58:01.226Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T09:58:02.354Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:00:15.297Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:00:16.383Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:04:05.488Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:04:06.625Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:04:32.010Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "ace00b78-416c-4dbd-9b68-28b270a4f7e9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:04:33.287Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+    "context": {
+      "hypothesisId": "ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:13:31.501Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:15:20.520Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:25:11.962Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:25:17.184Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:25:18.019Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:25:22.444Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:51:54.940Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T10:52:03.464Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (503): Service Unavailable"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:02:26.645Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:06:27.839Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "error": "PaperFinder failed (504): Gateway Timeout"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:20:52.677Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:20:57.703Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "ace00b78-416c-4dbd-9b68-28b270a4f7e9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:22:37.078Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+    "context": {
+      "hypothesisId": "1ab562ab-d7c0-48a6-8f4f-f4121bff283f",
+      "error": "PaperFinder failed (500): A content Agent has failed to respond; BroadSearchAgent failed to respond; No documents retrieved from dense and s2 search"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T11:23:58.529Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "ace00b78-416c-4dbd-9b68-28b270a4f7e9",
+      "totalTimeMs": 180824
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:06:19.209Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:08:27.141Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+    "context": {
+      "planId": "5cdb84d9-5be2-496c-818a-f9a4f167e00f",
+      "hypothesisId": "5724a5d4-847a-4faa-b27b-6dfa08235ed9",
+      "totalTimeMs": 127931
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:18:39.929Z",
+    "actor": "supervisor",
+    "message": "Starting research plan eb9a7422-5649-4e74-857e-d3f37574be39",
+    "level": "info",
+    "context": {
+      "planId": "eb9a7422-5649-4e74-857e-d3f37574be39"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:18:39.941Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "eb9a7422-5649-4e74-857e-d3f37574be39",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:18:57.007Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "eb9a7422-5649-4e74-857e-d3f37574be39",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:18:57.109Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "eb9a7422-5649-4e74-857e-d3f37574be39",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:20:50.463Z",
+    "actor": "supervisor",
+    "message": "Research plan eb9a7422-5649-4e74-857e-d3f37574be39 completed",
+    "level": "info",
+    "context": {
+      "planId": "eb9a7422-5649-4e74-857e-d3f37574be39",
+      "totalTimeMs": 130585
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:25:11.274Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+    "level": "info",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:25:11.299Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:25:23.425Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:25:23.433Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:27:02.497Z",
+    "actor": "supervisor",
+    "message": "Research plan 3687f175-c09f-4ffa-b189-9e5d9fd8aa1f completed",
+    "level": "info",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "totalTimeMs": 111250
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:28:28.272Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 47e81218-bb62-4063-bdd6-139998331642",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "hypothesisId": "47e81218-bb62-4063-bdd6-139998331642"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:31:27.453Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 47e81218-bb62-4063-bdd6-139998331642",
+    "context": {
+      "planId": "3687f175-c09f-4ffa-b189-9e5d9fd8aa1f",
+      "hypothesisId": "47e81218-bb62-4063-bdd6-139998331642",
+      "totalTimeMs": 179180
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:42:04.142Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+    "level": "info",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:42:04.150Z",
+    "actor": "supervisor",
+    "message": "Created 10 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "taskCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:42:19.305Z",
+    "actor": "supervisor",
+    "message": "Generated 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisCount": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:42:19.317Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 10 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "topN": 10
+    }
+  },
+  {
+    "timestamp": "2025-11-18T16:43:52.312Z",
+    "actor": "supervisor",
+    "message": "Research plan 73bd6e86-bcc0-477d-91c0-f6d4f443e79a completed",
+    "level": "info",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "totalTimeMs": 108236
+    }
+  },
+  {
+    "timestamp": "2025-11-21T10:54:14.856Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T10:56:45.937Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "totalTimeMs": 151080
+    }
+  },
+  {
+    "timestamp": "2025-11-21T13:23:16.272Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T13:24:43.380Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "totalTimeMs": 87108
+    }
+  },
+  {
+    "timestamp": "2025-11-21T17:54:21.243Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T17:55:24.837Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "totalTimeMs": 63594
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:31:16.672Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:32:28.320Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "totalTimeMs": 71648
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:39:57.381Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:41:11.636Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "error": "Cannot read properties of undefined (reading 'length')"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:43:15.211Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 61ed0d70-c81d-412b-b43a-ef21c1774353",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "61ed0d70-c81d-412b-b43a-ef21c1774353"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:44:50.241Z",
+    "actor": "supervisor",
+    "level": "error",
+    "message": "Experiment design pipeline failed for hypothesis 61ed0d70-c81d-412b-b43a-ef21c1774353",
+    "context": {
+      "hypothesisId": "61ed0d70-c81d-412b-b43a-ef21c1774353",
+      "error": "Cannot read properties of undefined (reading 'length')"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:49:20.807Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326"
+    }
+  },
+  {
+    "timestamp": "2025-11-21T19:50:55.117Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 332d955a-fa07-46ff-873f-3ce98dc5c326",
+    "context": {
+      "planId": "73bd6e86-bcc0-477d-91c0-f6d4f443e79a",
+      "hypothesisId": "332d955a-fa07-46ff-873f-3ce98dc5c326",
+      "totalTimeMs": 94310
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:38:59.203Z",
+    "actor": "supervisor",
+    "message": "Starting research plan dc676b56-624d-43dc-a669-1ef2467fdddd",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:38:59.578Z",
+    "actor": "supervisor",
+    "message": "Starting literature scout for plan dc676b56-624d-43dc-a669-1ef2467fdddd",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:39:08.154Z",
+    "actor": "supervisor",
+    "message": "Literature scout completed for plan dc676b56-624d-43dc-a669-1ef2467fdddd",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd",
+      "citations": 3
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:39:08.237Z",
+    "actor": "supervisor",
+    "message": "Created 5 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd",
+      "taskCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:39:16.611Z",
+    "actor": "supervisor",
+    "message": "Generated 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd",
+      "hypothesisCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:39:16.839Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd",
+      "topN": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:39:26.575Z",
+    "actor": "supervisor",
+    "message": "Research plan dc676b56-624d-43dc-a669-1ef2467fdddd completed",
+    "level": "info",
+    "context": {
+      "planId": "dc676b56-624d-43dc-a669-1ef2467fdddd"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:11.480Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 75b1fa47-fa92-40d2-9c85-15583afd4a17",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:11.688Z",
+    "actor": "supervisor",
+    "message": "Starting literature scout for plan 75b1fa47-fa92-40d2-9c85-15583afd4a17",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:22.221Z",
+    "actor": "supervisor",
+    "message": "Literature scout completed for plan 75b1fa47-fa92-40d2-9c85-15583afd4a17",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17",
+      "citations": 2
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:22.504Z",
+    "actor": "supervisor",
+    "message": "Created 5 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17",
+      "taskCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:30.791Z",
+    "actor": "supervisor",
+    "message": "Generated 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17",
+      "hypothesisCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:33.675Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17",
+      "topN": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:46:44.729Z",
+    "actor": "supervisor",
+    "message": "Research plan 75b1fa47-fa92-40d2-9c85-15583afd4a17 completed",
+    "level": "info",
+    "context": {
+      "planId": "75b1fa47-fa92-40d2-9c85-15583afd4a17"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:05.866Z",
+    "actor": "supervisor",
+    "message": "Starting research plan 99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:06.228Z",
+    "actor": "supervisor",
+    "message": "Starting literature scout for plan 99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:15.917Z",
+    "actor": "supervisor",
+    "message": "Literature scout completed for plan 99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "citations": 3
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:16.182Z",
+    "actor": "supervisor",
+    "message": "Created 5 generation tasks",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "taskCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:21.629Z",
+    "actor": "supervisor",
+    "message": "Generated 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisCount": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:21.790Z",
+    "actor": "supervisor",
+    "message": "Starting tournament with top 5 hypotheses",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "topN": 5
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:47:32.558Z",
+    "actor": "supervisor",
+    "message": "Research plan 99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a completed",
+    "level": "info",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:58:33.339Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T07:59:21.073Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+      "totalTimeMs": 47735
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:12:16.543Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 9f3e5731-a3c3-4fa5-8f0a-cc2cb8061fbf",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "9f3e5731-a3c3-4fa5-8f0a-cc2cb8061fbf"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:13:06.198Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 9f3e5731-a3c3-4fa5-8f0a-cc2cb8061fbf",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "9f3e5731-a3c3-4fa5-8f0a-cc2cb8061fbf",
+      "totalTimeMs": 49655
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:29:03.143Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis 95bd88c4-418b-455f-86c7-9c00b71c9d2c",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "95bd88c4-418b-455f-86c7-9c00b71c9d2c"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:29:55.118Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis 95bd88c4-418b-455f-86c7-9c00b71c9d2c",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "95bd88c4-418b-455f-86c7-9c00b71c9d2c",
+      "totalTimeMs": 51975
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:40:36.107Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:41:33.513Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+      "totalTimeMs": 57406
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:50:03.146Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Starting sequential experiment design pipeline for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5"
+    }
+  },
+  {
+    "timestamp": "2025-11-24T08:50:52.728Z",
+    "actor": "supervisor",
+    "level": "info",
+    "message": "Experiment design pipeline completed for hypothesis b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+    "context": {
+      "planId": "99bd57b9-a11d-4c6f-ba6c-b5a0c2134f4a",
+      "hypothesisId": "b55c1ee1-8c24-42db-bce2-2909c0638ad5",
+      "totalTimeMs": 49582
+    }
+  }
+]

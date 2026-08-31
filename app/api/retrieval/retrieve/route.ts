@@ -1,102 +1,82 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
-import { Database } from "@/supabase/types"
-import { createClient } from "@supabase/supabase-js"
-import OpenAI from "openai"
+/**
+ * Unified RAG retrieve endpoint.
+ *
+ * Replaces the legacy file-only retrieve. The chat handler now passes
+ * scope information (workspace_id + scope + scope_id) and the endpoint
+ * delegates to `lib/rag/retrieve` which:
+ *   - hits `match_rag_items` (dense + BM25 hybrid)
+ *   - RRF-fuses, applies recency boost + chat-content multiplier
+ *   - returns RagItem[] with denormalized citation metadata
+ *
+ * Back-compat: callers may still pass `fileIds` to restrict retrieval
+ * to a set of attached files (preserves the chat-attached-files UX).
+ */
+import { NextResponse } from "next/server"
+import { z } from "zod"
+
+import { retrieve } from "@/lib/rag/retrieve"
+import { requireUser } from "@/lib/server/require-user"
+
+const RetrieveBodySchema = z.object({
+  userInput: z.string().min(1),
+  workspaceId: z.string().min(1).nullable().optional(),
+  scope: z.enum(["project", "design", "report"]).nullable().optional(),
+  scopeId: z.string().nullable().optional(),
+  sourceCount: z.number().int().positive().max(50).optional(),
+  fileIds: z.array(z.string()).optional()
+})
 
 export async function POST(request: Request) {
-  const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
-    userInput: string
-    fileIds: string[]
-    embeddingsProvider: "openai" | "local"
-    sourceCount: number
-  }
-
-  const uniqueFileIds = [...new Set(fileIds)]
-
   try {
-    const supabaseAdmin = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const auth = await requireUser()
+    if (auth.response) return auth.response
 
-    const profile = await getServerProfile()
-
-    if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
-      }
+    const raw = await request.json().catch(() => null)
+    const parsed = RetrieveBodySchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 }
+      )
     }
 
-    let chunks: any[] = []
+    const { userInput, workspaceId, scope, scopeId, sourceCount, fileIds } =
+      parsed.data
 
-    let openai
-    if (profile.use_azure_openai) {
-      openai = new OpenAI({
-        apiKey: profile.azure_openai_api_key || "",
-        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-12-01-preview" },
-        defaultHeaders: { "api-key": profile.azure_openai_api_key }
-      })
-    } else {
-      openai = new OpenAI({
-        apiKey: profile.openai_api_key || "",
-        organization: profile.openai_organization_id
-      })
+    // workspaceId is required for any scope-driven query. The legacy
+    // fileIds-only path can run without one (the RPC just filters by
+    // source_id) but RLS demands the row's user_id matches caller - and
+    // the new retrieve module uses the service-role client. We require a
+    // workspaceId to keep tenancy explicit.
+    if (!workspaceId) {
+      return NextResponse.json(
+        { message: "workspaceId is required" },
+        { status: 400 }
+      )
     }
 
-    if (embeddingsProvider === "openai") {
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: userInput
-      })
-
-      const openaiEmbedding = response.data.map(item => item.embedding)[0]
-
-      const { data: openaiFileItems, error: openaiError } =
-        await supabaseAdmin.rpc("match_file_items_openai", {
-          query_embedding: openaiEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (openaiError) {
-        throw openaiError
-      }
-
-      chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(userInput)
-
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
-    }
-
-    const mostSimilarChunks = chunks?.sort(
-      (a, b) => b.similarity - a.similarity
-    )
-
-    return new Response(JSON.stringify({ results: mostSimilarChunks }), {
-      status: 200
+    const results = await retrieve({
+      query: userInput,
+      workspaceId,
+      scope: scope ?? null,
+      scopeId: scopeId ?? null,
+      sourceCount,
+      fileIds
     })
+
+    return NextResponse.json({ results })
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
-    const errorCode = error.status || 500
-    return new Response(JSON.stringify({ message: errorMessage }), {
-      status: errorCode
-    })
+    console.error("[retrieve] Error:", error)
+    // Surface the underlying message + Postgres/PostgREST hint when
+    // present so the browser console shows actionable diagnostics
+    // instead of opaque 500s. PostgREST errors carry `code`, `details`,
+    // `hint`; pgvector dimension mismatches show up as plain SQL errors.
+    return NextResponse.json(
+      {
+        message: error?.message ?? "Unexpected error",
+        detail: error?.details ?? error?.hint ?? error?.code ?? String(error)
+      },
+      { status: error?.status ?? 500 }
+    )
   }
 }

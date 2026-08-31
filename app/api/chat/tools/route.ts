@@ -1,12 +1,38 @@
 import { openapiToFunctions } from "@/lib/openapi-conversion"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { getAzureOpenAI, getAzureOpenAIModel } from "@/lib/azure-openai"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
+import type OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { requireUser } from "@/lib/server/require-user"
+import { safeFetch, SafeFetchError } from "@/lib/server/safe-fetch"
+import { checkRateLimit } from "@/lib/server/rate-limit"
+import { assertBudget, recordCompletionUsage } from "@/lib/billing/account"
+import {
+  budgetErrorResponse,
+  isBudgetExceededError
+} from "@/lib/billing/errors"
+import { streamMeterCallbacks } from "@/lib/billing/stream-meter"
 
 export async function POST(request: Request) {
+  const auth = await requireUser()
+  if (auth.response) return auth.response
+
+  try {
+    await assertBudget(auth.user.id)
+  } catch (e) {
+    if (isBudgetExceededError(e)) return budgetErrorResponse(e.plan)
+  }
+
+  const limited = await checkRateLimit({
+    name: "chat-tools",
+    identifier: auth.user.id,
+    requests: 60,
+    window: "1 h"
+  })
+  if (limited) return limited
+
   const json = await request.json()
   const { chatSettings, messages, selectedTools } = json as {
     chatSettings: ChatSettings
@@ -15,14 +41,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const profile = await getServerProfile()
-
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
-    const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
-    })
+    const openai = getAzureOpenAI()
+    const deployment = getAzureOpenAIModel()
 
     let allTools: OpenAI.Chat.Completions.ChatCompletionTool[] = []
     let allRouteMaps = {}
@@ -60,10 +80,15 @@ export async function POST(request: Request) {
     }
 
     const firstResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+      model: deployment as ChatCompletionCreateParamsBase["model"],
       messages,
       tools: allTools.length > 0 ? allTools : undefined
     })
+
+    await recordCompletionUsage(
+      { userId: auth.user.id, feature: "tools", model: deployment },
+      firstResponse
+    )
 
     const message = firstResponse.choices[0].message
     messages.push(message)
@@ -150,7 +175,9 @@ export async function POST(request: Request) {
             body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
           }
 
-          const response = await fetch(fullUrl, requestInit)
+          // safeFetch resolves the hostname and rejects URLs that point at
+          // internal networks (loopback, RFC1918, cloud metadata endpoints).
+          const response = await safeFetch(fullUrl, requestInit)
 
           if (!response.ok) {
             data = {
@@ -175,7 +202,7 @@ export async function POST(request: Request) {
             headers = JSON.parse(customHeaders)
           }
 
-          const response = await fetch(fullUrl, {
+          const response = await safeFetch(fullUrl, {
             method: "GET",
             headers: headers
           })
@@ -199,16 +226,30 @@ export async function POST(request: Request) {
     }
 
     const secondResponse = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+      model: deployment as ChatCompletionCreateParamsBase["model"],
       messages,
       stream: true
     })
 
-    const stream = OpenAIStream(secondResponse)
+    const stream = OpenAIStream(
+      secondResponse as any,
+      streamMeterCallbacks({
+        userId: auth.user.id,
+        feature: "tools",
+        model: deployment,
+        messages
+      })
+    )
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {
     console.error(error)
+    if (error instanceof SafeFetchError) {
+      return new Response(
+        JSON.stringify({ message: "Tool target blocked by network policy" }),
+        { status: 400 }
+      )
+    }
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {

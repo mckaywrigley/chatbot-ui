@@ -30,6 +30,9 @@ export const useSelectFileHandler = () => {
 
   useEffect(() => {
     handleFilesToAccept()
+    // Recomputes the accept-list when the model changes. `handleFilesToAccept`
+    // closes over `chatSettings.model` already, so the dep array is correct.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatSettings?.model])
 
   const handleFilesToAccept = () => {
@@ -59,13 +62,12 @@ export const useSelectFileHandler = () => {
       if (file.type.includes("image")) {
         reader.readAsDataURL(file)
       } else if (ACCEPTED_FILE_TYPES.split(",").includes(file.type)) {
-        if (simplifiedFileType.includes("vnd.adobe.pdf")) {
+        if (simplifiedFileType === "vnd.adobe.pdf") {
           simplifiedFileType = "pdf"
         } else if (
-          simplifiedFileType.includes(
+          simplifiedFileType ===
             "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
-          )
+          simplifiedFileType === "docx"
         ) {
           simplifiedFileType = "docx"
         }
@@ -81,12 +83,7 @@ export const useSelectFileHandler = () => {
         ])
 
         // Handle docx files
-        if (
-          file.type.includes(
-            "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
-          )
-        ) {
+        if (simplifiedFileType === "docx") {
           const arrayBuffer = await file.arrayBuffer()
           const result = await mammoth.extractRawText({
             arrayBuffer

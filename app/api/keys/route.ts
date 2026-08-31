@@ -29,7 +29,14 @@ export async function GET() {
     const key = envKeyMap[provider]
 
     if (key) {
-      acc[provider] = isUsingEnvironmentKey(key as EnvKey)
+      // Support AZURE_OPENAI_KEY alias (some setups use this name)
+      if (provider === "azure") {
+        acc[provider] =
+          Boolean(process.env.AZURE_OPENAI_KEY) ||
+          isUsingEnvironmentKey(key as EnvKey)
+      } else {
+        acc[provider] = isUsingEnvironmentKey(key as EnvKey)
+      }
     }
     return acc
   }, {})

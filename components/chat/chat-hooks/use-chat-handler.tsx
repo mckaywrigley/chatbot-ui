@@ -13,6 +13,7 @@ import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
+  deriveChatTitle,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
@@ -231,19 +232,41 @@ export const useChatHandler = () => {
 
       const b64Images = newMessageImages.map(image => image.base64)
 
-      let retrievedFileItems: Tables<"file_items">[] = []
+      // Post-PR-6: retrieval no longer requires attached files. Workspace-
+      // wide RAG fires for any chat with `useRetrieval=true`. Tier 3
+      // (design/report) chats still get the doc as a long-context dump
+      // via ScopedChatRail's chat.prompt - RAG is the fallback for those
+      // (PR-8 wires the >150k-token gate).
+      let retrievedFileItems: any[] = []
 
-      if (
-        (newMessageFiles.length > 0 || chatFiles.length > 0) &&
-        useRetrieval
-      ) {
+      // Design/report chats are "tier-3": the DESIGN DOCUMENT is already in the
+      // system prompt (ScopedChatRail dumps it into chat.prompt), so scope RAG
+      // used to be skipped for them to save latency and avoid duplicate chunks.
+      //
+      // But the document is not the FILES. A paper, an uploaded data file, or
+      // anything the researcher attaches to the message lives in file_items and
+      // reaches the model ONLY through retrieval. Skipping unconditionally meant
+      // attaching a file to a design chat did nothing whatsoever, and the model
+      // - correctly, given what it was sent - replied that it had no access to
+      // files. Retrieval is scope-filtered (scope + scope_id), not
+      // workspace-wide, so running it here returns this design's or report's own
+      // documents rather than unrelated ones.
+      const chatScope = (currentChat?.scope ?? null) as
+        | "project"
+        | "design"
+        | "report"
+        | null
+
+      if (useRetrieval && selectedWorkspace) {
         setToolInUse("retrieval")
 
         retrievedFileItems = await handleRetrieval(
           userInput,
+          selectedWorkspace.id,
+          chatScope,
+          currentChat?.scope_id ?? null,
           newMessageFiles,
           chatFiles,
-          chatSettings!.embeddingsProvider,
           sourceCount
         )
       }
@@ -267,7 +290,15 @@ export const useChatHandler = () => {
           : [...chatMessages, tempUserChatMessage],
         assistant: selectedChat?.assistant_id ? selectedAssistant : null,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        chatFileItems: chatFileItems,
+        // Carries the Concise/Elaborate toggle into the system
+        // prompt. Falls back to "concise" when the column isn't
+        // populated (legacy chats before migration 20260512).
+        answerStyle:
+          ((selectedChat as any)?.answer_style as
+            | "concise"
+            | "elaborate"
+            | undefined) ?? "concise"
       }
 
       let generatedText = ""
@@ -351,9 +382,21 @@ export const useChatHandler = () => {
           setChatFiles
         )
       } else {
+        // Name the chat from the FIRST user question (like ChatGPT/Claude).
+        // Scoped chats (design/project/report rails) are pre-created with a
+        // generic "<name> chat" placeholder; the first message retitles them.
+        const isFirstMessage = chatMessages.length === 0 && !isRegeneration
+        const derivedName = isFirstMessage
+          ? await deriveChatTitle(messageContent).catch(() => null)
+          : null
         const updatedChat = await updateChat(currentChat.id, {
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          ...(derivedName ? { name: derivedName } : {})
         })
+        if (derivedName) {
+          currentChat = { ...currentChat, name: derivedName }
+          setSelectedChat(updatedChat)
+        }
 
         setChats(prevChats => {
           const updatedChats = prevChats.map(prevChat =>

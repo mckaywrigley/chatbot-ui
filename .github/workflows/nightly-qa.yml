@@ -1,0 +1,98 @@
+name: Nightly QA
+
+# Full production health check: can a person sign up, sign in, create a design,
+# and does the science pipeline still produce papers, hypotheses, a design and
+# a report? Runs against the live deployment, because a health check that
+# passes on localhost while production is down is worse than none.
+on:
+  schedule:
+    # 02:30 UTC == 08:00 IST. Off-peak for Azure quota, and the result is
+    # waiting in the inbox at the start of the working day.
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Deployment to test (defaults to production)"
+        required: false
+        default: ""
+      suite:
+        description: "Which projects to run"
+        required: false
+        default: "all"
+        type: choice
+        options: ["all", "smoke"]
+      # "smoke" runs everything except the expensive AI pipeline.
+
+# Never let two nightly runs overlap - they share one QA account and workspace.
+concurrency:
+  group: nightly-qa
+  cancel-in-progress: false
+
+jobs:
+  qa:
+    name: Production health check
+    runs-on: ubuntu-latest
+    # The pipeline project alone can run 25+ minutes; this is the hard stop.
+    timeout-minutes: 75
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run QA suite
+        id: qa
+        # Keep going on failure: the digest step below is the whole point, and
+        # it must run precisely when the tests did NOT pass.
+        continue-on-error: true
+        env:
+          CI: "true"
+          E2E_BASE_URL: ${{ github.event.inputs.base_url || vars.E2E_BASE_URL || 'https://app.shadowai.work' }}
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_SIGNUP_DOMAIN: ${{ vars.E2E_SIGNUP_DOMAIN || 'shadowai.work' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.suite }}" = "smoke" ]; then
+            npx playwright test --config e2e/playwright.config.ts --project=public --project=smoke
+          else
+            npx playwright test --config e2e/playwright.config.ts
+          fi
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            e2e-results.json
+          retention-days: 14
+
+      - name: Email the digest
+        if: always()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          QA_REPORT_TO: ${{ secrets.QA_REPORT_TO }}
+          EMAIL_FROM_ADDRESS: ${{ vars.EMAIL_FROM_ADDRESS }}
+          E2E_BASE_URL: ${{ github.event.inputs.base_url || vars.E2E_BASE_URL || 'https://app.shadowai.work' }}
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node e2e/reporter/send-digest.mjs e2e-results.json
+
+      # The digest has been sent by now, so it is safe to fail the job and turn
+      # the Actions badge red.
+      - name: Fail the job if any check failed
+        if: steps.qa.outcome != 'success'
+        run: |
+          echo "::error::Nightly QA failed - see the emailed digest or the playwright-report artefact."
+          exit 1

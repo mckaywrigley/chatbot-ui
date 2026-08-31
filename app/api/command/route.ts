@@ -1,8 +1,11 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { checkRateLimit } from "@/lib/server/rate-limit"
 import OpenAI from "openai"
 
-export const runtime = "edge"
+// Runs on the Node runtime so the Upstash rate limiter (fetch-based, but
+// reliant on Node crypto for identifiers) works consistently with the rest
+// of the app.
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -13,6 +16,14 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
+    const limited = await checkRateLimit({
+      name: "command",
+      identifier: profile.user_id,
+      requests: 60,
+      window: "1 h"
+    })
+    if (limited) return limited
+
     checkApiKey(profile.openai_api_key, "OpenAI")
 
     const openai = new OpenAI({
@@ -21,7 +32,7 @@ export async function POST(request: Request) {
     })
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4-1106-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",

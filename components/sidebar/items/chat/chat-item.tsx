@@ -1,6 +1,7 @@
 import { ModelIcon } from "@/components/models/model-icon"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
+import { getAzureDeploymentNameClient } from "@/lib/azure-deployment-client"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
@@ -8,7 +9,7 @@ import { LLM } from "@/types"
 import { IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
-import { FC, useContext, useRef } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
 
@@ -30,6 +31,9 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const isActive = params.chatid === chat.id || selectedChat?.id === chat.id
 
   const itemRef = useRef<HTMLDivElement>(null)
+  const [azureDeploymentName, setAzureDeploymentName] = useState<
+    string | null | undefined
+  >(undefined)
 
   const handleClick = () => {
     if (!selectedWorkspace) return
@@ -52,6 +56,17 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const assistantImage = assistantImages.find(
     image => image.assistantId === chat.assistant_id
   )?.base64
+
+  useEffect(() => {
+    // Sidebar is Azure-first. Fetch once (cached) so tooltips / labels show the actual deployment.
+    if (azureDeploymentName !== undefined) return
+    ;(async () => {
+      const deployment = await getAzureDeploymentNameClient()
+      setAzureDeploymentName(deployment)
+    })()
+  }, [azureDeploymentName])
+
+  const displayedModelName = azureDeploymentName || MODEL_DATA?.modelName
 
   return (
     <div
@@ -83,15 +98,20 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       ) : (
         <WithTooltip
           delayDuration={200}
-          display={<div>{MODEL_DATA?.modelName}</div>}
+          display={<div>{displayedModelName}</div>}
           trigger={
             <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
           }
         />
       )}
 
-      <div className="ml-3 flex-1 truncate text-sm font-semibold">
-        {chat.name}
+      <div className="ml-3 min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold">{chat.name}</div>
+        {!chat.assistant_id && (
+          <div className="text-muted-foreground truncate text-xs">
+            {displayedModelName}
+          </div>
+        )}
       </div>
 
       <div

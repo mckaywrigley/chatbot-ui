@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All collections are server-only (accessed via admin SDK through API routes)
+    // This bypasses Firebase Auth since we're using Supabase Auth
+    
+    match /designs/{designId} {
+      allow read, write: if false; // Server-only via admin SDK
+    }
+    
+    match /research_plans/{planId} {
+      allow read, write: if false; // Server-only via admin SDK
+    }
+    
+    match /hypotheses/{hypothesisId} {
+      allow read, write: if false; // Server-only via admin SDK
+    }
+    
+    match /tournament_matches/{matchId} {
+      allow read, write: if false; // Server-only via admin SDK
+    }
+    
+    match /logs/{logId} {
+      allow read, write: if false; // Server-only via admin SDK
+    }
+  }
+}
+

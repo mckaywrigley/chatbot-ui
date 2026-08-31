@@ -1,10 +1,11 @@
 "use client"
 
-import { Dashboard } from "@/components/ui/dashboard"
+import { AppLayout } from "@/components/navigation/app-layout"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantWorkspacesByWorkspaceId } from "@/db/assistants"
 import { getChatsByWorkspaceId } from "@/db/chats"
 import { getCollectionWorkspacesByWorkspaceId } from "@/db/collections"
+import { getDesignWorkspacesByWorkspaceId } from "@/db/designs-firestore"
 import { getFileWorkspacesByWorkspaceId } from "@/db/files"
 import { getFoldersByWorkspaceId } from "@/db/folders"
 import { getModelWorkspacesByWorkspaceId } from "@/db/models"
@@ -14,11 +15,12 @@ import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspaceById } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import { supabase } from "@/lib/supabase/browser-client"
 import { LLMID } from "@/types"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
+import { getReportWorkspacesByWorkspaceId } from "@/db/reports-firestore"
+import { getDataCollectionWorkspacesByWorkspaceId } from "@/db/data-collections-firestore"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -37,10 +39,13 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setAssistantImages,
     setChats,
     setCollections,
+    setDesigns,
+    setDataCollections,
     setFolders,
     setFiles,
     setPresets,
     setPrompts,
+    setReports,
     setTools,
     setModels,
     selectedWorkspace,
@@ -60,18 +65,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    ;(async () => {
-      const session = (await supabase.auth.getSession()).data.session
-
-      if (!session) {
-        return router.push("/login")
-      } else {
-        await fetchWorkspaceData(workspaceId)
-      }
-    })()
-  }, [])
-
-  useEffect(() => {
     ;(async () => await fetchWorkspaceData(workspaceId))()
 
     setUserInput("")
@@ -85,99 +78,133 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setChatImages([])
     setNewMessageFiles([])
     setNewMessageImages([])
+    setReports([])
     setShowFilesDisplay(false)
+    // Workspace switch is the only real trigger here. The context setters
+    // and `fetchWorkspaceData` are stable references from useState /
+    // closure; including them would cause a re-run loop on every render
+    // without changing behavior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaceId])
 
   const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)
 
-    const workspace = await getWorkspaceById(workspaceId)
-    setSelectedWorkspace(workspace)
-
-    const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
-    setAssistants(assistantData.assistants)
-
-    for (const assistant of assistantData.assistants) {
-      let url = ""
-
-      if (assistant.image_path) {
-        url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
+    try {
+      const workspace = await getWorkspaceById(workspaceId)
+      if (!workspace) {
+        console.log("Workspace not found, redirecting to login")
+        router.push("/login?message=Workspace not found. Please sign in again.")
+        return
       }
+      setSelectedWorkspace(workspace)
 
-      if (url) {
-        const response = await fetch(url)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
+      // Fetch all workspace data in parallel
+      const [
+        assistantData,
+        reportData,
+        designData,
+        dataCollectionData,
+        chats,
+        collectionData,
+        folders,
+        fileData,
+        presetData,
+        promptData,
+        toolData,
+        modelData
+      ] = await Promise.all([
+        getAssistantWorkspacesByWorkspaceId(workspaceId),
+        getReportWorkspacesByWorkspaceId(workspaceId),
+        getDesignWorkspacesByWorkspaceId(workspaceId),
+        getDataCollectionWorkspacesByWorkspaceId(workspaceId),
+        getChatsByWorkspaceId(workspaceId),
+        getCollectionWorkspacesByWorkspaceId(workspaceId),
+        getFoldersByWorkspaceId(workspaceId),
+        getFileWorkspacesByWorkspaceId(workspaceId),
+        getPresetWorkspacesByWorkspaceId(workspaceId),
+        getPromptWorkspacesByWorkspaceId(workspaceId),
+        getToolWorkspacesByWorkspaceId(workspaceId),
+        getModelWorkspacesByWorkspaceId(workspaceId)
+      ])
 
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64,
-            url
+      setAssistants(assistantData.assistants)
+      setReports(reportData.reports)
+      setDesigns(designData.designs)
+      setDataCollections(dataCollectionData.dataCollections)
+      setChats(chats)
+      setCollections(collectionData.collections)
+      setFolders(folders)
+      setFiles(fileData.files)
+      setPresets(presetData.presets)
+      setPrompts(promptData.prompts)
+      setTools(toolData.tools)
+      setModels(modelData.models)
+
+      // Load assistant images in parallel (non-blocking)
+      Promise.all(
+        assistantData.assistants.map(async assistant => {
+          let url = ""
+          if (assistant.image_path) {
+            url =
+              (await getAssistantImageFromStorage(assistant.image_path)) || ""
           }
-        ])
-      } else {
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64: "",
-            url
+          if (url) {
+            const response = await fetch(url)
+            const blob = await response.blob()
+            const base64 = await convertBlobToBase64(blob)
+            setAssistantImages(prev => [
+              ...prev,
+              {
+                assistantId: assistant.id,
+                path: assistant.image_path,
+                base64,
+                url
+              }
+            ])
+          } else {
+            setAssistantImages(prev => [
+              ...prev,
+              {
+                assistantId: assistant.id,
+                path: assistant.image_path,
+                base64: "",
+                url
+              }
+            ])
           }
-        ])
-      }
+        })
+      )
+
+      setChatSettings({
+        model: (searchParams.get("model") ||
+          workspace?.default_model ||
+          "gpt-4o") as LLMID,
+        prompt:
+          workspace?.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature: workspace?.default_temperature || 0.5,
+        contextLength: workspace?.default_context_length || 4096,
+        includeProfileContext: workspace?.include_profile_context || true,
+        includeWorkspaceInstructions:
+          workspace?.include_workspace_instructions || true,
+        embeddingsProvider:
+          (workspace?.embeddings_provider as "openai" | "local") || "openai"
+      })
+
+      setLoading(false)
+    } catch (error) {
+      console.error("Error fetching workspace data:", error)
+      router.push(
+        "/login?message=Error loading workspace. Please sign in again."
+      )
+      setLoading(false)
     }
-
-    const chats = await getChatsByWorkspaceId(workspaceId)
-    setChats(chats)
-
-    const collectionData =
-      await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    setCollections(collectionData.collections)
-
-    const folders = await getFoldersByWorkspaceId(workspaceId)
-    setFolders(folders)
-
-    const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    setFiles(fileData.files)
-
-    const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
-    setPresets(presetData.presets)
-
-    const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
-    setPrompts(promptData.prompts)
-
-    const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
-    setTools(toolData.tools)
-
-    const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
-    setModels(modelData.models)
-
-    setChatSettings({
-      model: (searchParams.get("model") ||
-        workspace?.default_model ||
-        "gpt-4-1106-preview") as LLMID,
-      prompt:
-        workspace?.default_prompt ||
-        "You are a friendly, helpful AI assistant.",
-      temperature: workspace?.default_temperature || 0.5,
-      contextLength: workspace?.default_context_length || 4096,
-      includeProfileContext: workspace?.include_profile_context || true,
-      includeWorkspaceInstructions:
-        workspace?.include_workspace_instructions || true,
-      embeddingsProvider:
-        (workspace?.embeddings_provider as "openai" | "local") || "openai"
-    })
-
-    setLoading(false)
   }
 
   if (loading) {
     return <Loading />
   }
 
-  return <Dashboard>{children}</Dashboard>
+  return <AppLayout>{children}</AppLayout>
 }

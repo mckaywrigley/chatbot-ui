@@ -5,11 +5,9 @@ import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
-import {
-  buildFinalMessages,
-  adaptMessagesForGoogleGemini
-} from "@/lib/build-prompt"
+import { buildFinalMessages } from "@/lib/build-prompt"
 import { consumeReadableStream } from "@/lib/consume-stream"
+import { handleBudgetError } from "@/lib/billing/handle-budget-error"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
   ChatFile,
@@ -51,32 +49,63 @@ export const validateChatSettings = (
   }
 }
 
+/**
+ * Retrieve RAG context for the next chat turn.
+ *
+ * Post-PR-6 the endpoint searches the unified `rag_items` corpus
+ * filtered by chat scope (workspace / project / design / report).
+ * `attachedFileIds` (from chat-attached files) restricts to file rows
+ * only - preserves the legacy "chat with these specific PDFs" UX.
+ */
 export const handleRetrieval = async (
   userInput: string,
+  workspaceId: string,
+  scope: "project" | "design" | "report" | null,
+  scopeId: string | null,
   newMessageFiles: ChatFile[],
   chatFiles: ChatFile[],
-  embeddingsProvider: "openai" | "local",
   sourceCount: number
 ) => {
+  const attachedFileIds = [...newMessageFiles, ...chatFiles].map(
+    file => file.id
+  )
+
   const response = await fetch("/api/retrieval/retrieve", {
     method: "POST",
     body: JSON.stringify({
       userInput,
-      fileIds: [...newMessageFiles, ...chatFiles].map(file => file.id),
-      embeddingsProvider,
-      sourceCount
+      workspaceId,
+      scope,
+      scopeId,
+      sourceCount,
+      ...(attachedFileIds.length > 0 ? { fileIds: attachedFileIds } : {})
     })
   })
 
   if (!response.ok) {
-    console.error("Error retrieving:", response)
+    console.error("[retrieval] Error retrieving:", response)
+    return []
   }
 
   const { results } = (await response.json()) as {
-    results: Tables<"file_items">[]
+    results: Array<{
+      id: string
+      content: string
+      source_title?: string | null
+      source_url?: string | null
+      source_section?: string | null
+    }>
   }
 
-  return results
+  if (!results || results.length === 0) {
+    console.warn(
+      `[retrieval] 0 chunks matched scope=${scope ?? "workspace"}` +
+        (scopeId ? ` (id=${scopeId})` : "") +
+        ". Likely cause: no docs indexed yet for this scope, or query too vague."
+    )
+  }
+
+  return results ?? []
 }
 
 export const createTempMessages = (
@@ -201,27 +230,22 @@ export const handleHostedChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const provider =
-    modelData.provider === "openai" && profile.use_azure_openai
-      ? "azure"
-      : modelData.provider
+  // Force Azure OpenAI for all hosted chats.
+  // This makes chat work without any per-provider profile keys and removes
+  // dependence on other provider implementations.
+  const provider = "azure"
 
   let draftMessages = await buildFinalMessages(payload, profile, chatImages)
 
-  let formattedMessages : any[] = []
-  if (provider === "google") {
-    formattedMessages = await adaptMessagesForGoogleGemini(payload, draftMessages)
-  } else {
-    formattedMessages = draftMessages
-  }
+  // Azure-only: no provider-specific message adaptation required
+  const formattedMessages = draftMessages
 
-  const apiEndpoint =
-    provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+  const apiEndpoint = "/api/chat/azure"
 
   const requestBody = {
     chatSettings: payload.chatSettings,
     messages: formattedMessages,
-    customModelId: provider === "custom" ? modelData.hostedId : ""
+    customModelId: ""
   }
 
   const response = await fetchChatResponse(
@@ -261,6 +285,13 @@ export const fetchChatResponse = async (
   })
 
   if (!response.ok) {
+    // Out of credits → upgrade toast (instead of the generic error path).
+    if (await handleBudgetError(response)) {
+      setIsGenerating(false)
+      setChatMessages(prevMessages => prevMessages.slice(0, -2))
+      return response
+    }
+
     if (response.status === 404 && !isHosted) {
       toast.error(
         "Model not found. Make sure you have it downloaded via Ollama."
@@ -343,6 +374,40 @@ export const processResponse = async (
   }
 }
 
+/**
+ * Best-effort LLM call that turns the user's first message into a
+ * 1-3 word noun phrase the chat-history list can show as the slab
+ * title (#26 in the May ask). Cheap server-side call - we hit
+ * `/api/chat/title` which proxies into gpt-4o-mini. On any failure
+ * we fall back to the legacy "first 100 chars" so the chat is never
+ * untitled.
+ *
+ * The proxy lives at `/api/chat/title` because the OpenAI call needs
+ * the workspace's server key, which is not available from the
+ * browser bundle.
+ */
+export async function deriveChatTitle(messageContent: string): Promise<string> {
+  const trimmed = messageContent.trim()
+  if (!trimmed) return "Chat"
+  try {
+    const res = await fetch("/api/chat/title", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: trimmed.slice(0, 600) })
+    })
+    if (!res.ok) throw new Error(`title route ${res.status}`)
+    const data = (await res.json()) as { title?: string }
+    const title = (data.title ?? "").trim()
+    if (title) return title.slice(0, 80)
+  } catch (e: any) {
+    console.warn("[chat] auto-title fallback:", e?.message ?? e)
+  }
+  // Fallback: first 3 words, capitalised. Avoids dumping a 100-char
+  // chunk of message into the slab title.
+  const words = trimmed.split(/\s+/).slice(0, 3).join(" ")
+  return words.length > 0 ? words.slice(0, 80) : "Chat"
+}
+
 export const handleCreateChat = async (
   chatSettings: ChatSettings,
   profile: Tables<"profiles">,
@@ -354,6 +419,10 @@ export const handleCreateChat = async (
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
 ) => {
+  // Generate a context-aware title before the chat row lands. If the
+  // LLM proxy fails the helper falls back to first-three-words so we
+  // never insert with an empty name.
+  const title = await deriveChatTitle(messageContent)
   const createdChat = await createChat({
     user_id: profile.user_id,
     workspace_id: selectedWorkspace.id,
@@ -362,7 +431,7 @@ export const handleCreateChat = async (
     include_profile_context: chatSettings.includeProfileContext,
     include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
     model: chatSettings.model,
-    name: messageContent.substring(0, 100),
+    name: title,
     prompt: chatSettings.prompt,
     temperature: chatSettings.temperature,
     embeddings_provider: chatSettings.embeddingsProvider
@@ -476,15 +545,41 @@ export const handleCreateMessages = async (
       image_paths: paths
     })
 
-    const createdMessageFileItems = await createMessageFileItems(
-      retrievedFileItems.map(fileItem => {
-        return {
-          user_id: profile.user_id,
-          message_id: createdMessages[1].id,
-          file_item_id: fileItem.id
-        }
-      })
-    )
+    // Persist citations.
+    //
+    // Post-PR-9a `message_file_items` accepts EITHER `file_item_id`
+    // (legacy file-attached chats) OR `rag_item_id` (new unified RAG
+    // corpus). Each retrieved item carries denormalized citation
+    // metadata (source_title / source_url / content) so chips survive
+    // page reload + future doc re-indexing.
+    try {
+      await createMessageFileItems(
+        retrievedFileItems.map(fileItem => {
+          const item = fileItem as any
+          return {
+            user_id: profile.user_id,
+            message_id: createdMessages[1].id,
+            // RagItem rows live in `rag_items` and have no file_items
+            // FK; legacy chat-attached files only set file_item_id.
+            // Detection: presence of source_title / source_url marks
+            // a RagItem (those columns don't exist on file_items).
+            file_item_id: item.source_title || item.source_url ? null : item.id,
+            rag_item_id: item.source_title || item.source_url ? item.id : null,
+            source_title: item.source_title ?? null,
+            source_url: item.source_url ?? null,
+            content_snapshot: item.content ?? null
+          }
+        })
+      )
+    } catch (err) {
+      // Don't block the assistant message render path. Live citations
+      // still work via in-memory `chatFileItems`; only persistence
+      // (chip survival on reload) is affected.
+      console.warn(
+        "[chat-helpers] message_file_items write failed (citations live-only):",
+        err
+      )
+    }
 
     finalChatMessages = [
       ...chatMessages,

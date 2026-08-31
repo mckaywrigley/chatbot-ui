@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       stream: true
     })
 
-    const stream = OpenAIStream(response)
+    const stream = OpenAIStream(response as any)
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {

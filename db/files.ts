@@ -94,7 +94,10 @@ export const createFile = async (
   let validFilename = fileRecord.name.replace(/[^a-z0-9.]/gi, "_").toLowerCase()
   const extension = file.name.split(".").pop()
   const extensionIndex = validFilename.lastIndexOf(".")
-  const baseName = validFilename.substring(0, (extensionIndex < 0) ? undefined : extensionIndex)
+  const baseName = validFilename.substring(
+    0,
+    extensionIndex < 0 ? undefined : extensionIndex
+  )
   const maxBaseNameLength = 100 - (extension?.length || 0) - 1
   if (baseName.length > maxBaseNameLength) {
     fileRecord.name = baseName.substring(0, maxBaseNameLength) + "." + extension
@@ -120,7 +123,7 @@ export const createFile = async (
   const filePath = await uploadFile(file, {
     name: createdFile.name,
     user_id: createdFile.user_id,
-    file_id: createdFile.name
+    file_id: createdFile.id
   })
 
   await updateFile(createdFile.id, {
@@ -180,7 +183,7 @@ export const createDocXFile = async (
   const filePath = await uploadFile(file, {
     name: createdFile.name,
     user_id: createdFile.user_id,
-    file_id: createdFile.name
+    file_id: createdFile.id
   })
 
   await updateFile(createdFile.id, {

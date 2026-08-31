@@ -5,13 +5,9 @@ import { LLM_LIST_MAP } from "./llm/llm-list"
 
 export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   try {
-    const providers = ["google", "anthropic", "mistral", "groq", "perplexity"]
-
-    if (profile.use_azure_openai) {
-      providers.push("azure")
-    } else {
-      providers.push("openai")
-    }
+    // Azure OpenAI only (default). We intentionally do not expose other hosted
+    // providers in the model picker.
+    const providers = ["azure"]
 
     const response = await fetch("/api/keys")
 

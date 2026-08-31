@@ -58,8 +58,15 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
   }
 
   for (const [envKey, profileKey] of Object.entries(apiKeys)) {
-    if (process.env[envKey]) {
-      ;(profile as any)[profileKey] = process.env[envKey]
+    // Support alias env var names for Azure OpenAI.
+    // Some environments use AZURE_OPENAI_KEY while the rest of the app expects AZURE_OPENAI_API_KEY.
+    const value =
+      envKey === VALID_ENV_KEYS.AZURE_OPENAI_API_KEY
+        ? process.env[envKey] || process.env.AZURE_OPENAI_KEY
+        : process.env[envKey]
+
+    if (value) {
+      ;(profile as any)[profileKey] = value
     }
   }
 

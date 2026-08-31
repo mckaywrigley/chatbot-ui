@@ -26,12 +26,21 @@ export const useScroll = () => {
     if (!isGenerating && userScrolled) {
       setUserScrolled(false)
     }
+    // Intentionally fires only when `isGenerating` flips. Reading
+    // `userScrolled` from the body is fine - we don't want the effect to
+    // re-run when the user scrolls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGenerating])
 
   useEffect(() => {
     if (isGenerating && !userScrolled) {
       scrollToBottom()
     }
+    // Drives auto-scroll on every new chat message during generation.
+    // The other reads (isGenerating, userScrolled, scrollToBottom) are
+    // intentional snapshots; including them would cause spurious scrolls
+    // when the user manually scrolls back up.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatMessages])
 
   const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {

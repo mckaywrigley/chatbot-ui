@@ -152,7 +152,30 @@ EXECUTE PROCEDURE delete_old_profile_image();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('profile_images', 'profile_images', true);
+DO $$
+BEGIN
+  INSERT INTO storage.buckets (id, name)
+  VALUES ('profile_images', 'profile_images')
+  ON CONFLICT (id) DO NOTHING;
+
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'public'
+  ) THEN
+    UPDATE storage.buckets SET public = true WHERE id = 'profile_images';
+  ELSIF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'storage'
+      AND table_name = 'buckets'
+      AND column_name = 'is_public'
+  ) THEN
+    UPDATE storage.buckets SET is_public = true WHERE id = 'profile_images';
+  END IF;
+END $$;
 
 CREATE POLICY "Allow public read access on profile images"
     ON storage.objects FOR SELECT

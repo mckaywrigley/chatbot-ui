@@ -6,12 +6,17 @@ import {
   processPdf,
   processTxt
 } from "@/lib/retrieval/processing"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  getAzureOpenAIEmbeddingsClient,
+  getAzureOpenAIEmbeddingsDeployment
+} from "@/lib/azure-openai"
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { recordCompletionUsage } from "@/lib/billing/account"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
-import OpenAI from "openai"
+import { enforceSize, sniffAndValidate } from "@/lib/server/file-validation"
 
 export async function POST(req: Request) {
   try {
@@ -54,24 +59,21 @@ export async function POST(req: Request) {
     if (fileError)
       throw new Error(`Failed to retrieve file: ${fileError.message}`)
 
-    const fileBuffer = Buffer.from(await file.arrayBuffer())
-    const blob = new Blob([fileBuffer])
-    const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
+    const fileBuffer = Buffer.from(await file.arrayBuffer()) as Buffer
 
-    if (embeddingsProvider === "openai") {
-      try {
-        if (profile.use_azure_openai) {
-          checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-        } else {
-          checkApiKey(profile.openai_api_key, "OpenAI")
-        }
-      } catch (error: any) {
-        error.message =
-          error.message +
-          ", make sure it is configured or else use local embeddings"
-        throw error
-      }
-    }
+    const sizeError = enforceSize(fileBuffer.byteLength, "document")
+    if (sizeError) return sizeError
+
+    const mimeError = await sniffAndValidate(
+      fileBuffer,
+      "document",
+      fileMetadata.type ?? undefined,
+      fileMetadata.name
+    )
+    if (mimeError) return mimeError
+
+    const blob = new Blob([fileBuffer as BlobPart])
+    const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
 
     let chunks: FileItemChunk[] = []
 
@@ -99,26 +101,32 @@ export async function POST(req: Request) {
 
     let embeddings: any = []
 
-    let openai
-    if (profile.use_azure_openai) {
-      openai = new OpenAI({
-        apiKey: profile.azure_openai_api_key || "",
-        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-12-01-preview" },
-        defaultHeaders: { "api-key": profile.azure_openai_api_key }
-      })
-    } else {
-      openai = new OpenAI({
-        apiKey: profile.openai_api_key || "",
-        organization: profile.openai_organization_id
-      })
-    }
-
     if (embeddingsProvider === "openai") {
+      // Prefer per-user profile setting; fallback to env-based embeddings deployment.
+      const embeddingsDeployment =
+        profile.azure_openai_embeddings_id ||
+        getAzureOpenAIEmbeddingsDeployment()
+      if (!embeddingsDeployment) {
+        throw new Error(
+          "Azure embeddings deployment not configured. Set AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT or configure azure_openai_embeddings_id, or use local embeddings."
+        )
+      }
+
+      const openai = getAzureOpenAIEmbeddingsClient()
       const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: chunks.map(chunk => chunk.content)
+        model: embeddingsDeployment,
+        input: chunks.map(chunk => chunk.content),
+        dimensions: 1536
       })
+
+      await recordCompletionUsage(
+        {
+          userId: profile.user_id,
+          feature: "embeddings",
+          model: embeddingsDeployment
+        },
+        response
+      )
 
       embeddings = response.data.map((item: any) => {
         return item.embedding

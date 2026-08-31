@@ -98,7 +98,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         />
       )}
 
-      <div className="space-y-2">
+      <div className="flex w-full flex-col space-y-2">
         <div className="flex w-full items-center justify-center">
           <Button
             className="flex h-[32px] w-[140px] space-x-2"
@@ -167,7 +167,13 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                     <IconLoader2 className="animate-spin" />
                   </div>
 
-                  <div className="truncate text-sm">
+                  {/* `min-w-0 max-w-[180px]` lets the inner `truncate`
+                      actually clip - without min-w-0 the flex child
+                      defaults to its content's intrinsic width and
+                      pushes the file pill past the row boundary,
+                      which is what disturbed the alignment when a
+                      long filename was attached (#29). */}
+                  <div className="min-w-0 max-w-[180px] truncate text-sm">
                     <div className="truncate">{file.name}</div>
                     <div className="truncate opacity-50">{file.type}</div>
                   </div>
@@ -203,7 +209,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                     })()}
                   </div>
 
-                  <div className="truncate text-sm">
+                  <div className="min-w-0 max-w-[180px] truncate text-sm">
                     <div className="truncate">{file.name}</div>
                   </div>
 

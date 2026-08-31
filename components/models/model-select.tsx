@@ -59,10 +59,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       platformLink: "",
       imageInput: false
     })),
-    ...availableHostedModels,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ]
+    ...availableHostedModels
+  ].filter(model => model.provider === "openai")
 
   const groupedModels = allModels.reduce<Record<string, LLM[]>>(
     (groups, model) => {
@@ -97,7 +95,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       >
         {allModels.length === 0 ? (
           <div className="rounded text-sm font-bold">
-            Unlock models by entering API keys in your profile settings.
+            No hosted models available. Ensure Azure OpenAI env vars are set.
           </div>
         ) : (
           <Button
