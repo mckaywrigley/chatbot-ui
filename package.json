@@ -9,7 +9,7 @@
     "prepare": "husky install",
     "clean": "npm run lint:fix && npm run format:write",
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -124,6 +124,7 @@
     "tailwindcss": "^3.3.5",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@cloudflare/next-on-pages": "^1"
   }
 }

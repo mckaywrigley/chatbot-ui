@@ -1,0 +1,38 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main # Trigger deployment on push to main
+
+jobs:
+  publish:
+    runs-on: ${{ github.event.pull_request.head.repo.full_name && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64","proxmox-actions"]') }}
+    permissions:
+      contents: read
+      deployments: write
+    name: Publish to Cloudflare Pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or the version required by chatbot-ui
+
+      - name: Install Dependencies
+        run: npm ci # Use ci for faster, reproducible builds
+
+      - name: Build Application
+        run: npm run build # Assumes build script is adapted for next-on-pages
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3 # Use the official wrangler action
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: chatbot-ui-cf
+          directory: .vercel/output/static # Default output dir for next-on-pages build
+          # Or use wrangler directly:
+          # command: pages deploy .vercel/output/static --project-name=chatbot-ui-cf --branch=${{ github.ref_name }} --commit-dirty=true
